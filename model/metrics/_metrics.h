@@ -1,0 +1,42 @@
+#ifndef _METRICS_H
+#define _METRICS_H
+
+#include <src/common.h>
+
+#define BDRYMETRICS_NORMAL 0
+#define BDRYMETRICS_CENTERED 1
+
+
+double _X(np_t np, long dim1, long dim2);
+
+double _x(np_t np, long dim);
+
+void update_metrics_at_node(np_t *np, gl_t *gl, long l);
+
+void update_metrics_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta);
+
+void find_Omega_and_X_at_node(np_t *np, gl_t *gl, long l, double *Omega, dim2_t X);
+
+void find_metrics_at_node(np_t *np, gl_t *gl, long l,
+                               long theta, metrics_t *metrics);
+
+
+void find_Omega_and_X_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta,
+                          double *Omega, dim2_t X);
+
+void find_metrics_at_interface(np_t *np, gl_t *gl, long lL, long lR,
+                               long theta, metrics_t *metrics);
+
+void find_metrics_at_interface_2(np_t *np, gl_t *gl, long lL, long lR,
+                               long theta, long theta2, metrics_t *metrics);
+
+void update_metrics_at_bdry_node(np_t *np, gl_t *gl, int TYPELEVEL, long l_A, long l_B, long l_C,
+                       int BDRYMETRICS);
+
+void find_metrics_from_base_level(np_t *np, gl_t *gl, long l, metrics_t *metrics);
+
+double _Omega(np_t np, gl_t *gl);
+
+
+		       
+#endif

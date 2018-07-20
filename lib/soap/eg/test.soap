@@ -1,0 +1,16 @@
+#!./soap
+  numflower=3;
+
+
+
+
+  priceperflower=1.50;
+  printf("%s\n",numflower" were bought at $"priceperflower" each.");
+
+  a=sin(numflower);
+  printf("a=%E\n",a);
+  if (priceperflower==1.5,
+    printf("The right price!\n");
+  );
+
+  

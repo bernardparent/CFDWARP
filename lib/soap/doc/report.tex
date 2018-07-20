@@ -1,0 +1,872 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{amsbsy}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\rhos}{\rho}
+\newcommand{\Cv}{{C_{\rm v}}}
+\newcommand{\Cp}{{C_{\rm p}}}
+\newcommand{\nd}{{{n}_{\rm d}}}
+\newcommand{\ns}{{{n}_{\rm s}}}
+\newcommand{\nn}{{{n}_{\rm n}}}
+\newcommand{\ndm}{{\bar{n}_{\rm d}}}
+\newcommand{\nsm}{{\bar{n}_{\rm s}}}
+\newcommand{\turb}{_{\rm T}}
+\newcommand{\mut}{{\mu\turb}}
+\newcommand{\mfa}{\scriptscriptstyle}
+\newcommand{\mfb}{\scriptstyle}
+\newcommand{\mfc}{\textstyle}
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\hlinex}{\vspace{-0.34cm}~~\\ \hline \vspace{-0.31cm}~~\\}
+\newcommand{\hlinextop}{\vspace{-0.46cm}~~\\ \hline \hline \vspace{-0.32cm}~~\\}
+\newcommand{\hlinexbot}{\vspace{-0.37cm}~~\\ \hline \hline \vspace{-0.50cm}~~\\}
+\newcommand{\tablespacing}{\vspace{-0.4cm}}
+\newcommand{\fontxfig}{\footnotesize\scalefont{0.918}}
+\newcommand{\fontgnu}{\footnotesize\scalefont{0.896}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{1.0}}
+\renewcommand{\fontsizefigure}{\footnotesize}
+\renewcommand{\vec}[1]{\pmb{#1}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcounter{tocdepth}{3}
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\author{
+  Bernard Parent
+}
+
+\email{
+  bernparent@gmail.com
+}
+
+\department{
+  Department of Aerospace Engineering	
+}
+
+\institution{
+  Pusan National University
+}
+
+\title{
+  SOAP: an Interpreter Language for Scientific Computing
+}
+
+\date{
+  February 2001 -- Revised in January 2016
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+  \tableofcontents
+%  \makenomenclature
+%%  \listoftables
+%%  \listoffigures
+
+\sloppy
+
+\section{Introduction}
+
+\subsection{What is SOAP?}
+
+SOAP is a computer language of interpreter type, not unlike Perl, Python, or
+Java. SOAP is designed to be used as an interface between a
+C code and a control file in user space.
+
+\subsection{Why SOAP?}
+
+I needed a good user interface for my CFDWARP code. For some, a good
+interface probably refers to point-and-click buttons part of a GUI.
+For me however, a good interface is one which enables as much freedom
+in userland as possible, which generally can only be achieved
+through a programming language.
+
+There is a large number of programming languages that are freely available
+and could have been used in this project, but none proved satisfactory: they were
+too involved and complicated to use. Further, none supported arithmetic the way that
+I wanted it: they all seemed to be designed with the computer scientist
+in mind. I wanted my interface language to be designed
+with the engineer in mind, {\it i.e.} with predictable, user-friendly
+arithmetic.
+
+A second reason to write a specific language for CFDWARP rather than to use an existing one (like python or perl) is for portability reasons. CFDWARP is a CFD code that is to be used not only on desktop computers but also on supercomputers involving tens of thousands of cores. When designing a code that is expected to be run on various platforms, it is better to keep the code as independent of external libraries as possible. Should CFDWARP make use of python or perl, it would need to be linked to python and perl libraries which may or may not be available on the supercomputers. As well, libraries change over time and offer slightly different functionality, also leading to portability issues. By not linking CFDWARP to external libraries these portability issues are avoided and this reduces significantly maintenance of the code.
+
+Besides, writing my own language proved to have a third usefulness: I had never written an interpreter before
+and accomplishing such a task helped me understand better the technicalities 
+involved in language design.
+
+%For those interested, a good place to start searching for computer
+%languages (free or commercial) is as http://sal.kachinatech.com, or at
+%ftp://metalab.unc.edu.
+
+\subsection{Interpreter vs Compiler}
+
+An interpreter such as perl, python, java, bash, or tcsh, is a language that
+reads one ``action'' after the other
+from the ascii file and executes it on the fly. A compiler such as gcc, turbo pascal
+or nagware f90, reads in the
+entire file, optimizes the code in different ways and generates an executable
+file which can be run afterwards by the user. For some popular languages, like
+C, both compilers and interpreters are available.
+
+A compiler generally outperforms
+in speed and performance the interpreter at the expense of one extra
+step: the compilation. On the other hand the interpreter is slower, less
+memory efficient but avoids the somewhat clunky compilation step.
+
+Since execution time of the interface code is expected to be minimal
+compared to the CPU time needed to execute one iteration within CFDWARP, the interpreter
+approach was chosen.
+
+
+\section{Syntax}
+
+The syntax of SOAP is similar in essence to the one of C: each statement
+always ends by a semi-colon, even for loops and if conditions.
+
+\subsection{Variables}
+
+One noteworthy feature of SOAP is its lack of variable declaration: one needs only
+to assign a value to a variable for it to be declared:
+%
+\begin{verbatim}
+   rose=10.1;
+   margarita=1;
+   rose=3;
+\end{verbatim}
+%
+will declare the variable rose and margarita
+and assign to it the corresponding value. Should the variable be already declared,
+it will not be declared again. Hence the above code will declare only two variables:
+rose and margarita, each ending up with the value 3 and 1 respectively.
+
+With such lack of declarations, one might rightfully wonder
+how SOAP distinguishes between integer and real numbers. The answer? It doesn't
+matter. SOAP stores all integers  accurately as
+double-precision variables by getting rid of
+the round-off errors typical of double-precision formats on digital
+computers.
+
+For example the integer 3456 would be stored by SOAP as 3.4560000000E+03. An
+obvious drawback of such an approach is that it limits the integer size
+to 10 digits. But this is not particularly limiting as
+such is as many digits as the maximum number of digits offered by the 
+``long int''  C variables (2147483647).
+
+
+\subsubsection{Strings}
+
+A string variable can be declared in this manner:
+%
+\begin{verbatim}
+  flower1="tulip";
+\end{verbatim}
+%
+The following is an example involving the concatenation of two string variables:
+%
+\begin{verbatim}
+  flower1="tulip";
+  flower2="rose";
+  allflowers=flower1" and "flower2;
+  printf("%s\n",allflowers);
+\end{verbatim}
+%
+which would output to the screen
+%
+\begin{verbatim}
+tulip and rose
+\end{verbatim}
+%
+Non-string variables can be inserted into strings as follows
+%
+\begin{verbatim}
+  numflower=3;
+  priceperflower=1.50;
+  printf("%s\n",numflower" flowers were bought"
+         " at $"priceperflower" each.");
+\end{verbatim}
+%
+which would output to the screen
+%
+\begin{verbatim}
+3 flowers were bought at $1.50000000000E+00 each.
+\end{verbatim}
+%
+
+\subsection{Comments}
+
+Comments are enclosed
+between the ``$\{$'' and ``$\}$'' symbols, not unlike pascal, but with the added
+convenience that a comment can be embedded inside another one:
+%
+\begin{verbatim}
+   {rose=10.1;   {rose is declared}}
+   margarita=1; {margarita is declared}
+   rose=3;
+\end{verbatim}
+%
+would be valid SOAP syntax, with the first comment embedding another. This comes handy 
+when commenting out a section of code which has comments.
+
+
+\subsection{Arithmetic and Logical operators}
+
+In SOAP arithmetic operations, parentheses are supported as well as the expected priorities between operations.
+Table \ref{table:operators} lists the different arithmetic and logical
+operators along with their associated priorities. The different operators have the same
+definition as in C except for the exponent sign $\wedge$ which is
+non-existent in C.
+%
+\begin{table}[ht]
+\fontsizetable
+\vspace{0.3cm}
+\begin{center}
+  \begin{threeparttable}
+    \tablecaption{Valid operators and priorities.}
+    \begin{tabular}{lcccccccccccccc}
+      \toprule
+Operator & $+$ & $-$ & $*$ & $/$ & $\wedge$ & $!$ & $\mid \mid$ & $\&\&$ & $<=$ & $<$ & $>$ & $>=$ & $==$ & $!=$\\
+      \midrule
+Priority & 3   & 3   & 4   & 4   & 5        & 6   & 1           & 1      & 2    & 2   & 2   & 2    & 2    & 2\\
+      \bottomrule
+    \end{tabular}
+    \label{table:operators}
+  \end{threeparttable}
+\end{center}
+\tablespacing
+\end{table}
+%
+The higher the priority number, the earlier the operation is executed. Therefore,
+the negation $!$ will be executed before all other operators followed by the
+exponent $\wedge$, the multiplication and addition, and so on. 
+
+The following expression in SOAP:
+%
+\begin{verbatim}
+   10*4+50-6*5^3/2 > 10
+\end{verbatim}
+%
+would hence be equivalent to:
+%
+\begin{verbatim}
+   ((10*4)+50-6*(5^3)/2) > 10
+\end{verbatim}
+%
+
+
+
+\subsection{Built-in Functions}
+
+Contrarily to C where functions
+can also be used as subroutines, functions in SOAP must always return a value.
+A set of popular engineering functions are built into SOAP. They
+are shown in table \ref{table:functions}.
+%
+\begin{table}[ht]
+\fontsizetable
+\vspace{0.3cm}
+\begin{center}
+  \begin{threeparttable}
+    \tablecaption{SOAP built-in functions.}
+    \begin{tabular}{lll}
+      \toprule
+        Function & Argument               & Return value\\
+      \midrule
+        \verb|rad|   & $\theta$ [degrees] & $\theta$ [radians]\\
+        \verb|deg|   & $\theta$ [radians] & $\theta$ [degrees]\\
+        \verb|sin|   & $\theta$ [radians] & sinus of $\theta$\\
+        \verb|cos|   & $\theta$ [radians] & cosinus of $\theta$\\
+        \verb|tan|   & $\theta$ [radians] & tangent of $\theta$\\
+        \verb|asin|  & $x$                & arcsinus of $x$ [radians]\\
+        \verb|acos|  & $x$                & arccosinus of $x$ [radians]\\
+        \verb|atan|  & $x$                & arctangent of $x$ [radians]\\
+        \verb|sqrt|  & $x$                & $\sqrt{x}$ \\
+        \verb|sqr|   & $x$                & $x^2$\\
+        \verb|exp|   & $x$                & $e^x$ \\
+        \verb|ln|    & $x$                & natural logarithm of $x$ \\
+        \verb|round| & $x$                & closest integer to $x$ \\
+        \verb|floor| & $x$                & integer obtained from truncated real $x$ \\
+        \verb|abs|   & $x$                & absolute value of $x$ \\
+        \verb|min|   & $x_1,...,x_n$      & the minimum of all $x_i$'s \\
+        \verb|max|   & $x_1,...,x_n$      & the maximum of all $x_i$'s \\
+        \verb|random|& $x_1,x_2$          & a random number between $x_1$ and $x_2$ \\
+        \verb|mod|   & $x_1,x_2$          & the modulo of the integer division $x_1/x_2$ \\
+        \verb|krodelta|& $x_1,x_2$            & the kronecker delta of $x_1$ and $x_2$\\
+        \verb|defined|& $x$               & returns true if variable x is defined \\
+      \bottomrule
+    \end{tabular}
+    \label{table:functions}
+  \end{threeparttable}
+\end{center}
+\tablespacing
+\end{table}
+%
+
+Functions can be used in any logical or arithmetic expression,
+and any expression can also contain any number of functions. The
+following is hence valid SOAP code:
+%
+\begin{verbatim}
+  a=sin(rad(10))+cos(0.5);
+  if ( asin(a)>10 ,
+    a=0.0;
+  );
+\end{verbatim}
+%
+
+
+\subsection{Built-in Actions}
+
+In SOAP, an action is the equivalent of a Pascal procedure, a Fortran subroutine
+or a void C function. An action can have none, one or multiple arguments,
+which can be values, expressions or embedded codes.
+
+\subsubsection{\emph{write} and \emph{writeln}}
+
+SOAP supports the \verb|write| and \verb|writeln| actions, used to output
+data to the console. The latter two actions both support an unlimited number
+of arguments, which must all be expressions; contrarily to
+\verb|write|, \verb|writeln| will terminate its output by a carriage return.
+When executed, the following piece of code
+%
+\begin{verbatim}
+  a=10.1;
+  writeln(a/10,100);
+\end{verbatim}
+%
+would output:
+%
+\begin{verbatim}
+  1.01000000000E+00,100
+\end{verbatim}
+%
+
+\subsubsection{\emph{printf}}
+
+The syntax of \verb|printf| in
+SOAP works in exactly the same way as in C, with the first argument a string
+defining the format of the output, and the following arguments variables
+that are referred to in the format string. For example,
+%
+\begin{verbatim}
+  a=10.1;
+  printf("begin\na=%E and sin(a) = %13.2E\nend\n",a,sin(a));
+\end{verbatim}
+%
+would output:
+%
+\begin{verbatim}
+begin
+a=1.010000E+01 and sin(a) =     -6.25E-01
+end
+\end{verbatim}
+%
+The reader is invited to refer to the printf manpage for the full syntax of \verb|printf|.
+
+
+\subsubsection{\emph{fprintf}}
+
+The action \verb|fprintf| does the same thing as the previous action \verb|printf| except
+that an additional argument is given (the first) to indicate the filename to which
+the data should be appended. If the file does not exist, then it is created.
+ For example,
+%
+\begin{verbatim}
+  a=10.1;
+  fprintf("PNU_is_awesome.txt","a=%E\n",a);
+\end{verbatim}
+%
+would append the line
+%
+\begin{verbatim}
+a=1.010000E+01
+\end{verbatim}
+%
+to the file \verb|PNU_is_awesome.txt|.
+
+
+\subsubsection{\emph{for}}
+
+Forming a \verb|for| loop consists of calling the \verb|for|
+action followed by 4 arguments separated by commas: the counter variable, the start of
+the counting, the end of the counting and the loop code. Both
+the start and end of the counting must be integer expressions.
+As an example, the following \verb|for| loop
+%
+\begin{verbatim}
+   a=1;
+   for ( i , 3 , 6 ,
+     a=a*2+i;
+   );
+\end{verbatim}
+%
+would execute the code inside the loop 4 times and the variables
+\verb|i| and \verb|a| would be assigned to:
+%
+\begin{verbatim}
+  i=3    a=1*2+3=5
+  i=4    a=5*2+4=14
+  i=5    a=14*2+5=33
+  i=6    a=33*2+6=72
+\end{verbatim}
+%
+
+\subsubsection{\emph{if}}
+
+The \verb|if| action  calls for
+two arguments: the logical expression and the code to
+be executed should the logical expression be true.
+For example, the following
+%
+\begin{verbatim}
+   a=10;
+   if ( a==10 ,
+     a=20;
+   );
+\end{verbatim}
+%
+would result in a final value for \verb|a| of \verb|20|. For a \verb|if|-\verb|else| construct that would set \verb|a=20| should \verb|a==10| and \verb|a=10| otherwise, the following should be written:
+%
+\begin{verbatim}
+   a=10;
+   if ( a==10 ,
+     a=20;
+   , {else}
+     a=10;
+   );
+\end{verbatim}
+%
+
+
+\subsubsection{\emph{while}}
+
+The SOAP \verb|while| loop works similarly as in other languages
+by first checking the condition and
+either executing the loop code should the condition be true or exiting
+should it be false.
+
+It is written by calling the \verb|while| action followed by
+two arguments separated by a comma: the condition and the loop code:
+%
+\begin{verbatim}
+   k=1;
+   while ( k<4 ,
+     k=k+1;
+   );
+\end{verbatim}
+%
+which would result in a final \verb|k| value of 4.
+
+
+\subsubsection{\emph{exit}}
+
+The \verb|exit| action works the same way as in C, with one integer
+argument. For example:
+%
+\begin{verbatim}
+   exit(1);
+\end{verbatim}
+%
+will cause unsuccessful program termination, returning 1.
+
+
+\subsubsection{\emph{system}}
+
+The \verb|system| action works the same way as in C: the string is sent to
+the shell which executes it and there is no return value. Example:
+%
+\begin{verbatim}
+   system("touch PNU_is_great");
+   system("rm -f PNU_is_great");
+\end{verbatim}
+%
+will create the file \verb|PNU_is_great| in the local directory where CFDWARP is launched from and then delete it such file. 
+
+
+\subsubsection{\emph{include}}
+
+The \verb|include| action includes a file where it is called, as in
+C or Fortran. Only one argument (the filename) can be given. For example,
+%
+\begin{verbatim}
+   a=10;
+   include("PNU_is_great.txt");
+   b=10*a;
+\end{verbatim}
+%
+will include the code in \verb|PNU_is_great.txt|
+between the actions \verb|a=10| and \verb|b=10*a|.
+
+
+\subsection{Built-in Constants}
+
+Table \ref{table:constants} lists all the constants available in SOAP
+along with their corresponding value.
+For user convenience, the boolean expressions are available in
+both lower case and upper case.
+
+\begin{table}[ht]
+\fontsizetable
+\vspace{0.3cm}
+\begin{center}
+  \begin{threeparttable}
+    \tablecaption{SOAP built-in constants.}
+    \begin{tabular}{cc}
+      \toprule
+        Constant & Value \\
+       \midrule
+        \verb|pi| & 3.141592654\\
+        \verb|YES| & 1\\
+        \verb|NO| & 0\\
+        \verb|TRUE| & 1\\
+        \verb|FALSE| & 0\\
+        \verb|EXIT_SUCCESS| &0\\
+        \verb|EXIT_FAILURE| &1   \\
+      \bottomrule
+    \end{tabular}
+    \label{table:constants}
+  \end{threeparttable}
+\end{center}
+\tablespacing
+\end{table}
+%
+
+
+
+
+\subsection{Arrays}
+
+Variables can also be stored in array mode, with the same syntax as in C,
+i.e. enclosing the array dimensioning between square brackets. Any number of
+dimensions is supported, and the array size is unlimited. Arrays
+are not declared: memory is allocated on the fly when values are assigned
+to new elements. For example, the following code:
+%
+\begin{verbatim}
+   rose[0]=10;
+   rose[1]=20;
+   rose[2]=30;
+   tulip=0;
+   for (k,0,2,
+     tulip=tulip+rose[k];
+   );
+\end{verbatim}
+%
+initializes the one dimensional array \verb|rose| and sums up its elements
+in \verb|tulip|. A second example highlights the syntax of a two-dimensional
+array \verb|margarita|:
+%
+\begin{verbatim}
+   for (i,0,10,
+     for (j,0,10,
+       margarita[i][j]=i*j;
+     );
+   );
+   writeln(margarita[5][5]);
+\end{verbatim}
+%
+
+
+
+\section{Embedding SOAP in C}
+
+We have given an overview so far of the syntax of the language,
+but we haven't mentioned anything about how to embed SOAP within C.
+Going through several examples,
+this section will give a detailed explanation on how to do so.
+The reader is further referred to the examples subdirectory accompanying
+the interpreter library for some templates and examples.
+
+
+\subsection{A Minimalistic Example}
+
+The following C code is a good example of a minimalistic setup
+where no function or action is passed from the C program to
+the SOAP interpreter:
+%
+\begin{verbatim}
+01 #include <soap.h>
+02
+03 int main(){
+04   char code[]="
+05                k=0;
+06                while (k<=10,
+07                  writeln(k);
+08                  k=k+1;
+09                );
+10               ";
+11   SOAP_codex_t codex;
+12
+13   SOAP_init_codex(&codex,"?");
+14   SOAP_process_code(code, &codex, SOAP_VARS_KEEP_ALL);
+15   SOAP_free_codex(&codex);
+16
+17   return(0);
+18 }
+\end{verbatim}
+%
+The above will execute the SOAP code stored in the string ``\verb|code[]|''
+and exit. Note that in order to compile it, you must make sure that
+the path of the SOAP library is given to the compiler. If you
+don't know how to do this, have a look at the Makefile to the directory ``examples''.
+
+Line 13 and 15 are used to initialize and free codex, a struct used by
+the C code to specify further functions and actions
+that the C code  supplies to the interpreter. The string \verb|"?"| can be replaced if so desired by 
+the name of a file that will be used to store an error if encountered. If it is
+not desired to supply a filename leave the second argument to \verb|"?"|. The constant \verb|SOAP_VARS_KEEP_ALL|
+can be replaced by \verb|SOAP_VARS_CLEAN_ALL| or \verb|SOAP_VARS_CLEAN_ADDED| to instruct the interpreter to
+clean from memory all variables or the new variables added after it is done interpreting the
+code.
+
+Finally, line 14 processes the \verb|code| string using the SOAP interpreter,
+and we exit from the main on line 17.
+
+
+
+
+\subsection{Passing Preset Variables to SOAP}
+
+The following example, while being similar to the previous one, shows
+one interesting aspect of SOAP embedding: the passing of variables from
+within the C program.
+%
+\begin{verbatim}
+01 #include <soap.h>
+02
+03 int main(){
+04   char code[]="
+05                k=tulip;
+06                while (k<=10,
+07                  writeln(k*rose);
+08                  k=k+1;
+09                );
+10               ";
+11   SOAP_codex_t codex;
+12
+13   SOAP_init_codex(&codex,"?");
+14   SOAP_add_to_vars(&codex,"rose","10.4");
+15   SOAP_add_to_vars(&codex,"tulip","5");
+16   SOAP_process_code(code, &codex, SOAP_VARS_KEEP_ALL);
+17   SOAP_free_codex(&codex);
+18
+19   return(0);
+20 }
+\end{verbatim}
+%
+In this case, the variables \verb|rose| and
+\verb|tulip| are passed to the SOAP code on lines 14-15 with the values 10.4 and 5
+respectively. It is noted however that only values and not addresses
+(i.e. pointers) can be passed.
+
+
+
+
+
+\subsection{How to Create C-managed Functions}
+
+In a first step, a code example is shown in which the function
+\verb|pow| is added to the list of SOAP functions; \verb|pow| is unnecessary
+in SOAP as the exponent operator is builtin, but serves as a good embedding case.
+%
+\begin{verbatim}
+01 #include <soap.h>
+02
+03 void C_functions(char *functionname, char **argum,
+04                  char **returnstr, codex_t *codex){
+05   double base,expon;
+06
+07   if (strcmp(functionname,"pow")==0) {
+08     SOAP_sub_all_argums(argum,codex);
+09     sscanf(*argum,"%lg,%lg",&base,&expon);
+10     *returnstr=(char *)realloc(*returnstr,30*sizeof(char));
+11     sprintf(*returnstr,"%E",pow(base,expon));
+12   }
+13
+14 }
+15
+16 int main(){
+17   char code[]="
+18                k=0;
+19                while (k<=10,
+20                  writeln(k,pow(k,2),k^2);
+21                  k=k+1;
+22                );
+23               ";
+24   SOAP_codex_t codex;
+25
+26   SOAP_init_codex(&codex,"?");
+27   codex.FUNCTION=TRUE;
+28   codex.function=&C_functions;
+29   SOAP_process_code(code, &codex, SOAP_VARS_KEEP_ALL);
+30   SOAP_free_codex(&codex);
+31
+32   return(0);
+33 }
+\end{verbatim}
+%
+Pay attention to lines 27-28 where the FUNCTION flag is activated and the pointer
+of the C function ``\verb|C_functions|'' is given to codex. The \verb|pow|
+function is defined in C on lines 07-12 and is called in SOAP on line
+20.
+
+A second example illustrates how to share arguments between the C function
+\verb|C_functions| and the C code that called the interpreter, through
+\verb|function_args|. Notice how the address of the array \verb|x| is passed
+to \verb|function_args| on line 36, to be requested by \verb|C_functions| on
+lines 16-17. Line 26 shows how the values of the array \verb|x| can be accessed
+through the use of a function.
+%
+\begin{verbatim}
+01 #include <soap.h>
+02
+03 typedef struct function_args {
+04   double *x;
+05 } function_args_t;
+06
+07
+08 void C_functions(char *functionname, char **argum,
+09                  char **returnstr, codex_t *codex){
+10   long cnt;
+11
+12   if (strcmp(functionname,"x")==0) {
+13     SOAP_sub_all_argums(argum,codex);
+14     sscanf(*argum,"%ld",&cnt);
+15     *returnstr=(char *)realloc(*returnstr,30*sizeof(char));
+16     sprintf(*returnstr,"%E",((function_args_t *)
+17                             codex->function_args)->x[cnt]);
+18   }
+19
+20 }
+21
+22 int main(){
+23   char code[]="
+24                sum=0;
+25                for (cnt,0,30,
+26                 sum=sum+x(cnt);
+27                );
+28                writeln(sum);
+29               ";
+30   codex_t codex;
+31   long cnt;
+32   function_args_t function_args;
+33   double x[31];
+34
+35   for (cnt=0; cnt<=30; cnt++) x[cnt]=(double)cnt;
+36   function_args.x=x;
+37
+38   SOAP_init_codex(&codex,"?");
+39   codex.FUNCTION=TRUE;
+40   codex.function=&C_functions;
+41   codex.function_args=(void *)&function_args;
+42   SOAP_process_code(code, &codex, SOAP_VARS_KEEP_ALL);
+43   SOAP_free_codex(&codex);
+44
+45   return(0);
+46 }
+\end{verbatim}
+%
+
+
+
+
+\subsection{How to Create C-managed Actions}
+
+Creating C-managed actions is similar to creating C-managed functions
+with the main difference being the lack of a return value, \verb|returnstr|.
+An example:
+%
+\begin{verbatim}
+01 #include <soap.h>
+02
+03 typedef struct action_args {
+04   double x;
+05 } action_args_t;
+06
+07 void C_actions(char *actionname, char **argum, codex_t *codex){
+08   if (strcmp(actionname,"assign_to_x")==0) {
+09     SOAP_sub_all_argums(argum,codex);
+10     sscanf(*argum,"%lg",&(((action_args_t *)codex->action_args)->x));
+11     codex->ACTIONPROCESSED=TRUE;
+12   }
+13 }
+14
+15 int main(){
+16   char code[]="
+17                assign_to_x(10.0e0);
+18               ";
+19   codex_t codex;
+20   action_args_t action_args;
+21
+22   SOAP_init_codex(&codex,"?");
+23   codex.ACTION=TRUE;
+24   codex.action=&C_actions;
+25   codex.action_args=(void *)&action_args;
+26   SOAP_process_code(code, &codex, SOAP_VARS_KEEP_ALL);
+27   SOAP_free_codex(&codex);
+28
+29   printf("x=%E\n",action_args.x);
+30   return(0);
+31 }
+\end{verbatim}
+%
+The latter code defined an action \verb|assign_to_x| which can be
+called anywhere within SOAP, with the obvious effect of assigning its argument
+to the C variable \verb|x|. Hence, within SOAP (line 17) \verb|x| is assigned 10.0e0,
+and within C (line 29) the value of \verb|x| is outputted to the screen.
+
+
+
+
+  \bibliographystyle{warpdoc}
+  \bibliography{all}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

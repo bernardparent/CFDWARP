@@ -1,0 +1,136 @@
+The NASA thermo data file format was documented in:
+
+Sanford Gordon and Bonnie J. McBride, "Computer Program for Calculation of
+Complex Chemical Equilibrium Compositions and Applications: I. Analysis",
+NASA Reference Publication 1311, October 1994.
+
+Bonnie J. McBride and Sanford Gordon, "Computer Program for Calculation of
+Complex Chemical Equilibrium Compositions and Applications: II. Users Manual
+and Program Description", NASA Reference Publication 1311, June 1996.
+
+The equations below for nondimensional specific heat, enthalpy, and
+entropy, are given in Sanford and Bonnie (1994).  Eqs. 4.6-4.8 are the
+"old" NASA format, and Eqs. 4.9-4.11 are the "new" NASA format as discussed
+in this file.
+
+Eq. 4.6: Cp0/R = a1 + a2*T + a3*T^2 + a4*T^3 + a5*T^4
+Eq. 4.7: H0/RT = a1 + a2/2*T + a3/3*T^2 + a4/4*T^3 + a5/5*T^4 + a6/T
+Eq. 4.8: S0/R = a1*ln(T) + a2*T + a3/2*T^2 + a4/3*T^3 + a5/4*T^4 + a7
+
+Eq. 4.9: Cp0/R = a1*T^-2 + a2*T^-1 + a3 + a4*T + a5*T^2 + a6*T^3 + a7*T^4
+Eq. 4.10: H0/RT = -a1*T^-2 + a2*T^-1*ln(T) + a3 + a4*T/2 + a5*T^2/3 +
+                      a6*T^3/4 + a7*T^4/5 + b1/T
+Eq. 4.11: S0/R = -a1*T^-2/2 - a2*T^-1 + a3*ln(T) + a4*T + a5*T^2/2 +
+                    a6*T^3/6 + a7*T^4/4 + b2
+
+The following information is quoted directly from McBride and Gordon (1996):
+
+"Appendix A: Format for Thermodynamic Data
+
+The library of thermodynamic data contains data for both reaction products
+and reactants.  All reaction products and some reactants are in the
+nine-constant functional form discussed in section 4.2 of Gordon and
+McBride (1994).  The format for these data is given here.  Thermodynamic
+data are provided with the program on a separate file, thermo.inp.
+Sections 2.8 and 5.24 discuss the processing of the thermo.inp data and
+the storing of the processed data in thermo.lib for subsequent use in the
+CEA program.  Names of species contained in thermo.inp are listed in
+Appendix B.
+
+The general format is given in table A1.  This format is applicable for
+all gaseous species and for those condensed species whose data extend over
+a temperature range.  For those condensed species with data given at only
+one temperature, the format is somewhat different.  On record 2, instead
+of the last number being a heat of formation, it is an assigned enthalpy.
+(Note that if the temperature is 298.15 K, the heat of formation and the
+assigned enthalpy are equivalent.)  The first number in record 2 (number
+of temperature intervals) is always zero.  On record 3, only one number is
+given, the temperature of the assigned enthalpy on record 2.  Two examples are
+given.  Example A1, for chlorine gas, illustrates the general format.
+Example A2, for liquid acetylene, illustrates the format for a condensed
+species with data given at only one temperature.  The general equations
+for dimensionless heat capacity, enthalpy, and entropy (eqs. (4.6) to (4.8)
+<sic> from Gordon and McBride, 1994) are repeated for convenience.
+
+Record           Constants                            Format       Column
+1      Species name or formula                          A24         1 to 24
+       Comments (data source)                           A56         25-80
+2      Number of T intervals                            I2          2
+       Optional identification code                     A6          4-9
+       Chemical formulas, symbols, and numbers          5(A2,F6.2)  11-50
+       Zero for gas and nonzero for condensed phases    I1          52
+       Molecular weight                                 F13.5       53-65
+       Heat of formation at 298.15 K, J/mol             F13.5       66-80
+3      Temperature range                                2F10.3      2-21
+       Number of coefficients for Cp0/R                 I1          23
+       T exponents in empirical equation for Cp0/R      8F5.1       24-63
+       {H0(298.15)-H0(0)}, J/mol                        F15.3       66-80
+4      First five coefficients for Cp0/R                5D16.8      1-80
+5      Last two coefficients for Cp0/R                  3D16.8      1-48
+       Integration constants b1 and b2                  2D16.8      49-80
+...    Repeat 3, 4, and 5 for each interval
+
+Example A.1:
+
+CL2           Chlorine gas. TPIS 1989, v1, pt2, p88.
+ 2 tpis89 CL  2.00    0.00    0.00    0.00    0.00 0     70.90540          0.000
+    200.000  1000.000 7 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0         9181.110
+  3.46281724D+04 -5.54712949D+02  6.20759103D+00 -2.98963673D-03  3.17303416D-06
+ -1.79363467D-09  4.26005863D-13  0.00000000D+00  1.53407075D+03 -9.43835303D+00
+   1000.000  6000.000 7 -2.0 -1.0  0.0  1.0  2.0  3.0  4.0  0.0         9181.110
+  6.09256675D+06 -1.94962688D+04  2.85453491D+01 -1.44996828D-02  4.46388943D-06
+ -6.35852403D-10  3.32735931D-14  0.00000000D+00  1.21211722D+05 -1.69077832D+02
+
+Empirical equations for example A.1:
+
+Heat capacity: Cp0/R = a1*T^-2 + a2*T^-1 + a3 + a4*T + a5*T^2 + a6*T^3 + a7*T^4
+Enthalpy: H0(T)/(RT) = -a1*T^-2 + a2*T^-1*ln(T) + a3 + a4*T/2 + a5*T^2/3 +
+    a6*T^3/4 + a7*T^4/5 + b1/T
+Entropy: S0(T)/R = -a1*T^-2/2 - a2*T^-1 + a3*ln(T) + a4*T + a5*T^2/2 +
+    at*T^3/3 + a7*T^4/4 + b2
+
+Example A.2:
+
+C2H2(L),acetyle  Acetylene. JANAF Prop.Ser.E,1/67. TRC a-3000,10/86.
+ 0 1 3/95 C   2.00H  2.00    0.00    0.00    0.00 1     26.03788      207599.000
+    192.35"
+
+Notes:
+1. Besides a very different file layout, the most significant change between
+ the older (1971) NASA thermo data and the 1996 data is the generalization
+ to any number of temperature intervals.
+2. The preceding discussion only mentions the format of individual species
+ data blocks.  In addition, the thermo input file included with the NASA
+ CEA program contains:
+ a. Comments at the top of the file marked by exclamation (!) points in the
+    first column
+ b. Two lines at the beginning of the species data:
+    i. One line containing only "thermo"
+    ii. One line with 4 temperatures and a date
+ c. A line containing only "END PRODUCTS" separating product species from
+    reactants, and a line at the end of the file containing only
+    "END REACTANTS".
+3. There are some differences between the format actually used by CEA and
+ the format described in McBride and Gordon (1996), and some undocumented
+ features:
+ a. In the CEA code, the actual read and format statements differ from the
+    documentation by:
+    i. The species name on the first line of a block is 15 characters long,
+       not 24.  The rest of the line is comments.
+    ii. The heat of formation at the end of line 2 is read with f15.3, not f13.5
+    iii. The temperature range at the beginning of line 3 is read as 2F11.3,
+         not 2F10.3.
+    iv. Line 5 is formatted as 2D16.8,16x,2D16.8 rather than
+        3D16.8,2D16.8.  The 16x acknowledges that the third field is
+        not actually used.  The first two fields are the 6th and 7th
+        polynomial coefficients, and the last two fields are the 8th and
+        9th (integration constants).
+ b. Although the number of polynomial coefficients is included in the data,
+    this number is almost always 7 (plus 2 integration constants).  In the
+    current NASA database, there are only 3 species that use less than
+    7 coefficients (P4O10(cr), P4O10(cr), and P4O10(L)).  Apparently if
+    less than 7 are used, they are the lowest numbered (a1, a2, a3, ...).
+4. In the preceding excerpt from McBride and Gordon (1996), reference is
+  made to eqs. (4.6) to (4.8).  These should be eqs. (4.9) to (4.11).
+
+[Corrected by DL and JES April 29, 2005]

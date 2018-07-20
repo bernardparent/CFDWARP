@@ -1,0 +1,46 @@
+This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: Rocketrep.aux
+The style file: warpdoc.bst
+Database file #1: rocketrefs.bib
+You've used 17 entries,
+            2310 wiz_defined-function locations,
+            691 strings with 6959 characters,
+and the built_in function-call counts, 3354 in all, are:
+= -- 255
+> -- 99
+< -- 13
++ -- 41
+- -- 24
+* -- 295
+:= -- 474
+add.period$ -- 26
+call.type$ -- 17
+change.case$ -- 8
+chr.to.int$ -- 6
+cite$ -- 17
+duplicate$ -- 196
+empty$ -- 385
+format.name$ -- 24
+if$ -- 765
+int.to.chr$ -- 0
+int.to.str$ -- 17
+missing$ -- 13
+newline$ -- 55
+num.names$ -- 19
+pop$ -- 52
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 83
+stack$ -- 0
+substring$ -- 167
+swap$ -- 79
+text.length$ -- 11
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 28
+width$ -- 19
+write$ -- 165

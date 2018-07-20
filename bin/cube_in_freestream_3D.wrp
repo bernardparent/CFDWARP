@@ -1,0 +1,339 @@
+{
+  _______________________________________________________________________________________________
+
+                                           C F D W A R P
+
+                               A CFD Code for Plasma & Reactive Flow
+  _______________________________________________________________________________________________
+
+  Version                          18feb26a
+  Compiler                         gcc 5.4.0 20160609 with OPENMP threads with distributed
+                                   memory MPI with assertions
+  Compiled on                      Feb 26 2018 at 20:10:07
+  Cycle Strategy                   Predictor-Corrector
+  Fluid Relaxation                 None
+  EM Field Relaxation              None
+  Convection Discretization        MUSCL FVS/FDS [1,3] and primitive interpolation TVD [2], WENO
+                                   [4], CWENO [6], AOWENO [5]
+  Temporal Discretization          Total Variation Diminishing Runge Kutta [7]
+  Fluid Model                      Navier-Stokes Perfect Gas
+  Thermodynamic Model              Perfect Gas
+  Chemical Model                   Air 1 species 0 reaction
+  EM Field Model                   None
+  Beam Model                       None
+  Number of Dimensions             3
+  Number of Flux Components        5
+  _______________________________________________________________________________________________
+
+  [1]  JL Steger and RF Warming. "Flux Vector Splitting of the Inviscid Gasdynamic Equations
+       with Application to Finite-Difference Methods", Journal of Computational Physics
+       40:263-293, 1981.
+  [2]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume Flux Vector
+       Splittings for the Euler Equations", AIAA Journal 24:1453-1460, 1986.
+  [3]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes", Journal
+       of Computational Physics 43:357-372, 1981.
+  [4]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes", Journal of
+       Computational Physics 126:202-228, 1996.
+  [5]  DS Balsara, S Garain, and CW Shu. "An Efficient Class of WENO schemes with Adaptive
+       Order", Journal of Computational Physics 326:780-804, 2016.
+  [6]  M Dumbser and M Kaser. "Arbitrary High Order Non-oscillatory Finite Volume Schemes on
+       Unstructured Meshes for Linear Hyperbolic Systems", Journal of Computational Physics,
+       221:693-723, 2007.
+  [7]  S Gottlieb and CW Shu. "Total Variation Diminishing Runge Kutta Schemes", Mathematics of
+       Computation, 67:73-85, 1998.
+
+  CFDWARP is a Copyright (c) 1998-2018 of Bernard Parent. Copying and distribution of CFDWARP is
+  prohibited.
+
+}
+
+SPLINE_SURFACES=TRUE;
+
+ M=0.7;
+P=10000; {Pa}
+T=300; {K}
+gamma=1.4;
+R=286.0;        {J/kgK }
+
+mf=1.0;
+tf=1.0*(max(M,1)*2);
+L1=1.0;
+L2=0.1;
+
+is1=1;  
+is2=round(is1+20*mf);
+is3=round(is2+11*mf);
+is4=round(is3+20*mf);
+js1=1;  
+js2=round(js1+20*mf);
+js3=round(js2+11*mf);
+js4=round(js3+20*mf);
+is=is1;
+ie=is4;
+js=js1;
+je=js4;
+
+ks1=1;
+ks2=round(mf*10);
+ks3=round(mf*20);
+ks4=round(mf*30);
+
+ks=ks1;
+ke=ks4;
+
+xs1=-L1;
+xs2=-L2;
+xs3=L2;
+xs4=L1;
+ys1=-L1;
+ys2=-L2;
+ys3=L2;
+ys4=L1;
+zs1=-L1;
+zs2=-L2;
+zs3=L2;
+zs4=L1;
+
+Grid(
+  Size(is,js,ks, ie,je,ke);
+  Corners(is2,js2,ks1, is3,js3,ks1, xs2,ys2,zs1, xs3,ys3,zs1);
+  JoinCorners(is2,js2,ks1, is3,js3,ks1,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0, NO,0.5e0,1.0e0,1.0e0);
+
+  Corners(is2,js1,ks1, is3,js4,ks1, xs2,ys1,zs1, xs3,ys4,zs1);
+  JoinCorners(is2,js1,ks1, is3,js2,ks1,  EE,0.5e0,1.0e0,1.0e0,  EG,0.2e0,1.0e0,1.0e0, NO,0.5e0,1.0e0,1.0e0);
+  JoinCorners(is2,js3,ks1, is3,js4,ks1,  EE,0.5e0,1.0e0,1.0e0,  GE,0.8e0,1.0e0,1.0e0, NO,0.5e0,1.0e0,1.0e0);
+
+  Copy(is2,js1,ks1, is2,js4,ks1,  is1,js1,ks1);
+  Scale(is1,js1,ks1, is1,js4,ks1, 0,0,0,1.0,0.8,1.0);
+  Translate(is1,js1,ks1, is1,js4,ks1, xs1-xs2,0,0);
+  Join(is1,js1,ks1, is2,js4,ks1, i,EG,0.2,1.0,1.0);
+
+  Copy(is3,js1,ks1, is3,js4,ks1,  is4,js1,ks1);
+  Scale(is4,js1,ks1, is4,js4,ks1, 0,0,0,1.0,0.8,1.0);
+  Translate(is4,js1,ks1, is4,js4,ks1, xs4-xs3,0,0);
+  Join(is3,js1,ks1, is4,js4,ks1, i,GE,0.8,1.0,1.0);
+
+  {copy back face to front face}
+  Copy(is,js,ks1, ie,je,ks1, is,js,ks2);
+  Translate(is,js,ks2, ie,je,ks2, 0,0,L1-L2);
+  Copy(is,js,ks1, ie,je,ks1, is,js,ks3);
+  Translate(is,js,ks3, ie,je,ks3, 0,0,L1+L2);
+  Copy(is,js,ks1, ie,je,ks1, is,js,ks4);
+  Translate(is,js,ks4, ie,je,ks4, 0,0,2*L1);
+  
+  if (SPLINE_SURFACES,
+    Spline(is,js,ks4, ie,je,ks4, z(x), -L1*1.0001,L1, -0.1*L1,L1*1.2, 0.1*L1,L1*1.2, L1*1.001,L1); 
+    Spline(is,js,ks1, ie,je,ks1, z(x), -L1*1.0001,-L1, -0.1*L1,-L1*1.2, 0.1*L1,-L1*1.2, L1*1.001,-L1); 
+  );
+
+  Join(is,js,ks2,ie,je,ks3, k, EE,0.5,1,1);
+  Join(is,js,ks1,ie,je,ks2, k, EG,0.2,1,1);
+  Join(is,js,ks3,ie,je,ks4, k, GE,0.8,1,1);
+);
+
+
+
+Bdry(
+  NavierStokesPerfect(
+    {
+    _________________________________________________________________________________________
+
+    Boundary Condition Type    ID    Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC      0     Inflow, supersonic
+    BDRY_OUTFLOWSUPERSONIC1    1     Outflow, supersonic, 1o
+    BDRY_SYMMETRICAL1          2     Symmetrical, 1o (can be used as a "slip wall")
+    BDRY_SYMMETRICAL2          3     Symmetrical, 2o (can be used as a "slip wall")
+    BDRY_SYMMETRICAL3          8     Symmetrical, 3o (can be used as a "slip wall")
+    BDRY_WALLTFIXED11           4     Wall, T specified, 1o
+    BDRY_WALLTFIXED12           a     Wall, T specified, 2o
+    BDRY_WALLADIABATIC1        5     Wall, adiabatic, 1o
+    BDRY_WALLADIABATIC2        b     Wall, adiabatic, 2o
+    BDRY_INFLOWSUBSONIC1       6     Subsonic Inflow 1o (Constant Tstag, Pstag at inflow)
+    BDRY_OUTFLOWSUBSONIC1      7     Subsonic Outflow 1o (Constant P at outflow)
+    BDRY_FREESTREAM1           9     Freestream, 1o, params Vx,Vy,Vz, P, T
+    _________________________________________________________________________________________
+    }
+    Cut(is2,js2,ks2,is3,js3,ks3);
+    All(BDRY_WALLADIABATIC2);
+    Faces(BDRY_FREESTREAM1,BDRY_FREESTREAM1,  BDRY_FREESTREAM1,BDRY_FREESTREAM1, BDRY_FREESTREAM1,BDRY_FREESTREAM1);
+    Vx=M*sqrt(gamma*R*T);  Vy=0.0;  Vz=0.0;  rho=P/R/T;
+    Param(is,js,ks,  ie,je,ke,  BDRY_FREESTREAM1, Vx,Vy,Vz,P,T);
+
+    {
+    Cut(is,js,ks,  ie,je,ke);
+    Region(is,js,ks,  ie,je,ke,  BDRY_INFLOWSUPERSONIC);
+    Link(i1,j1,k1,  i2,j2,k2);
+    Vx=300;{m/s}  Vy=0;{m/s}  Vz=0;{m/s}  P=100000;{Pa}  T=300;{K}
+    Param(is,js,ks,  ie,je,ke,  BDRY_FREESTREAM1, Vx,Vy,Vz,P,T);
+    }
+  );
+);
+ 
+ 
+Model(
+  NavierStokesPerfect(
+    gamma=1.4;
+    R=286.0;        {J/kgK }
+    eta=2e-5;       {kg/ms}
+    kappa=0.03;     {W/mK}
+    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
+    Tmin=1.0e1;     Tmax=6.0e3;    {K}
+    SetBodyForce(is,js,ks, ie,je,ke, 0.0{N/m3},0.0{N/m3},0.0{N/m3});
+    SetHeatDeposited(is,js,ks, ie,je,ke, 0.0 {W/m3});
+    {
+    AddHeatPoint(0.0{x,m},0.0{y,m},0.0{z,m}, 0.1{radius,m}, 0.0{W});
+    }
+  );
+);
+
+
+Init(
+  NavierStokesPerfect(
+    {
+    _______________________________________________________________________________________
+
+    Initial Condition Type       Parameters
+    _______________________________________________________________________________________
+
+    INIT_TYPE1                   V[1]..V[nd],  P,  T     
+    INIT_TYPE2                   M[1]..M[nd],  P,  T     
+    INIT_TYPE3                   V[1]..V[nd],  P,  rho   
+    _______________________________________________________________________________________
+    }
+    Mx=M;
+    My=0;
+    Mz=0;
+    All(INIT_TYPE2,Mx,My,Mz,P,T);
+    {
+    Bdry(BDRY_WALLTFIXED1, INIT_TYPE2, Mx,My,Mz,P,T);
+    Region(is,js,ks,  ie,je,ke,  INIT_TYPE2, Mx,My,Mz,P,T);
+    }
+  );
+);
+
+
+Disc(
+  NavierStokesPerfect(
+    zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.95;
+    INTERPOL=INTERPOL_AOWENO5;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+  );
+  MUSCLplus(
+    FLUX=FLUX_FDSplus;
+    numiter=2;
+    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.95;
+    INTERPOL=INTERPOL_AOWENO5;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+  );
+  TVDRK(
+    METHOD=METHOD_TVDRK2;
+  );
+);
+
+
+Cycle(
+  NavierStokesPerfect(
+    xiverge=1e-3;          {residual convergence threshold}
+    rhoref=1.0;            {reference density in kg/m3}
+    aref=300.0;            {reference sound speed in m/s}
+    Uref[0]=rhoref;            
+    Uref[1]=rhoref*aref;       
+    Uref[2]=rhoref*aref;   
+    Uref[3]=rhoref*aref;   
+    Uref[4]=rhoref*aref*aref;  
+  );
+  PredictorCorrector(
+    tmax=90e-3;    {simulation time span in seconds}
+    dt=45e-3/(1200*mf*tf);   {physical time step in seconds}
+    if (time>tmax-0.1*dt,
+      WriteDataFile(outputfilename"."round(time/dt));
+      exit(EXIT_SUCCESS);
+    );
+    if (mod(iter,50)==1,
+      WriteDataFile(outputfilename"."round(time/dt));
+    );
+    UpdateFluid(dt);
+    printf("%E %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
+           time,iter,effiter_U,ximax,i_ximax,
+           j_ximax,clipinfo);
+  );
+  SteadyState(
+    if (mod(iter,50)==0,
+      WriteDataFile(outputfilename);
+    );
+    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
+    if (iter==1,
+      CFL=0.5;
+    );
+    CFL=min(CFL*1.05,1.5);
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,k_ximax,clipinfo);
+  );
+);
+
+
+Post(
+  xstation[1]=0.1; {m}
+  xstation[2]=0.2; {m}
+  xstation[3]=0.3; {m}
+  numsteps=300;
+  qmin=1.0; {m/s, as small a value as possible}
+  Pback_min=400; {Pa}
+  Pback_max=40000; {Pa}
+  Aback=1.0; {m2}
+  for (cnt,1,3,
+    SetXstation(xstation[cnt]);
+    Pback=_Pback_xstation(Aback, Pback_min, Pback_max, numsteps, qmin);
+    Fpot=_Fpot_xstation(Pback, numsteps, qmin);
+    mdot=_mdot_xstation();
+    Tstag=_Tstag_xstation();
+    Pstag=_Pstag_xstation(numsteps);
+    Pstar=_Pstar_xstation();
+    T=_T_xstation();
+    q=_q_xstation();
+    rho=_rho_xstation();
+    htstar=_htstar_xstation();
+    printf("x      = %E m\n"
+           "Pback  = %E Pa\n"
+           "Fpot   = %E Ns/kg\n"
+           "mdot   = %E kg/s\n"
+           "htstar = %E J/kg\n"
+           "Tstag  = %E K\n"
+           "Pstag  = %E Pa\n"
+           "Pstar  = %E Pa\n"
+           "T      = %E K\n"
+           "q      = %E m/s\n"
+           "rho    = %E kg/m3\n\n"
+           ,xstation[cnt],Pback,Fpot,mdot,htstar,Tstag,Pstag,Pstar,T,q,rho);
+  );
+  printf("\n");
+  for (dim,1,3,
+    Area[dim]=_Area(is,js,ks, ie,je,ke, dim,BDRY_WALLTFIXED1);
+    Fshear[dim]=_Fshear(is,js,ks, ie,je,ke, dim,BDRY_WALLTFIXED1);
+    Fpressure[dim]=_Fpressure(is,js,ks, ie,je,ke, dim,BDRY_WALLTFIXED1);
+  );
+  printf("Fshear    = (%+E,%+E,%+E) N\n",Fshear[1],Fshear[2],Fshear[3]);
+  printf("Fpressure = (%+E,%+E,%+E) N\n",Fpressure[1],Fpressure[2],Fpressure[3]);
+  printf("Qheat     = %+E W\n",_Qheat(is,js,ks, ie,je,ke, BDRY_WALLTFIXED1));
+  printf("metotal   = %+E J\n",_metotal(is,js,ks, ie,je,ke));
+  printf("m         = %+E J\n",_m(is,js,ks, ie,je,ke));
+  printf("\n");
+  {
+  POSTGRIDONLY=FALSE;
+  WritePostFile(is,js,ks, ie,je,ke, "post.01", "tecplot", POSTGRIDONLY);
+  }
+);

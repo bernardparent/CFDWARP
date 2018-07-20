@@ -1,0 +1,216 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{amsmath}
+\usepackage{bm}
+
+
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\nd}{{n_{\rm d}}}
+\newcommand{\M}{{\bf M}}
+\newcommand{\N}{{\bf N}}
+\newcommand{\B}{{\bf B}}
+\newcommand{\BI}{\wbar{{\bf B}}}
+\newcommand{\A}{{\bf A}}
+\newcommand{\C}{{\bf C}}
+\newcommand{\T}{{\bf T}}
+\newcommand{\Dstar}{D^{\!\star}}
+\newcommand{\Fstar}{F^{\!\star}}
+\newcommand{\Ustar}{U^{\!\star}}
+\newcommand{\Sstar}{S^{\!\star}}
+\newcommand{\Kstar}{K^{\!\star}}
+\newcommand{\Ystar}{Y^{\!\star}}
+\newcommand{\co}{,~~}
+\newcommand{\band}{{\rm Band}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{1.0}}
+\renewcommand{\fontsizefigure}{\footnotesize}
+\renewcommand{\vec}[1]{\bm{#1}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcounter{tocdepth}{3}
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\author{
+  Bernard Parent
+}
+
+\email{
+  bernparent@gmail.com
+}
+
+\department{
+  Dept. of Aerospace Engineering	
+}
+
+\institution{
+  Pusan National University
+}
+
+\title{
+  Successive Over Relaxation
+}
+
+\date{
+  April 2018
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+%  \tableofcontents
+%  \makenomenclature
+%%  \listoftables
+%%  \listoffigures
+\sloppy
+
+\section{Description of the Method}
+
+The Successive Over Relaxation (SOR) method was first outlined in Frankel \cite{moc:1950:frankel} and Young \cite{thesis:1950:young}. It can be summarized as follows.
+Say that we want to solve for the system of equations
+%
+\begin{equation}
+A X = B
+\end{equation}
+%
+with $A$ a $n\times n$ square matrix, and $X$ and $B$ some vectors with $n$ rows each. We can split $A$ as a sum of a lower-diagonal, a diagonal, and an upper-diagonal matrix as follows:
+%
+\begin{equation}
+A=L+D+U
+\end{equation}
+% 
+Then:
+%
+\begin{equation}
+(L+D+U) X = B
+\end{equation}
+%
+Multiply all terms by the relaxation factor $\alpha$:
+%
+\begin{equation}
+(\alpha L+\alpha D+ \alpha U) X = \alpha B
+\end{equation}
+%
+Add $(1-\alpha)DX$ on both sides:
+%
+\begin{equation}
+(\alpha L+ D+ \alpha U) X = \alpha B + (1-\alpha)DX
+\end{equation}
+%
+Substract $\alpha U X$ from both sides:
+%
+\begin{equation}
+(\alpha L+ D) X = \alpha B + (1-\alpha)DX- \alpha UX
+\end{equation}
+%
+Regroup:
+%
+\begin{equation}
+(\alpha L+ D) X = \alpha B + \left((1-\alpha)D - \alpha U \right)X
+\end{equation}
+%
+Let's evaluate $X$ on the LHS at the iteration count $m+1$ and $X$ on the RHS at the iteration count $m$:
+%
+\begin{equation}
+(\alpha L+ D) X^{m+1} = \alpha B + \left((1-\alpha)D - \alpha U \right)X^m
+\end{equation}
+%
+In the latter, the relaxation factor $\alpha$ must be set to a value greater than 1 and less than 2.
+We can express the latter in tensor form:
+%
+\begin{equation}
+\sum_{k} (\alpha L_{rk} + D_{rk}) X_k^{m+1} = \alpha B_r + \sum_k\left((1-\alpha)D_{rk} - \alpha U_{rk} \right)X_k^m
+\end{equation}
+%
+But $D$ is zero except when $r=k$. Thus:
+%
+\begin{equation}
+D_{rr} X_r^{m+1} + \sum_{k} \alpha L_{rk}  X_k^{m+1} = \alpha B_r + (1-\alpha)D_{rr}X_r^m - \sum_k \alpha U_{rk} X_k^m 
+\end{equation}
+%
+But $L$ is zero wherever $k$ is higher or equal to $r$, and $U$ is zero wherever $k$ is less or equal to $r$:
+%
+\begin{equation}
+D_{rr} X_r^{m+1} + \sum_{k=1}^{r-1} \alpha L_{rk}  X_k^{m+1} = \alpha B_r + (1-\alpha)D_{rr}X_r^m - \sum_{k=r+1}^{n} \alpha U_{rk} X_k^m 
+\end{equation}
+%
+When $k<r$, $L=A$. Also, when $k>r$, $U=A$. Also, when $k=r$, $D=A$. Thus:
+%
+\begin{equation}
+A_{rr} X_r^{m+1} + \sum_{k=1}^{r-1} \alpha A_{rk}  X_k^{m+1} = \alpha B_r + (1-\alpha)A_{rr}X_r^m - \sum_{k=r+1}^{n} \alpha A_{rk} X_k^m 
+\end{equation}
+%
+Regroup:
+%
+\begin{equation}
+A_{rr} X_r^{m+1} = A_{rr}X_r^m -  \alpha A_{rr}X_r^m + \alpha\left(B_r - \sum_{k=1}^{r-1}  A_{rk}  X_k^{m+1}    - \sum_{k=r+1}^{n}  A_{rk} X_k^m \right)
+\end{equation}
+%
+Divide by $A_{rr}$:
+%
+\begin{equation}
+ X_r^{m+1} = X_r^m -  \alpha X_r^m + \frac{\alpha}{A_{rr}}\left(B_r - \sum_{k=1}^{r-1}  A_{rk}  X_k^{m+1}    - \sum_{k=r+1}^{n}  A_{rk} X_k^m \right)
+\end{equation}
+%
+or
+%
+\begin{equation}
+ X_r^{m+1} = (1-\alpha) X_r^m  + \frac{\alpha}{A_{rr}}\left(B_r - \sum_{k=1}^{r-1}  A_{rk}  X_k^{m+1}    - \sum_{k=r+1}^{n}  A_{rk} X_k^m \right)
+\end{equation}
+%
+ 
+
+  \bibliographystyle{warpdoc}
+  \bibliography{all}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

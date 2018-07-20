@@ -1,0 +1,72 @@
+#!/usr/local/bin/soap
+
+betae=0.5;
+sigma=2.0;
+
+B[1]=2.5;
+B[2]=4.5;
+B[3]=7.0;
+
+E[1]=1.0;
+E[2]=0.0;
+E[3]=1.0;
+
+v[1]=1000;
+v[2]=500;
+v[3]=400;
+
+
+Bmag=sqrt(B[1]^2+B[2]^2+B[3]^2);
+B1=B[1]/Bmag;
+B2=B[2]/Bmag;
+B3=B[3]/Bmag;
+
+sigmatilde[1][1]=1+betae^2*B1^2;
+sigmatilde[1][2]=-betae*B3+betae^2*B1*B2;
+sigmatilde[1][3]=betae*B2+betae^2*B1*B3;
+
+sigmatilde[2][1]=betae*B3+betae^2*B2*B1;
+sigmatilde[2][2]=1.0+betae^2*B2*B2;
+sigmatilde[2][3]=-betae*B1+betae^2*B2*B3;
+
+sigmatilde[3][1]=-betae*B2+betae^2*B3*B1;
+sigmatilde[3][2]=betae*B1+betae^2*B2*B3;
+sigmatilde[3][3]=1.0+betae^2*B3*B3;
+
+
+for(i,1,3,
+  for (j,1,3,
+     sigmatilde[i][j]=sigmatilde[i][j]*sigma/(1+betae^2);
+     sigmatilde[i][j]=sigma/(1+betae^2)*(
+                         krodelta(i,j)+betae^2*B[i]*B[j]/Bmag^2
+		         +betae*(1-krodelta(i,j)-2*krodelta(mod(i,3)+1,j))*B[abs(mod(6-i-j-1,3))+1]/Bmag
+		       );
+  );
+);
+
+
+
+
+EvB[1]=E[1]+v[2]*B[3]-v[3]*B[2];
+EvB[2]=E[2]+v[3]*B[1]-v[1]*B[3];
+EvB[3]=E[3]+v[1]*B[2]-v[2]*B[1];
+
+for (i,1,3,
+  J[i]=0.0;
+  for (j,1,3,
+    J[i]=J[i]+sigmatilde[i][j]*EvB[j];
+  );
+  printf("J[%ld]=%E\n",i,J[i]);
+);
+
+for (i,1,3,
+  J2[i]=EvB[i]*sigma;
+);
+
+J2[1]=J2[1]-(J[2]*B[3]-J[3]*B[2])*betae/Bmag;
+J2[2]=J2[2]-(J[3]*B[1]-J[1]*B[3])*betae/Bmag;
+J2[3]=J2[3]-(J[1]*B[2]-J[2]*B[1])*betae/Bmag;
+
+for (i,1,3,
+  printf("J2[%ld]=%E\n",i,J2[i]);
+);

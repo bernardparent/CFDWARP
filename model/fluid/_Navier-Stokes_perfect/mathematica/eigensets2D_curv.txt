@@ -1,0 +1,644 @@
+
+
+A = {{0, 
+      X1, 
+      X2,  
+      0}, 
+     {(g-3)*X1*u*u/2 - X2*u*v  + (g-1)*X1*v*v/2, 
+      (3-g)*u*X1 + v*X2, 
+      u*X2 - (g-1)*X1*v, 
+      (g-1)*X1}, 
+     {(g-3)*X2*v*v/2 - X1*u*v  + (g-1)*X2*u*u/2, 
+      v*X1 - (g-1)*X2*u,
+      (3-g)*v*X2 + u*X1, 
+      (g-1)*X2}, 
+     {-(X1*u+X2*v)*(a*a/(g-1) + (1-g/2)*(u*u+v*v)), 
+      (2*a*a/(g-1) + v*v + (3-2*g)*u*u)*X1/2 + X2*(1-g)*u*v, 
+      (2*a*a/(g-1) + u*u + (3-2*g)*v*v)*X2/2 + X1*(1-g)*u*v, 
+      g*(u*X1 + v*X2)}
+    }
+
+
+
+U = {rho, rho*u, rho*v, rho*a*a/g/(g - 1) + rho*(u*u + v*v)/2}
+
+
+F = {rho*(u*X1 + v*X2), rho*u*(u*X1 + v*X2) + rho*a*a/g*X1, 
+  rho*v*(u*X1 + v*X2) + rho*a*a/g*X2, 
+  rho*(u*X1 + v*X2)*(a*a/(g - 1) + (u*u + v*v)/2)}
+
+F2 = Simplify[A.U]
+
+Linv = Simplify[Transpose[Eigenvectors[A]]]
+
+
+===========================================================================================
+Eigenvector and Eigenvalues Set #1
+===========================================================================================
+
+
+Lambda = DiagonalMatrix[{u*X1 + v*X2, u*X1 + v*X2, 
+   u*X1 + v*X2 - a*Sqrt[X1*X1 + X2*X2], 
+   u*X1 + v*X2 + a*Sqrt[X1*X1 + X2*X2]}]
+
+
+Linv = { 
+     {X1,
+      -v*X1 + u*X2,
+      2*(g - 1)*(X1*X1 + X2*X2),
+      2*(g - 1)*(X1*X1 + X2*X2)              
+   },
+     {u*X1 + v*X2,
+      X2*(u*u - v*v)/2 - u*v*X1,
+      2*(g - 1)*(u*(X1*X1 + X2*X2) - X1*a*Sqrt[X1*X1 + X2*X2]),
+      2*(g - 1)*(u*(X1*X1 + X2*X2) + X1*a*Sqrt[X1*X1 + X2*X2])
+   },
+     {0,
+      X1*(u*u - v*v)/2 + u*v*X2,
+      2*(g - 1)*(v*(X1*X1 + X2*X2) - X2*a*Sqrt[X1*X1 + X2*X2]),
+      2*(g - 1)*(v*(X1*X1 + X2*X2) + X2*a*Sqrt[X1*X1 + X2*X2])
+   },
+     {X1*(u*u - v*v)/2 + u*v*X2,
+      0,
+      2*a*a*(X1*X1 + X2*X2) + (g - 1)*((u*u + v*v)*(X1*X1 + X2*X2) - 
+         2*(u*X1 + v*X2)*a*Sqrt[X1*X1 + X2*X2]),
+      2*a*a*(X1*X1 + X2*X2) + (g - 1)*((u*u + v*v)*(X1*X1 + X2*X2) + 
+         2*(u*X1 + v*X2)*a*Sqrt[X1*X1 + X2*X2])
+   }
+}
+
+
+
+L={
+{
+(-(-1 + g) (u*u + v*v)*(u*u + v*v) (X1*X1 + X2*X2) + 
+   2*a*a (4*u*v*X1*X2 + u*u*(X1*X1 - X2*X2) + 
+      v*v (-X1*X1 + X2*X2)))/(2*a*a (u*u*X1 - v*v*X1 + 2*u*v*X2) (X1*X1 +
+      X2*X2)),
+ (-2*a*a*v*X1*X2 + (-1 + g)*u*u*u*(X1*X1 + X2*X2) + 
+   u*(2*a*a*X2*X2 + (-1 + g) v*v*(X1*X1 + X2*X2)))/(a*a (u*u*X1 - 
+     v*v*X1 + 2*u*v*X2)*(X1*X1 + X2*X2)),
+ (2*a*a*X1*(v*X1 - u*X2) + (-1 + g)*v*(u*u + v*v) (X1*X1 + 
+    X2*X2))/(a*a (u*u*X1 - v*v*X1 + 2*u*v*X2)*(X1*X1 + X2*X2)),
+-(((-1 + g)*(u*u + v*v))/(a*a*(u*u*X1 - v*v*X1 + 2*u*v*X2)))
+},
+{
+(2*a*a*u*X1*X2 + 
+ 2*a*a*v*X2*X2 - (-1 + g)*u*u*v*(X1*X1 + X2*X2) - (-1 + g)*v*v*v*(X1*X1 + 
+    X2*X2))/(a*a*(u*u*X1 - v*v*X1 + 2*u*v*X2)*(X1*X1 + X2*X2)),
+-((2*(a*a*X1*X2 - (-1 + g)*u*v*(X1*X1 + X2*X2)))/(
+ a*a*(u*u*X1 - v*v*X1 + 2*u*v*X2)*(X1*X1 + X2*X2))),
+(2*(a*a*X1*X1 + (-1 + g) v*v*(X1*X1 + X2*X2)))/(a*a*(u*u*X1 - v*v*X1 + 
+   2*u*v*X2)*(X1*X1 + X2*X2)),
+-((2*(-1 + g)*v)/(a*a*(u*u*X1 - v*v*X1 + 2*u*v*X2)))
+},
+{
+(2*a*(u*X1 + v*X2) + (-1 + g)*(u*u + v*v)*Sqrt[
+  X1*X1 + X2*X2])/(8*a*a*(-1 + g)*(X1*X1 + X2*X2)^(3/2)),
+(-a*X1 - (-1 + g)*u*Sqrt[X1*X1 + X2*X2])/(4*a*a*(-1 + g)*(X1*X1 + X2*X2)^(3/2)),
+(-a*X2 - (-1 + g)*v*Sqrt[X1*X1 + X2*X2])/(4*a*a*(-1 + g)*(X1*X1 + X2*X2)^(3/2)),
+1/(4*a*a*(X1*X1 + X2*X2))
+},
+{
+(-2*a*(u*X1 + v*X2) + (-1 + g) (u*u + v*v)*Sqrt[
+  X1*X1 + X2*X2])/(8*a*a*(-1 + g)*(X1*X1 + X2*X2)^(3/2)),
+(a*X1 - (-1 + g)*u*Sqrt[X1*X1 + X2*X2])/(4*a*a*(-1 + g)*(X1*X1 + X2*X2)^(3/2)),
+(a*X2 - (-1 + g)*v*Sqrt[X1*X1 + X2*X2])/(4*a*a*(-1 + g)*(X1*X1 + X2*X2)^(3/2)),
+1/(4*a*a*(X1*X1 + X2*X2))
+}
+}
+
+
+
+
+Linv = { 
+     {X1*(u*u+v*v)/(X1*(u*u-v*v)+2*u*v*X2),
+      (-v*X1 + u*X2)*v/(X1*(u*u-v*v)+2*u*v*X2),
+      2*(g - 1)*(X1*X1 + X2*X2),
+      2*(g - 1)*(X1*X1 + X2*X2)              
+   },
+     {(u*X1 + v*X2)*(u*u+v*v)/(X1*(u*u-v*v)+2*u*v*X2),
+      (X2*(u*u - v*v)/2 - u*v*X1)*v/(X1*(u*u-v*v)+2*u*v*X2),
+      2*(g - 1)*(u*(X1*X1 + X2*X2) - X1*a*Sqrt[X1*X1 + X2*X2]),
+      2*(g - 1)*(u*(X1*X1 + X2*X2) + X1*a*Sqrt[X1*X1 + X2*X2])
+   },
+     {0,
+      (X1*(u*u - v*v)/2 + u*v*X2)*v/(X1*(u*u-v*v)+2*u*v*X2),
+      2*(g - 1)*(v*(X1*X1 + X2*X2) - X2*a*Sqrt[X1*X1 + X2*X2]),
+      2*(g - 1)*(v*(X1*X1 + X2*X2) + X2*a*Sqrt[X1*X1 + X2*X2])
+   },
+     {(u*u+v*v)/2,
+      0,
+      2*a*a*(X1*X1 + X2*X2) + (g - 1)*((u*u + v*v)*(X1*X1 + X2*X2) - 
+         2*(u*X1 + v*X2)*a*Sqrt[X1*X1 + X2*X2]),
+      2*a*a*(X1*X1 + X2*X2) + (g - 1)*((u*u + v*v)*(X1*X1 + X2*X2) + 
+         2*(u*X1 + v*X2)*a*Sqrt[X1*X1 + X2*X2])
+   }
+}
+
+===========================================================================================
+Eigenvector and Eigenvalues Set #2
+===========================================================================================
+
+
+Lambda = DiagonalMatrix[{u*X1 + v*X2, u*X1 + v*X2, 
+   u*X1 + v*X2 + a*Sqrt[X1*X1 + X2*X2], 
+   u*X1 + v*X2 - a*Sqrt[X1*X1 + X2*X2]}]
+
+
+Linv=
+{
+{
+ 1,
+ 0,
+ 1,
+ 1
+},
+{
+ u,
+ X2*a/Sqrt[X1*X1+X2*X2],
+ u+a*X1/Sqrt[X1*X1+X2*X2],
+ u-a*X1/Sqrt[X1*X1+X2*X2]
+},
+{
+ v,
+ -X1*a/Sqrt[X1*X1+X2*X2],
+ v+a*X2/Sqrt[X1*X1+X2*X2],
+ v-a*X2/Sqrt[X1*X1+X2*X2] 
+},
+{
+ (u*u+v*v)/2,
+ X2*a/Sqrt[X1*X1+X2*X2]*u-X1*a/Sqrt[X1*X1+X2*X2]*v,
+ a*a/(g-1)+(u*u+v*v)/2+a*(u*X1+v*X2)/Sqrt[X1*X1+X2*X2],
+ a*a/(g-1)+(u*u+v*v)/2-a*(u*X1+v*X2)/Sqrt[X1*X1+X2*X2]
+}
+}
+
+L=
+{
+
+ {
+ (2*a*a - (-1 + g)*(u*u + v*v))/(2*a*a),
+((-1 + g)*u)/(a*a),
+((-1 + g)*v)/(a*a),
+(1 - g)/(a*a)
+ },
+
+ {
+ (v*X1 - u*X2)/(a*Sqrt[X1*X1 + X2*X2]),
+X2/(a*Sqrt[X1*X1 + X2*X2]),
+-X1/(a*Sqrt[X1*X1 + X2*X2]),
+0
+ },
+
+ {
+ (-2*a*(u*X1 + v*X2) + (-1 + g)*(u*u + v*v)*Sqrt[
+  X1*X1 + X2*X2])/(4*a*a*Sqrt[X1*X1 + X2*X2]),
+(u - g*u + (a*X1)/Sqrt[X1*X1 + X2*X2])/(2*a*a),
+(v - g*v + (a*X2)/Sqrt[X1*X1 + X2*X2])/(2*a*a),
+(-1 + g)/(2*a*a)
+ },
+
+ {
+ (2*a*(u*X1 + v*X2) + (-1 + g)*(u*u + v*v)*Sqrt[
+  X1*X1 + X2*X2])/(4*a*a* Sqrt[X1*X1 + X2*X2]),
+(u - g*u - (a*X1)/Sqrt[X1*X1 + X2*X2])/(2*a*a),
+(v - g*v - (a*X2)/Sqrt[X1*X1 + X2*X2])/(2*a*a),
+(-1 + g)/(2 a*a)
+ }
+
+}
+
+
+
+
+
+
+
+
+
+===========================================================================================
+Eigenvector and Eigenvalues Set #3
+===========================================================================================
+
+Lambda = DiagonalMatrix[{u*X1 + v*X2, u*X1 + v*X2, 
+   u*X1 + v*X2 + a*Sqrt[X1*X1 + X2*X2], 
+   u*X1 + v*X2 - a*Sqrt[X1*X1 + X2*X2]}]
+Lambda1 = 
+ DiagonalMatrix[{u*X1 + v*X2, u*X1 + v*X2, u*X1 + v*X2, u*X1 + v*X2}]
+U = {rho, rho*u, rho*v, rho*a*a/g/(g - 1) + rho*(u*u + v*v)/2}
+
+A = {{0, X1, X2, 
+   0}, {(g - 3)*X1*u*u/2 - X2*u*v + (g - 1)*X1*v*v/2, (3 - g)*u*X1 + 
+    v*X2, u*X2 - (g - 1)*X1*v, (g - 1)*X1}, {(g - 3)*X2*v*v/2 - 
+    X1*u*v + (g - 1)*X2*u*u/2, 
+   v*X1 - (g - 1)*X2*u, (3 - g)*v*X2 + u*X1, (g - 1)*
+    X2}, {-(X1*u + X2*v)*(a*
+       a/(g - 1) + (1 - g/2)*(u*u + v*v)), (2*a*a/(g - 1) + 
+       v*v + (3 - 2*g)*u*u)*X1/2 + 
+    X2*(1 - g)*u*v, (2*a*a/(g - 1) + u*u + (3 - 2*g)*v*v)*X2/2 + 
+    X1*(1 - g)*u*v, g*(u*X1 + v*X2)}}
+
+eigen1a = {1, u, v, (u*u + v*v)/2}
+eigen1b = {0, X2, -X1, u*X2 - X1*v}
+eigen1c = {X2, 0, v*X2 + u*X1, u*v*X1 - u*u/2*X2 + v*v/2*X2}
+eigen1d = {X1, u*X1 + v*X2, 0, X1*(u*u - v*v)/2 + u*v*X2}
+eigen1e = {-v*X1 + u*X2, X2*(u*u - v*v)/2 - u*v*X1, 
+  X1*(u*u - v*v)/2 + u*v*X2, 0}
+eigen1f = {X2, (u + a)*X2, X2*v - a*X1, 
+  a*(X2*u - X1*v) + X2*u*u/2 + X2*v*v/2}
+eigen1g = {X2, (u - a)*X2, v*X2 + a*X1, 
+  a*v*X1 - a*u*X2 + u*u/2*X2 + v*v/2*X2}
+eigen1h = {X1, u*X1 + a*X2, (v - a)*X1, 
+  u*u/2*X1 + a*u*X2 - a*v*X1 + v*v/2*X1}
+eigen1i = {X1, u*X1 - a*X2, (v + a)*X1, 
+  u*u/2*X1 - a*u*X2 + a*v*X1 + v*v/2*X1}
+eigen1j = {X2, X2*Sqrt[u*u + v*v], 
+  u*X1 - Sqrt[u*u + v*v]*X1 + X2*v, -v*Sqrt[u*u + v*v]*X1 - X2*u*u/2 +
+    X2*v*v/2 + u*v*X1 + X2*u*Sqrt[u*u + v*v]}
+eigen1k = {X1*X2, X2*Sqrt[u*u*X1*X1 + v*v*X2*X2], 
+  X1*(u*X1 + v*X2) - X1*Sqrt[u*u*X1*X1 + v*v*X2*X2], -u*u*X1*X2/2 + 
+   v*v*X1*X2/2 - v*X1*Sqrt[u*u*X1*X1 + v*v*X2*X2] + 
+   u*(v*X1*X1 + X2*Sqrt[u*u*X1*X1 + v*v*X2*X2])}
+eigen1l = {X1*X2, (u + a)*X2*X2, -(a + u)*X1*X2 + 
+   X1*(u*X1 + v*X2), -(u*u*(X1 - 2*X2)*X2 - 
+      2*u*(v*X1*(X1 - X2) + a*X2*X2) + X2*(2*a*v*X1 - v*v*X1))/2}
+eigen1m = {1, u + a*X2/Sqrt[X1*X1 + X2*X2], 
+  v - a*X1/Sqrt[X1*X1 + X2*X2], 
+  u*u/2 + v*v/2 + a*(u*X2 - v*X1)/Sqrt[X1*X1 + X2*X2]}
+eigen1n = {1, u - a*X2/Sqrt[X1*X1 + X2*X2], 
+  v + a*X1/Sqrt[X1*X1 + X2*X2], 
+  u*u/2 + v*v/2 + a*(-u*X2 + v*X1)/Sqrt[X1*X1 + X2*X2]}
+
+eigen2 = {1, u + a*X1/Sqrt[X1*X1 + X2*X2], 
+  v + a*X2/Sqrt[X1*X1 + X2*X2], 
+  a*a/(g - 1) + (u*u + v*v)/2 + a*(u*X1 + v*X2)/Sqrt[X1*X1 + X2*X2]}
+eigen3 = {1, u - a*X1/Sqrt[X1*X1 + X2*X2], 
+  v - a*X2/Sqrt[X1*X1 + X2*X2], 
+  a*a/(g - 1) + (u*u + v*v)/2 - a*(u*X1 + v*X2)/Sqrt[X1*X1 + X2*X2]}
+V = X1*u + X2*v
+tmpzero = Simplify[A.eigen1n - Lambda1.eigen1n]
+Linvtranspose = {eigen1m, eigen1n, eigen2, eigen3}
+Linv = Simplify[Transpose[Linvtranspose]]
+tmpzero = Simplify[A.Linv - Linv.Lambda]
+alpha = Simplify[Inverse[Linv].U]
+L = Simplify[Inverse[Linv]]
+
+
+
+===========================================================================================
+Eigenvector and Eigenvalues Set #4
+===========================================================================================
+
+Lambda = DiagonalMatrix[{u*X1 + v*X2, u*X1 + v*X2, 
+   u*X1 + v*X2 + a*Sqrt[X1*X1 + X2*X2], 
+   u*X1 + v*X2 - a*Sqrt[X1*X1 + X2*X2]}]
+Lambda1 = 
+ DiagonalMatrix[{u*X1 + v*X2, u*X1 + v*X2, u*X1 + v*X2, u*X1 + v*X2}]
+U = {rho, rho*u, rho*v, rho*a*a/g/(g - 1) + rho*(u*u + v*v)/2}
+
+A = {{0, X1, X2, 
+   0}, {(g - 3)*X1*u*u/2 - X2*u*v + (g - 1)*X1*v*v/2, (3 - g)*u*X1 + 
+    v*X2, u*X2 - (g - 1)*X1*v, (g - 1)*X1}, {(g - 3)*X2*v*v/2 - 
+    X1*u*v + (g - 1)*X2*u*u/2, 
+   v*X1 - (g - 1)*X2*u, (3 - g)*v*X2 + u*X1, (g - 1)*
+    X2}, {-(X1*u + X2*v)*(a*
+       a/(g - 1) + (1 - g/2)*(u*u + v*v)), (2*a*a/(g - 1) + 
+       v*v + (3 - 2*g)*u*u)*X1/2 + 
+    X2*(1 - g)*u*v, (2*a*a/(g - 1) + u*u + (3 - 2*g)*v*v)*X2/2 + 
+    X1*(1 - g)*u*v, g*(u*X1 + v*X2)}}
+
+
+eigen1m = {1, u + m*a*X2/Sqrt[X1*X1 + X2*X2], 
+  v - m*a*X1/Sqrt[X1*X1 + X2*X2], 
+  u*u/2 + v*v/2 + m*a*(u*X2 - v*X1)/Sqrt[X1*X1 + X2*X2]}
+eigen1n = {1, u - n*a*X2/Sqrt[X1*X1 + X2*X2], 
+  v + n*a*X1/Sqrt[X1*X1 + X2*X2], 
+  u*u/2 + v*v/2 + n*a*(-u*X2 + v*X1)/Sqrt[X1*X1 + X2*X2]}
+
+eigen2 = {1, u + a*X1/Sqrt[X1*X1 + X2*X2], 
+  v + a*X2/Sqrt[X1*X1 + X2*X2], 
+  a*a/(g - 1) + (u*u + v*v)/2 + a*(u*X1 + v*X2)/Sqrt[X1*X1 + X2*X2]}
+eigen3 = {1, u - a*X1/Sqrt[X1*X1 + X2*X2], 
+  v - a*X2/Sqrt[X1*X1 + X2*X2], 
+  a*a/(g - 1) + (u*u + v*v)/2 - a*(u*X1 + v*X2)/Sqrt[X1*X1 + X2*X2]}
+V = X1*u + X2*v
+tmpzero = Simplify[A.eigen1n - Lambda1.eigen1n]
+Linvtranspose = {eigen1m, eigen1n, eigen2, eigen3}
+Linv = Simplify[Transpose[Linvtranspose]]
+tmpzero = Simplify[A.Linv - Linv.Lambda]
+alpha = Simplify[Inverse[Linv].U]
+L = Simplify[Inverse[Linv]]
+
+
+
+===========================================================================================
+Eigenvector and Eigenvalues Set #11
+===========================================================================================
+
+
+Lambda = DiagonalMatrix[{u*X1 + v*X2, u*X1 + v*X2, 
+   u*X1 + v*X2 + a*Sqrt[X1*X1 + X2*X2], 
+   u*X1 + v*X2 - a*Sqrt[X1*X1 + X2*X2]}]
+
+
+
+Linv=
+{
+{
+ X1,
+ 0,
+ 1,
+ 1
+},
+{
+ u*X1 + v*X2,
+ X2*a/Sqrt[X1*X1+X2*X2],
+ u+a*X1/Sqrt[X1*X1+X2*X2],
+ u-a*X1/Sqrt[X1*X1+X2*X2]
+},
+{
+ 0,
+ -X1*a/Sqrt[X1*X1+X2*X2],
+ v+a*X2/Sqrt[X1*X1+X2*X2],
+ v-a*X2/Sqrt[X1*X1+X2*X2] 
+},
+{
+ X1*(u*u - v*v)/2 + u*v*X2,
+ X2*a/Sqrt[X1*X1+X2*X2]*u-X1*a/Sqrt[X1*X1+X2*X2]*v,
+ a*a/(g-1)+(u*u+v*v)/2+a*(u*X1+v*X2)/Sqrt[X1*X1+X2*X2],
+ a*a/(g-1)+(u*u+v*v)/2-a*(u*X1+v*X2)/Sqrt[X1*X1+X2*X2]
+}
+}
+
+
+
+===========================================================================================
+Eigenvector and Eigenvalues Set #12
+===========================================================================================
+
+
+Lambda = DiagonalMatrix[{u*X1 + v*X2, u*X1 + v*X2, 
+   u*X1 + v*X2 + a*Sqrt[X1*X1 + X2*X2], 
+   u*X1 + v*X2 - a*Sqrt[X1*X1 + X2*X2]}]
+Lambda1 = 
+ DiagonalMatrix[{u*X1 + v*X2, u*X1 + v*X2, u*X1 + v*X2, u*X1 + v*X2}]
+U = {rho, rho*u, rho*v, rho*a*a/g/(g - 1) + rho*(u*u + v*v)/2}
+
+A = {{0, X1, X2, 
+   0}, {(g - 3)*X1*u*u/2 - X2*u*v + (g - 1)*X1*v*v/2, (3 - g)*u*X1 + 
+    v*X2, u*X2 - (g - 1)*X1*v, (g - 1)*X1}, {(g - 3)*X2*v*v/2 - 
+    X1*u*v + (g - 1)*X2*u*u/2, 
+   v*X1 - (g - 1)*X2*u, (3 - g)*v*X2 + u*X1, (g - 1)*
+    X2}, {-(X1*u + X2*v)*(a*
+       a/(g - 1) + (1 - g/2)*(u*u + v*v)), (2*a*a/(g - 1) + 
+       v*v + (3 - 2*g)*u*u)*X1/2 + 
+    X2*(1 - g)*u*v, (2*a*a/(g - 1) + u*u + (3 - 2*g)*v*v)*X2/2 + 
+    X1*(1 - g)*u*v, g*(u*X1 + v*X2)}}
+
+Linv = {{1, 0, 1, 1}, {u, X2*a/Sqrt[X1*X1 + X2*X2], 
+   u + a*X1/Sqrt[X1*X1 + X2*X2], 
+   u - a*X1/Sqrt[X1*X1 + X2*X2]}, {v, -X1*a/Sqrt[X1*X1 + X2*X2], 
+   v + a*X2/Sqrt[X1*X1 + X2*X2], 
+   v - a*X2/Sqrt[X1*X1 + X2*X2]}, {(u*u + v*v)/2, 
+   X2*a/Sqrt[X1*X1 + X2*X2]*u - X1*a/Sqrt[X1*X1 + X2*X2]*v, 
+   a*a/(g - 1) + (u*u + v*v)/2 + a*(u*X1 + v*X2)/Sqrt[X1*X1 + X2*X2], 
+   a*a/(g - 1) + (u*u + v*v)/2 - 
+    a*(u*X1 + v*X2)/Sqrt[X1*X1 + X2*X2]}}
+eigen1a = {1, u, v, (u*u + v*v)/2}
+eigen1b = {0, X2, -X1, u*X2 - X1*v}
+eigen1c = {X2, 0, v*X2 + u*X1, u*v*X1 - u*u/2*X2 + v*v/2*X2}
+eigen1d = {X1, u*X1 + v*X2, 0, X1*(u*u - v*v)/2 + u*v*X2}
+eigen3 = {1, u - a*X1/Sqrt[X1*X1 + X2*X2], 
+  v - a*X2/Sqrt[X1*X1 + X2*X2], 
+  a*a/(g - 1) + (u*u + v*v)/2 - a*(u*X1 + v*X2)/Sqrt[X1*X1 + X2*X2]}
+V = X1*u + X2*v
+tmpzero = Simplify[A.eigen1a - Lambda1.eigen1a]
+Linvtranspose = {eigen1b/X2, eigen1c/X2, eigen2, eigen3}
+Linvtranspose = {eigen1c, eigen1d, eigen2, eigen3}
+Linvtranspose = {eigen1c/V, eigen1d/V, eigen2/a, eigen3/a}
+Linv = Transpose[Linvtranspose]
+tmpzero = Simplify[A.Linv - Linv.Lambda]
+alpha = Simplify[Inverse[Linv].U]
+L = Simplify[Inverse[Linv]]
+
+
+
+
+===========================================================================================
+Eigenvector and Eigenvalues Set #13
+===========================================================================================
+
+Lambda = DiagonalMatrix[{u*X1 + v*X2, u*X1 + v*X2, 
+   u*X1 + v*X2 + a*Sqrt[X1*X1 + X2*X2], 
+   u*X1 + v*X2 - a*Sqrt[X1*X1 + X2*X2]}]
+Lambda1 = 
+ DiagonalMatrix[{u*X1 + v*X2, u*X1 + v*X2, u*X1 + v*X2, u*X1 + v*X2}]
+U = {rho, rho*u, rho*v, rho*a*a/g/(g - 1) + rho*(u*u + v*v)/2}
+
+A = {{0, X1, X2, 
+   0}, {(g - 3)*X1*u*u/2 - X2*u*v + (g - 1)*X1*v*v/2, (3 - g)*u*X1 + 
+    v*X2, u*X2 - (g - 1)*X1*v, (g - 1)*X1}, {(g - 3)*X2*v*v/2 - 
+    X1*u*v + (g - 1)*X2*u*u/2, 
+   v*X1 - (g - 1)*X2*u, (3 - g)*v*X2 + u*X1, (g - 1)*
+    X2}, {-(X1*u + X2*v)*(a*
+       a/(g - 1) + (1 - g/2)*(u*u + v*v)), (2*a*a/(g - 1) + 
+       v*v + (3 - 2*g)*u*u)*X1/2 + 
+    X2*(1 - g)*u*v, (2*a*a/(g - 1) + u*u + (3 - 2*g)*v*v)*X2/2 + 
+    X1*(1 - g)*u*v, g*(u*X1 + v*X2)}}
+
+Linv = {{1, 0, 1, 1}, {u, X2*a/Sqrt[X1*X1 + X2*X2], 
+   u + a*X1/Sqrt[X1*X1 + X2*X2], 
+   u - a*X1/Sqrt[X1*X1 + X2*X2]}, {v, -X1*a/Sqrt[X1*X1 + X2*X2], 
+   v + a*X2/Sqrt[X1*X1 + X2*X2], 
+   v - a*X2/Sqrt[X1*X1 + X2*X2]}, {(u*u + v*v)/2, 
+   X2*a/Sqrt[X1*X1 + X2*X2]*u - X1*a/Sqrt[X1*X1 + X2*X2]*v, 
+   a*a/(g - 1) + (u*u + v*v)/2 + a*(u*X1 + v*X2)/Sqrt[X1*X1 + X2*X2], 
+   a*a/(g - 1) + (u*u + v*v)/2 - 
+    a*(u*X1 + v*X2)/Sqrt[X1*X1 + X2*X2]}}
+eigen1a = {1, u, v, (u*u + v*v)/2}
+eigen1b = {0, X2, -X1, u*X2 - X1*v}
+eigen1c = {X2, 0, v*X2 + u*X1, u*v*X1 - u*u/2*X2 + v*v/2*X2}
+eigen1d = {X1, u*X1 + v*X2, 0, X1*(u*u - v*v)/2 + u*v*X2}
+eigen1e = {-v*X1 + u*X2, X2*(u*u - v*v)/2 - u*v*X1, 
+  X1*(u*u - v*v)/2 + u*v*X2, 0}
+eigen1f = {X2, (u + a)*X2, X2*v - a*X1, 
+  a*(X2*u - X1*v) + X2*u*u/2 + X2*v*v/2}
+eigen1g = {X2, (u - a)*X2, v*X2 + a*X1, 
+  a*v*X1 - a*u*X2 + u*u/2*X2 + v*v/2*X2}
+eigen1h = {X1, u*X1 + a*X2, (v - a)*X1, 
+  u*u/2*X1 + a*u*X2 - a*v*X1 + v*v/2*X1}
+eigen1i = {X1, u*X1 - a*X2, (v + a)*X1, 
+  u*u/2*X1 - a*u*X2 + a*v*X1 + v*v/2*X1}
+eigen1j = {X2, X2*Sqrt[u*u + v*v], 
+  u*X1 - Sqrt[u*u + v*v]*X1 + X2*v, -v*Sqrt[u*u + v*v]*X1 - X2*u*u/2 +
+    X2*v*v/2 + u*v*X1 + X2*u*Sqrt[u*u + v*v]}
+eigen1k = {X1*X2, X2*Sqrt[u*u*X1*X1 + v*v*X2*X2], 
+  X1*(u*X1 + v*X2) - X1*Sqrt[u*u*X1*X1 + v*v*X2*X2], -u*u*X1*X2/2 + 
+   v*v*X1*X2/2 - v*X1*Sqrt[u*u*X1*X1 + v*v*X2*X2] + 
+   u*(v*X1*X1 + X2*Sqrt[u*u*X1*X1 + v*v*X2*X2])}
+eigen1l = {X1*X2, (u + a)*X2*X2, -(a + u)* X1*X2 + X1*(u* X1 + v* X2), 
+  -(u*u* (X1 - 2 *X2) *X2 - 2 *u *(v* X1* (X1 - X2) + a *X2*X2) + 
+      X2 *(2*a*v*X1 - v*v *X1))/2}
+
+
+eigen2 = {1, u + a*X1/Sqrt[X1*X1 + X2*X2], 
+  v + a*X2/Sqrt[X1*X1 + X2*X2], 
+  a*a/(g - 1) + (u*u + v*v)/2 + a*(u*X1 + v*X2)/Sqrt[X1*X1 + X2*X2]}
+eigen3 = {1, u - a*X1/Sqrt[X1*X1 + X2*X2], 
+  v - a*X2/Sqrt[X1*X1 + X2*X2], 
+  a*a/(g - 1) + (u*u + v*v)/2 - a*(u*X1 + v*X2)/Sqrt[X1*X1 + X2*X2]}
+V = X1*u + X2*v
+tmpzero = Simplify[A.eigen1a - Lambda1.eigen1a]
+Linvtranspose = {eigen1g, eigen1h, eigen2, eigen3}
+Linv = Transpose[Linvtranspose]
+tmpzero = Simplify[A.Linv - Linv.Lambda]
+alpha = Simplify[Inverse[Linv].U]
+L = Simplify[Inverse[Linv]]
+
+
+
+
+
+============================================================================================
+Useful properties to check eigenvalues/eigenvectors
+============================================================================================
+
+
+L = Simplify[Inverse[Linv]]
+
+
+ALinv = Simplify[A.Linv]
+LinvLambda = Simplify[Linv.Lambda]
+Lambda = Simplify[L.A.Linv]
+
+L = Simplify[Inverse[Linv]]
+alpha = Simplify[L.U]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ALTERNATIVELY:
+
+Etot=(a*a/g/(g-1)+(u*u+v*v)/2)
+
+g*(Etot-(u*u+v*v)/2) = a*a/(g-1)
+
+(g-1)*(Etot-(u*u+v*v)/2) = a*a/g
+
+
+then:
+
+
+A = {{0, X1, X2, 0}, 
+     {-X1*u*u-X2*u*v+(g-1)*X1*u*u/2 + (g-1)*X1*v*v/2, 
+       2*u*X1+v*X2-u*X1*(g-1), 
+       u*X2-(g-1)*X1*v, 
+       (g-1)*X1}, 
+     {-X1*u*v-X2*v*v+(g-1)*X2*u*u/2 + (g-1)*X2*v*v/2, 
+      v*X1-(g-1)*X2*u, 
+      u*X1+2*v*X2-(g-1)*v*X2,
+      (g-1)*X2}, 
+     {-X1*g*u*Etot -X2*g*v*Etot - X1*(1-g)*u*u*u - X2*(1-g)*u*u*v - X1*(1-g)*u*v*v -X2*(1-g)*v*v*v,
+      X1*g*Etot + 3*(1-g)/2*X1*u*u + X2*(1-g)*u*v + X1*(1-g)*v*v/2,
+      X2*g*Etot + X2*(1-g)*u*u/2 + X1*(1-g)*u*v + 3*X2*(1-g)*v*v/2,
+      X1*g*u + X2*g*v }
+    }
+
+U = {rho, 
+     rho*u, 
+     rho*v, 
+     rho*Etot}
+
+
+F = {rho*(u*X1+v*X2), 
+     rho*u*(u*X1+v*X2) + rho*X1*(g-1)*(Etot-(u*u+v*v)/2), 
+     rho*v*(u*X1+v*X2) + rho*X2*(g-1)*(Etot-(u*u+v*v)/2), 
+     rho*(u*X1+v*X2)*(g*(Etot-(u*u+v*v)/2) + (u*u + v*v)/2) }
+
+
+
+
+
+
+
+RECALL:
+
+F1= U2*X1 + U3*X2
+F2= U2*U2*X1/U1 + U2*U3*X2/U1 + (g-1)*X1*U4 - 0.5*(g-1)*X1*U2*U2/U1 - 0.5*(g-1)*X1*U3*U3/U1  
+F3= U2*U3*X1/U1 + U3*U3*X2/U1 + (g-1)*X2*U4 - 0.5*(g-1)*X2*U2*U2/U1 - 0.5*(g-1)*X2*U3*U3/U1
+F4= X1*g*U2*U4/U1 + X2*g*U3*U4/U1 + U2*X1*(1-g)*U2*U2/(2*U1*U1) + U3*X2*(1-g)*U2*U2/(2*U1*U1)
+         + U2*X1*(1-g)*U3*U3/(2*U1*U1)    + U3*X2*(1-g)*U3*U3/(2*U1*U1)
+
+
+old:
+F4= (U2*X1+U3*X2)*( g*U4/U1 - g*U2*U2/(2*U1*U1) - g*U3*U3/(2*U1*U1) +U2*U2/(2*U1*U1) + U3*U3/(2*U1*U1) )  
+F4= (U2*X1+U3*X2)*( g*U4/U1 + (1-g)*U2*U2/(2*U1*U1)  + (1-g)*U3*U3/(2*U1*U1) )  
+
+  
+Linv = Simplify[Transpose[Eigenvectors[A]]]
+
+Linv = {{1, 1, 1, 1}, 
+        {u, u, u - a, u + a}, 
+        {0, (v*v - u*u)/2/v, v, v}, 
+        {u*u/2 - v*v/2, 0, u*u/2 + v*v/2 - u*a + a*a/(g - 1), u*u/2 + v*v/2 + u*a + a*a/(g - 1)}}
+
+Linv = {{0, 1, 1, 1}, 
+        {0, u, u - a, u + a}, 
+        {v, (v*v - u*u)/2/v, v, v}, 
+        {v*v, 0, u*u/2 + v*v/2 - u*a + a*a/(g - 1), u*u/2 + v*v/2 + u*a + a*a/(g - 1)}}
+
+Linv = {{1, 0, 1, 1}, 
+        {u, 0, u - a, u + a}, 
+        {v, -a, v, v}, 
+        {u*u/2 + v*v/2, -a*v, a*a/(g - 1) + u*u/2 + v*v/2 - a*u, a*a/(g - 1) + u*u/2 + v*v/2 + a*u}}
+
+
+
+
+Fcheck = Simplify[A.U]
+
+ALinv = Simplify[A.Linv]
+LinvLambda = Simplify[Linv.Lambda]
+Iden = Simplify[ALinv.Inverse[LinvLambda]]
+ Lambdacheck = Simplify[Inverse[Linv].A.Linv]

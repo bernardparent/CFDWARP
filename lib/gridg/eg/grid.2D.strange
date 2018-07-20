@@ -1,0 +1,19 @@
+Grid2D(
+  im=40;
+  jm=60;
+  is=1;
+  js=1;
+  M=7;
+  dw=1.0e-06;
+
+  Size(is,js, im,jm);
+
+  Point(is,js, 0.0e0,0.0e0);
+  Point(im,js, 0.5e0,0.0e0);
+  Point(is,jm, 0.0e0,0.3e0);
+  Point(im,jm, 0.5e0,0.5e0);
+
+  Block(is,js, im,jm,  EE,0.4e0,1,1,  EE,0.5e0,1.2e0,1.0e0);
+  Scale (is,js,im,jm, -1,-1,3);
+  Mirror(is,js,im,jm, x, -1);
+);

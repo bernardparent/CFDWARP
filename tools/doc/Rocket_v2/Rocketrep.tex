@@ -1,0 +1,136 @@
+\documentclass{warpdoc}
+%\DeclareMathSizes{10}{10}{6.8}{6.0}   % redefine the math font sizes for 10pt document
+%\DeclareMathSizes{11}{11}{7.48}{6.6}  % redefine the math font sizes for 11pt document
+%\DeclareMathSizes{12}{12}{8.16}{7.2}  % redefine the math font sizes for 12pt document
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{bm}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\rhos}{\rho}
+\newcommand{\Cv}{{C_{\rm v}}}
+\newcommand{\Cp}{{C_{\rm p}}}
+\newcommand{\Sct}{{{\rm Sc}_{\rm T}}}
+\newcommand{\Prt}{{{\rm Pr}_{\rm T}}}
+\newcommand{\nd}{{{n}_{\rm d}}}
+\newcommand{\ns}{{{n}_{\rm s}}}
+\newcommand{\nn}{{{n}_{\rm n}}}
+\newcommand{\ndm}{{\bar{n}_{\rm d}}}
+\newcommand{\nsm}{{\bar{n}_{\rm s}}}
+\newcommand{\turb}{_{\rm T}}
+\newcommand{\mut}{{\mu\turb}}
+\newcommand{\mfa}{\scriptscriptstyle}
+\newcommand{\mfb}{\scriptstyle}
+\newcommand{\mfc}{\textstyle}
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\hlinex}{\vspace{-0.34cm}~~\\ \hline \vspace{-0.31cm}~~\\}
+\newcommand{\hlinextop}{\vspace{-0.46cm}~~\\ \hline \hline \vspace{-0.32cm}~~\\}
+\newcommand{\hlinexbot}{\vspace{-0.37cm}~~\\ \hline \hline \vspace{-0.50cm}~~\\}
+\newcommand{\tablespacing}{\vspace{-0.4cm}}
+\newcommand{\fontxfig}{\footnotesize\scalefont{0.918}}
+\newcommand{\fontgnu}{\footnotesize\scalefont{0.896}}
+\newcommand{\ev}{e_{\rm v}}
+\newcommand{\evzero}{e_{\rm v0}}
+\newcommand{\cNtwo}{c_{\rm N_2}}
+\newcommand{\tauvt}{\tau_{\rm vt}}
+\newcommand{\sigmaev}{\sigma_{e_{\rm v}}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{1.0}}
+\renewcommand{\fontsizefigure}{\footnotesize}
+\renewcommand{\vec}[1]{\bm{#1}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcounter{tocdepth}{3}
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\author{
+  Jason Etele
+}
+
+\email{
+  jason.etele@utoronto.ca
+}
+
+\department{
+  Institute for Aerospace Studies	
+}
+
+\institution{
+  University of Toronto
+}
+
+\title{
+Axisymmetric Rocket Nozzle Design
+}
+
+\date{
+  November 2001
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+  \tableofcontents
+%  \makenomenclature
+%%  \listoftables
+%%  \listoffigures
+
+
+
+
+\input{rocket}
+\appendix
+	\input{rocketappendix}
+
+\nocite{*}
+  \bibliographystyle{warpdoc}
+  \bibliography{rocketrefs}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,123 @@
+\section{Jachimowsky Combustion Model}
+
+The calculation of a chemical source term is explained in detail in Anderson. \cite{gen:anderson2}.
+A brief summary of that exaplanation follows here.
+Each species conservation equation has a source term for each species $k$ given by:
+
+\begin{displaymath}
+\dot{W}_k = {\cal M}_k \sum_{l=1}^{N_e} \left( \nu''_{l,k} - \nu'_{l,k} \right)
+\left[ k_{f,l} \prod_{m=1}^{N_l} \left[ \chi_m \right]^{\nu'_{l,m}}
+- k_{b,l} \prod_{m=1}^{N_l} \left[ \chi_m \right]^{\nu''_{l,m}} \right]
+\end{displaymath}
+
+$N_e$ is the number of elementary reactions involving species $k$.
+$N_l$ is the number of species involved in the elementary reaction.
+${\cal M}_k$ is the molecular weight of species $k$.
+$\chi_m$ is the mole fraction of species $m$.
+$\nu'_{l,k}$ is the stoichiometric coefficient for the reactants of reaction $l$.
+$\nu''_{l,k}$ is the stoichiometric coefficient for the products of reaction $l$.
+$k_b$ is the backward reaction rate constant and
+$k_f$ is the forward reaction rate constant, given by the
+modified Arrhenius equation:
+\begin{displaymath}
+k_f = AT^n \exp(-E/{\cal R}T)
+\end{displaymath}
+where the coefficients $A$, $n$ and $E$ are germane to a particular combustion
+model. In this study, the Jachimowsky hydrogen-air combustion model is used 
+\cite{chem:jachimowsky} and the coefficients are given in table \ref{model} 
+below.
+
+The backward and the forward reaction rate constants are related by the
+equilibrium constant, $K_c$
+\begin{displaymath}
+\frac{k_f}{k_b} = K_c
+\end{displaymath}
+The equilibrium constant, $K_c$ is given by:
+\begin{displaymath}
+K_c = ({\cal R} T)^{-\Delta \nu}
+       \exp \left( \frac{-\Delta G^0}{{\cal R} T} \right)
+\end{displaymath}
+
+where
+\begin{displaymath}
+\Delta \nu = \sum_{i=1}^{N_l} (\nu''_i - \nu'_i)
+\end{displaymath}
+The Gibbs free energy for species $i$
+is defined as $G_i = H_i - T S_i$, where $H_i$ is the
+enthalpy, $T$ is the temperature and $S_i$ is the entropy.
+The difference in Gibbs free energy $\Delta G^0$ of products and reactants is
+\begin{displaymath}
+\Delta G^0 = \sum_{i=1}^{N_l} (\nu''_i - \nu'_i) \left( h^0_i - T s^0_i \right)
+\end{displaymath}
+where $h^0_i$ is the molar enthalpy (including the heat of formation at a
+reference temperature of 298 K)
+of the species $i$, and $s^0_i$ is its the molar entropy,
+each calculated at a reference pressure (one atmosphere).\\
+\\
+
+\begin{table}
+\begin{threeparttable}
+\caption{Jachimowsky Hydrogen-Air Combustion Model with Nitrogen Inert}
+\begin{tabular}{|cc|c|c|c|} \hline
+\multicolumn{2}{|c|}{Reaction} & A & n & E  \\ \hline \hline
+(1) & H$_{2}$ + O$_{2} \rightarrow$ OH + OH & 1.70 $\times$ 10$^{13}$ & 0 & 48 000 \\
+(2) & H + O$_{2} \rightarrow$ OH + O & 2.60 $\times$ 10$^{14}$ & 0 & 16 800 \\
+(3) & O + H$_{2} \rightarrow$ OH + H & 1.80 $\times$ 10$^{10}$ & 1.00 & 8 900 \\
+(4) & OH + H$_{2} \rightarrow$ H$_{2}$O + H & 2.20 $\times$ 10$^{13}$ & 0 & 5 150 \\
+(5) & OH + OH $\rightarrow$ H$_{2}$O + O & 6.30 $\times$ 10$^{12}$ & 0 & 1 090 \\
+(6) & H + OH + M $\rightarrow$ H$_{2}$O + M & 2.20 $\times$ 10$^{22}$ & -2.00 & 0 \\
+(7) & H + H + M $\rightarrow$ H$_{2}$ + M & 6.40 $\times$ 10$^{17}$ & -1.00 & 0 \\
+(8) & H + O + M $\rightarrow$ OH + M & 6.00 $\times$ 10$^{16}$ & -0.60 & 0 \\
+(9) & H + O$_{2}$ + M $\rightarrow$ HO$_{2}$ + M & 2.10 $\times$ 10$^{15}$ & 0 & -1 000 \\
+(10) & HO$_{2}$ + H $\rightarrow$ H$_{2}$ + O$_{2}$ & 1.30 $\times$ 10$^{13}$ & 0 & 0 \\
+(11) & HO$_{2}$ + H $\rightarrow$ OH + OH & 1.40 $\times$ 10$^{14}$ & 0 & 1 080 \\
+(12) & HO$_{2}$ + H $\rightarrow$ H$_{2}$O + O & 1.00 $\times$ 10$^{13}$ & 0 & 1 080 \\
+(13) & HO$_{2}$ + O $\rightarrow$ O$_{2}$ + OH & 1.50 $\times$ 10$^{13}$ & 0 &  950 \\
+(14) & HO$_{2}$ + OH $\rightarrow$ H$_{2}$O + O$_{2}$ & 8.00 $\times$ 10$^{12}$ & 0 & 0 \\
+(15) & HO$_{2}$ + HO$_{2} \rightarrow$ H$_{2}$O$_{2}$ + O$_{2}$ & 2.00 $\times$ 10$^{12}$ & 0 & 0 \\
+(16) & H + H$_{2}$O$_{2} \rightarrow$ H$_{2}$ + HO$_{2}$ & 1.40 $\times$ 10$^{12}$ & 0 & 3 600 \\
+(17) & O + H$_{2}$O$_{2} \rightarrow$ OH + HO$_{2}$ & 1.40 $\times$ 10$^{13}$ & 0 & 6 400 \\
+(18) & OH + H$_{2}$O$_{2} \rightarrow$ H$_{2}$O + HO$_{2}$ & 6.10 $\times$ 10$^{12}$ & 0 & 1 430 \\
+(19) & M + H$_{2}$O$_{2} \rightarrow$ OH + OH + M & 1.20 $\times$ 10$^{17}$ & 0 & 45 500 \\
+(20) & O + O + M $\rightarrow$ O$_{2}$ + M & 6.00 $\times$ 10$^{17}$ & 0 & -1 800 \\
+\hline
+\end{tabular}
+\label{model}
+\end{threeparttable}
+\end{table}
+
+The units for $A$ are in $[\frac{cm^{3b}}{(gmol-s)^b}]$ where $b=1$ for two body reactions and 
+$b=2$ for three body reactions. $E$ is in $[\frac{cal}{gmol}]$.\\
+\\
+
+The symbol $M$ denotes a third-body collision partner, a species acting as a catalyst only.
+The concentration of $M$ is simply determined from the equation :\\
+
+\begin{displaymath}
+X_M = \sum_{k=1}^{n_s} \eta_k X_k
+\end{displaymath}
+\clearpage
+
+where $\eta_k$ is the third-body efficiency. $\eta_k$ is unity
+for most species and reactions except those listed in the table 
+\ref{thirds} above.
+
+\vspace*{-3cm}
+\begin{table}
+\begin{threeparttable}
+\caption{Third Body Efficiencies for Jachimowsky Model}
+\begin{tabular}{|cc|cccc|} \hline
+\multicolumn{2}{|c|}{Reaction} & \multicolumn{4}{|c|}{third body efficiency} \\ \hline \hline
+(6) & H + OH + M $\rightarrow$ H$_{2}$O + M & H$_{2}$ & 1.0 & H$_{2}$O & 6.0 \\
+(7) & H + H + M $\rightarrow$ H$_{2}$ + M & H$_{2}$ & 2.0 & H$_{2}$O & 6.0 \\
+(8) & H + O + M $\rightarrow$ OH + M & H$_{2}$ & 1.0 & H$_{2}$O & 5.0 \\
+(9) & H + O$_{2}$ + M $\rightarrow$ HO$_{2}$ + M & H$_{2}$ & 2.0 & H$_{2}$O & 16.0 \\
+(19) & M + H$_{2}$O$_{2} \rightarrow$ OH + OH + M & H$_{2}$ & 1.0 & H$_{2}$O & 15.0 \\
+\hline
+\end{tabular}
+\label{thirds}
+\end{threeparttable}
+\end{table}
+
+
+

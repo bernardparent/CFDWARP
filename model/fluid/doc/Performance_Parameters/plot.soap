@@ -1,0 +1,20 @@
+#!/usr/local/bin/soap
+k=0;
+R=286;
+gamma=1.4;
+j=(gamma-1)/gamma;
+Tstag=450*(1+(gamma-1)/2*7.7^2);
+Pstar3_over_Pstag=1000/((Tstag/450)^(1/j)*5500);
+Tstag=Tstag;
+
+fact=1e9;
+while (fact>1,
+  fact=fact*0.9;
+  Pstar3_over_Pstag_new=Pstar3_over_Pstag*fact;
+  {Fpot=sqrt((2*R*Tstag+4/3*k)/j)
+     *(1+(j/2-1)*Pstar3_over_Pstag_new^j)
+     /sqrt(1-Pstar3_over_Pstag_new^j);}
+  RTstag=fact;
+  Fpotpart=sqrt((2*RTstag+4/3*k)/j);
+  printf("%E  %E\n",RTstag,Fpotpart);
+);

@@ -1,0 +1,4 @@
+#!MC 1200
+# Created by Tecplot 360 build 12.0.0.3454
+$!ALTERDATA 
+  EQUATION = '{Pdiff}=abs({P}[1]-{P}[2])/abs({P}[1])'

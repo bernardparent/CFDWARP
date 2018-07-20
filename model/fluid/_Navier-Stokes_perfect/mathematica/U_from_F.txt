@@ -1,0 +1,7 @@
+V = X1*U2/U1 + X2*U3/U1 + X3*U4/U1
+P = (g - 1)*(U5 - U2*U2/(2*U1) - U3*U3/(2*U1) - U4*U4/(2*U1))
+
+Simplify[Simplify[
+  Solve[{U1*V == F1, U2*V + X1*P == F2, U3*V + X2*P == F3, 
+    U4*V + X3*P == F4, U5*V + V*P == F5}, {U1, U2, U3, U4, U5}]
+  ]]

@@ -1,0 +1,244 @@
+
+___________________________________________________________________________________
+
+
+CFDWARP USAGE
+
+___________________________________________________________________________________
+
+
+
+
+CREATE TEMPLATE CONTROL FILE
+
+./warp -w control.wrp
+
+
+
+EDIT CONTROL FILE
+
+Use your favourite editor (vi, emacs, pluma, kate) and edit the control
+file to your taste:
+
+pluma control.wrp
+
+The control file uses the SOAP interpreter language, for which a manual
+is provided (SOAP_manual.pdf). As well, the grid generation is done 
+through the GRIDG library (see GRIDG_manual.pdf). Learn how to write 
+code in SOAP and how to generate a grid through the examples given in 
+the manuals.
+
+
+
+CHECK THE GRID
+
+At the UNIX shell prompt, execute warp as follows:
+
+./warp -r control.wrp -opg post.grid
+
+Then, verify if your grid is correct in tecplot
+
+tec360 post.grid
+
+Alternately, you can generate a grid in vtk format as follows:
+
+./warp -r control.wrp -opg post.vtk -pt vtk
+
+And visualize the grid in paraview:
+
+paraview post.vtk
+
+
+
+CHECK THE BOUNDARY CONDITIONS
+
+For a 2D problem, you can verify if your boundary conditions are 
+implemented correctly through the following command:
+
+./warp -r control.wrp -n 20 25 40
+
+This will output to the screen the node types around the point i=20, 
+j=25 with a  bandwidth of 40 nodes. To display the node types in 3D 
+around  the point i=120, j=25, k=22 with a bandwidth of 30 nodes, 
+the command becomes:
+
+./warp -r control.wrp -n 120 25 22 30
+
+ 
+
+CHECK THE INITIAL CONDITIONS
+
+The initial conditions can be verified by creating a tecplot 
+postfile directly from the control file:
+
+./warp -r control.wrp -op post.01
+
+and then opening post.01 using tecplot:
+
+tec360 post.01
+
+Alternately, you can add the flag -pt followed by either vtk or 
+nodplot to create a  postfile in paraview or nodplot format, 
+respectively.
+
+
+
+RUN A CASE
+
+Once the grid, boundary conditions, and initial conditions have been 
+verified to be valid, you can run a case as follows:
+
+./warp -r control.wrp -o data.01
+
+This will iterate the case with the boundary conditions, grid, and 
+initial conditions specified in control.wrp and output the 
+converged solution to the data file data.01. In case of a crash,
+lower the CFL within the Cycle() module. 
+
+
+
+RESTART A CASE
+
+If you wish to restart a case that is not yet converged, this can be 
+done with the following:
+ 
+./warp -r control.wrp -i data.01 -o data.02
+
+This tells warp to read the data file data.01 instead of applying the 
+initial conditions and to continue the iteration process which will be 
+saved in the data file data.02.
+
+
+
+VISUALIZE THE DATA
+
+The data file can be transformed into a post file that can be read by
+tecplot or some other data visualization program through the command:
+ 
+./warp -r control.wrp -i data.02 -op post.02
+
+
+
+POST-PROCESS THE DATA 
+
+CFDWARP has some built-in functions within the Post() module part 
+of the control file to help with data post-processing. For instance, 
+using the Post() module, it is possible to find the thrust potential 
+or the average stagnation pressure at a certain x-station (such would 
+be tedious to obtain using TECPLOT or other post-processing software). 
+To run post-processing commands using the Post() module, type the 
+following at the shell prompt:
+
+./warp -r control.wrp -i data.02 -opm
+
+
+
+RUN CFDWARP IN THE BACKGROUND
+
+You may wish occasionally to run warp in the "background" so that it 
+continues running even after you exit your shell. To do so,
+first figure out which shell you are using by typing at the prompt:
+
+echo $SHELL
+
+If tcsh, then you can run CFDWARP in the background as follows:
+
+./warp -r control.wrp -o data.01 >& scr.01 &
+
+where both stdout (the screen output) and stderr (the error)
+are outputted to scr.01. If you want to restart a not-yet-converged
+case, rather execute the following:
+
+./warp -r control.wrp -i data.01 -o data.02 >>& scr.01 &
+
+where ``>>'' tells the shell to append to the file scr.01.
+
+On the other hand, if the shell is bash (on linux) or sh (on 
+traditional UNIX OSes), then run CFDWARP in the background with:
+
+./warp -r control.wrp -o data.01 1> scr.01 2> scr.error &
+
+where stdout is outputted to scr.01 and stderr is outputted to
+scr.error. To restart a case, use:
+
+./warp -r control.wrp -i data.01 -o data.02 1>> scr.01 2>> scr.error &
+
+
+
+SEND A SIGNAL TO A RUNNING CFDWARP
+
+By sending the signal USR1 to a running warp, warp will save the 
+datafile  at the following iteration. For example, the following will 
+tell all running warp codes on a machine to save the datafile:
+
+killall -USR1 warp
+
+Alternately, you can send a signal to a specific warp process by finding 
+its process ID through top, and then specifying the following:
+
+kill -USR1 PID
+
+where PID should be substituted by the process ID of CFDWARP found through top.
+
+
+
+RUN CFDWARP WITH MPI
+
+If CFDWARP was compiled to be used with MPI, then the following command 
+should be used at the prompt:
+
+mpiexec -np 4 ./warp -r control.wrp -i data.01 -o data.02
+
+The latter shares the work and memory on four processes that will be 
+distributed on one machine or on several machines depending on how MPI was 
+configured on your server.
+       
+
+
+RUN CFDWARP WITH OPENMP THREADS
+
+If CFDWARP was compiled with OPENMP threads, the number of threads can be 
+changed to 4 within the shell by typing:
+
+set OMP_NUM_THREADS=4
+
+or
+
+export OMP_NUM_THREADS=4
+
+Alternately, you can change the number of threads with the -nt flag. Note
+that the number of threads specified through the -nt flag supersedes the 
+one specified by the OMP_NUM_THREADS environment variable.
+
+
+
+CPU PROFILING
+
+If CFDWARP was compiled with the CPU profiling option (-pg flag), then run
+it as usual and wait for it to finish the job normally (don't kill it
+prematurely). This will output the file gmon.out in the local directory.
+Then run the following
+
+gprof ./warp > gprof.out
+
+or
+
+gprof -D ./warp > gprof.out
+
+Gprof will read in the executable and the file gmon.out and output the
+CPU profiling information in the file gprof.out.
+
+
+
+OTHER COMMANDS
+
+For other commands, see the list of possible flags that warp recognizes by
+typing warp without arguments at the prompt:
+
+./warp 
+
+
+
+
+
+

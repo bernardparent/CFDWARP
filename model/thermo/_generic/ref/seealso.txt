@@ -1,0 +1,11 @@
+downloads.virtualmaterials.com/ downloads/manuals/files/Thermo37.pdf
+
+JANAF Thermochemical Tables, 3rd edition, M.W. Chase Jr., C.A. Davies, J.R. Davies, Jr., D.J. Fulrip, R.A. McDonald, and A.N. Syverud, Journal of Physical and Chemical Reference Data, 14, Supplement 1, 1985.
+
+http://www.galcit.caltech.edu/EDL/public/thermo.html
+
+ftp://ftp.technion.ac.il/pub/supported/aetdd/thermodynamics
+
+http://public.ca.sandia.gov/HiTempThermo/mp4search.html
+
+http://cea.grc.nasa.gov/

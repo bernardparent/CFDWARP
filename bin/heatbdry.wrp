@@ -1,0 +1,508 @@
+{
+  _____________________________________________________________________________
+
+  WARP: a CFD Code for Plasma & Reactive Flows [a]
+  _____________________________________________________________________________
+
+  Cycle Strategy                          Standard Cycle
+  Fluid Transport Integration             Block DDADI [2,1]
+  EM Field Integration                    none
+  Convection Derivative Discretization    Positivity-Preserving FDS [3]
+                                          ADER-WENO 6th Order [4]
+  Time Derivative Discretization          Positivity-Preserving
+                                          Cross-Difference Formula Parent
+                                          First-Order [5]
+  Fluid Transport Model                   Navier-Stokes Perfect Gas
+  Chemical Model                          Air 1 species 0 reaction
+  Beam Model                              None
+  EM Field Model                          None
+  Thermodynamic Model                     Perfect Gas
+  Number of Dimensions                    3
+  Number of Flux Components               5
+  _____________________________________________________________________________
+
+  [a]  B Parent. "WARP: a CFD Code for Plasma & Reactive Flows", WARP version
+       17apr02b compiled on Apr  3 2017 at 10:40:48 by parent on WAFL101 using
+       gcc 4.9.2 with OPENMP threads with distributed memory MPI. WARP is a
+       Copyright (c) 1998-2017 of Bernard Parent. Copying and distribution of
+       WARP is prohibited.
+  [1]  RW MacCormack. "A New Implicit Algorithm for Fluid Flow", 13th
+       Computational Fluid Dynamics Conference, AIAA Paper 97-2100, 1997.
+  [2]  J Bardina and CK Lombard. "Three Dimensional Hypersonic Flow Simulations
+       with the CSCM Implicit Upwind Navier-Stokes Method", Proceedings of the
+       8th Computational Fluid Dynamics Conference, AIAA Paper 87-1114, 1987.
+  [3]  B Parent. "Positivity-Preserving Flux Difference Splitting Schemes",
+       Journal of Computational Physics 243:194-209, 2013.
+  [4]  DS Balsara, S Garain, and CW Shu. "An Efficient Class of WENO schemes
+       with Adaptive Order", Journal of Computational Physics 326:780-804,
+       2016.
+  [5]  B Parent. "Positive Coefficients, Cross Differences, and
+       Dual-Time-Stepping Schemes", under review, 2017.
+
+}
+ 
+
+
+mf=1.5; {1.5}
+
+
+xs0=0.0;
+xs1=0.013; {start of exposed electrode}
+xs2=0.016; {end of exposed electrode}
+xs3=0.018; {start of buried electrode}
+xs4=0.021; {end of buried electrode}
+xs5=0.06; {end of high resolution region}  
+L=xs5;
+
+
+Hdielectric=300e-6*5; {depth of buried electrode}
+Hfluid=0.01; 
+Hbdryexit=0.0011;
+Hsheath=0.0007;
+
+
+
+
+is0=1;
+is1=is0+round(mf*50);
+is2=is1+round(mf*24);
+is3=is2+round((is2-is1)*(xs3-xs2)/(xs2-xs1));
+is4=is3+round((is2-is1)*(xs4-xs3)/(xs2-xs1));
+is5=is4+round(mf*190);
+
+ie=is5;
+
+dx=(xs5-xs4)/(is5-is4)/2;
+
+
+js0=1;
+js1=round(js0+12*mf);
+js2=round(js1+12*mf);
+js3=round(js2+30*mf);
+js4=round(js3+20*mf);
+
+is=is0;  js=js0; 
+ie=is5; je=js4;
+
+
+dy=Hsheath/(js3-js2)/3.0;
+dyexit=Hbdryexit/(js3-js2)/3.0;
+
+
+D=0.003;
+dz_electrodetwist=0; {D/20 works fine. makes electrodes off-centered}
+dz_electrode=D/34; {moves both electrodes along z by dz_electrode}
+zs0=0.0;
+zs1=0.33*D;
+zs2=0.67*D;
+zs3=D;
+
+Hheat=-0.0017;
+Rheat=0.002;
+Dheat=D*0.3;
+numtimelevelsskip_writedatafile=round(mf*4); {affects unsteady simulation only}
+
+
+ks=1;
+ke=round(35*mf);
+ks1=round(ks+(ke-ks)*zs1/D);
+ks2=round(ks+(ke-ks)*zs2/D);
+
+Grid(
+  Size(is,js,ks, ie,je,ke);
+  printf("%ldx%ldx%ld..",(ie-is+1),(je-js+1),(ke-ks+1));
+
+  {first electrode}
+  Corners(is1,js1,ks, is2,js2,ks, xs1,-Hdielectric,0.0, xs2,0.0,0.0);
+  JoinCorners(is1,js1,ks, is2,js2,ks,  EE,0.5e0,1.0,1.0,  EF,0.5e0,1.0e0,dy, NO,0.5,1,1);
+
+  {second electrode}
+  Corners(is3,js1,ks, is4,js2,ks, xs3,-Hdielectric,0, xs4,0.0,0);
+  JoinCorners(  is3,js1,ks, is4,js2,ks,  EE,0.5e0,1.0,1.0,  EF,0.5e0,1.0e0,dy, NO,0.5,1,1);
+
+  {from inflow to first electrode}
+  Corners(is0,js1,ks, is1,js2,ks,  0.0,-Hdielectric,0.0, xs1,0.0,0.0);
+  JoinCorners(  is0,js1,ks, is1,js2,ks,  fg,0.5e0,dx,1.0,  EF,0.5e0,1.0e0,dy, NO,0.5,1,1);
+
+  {in between electrodes}
+  Corners(is2,js1,ks, is3,js2,ks, xs2,-Hdielectric,0, xs3,0.0,0);
+  JoinCorners(is2,js1,ks, is3,js2,ks,  GG,0.5e0,1.0,1.0,  EF,0.5e0,1.0e0,dy, NO,0.5,1,1);
+
+  {after second electrode}
+  Corners(is4,js1,ks, is5,js2,ks, xs4,-Hdielectric,0, xs5,0.0,0);
+  JoinCorners(is4,js1,ks, is5,js2,ks,  GE,0.2e0,1.0,1.0,  EF,0.5e0,1.0e0,dy, NO,0.5,1,1);
+
+
+
+
+
+  {copy the row j=js2 on j=js3}
+  Copy(is,js2,ks, ie,js2,ks, is,js3,ks);
+  {translate row j=js3 from y=0 to y=Hsheath}
+  Translate(is,js3,ks, ie,js3,ks, 0.0,Hsheath,0.0);
+  {Join row j=js2 to row j=js3}
+  Join(is,js2,ks, ie,js3,ks, j, FE,0.25,dy,1.0); 
+
+  {copy the row j=js2 on j=je}
+  Copy(is,js2,ks, ie,js2,ks, is,je,ks);
+  {translate row j=je from y=0 to y=Hfluid}
+  Translate(is,je,ks, ie,je,ks, 0.0,Hfluid,0.0);
+  {Join row j=js3 to row j=je}
+  Join(is,js3,ks, ie,je,ks, j, GE,0.8,1.0,1.0); 
+
+  {copy the row j=js1 on j=js0}
+  Copy(is,js1,ks, ie,js1,ks, is,js0,ks);
+  {translate row j=js0 from y= to y=Hfluid}
+  Translate(is,js,ks, ie,js,ks, 0.0,-Hdielectric,0.0);
+  {Join row j=js0 to row j=js1}
+  Join(is,js0,ks, ie,js1,ks, j, EG, 0.5,1.0,1.0); 
+  
+  {make adjustment to grid at exit plane}
+  Point(ie,js3,ks, L,Hbdryexit,0);
+  JoinCorners(ie,js2,ks, ie,js3,ks, NO,0.5,1,1, FE,0.25,dyexit,1.0, NO,0.5,1,1);
+  Join(ie,js3,ks, ie,je,ks, j, GE,0.8,1.0,1.0); 
+  
+  {join is4 and is5}
+  Join(is4,js,ks, is5,je,ks, i, GE,0.3,1.0,1.0); 
+   
+
+  Copy(is,js,ks, ie,je,ks, is,js,ke);
+  Translate(is,js,ke,ie,je,ke, 0.0,0.0,D);
+
+  Copy(is,js,ks, ie,je,ks, is,js,ks1);
+  Translate(is,js,ks1,ie,je,ks1, 0.0,0.0,zs1);
+
+  Copy(is,js,ks, ie,je,ks, is,js,ks2);
+  Translate(is,js,ks2,ie,je,ks2, 0.0,0.0,zs2);
+
+
+  Join(is,js,ks1, ie,je,ks2, k, EE,0.5,1,1);
+
+  {Make the electrodes off centered}
+  Translate(is1,js,ks1,is2,je,ks2, 0.0,0.0,-dz_electrodetwist);
+  Translate(is3,js,ks1,is4,je,ks2, 0.0,0.0,+dz_electrodetwist);
+
+
+  Join(is,js,ks, ie,je,ks1, k, EG,0.5,1,1);
+  Join(is,js,ks2, ie,je,ke, k, GE,0.5,1,1);
+
+
+  {make grid smooth before first electrode }
+  Join(round(is1-0.5*(is1-is)),js,ks,is1,je,ke,i,GG,0.5e0,1.0,1.0);
+  {make grid smooth in-between electrodes}
+  Join(is2,js,ks,is3,je,ke,i,GG,0.5e0,1.0,1.0);
+  {make grid smooth after second electrode}
+  Join(is4,js,ks,round(is4+(ie-is4)*0.2),je,ke,i,GG,0.5e0,1.0,1.0);
+
+);
+
+
+
+
+
+
+
+
+Bdry(
+  NavierStokesPerfect(
+    {
+    _________________________________________________________________________________________
+
+    Boundary Condition Type            Number  Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC              0       Inflow, supersonic, 1o
+    BDRY_INFLOWSUBSONIC1               7       Inflow, subsonic, Tstag, Pstag fixed, 1o
+    BDRY_INFLOWSUBSONICMASSFLOWFIXED1  16      Inflow, subsonic, Pstag, Massflow/Area fixed, 1o
+    BDRY_OUTFLOWSUPERSONIC1            1       Outflow, supersonic, 1o
+    BDRY_OUTFLOWSUPERSONIC2            2       Outflow, supersonic, 2o
+    BDRY_OUTFLOWSUBSONIC1              4       Outflow, subsonic, P fixed, 1o
+    BDRY_OUTFLOWSUBSONICMFIXED1        15      Outflow, subsonic, M fixed, 1o
+    BDRY_SYMMETRICAL2                  14      Symmetrical, 2o
+    BDRY_SYMMETRICAL1                  9       Symmetrical, 1o
+    BDRY_WALLTFIXED1                    3       Wall, T specified
+    BDRY_WALLADIABATIC1                 6       Wall, Adiabatic
+    BDRY_SLIPWALL1                     12      Slip wall, Adiabatic, 1o
+    _________________________________________________________________________________________
+    }
+    Cut(is,js,ks,  ie,js2,ke);
+    All(BDRY_WALLTFIXED1);
+    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLTFIXED1,BDRY_OUTFLOWSUPERSONIC1, BDRY_SYMMETRICAL2,BDRY_SYMMETRICAL2);
+
+    {
+    Cut(is,js,ks,  ie,je,ke);
+    Region(is,js,ks,  ie,je,ke,  BDRY_INFLOWSUPERSONIC);
+    }
+  );
+);
+ 
+ 
+Model(
+  NavierStokesPerfect(
+    gamma=1.4;
+    R=286.0; {J/kgK }
+    eta=2e-5; {kg/ms}
+    kappa=0.03; {W/mK}
+    Pmin=500;    Pmax=9.9e99;   {min and max pressure allowed in the domain in Pa}
+    Tmin=50;     Tmax=10.0e3;    {min and max temperature allowed in the domain in K}
+    zetaA1=0.0e0;   {conditions the convective waves of the A jacobian}
+    zetaA2=0.3;
+    zetaA3=1.0e0;   {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
+    
+    SetHeatDeposited(is,js,ks, ie,je,ke, 0.0 {W/m3});
+    SetBodyForce(is,js,ks, ie,je,ke, 0.0{N/m3},0.0{N/m3},0.0{N/m3});
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+  );
+
+
+);
+
+
+Init(
+
+    NavierStokesPerfect(
+      {
+      _______________________________________________________________________________________
+
+      Initial Condition Type       Parameters
+      _______________________________________________________________________________________
+
+      INIT_TYPE1                   V[1]..V[nd],  P,  T     
+      INIT_TYPE2                   M[1]..M[nd],  P,  T     
+      _______________________________________________________________________________________
+
+      }
+      Vx=600;
+      Vy=0;
+      Vz=0;
+      P=10000; {Pa}
+      T=300; {K}
+      All(1,Vx,Vy,Vz,P,T);
+      {
+      Bdry(BDRY_WALLTFIXED1, 2, Mx,My,Mz,P,T);
+      Region(is,js,ks,  ie,je,ke,  2, Mx,My,Mz,P,T);
+      }
+    );
+
+);
+
+
+Cycle(
+  NavierStokesPerfect(
+    xiverge=1e2;          {residual convergence threshold}
+    rhoref=0.1;            {reference density in kg/m3}
+    aref=300.0;            {reference sound speed in m/s}
+    Uref[0]=rhoref;            
+    Uref[1]=rhoref*aref;       
+    Uref[2]=rhoref*aref;   
+    Uref[3]=rhoref*aref;   
+    Uref[4]=rhoref*aref*aref;  
+  );
+
+  DualTimeStepping(
+    tref=1e-4;    {simulation reference time span in seconds}
+    tmax=4*tref; {time after which simulation is stopped}
+    dt=tref/(600*mf);  {physical time step in seconds}
+    number_pulses=5; {number of pulses during tref at one actuator}
+    tpulse=tref/number_pulses;
+    power_of_pulse_left=80; {Watts} 
+    power_of_pulse_right=30; {Watts} 
+    iterpulse=10*mf;
+
+    sigma1=0.5;      {exponent of largest pseudotime step in all dimensions}
+    sigma2=0.0;      {exponent of largest pseudotime step in all flux components}
+    PRECONDITIONING=PRECON_LOCALTIMESTEP;
+    HEATADDITION="NN";
+    if (mod(round(time/dt),round(tpulse/dt))<iterpulse,
+      HEATADDITION="NY";
+    );
+    if (mod(round(time/dt),round(tpulse/dt))>=iterpulse && mod(round(time/dt),round(tpulse/dt))<2*iterpulse,
+      HEATADDITION="YN";
+    );
+    printf(HEATADDITION);
+    if (iter==1,
+      if (HEATADDITION!="NN",
+        CFL=0.7;
+      ,{else}
+        CFL=1.5;
+      );
+      Model(
+       NavierStokesPerfect(
+        SetHeatDeposited(is,js,ks, ie,je,ke, 0 {W/m3});
+ 
+        if (HEATADDITION=="YN",
+          AddHeatPoint(0.5*(xs1+xs2),Hheat,D*0.5-dz_electrodetwist+dz_electrode, Rheat, power_of_pulse_left/iterpulse);
+        );
+        if (HEATADDITION=="NY",
+          AddHeatPoint(0.5*(xs3+xs4),Hheat,D*0.5+dz_electrodetwist+dz_electrode, Rheat, power_of_pulse_right/iterpulse);
+        );
+       );
+      );
+    );
+    CFL=min(CFL*1.1,2.5);
+    phi1=round(25*sqrt(mf));     {maximum number of gridlines per zone in each dimension}
+
+    if (iter>15,
+      CFL=1.0;
+    );
+
+    if (iter>50,
+      CFL=0.3;
+    );
+
+    UpdateFluid(CFL,PRECONDITIONING,sigma1,sigma2,dt);
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,k_ximax,clipinfo);
+    if (ximax<xiverge || iter>30,
+      IncreaseTimeLevel();
+      if (mod(round(time/dt),numtimelevelsskip_writedatafile)<1,
+        WriteDataFile(outputfilename"."round(time/dt));
+      );
+      printf("dt=%E time=%Es\n",dt,time);
+    );
+  );
+
+
+
+
+  Multizone(
+    tref=1e-4;    {simulation reference time span in seconds}
+    tmax=4*tref; {time after which simulation is stopped}
+    dt=tref/(600*mf);  {physical time step in seconds}
+    number_pulses=5; {number of pulses during tref at one actuator}
+    tpulse=tref/number_pulses;
+    power_of_pulse_left=250; {Watts} 
+    power_of_pulse_right=60; {Watts} 
+    iterpulse=10*mf;
+
+    sigma1=0.5;      {exponent of largest pseudotime step in all dimensions}
+    sigma2=0.0;      {exponent of largest pseudotime step in all flux components}
+    PRECONDITIONING=PRECON_LOCALTIMESTEP;
+    HEATADDITION="NN";
+    if (mod(round(time/dt),round(tpulse/dt))<iterpulse,
+      HEATADDITION="NY";
+    );
+    if (mod(round(time/dt),round(tpulse/dt))>=iterpulse && mod(round(time/dt),round(tpulse/dt))<2*iterpulse,
+      HEATADDITION="YN";
+    );
+    printf(HEATADDITION);
+    if (iter==1,
+      if (HEATADDITION!="NN",
+        CFL=0.3;
+      ,{else}
+        CFL=1.5;
+      );
+      Model(
+       NavierStokesPerfect(
+        SetHeatDeposited(is,js,ks, ie,je,ke, 0 {W/m3});
+ 
+        if (HEATADDITION=="YN",
+          AddHeatPoint(0.5*(xs1+xs2),Hheat,D*0.5-dz_electrodetwist, Rheat, power_of_pulse_left/iterpulse);
+        );
+        if (HEATADDITION=="NY",
+          AddHeatPoint(0.5*(xs3+xs4),Hheat,D*0.5+dz_electrodetwist, Rheat, power_of_pulse_right/iterpulse);
+        );
+       );
+      );
+    );
+    CFL=min(CFL*1.15,2.5);
+    phi1=round(25*sqrt(mf));     {maximum number of gridlines per zone in each dimension}
+
+    if (iter>15,
+      CFL=1.0;
+    );
+
+    if (iter>50,
+      CFL=0.3;
+    );
+
+    phi1=round(20*mf);      {maximum number of gridlines per zone in each dimension}
+    UpdateFluid(CFL,PRECONDITIONING,sigma1,sigma2,phi1,dt);
+
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld,%4ld) %3ld/%3ld%s \n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,k_ximax,numzones_updated,numzones_total,clipinfo);
+    if (ximax<xiverge || iter>30,
+      IncreaseTimeLevel();
+      if (mod(round(time/dt),numtimelevelsskip_writedatafile)<1,
+        WriteDataFile(outputfilename"."round(time/dt));
+      );
+      printf("dt=%E time=%Es\n",dt,time);
+    );
+
+
+
+  );
+
+
+
+
+  SteadyState(
+    if (mod(iter,5000)==0,
+      WriteDataFile(outputfilename);
+    );
+    sigma1=0.5;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
+    PRECONDITIONING=FALSE;
+    if (iter==1,
+      CFL=0.1;
+    );
+    CFL=min(CFL*1.05,1.0);
+    UpdateFluid(CFL,PRECONDITIONING,sigma1,sigma2);
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,k_ximax,clipinfo);
+  );
+
+
+
+);
+
+
+
+Post(
+  xstation[1]=0.01;{m}
+  xstation[2]=0.02;{m}
+  xstation[3]=0.03;{m}
+  for (cnt,1,3,
+    SetXstation(xstation[cnt]);
+    printf("    Processing x-station..");
+    Pback=_Pback_xstation({Aback,m2}1.0, {Pback_min,Pa}400, {Pback_max,Pa}4000, {numsteps}300,
+                 {q_min (as small a positive value as possible)}1.0);
+    Fpot=_Fpot_xstation(Pback,{numsteps}300, {q_min}1.0);
+    mdot=_mdot_xstation();
+    Tstag=_Tstag_xstation();
+    Pstag=_Pstag_xstation({numsteps} 300);
+    Pstar=_Pstar_xstation();
+    T=_T_xstation();
+    q=_q_xstation();
+    rho=_rho_xstation();
+    htstar=_htstar_xstation();
+    printf("\n"
+           "    x      = %E m\n"
+           "    Pback  = %E Pa\n"
+           "    Fpot   = %E Ns/kg\n"
+           "    mdot   = %E kg/s\n"
+           "    htstar = %E J/kg\n"
+           "    Tstag  = %E K\n"
+           "    Pstag  = %E Pa\n"
+           "    Pstar  = %E Pa\n"
+           "    T      = %E K\n"
+           "    q      = %E m/s\n"
+           "    rho    = %E kg/m3\n\n"
+           ,xstation[cnt],Pback,Fpot,mdot,htstar,Tstag,Pstag,Pstar,T,q,rho);
+  );
+  printf("\n");
+  for (dim,1,3,
+    Fshear[dim]=_Fshear(ie-round(50*mf),js,ks, ie,je,ke,dim,BDRY_WALLTFIXED1);
+    Fpressure[dim]=_Fpressure(ie-round(50*mf),js,ks, ie,je,ke,dim,BDRY_WALLTFIXED1);
+  );
+  printf("    Fshear    = (%+E,%+E,%+E) N\n",Fshear[1],Fshear[2],Fshear[3]);
+  printf("    Fpressure = (%+E,%+E,%+E) N\n",Fpressure[1],Fpressure[2],Fpressure[3]);
+  printf("\n");
+  {
+  WritePostFile("post.01", "tecplot",POSTFILE_ALL);
+  WritePostFile("grid.01", "tecplot",POSTFILE_GRID);
+  }
+);

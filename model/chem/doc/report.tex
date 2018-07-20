@@ -1,0 +1,743 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{bm}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\efficiency}{\eta}
+\newcommand{\ordi}{{\rm d}}
+\newcommand{\unitvecdiff}[2]{\overline{\vec{#1} - \vec{#2}}}
+%\let\vec\bf
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\rhos}{\rho}
+\newcommand{\Cv}{{C_{\rm v}}}
+\newcommand{\Cp}{{C_{\rm p}}}
+\newcommand{\Sct}{{{\rm Sc}_{\rm T}}}
+\newcommand{\Prt}{{{\rm Pr}_{\rm T}}}
+\newcommand{\nd}{{{n}_{\rm d}}}
+\newcommand{\ns}{{{n}_{\rm s}}}
+\newcommand{\nn}{{{n}_{\rm n}}}
+\newcommand{\nr}{{{n}_{\rm r}}}
+\newcommand{\ndm}{{\bar{n}_{\rm d}}}
+\newcommand{\nsm}{{\bar{n}_{\rm s}}}
+\newcommand{\turb}{_{\rm T}}
+\newcommand{\mut}{{\mu\turb}}
+\newcommand{\mfa}{\scriptscriptstyle}
+\newcommand{\mfb}{\scriptstyle}
+\newcommand{\mfc}{\textstyle}
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\hlinex}{\vspace{-0.34cm}~~\\ \hline \vspace{-0.31cm}~~\\}
+\newcommand{\hlinextop}{\vspace{-0.46cm}~~\\ \hline \hline \vspace{-0.32cm}~~\\}
+\newcommand{\hlinexbot}{\vspace{-0.37cm}~~\\ \hline \hline \vspace{-0.50cm}~~\\}
+\newcommand{\tablespacing}{\vspace{-0.4cm}}
+\newcommand{\fontxfig}{\footnotesize\scalefont{0.918}}
+\newcommand{\fontgnu}{\footnotesize\scalefont{0.896}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{0.9}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\author{
+  Bernard Parent and Giovanni Fusina
+}
+
+\email{
+  bernparent@gmail.com
+}
+
+\department{
+  Institute for Aerospace Studies
+}
+
+\institution{
+  University of Toronto
+}
+
+\title{Chemical Models
+}
+
+\date{
+  November 2000, July 2015
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+  \tableofcontents
+%  \makenomenclature
+  \listoftables
+%%  \listoffigures
+
+
+
+\section{Chemical Models in Arrhenius Form}
+
+
+
+The calculation of a chemical source term is explained in detail in Anderson \cite{book:1989:anderson}.
+A brief summary of that explanation follows here.
+Each species conservation equation has a source term for each species $k$ given by:
+%
+\begin{equation}
+W_k = {\cal M}_k \sum_{r=1}^{\nr} \left( \nu''_{r,k} - \nu'_{r,k} \right)
+\left[ k_{f,r} \prod_{m=1}^{\ns} \left[ X_m \right]^{\nu'_{r,m}}
+- k_{b,r} \prod_{m=1}^{\ns} \left[ X_m \right]^{\nu''_{r,m}} \right]
+\end{equation}
+%
+where $W_k$ is the mass created per unit volume per unit time in $\rm kg/(cm^3\cdot s)$, and where $\nr$ is the number of elementary reactions, $\ns$ is the number of species involved, ${\cal M}_k$ is the molecular weight of species $k$ in kg/gmol, $X_m$ is the number of moles per unit volume of species $m$ in gmol/cm$^3$, $\nu'_{r,k}$ is the stoichiometric coefficient for the reactants of reaction $r$, $\nu''_{r,k}$ is the stoichiometric coefficient for the products of reaction $r$, $k_b$ is the backward reaction rate constant and
+$k_f$ is the forward reaction rate constant, given by the
+modified Arrhenius equation:
+%
+\begin{equation}
+k_f = AT^n \exp(-E/{\cal R}T)
+\end{equation}
+%
+where $\cal R$ is the universal gas constant:
+%
+\begin{equation}
+ {\cal R}=1.9872036 ~\frac{\rm cal}{\rm gmol\cdot K}
+\end{equation}
+%
+and where the coefficients $A$, $n$ and $E$ are germane to a particular combustion
+model and are listed in  Table \ref{tab:jachimowsky} and \ref{tab:jachimowsky-thirdbody} (Jachimowsky hydrogen-air model) and Table \ref{tab:dunn-kang} (Dunn-Kang high-temperature air plasma model). Note that a gram-mole is the same as the SI unit mole and corresponds to:
+%
+\begin{equation}
+{\rm gmol}={\rm mole}=6.023 \times 10^{23}~{\rm particules}
+\end{equation}
+%
+
+The backward and the forward reaction rate constants are related by the
+equilibrium constant, $K_c$
+%
+\begin{equation}
+\frac{k_f}{k_b} = K_c
+\end{equation}
+%
+The equilibrium constant, $K_c$ is given by:
+%
+\begin{equation}
+K_c = \left(10^{-6} \frac{\rm m^3}{\rm cm^3}\frac{P_{\rm ref}}{{\cal R} T}\right)^{\Delta \nu}
+       \exp \left( \frac{-\Delta G^0}{{\cal R} T} \right)
+\end{equation}
+%
+where $P_{\rm ref}$ is a reference pressure set to 100000~Pa, $T$ the temperature in K, $\cal R$ the universal gas constant set to 8.314472~J$\cdot$K$^{-1}\cdot$mole$^{-1}$,  and where
+%
+\begin{equation}
+\Delta \nu = \sum_{i=1}^{\ns} (\nu''_i - \nu'_i)
+\end{equation}
+%
+The Gibbs free energy for species $i$ is defined as $G_i = H_i - T S_i$, where $H_i$ is the enthalpy, $T$ is the temperature and $S_i$ is the entropy. The difference in Gibbs free energy $\Delta G^0$ of products and reactants is
+%
+\begin{equation}
+\Delta G^0 = \sum_{i=1}^{\ns} (\nu''_i - \nu'_i) \left( h^0_i - T s^0_i \right)
+\end{equation}
+%
+where $h^0_i$ is the molar enthalpy (including the heat of formation at a
+reference temperature of 298 K)
+of the species $i$, and $s^0_i$ is its the molar entropy,
+each calculated at a reference pressure (one atmosphere).
+
+
+
+The units for $A$ are in $[\textrm{cm}^{3b}\cdot (\textrm{gmol}\cdot \textrm{s})^{-b} \cdot \textrm{K}^{-n} ]$ where $b=1$ for two-body reactions and 
+$b=2$ for three-body reactions. On the other hand, the units for $E$ are in $[\rm {cal}/{gmol}]$.
+
+The symbol $M$ denotes a third-body collision partner, a species acting as a catalyst only.
+The concentration of $M$ is simply determined from the equation:
+%
+\begin{equation}
+X_M = \sum_{k=1}^{\ns} \eta_k X_k
+\end{equation}
+%
+where $\eta_k$ is the third-body efficiency set to 1
+for most species and reactions except those listed in Table 
+\ref{tab:jachimowsky-thirdbody}.
+
+
+
+%
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Jachimowsky 9-species 20-reactions hydrogen-air model with nitrogen inert \cite{chem:jachimowsky}.}
+\begin{tabular}{ccccc} 
+\toprule
+\multicolumn{2}{c}{Reaction} & $A$ & $n$ & $E$  \\ 
+\midrule
+(1) & H$_{2}$ + O$_{2} \rightarrow$ OH + OH & 1.70 $\times$ 10$^{13}$ & 0 & 48 000 \\
+(2) & H + O$_{2} \rightarrow$ OH + O & 2.60 $\times$ 10$^{14}$ & 0 & 16 800 \\
+(3) & O + H$_{2} \rightarrow$ OH + H & 1.80 $\times$ 10$^{10}$ & 1.00 & 8 900 \\
+(4) & OH + H$_{2} \rightarrow$ H$_{2}$O + H & 2.20 $\times$ 10$^{13}$ & 0 & 5 150 \\
+(5) & OH + OH $\rightarrow$ H$_{2}$O + O & 6.30 $\times$ 10$^{12}$ & 0 & 1 090 \\
+(6) & H + OH + M $\rightarrow$ H$_{2}$O + M & 2.20 $\times$ 10$^{22}$ & -2.00 & 0 \\
+(7) & H + H + M $\rightarrow$ H$_{2}$ + M & 6.40 $\times$ 10$^{17}$ & -1.00 & 0 \\
+(8) & H + O + M $\rightarrow$ OH + M & 6.00 $\times$ 10$^{16}$ & -0.60 & 0 \\
+(9) & H + O$_{2}$ + M $\rightarrow$ HO$_{2}$ + M & 2.10 $\times$ 10$^{15}$ & 0 & -1 000 \\
+(10) & HO$_{2}$ + H $\rightarrow$ H$_{2}$ + O$_{2}$ & 1.30 $\times$ 10$^{13}$ & 0 & 0 \\
+(11) & HO$_{2}$ + H $\rightarrow$ OH + OH & 1.40 $\times$ 10$^{14}$ & 0 & 1 080 \\
+(12) & HO$_{2}$ + H $\rightarrow$ H$_{2}$O + O & 1.00 $\times$ 10$^{13}$ & 0 & 1 080 \\
+(13) & HO$_{2}$ + O $\rightarrow$ O$_{2}$ + OH & 1.50 $\times$ 10$^{13}$ & 0 &  950 \\
+(14) & HO$_{2}$ + OH $\rightarrow$ H$_{2}$O + O$_{2}$ & 8.00 $\times$ 10$^{12}$ & 0 & 0 \\
+(15) & HO$_{2}$ + HO$_{2} \rightarrow$ H$_{2}$O$_{2}$ + O$_{2}$ & 2.00 $\times$ 10$^{12}$ & 0 & 0 \\
+(16) & H + H$_{2}$O$_{2} \rightarrow$ H$_{2}$ + HO$_{2}$ & 1.40 $\times$ 10$^{12}$ & 0 & 3 600 \\
+(17) & O + H$_{2}$O$_{2} \rightarrow$ OH + HO$_{2}$ & 1.40 $\times$ 10$^{13}$ & 0 & 6 400 \\
+(18) & OH + H$_{2}$O$_{2} \rightarrow$ H$_{2}$O + HO$_{2}$ & 6.10 $\times$ 10$^{12}$ & 0 & 1 430 \\
+(19) & M + H$_{2}$O$_{2} \rightarrow$ OH + OH + M & 1.20 $\times$ 10$^{17}$ & 0 & 45 500 \\
+(20) & O + O + M $\rightarrow$ O$_{2}$ + M & 6.00 $\times$ 10$^{17}$ & 0 & -1 800 \\
+\bottomrule
+\end{tabular}
+\label{tab:jachimowsky}
+\end{threeparttable}
+\end{center}
+\end{table}
+%
+%
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Third body efficiencies for Jachimowsky 9-species 20-reactions model \cite{chem:jachimowsky}}
+\begin{tabular}{cccccc} 
+\toprule
+\multicolumn{2}{c}{Reaction} & \multicolumn{4}{c}{third body efficiency} \\ 
+\midrule
+(6) & H + OH + M $\rightarrow$ H$_{2}$O + M & H$_{2}$ & 1.0 & H$_{2}$O & 6.0 \\
+(7) & H + H + M $\rightarrow$ H$_{2}$ + M & H$_{2}$ & 2.0 & H$_{2}$O & 6.0 \\
+(8) & H + O + M $\rightarrow$ OH + M & H$_{2}$ & 1.0 & H$_{2}$O & 5.0 \\
+(9) & H + O$_{2}$ + M $\rightarrow$ HO$_{2}$ + M & H$_{2}$ & 2.0 & H$_{2}$O & 16.0 \\
+(19) & M + H$_{2}$O$_{2} \rightarrow$ OH + OH + M & H$_{2}$ & 1.0 & H$_{2}$O & 15.0 \\
+\bottomrule
+\end{tabular}
+\label{tab:jachimowsky-thirdbody}
+\end{threeparttable}
+\end{center}
+\end{table}
+%
+
+
+
+
+
+%
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Dunn-Kang 11-species 31-reaction high-temperature air model \cite{nasa:1973:dunn,aiaaconf:1987:Bussing}.}
+\begin{tabular}{ccccc} 
+\toprule
+\multicolumn{2}{c}{Reaction} & $A$, $\textrm{cm}^3\cdot(\textrm{gmol}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/gmol  \\ 
+\midrule
+(1) & $\rm O_2 + N \rightarrow 2O+N$ & 3.6 $\times$ 10$^{18}$  & -1 & 118,800 \\
+(2) & $\rm O_2 + NO \rightarrow 2O+NO$ & 3.6 $\times$ 10$^{18}$ & -1 & 118,800 \\
+(3) & $\rm N_2 + O \rightarrow 2N+O$ & 1.9 $\times$ 10$^{17}$ & -0.5 & 226,000 \\
+(4) & $\rm N_2 + NO \rightarrow 2N+NO$ & 1.9 $\times$ 10$^{17}$ & -0.5 & 226,000 \\
+(5) & $\rm N_2 + O_2 \rightarrow 2N+O_2$ & 1.9 $\times$ 10$^{17}$ & -0.5 & 226,000 \\
+(6) & $\rm NO + O_2 \rightarrow N+O+O_2$ & 3.9 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
+(7) & $\rm NO + N_2 \rightarrow N+O+N_2$ & 3.9 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
+(8) & $\rm O + NO \rightarrow N+O_2$ & 3.2 $\times$ 10$^{9}$ & 1 & 39,400 \\
+(9) & $\rm O + N_2 \rightarrow N+NO$ & 7 $\times$ 10$^{13}$ & 0 & 76,000 \\
+(10) & $\rm N + N_2 \rightarrow 2N+N$ & 4.085 $\times$ 10$^{22}$ & -1.5 & 226,000 \\
+(11) & $\rm O + N \rightarrow NO^{+}+e^{-}$ & 1.4 $\times$ 10$^{6}$ & 1.5 & 63,800 \\
+(12) & $\rm O + e^- \rightarrow O^++2e^-$ & 3.6 $\times$ 10$^{31}$ & -2.91 & 316,000 \\
+(13) & $\rm N + e^- \rightarrow N^++2e^-$ & 1.1 $\times$ 10$^{32}$ & -3.14 & 338,000 \\
+(14) & $\rm O + O \rightarrow O_2^{+}+e^-$ & 1.6 $\times$ 10$^{17}$ & -0.98 & 161,600 \\
+(15) & $\rm O + O_2^+ \rightarrow O_2+O^+$ & 2.92 $\times$ 10$^{18}$ & -1.11 & 56,000 \\
+(16) & $\rm N_2 + N^+ \rightarrow N+N_2^{+}$ & 2.02 $\times$ 10$^{11}$ & 0.81 & 26,000 \\
+(17) & $\rm N + N \rightarrow N_2^{+} + e^-$ & 1.4 $\times$ 10$^{13}$ & 0 & 135,600 \\
+(18) & $\rm O + NO^+ \rightarrow NO + O^+$ & 3.63 $\times$ 10$^{15}$ & -0.6 & 101,600 \\
+(19) & $\rm N_2 + O^+ \rightarrow O + N_2^{+}$ & 3.4 $\times$ 10$^{19}$ & -2 & 46,000 \\
+(20) & $\rm N + NO^+ \rightarrow NO + N^+$ & 1 $\times$ 10$^{19}$ & -0.93 & 122,000 \\
+(21) & $\rm O_2 + NO^+ \rightarrow NO + O_2^{+}$ & 1.8 $\times$ 10$^{15}$ & 0.17 & 66,000 \\
+(22) & $\rm O + NO^+ \rightarrow O_2 + N^+$ & 1.34 $\times$ 10$^{13}$ & 0.31 & 154,540 \\
+(23) & $\rm O_2 + O \rightarrow 2O + O$ & 9 $\times$ 10$^{19}$ & -1 & 119,000 \\
+(24) & $\rm O_2 + O_2 \rightarrow 2O + O_2$ & 3.24 $\times$ 10$^{19}$ & -1 & 119,000 \\
+(25) & $\rm O_2 + N_2 \rightarrow 2O + N_2$ & 7.2 $\times$ 10$^{18}$ & -1 & 119,000 \\
+(26) & $\rm N_2 + N_2 \rightarrow 2N + N_2$ & 4.7 $\times$ 10$^{17}$ & -0.5 & 226,000 \\
+(27) & $\rm NO + O \rightarrow N + 2O$ & 7.8 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
+(28) & $\rm NO + N \rightarrow O + 2N$ & 7.8 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
+(29) & $\rm NO + NO \rightarrow N + O + NO$ & 7.8 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
+(30) & $\rm O2 + N2 \rightarrow NO + NO^+ + e^-$ & 1.38 $\times$ 10$^{20}$ & -1.84 & 282,000 \\
+(31) & $\rm NO + N2 \rightarrow NO^- + e^- + N_2$ & 2.2 $\times$ 10$^{15}$ & -0.35 & 216,000 \\
+\bottomrule
+\end{tabular}
+\label{tab:dunn-kang}
+\end{threeparttable}
+\end{center}
+\end{table}
+%
+
+
+
+
+
+
+
+
+
+
+
+%
+\begin{table}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Macheret 8-species 28-reactions air plasma chemical model.\tnote{a}}
+    \label{tab:macheret}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}lll}
+    \toprule
+    No.&Reaction & Rate Coefficient  & Refs. \\
+    \midrule
+    1a  & $\rm e^- + N_2   \rightarrow N_2^+ + e^- + e^-$  
+       &  ${\rm exp}(-0.0105809\cdot {\rm ln}^2 E^\star - 2.40411\cdot 10^{-75} \cdot {\rm ln}^{46}E^\star)$~cm$^3$/s
+       & \cite{jcp:2014:parent} \\
+    1b  & $\rm e^- + O_2   \rightarrow O_2^+ + e^- + e^-$  
+       &  ${\rm exp}(-0.0102785\cdot {\rm ln}^2 E^\star - 2.42260\cdot 10^{-75} \cdot {\rm ln}^{46}E^\star)$~cm$^3$/s
+       & \cite{jcp:2014:parent} \\
+    2a & $\rm e^-+O_2^+ \rightarrow O + O$  
+       & $2.0 \cdot 10^{-7} \cdot (300/T_{\rm e})^{0.7}  $ cm$^3$/s
+       & \cite{misc:1997:aleksandrov}\\
+    2b & $\rm e^-+N_2^+ \rightarrow N + N$  
+       & $2.8 \cdot 10^{-7} \cdot (300/T_{\rm e})^{0.5}  $ cm$^3$/s 
+       & \cite{misc:1992:kossyi}\\
+    3a & $\rm O_2^{-}+N_2^{+} \rightarrow O_2 + N_2$ 
+       & $2.0 \cdot 10^{-7} \cdot (300/T)^{0.5}$ cm$^3$/s
+       & \cite{misc:1992:kossyi}\\
+    3b & $\rm O_2^{-}+O_2^{+} \rightarrow O_2 + O_2$ 
+       & $2.0 \cdot 10^{-7} \cdot (300/T)^{0.5}$ cm$^3$/s
+       & \cite{misc:1992:kossyi}\\
+    4a & $\rm O_2^{-}+N_2^{+} + N_2\rightarrow O_2 + N_2 +N_2$ 
+       & $2.0 \cdot 10^{-25} \cdot (300/T)^{2.5}$ cm$^6$/s  
+       & \cite{misc:1992:kossyi}\\
+    4b & $\rm O_2^{-}+O_2^{+} + N_2\rightarrow O_2 + O_2 +N_2$ 
+       & $2.0 \cdot 10^{-25} \cdot (300/T)^{2.5}$ cm$^6$/s  
+       & \cite{misc:1992:kossyi}\\
+    4c & $\rm O_2^{-}+N_2^{+} + O_2\rightarrow O_2 + N_2 +O_2$ 
+       & $2.0 \cdot 10^{-25} \cdot (300/T)^{2.5}$ cm$^6$/s  
+       & \cite{misc:1992:kossyi}\\
+    4d & $\rm O_2^{-}+O_2^{+} + O_2\rightarrow O_2 + O_2 +O_2$ 
+       & $2.0 \cdot 10^{-25} \cdot (300/T)^{2.5}$ cm$^6$/s  
+       & \cite{misc:1992:kossyi}\\
+    5a & $\rm e^- + O_2 +O_2 \rightarrow O_2^- + O_2$  
+       &  $1.4 \cdot 10^{-29} \cdot \left( {300}/{T_{\rm e}}\right)\cdot  \exp \left( {-600}/{T}\right)$
+       & \cite{misc:1992:kossyi}\\
+    ~  &   
+       & ~~~$\cdot \exp \left( {700 \cdot (T_{\rm e}-T)}/{(T_{\rm e} T)}  \right)$ cm$^6$/s
+       & ~\\
+    5b & $\rm e^- + O_2 + N_2 \rightarrow O_2^- + N_2$  
+       & $1.07 \cdot 10^{-31} \cdot \left( {300}/{T_{\rm e}} \right)^2 \cdot \exp \left( {-70}/{T}\right)$          
+       & \cite{misc:1992:kossyi}\\
+    ~  &   
+       & ~~~$\cdot \exp \left( {1500 \cdot (T_{\rm e}-T)}/({T_{\rm e} T})  \right)$ cm$^6$/s 
+       & ~\\
+    6  & $\rm O_2^- + O_2 \rightarrow e^- + O_2 + O_2$  
+       & $8.6 \cdot 10^{-10} \cdot \exp \left( {-6030}/{T}\right)
+               \left(1-\exp \left( {-1570}/{T} \right)  \right)$ cm$^3$/s
+       & \cite{book:1997:bazelyan}, Ch.\ 2\\
+    7a  & $\rm O_2 \rightarrow e^- + O_2^+$   
+       & $2.0 \cdot 10^{17} \cdot Q_{\rm b}^\star$ 1/s 
+       & \cite{book:1982:bychkov}\\
+    7b  & $\rm N_2 \rightarrow e^- + N_2^+$   
+       & $1.8 \cdot 10^{17} \cdot Q_{\rm b}^\star$ 1/s 
+       & \cite{book:1982:bychkov}\\
+    8a  & $\rm O_2 + O_2 \rightarrow 2 O + O_2$   
+       & $3.7 \cdot 10^{-8} \cdot \exp(-59380/T) (1-\exp(-2240/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    8b  & $\rm O_2 + N_2 \rightarrow 2 O + N_2$   
+       & $9.3 \cdot 10^{-9} \cdot \exp(-59380/T) (1-\exp(-2240/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    8c  & $\rm O_2 + O \rightarrow 3 O$   
+       & $1.3 \cdot 10^{-7} \cdot \exp(-59380/T) (1-\exp(-2240/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    8d  & $\rm N_2 + O_2 \rightarrow 2 N + O_2$   
+       & $5.0 \cdot 10^{-8} \cdot \exp(-113200/T) (1-\exp(-3354/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    8e  & $\rm N_2 + N_2 \rightarrow 2 N + N_2$   
+       & $5.0 \cdot 10^{-8} \cdot \exp(-113200/T) (1-\exp(-3354/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    8f  & $\rm N_2 + O \rightarrow 2 N + O$   
+       & $1.1 \cdot 10^{-7} \cdot \exp(-113200/T) (1-\exp(-3354/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9a  & $\rm O + O + O_2 \rightarrow 2 O_2$   
+       & $2.45 \cdot 10^{-31} \cdot T^{-0.63}$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9b  & $\rm O + O + N_2 \rightarrow O_2+N_2$   
+       & $2.76 \cdot 10^{-34} \cdot \exp(720/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9c  & $\rm O + O + O \rightarrow O_2+O$   
+       & $8.8 \cdot 10^{-31} \cdot T^{-0.63}$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9d  & $\rm N + N + O_2 \rightarrow N_2 + O_2$   
+       & $8.27 \cdot 10^{-34} \cdot \exp(500/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9e  & $\rm N + N + N_2 \rightarrow 2 N_2$   
+       & $8.27 \cdot 10^{-34} \cdot \exp(500/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9f  & $\rm N + N + O \rightarrow N_2 + O$   
+       & $8.27 \cdot 10^{-34} \cdot \exp(500/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9g  & $\rm N + N + N \rightarrow N_2 + N $   
+       & $8.27 \cdot 10^{-34} \cdot \exp(500/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    \bottomrule
+    \end{tabular*}
+\begin{tablenotes}
+\item[{a}] Notation and units: $E^\star$ is the reduced effective electric field in the electron reference frame ($E^\star\equiv|\vec{E}+\vec{V}^{\rm e}\times \vec{B}|/N$) in units of V$\cdot$m$^2$; $T_{\rm e}$ is the electron temperature in Kelvin; $T$ is the neutrals temperature in Kelvin; $Q^\star_{\rm b}$ is the ratio in Watts between the electron beam power per unit volume $Q_{\rm b}$ and the total number density of the plasma $N$  ($Q^\star_{\rm b}\equiv Q_{\rm b}/N$).
+\end{tablenotes}
+   \end{threeparttable}
+\end{table}
+%
+
+
+
+
+%
+\begin{table}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{6-species 15-reactions air plasma chemical model.\tnote{a}}
+    \label{tab:airplasma6s20r}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}lll}
+    \toprule
+    No.&Reaction & Rate Coefficient  & Refs. \\
+    \midrule
+    1a  & $\rm e^- + N_2   \rightarrow N_2^+ + e^- + e^-$  
+       &  ${\rm exp}(-0.0105809\cdot {\rm ln}^2 E^\star - 2.40411\cdot 10^{-75} \cdot {\rm ln}^{46}E^\star)$~cm$^3$/s
+       & \cite{jcp:2014:parent} \\
+    1b  & $\rm e^- + O_2   \rightarrow O_2^+ + e^- + e^-$  
+       &  ${\rm exp}(-0.0102785\cdot {\rm ln}^2 E^\star - 2.42260\cdot 10^{-75} \cdot {\rm ln}^{46}E^\star)$~cm$^3$/s
+       & \cite{jcp:2014:parent} \\
+    2a & $\rm e^-+O_2^+ \rightarrow O + O$  
+       & $2.0 \cdot 10^{-7} \cdot (300/T_{\rm e})^{0.7}  $ cm$^3$/s
+       & \cite{misc:1997:aleksandrov}\\
+    2b & $\rm e^-+N_2^+ \rightarrow N + N$  
+       & $2.8 \cdot 10^{-7} \cdot (300/T_{\rm e})^{0.5}  $ cm$^3$/s 
+       & \cite{misc:1992:kossyi}\\
+    3a & $\rm O_2^{-}+N_2^{+} \rightarrow O_2 + N_2$ 
+       & $2.0 \cdot 10^{-7} \cdot (300/T)^{0.5}$ cm$^3$/s
+       & \cite{misc:1992:kossyi}\\
+    3b & $\rm O_2^{-}+O_2^{+} \rightarrow O_2 + O_2$ 
+       & $2.0 \cdot 10^{-7} \cdot (300/T)^{0.5}$ cm$^3$/s
+       & \cite{misc:1992:kossyi}\\
+    4a & $\rm O_2^{-}+N_2^{+} + N_2\rightarrow O_2 + N_2 +N_2$ 
+       & $2.0 \cdot 10^{-25} \cdot (300/T)^{2.5}$ cm$^6$/s  
+       & \cite{misc:1992:kossyi}\\
+    4b & $\rm O_2^{-}+O_2^{+} + N_2\rightarrow O_2 + O_2 +N_2$ 
+       & $2.0 \cdot 10^{-25} \cdot (300/T)^{2.5}$ cm$^6$/s  
+       & \cite{misc:1992:kossyi}\\
+    4c & $\rm O_2^{-}+N_2^{+} + O_2\rightarrow O_2 + N_2 +O_2$ 
+       & $2.0 \cdot 10^{-25} \cdot (300/T)^{2.5}$ cm$^6$/s  
+       & \cite{misc:1992:kossyi}\\
+    4d & $\rm O_2^{-}+O_2^{+} + O_2\rightarrow O_2 + O_2 +O_2$ 
+       & $2.0 \cdot 10^{-25} \cdot (300/T)^{2.5}$ cm$^6$/s  
+       & \cite{misc:1992:kossyi}\\
+    5a & $\rm e^- + O_2 +O_2 \rightarrow O_2^- + O_2$  
+       &  $1.4 \cdot 10^{-29} \cdot \left( {300}/{T_{\rm e}}\right)\cdot  \exp \left( {-600}/{T}\right)$
+       & \cite{misc:1992:kossyi}\\
+    ~  &   
+       & ~~~$\cdot \exp \left( {700 \cdot (T_{\rm e}-T)}/{(T_{\rm e} T)}  \right)$ cm$^6$/s
+       & ~\\
+    5b & $\rm e^- + O_2 + N_2 \rightarrow O_2^- + N_2$  
+       & $1.07 \cdot 10^{-31} \cdot \left( {300}/{T_{\rm e}} \right)^2 \cdot \exp \left( {-70}/{T}\right)$          
+       & \cite{misc:1992:kossyi}\\
+    ~  &   
+       & ~~~$\cdot \exp \left( {1500 \cdot (T_{\rm e}-T)}/({T_{\rm e} T})  \right)$ cm$^6$/s 
+       & ~\\
+    6  & $\rm O_2^- + O_2 \rightarrow e^- + O_2 + O_2$  
+       & $8.6 \cdot 10^{-10} \cdot \exp \left( {-6030}/{T}\right)
+               \left(1-\exp \left( {-1570}/{T} \right)  \right)$ cm$^3$/s
+       & \cite{book:1997:bazelyan}, Ch.\ 2\\
+    7a  & $\rm O_2 \rightarrow e^- + O_2^+$   
+       & $2.0 \cdot 10^{17} \cdot Q_{\rm b}^\star$ 1/s 
+       & \cite{book:1982:bychkov}\\
+    7b  & $\rm N_2 \rightarrow e^- + N_2^+$   
+       & $1.8 \cdot 10^{17} \cdot Q_{\rm b}^\star$ 1/s 
+       & \cite{book:1982:bychkov}\\
+    \bottomrule
+    \end{tabular*}
+\begin{tablenotes}
+\item[{a}] Notation and units: $E^\star$ is the reduced effective electric field in the electron reference frame ($E^\star\equiv|\vec{E}+\vec{V}^{\rm e}\times \vec{B}|/N$) in units of V$\cdot$m$^2$; $T_{\rm e}$ is the electron temperature in Kelvin; $T$ is the neutrals temperature in Kelvin; $Q^\star_{\rm b}$ is the ratio in Watts between the electron beam power per unit volume $Q_{\rm b}$ and the total number density of the plasma $N$  ($Q^\star_{\rm b}\equiv Q_{\rm b}/N$).
+\end{tablenotes}
+   \end{threeparttable}
+\end{table}
+%
+
+
+
+
+
+%
+\begin{table}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{4-species 13-reactions air chemical model.\tnote{a}}
+    \label{tab:air4s13r}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}lll}
+    \toprule
+    No.&Reaction & Rate Coefficient  & Refs. \\
+    \midrule
+    8a  & $\rm O_2 + O_2 \rightarrow 2 O + O_2$   
+       & $3.7 \cdot 10^{-8} \cdot \exp(-59380/T) (1-\exp(-2240/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    8b  & $\rm O_2 + N_2 \rightarrow 2 O + N_2$   
+       & $9.3 \cdot 10^{-9} \cdot \exp(-59380/T) (1-\exp(-2240/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    8c  & $\rm O_2 + O \rightarrow 3 O$   
+       & $1.3 \cdot 10^{-7} \cdot \exp(-59380/T) (1-\exp(-2240/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    8d  & $\rm N_2 + O_2 \rightarrow 2 N + O_2$   
+       & $5.0 \cdot 10^{-8} \cdot \exp(-113200/T) (1-\exp(-3354/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    8e  & $\rm N_2 + N_2 \rightarrow 2 N + N_2$   
+       & $5.0 \cdot 10^{-8} \cdot \exp(-113200/T) (1-\exp(-3354/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    8f  & $\rm N_2 + O \rightarrow 2 N + O$   
+       & $1.1 \cdot 10^{-7} \cdot \exp(-113200/T) (1-\exp(-3354/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9a  & $\rm O + O + O_2 \rightarrow 2 O_2$   
+       & $2.45 \cdot 10^{-31} \cdot T^{-0.63}$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9b  & $\rm O + O + N_2 \rightarrow O_2+N_2$   
+       & $2.76 \cdot 10^{-34} \cdot \exp(720/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9c  & $\rm O + O + O \rightarrow O_2+O$   
+       & $8.8 \cdot 10^{-31} \cdot T^{-0.63}$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9d  & $\rm N + N + O_2 \rightarrow N_2 + O_2$   
+       & $8.27 \cdot 10^{-34} \cdot \exp(500/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9e  & $\rm N + N + N_2 \rightarrow 2 N_2$   
+       & $8.27 \cdot 10^{-34} \cdot \exp(500/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9f  & $\rm N + N + O \rightarrow N_2 + O$   
+       & $8.27 \cdot 10^{-34} \cdot \exp(500/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9g  & $\rm N + N + N \rightarrow N_2 + N $   
+       & $8.27 \cdot 10^{-34} \cdot \exp(500/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    \bottomrule
+    \end{tabular*}
+\begin{tablenotes}
+\item[{a}] Notation and units: $T$ is the neutrals temperature in Kelvin.
+\end{tablenotes}
+   \end{threeparttable}
+\end{table}
+%
+
+
+
+%
+\begin{table}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{3-species 3-reactions nitrogen plasma chemical model.\tnote{a}}
+    \label{tab:nitrogenplasma3s3r}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}lll}
+    \toprule
+    No.&Reaction & Rate Coefficient  & Refs. \\
+    \midrule
+    1a  & $\rm e^- + N_2   \rightarrow N_2^+ + e^- + e^-$  
+       &  ${\rm exp}(-0.0105809\cdot {\rm ln}^2 E^\star - 2.40411\cdot 10^{-75} \cdot {\rm ln}^{46}E^\star)$~cm$^3$/s
+       & \cite{jcp:2014:parent} \\
+    2b & $\rm e^-+N_2^+ \rightarrow N + N$  
+       & $2.8 \cdot 10^{-7} \cdot (300/T_{\rm e})^{0.5}  $ cm$^3$/s 
+       & \cite{misc:1992:kossyi}\\
+    7b  & $\rm N_2 \rightarrow e^- + N_2^+$   
+       & $1.8 \cdot 10^{17} \cdot Q_{\rm b}^\star$ 1/s 
+       & \cite{book:1982:bychkov}\\
+    \bottomrule
+    \end{tabular*}
+\begin{tablenotes}
+\item[{a}] Notation and units: $E^\star$ is the reduced effective electric field in the electron reference frame ($E^\star\equiv|\vec{E}+\vec{V}^{\rm e}\times \vec{B}|/N$) in units of V$\cdot$m$^2$; $T_{\rm e}$ is the electron temperature in Kelvin; $T$ is the neutrals temperature in Kelvin; $Q^\star_{\rm b}$ is the ratio in Watts between the electron beam power per unit volume $Q_{\rm b}$ and the total number density of the plasma $N$  ($Q^\star_{\rm b}\equiv Q_{\rm b}/N$).
+\end{tablenotes}
+   \end{threeparttable}
+\end{table}
+%
+
+
+
+\section{Chemical Models in Reaction-Rate Form}
+
+As outlined in Ch.\ 13 of Ref.\ \citen{book:1989:anderson}, we can write the $r$th reaction in the form:
+%
+\begin{equation}
+  \sum_{j=1}^\ns {\nu^\prime_{r,j}} {\rm M}_j \rightarrow \sum_{j=1}^\ns {\nu^{\prime\prime}_{r,j}} {\rm M}_j
+\end{equation}
+%
+where ${\rm M}_j$ refers to the name of the $j$th species, while $\nu^\prime_{r,j}$ and $\nu^{\prime\prime}_{r,j}$
+refer to integer numbers preceding the reactants and products of the $r$th reaction. 
+ Should the reaction rate of the $r$th reaction be denoted as ${k}_r$,
+the rate of change of the number density $N_{j}$ for the $r$th reaction can be expressed as:
+%
+\begin{equation}
+\left.  \frac{{\rm d} N_{j}}{{\rm d} t}\right|_r  =  \left( \nu^{\prime\prime}_{r,j} - \nu^\prime_{r,j} \right) {k}_r \prod_{i=1}^\ns {\left( N_{i} \right)}^{\nu^\prime_{r,i}}
+\end{equation}
+%
+where the number density $N_{j}$ is in  1/cm$^3$ and can be obtained from the partial density as follows:
+%
+\begin{equation}
+  N_{j} {\rm ~~[1/cm^3]}= \frac{\rho_j {\rm ~~[kg/m^3]}~~~{\cal A ~~{\rm [1/mole]}}}{{\cal M}_j {\rm ~~[kg/mole]}} \times 10^{-6} {\rm ~~[m^3/cm^3]}
+\end{equation}
+%
+where ${\cal M}_j$ is the molecular weight of the $j$th species. 
+Then, the continuity equations source terms related to the chemical reactions can be expressed as:
+%
+\begin{equation}
+ W_j  = \frac{10^6 \times {\cal M}_j}{\cal A} \sum_{r=1}^{\nr} \left. \frac{{\rm d} N_{j}}{{\rm d} t} \right|_r     
+\end{equation}
+%
+where $W_j$ is in $\rm kg/m^3 s$, ${{\rm d} N_j}/{{\rm d} t}$ in $\rm 1/cm^3 s$, and ${\cal M}_j$ in $\rm kg/mole$ and $\cal A$ is in 1/mole.
+
+Chemical models used in WARP that are written in reaction-rate form are the 8-species 28-reaction Macheret air plasma model in Table \ref{tab:macheret}, the 6-species 15-reaction air plasma model in Table \ref{tab:airplasma6s20r}, the 4-species 13-reaction air model in Table \ref{tab:air4s13r}, and the 3-species 3-reaction nitrogen plasma model in Table \ref{tab:nitrogenplasma3s3r}.
+
+
+
+\section{Linearization of Electron Impact Reactions}
+
+
+In order to make the pseudotime integration stable it is found necessary not to fully linearize the electron impact ionization (i.e.\ Townsend ionization) terms. Rather, we here propose a partial linearization of the Townsend ionization terms that is stable and that results in faster convergence. This is accomplished by first rewriting the electron impact source terms as a function of current (instead of electric field), and then linearizing under the condition of quasi-constant current. For this purpose, we can rewrite the reduced electric field as:
+%
+\begin{equation}
+\frac{|\vec{E}|}{N}=\frac{|\xi|}{\sigma} 
+\label{eqn:EoverN}
+\end{equation}
+%
+where $N$ is the total number density and $\sigma$ is the conductivity defined as:
+%
+\begin{equation}
+\sigma = \sum_{k=1}^\ns \mu_k |C_k| N_k
+\label{eqn:sigma}
+\end{equation}
+%
+Then, recall the definition of the current density:
+%
+\begin{equation}
+\mfd  \vec{J}_i \equiv   \sigma \vec{E}_i 
+             -  \sum_{k=1}^\ns s_k \mu_k  \frac{\partial P_k}{\partial x_i}
++ \sum_{k=1}^\ns C_k N_k \vec{V}_i^{\rm n} 
+\label{eqn:J}
+\end{equation}
+%
+Isolate the electric field in the latter and substitute in Eq.\ (\ref{eqn:EoverN}), it follows that $\xi_i$ is equal to:
+%
+\begin{equation}
+\xi_i=\frac{1}{N}\left(\vec{J}_i+\sum_{k=1}^\ns s_k \mu_k  \frac{\partial P_k}{\partial x_i}
+- \sum_{k=1}^\ns C_k N_k \vec{V}_i^{\rm n}\right)
+\end{equation}
+%
+Then note that the electron impact ionization rates can be written as follows (see reactions 1a and 1b in Tables \ref{tab:nitrogenplasma3s3r}, \ref{tab:airplasma6s20r}, \ref{tab:macheret}):
+%
+\begin{equation}
+k_{\rm ei}={\rm exp}(-\theta_1 \cdot {\rm ln}^2 E^\star -\theta_2 \cdot {\rm ln}^{46}E^\star)
+\label{eqn:ktownsend}
+\end{equation}
+%
+with $\theta_1$ and $\theta_2$ some constants. Substitute $E^\star=|\vec{E}|/N=|\xi|/\sigma$ in the latter and take the derivative with respect to $\sigma$ on both sides keeping $\xi$ constant (a constant $\xi$ essentially entails a constant current density because $\xi$ depends mostly on the current density $\vec{J}$ within the cathode sheath where the Townsend ionization takes place):
+%
+\begin{equation}
+\left(\frac{\partial k_{\rm ei}}{\partial \sigma}\right)_\xi=k_{\rm ei} \left(\frac{2\theta_1}{\sigma}\ln E^\star + \frac{46 \theta_2}{\sigma} {\rm ln}^{45}E^\star \right)
+\end{equation}
+%
+But recall that the conductivity is proportional to the number density of each species (Eq.\ (\ref{eqn:sigma})). Assuming constant mobilities, it follows that:
+%
+\begin{equation}
+ \left(\frac{\partial k_{\rm ei}}{\partial N_k}\right)_\xi=\left(\frac{\partial \sigma}{\partial N_k}\right)_\xi \times \left(\frac{\partial k_{\rm ei}}{\partial \sigma}\right)_\xi = |C_k| \mu_k k_{\rm ei} \left(\frac{2\theta_1}{\sigma}\ln E^\star + \frac{46 \theta_2}{\sigma} {\rm ln}^{45}E^\star \right) 
+\label{eqn:townsendlinearization1}
+\end{equation}
+%
+For instance, consider a plasma composed of $\rm O_2$, $\rm N_2$, $\rm N_2^+$, $\rm O_2^+$, $\rm O_2^-$, and electrons. The Townsend ionization rate $k_{\rm 1a}$ for the reaction $\rm e^-+N_2 \rightarrow N_2^++e^-+e^-$ can be approximated by Eq.\ (\ref{eqn:ktownsend}) with $\theta_1=0.0105809$ and $\theta_2=2.40411\times 10^{-75}$. The $U$ vector in this case would be limited to the charged species and would hence correspond to $U=[N_{\rm O_2^+}~~N_{\rm N_2^+}~~N_{\rm O_2^-}~~\nr]^{\rm T}$. The contributions to the source term Jacobian $\partial S / \partial U$ originating from reaction 1a would then amount to:
+%
+\begin{equation}
+\left.\frac{\partial S}{\partial U}\right|_{\rm 1a}=
+\left[\begin{array}{cccc}
+0 & 0 & 0 &0 \alb
+ \mfd N_{\rm N_2} \nr \left(\frac{\partial k_{\rm 1a}}{\partial N_{\rm O_2^+}}\right)_\xi 
+  & \mfd N_{\rm N_2} \nr \left(\frac{\partial k_{\rm 1a}}{\partial N_{\rm N_2^+}}\right)_\xi
+  & \mfd N_{\rm N_2} \nr \left(\frac{\partial k_{\rm 1a}}{\partial N_{\rm O_2^-}}\right)_\xi 
+  & \mfd N_{\rm N_2} \nr \left(\frac{\partial k_{\rm 1a}}{\partial \nr}\right)_\xi \alb
+0 & 0 & 0 &0 \alb
+ \mfd N_{\rm N_2} \nr \left(\frac{\partial k_{\rm 1a}}{\partial N_{\rm O_2^+}}\right)_\xi 
+  & \mfd N_{\rm N_2} \nr \left(\frac{\partial k_{\rm 1a}}{\partial N_{\rm N_2^+}}\right)_\xi
+  & \mfd N_{\rm N_2} \nr \left(\frac{\partial k_{\rm 1a}}{\partial N_{\rm O_2^-}}\right)_\xi 
+  & \mfd N_{\rm N_2} \nr \left(\frac{\partial k_{\rm 1a}}{\partial \nr}\right)_\xi \alb
+\end{array}\right]
+\label{eqn:townsendlinearization}
+\end{equation}
+% 
+where the various $(\partial k_{\rm 1a}/\partial N_k)_\xi$ terms are taken from Eq.\ (\ref{eqn:townsendlinearization1}). 
+
+
+\section{Miscellaneous Notes}
+
+\subsection{Ionization by Electron Beam}
+
+ The heat deposited by the electron beam  corresponds, $Q_{\rm b}$, has units of Watts per cubic meter while the number density N is in 1/m$^3$. Reactions 7a and 7b are simplifications of the following rate coefficient:
+%
+\begin{equation}
+  k_{\rm 7a}=\frac{Q_{\rm b}}{N} \frac{1}{30.9 {\rm ~eV} ~\times~ 1.6022 \times 10^{-19}~C}
+\end{equation}
+%
+%
+\begin{equation}
+  k_{\rm 7b}=\frac{Q_{\rm b}}{N} \frac{1}{35 {\rm ~eV} ~\times~ 1.6022 \times 10^{-19}~C}
+\end{equation}
+%
+
+
+
+
+\subsection{Future Work}
+
+
+Another source of reactions that might be worth looking into in the future is M\"atzing \cite{misc:1991:matzing}. M\"atzing is especially important to determine the
+chemical reactions that would occur due to the electron beam.
+Yet other papers worth looking into are Refs.\ \citen{misc:2000:bourdon} and \citen{aiaaconf:1999:laux}.
+
+
+In the reactions due to ionization by electron impact (Townsend ionization), the rates may be modified to account for vibrational excitation which is known to enhance ionization in steady-state discharges \cite{book:1987:mantsakanyan,misc:1978:aleksandrov,misc:1978:son}. 
+
+
+
+
+
+\bibliographystyle{warpdoc}
+\bibliography{all}
+
+
+\end{document}
+
+
+

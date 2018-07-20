@@ -1,0 +1,347 @@
+This is e-TeX, Version 3.14159-2.1 (Web2C 7.4.5) (format=latex 2004.11.18)  11 FEB 2005 09:27
+entering extended mode
+**report
+(./report.tex
+LaTeX2e <2001/06/01>
+Babel <v3.7h> and hyphenation patterns for american, french, german, ngerman, b
+ahasa, basque, catalan, croatian, czech, danish, dutch, finnish, greek, iceland
+ic, irish, italian, latin, magyar, norsk, norsk, portuges, romanian, russian, s
+lovak, slovene, spanish, swedish, turkish, ukrainian, nohyphenation, loaded.
+(../../../../lib/latex/ProReport.cls
+Document Class: ProReport 1998/10/23 v1.0a Bernard Parent, 1998-2000
+(/usr/share/texmf/tex/latex/base/size10.clo
+File: size10.clo 2001/04/21 v1.4e Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+
+(/usr/share/texmf/tex/latex/misc/setspace.sty
+Package: setspace 2000/12/01 6.7 Contributed and Supported LaTeX2e package
+
+Package: `setspace' 6.7 <2000/12/01>
+)) (/usr/share/texmf/tex/latex/psnfss/times.sty
+Package: times 2002/09/08 PSNFSS-v9.0a (SPQR) 
+)
+(/usr/share/texmf/tex/latex/psnfss/mathptm.sty
+Package: mathptm 2002/09/08 PSNFSS-v9.0a Times w/ Math (SPQR, WaS) 
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 28.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  OT1/cmr/m/n --> OT1/ptmcm/m/n on input line 28.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/ptmcm/m/n on input line 28.
+LaTeX Font Info:    Redeclaring symbol font `letters' on input line 29.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `normal'
+(Font)                  OML/cmm/m/it --> OML/ptmcm/m/it on input line 29.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `bold'
+(Font)                  OML/cmm/b/it --> OML/ptmcm/m/it on input line 29.
+LaTeX Font Info:    Redeclaring symbol font `symbols' on input line 30.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `normal'
+(Font)                  OMS/cmsy/m/n --> OMS/pzccm/m/n on input line 30.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `bold'
+(Font)                  OMS/cmsy/b/n --> OMS/pzccm/m/n on input line 30.
+LaTeX Font Info:    Redeclaring symbol font `largesymbols' on input line 31.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
+(Font)                  OMX/cmex/m/n --> OMX/psycm/m/n on input line 31.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
+(Font)                  OMX/cmex/m/n --> OMX/psycm/m/n on input line 31.
+\symbold=\mathgroup4
+\symitalic=\mathgroup5
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 34.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
+(Font)                  OT1/cmr/bx/n --> OT1/ptm/bx/n on input line 34.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/ptm/bx/n on input line 34.
+LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 35.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
+(Font)                  OT1/cmr/m/it --> OT1/ptm/m/it on input line 35.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
+(Font)                  OT1/cmr/bx/it --> OT1/ptm/m/it on input line 35.
+)
+(/usr/share/texmf/tex/latex/cite/overcite.sty
+Package: overcite 2001/10/14  v 3.9
+)
+(/usr/share/texmf/tex/latex/misc/psfrag.sty
+Package: psfrag 1998/04/11 v3.04 PSfrag (MCG)
+
+(/usr/share/texmf/tex/latex/graphics/graphics.sty
+Package: graphics 2001/07/07 v1.0n Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf/tex/latex/graphics/trig.sty
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+)
+(/usr/share/texmf/tex/latex/config/graphics.cfg
+File: graphics.cfg 2001/08/31 v1.1 graphics configuration of teTeX/TeXLive
+)
+Package graphics Info: Driver file: dvips.def on input line 80.
+
+(/usr/share/texmf/tex/latex/graphics/dvips.def
+File: dvips.def 1999/02/16 v3.0i Driver-dependant file (DPC,SPQR)
+))
+\pfg@pcount=\count87
+\pfg@scount=\count88
+\pfg@temp=\write3
+)
+(/usr/share/texmf/tex/latex/misc/subfigure.sty
+Package: subfigure 2002/07/30 v2.1.4 subfigure package
+\subfigtopskip=\skip43
+\subfigcapskip=\skip44
+\subfigcaptopadj=\dimen103
+\subfigbottomskip=\skip45
+\subfigcapmargin=\dimen104
+\subfiglabelskip=\skip46
+\c@subfigure=\count89
+\c@lofdepth=\count90
+\c@subtable=\count91
+\c@lotdepth=\count92
+\subfig@top=\skip47
+\subfig@bottom=\skip48
+)
+(/usr/share/texmf/tex/latex/misc/rotating.sty
+Package: rotating 1997/09/26, v2.13 Rotation package
+
+(/usr/share/texmf/tex/latex/graphics/graphicx.sty
+Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf/tex/latex/graphics/keyval.sty
+Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
+\KV@toks@=\toks14
+)
+\Gin@req@height=\dimen105
+\Gin@req@width=\dimen106
+)
+(/usr/share/texmf/tex/latex/base/ifthen.sty
+Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
+)
+\c@r@tfl@t=\count93
+\rot@float@box=\box26
+)
+(/usr/share/texmf/tex/latex/carlisle/scalefnt.sty)
+(/usr/share/texmf/tex/latex/pstricks/pstricks.sty
+Package: pstricks 1997/03/25 package wrapper for PSTricks pstricks.tex
+
+(/usr/share/texmf/tex/generic/pstricks/pstricks.tex
+`PSTricks' v97 patch 14  <1999/12/23> (tvz)
+\pst@dima=\dimen107
+\pst@dimb=\dimen108
+\pst@dimc=\dimen109
+\pst@dimd=\dimen110
+\pst@dimg=\dimen111
+\pst@dimh=\dimen112
+\pst@hbox=\box27
+\pst@boxg=\box28
+\pst@cnta=\count94
+\pst@cntb=\count95
+\pst@cntc=\count96
+\pst@cntd=\count97
+\pst@cntg=\count98
+\pst@cnth=\count99
+\pst@toks=\toks15
+(/usr/share/texmf/tex/generic/pstricks/pstricks.con)
+\psunit=\dimen113
+\psxunit=\dimen114
+\psyunit=\dimen115
+\pslinewidth=\dimen116
+\pst@customdefs=\toks16
+\pslinearc=\dimen117
+\everypsbox=\toks17
+\psframesep=\dimen118
+\pslabelsep=\dimen119
+\theoverlaybox=\box29
+))
+(/usr/share/texmf/tex/latex/caption/caption.sty
+Package: caption 2004/05/16 v3.0b Customising captions (AS)
+\captionmargin=\dimen120
+\captionwidth=\dimen121
+\captionindent=\dimen122
+\captionparindent=\dimen123
+\captionhangindent=\dimen124
+Package caption Info: rotating package v2.0 (or newer) detected on input line 6
+44.
+)
+(/usr/share/texmf/tex/latex/misc/sidecap.sty
+Package: sidecap 2000/02/04 v1.5d SideCap Package (RN/HjG)
+\SC@BOXWD=\skip49
+\SC@CAPWD=\skip50
+\SC@tempdim=\skip51
+\c@SC@C=\count100
+\SC@BOX=\box30
+)
+(/usr/share/texmf/tex/latex/misc/threeparttable.sty
+\@tempboxb=\box31
+\TPT@unhook=\toks18
+)
+
+LaTeX Warning: Unused global option(s):
+    [12pt].
+
+No file report.aux.
+\openout1 = `report.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 52.
+LaTeX Font Info:    ... okay on input line 52.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 52.
+LaTeX Font Info:    ... okay on input line 52.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 52.
+LaTeX Font Info:    ... okay on input line 52.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 52.
+LaTeX Font Info:    ... okay on input line 52.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 52.
+LaTeX Font Info:    ... okay on input line 52.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 52.
+LaTeX Font Info:    ... okay on input line 52.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 52.
+(/usr/share/texmf/tex/latex/psnfss/ot1ptm.fd
+File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
+)
+\big@size=\dimen125
+
+(/usr/share/texmf/tex/latex/ms/ragged2e.sty
+Package: ragged2e 2003/02/24 v2.02 ragged2e Package (MS)
+
+(/usr/share/texmf/tex/latex/ms/everysel.sty
+Package: everysel 1999/06/08 v1.03 EverySelectfont Package (MS)
+LaTeX Info: Redefining \selectfont on input line 125.
+)
+\CenteringLeftskip=\skip52
+\RaggedLeftLeftskip=\skip53
+\RaggedRightLeftskip=\skip54
+\CenteringRightskip=\skip55
+\RaggedLeftRightskip=\skip56
+\RaggedRightRightskip=\skip57
+\CenteringParfillskip=\skip58
+\RaggedLeftParfillskip=\skip59
+\RaggedRightParfillskip=\skip60
+\JustifyingParfillskip=\skip61
+\CenteringParindent=\skip62
+\RaggedLeftParindent=\skip63
+\RaggedRightParindent=\skip64
+\JustifyingParindent=\skip65
+)
+Package caption Info: sidecap package v1.4d (or newer) detected on input line 5
+2.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <24.88> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 58.
+
+Underfull \hbox (badness 10000) in paragraph at lines 58--58
+
+ []
+
+[1
+
+]
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 60.
+
+No file report.toc.
+\tf@toc=\write4
+\openout4 = `report.toc'.
+
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 61.
+
+Underfull \hbox (badness 10000) has occurred while \output is active
+ 
+ []
+
+[2] (./chem.tex
+LaTeX Font Info:    Try loading font information for OT1+ptmcm on input line 3.
+
+ (/usr/share/texmf/tex/latex/psnfss/ot1ptmcm.fd
+File: ot1ptmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OT1/ptmcm.
+)
+LaTeX Font Info:    Try loading font information for OML+ptmcm on input line 3.
+
+
+(/usr/share/texmf/tex/latex/psnfss/omlptmcm.fd
+File: omlptmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OML/ptmcm.
+)
+LaTeX Font Info:    Try loading font information for OMS+pzccm on input line 3.
+
+
+(/usr/share/texmf/tex/latex/psnfss/omspzccm.fd
+File: omspzccm.fd 2000/01/03 Fontinst v1.801 font definitions for OMS/pzccm.
+)
+LaTeX Font Info:    Try loading font information for OMX+psycm on input line 3.
+
+
+(/usr/share/texmf/tex/latex/psnfss/omxpsycm.fd
+File: omxpsycm.fd 2000/01/03 Fontinst v1.801 font definitions for OMX/psycm.
+)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 3.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 3.
+
+
+LaTeX Warning: Citation `gen:anderson2' on page 1 undefined on input line 3.
+
+
+LaTeX Warning: Citation `chem:singh' on page 1 undefined on input line 27.
+
+
+LaTeX Warning: Reference `model' on page 1 undefined on input line 27.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 51--57
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 51--57
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 76--79
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 76--79
+
+ []
+
+
+Underfull \hbox (badness 10000) has occurred while \output is active
+ 
+ []
+
+[1]
+Underfull \hbox (badness 10000) in paragraph at lines 80--82
+
+ []
+
+)
+Underfull \hbox (badness 10000) has occurred while \output is active
+ 
+ []
+
+[2]
+No file report.bbl.
+(./report.aux)
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 2341 strings out of 95370
+ 30237 string characters out of 1188184
+ 90573 words of memory out of 1000001
+ 5379 multiletter control sequences out of 10000+50000
+ 18596 words of font info for 45 fonts, out of 500000 for 1000
+ 198 hyphenation exceptions out of 1000
+ 30i,10n,32p,252b,350s stack positions out of 1500i,500n,5000p,200000b,5000s
+
+Output written on report.dvi (4 pages, 7888 bytes).

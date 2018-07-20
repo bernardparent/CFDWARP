@@ -1,0 +1,82 @@
+Xmag=Sqrt[X1*X1 + X2*X2]
+q2=u*u+v*v
+a1=a*X1/Xmag
+a2=a*X2/Xmag
+Lambda = DiagonalMatrix[{u*X1 + v*X2, u*X1 + v*X2, 
+   u*X1 + v*X2 + a*Xmag, 
+   u*X1 + v*X2 - a*Xmag}]
+Lambda1 = 
+ DiagonalMatrix[{u*X1 + v*X2, u*X1 + v*X2, u*X1 + v*X2, u*X1 + v*X2}]
+U = {rho, rho*u, rho*v, rho*a*a/g/(g - 1) + rho*(u*u + v*v)/2}
+
+
+F = {rho*(u*X1 + v*X2), rho*u*(u*X1 + v*X2) + rho*a*a/g*X1, 
+  rho*v*(u*X1 + v*X2) + rho*a*a/g*X2, 
+  rho*(u*X1 + v*X2)*(a*a/(g - 1) + (u*u + v*v)/2)}
+
+A = {{0, X1, X2, 
+   0}, {(g - 3)*X1*u*u/2 - X2*u*v + (g - 1)*X1*v*v/2, (3 - g)*u*X1 + 
+    v*X2, u*X2 - (g - 1)*X1*v, (g - 1)*X1}, {(g - 3)*X2*v*v/2 - 
+    X1*u*v + (g - 1)*X2*u*u/2, 
+   v*X1 - (g - 1)*X2*u, (3 - g)*v*X2 + u*X1, (g - 1)*
+    X2}, {-(X1*u + X2*v)*(a*
+       a/(g - 1) + (1 - g/2)*(u*u + v*v)), (2*a*a/(g - 1) + 
+       v*v + (3 - 2*g)*u*u)*X1/2 + 
+    X2*(1 - g)*u*v, (2*a*a/(g - 1) + u*u + (3 - 2*g)*v*v)*X2/2 + 
+    X1*(1 - g)*u*v, g*(u*X1 + v*X2)}}
+
+Linvold = {
+         {1,1,1,1},
+         {u+a2,u-a2,u+a1,u-a1},
+         {v-a1,v+a1,v+a2,v-a2},
+         {q2/2 + (u*a2 - v*a1), q2/2 + (-u*a2 + v*a1), q2/2 + (u*a1 + v*a2) + a*a/(g - 1), q2/2 - (u*a1 + v*a2) + a*a/(g - 1)}
+       }
+b=1
+
+eigen1 = {1, u + a2, v - a1, q2/2 + (u*a2 - v*a1) + b*a*a}
+eigen2 = {1, u - a2, v + a1, q2/2 + (-u*a2 + v*a1)+ b*a*a}
+eigen3 = {1, u + a1, v + a2, q2/2 + (u*a1 + v*a2) + a*a/(g - 1)+b*(1-g)*a*a}
+eigen4 = {1, u - a1, v - a2, q2/2 - (u*a1 + v*a2) + a*a/(g - 1)+b*(1-g)*a*a}
+
+V = X1*u + X2*v
+tmpzero = Simplify[A.eigen1 - Lambda1.eigen1]
+Linvtranspose = {eigen1, eigen2, eigen3, eigen4}
+Linv = Simplify[Transpose[Linvtranspose]]
+
+tmpzero = Simplify[A.Linv - Linv.Lambda]
+LU = Simplify[Inverse[Linv].U]
+L = Simplify[Inverse[Linv]]
+Zero = Simplify[F - Linv.Lambda.LU]
+
+Lold = Simplify[Inverse[Linvold]]
+Ldiff= Simplify[L-Lold]
+
+
+
+
+===========================================================================================================
+
+Ldiff=
+{{((-1 + g) (-2 a^2 + (-1 + g) g (u^2 + v^2)))/(
+  4 a^2 (-1 - g + g^2)), -(((-1 + g)^2 g u)/(
+   2 a^2 (-1 - g + g^2))), -(((-1 + g)^2 g v)/(
+   2 a^2 (-1 - g + g^2))), ((-1 + g)^2 g)/(
+  2 a^2 (-1 - g + g^2))}, {((-1 + 
+     g) (-2 a^2 + (-1 + g) g (u^2 + v^2)))/(
+  4 a^2 (-1 - g + g^2)), -(((-1 + g)^2 g u)/(
+   2 a^2 (-1 - g + g^2))), -(((-1 + g)^2 g v)/(
+   2 a^2 (-1 - g + g^2))), ((-1 + g)^2 g)/(
+  2 a^2 (-1 - g + g^2))}, {((-1 + 
+     g) (2 a^2 - (-1 + g) g (u^2 + v^2)))/(
+  4 a^2 (-1 - g + g^2)), ((-1 + g)^2 g u)/(
+  2 a^2 (-1 - g + g^2)), ((-1 + g)^2 g v)/(
+  2 a^2 (-1 - g + g^2)), -(((-1 + g)^2 g)/(
+   2 a^2 (-1 - g + g^2)))}, {((-1 + 
+     g) (2 a^2 - (-1 + g) g (u^2 + v^2)))/(
+  4 a^2 (-1 - g + g^2)), ((-1 + g)^2 g u)/(
+  2 a^2 (-1 - g + g^2)), ((-1 + g)^2 g v)/(
+  2 a^2 (-1 - g + g^2)), -(((-1 + g)^2 g)/(2 a^2 (-1 - g + g^2)))}}
+
+
+
+

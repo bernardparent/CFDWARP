@@ -1,0 +1,3 @@
+A. Burcat and B. McBride, "1997 Ideal Gas Thermodynamic Data for Combustion and Air-Pollution Use", Technion Israel Institute of Technology, Aerospace Engineering Report, TAE 804, 1997.
+
+ftp://ftp.technion.ac.il/pub/supported/aetdd/thermodynamics

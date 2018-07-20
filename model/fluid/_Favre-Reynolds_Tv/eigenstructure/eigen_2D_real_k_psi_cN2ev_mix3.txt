@@ -1,0 +1,113 @@
+c3 = 1 - c2 - c1
+Prho1 = ((u*u + v*v)/2 + tmp1)*PrhoE
+Prho2 = ((u*u + v*v)/2 + tmp2)*PrhoE
+Prho3 = ((u*u + v*v)/2 + tmp3)*PrhoE
+
+Prho = c1*Prho1 + c2*Prho2 + c3*Prho3
+Prhou = -u*PrhoE
+Prhov = -v*PrhoE
+V = X1*u + X2*v
+H = u*u + v*v + k + cN2*ev + (a*a - Prho - k*2/3)/PrhoE
+
+Xmag = Sqrt[X1*X1 + X2*X2]
+Xhat1 = X1/Xmag
+Xhat2 = X2/Xmag
+
+A = {{V - V*c1, -V*c1, -V*c1, X1*c1, X2*c1, 0, 0, 0, 0},
+     {-V*c2, V - V*c2, -V*c2, X1*c2, X2*c2, 0, 0, 0, 0},
+   {-V*c3, -V*c3, V - V*c3, X1*c3, X2*c3, 0, 0, 0, 0},
+   {X1*Prho1 - u*V, X1*Prho2 - u*V, X1*Prho3 - u*V, 
+   V + X1*Prhou + X1*u, X1*Prhov + X2*u, X1*PrhoE, -X1*(PrhoE - 2/3), 
+   0, -X1*PrhoE},
+  {X2*Prho1 - v*V, X2*Prho2 - v*V, X2*Prho3 - v*V, X2*Prhou + X1*v, 
+   V + X2*Prhov + X2*v, X2*PrhoE, -X2*(PrhoE - 2/3), 0, -X2*PrhoE},
+  {V*Prho1 - H*V, V*Prho2 - H*V, V*Prho3 - H*V, V*Prhou + X1*H, 
+   V*Prhov + X2*H, V + V*PrhoE, -V*(PrhoE - 2/3), 0, -V*PrhoE},
+  {-V*k, -V*k, -V*k, X1*k, X2*k, 0, V, 0, 0},
+  {-V*psi, -V*psi, -V*psi, X1*psi, X2*psi, 0, 0, V, 0},
+  {-V*cN2*ev, -V*cN2*ev, -V*cN2*ev, X1*cN2*ev, X2*cN2*ev, 0, 0, 0, V}}
+
+Lambda = DiagonalMatrix[{V, V, V, V, V + a*Xmag, V - a*Xmag, V, V, V}]
+
+
+
+Linv = {{1, 0, 0, c1, c1, c1, 0, 0, 0},
+  {0, 1, 0, c2, c2, c2, 0, 0, 0},
+  {0, 0, 1, c3, c3, c3, 0, 0, 0}, {u + a*Xhat2, u + a*Xhat2, 
+   u + a*Xhat2, u - a*Xhat2, u + a*Xhat1, u - a*Xhat1, 0, 0, 
+   0}, {v - a*Xhat1, v - a*Xhat1, v - a*Xhat1, v + a*Xhat1, 
+   v + a*Xhat2, v - a*Xhat2, 0, 0, 
+   0}, {u*u + v*v - Prho1/PrhoE + a*(u*Xhat2 - v*Xhat1),
+   u*u + v*v - Prho2/PrhoE + a*(u*Xhat2 - v*Xhat1),
+   u*u + v*v - Prho3/PrhoE + a*(u*Xhat2 - v*Xhat1), 
+   H - a*a/PrhoE + a*(v*Xhat1 - u*Xhat2),
+   H + a*(u*Xhat1 + v*Xhat2),
+   H - a*(u*Xhat1 + v*Xhat2),
+   a*a - 2*a*a/(3*PrhoE), 0, cN2*a*a}, {0, 0, 0, k, k, k, a*a, 0, 0},
+  {0, 0, 0, psi, psi, psi, 0, a*a, 0}, {0, 0, 0, cN2*ev, cN2*ev, 
+   cN2*ev, 0, 0, cN2*a*a}}
+
+
+
+a2 = a^2
+qtmp1 = -v*Xhat1 + u*Xhat2
+
+
+L = {{-c1*(a2 + Prho1 + a*qtmp1) + 
+     2*a2, -c1*(a2 + Prho2 + a*qtmp1), -c1*(a2 + Prho3 + a*qtmp1), 
+    c1*(PrhoE*u + a*Xhat2), c1*(PrhoE*v - a*Xhat1), -c1*PrhoE, 
+    c1*(PrhoE - 2/3), 0, c1*PrhoE},
+   {-c2*(a2 + Prho1 + a*qtmp1), -c2*(a2 + Prho2 + a*qtmp1) + 
+     2*a2, -c2*(a2 + Prho3 + a*qtmp1), c2*(PrhoE*u + a*Xhat2), 
+    c2*(PrhoE*v - a*Xhat1), -c2*PrhoE, c2*(PrhoE - 2/3), 0, 
+    c2*PrhoE},
+   {-c3*(a*qtmp1 + a2 + Prho1), -c3*(a*qtmp1 + a2 + 
+       Prho2), -c3*(a*qtmp1 + a2 + Prho3) + 2 a2, 
+    c3*(a*Xhat2 + PrhoE*u), -c3*(a*Xhat1 - PrhoE*v), -c3*PrhoE, 
+    c3*(PrhoE - 2/3), 0, c3*PrhoE},
+   {a2 - Prho1 + a*qtmp1, a2 - Prho2 + a*qtmp1, a2 - Prho3 + a*qtmp1, 
+    PrhoE*u - a*Xhat2, PrhoE*v + a*Xhat1, -PrhoE, PrhoE - 2/3, 0, 
+    PrhoE},
+   {-a*V/Xmag + Prho1, -a*V/Xmag + Prho2, -a*V/Xmag + 
+     Prho3, -PrhoE*u + a*Xhat1, -PrhoE*v + a*Xhat2, PrhoE, 
+    2/3 - PrhoE, 0, -PrhoE}, 
+   {a*V/Xmag + Prho1, a*V/Xmag + Prho2, 
+    a*V/Xmag + Prho3, -(PrhoE*u + a*Xhat1), -(PrhoE*v + a*Xhat2), 
+    PrhoE, 2/3 - PrhoE, 
+    0, -PrhoE}, 
+   {-k*(a2 + Prho1 + a*qtmp1), -k*(a2 + Prho2 + 
+        a*qtmp1), -k*(a2 + Prho3 + a*qtmp1), k*(PrhoE*u + a*Xhat2), 
+     k*(PrhoE*v - a*Xhat1), -k*PrhoE, 2*a2 - (2/3)*k + k*PrhoE, 0, 
+     k*PrhoE}/(a2), 
+   {-psi*(a2 + Prho1 + a*qtmp1), -psi*(a2 + Prho2 + 
+        a*qtmp1), -psi*(a2 + Prho3 + a*qtmp1), 
+     psi*(PrhoE*u + a*Xhat2), psi*(PrhoE*v - a*Xhat1), -PrhoE*psi, 
+     psi*(PrhoE - 2/3), 2*a2, 
+     PrhoE*psi}/(a2), 
+   {-ev*(a2 + Prho1 + a*qtmp1), -ev*(a2 + Prho2 + 
+        a*qtmp1), -ev*(a2 + Prho3 + a*qtmp1), ev*(PrhoE*u + a*Xhat2), 
+     ev*(PrhoE*v - a*Xhat1), -ev*PrhoE, ev*(PrhoE - 2/3), 
+     0, (2*a2 + cN2*ev*PrhoE)/cN2}/(a2)}/(2*a2)
+
+Lanal = Simplify[Inverse[Linv]]
+Pstar = P + (2/3)*rho*k
+alpha = {c1*Pstar*PrhoE, c2*Pstar*PrhoE, c3*Pstar*PrhoE, Pstar*PrhoE, 
+   rho*a2 - Pstar*PrhoE, rho*a2 - Pstar*PrhoE, k*Pstar*PrhoE/a2, 
+   psi*Pstar*PrhoE/a2, ev*Pstar*PrhoE/a2}/(2*a2)
+
+
+U = {c1*rho, c2*rho, c3*rho, rho*u, rho*v, rho*(H - P/rho - (2/3)*k), 
+  rho*k, rho*psi, rho*cN2*ev}
+
+ALinv = Simplify[A.Linv]
+LinvLambda = Simplify[Linv.Lambda]
+
+Zero = Simplify[ALinv - LinvLambda]
+
+Iden = Simplify[L.Linv]
+
+
+alpha2 = Simplify[L.U]
+Zero = Simplify[alpha2 - alpha]
+Zero = Simplify[Lanal - L]
+F = Simplify[A.U]

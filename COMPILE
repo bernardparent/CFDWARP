@@ -1,0 +1,80 @@
+___________________________________________________________________________________
+
+COMPILATION OF CFDWARP
+___________________________________________________________________________________
+
+
+
+CONFIGURE CFDWARP
+
+In the CFDWARP main directory (where this file COMPILE is located) first configure
+CFDWARP through the command
+
+make config
+
+or  
+
+make configx (to include experimental modules)
+make configp (to have access to proprietary modules)
+make configpx (to have access to the experimental and proprietary modules)
+
+Then answer all multiple-choice questions. Note: make config compiles and runs 
+config.c in the config directory, which itself creates applyconfig.sh, a bash script 
+which is thereafter executed from within the config directory. To reestablish 
+your configuration at a later time, you can copy the file applyconfig.sh in a safe 
+place and rerun it from the config directory when needed.
+
+
+
+
+COMPILE CFDWARP
+
+Tweak .makefile-header if necessary in the top directory (this should only be 
+needed if compiling on an esoteric UNIX box or if you want to add additional 
+flags to the C compiler, or if you wish to use a different compiler from cc, icc,  
+mpicc, or gcc). Then, clean the directories and create the CFDWARP executable with the 
+commands: 
+
+make clean
+make src
+
+The executable is named warp and is in the src directory.
+
+
+
+CREATE A CFDWARP PACKAGE
+
+To create a tgz package that contains the warp executable along with some 
+documentation manuals, type at the prompt:
+
+make tar
+
+This will create a warp_package.tgz file in the tar directory. Note: before 
+creating a warp package, it may help to compile CFDWARP as a statically-linked 
+executable by saying yes to the "Create static binary" question within make 
+config. This will ensure that the warp executable does not depend on any 
+external library and can be run on any Linux distribution.
+
+
+
+CPU PROFILING
+
+CPU profiling comes in handy to know which algorithms are not optimal and take
+up more resources than expected. To enable CPU profiling, compile warp with the 
+-pg flag by saying yes to the "CPU profiling" question in the  make config.
+
+Then, run warp as usual:
+
+./warp -r test.wrp -o out.01
+
+When warp finishes, it will output a file called "gmon.out". This can be analyzed
+using gprof with the analysis outputted to an ascii file as follows:
+
+gprof ./warp gmon.out > analysis.txt
+
+Open analysis.txt. 
+
+
+
+
+

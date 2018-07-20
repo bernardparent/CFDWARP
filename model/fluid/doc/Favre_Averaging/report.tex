@@ -1,0 +1,4024 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+%\usepackage{amsbsy}
+\usepackage{amsmath}
+\usepackage{bm}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\rhos}{\rho}
+\newcommand{\Cv}{{c_{v}}}
+\newcommand{\Cp}{{c_{p}}}
+\newcommand{\Sct}{{{\rm Sc}_{\rm t}}}
+\newcommand{\Prt}{{{\rm Pr}_{\rm t}}}
+\newcommand{\nd}{{{n}_{\rm d}}}
+\newcommand{\ns}{{{n}_{\rm s}}}
+\newcommand{\nn}{{{n}_{\rm n}}}
+\newcommand{\ndm}{{\wbar{n}_{\rm d}}}
+\newcommand{\nsm}{{\wbar{n}_{\rm s}}}
+\newcommand{\turb}{_{\rm t}}
+\newcommand{\etat}{{\eta\turb}}
+\newcommand{\mfa}{\scriptscriptstyle}
+\newcommand{\mfb}{\scriptstyle}
+\newcommand{\mfc}{\textstyle}
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\hlinex}{\vspace{-0.34cm}~~\\ \hline \vspace{-0.31cm}~~\\}
+\newcommand{\hlinextop}{\vspace{-0.46cm}~~\\ \hline \hline \vspace{-0.32cm}~~\\}
+\newcommand{\hlinexbot}{\vspace{-0.37cm}~~\\ \hline \hline \vspace{-0.50cm}~~\\}
+\newcommand{\tablespacing}{\vspace{-0.4cm}}
+\newcommand{\fontxfig}{\footnotesize\scalefont{0.918}}
+\newcommand{\fontgnu}{\footnotesize\scalefont{0.896}}
+\newcommand{\ev}{e_{\rm v}}
+\newcommand{\evzero}{e_{\rm v}^0}
+\newcommand{\tildeevzero}{\wtilde{e}_{\rm v}^0}
+\newcommand{\cNtwo}{w_{\rm N_2}}
+\newcommand{\tauvt}{\tau_{\rm vt}}
+\newcommand{\sigmav}{\sigma_{\rm v}}
+\newcommand{\etstar}{{e_{\rm t}^\star}}
+\newcommand{\et}{{e_{\rm t}}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{1.0}}
+\renewcommand{\fontsizefigure}{\footnotesize}
+%\renewcommand{\vec}[1]{\bm{#1}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcounter{tocdepth}{3}
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\author{
+  Bernard Parent
+}
+
+\email{
+  bernparent@gmail.com
+}
+
+\department{
+  Institute for Aerospace Studies	
+}
+
+\institution{
+  University of Toronto
+}
+
+\title{
+  Derivation of the Favre-Averaged Navier-Stokes Equations 
+}
+
+\date{
+  May-July 2000, Aug-Oct 2004, July 2015
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+  \tableofcontents
+%  \makenomenclature
+%%  \listoftables
+%%  \listoffigures
+
+
+
+
+
+
+
+
+
+
+
+\section{Introduction}
+
+\subsection{Goal of this document}
+
+The goal of this document is to offer a complete derivation
+of the Favre averaged Navier-Stokes equations from the
+well-known laminar multi-species Navier-Stokes equations.
+Further, the modeling of the Favre equations through the use
+of the Boussinesq approximation is presented, along with two
+popular two-equation models.
+
+The report is split into four major parts: (1) some background
+on Reynolds and Favre averaging, (2) the exact form of the
+time averaged continuity, species conservation, momentum, energy, turbulent
+kinetic energy and dissipation rate equations, (3) the modeling
+of the averaged equations through the use of the Boussinesq
+approximation and (4) a quick overview of the Launder-Jones
+$k\epsilon$ and Wilcox $k\omega$ models.
+
+\subsection{Laminar Navier-Stokes Equations}
+
+As a starting point, let us list the laminar multi-species Navier-Stokes equations excluding the source terms to the continuity, momentum, and energy equations:
+\\  \\Species Conservation:
+\begin{displaymath}
+  \mfd\frac{\partial}{\partial t}  {\rho}  {w_k}
+      +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+        {\rho} {\bm{V}_j} {w_k}
+      -  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+            \left(  {\nu_k}
+              \frac{\partial {w_k}}{\partial x_j} \right)
+      = 0
+\end{displaymath}
+%
+Momentum:
+\begin{displaymath}
+  \mfd\frac{\partial}{\partial t}  {\rho}  {\bm{V}_i}
+      +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+             {\rho} {\bm{V}_j} {\bm{V}_i}
+      - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+           \left[ {\eta}
+          \left(
+                \frac{\partial {\bm{V}_i}}{\partial x_j}
+              + \frac{\partial {\bm{V}_j}}{\partial x_i}
+              - \frac{2}{3} \delta_{ij} \sum_{k=1}^\nd \frac{\partial {\bm{V}_k}}{\partial x_k}
+          \right)\right]
+      +  \frac{\partial P}{\partial x_i}
+      =  0
+\end{displaymath}
+%
+%
+%
+Energy:
+%
+\begin{align*}
+    % unsteady terms
+    \mfd\frac{\partial}{\partial t}  {\rho} \et
+    % convection terms
+     + \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} &\left[ {\bm{V}_j}
+       \left(
+            {\rho} \et +{P}
+       \right)
+    % turbulence and molecular diffusion terms
+    -\sum_{k=1}^{\ns} {h_k} {\nu_k} \frac{\partial {w_k}}{\partial x_j}
+    -\ev {\nu_{\rm N_2}} \frac{\partial {w_{\rm N_2}}}{\partial x_j}
+    \right. \alb &\left. 
+      -\sum_{i=1}^{\nd}
+         {\bm{V}_i} 
+            {\eta} \left(
+               \frac{\partial {\bm{V}_i}}{\partial x_j}
+               +\frac{\partial {\bm{V}_j}}{\partial x_i}
+               -\frac{2}{3} \delta_{ij} \sum_{k=1}^\nd \frac{\partial {\bm{V}_k}}{\partial x_k}
+            \right)
+      \mfd+ q_j
+      \right]
+      = 0
+\end{align*}
+%
+Nitrogen Vibration Energy:
+\begin{displaymath}
+  \mfd\frac{\partial}{\partial t}  {\rho}  w_{\rm N_2} {\ev}
+      +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+        {\rho}  {\bm{V}_j} w_{\rm N_2} \ev
+      + \sum_{j=1}^{\nd}\frac{\partial }{\partial x_j} q^{\rm v}_j
+      - \sum_{j=1}^{\nd}\frac{\partial }{\partial x_j} e_{\rm v} \nu_{\rm N_2} \frac{\partial w_{\rm N_2}}{\partial x_j}
+      = Q_{\rm v}
+\end{displaymath}
+%
+%
+where the total energy corresponds to $\et\equiv \sum_k w_k e_k + \cNtwo \ev+ \frac{1}{2} q^2$ in which $e_k$ is understood to include the vibration energy at equilibrium of all species, \emph{except} for $e_{\rm N_2}$ which does not include the vibration energy. Similarly, $h_k$ is understood to include the vibration energy except when $k={\rm N_2}$. Our goal is to average in time the latter to obtain a second set of
+equations, i.e. the so-called Favre-averaged Navier-Stokes equations. Also, it is assumed in the energy equation that $\nu_{\rm N_2}$ is a function only of the gas temperature, and not of the nitrogen vibration temperature.
+
+Concerning the nitrogen vibrational energy equation, the molecular flux $q_{\rm v}$ includes contributions from both  thermal diffusion and mass diffusion:
+%
+\begin{equation}
+q^{\rm v}_j= -\kappa_{\rm v} \frac{\partial T_{\rm v}}{\partial x_j} 
+\end{equation}
+%
+while the source $Q_{\rm v}$ corresponds to:
+%
+\begin{equation}
+Q_{\rm v}= \zeta_{\rm v} Q_{\rm J}^{\rm e} + \frac{\rho_{\rm N_2}}{\tau_{\rm vt}}\left(e_{\rm v}^0 -e_{\rm v}  \right) + W_{\rm N_2} e_{\rm v}
+\end{equation}
+%
+
+
+
+
+
+
+
+
+
+
+\section{Background}
+
+
+\subsection{Reynolds and Favre Averaging}
+
+The Reynolds average of property $\phi$ corresponds to taking the average of
+$\phi$ over a period of time $T$:
+%
+\begin{equation}
+  \overline{\phi}=\frac{1}{T} \int_{\tau=t}^{t+T} \phi  d \tau
+  \label{eqn:ReynoldsAverage}
+\end{equation}
+%
+where $T$ is a large time interval. The Favre average is a density
+weighted Reynolds average:
+%
+\begin{equation}
+  {\wtilde{\phi}}=\frac{1}{\wbar{\rho}\, T} \int_{\tau=t}^{t+T} \rho \phi  d \tau
+  \label{eqn:FavreAverage}
+\end{equation}
+%
+From the latter two equations, it can be seen that:
+%
+\begin{equation}
+  \overline{\rho  \phi}=\wbar{\rho}\,  {\wtilde{\phi}}
+  \label{eqn:rhophi}
+\end{equation}
+%
+
+\subsection{Reynolds Average Correlations}
+
+Directly from Eq.\ (\ref{eqn:ReynoldsAverage}) it can be seen that the
+average of a sum of two terms is equal to the sum of the average
+of each term:
+%
+\begin{equation}
+  \overline{\phi_1+\phi_2}=\overline{\phi_1}+\overline{\phi_2}
+  \label{eqn:Average_Sum}
+\end{equation}
+%
+Decomposing the variable $\phi$ into its mean and fluctuating parts:
+%
+\begin{equation}
+  \phi=\overline{\phi}+\phi^{\prime}
+\end{equation}
+%
+where the mean $\overline{\phi}$ is set to the value of the  average of $\phi$.
+Averaging both sides:
+%
+\begin{equation}
+  \overline{\phi} = \overline{\overline{\phi}+\phi^{\prime}}
+                  = \overline{\overline{\phi}}+\overline{\phi^{\prime}}
+                  = \overline{\phi}+\overline{\phi^{\prime}}
+\end{equation}
+%
+hence resulting in the observation that:
+%
+\begin{equation}
+  \overline{\phi^{\prime}}=0
+\end{equation}
+%
+The mean value of a spatial derivative corresponds to:
+%
+\begin{equation}
+  \begin{array}{c}
+  \mfd\overline{\frac{\partial \phi}{\partial x} }
+     = \overline{\frac{\partial \overline{\phi}}{\partial x} + \frac{\partial \phi^{\prime}}{\partial x}}
+     = \overline{\frac{\partial \overline{\phi}}{\partial x}} + \overline{\frac{\partial \phi^{\prime}}{\partial x}}
+     = \frac{\partial \overline{\phi}}{\partial x} + \overline{\frac{\partial \phi^{\prime}}{\partial x}}
+    \alb
+  \mfd = \frac{\partial \overline{\phi}}{\partial x} + \left. \overline{\frac{\Delta \phi^{\prime}}{\Delta x}} \right|_{\Delta x \rightarrow 0}
+     = \frac{\partial \overline{\phi}}{\partial x} + \overline{\frac{ \phi^{\prime}_R-\phi^{\prime}_L}{\Delta x}}
+     = \frac{\partial \overline{\phi}}{\partial x} + \frac{ \overline{\phi^{\prime}_R}-\overline{\phi^{\prime}_L}}{\Delta x}
+     = \frac{\partial \overline{\phi}}{\partial x}
+  \end{array}
+\end{equation}
+%
+The  average of a product is derived as:
+%
+\begin{equation}
+  \begin{array}{c}
+  \overline{\phi_1  \phi_2}
+   = \overline{\left( \overline{\phi_1} + \phi_1^{\prime}\right) \left(\overline{\phi_2} + \phi_2^{\prime} \right)}
+   = \overline{ \overline{\phi_1}  \overline{\phi_2}
+                +\overline{\phi_1}  \phi_2^{\prime}
+                +\overline{\phi_2}  \phi_1^{\prime}
+                +\phi_1^{\prime}  \phi_2^{\prime}} \alb
+   =  \overline{\phi_1}  \overline{\phi_2}
+                +\overline{\phi_1}  \overline{\phi_2^{\prime}}
+                +\overline{\phi_2}  \overline{\phi_1^{\prime}}
+                +\overline{\phi_1^{\prime}  \phi_2^{\prime}}
+   =  \overline{\phi_1}  \overline{\phi_2}
+                +\overline{\phi_1^{\prime}  \phi_2^{\prime}}
+  \end{array}
+\end{equation}
+%
+The  average of a triple product:
+%
+\begin{equation}
+  \begin{array}{c}
+  \overline{\phi_1  \phi_2  \phi_3}
+   = \overline{\left(\overline{\phi_1} + \phi_1^{\prime}\right)
+               \left(\overline{\phi_2} + \phi_2^{\prime} \right)
+               \left(\overline{\phi_3} + \phi_3^{\prime} \right)
+              }
+   = \overline{\left(\overline{\phi_1} \overline{\phi_2}+\overline{\phi_1} \phi_2^{\prime}
+                   + \phi_1^{\prime} \overline{\phi_2} + \phi_1^{\prime} \phi_2^{\prime} \right)
+               \left(\overline{\phi_3} + \phi_3^{\prime} \right)
+              } \alb
+   = \overline{\overline{\phi_1} \overline{\phi_2} \overline{\phi_3}+\overline{\phi_1} \phi_2^{\prime} \overline{\phi_3}
+                   + \phi_1^{\prime} \overline{\phi_2} \overline{\phi_3} + \phi_1^{\prime} \phi_2^{\prime} \overline{\phi_3}
+               +\overline{\phi_1} \overline{\phi_2} \phi_3^{\prime}+\overline{\phi_1} \phi_2^{\prime} \phi_3^{\prime}
+                   + \phi_1^{\prime} \overline{\phi_2} \phi_3^{\prime} + \phi_1^{\prime} \phi_2^{\prime} \phi_3^{\prime}
+              } \alb
+   = \overline{\phi_1} \overline{\phi_2} \overline{\phi_3}
+              +\overline{\phi_3} \overline{\phi_1^{\prime} \phi_2^{\prime}}
+              +\overline{\phi_1} \overline{\phi_2^{\prime} \phi_3^{\prime}}
+              +\overline{\phi_2} \overline{\phi_1^{\prime} \phi_3^{\prime}}
+              +\overline{\phi_1^{\prime} \phi_2^{\prime} \phi_3^{\prime}}
+  \end{array}
+\end{equation}
+%
+
+\subsection{Favre Average Correlations}
+
+Interestingly, if one uses density weighted averaging, the average of a
+double product involving density simplifies to:
+%
+\begin{equation}
+  \overline{\rho  \phi}
+   =  \wbar{\rho}\,  \overline{\phi}
+                +\overline{\rho^{\prime}  \phi^{\prime}}
+   =  \wbar{\rho}\,  {\wtilde{\phi}}
+  \label{eqn:AverageDoubleProduct}
+\end{equation}
+%
+Further, decomposing a variable into its mean and fluctuating part using
+Favre averaging will result to:
+%
+\begin{equation}
+  \phi={\wtilde{\phi}}+\phi^{\prime\prime}
+  \label{eqn:FavreDecomposition}
+\end{equation}
+%
+which, after multiplying by the density and time averaging each term, becomes:
+%
+\begin{equation}
+  \overline{\rho  \phi}
+   = \overline{\rho  {\wtilde{\phi}}} + \overline{\rho  \phi^{\prime\prime}}
+   = \wbar{\rho}\,  {\wtilde{\phi}} + \overline{\rho  \phi^{\prime\prime}}
+  \label{eqn:FavreAveraging}
+\end{equation}
+%
+Comparing Eq.\ (\ref{eqn:AverageDoubleProduct}) and Eq.\ (\ref{eqn:FavreAveraging}),
+one can deduce that:
+%
+\begin{equation}
+  \overline{\left( \wbar{\rho}\, + \rho^{\prime} \right)  \phi^{\prime\prime}}=\overline{\rho  \phi^{\prime\prime}}=0
+\end{equation}
+%
+Also, the averaging of a triple product involving the density and
+two Favre averaged quantities can be derived as:
+%
+%
+\begin{displaymath}
+  \mfd\overline{\rho \psi \phi} = \overline{\rho \left( {\wtilde{\psi}}+\psi^{\prime\prime}\right)
+       \left( {\wtilde{\phi}}+\phi^{\prime\prime} \right)}
+\end{displaymath}
+%
+\begin{displaymath}
+   = \mfd\overline{
+      \rho {\wtilde{\psi}} {\wtilde{\phi}}+\rho \psi^{\prime\prime} {\wtilde{\phi}}
+     +\rho {\wtilde{\psi}} \phi^{\prime\prime}+\rho \psi^{\prime\prime} \phi^{\prime\prime}}
+   = \mfd \overline{\rho {\wtilde{\psi}} {\wtilde{\phi}}}
+            +{\wtilde{\phi}} \overline{\rho \psi^{\prime\prime}}
+            +{\wtilde{\psi}} \overline{\rho \phi^{\prime\prime}}
+            +\overline{\rho \psi^{\prime\prime} \phi^{\prime\prime}}
+\end{displaymath}
+%
+\begin{displaymath}
+   = \mfd \overline{\left( \wbar{\rho}\, + \rho^{\prime} \right)} {\wtilde{\psi}} {\wtilde{\phi}}
+            +\overline{\rho \psi^{\prime\prime} \phi^{\prime\prime}}
+   = \mfd \wbar{\rho}\, {\wtilde{\psi}} {\wtilde{\phi}} + \overline{\rho^{\prime}} {\wtilde{\psi}} {\wtilde{\phi}}
+            +\overline{\rho \psi^{\prime\prime} \phi^{\prime\prime}}
+\end{displaymath}
+%
+\begin{equation}
+  \mfd\overline{\rho \psi \phi}
+      = \mfd \wbar{\rho}\, {\wtilde{\psi}} {\wtilde{\phi}}
+            +\overline{\rho \psi^{\prime\prime} \phi^{\prime\prime}}
+  \label{eqn:favre-mult-2term}
+\end{equation}
+%
+while the product of the density and three Favre averaged properties
+corresponds to:
+%
+\begin{displaymath}
+  \mfd\overline{\rho \psi \phi \theta} = \overline{\rho
+       \left( {\wtilde{\psi}}+\psi^{\prime\prime} \right)
+       \left( {\wtilde{\phi}}+\phi^{\prime\prime} \right)
+       \left( \wtilde{\theta}+\theta^{\prime\prime} \right) }
+\end{displaymath}
+%
+\begin{displaymath}
+   = \mfd\overline{
+     \left( \rho {\wtilde{\psi}} {\wtilde{\phi}}+\rho \psi^{\prime\prime} {\wtilde{\phi}}
+            +\rho {\wtilde{\psi}} \phi^{\prime\prime}+\rho \psi^{\prime\prime} \phi^{\prime\prime}
+     \right)
+     \left(
+            \wtilde{\theta}+\theta^{\prime\prime}
+     \right)
+     }
+\end{displaymath}
+%
+\begin{displaymath}
+   = \mfd\overline{
+      \rho {\wtilde{\psi}} {\wtilde{\phi}} \wtilde{\theta}+\rho \psi^{\prime\prime} {\wtilde{\phi}} \wtilde{\theta}
+            +\rho {\wtilde{\psi}} \phi^{\prime\prime} \wtilde{\theta}+\rho \psi^{\prime\prime} \phi^{\prime\prime} \wtilde{\theta}
+      +\rho {\wtilde{\psi}} {\wtilde{\phi}} \theta^{\prime\prime}+\rho \psi^{\prime\prime} {\wtilde{\phi}} \theta^{\prime\prime}
+            +\rho {\wtilde{\psi}} \phi^{\prime\prime} \theta^{\prime\prime}+\rho \psi^{\prime\prime} \phi^{\prime\prime} \theta^{\prime\prime}
+     }
+\end{displaymath}
+%
+\begin{displaymath}
+   = \mfd\wbar{\rho}\, {\wtilde{\psi}} {\wtilde{\phi}} \wtilde{\theta}
+         +{\wtilde{\phi}} \wtilde{\theta} \overline{\rho \psi^{\prime\prime}}
+       +{\wtilde{\psi}} \wtilde{\theta} \overline{\rho \phi^{\prime\prime}}
+       +\wtilde{\theta} \overline{\rho \psi^{\prime\prime} \phi^{\prime\prime}}
+       +{\wtilde{\psi}} {\wtilde{\phi}} \overline{\rho \theta^{\prime\prime}}
+       +{\wtilde{\phi}} \overline{\rho \psi^{\prime\prime} \theta^{\prime\prime}}
+       +{\wtilde{\psi}} \overline{\rho \phi^{\prime\prime} \theta^{\prime\prime}}
+       +\overline{\rho \psi^{\prime\prime} \phi^{\prime\prime} \theta^{\prime\prime}}
+\end{displaymath}
+%
+finally,
+%
+\begin{equation}
+   \mfd\overline{\rho \psi \phi \theta} = \mfd\wbar{\rho}\, {\wtilde{\psi}} {\wtilde{\phi}} \wtilde{\theta}
+       +\wtilde{\theta} \overline{\rho \psi^{\prime\prime} \phi^{\prime\prime}}
+       +{\wtilde{\phi}} \overline{\rho \psi^{\prime\prime} \theta^{\prime\prime}}
+       +{\wtilde{\psi}} \overline{\rho \phi^{\prime\prime} \theta^{\prime\prime}}
+       +\overline{\rho \psi^{\prime\prime} \phi^{\prime\prime} \theta^{\prime\prime}}
+  \label{eqn:favre-mult-3term}
+\end{equation}
+%
+
+\subsection{Link between Favre and Reynolds average}
+
+From the definition of the Favre average,
+%
+\begin{equation}
+  \phi^{\prime\prime} = \phi-{\wtilde{\phi}} = \phi-\frac{\overline{\rho  \phi}}{\wbar{\rho}\,}
+\end{equation}
+%
+since $\wbar{\rho}\, {\wtilde{\phi}} = \overline{\rho  \phi}$.
+The latter can be rewritten if expanding $\rho$ and $\phi$ as
+$\wbar{\rho}\,+\rho^{\prime}$ and $\overline{\phi}+\phi^{\prime}$ respectively:
+%
+\begin{equation}
+  \begin{array}{rcl}
+  \phi^{\prime\prime} &=&\mfd\overline{\phi}+\phi^{\prime}-\frac{\overline{\rho  \phi}}{\wbar{\rho}\,} \alb
+           &=&\mfd\overline{\phi}+\phi^{\prime}-\overline{\phi}-\frac{\overline{\rho^{\prime}  \phi^{\prime}}}{\wbar{\rho}\,}
+           = \mfd\phi^{\prime}-\frac{\overline{\rho^{\prime}  \phi^{\prime}}}{\wbar{\rho}\,} \alb
+           &=&\mfd\phi^{\prime}-\overline{\left(\frac{\rho^{\prime}}{\wbar{\rho}\,}\right) \phi^{\prime}} \alb
+  \end{array}
+\end{equation}
+%
+or, averaging both sides:
+%
+\begin{equation}
+  \overline{\phi^{\prime\prime}} = -\overline{\left(\frac{\rho^{\prime}}{\wbar{\rho}\,}\right) \phi^{\prime}}
+\end{equation}
+%
+
+
+\subsection{Multi-species formulation}
+
+From Eq.\ (\ref{eqn:rhophi}):
+%
+\begin{equation}
+  \overline{\rho  \phi} - \wbar{\rho}\,  {\wtilde{\phi}} = 0
+\end{equation}
+%
+Should the density be expressed as the sum of the partial densities, \emph{i.e.}
+%
+\begin{equation}
+  \rho=\sum_{k=1}^\ns \rho_k
+\end{equation}
+%
+then,
+%
+\begin{displaymath}
+     \overline{\sum_{k=1}^\ns \rho_k  \phi} - \overline{\sum_{k=1}^\ns \rho_k}  {\wtilde{\phi}}
+  =  \sum_{k=1}^\ns \overline{\rho_k  \phi} - \sum_{k=1}^\ns \overline{\rho_k}  {\wtilde{\phi}}
+  =  \sum_{k=1}^\ns \left( \overline{\rho_k \phi} -  \overline{\rho_k}  {\wtilde{\phi}}\right)
+  =  0
+\end{displaymath}
+%
+%
+\begin{equation}
+ {\rm or    }\sum_{k=1}^\ns \overline{\rho_k  \phi}
+          =  \sum_{k=1}^\ns \overline{\rho_k}  {\wtilde{\phi}}
+ \label{eqn:rhophik}
+\end{equation}
+%
+Further, from the definition of the mass fraction $w_k$, one can rewrite the latter
+equation as:
+%
+\begin{equation}
+     \sum_{k=1}^\ns \overline{\rho w_k \phi}
+  =  \sum_{k=1}^\ns \overline{\rho w_k} {\wtilde{\phi}}
+ \label{eqn:rhock}
+\end{equation}
+%
+Decomposing the mass fraction into a Favre averaged mean and fluctuating part,
+%
+\begin{equation}
+     \sum_{k=1}^\ns \overline{\rho w_k \phi}
+  =  \sum_{k=1}^\ns \wbar{\rho}\, {\wtilde{w}_k} {\wtilde{\phi}}
+ \label{eqn:rhock2}
+\end{equation}
+%
+and making use of Eq.\ (\ref{eqn:favre-mult-2term}) on the LHS:
+%
+\begin{equation}
+     \sum_{k=1}^\ns \wbar{\rho}\, {\wtilde{w}_k} {\wtilde{\phi}}
+   + \sum_{k=1}^\ns \overline{\rho w_k^{\prime\prime} \phi^{\prime\prime}}
+  =  \sum_{k=1}^\ns \wbar{\rho}\, {\wtilde{w}_k} {\wtilde{\phi}}
+ \label{eqn:rhock3}
+\end{equation}
+%
+hence resulting in the observation that:
+%
+\begin{equation}
+  \sum_{k=1}^\ns \overline{\rho w_k^{\prime\prime} \phi^{\prime\prime}} = 0
+ \label{eqn:rhock4}
+\end{equation}
+%
+For a product involving the density and two independant variables,
+Eq.\ (\ref{eqn:favre-mult-2term}) gives:
+%
+\begin{displaymath}
+  \mfd\overline{\rho \psi \phi}
+      = \mfd \wbar{\rho}\, {\wtilde{\psi}} {\wtilde{\phi}}
+            +\overline{\rho \psi^{\prime\prime} \phi^{\prime\prime}}
+\end{displaymath}
+%
+
+
+%
+\begin{displaymath}
+   \mfd\overline{\rho \psi \phi \theta} = \mfd\wbar{\rho}\, {\wtilde{\psi}} {\wtilde{\phi}} \wtilde{\theta}
+       +\wtilde{\theta} \overline{\rho \psi^{\prime\prime} \phi^{\prime\prime}}
+       +{\wtilde{\phi}} \overline{\rho \psi^{\prime\prime} \theta^{\prime\prime}}
+       +{\wtilde{\psi}} \overline{\rho \phi^{\prime\prime} \theta^{\prime\prime}}
+       +\overline{\rho \psi^{\prime\prime} \phi^{\prime\prime} \theta^{\prime\prime}}
+\end{displaymath}
+%
+
+
+
+\subsection{Chosen Variables}
+
+Before starting the derivations of the Favre averaged
+equations, a word of caution is necessary. A system of
+$x$ equations solving for $x$ unknowns
+can be expressed in terms of only $x$ variables: such
+is the case of the Navier-Stokes equations.
+When decomposing variables as a sum of a mean
+and fluctuating part, it is very important to decompose
+\emph{only} the $x$ variables with which the equations
+are formulated. For example, it would be unacceptable to decompose
+at one place say $\rho$ and $e$ while decomposing at
+another place $e^2$ and $\rho e$. One might argue that
+while $\rho$ and $e$ fluctuate, their product, $\rho e$
+fluctuates as well and could be expressed as a sum of a mean
+and fluctuating part. While this is true, it hides the fact that
+the fluctuations of $\rho e$ are dependant on the fluctuations
+of its primitives and hence must be written down as such.
+
+For this report, the variables that are chosen to
+be decomposed are the mass fractions $w_k$, the velocities
+$\bm{V}_i$, the density $\rho$, the temperature $T$, and the nitrogen vibration energy $\ev$.
+All other variables, should they appear in the equations,
+first must be expressed as a function of the above and then decomposed.
+It is understood that only $\ns-1$ mass fractions are to be solved,
+with $\ns$ the number of species, since $w_{ns}$ can be obtained
+from subtracting from 1 $w_1$ to $w_{\ns-1}$.
+
+In light of the above, we shall now seek the fluctuations of $P$,
+starting from the averaged equation of state:
+%
+\begin{equation}
+  \wbar{P}=\overline{\rho R T}=\wbar{\rho}\, R \wtilde{T}
+\end{equation}
+%
+Since no fluctuations appear on the RHS, it can be deduced
+that $P$, when averaged, must not involve any fluctuations.
+One possible decomposition of $P$ is hence through Reynolds
+averaging, i.e. $P=\wbar{P}+P^{\prime}$. Note that for a multi-species
+gas however, this wouldn't hold true.
+
+
+
+
+
+
+\section{Averaging}
+
+
+
+\subsection{Continuity}
+
+The continuity equation can be written as follows:
+%
+\begin{equation}
+  \frac{\partial \rho }{\partial t} + \sum_{i=1}^{\nd} \frac{\partial \rho \bm{V}_i }{\partial x_i} =0
+  \label{eqn:C:1}
+\end{equation}
+%
+which after substitution of $\rho=\wbar{\rho}\,+\rho^{\prime}$ and $\bm{V}_i={\wtilde{\bm{V}}_i}+\bm{V}_i^{\prime\prime}$
+becomes:
+%
+\begin{equation}
+  \frac{\partial}{\partial t} \left( \wbar{\rho}\,+\rho^{\prime} \right)  + \sum_{i=1}^{\nd}
+     \frac{\partial}{\partial x_i} \left( \wbar{\rho}\,+\rho^{\prime}\right)
+           \left( {\wtilde{\bm{V}}_i}+\bm{V}_i^{\prime\prime} \right) =0
+  \label{eqn:C:2}
+\end{equation}
+%
+averaging in time:
+%
+\begin{equation}
+  \begin{array}{c}
+    \mfd\frac{\partial}{\partial t} \overline{\left( \wbar{\rho}\,+\rho^{\prime} \right)}
+     + \sum_{i=1}^{\nd}
+       \frac{\partial}{\partial x_i} \overline{\left( \wbar{\rho}\,+\rho^{\prime}\right)
+             \left( {\wtilde{\bm{V}}_i}+\bm{V}_i^{\prime\prime} \right)} =0 \alb
+    \mfd\frac{\partial}{\partial t} \wbar{\rho}\,
+     + \sum_{i=1}^{\nd}
+       \frac{\partial}{\partial x_i} \overline{\wbar{\rho}\, {\wtilde{\bm{V}}_i}+\rho^{\prime} {\wtilde{\bm{V}}_i}+\rho \bm{V}_i^{\prime\prime}} =0 \alb
+    \mfd\frac{\partial}{\partial t} \wbar{\rho}\,
+     + \sum_{i=1}^{\nd}
+       \frac{\partial}{\partial x_i} \left(
+          \wbar{\rho}\, {\wtilde{\bm{V}}_i}
+          +\overline{\rho^{\prime}} {\wtilde{\bm{V}}_i}+\overline{\rho \bm{V}_i^{\prime\prime}} \right) =0 \alb
+  \end{array}
+\end{equation}
+%
+finally,
+%
+\begin{equation}
+    \mfd\frac{\partial}{\partial t} \wbar{\rho}\,
+     + \sum_{i=1}^{\nd}
+       \frac{\partial}{\partial x_i}
+          \wbar{\rho}\, {\wtilde{\bm{V}}_i}
+           =0 
+    \label{eqn:C:final}
+\end{equation}
+%
+
+
+\subsection{Flow Transport}
+
+
+The general form of a flow transport equation
+for property $\phi$ corresponds to:
+%
+\begin{equation}
+  \frac{\partial  \rho  \phi}{\partial t}
+   +  \sum_{i=1}^{\nd} \frac{\partial  \rho  \bm{V}_i  \phi}{\partial x_i} =0
+  \label{eqn:FT:1}
+\end{equation}
+%
+which after substitution of $\rho=\wbar{\rho}\,+\rho^{\prime}$, $\bm{V}_i={\wtilde{\bm{V}}_i}+\bm{V}_i^{\prime\prime}$
+and $\phi={\wtilde{\phi}}+\phi^{\prime\prime}$ becomes:
+%
+\begin{displaymath}
+  \mfd\frac{\partial}{\partial t}  \wbar{\rho}\,  {\wtilde{\phi}}
+      +  \sum_{i=1}^{\nd} \frac{\partial }{\partial x_i}  \overline{\rho  \left( {\wtilde{\bm{V}}_i}+\bm{V}_i^{\prime\prime}\right)
+        \left( {\wtilde{\phi}}+\phi^{\prime\prime} \right)} = 0 
+\end{displaymath}
+%
+\begin{equation}
+  \mfd\frac{\partial}{\partial t}  \wbar{\rho}\,  {\wtilde{\phi}}
+      + \sum_{i=1}^{\nd} \frac{\partial }{\partial x_i}
+        \wbar{\rho}\, {\wtilde{\bm{V}}_i} {\wtilde{\phi}}
+      + \sum_{i=1}^{\nd} \frac{\partial }{\partial x_i}
+             \overline{\rho \bm{V}_i^{\prime\prime} \phi^{\prime\prime}}
+      = 0 
+  \label{eqn:FT:final}
+\end{equation}
+%
+
+
+
+
+
+
+
+\subsection{Species Conservation}
+
+
+The general form of a species conservation equation
+solving for the mass fraction $w_k$ can be written as:
+%
+\begin{equation}
+  \frac{\partial }{\partial t} \rho w_k
+ +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}  \rho  \bm{V}_j  w_k
+ -  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}  d_{kj}  = 0
+  \label{eqn:SC:1}
+\end{equation}
+%
+where $\nu_k$ is the mass diffusion coefficient of species $k$
+and $d_{kj}$ corresponds to:
+%
+\begin{equation}
+  d_{kj}=\nu_k \frac{\partial w_k}{\partial x_j}
+  \label{eqn:dkj}
+\end{equation}
+%
+Similarly to the averaging of the flow transport equation, Eq.\ (\ref{eqn:SC:1}) becomes:
+%
+\begin{equation}
+  \mfd\frac{\partial}{\partial t}  \wbar{\rho}\,  {\wtilde{w}_k}
+      +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+        \wbar{\rho}\, {\wtilde{\bm{V}}_j} {\wtilde{w}_k}
+      + \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} 
+            \overline{\rho \bm{V}_j^{\prime\prime} w_k^{\prime\prime}}
+      -  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+        \overline{
+             d_{kj}
+        }
+      = 0
+  \label{eqn:SC:final}
+\end{equation}
+%
+
+
+
+
+\subsection{Momentum}
+
+
+The general form of the $i_{\rm th}$ component of the momentum equation (solving for $\bm{V}_i$)
+can be written as:
+%
+\begin{equation}
+    \frac{\partial }{\partial t} \rho  \bm{V}_i
+   +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \rho  \bm{V}_j  \bm{V}_i
+   +  \frac{\partial }{\partial x_i} P
+   -  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} t_{ij}   = 0
+  \label{eqn:M:1}
+\end{equation}
+%
+where $t_{ij}$ is equal to:
+%
+\begin{equation}
+  t_{ij} = t_{ji} = \eta \left( \frac{\partial \bm{V}_i}{\partial x_j}
+                   +  \frac{\partial \bm{V}_j}{\partial x_i}
+                   -  \frac{2}{3} \delta_{ij} \sum_{k=1}^{\nd} \frac{\partial \bm{V}_k}{\partial x_k}
+         \right)
+  \label{eqn:tij}
+\end{equation}
+%
+with $\delta_{ij}$ the Kronecker delta. Similarly to the averaging of the flow
+transport equation, after substitution of $\rho=\wbar{\rho}\,+\rho^{\prime}$,
+$\bm{V}_i={\wtilde{\bm{V}}_i}+\bm{V}_i^{\prime\prime}$ and $P=\wbar{P}+P^{\prime}$ the averaged momentum
+equation becomes:
+%
+\begin{equation}
+  \mfd\frac{\partial}{\partial t}  \wbar{\rho}\,  {\wtilde{\bm{V}}_i}
+      +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+             \wbar{\rho}\, {\wtilde{\bm{V}}_j} {\wtilde{\bm{V}}_i}
+      + \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+             \overline{\rho \bm{V}_j^{\prime\prime} \bm{V}_i^{\prime\prime}}
+      +  \frac{\partial }{\partial x_i} \wbar{P}
+      -  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{t_{ij}}
+      = 0
+  \label{eqn:M:final}
+\end{equation}
+%
+
+
+
+
+
+\subsection{Equation of State}
+
+For a multi-species thermally perfect gas, the equation of state corresponds
+to:
+%
+\begin{equation}
+  P = \sum_{k=1}^\ns  \rho  w_k  R_k  T
+\end{equation}
+%
+which, after averaging on both sides becomes:
+%
+\begin{equation}
+ \wbar{P} = \sum_{k=1}^\ns \overline{\rho  w_k R_k  T}
+              = \sum_{k=1}^\ns R_k \overline{\rho  w_k T}
+\end{equation}
+%
+since $R_k$ is a constant but differs for each species. Interestingly,
+should only one species be present, the latter would elegantly collapse
+to:
+%
+\begin{equation}
+ \wbar{P} = R \wbar{\rho}\,  \wtilde{T} \textrm{~~~~~for one species only}
+\end{equation}
+%
+Sadly, the same is not true for a multi-species mixture. Expanding the
+mass fractions and temperature in a sum of a Favre-averaged and a fluctuating
+part, and using Eq.\ (\ref{eqn:favre-mult-2term}):
+%
+\begin{equation}
+ \wbar{P}
+     =   \sum_{k=1}^\ns R_k \wbar{\rho}\,  {\wtilde{w}_k} \wtilde{T}
+       + \sum_{k=1}^\ns R_k \overline{\rho w_k^{\prime\prime} T^{\prime\prime}}
+ \label{eqn:EOS:final}
+\end{equation}
+%
+
+
+
+
+
+\subsection{Energy}
+
+The viscous form of the energy equation can be written as:
+%
+\begin{equation}
+ \begin{array}{l}
+  \mfd\frac{\partial}{\partial t} \rho\left( \sum_{k=1}^{\ns} w_k e_k+\cNtwo \ev +\sum_{i=1}^{\nd} \frac{\bm{V}_i^2}{2}\right)
+   + \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \rho \bm{V}_j \left( \sum_{k=1}^\ns w_k  h_k+\cNtwo\ev+\sum_{i=1}^{\nd} \frac{\bm{V}_i^2}{2}\right) \alb
+  \mfd
+~~   - \sum_{k=1}^{\ns}\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} h_k d_{kj}
+   - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \ev d_{{\rm N_2}j }
+   - \sum_{i=1}^{\nd}\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \bm{V}_i t_{ij}
+   + \sum_{j=1}^{\nd} \frac{\partial q_j}{\partial x_j}
+   = 0
+ \end{array}
+\end{equation}
+%
+where the first two terms are the unsteady and convective parts of the energy
+while the last four are related to the action of the viscous forces on the energy.
+The heat flux $q_j$ is here understood to include the contribution from the gas temperature and vibration temperature gradients. After decomposing all terms and time averaging, the energy equation becomes:
+%
+\begin{displaymath}
+ \begin{array}{l}
+    \mfd\sum_{k=1}^{\ns} \frac{\partial}{\partial t} \overline{\rho \left({\wtilde{w}_k} + w_k^{\prime\prime} \right) \left( {\wtilde{e}_k} +e_k^{\prime\prime} \right)}
+    +\frac{\partial}{\partial t} \overline{\rho \left({\wtilde{w}_{\rm N_2}} + \cNtwo^{\prime\prime} \right) \left( \wtilde{\ev} +\ev^{\prime\prime} \right)}\alb\mfd
+%
+~~+\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \overline{ \rho \left( {\wtilde{\bm{V}}_j}+\bm{V}_j^{\prime\prime} \right)  \left( {\wtilde{w}_{\rm N_2}}+\cNtwo^{\prime\prime} \right) \left( \wtilde{\ev} + \ev^{\prime\prime} \right) }
+       +\frac{1}{2}\sum_{i=1}^{\nd}\frac{\partial}{\partial t} \overline{\rho  \left({\wtilde{\bm{V}}_i}+\bm{V}_i^{\prime\prime} \right) \left({\wtilde{\bm{V}}_i}+\bm{V}_i^{\prime\prime} \right)}
+       \alb
+% 
+   \mfd ~~+\sum_{k=1}^{\ns} \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \overline{ \rho \left( {\wtilde{\bm{V}}_j}+\bm{V}_j^{\prime\prime} \right)  \left( {\wtilde{w}_k}+w_k^{\prime\prime} \right) \left( {\wtilde{h}_k} + h_k^{\prime\prime} \right) }\alb\mfd
+%
+         ~~+\frac{1}{2}\sum_{j=1}^{\nd} \sum_{i=1}^{\nd} \frac{\partial}{\partial x_j} \overline{\rho \left( {\wtilde{\bm{V}}_j}+\bm{V}_j^{\prime\prime} \right)  \left( {\wtilde{\bm{V}}_i}+\bm{V}_i^{\prime\prime} \right) \left( {\wtilde{\bm{V}}_i}+\bm{V}_i^{\prime\prime} \right)}\alb
+%
+    \mfd ~~- \sum_{k=1}^{\ns}\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{ h_k d_{kj}}
+   - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{\ev d_{{\rm N_2}j} }
+         - \sum_{i=1}^{\nd}\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{ t_{ij} \left( {\wtilde{\bm{V}}_i} +\bm{V}_i^{\prime\prime} \right) }
+         + \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{q_j} = 0
+\end{array}
+\end{displaymath}
+%
+where we have taken some liberty in decomposing the partial enthalpy $h_k$
+and the internal energy $e_k$ using Favre averages. Note that for a calorically perfect gas in which
+the enthalpy and the internal energy can be expressed as the product of a constant and the temperature,
+this would be exactly correct since the temperature has already been defined
+as Favre averaged. For a calorically non perfect gas however, decomposing
+the enthalpy as $h_k={\wtilde{h}_k}+h_k^{\prime\prime}$ neglects the fluctuations
+of $\Cp_k = \partial h_k / \partial T$ in space and time. This assumption
+should not be too severe however, as one may imagine the fluctuations to
+be small enough that locally the gas behaves as perfect.
+
+
+Expanding the terms, the energy equation can also be written as:
+%
+\begin{displaymath}
+ \begin{array}{l}
+\mfd    \frac{\partial}{\partial t} \wbar{\rho}\, {\wtilde{w}_{\rm N_2}}  \wtilde{\ev}
++\mfd    \frac{\partial}{\partial t} \overline{\rho \cNtwo^{\prime\prime}   \ev^{\prime\prime}}
++\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} {\wtilde{w}_{\rm N_2}} {\wtilde{\ev}}
+       +\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}{\wtilde{\ev}} \overline{\rho \bm{V}_j^{\prime\prime} \cNtwo^{\prime\prime}}+\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}{\wtilde{w}_{\rm N_2}} \overline{\rho \bm{V}_j^{\prime\prime} \ev^{\prime\prime}}\alb\mfd
+%
+~~       
+       +\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}{\wtilde{\bm{V}}_j} \overline{\rho \cNtwo^{\prime\prime} \ev^{\prime\prime}}
+       +\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}\overline{\rho \bm{V}_j^{\prime\prime} \cNtwo^{\prime\prime} \ev^{\prime\prime}} 
++      \sum_{k=1}^{\ns} \frac{\partial}{\partial t} \wbar{\rho}\,  {\wtilde{w}_k}   {\wtilde{h}_k}
+        + \sum_{k=1}^{\ns} \frac{\partial}{\partial t} \overline{\rho  w_k^{\prime\prime}   h_k^{\prime\prime} }
+        - \frac{\partial}{\partial t} \wbar{P}\alb
+%
+    \mfd
+  ~~  
+        + \frac{1}{2}\sum_{i=1}^{\nd}\frac{\partial}{\partial t} \wbar{\rho}\,   {\wtilde{\bm{V}}_i}  {\wtilde{\bm{V}}_i}
+        + \frac{1}{2}\sum_{i=1}^{\nd}\frac{\partial}{\partial t} \overline{\rho   \bm{V}_i^{\prime\prime}  \bm{V}_i^{\prime\prime} } \alb
+%
+ ~~   \mfd  + \sum_{j=1}^{\nd} \sum_{k=1}^{\ns} \frac{\partial}{\partial x_j}
+       \left(
+         \wbar{\rho}\,  {\wtilde{\bm{V}}_j}  {\wtilde{w}_k}  {\wtilde{h}_k}
+         + {\wtilde{w}_k}  \overline{\rho  \bm{V}_j^{\prime\prime}  h_k^{\prime\prime}}
+         + {\wtilde{h}_k}  \overline{\rho  \bm{V}_j^{\prime\prime}  w_k^{\prime\prime}}
+         + {\wtilde{\bm{V}}_j}  \overline{\rho  w_k^{\prime\prime}  h_k^{\prime\prime}}
+         + \overline{\rho  \bm{V}_j^{\prime\prime}  w_k^{\prime\prime}  h_k^{\prime\prime} }
+       \right) \alb
+%
+~~    \mfd  + \frac{1}{2}\sum_{j=1}^{\nd} \sum_{i=1}^{\nd} \frac{\partial}{\partial x_j}
+       \left(
+         \wbar{\rho}\,  {\wtilde{\bm{V}}_j}  {\wtilde{\bm{V}}_i}  {\wtilde{\bm{V}}_i}
+         + 2 {\wtilde{\bm{V}}_i}  \overline{\rho  \bm{V}_j^{\prime\prime}  \bm{V}_i^{\prime\prime}}
+         + {\wtilde{\bm{V}}_j}  \overline{\rho  \bm{V}_i^{\prime\prime}  \bm{V}_i^{\prime\prime}}
+         + \overline{\rho  \bm{V}_j^{\prime\prime}  \bm{V}_i^{\prime\prime}  \bm{V}_i^{\prime\prime} }
+       \right)
+     - \sum_{k=1}^{\ns}\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{ h_k d_{kj}}\alb\mfd
+%
+~~
+   - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{\ev d_{{\rm N_2}j}}
+         - \sum_{i=1}^{\nd}\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{ t_{ij} }  {\wtilde{\bm{V}}_i}
+         - \sum_{i=1}^{\nd}\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{ t_{ij}  \bm{V}_i^{\prime\prime} }
+         + \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{q_j} = 0
+\end{array}
+\end{displaymath}
+%
+Should we define the mass-weighted kinetic energy of turbulence as:
+%
+\begin{equation}
+  \wbar{\rho}\, k = \frac{1}{2} \sum_{i=1}^\nd \overline{\rho \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}}
+  \label{eqn:k}
+\end{equation}
+%
+and the mass-weighted enthalpic energy of turbulence as:
+%
+\begin{equation}
+  \wbar{\rho}\, g = \sum_{k=1}^\ns \overline{\rho w_k^{\prime\prime} h_k^{\prime\prime}}
+    + \overline{\rho \cNtwo^{\prime\prime}  \ev^{\prime\prime}}
+  \label{eqn:g}
+\end{equation}
+%
+the energy balance hence reduces to:
+%
+\begin{displaymath}
+ \begin{array}{l}
+\mfd    \frac{\partial}{\partial t} \wbar{\rho}\, {\wtilde{w}_{\rm N_2}}   \wtilde{\ev}
++\mfd    \frac{\partial}{\partial t} \overline{\rho \cNtwo^{\prime\prime}   \ev^{\prime\prime}}
++\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} {\wtilde{w}_{\rm N_2}} {\wtilde{\ev}}
+       +\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}{\wtilde{\ev}} \overline{\rho \bm{V}_j^{\prime\prime} \cNtwo^{\prime\prime}}   +\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}{\wtilde{w}_{\rm N_2}} \overline{\rho \bm{V}_j^{\prime\prime} \ev^{\prime\prime}}\alb\mfd
+%
+~~    
+       +\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}{\wtilde{\bm{V}}_j} \overline{\rho \cNtwo^{\prime\prime} \ev^{\prime\prime}}
+       +\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}\overline{\rho \bm{V}_j^{\prime\prime} \cNtwo^{\prime\prime} \ev^{\prime\prime}} +\frac{\partial}{\partial t}
+       \left( \wbar{\rho}\,  \wtilde{e}
+           + \wbar{\rho}\, k
+           + \wbar{\rho}\, g
+           + \frac{1}{2}\sum_{i=1}^{\nd}
+                    \wbar{\rho}\,   {\wtilde{\bm{V}}_i}  {\wtilde{\bm{V}}_i}
+       \right)\alb
+ ~~   
+    \mfd
+     + \sum_{j=1}^{\nd} \sum_{k=1}^{\ns} \frac{\partial}{\partial x_j}
+       \left(
+         \wbar{\rho}\,  {\wtilde{\bm{V}}_j}  {\wtilde{w}_k}  {\wtilde{h}_k}
+         + {\wtilde{w}_k}  \overline{\rho  \bm{V}_j^{\prime\prime}  h_k^{\prime\prime}}
+         + {\wtilde{h}_k}  \overline{\rho  \bm{V}_j^{\prime\prime}  w_k^{\prime\prime}}
+         + {\wtilde{\bm{V}}_j}  \overline{\rho  w_k^{\prime\prime}  h_k^{\prime\prime}}
+         + \overline{\rho  \bm{V}_j^{\prime\prime}  w_k^{\prime\prime}  h_k^{\prime\prime} }
+       \right)\alb\mfd~~
+     + \frac{1}{2}\sum_{j=1}^{\nd} \sum_{i=1}^{\nd} \frac{\partial}{\partial x_j}
+       \left(
+         \wbar{\rho}\,  {\wtilde{\bm{V}}_j}  {\wtilde{\bm{V}}_i}  {\wtilde{\bm{V}}_i}
+         + 2 {\wtilde{\bm{V}}_i}  \overline{\rho  \bm{V}_j^{\prime\prime}  \bm{V}_i^{\prime\prime}}
+         + {\wtilde{\bm{V}}_j}  \overline{\rho  \bm{V}_i^{\prime\prime}  \bm{V}_i^{\prime\prime}}
+         + \overline{\rho  \bm{V}_j^{\prime\prime}  \bm{V}_i^{\prime\prime}  \bm{V}_i^{\prime\prime} }
+       \right)\alb
+   ~~ \mfd - \sum_{k=1}^{\ns}\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \left( \overline{ d_{kj} }  {\wtilde{h}_k}+\overline{ d_{kj}  h_k^{\prime\prime}} \right)
+   - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \wtilde{\ev} \overline{d_{{\rm N_2}j} }- \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{\ev^{\prime\prime} d_{{\rm N_2}j} }\alb\mfd
+~~         - \sum_{i=1}^{\nd}\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \left( \overline{ t_{ij} }  {\wtilde{\bm{V}}_i} + \overline{ t_{ij}  \bm{V}_i^{\prime\prime} }\right)
+         + \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{q_j}= 0
+\end{array}
+\end{displaymath}
+%
+For the turbulent heat flux term, assuming a calorically perfect gas, one can write:
+%
+\begin{equation}
+  -\sum_{k=1}^\ns {\wtilde{w}_k} \overline{\rho \bm{V}_j^{\prime\prime} h_k^{\prime\prime}}
+    = 
+  -\sum_{k=1}^\ns {\wtilde{w}_k} \Cp_k \overline{\rho \bm{V}_j^{\prime\prime} T^{\prime\prime}}
+    = 
+  -\overline{\Cp} \overline{\rho \bm{V}_j^{\prime\prime} T^{\prime\prime}}
+\end{equation}
+%
+where by definition, $\overline{\Cp}$ corresponds to:
+%
+\begin{equation}
+  \overline{\Cp} \equiv \sum_{k=1}^\ns {\wtilde{w}_k} \Cp_k
+  \label{eqn:Cp}
+\end{equation}
+%
+and finally, regrouping terms:
+%
+\begin{equation}
+ \begin{array}{l}
+    % unsteady terms
+    \mfd\frac{\partial}{\partial t}  \wbar{\rho}\,
+       \left(  \wtilde{e}
+           + 
+          {\wtilde{w}_{\rm N_2}}\wtilde{\ev}
+           + 
+          k
+           + 
+          g
+           + \frac{1}{2}\sum_{i=1}^{\nd}  {\wtilde{\bm{V}}_i}  {\wtilde{\bm{V}}_i}
+       \right)\alb\mfd~~
+    % convection terms
+     + \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \left\{ \wbar{\rho}\, {\wtilde{\bm{V}}_j}
+       \left(
+            \sum_{k=1}^{\ns} {\wtilde{w}_k}  {\wtilde{h}_k}
+          + {\wtilde{w}_{\rm N_2}}\wtilde{\ev}  + k + g
+          + \frac{1}{2}\sum_{i=1}^{\nd} {\wtilde{\bm{V}}_i}  {\wtilde{\bm{V}}_i}
+       \right) \right.\alb~~
+    % turbulence and molecular diffusion terms
+    \mfd+ \overline{q_j}+\overline{\Cp}  \overline{\rho  \bm{V}_j^{\prime\prime}  T^{\prime\prime}} +{\wtilde{w}_{\rm N_2}} \overline{\rho \bm{V}_j^{\prime\prime} \ev^{\prime\prime}}
+      -\sum_{k=1}^{\ns}{\wtilde{h}_k} \left( \overline{ d_{kj} }
+
+      -\overline{\rho  \bm{V}_j^{\prime\prime}  w_k^{\prime\prime}}\right)
+      -\wtilde{\ev} \left(\overline{d_{{\rm N_2}j} }       - \overline{\rho \bm{V}_j^{\prime\prime} \cNtwo^{\prime\prime}}\right)\alb
+    \mfd~~
+        - \sum_{k=1}^{\ns}\left( \overline{ d_{kj}  h_k^{\prime\prime} } - \overline{\rho  \bm{V}_j^{\prime\prime}  w_k^{\prime\prime}  h_k^{\prime\prime} } \right)
+   -\left(\overline{d_{{\rm N_2}j}\ev^{\prime\prime} }    -\overline{\rho \bm{V}_j^{\prime\prime} \cNtwo^{\prime\prime} \ev^{\prime\prime}} \right)
+        \alb
+ ~~   \mfd \left.  - \sum_{i=1}^{\nd}
+       \left[
+          {\wtilde{\bm{V}}_i} \left( \overline{ t_{ij} } -\overline{\rho  \bm{V}_j^{\prime\prime}  \bm{V}_i^{\prime\prime}}\right)
+        + \left( \overline{ t_{ij}  \bm{V}_i^{\prime\prime} } -\frac{1}{2}\overline{\rho  \bm{V}_j^{\prime\prime}  \bm{V}_i^{\prime\prime}  \bm{V}_i^{\prime\prime} } \right)
+       \right]
+    \right\}= 0
+ \end{array}
+ \label{eqn:etstar:final}
+\end{equation}
+%
+
+
+
+
+
+\subsection{Nitrogen Vibration Energy}
+
+
+The general form of a nitrogen vibration energy conservation equation:
+%
+\begin{equation}
+  \mfd\frac{\partial}{\partial t}  {\rho}  w_{\rm N_2} {\ev}
+      +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+        {\rho}  {\bm{V}_j} w_{\rm N_2} \ev
+      + \sum_{j=1}^{\nd}\frac{\partial }{\partial x_j} q^{\rm v}_j
+      - \sum_{j=1}^{\nd}\frac{\partial }{\partial x_j} e_{\rm v} d_{{\rm N_2}j}
+      = Q_{\rm v}
+  \label{eqn:NV:1}
+\end{equation}
+%
+Similarly to the averaging of the energy transport equation, Eq.\ (\ref{eqn:NV:1}) becomes:
+%
+\begin{align*}
+    \frac{\partial}{\partial t} \overline{\rho \left({\wtilde{w}_{\rm N_2}} + \cNtwo^{\prime\prime} \right) \left( \wtilde{\ev} +\ev^{\prime\prime} \right)}
+&~+~\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \overline{ \rho \left( {\wtilde{\bm{V}}_j}+\bm{V}_j^{\prime\prime} \right)  \left( {\wtilde{w}_{\rm N_2}}+\cNtwo^{\prime\prime} \right) \left( \wtilde{\ev} + \ev^{\prime\prime} \right) }\alb
+&~-~ \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{(\wtilde{\ev}+\ev^{\prime\prime}) d_{{\rm N_2}j} }
+~+~ \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{q_j^{\rm v}} = \wbar{Q}_{\rm v}
+\end{align*}
+%
+Expand:
+%
+\begin{align*}
+    \frac{\partial}{\partial t} \wbar{\rho}\, {\wtilde{w}_{\rm N_2}}  \wtilde{\ev}
+&+    \frac{\partial}{\partial t} \overline{\rho \cNtwo^{\prime\prime}   \ev^{\prime\prime}}
++\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} {\wtilde{w}_{\rm N_2}} {\wtilde{\ev}}
+       +\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}{\wtilde{\ev}} \overline{\rho \bm{V}_j^{\prime\prime} \cNtwo^{\prime\prime}}+\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}{\wtilde{w}_{\rm N_2}} \overline{\rho \bm{V}_j^{\prime\prime} \ev^{\prime\prime}}\alb
+%
+       &+\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}{\wtilde{\bm{V}}_j} \overline{\rho \cNtwo^{\prime\prime} \ev^{\prime\prime}}
+       +\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}\overline{\rho \bm{V}_j^{\prime\prime} \cNtwo^{\prime\prime} \ev^{\prime\prime}} \alb
+%
+   &- \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \wtilde{\ev} \overline{d_{{\rm N_2}j}}
+   - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{\ev^{\prime\prime} d_{{\rm N_2}j}}
+         + \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{q_j^{\rm v}} = \wbar{Q}_{\rm v}
+\end{align*}
+%
+Define $g_{\rm v}$ such that:
+%
+\begin{equation}
+  \wbar{\rho}\, g_{\rm v} \equiv \overline{\rho \cNtwo^{\prime\prime}  \ev^{\prime\prime}}
+  \label{eqn:gv}
+\end{equation}
+%
+Then:
+%
+\begin{align}
+    \frac{\partial}{\partial t} \wbar{\rho}\, {\wtilde{w}_{\rm N_2}}  \wtilde{\ev}
+&+    \frac{\partial}{\partial t} \wbar{\rho}\, g_{\rm v} 
++\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} {\wtilde{w}_{\rm N_2}} {\wtilde{\ev}}
+       +\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}{\wtilde{\ev}} \overline{\rho \bm{V}_j^{\prime\prime} \cNtwo^{\prime\prime}}+\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}{\wtilde{w}_{\rm N_2}} \overline{\rho \bm{V}_j^{\prime\prime} \ev^{\prime\prime}}\nonumber\alb
+%
+       &+\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}{\wtilde{\bm{V}}_j} \wbar{\rho}\, g_{\rm v}
+       +\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}\overline{\rho \bm{V}_j^{\prime\prime} \cNtwo^{\prime\prime} \ev^{\prime\prime}} \nonumber\alb
+   &- \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \wtilde{\ev} \overline{d_{{\rm N_2}j}}
+   - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{\ev^{\prime\prime} d_{{\rm N_2}j}}
+         + \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{q_j^{\rm v}} = \wbar{Q}_{\rm v}
+\end{align}
+%
+Regroup terms:
+%
+\begin{align}
+    \frac{\partial}{\partial t} &\wbar{\rho} \left( {\wtilde{w}_{\rm N_2}}  \wtilde{\ev} + g_{\rm v}\right)
++\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} \left( {\wtilde{w}_{\rm N_2}} {\wtilde{\ev}} + g_{\rm v}\right)
+       +\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}{\wtilde{\ev}} \overline{\rho \bm{V}_j^{\prime\prime} \cNtwo^{\prime\prime}}+\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}{\wtilde{w}_{\rm N_2}} \overline{\rho \bm{V}_j^{\prime\prime} \ev^{\prime\prime}}\nonumber\alb
+%
+       &+\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}\overline{\rho \bm{V}_j^{\prime\prime} \cNtwo^{\prime\prime} \ev^{\prime\prime}} 
+- \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \wtilde{\ev} \overline{d_{{\rm N_2}j}}
+   - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{\ev^{\prime\prime} d_{{\rm N_2}j}}
+         + \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{q_j^{\rm v}} = \wbar{Q}_{\rm v}
+\label{eqn:NV:final}
+\end{align}
+%
+
+
+
+
+\subsection{Turbulence kinetic energy}
+
+The turbulence kinetic energy equation is obtained from a multiplication
+of the instantaneous $i_{\rm th}$ component of the momentum equation by the fluctuating part of the
+$i_{\rm th}$ component of the velocity. The momentum equation is first reduced from its conservative
+form to its primitive form by subtracting the product of the
+global continuity equation and $\bm{V}_i$:
+%
+\begin{displaymath}
+    \frac{\partial} {\partial t}  \rho \bm{V}_i
+   +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \rho \bm{V}_j \bm{V}_i
+   +  \frac{\partial P}{\partial x_i}
+   -  \sum_{j=1}^{\nd} \frac{\partial t_{ij}}{\partial x_j}
+   - \frac{\partial \rho }{\partial t} - \sum_{j=1}^{\nd} \frac{\partial  }{\partial x_j} \rho \bm{V}_j  = 0
+\end{displaymath}
+%
+%
+\begin{displaymath}
+    \rho\frac{\partial \bm{V}_i }{\partial t}
+   +  \bm{V}_i\frac{\partial \rho}{\partial t}
+   +   \sum_{j=1}^{\nd} \rho \bm{V}_j \frac{\partial \bm{V}_i }{\partial x_j}
+   +  \sum_{j=1}^{\nd} \bm{V}_i \frac{\partial }{\partial x_j} \rho \bm{V}_j
+   +  \frac{\partial P}{\partial x_i}
+   -  \sum_{j=1}^{\nd} \frac{\partial t_{ij}}{\partial x_j}
+   - \bm{V}_i \frac{\partial \rho }{\partial t} - \sum_{j=1}^{\nd} \bm{V}_i \frac{\partial  }{\partial x_j} \rho \bm{V}_j  = 0
+\end{displaymath}
+%
+%
+\begin{displaymath}
+   \rho\frac{\partial \bm{V}_i }{\partial t}
+   +   \sum_{j=1}^{\nd} \rho  \bm{V}_j  \frac{\partial \bm{V}_i }{\partial x_j}
+   +  \frac{\partial P}{\partial x_i}
+   -  \sum_{j=1}^{\nd} \frac{\partial t_{ij}}{\partial x_j}
+   = 0
+\end{displaymath}
+%
+Multiplying the latter by $\bm{V}_i^{\prime\prime}$ and averaging:
+%
+\begin{equation}
+   \overline{\rho \bm{V}_i^{\prime\prime} \frac{\partial \bm{V}_i }{\partial t}}
+   + \sum_{j=1}^{\nd} \overline{\rho \bm{V}_i^{\prime\prime} \bm{V}_j \frac{\partial \bm{V}_i }{\partial x_j}}
+   + \overline{\bm{V}_i^{\prime\prime} \frac{\partial P}{\partial x_i}}
+   - \sum_{j=1}^{\nd} \overline{ \bm{V}_i^{\prime\prime}\frac{\partial t_{ij}}{\partial x_j}}
+   = 0
+  \label{eqn:TKE:1}
+\end{equation}
+%
+For simplicity, each term will be simplified individually.
+The time dependant term corresponds to:
+%
+\begin{displaymath}
+    \mfd\overline{\rho \bm{V}_i^{\prime\prime} \frac{\partial \bm{V}_i }{\partial t}}
+     =  \mfd\overline{\rho \bm{V}_i^{\prime\prime}} \frac{\partial {\wtilde{\bm{V}}_i} }{\partial t}
+          +\overline{\rho \bm{V}_i^{\prime\prime} \frac{\partial \bm{V}_i^{\prime\prime} }{\partial t} }
+     =  \mfd \overline{\frac{1}{2} \rho \bm{V}_i^{\prime\prime} \frac{\partial \bm{V}_i^{\prime\prime} }{\partial t} }
+                 +\overline{\frac{1}{2} \rho \bm{V}_i^{\prime\prime} \frac{\partial \bm{V}_i^{\prime\prime} }{\partial t} }
+     =  \mfd \overline{\frac{1}{2}\rho \frac{\partial \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}}{\partial t} }
+\end{displaymath}
+%
+\begin{displaymath}
+   =  \mfd \frac{\partial }{\partial t} \overline{{\mfc\frac{1}{2}}\rho \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime} }
+     -\overline{\frac{1}{2}\bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}\frac{\partial }{\partial t} \rho }
+\end{displaymath}
+%
+for the convective term, we get:
+%
+\begin{align*}
+     \sum_{j=1}^{\nd} &\overline{\rho \bm{V}_i^{\prime\prime} \bm{V}_j \frac{\partial \bm{V}_i }{\partial x_j}}
+   = \sum_{j=1}^{\nd} \left(
+                           \overline{\rho \bm{V}_i^{\prime\prime} \left({\wtilde{\bm{V}}_j}+\bm{V}_j^{\prime\prime}\right)
+                                     \frac{\partial }{\partial x_j} \left({\wtilde{\bm{V}}_i}+\bm{V}_i^{\prime\prime}\right)
+                                    }
+                       \right) \alb
+   &= \sum_{j=1}^{\nd} \left(
+                              \overline{\rho \bm{V}_i^{\prime\prime} \left({\wtilde{\bm{V}}_j}+\bm{V}_j^{\prime\prime}\right)
+                                     \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_i}
+                                    }
+                          +   \overline{\rho \bm{V}_i^{\prime\prime} \left({\wtilde{\bm{V}}_j}+\bm{V}_j^{\prime\prime}\right)
+                                     \frac{\partial }{\partial x_j} \bm{V}_i^{\prime\prime}
+                                    }
+                       \right)\alb
+  &=\sum_{j=1}^{\nd} \left(
+                              \overline{\rho \bm{V}_i^{\prime\prime}} {\wtilde{\bm{V}}_j}
+                                     \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_i}
+                          +   \overline{\rho \bm{V}_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+                                     \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_i}
+                          +   \overline{\rho \bm{V}_i^{\prime\prime} \bm{V}_j
+                                     \frac{\partial }{\partial x_j} \bm{V}_i^{\prime\prime}
+                                    }
+                       \right)\alb
+  &=\sum_{j=1}^{\nd} \left(
+                              \overline{\rho \bm{V}_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+                                     \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_i}
+                          +   \overline{\rho \bm{V}_j \bm{V}_i^{\prime\prime}
+                                     \frac{\partial }{\partial x_j} \bm{V}_i^{\prime\prime}
+                                    }
+                       \right)\alb
+  &=\sum_{j=1}^{\nd} \left(
+                              \overline{\rho \bm{V}_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+                                     \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_i}
+                          +   \overline{{\frac{1}{2}}\rho \bm{V}_j 
+                                     \frac{\partial }{\partial x_j} \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}
+                                    }
+                     \right)\alb
+  &=\sum_{j=1}^{\nd} \left(
+                              \overline{\rho \bm{V}_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+                                     \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_i}
+                          -  \overline{{ \frac{1}{2}}\bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime} \frac{\partial }{\partial x_j} \rho \bm{V}_j}
+                          +  \frac{\partial }{\partial x_j} \overline{{\mfc \frac{1}{2}}\rho \bm{V}_j \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}}
+                     \right)\alb
+  &=\sum_{j=1}^{\nd} \left(
+                              \overline{\rho \bm{V}_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+                                     \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_i}
+                          -  \overline{{ \frac{1}{2}}\bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime} \frac{\partial }{\partial x_j} \rho \bm{V}_j}
+                          +  \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_j} \overline{{\mfc \frac{1}{2}} \rho \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}}
+                          +  {\frac{1}{2}}\frac{\partial }{\partial x_j} \overline{\rho {\bm{V}_j^{\prime\prime}} \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}}
+                     \right)
+\end{align*}
+%
+The pressure gradient term is left as is while
+the viscous term is rewritten to:
+%
+\begin{displaymath}
+     -\sum_{j=1}^{\nd} \overline{ \bm{V}_i^{\prime\prime}\frac{\partial t_{ij}}{\partial x_j}}
+   = -\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{\bm{V}_i^{\prime\prime} t_{ij}}
+     +\sum_{j=1}^{\nd} \overline{ t_{ij}\frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}}
+\end{displaymath}
+%
+Substituting all terms back in Eq.\ (\ref{eqn:TKE:1}),
+the turbulence kinetic energy equation can be rewritten as:
+%
+\begin{align}
+  \frac{\partial }{\partial t} &\overline{{\mfc\frac{1}{2}}\rho \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime} }
+     -\overline{\frac{1}{2}\bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}\frac{\partial }{\partial t} \rho }
+   + \mfd\overline{\bm{V}_i^{\prime\prime}} \frac{\partial }{\partial x_i} \wbar{P}
+       + \frac{\partial }{\partial x_i} \overline{ P^{\prime} \bm{V}_i^{\prime\prime}}
+       - \overline{P^{\prime} \frac{\partial }{\partial x_i} \bm{V}_i^{\prime\prime} }\nonumber\alb
+   &- \mfd\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{\bm{V}_i^{\prime\prime} t_{ij}}
+     +\sum_{j=1}^{\nd} \overline{ t_{ij}\frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}} \nonumber\alb
+   &+ \mfd\sum_{j=1}^{\nd} \left(
+                              \overline{\rho \bm{V}_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+                                     \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_i}
+                          -  \overline{{ \frac{1}{2}}\bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime} \frac{\partial }{\partial x_j} \rho \bm{V}_j}
+                          +  \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_j} \overline{{\mfc \frac{1}{2}} \rho \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}}
+                          +  {\frac{1}{2}}\frac{\partial }{\partial x_j} \overline{\rho {\bm{V}_j^{\prime\prime}} \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}}
+                     \right)  = 0
+  \label{eqn:TKE:2}
+\end{align}
+%
+However, the global continuity equation can be multiplied by
+the factor $\left(-\frac{1}{2}\bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}\right)$ and time averaged, resulting in:
+%
+\begin{equation}
+  -\overline{\frac{1}{2}\bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}\frac{\partial }{\partial t} \rho }
+       -  \sum_{j=1}^\nd \overline{{ \frac{1}{2}}\bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime} \frac{\partial }{\partial x_j} \rho \bm{V}_j} = 0
+\end{equation}
+%
+which will get rid of two terms in Eq.\ (\ref{eqn:TKE:2}). Rearranging:
+%
+\begin{equation}
+  \begin{array}{l}
+  \mfd \frac{\partial }{\partial t} \overline{{\mfc\frac{1}{2}}\rho \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime} }
+                          +  \sum_{j=1}^{\nd}\frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_j} \overline{{\mfc \frac{1}{2}} \rho \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}}
+   + \mfd\sum_{j=1}^{\nd} \left(
+                              \overline{\rho \bm{V}_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+                                     \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_i}
+                          +  {\frac{1}{2}}\frac{\partial }{\partial x_j} \overline{\rho {\bm{V}_j^{\prime\prime}} \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}}
+                     \right) \alb~~
+   + \mfd\overline{\bm{V}_i^{\prime\prime} \frac{\partial P}{\partial x_i}}
+   - \mfd\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{\bm{V}_i^{\prime\prime} t_{ij}}
+     +\sum_{j=1}^{\nd} \overline{ t_{ij}\frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}}
+   = 0
+  \end{array}
+  \label{eqn:TKE:3}
+\end{equation}
+%
+To obtain the global kinetic energy of turbulence, we take the sum along
+$i$ on both sides of Eq.\ (\ref{eqn:TKE:3}):
+%
+\begin{equation}
+  \begin{array}{l}
+  \mfd \sum_{i=1}^\nd \frac{\partial }{\partial t} \overline{{\mfc\frac{1}{2}}\rho \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime} }
+                          +  \sum_{i=1}^\nd\sum_{j=1}^{\nd}\frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_j} \overline{{\mfc \frac{1}{2}} \rho \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}}
+   + \sum_{i=1}^\nd \mfd\sum_{j=1}^{\nd} \left(
+                              \overline{\rho \bm{V}_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+                                     \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_i}
+                          +  {\frac{1}{2}}\frac{\partial }{\partial x_j} \overline{\rho {\bm{V}_j^{\prime\prime}} \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}}
+                     \right) \alb~~
+   + \mfd\sum_{i=1}^{\nd}\overline{\bm{V}_i^{\prime\prime} \frac{\partial P}{\partial x_i}}
+   - \mfd\sum_{i=1}^\nd\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{\bm{V}_i^{\prime\prime} t_{ij}}
+     +\sum_{i=1}^\nd\sum_{j=1}^{\nd} \overline{ t_{ij}\frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}}
+   = 0
+  \end{array}
+  \label{eqn:TKE:4}
+\end{equation}
+%
+Taking into account the definition of the kinetic energy of turbulence (see Eq.\ (\ref{eqn:k})) and defining the mass-weighted dissipation rate as:
+%
+\begin{equation}
+  \wbar{\rho}\,  \epsilon
+    = \sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+      \overline{ t_{ij}\frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}}
+  \label{eqn:eps}
+\end{equation}
+%
+one can reduce Eq.\ (\ref{eqn:TKE:4}) to:
+%
+\begin{equation}
+  \begin{array}{l}
+  \mfd
+   % unsteady term
+    \frac{\partial }{\partial t} \wbar{\rho}\, k
+   % convection term
+   +  \sum_{j=1}^{\nd}\frac{\partial }{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} k
+   % molecular and turbulent diffusion term
+   - \mfd\sum_{i=1}^\nd\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \left( \overline{\bm{V}_i^{\prime\prime} t_{ij}}
+                     - {\frac{1}{2}} \overline{\rho {\bm{V}_j^{\prime\prime}} \bm{V}_i^{\prime\prime} \bm{V}_i^{\prime\prime}} \right)
+   % production of TKE
+   + \sum_{i=1}^\nd \mfd\sum_{j=1}^{\nd}
+                              \overline{\rho \bm{V}_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+                                     \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_i} \alb~~
+   % dissipation of TKE
+   + \wbar{\rho}\, \epsilon
+   % pressure related source terms
+   + \mfd\sum_{i=1}^{\nd}\overline{\bm{V}_i^{\prime\prime} \frac{\partial P}{\partial x_i}}
+   = 0
+  \end{array}
+  \label{eqn:TKE:final}
+\end{equation}
+%
+
+
+
+
+
+\subsection{Bridge to the dissipation rate equation}
+
+
+From the exact form of the turbulence kinetic energy equation, the
+turbulence kinetic energy dissipation $\wbar{\rho}\, \epsilon$ can be observed
+to correspond to:
+%
+\begin{equation}
+  \wbar{\rho}\, \epsilon
+    = \sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+      \overline{ t_{ij}\frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}}
+    = \sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+      \overline{
+                    \eta  \left( \frac{\partial \bm{V}_i}{\partial x_j}
+                     + \frac{\partial \bm{V}_j}{\partial x_i}
+                     - \frac{2}{3} \delta_{ij} \sum_{k=1}^{\nd} \frac{\partial \bm{V}_k}{\partial x_k}
+                 \right)
+                  \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}}
+\end{equation}
+%
+following Wilcox \cite{turb:wilcoxbook}, if we define:
+%
+\begin{equation}
+ s_{ij}=\frac{1}{2}\left( \frac{\partial \bm{V}_i}{\partial x_j} +
+                          \frac{\partial \bm{V}_j}{\partial x_i} \right)
+ {\rm    ~~~ and~~~    }
+ s_{ij}^{\prime\prime}=\frac{1}{2}\left( \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j} +
+                          \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_i} \right)
+\end{equation}
+%
+then:
+%
+\begin{align*}
+    \wbar{\rho}\, \epsilon
+     &=\mfd\sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+      \overline{
+                    \eta  \left( \frac{\partial \bm{V}_i}{\partial x_j}
+                     + \frac{\partial \bm{V}_j}{\partial x_i}
+                     - \frac{2}{3}  \delta_{ij}  \sum_{k=1}^{\nd} \frac{\partial \bm{V}_k}{\partial x_k}
+                 \right)
+                  \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}} \alb
+      &=\mfd\sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+            \overline{
+               \eta  \left( \frac{\partial \bm{V}_i}{\partial x_j}
+             + \frac{\partial \bm{V}_j}{\partial x_i} \right) \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}
+            }
+      -\frac{2}{3}  \sum_{i=1}^{\nd}\sum_{j=1}^{\nd}
+            \overline{ \eta 
+                  \frac{\partial \bm{V}_i}     {\partial x_i} 
+                  \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}} \alb
+      &=\mfd\sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+            \overline{
+               \eta  \frac{1}{2}
+                   \left( \frac{\partial \bm{V}_i}{\partial x_j}
+                        + \frac{\partial \bm{V}_j}{\partial x_i}
+                   \right)
+                   \left(
+                          \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}
+                        + \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_i}
+                   \right)
+            }
+      -\frac{2}{3}  \sum_{i=1}^{\nd}\sum_{j=1}^{\nd}
+            \overline{ \eta 
+                  \frac{\partial \bm{V}_i}     {\partial x_i}
+                   \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}} \alb
+      &=\mfd\sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+            \overline{
+               2 \eta s_{ij} s_{ij}^{\prime\prime}
+            }
+      -\frac{2}{3}  \sum_{i=1}^{\nd}\sum_{j=1}^{\nd}
+            \overline{ \eta 
+                  \frac{\partial \bm{V}_i}     {\partial x_i}
+                   \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}} 
+\end{align*}
+%
+since it can be shown through a substitution between the $i$ and $j$ indices, that:
+%
+\begin{equation}
+  \sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+                \left( \frac{\partial \bm{V}_i}{\partial x_j}
+             + \frac{\partial \bm{V}_j}{\partial x_i} \right) \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}
+ = 
+  \sum_{j=1}^{\nd} \sum_{i=1}^{\nd}
+                \left( \frac{\partial \bm{V}_j}{\partial x_i}
+             + \frac{\partial \bm{V}_i}{\partial x_j} \right) \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_i}
+ = 
+  \sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+                \left( \frac{\partial \bm{V}_i}{\partial x_j}
+             + \frac{\partial \bm{V}_j}{\partial x_i} \right) \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_i}
+\end{equation}
+%
+We can then rewrite the dissipation as:
+%
+\begin{equation}
+  \wbar{\rho}\, \epsilon
+    =\sum_{i=1}^{\nd} \sum_{j=1}^{\nd} \overline{ \eta  \left[ 2 s_{ij} s_{ij}^{\prime\prime}
+        -\frac{2}{3} \frac{\partial \bm{V}_i}{\partial x_i}  \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}\right]  }
+    =\sum_{i=1}^{\nd} \sum_{j=1}^{\nd} \overline{ \frac{\eta}{\rho} \left[ 2 \rho s_{ij} s_{ij}^{\prime\prime}
+        -\frac{2}{3} \rho  \frac{\partial \bm{V}_i}{\partial x_i}  \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}\right]  }
+\end{equation}
+%
+If we assume that the correlation between the
+kinematic velocity $\eta/\rho$ fluctuations and the velocity spatial
+derivatives fluctuations is negligible (see Wilcox\cite{turb:wilcoxbook}),
+we can rewrite the latter as:
+%
+\begin{align*}
+  \wbar{\rho}\, \epsilon
+  &\approx \overline{\eta/\rho}~ 
+      \sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+      \left[
+         2 \overline{ \rho s_{ij} s_{ij}^{\prime\prime}}
+        -\frac{2}{3}  \overline{ \rho  \frac{\partial \bm{V}_i}{\partial x_i}  \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}}
+      \right]\alb
+    &=\overline{\eta/\rho}~ 
+      \sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+      \left[
+         2 \overline{ \rho  \left(\overline{s_{ij}}+s_{ij}^{\prime\prime}\right) s_{ij}^{\prime\prime}}
+        -\frac{2}{3}  \overline{ \rho  \frac{\partial \left(\overline{\bm{V}_i}+\bm{V}_i^{\prime\prime}\right)}{\partial x_i}  \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}}
+      \right]\alb
+    &=\overline{\eta/\rho}~ 
+      \sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+      \left[
+         2 \overline{ \rho  \overline{s_{ij}}  s_{ij}^{\prime\prime}}
+        +2 \overline{ \rho  s_{ij}^{\prime\prime}  s_{ij}^{\prime\prime}}
+        -\frac{2}{3}  \overline{ \rho  \frac{\partial \overline{\bm{V}_i}}{\partial x_i}  \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}}
+        -\frac{2}{3}  \overline{ \rho  \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_i}  \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}}
+      \right]\alb
+    &=\overline{\eta/\rho}~ 
+      \sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+      \left[
+        2 \overline{ \rho  s_{ij}^{\prime\prime}  s_{ij}^{\prime\prime}}
+        -\frac{2}{3}  \overline{ \rho  \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_i}  \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}}
+      \right]
+\end{align*}
+%
+since
+%
+\begin{equation}
+      \frac{\partial \left(\bm{V}_i\right)^{\prime\prime}}{\partial x_j}
+   =  \left( \frac{\partial \bm{V}_i}{\partial x_j} \right)^{\prime\prime}
+\end{equation}
+%
+However, should we define
+%
+\begin{equation}
+ \omega_i^{\prime\prime}
+       =  \frac{\partial \bm{V}_{i+2}^{\prime\prime}}{\partial x_{i+1}}
+         -\frac{\partial \bm{V}_{i+1}^{\prime\prime}}{\partial x_{i+2}}
+\end{equation}
+%
+%%%%%%%%%%%%
+%  \sum_{i=1}^\nd \omega_i^{\prime\prime} \omega_i^{\prime\prime}=
+%
+%  \omega_0^{\prime\prime} \omega_0^{\prime\prime}+
+%  \omega_1^{\prime\prime} \omega_1^{\prime\prime}+
+%  \omega_2^{\prime\prime} \omega_2^{\prime\prime}
+%=
+%   \frac{\partial \bm{V}_{l+2}}{\partial x_{l+1}}*\frac{\partial \bm{V}_{l+2}}{\partial x_{l+1}}
+%   -2\frac{\partial \bm{V}_{l+1}}{\partial x_{l+2}}*\frac{\partial \bm{V}_{l+2}}{\partial x_{l+1}}
+%   +\frac{\partial \bm{V}_{l+1}}{\partial x_{l+2}}*\frac{\partial \bm{V}_{l+1}}{\partial x_{l+2}}
+%=
+%   +\frac{\partial \bm{V}_2}{\partial x_1}*\frac{\partial \bm{V}_2}{\partial x_1}
+%   -2\frac{\partial \bm{V}_1}{\partial x_2}*\frac{\partial \bm{V}_2}{\partial x_1}
+%   +\frac{\partial \bm{V}_1}{\partial x_2}*\frac{\partial \bm{V}_1}{\partial x_2}
+%
+%   +\frac{\partial \bm{V}_0}{\partial x_2}*\frac{\partial \bm{V}_0}{\partial x_2}
+%   -2\frac{\partial \bm{V}_2}{\partial x_0}*\frac{\partial \bm{V}_0}{\partial x_2}
+%   +\frac{\partial \bm{V}_2}{\partial x_0}*\frac{\partial \bm{V}_2}{\partial x_0}
+%
+%   +\frac{\partial \bm{V}_1}{\partial x_0}*\frac{\partial \bm{V}_1}{\partial x_0}
+%   -2\frac{\partial \bm{V}_0}{\partial x_1}*\frac{\partial \bm{V}_1}{\partial x_0}
+%   +\frac{\partial \bm{V}_0}{\partial x_1}*\frac{\partial \bm{V}_0}{\partial x_1}
+%
+%%%%%%%%%%%%
+%%%%%%%%%%
+%  2 \sum_i \sum_j \frac{\partial \bm{V}_i}{\partial x_j} \frac{\partial \bm{V}_j}{\partial x_i}
+%   = 
+%  2 \frac{\partial \bm{V}_0}{\partial x_0} \frac{\partial \bm{V}_0}{\partial x_0}
+%  2 \frac{\partial \bm{V}_1}{\partial x_1} \frac{\partial \bm{V}_1}{\partial x_1}
+%  2 \frac{\partial \bm{V}_2}{\partial x_2} \frac{\partial \bm{V}_2}{\partial x_2}
+%
+%  4 \frac{\partial \bm{V}_0}{\partial x_1} \frac{\partial \bm{V}_1}{\partial x_0}
+%  4 \frac{\partial \bm{V}_0}{\partial x_2} \frac{\partial \bm{V}_2}{\partial x_0}
+%  4 \frac{\partial \bm{V}_1}{\partial x_2} \frac{\partial \bm{V}_2}{\partial x_1}
+%
+%%%%%%%@@@%
+%%%%%%%%%%%%%
+% 4 \sum_i \sum_j s_{ij}s_{ij}=
+% =
+%  + \frac{\partial \bm{V}_i}{\partial x_j}*\frac{\partial \bm{V}_i}{\partial x_j}
+% + 2\frac{\partial \bm{V}_j}{\partial x_i}*\frac{\partial \bm{V}_i}{\partial x_j}
+% + \frac{\partial \bm{V}_j}{\partial x_i}*\frac{\partial \bm{V}_j}{\partial x_i}
+%
+%SO:
+%
+% 2 \sum_i \sum_j s_{ij}s_{ij}
+% =
+% + 2\frac{\partial \bm{V}_0}{\partial x_0}*\frac{\partial \bm{V}_0}{\partial x_0}
+% + 2\frac{\partial \bm{V}_1}{\partial x_1}*\frac{\partial \bm{V}_1}{\partial x_1}
+% + 2\frac{\partial \bm{V}_2}{\partial x_2}*\frac{\partial \bm{V}_2}{\partial x_2}
+% + 1\frac{\partial \bm{V}_0}{\partial x_1}*\frac{\partial \bm{V}_0}{\partial x_1}
+% + 1\frac{\partial \bm{V}_1}{\partial x_0}*\frac{\partial \bm{V}_1}{\partial x_0}
+% + 1\frac{\partial \bm{V}_0}{\partial x_2}*\frac{\partial \bm{V}_0}{\partial x_2}
+% + 1\frac{\partial \bm{V}_2}{\partial x_0}*\frac{\partial \bm{V}_2}{\partial x_0}
+% + 1\frac{\partial \bm{V}_1}{\partial x_2}*\frac{\partial \bm{V}_1}{\partial x_2}
+% + 1\frac{\partial \bm{V}_2}{\partial x_1}*\frac{\partial \bm{V}_2}{\partial x_1}
+% + 2\frac{\partial \bm{V}_1}{\partial x_0}*\frac{\partial \bm{V}_0}{\partial x_1}
+% + 2\frac{\partial \bm{V}_2}{\partial x_0}*\frac{\partial \bm{V}_0}{\partial x_2}
+% + 2\frac{\partial \bm{V}_2}{\partial x_1}*\frac{\partial \bm{V}_1}{\partial x_2}
+%%%%%%%%%%%%
+%%%%%%%%%%%%%%
+% 2 \sum_i \sum_j s_{ij}s_{ij}
+% =
+% +\sum_i \omega_i^{\prime\prime} \omega_i^{\prime\prime}
+%
+% + 2\frac{\partial \bm{V}_0}{\partial x_0}*\frac{\partial \bm{V}_0}{\partial x_0}
+% + 2\frac{\partial \bm{V}_1}{\partial x_1}*\frac{\partial \bm{V}_1}{\partial x_1}
+% + 2\frac{\partial \bm{V}_2}{\partial x_2}*\frac{\partial \bm{V}_2}{\partial x_2}
+% + 4\frac{\partial \bm{V}_1}{\partial x_0}*\frac{\partial \bm{V}_0}{\partial x_1}
+% + 4\frac{\partial \bm{V}_2}{\partial x_0}*\frac{\partial \bm{V}_0}{\partial x_2}
+% + 4\frac{\partial \bm{V}_2}{\partial x_1}*\frac{\partial \bm{V}_1}{\partial x_2}
+%%%%%%%%%%%%%%%
+% 2 \sum_i \sum_j s_{ij}s_{ij}
+% =
+% +\sum_i \omega_i^{\prime\prime} \omega_i^{\prime\prime}
+% +2 \sum_i \sum_j \frac{\partial \bm{V}_i}{\partial x_j} \frac{\partial \bm{V}_j}{\partial x_i}
+%
+it can be shown explicitly that
+the product of the strain rates would be equal to:
+%
+\begin{equation}
+  \sum_{i=1}^\nd \sum_{j=1}^\nd s_{ij}^{\prime\prime} s_{ij}^{\prime\prime} = 
+  \frac{1}{2} \sum_{i=1}^\nd \omega_i^{\prime\prime}  \omega_i^{\prime\prime}
+  +\sum_{i=1}^\nd \sum_{j=1}^\nd \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}  \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_i}
+\end{equation}
+%
+which can be substituted in the dissipation rate equation:
+%
+\begin{displaymath}
+\begin{array}{rl}
+   &\mfd\overline{\eta/\rho}~ 
+    \left[
+      \sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+        2 \overline{ \rho  s_{ij}^{\prime\prime}   s_{ij}^{\prime\prime}}
+  -\sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+        \frac{2}{3}  \overline{ \rho  \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_i}  \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}}
+    \right]     \alb
+   = & \mfd\overline{\eta/\rho}~ 
+    \left[
+        \sum_{i=1}^\nd \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}}
+     +2 \sum_{i=1}^\nd \sum_{j=1}^\nd \overline{\rho \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}  \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_i}}
+     -  \frac{2}{3}  \sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+           \overline{ \rho  \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_i}  \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}}
+    \right]
+\end{array}
+\end{displaymath}
+%
+We can then write the dissipation as a sum of a solenoidal
+and dilatation part, \emph{i.e.}
+$\wbar{\rho}\,\epsilon\approx\wbar{\rho}\,\epsilon_s+
+\wbar{\rho}\,\epsilon_d$, both of which correspond to:
+%
+\begin{eqnarray}
+ \label{eqn:BDR:solenoidal}
+ \wbar{\rho}\, \epsilon_s&=&
+    \overline{\eta/\rho}~ 
+    \left[
+        \sum_{i=1}^\nd \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}}
+    \right] \alb
+ \label{eqn:BDR:dilatation}
+ \wbar{\rho}\, \epsilon_d&=&
+    \overline{\eta/\rho}~ 
+    \left[
+      2 \sum_{i=1}^\nd \sum_{j=1}^\nd \overline{\rho \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}  \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_i}}
+     -  \frac{2}{3}  \sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+           \overline{ \rho  \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_i}  \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}}
+    \right]
+\end{eqnarray}
+%
+
+
+
+
+
+
+
+\subsection{Solenoidal dissipation rate}
+
+This section will seek a flow equation solving for
+$\wbar{\rho}\,\epsilon_s$. In a first step,
+we will derive the Helmholtz vorticity equation from
+the momentum equations:
+%
+\begin{equation}
+ \label{eqn:SDR:momentum1}
+ \begin{array}{r}
+  \mfd\frac{\partial}{\partial t}  {\rho}  {\bm{V}_i}
+      +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+             {\rho} {\bm{V}_j} {\bm{V}_i}
+      - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} t_{ij}
+      +  \frac{\partial P}{\partial x_i}
+      = 0
+ \end{array}
+\end{equation}
+%
+which, after substracting the global continuity equation, becomes:
+%
+\begin{equation}
+ \label{eqn:SDR:momentum2}
+ \begin{array}{r}
+  \mfd {\rho} \frac{\partial}{\partial t}  {\bm{V}_i}
+      +  \sum_{j=1}^{\nd} {\rho} {\bm{V}_j} \frac{\partial }{\partial x_j}{\bm{V}_i}
+      - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} t_{ij}
+      +  \frac{\partial P}{\partial x_i}
+      = 0
+ \end{array}
+\end{equation}
+%
+Dividing both sides by the density results in:
+%
+\begin{equation}
+ \label{eqn:SDR:momentum3}
+ \begin{array}{r}
+  \mfd \frac{\partial}{\partial t}  {\bm{V}_i}
+      +  \sum_{j=1}^{\nd} {\bm{V}_j} \frac{\partial }{\partial x_j}{\bm{V}_i}
+      - \frac{1}{\rho}\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} t_{ij}
+      +  \frac{1}{\rho}\frac{\partial P}{\partial x_i}
+      = 0
+ \end{array}
+\end{equation}
+%
+The $i_{\rm th}$ component of the momentum equation can be written
+in vector form as:
+%
+\begin{equation}
+ \label{eqn:SDR:momentum4}
+ \begin{array}{r}
+  \mfd\frac{\partial}{\partial t} \bm{V}_i
+      + 
+            \left( \bm{V} \cdot \vec{\nabla} \right) \bm{V}_i
+      - \frac{1}{\rho} \vec{\nabla} \cdot \vec{t_i}
+      +  \frac{1}{\rho} \frac{\partial P}{\partial x_i}
+      = 0
+ \end{array}
+\end{equation}
+%
+which can be recasted to:
+%
+\begin{equation}
+ \label{eqn:SDR:momentum5}
+ \begin{array}{r}
+  \mfd\frac{\partial}{\partial t} \bm{V}
+      + 
+            \left( \bm{V} \cdot \vec{\nabla} \right) \bm{V}
+      - \frac{1}{\rho} \vec{\nabla} \cdot t_{ij}
+      +  \frac{1}{\rho} \vec{\nabla} P
+      = 0
+ \end{array}
+\end{equation}
+%
+Should we use the vector identity
+$\left( \bm{V} \cdot \vec{\nabla} \right) \bm{V}  = 
+        \frac{1}{2} \vec{\nabla} \left( \bm{V} \cdot \bm{V} \right)
+       -\bm{V} \times \left( \vec{\nabla} \times \bm{V} \right)$, the
+latter becomes:
+%
+\begin{equation}
+ \label{eqn:SDR:momentum6}
+ \begin{array}{r}
+  \mfd\frac{\partial}{\partial t} \bm{V}
+      + \frac{1}{2} \vec{\nabla} \left( \bm{V} \cdot \bm{V} \right)
+       -\bm{V} \times \vec{\omega}
+      - \frac{1}{\rho} \vec{\nabla} \cdot t_{ij}
+      +  \frac{1}{\rho} \vec{\nabla} P
+      = 0
+ \end{array}
+\end{equation}
+%
+since the vorticity $\vec{\omega}$ corresponds by definition to the curl of the velocity:
+%
+\begin{equation}
+  \vec{\omega} \equiv \vec{\nabla} \times \bm{V}
+\end{equation}
+%
+Substituting $\bm{V} \times \vec{\omega} = - \vec{\omega} \times \bm{V}$
+and taking the curl on all terms gives:
+%
+\begin{equation}
+ \label{eqn:SDR:vorticity1}
+ \begin{array}{r}
+  \mfd\frac{\partial}{\partial t} \vec{\omega}
+      + \frac{1}{2} \vec{\nabla} \times \left( \vec{\nabla} \left( \bm{V} \cdot \bm{V} \right)\right)
+       +\vec{\nabla} \times \left(\vec{\omega} \times \bm{V}\right)
+      - \vec{\nabla} \times \left( \frac{1}{\rho} \vec{\nabla} \cdot t_{ij} \right)
+      + \vec{\nabla} \times \left( \frac{1}{\rho} \vec{\nabla} P \right)
+      = 0
+ \end{array}
+\end{equation}
+%
+Noticing that $\bm{V}\cdot \bm{V}$ is a scalar and that by definition
+the vectorial product of a vector by himself vanishes, we can say
+%
+\begin{displaymath}
+\frac{1}{2} \vec{\nabla} \times \left( \vec{\nabla} \left( \bm{V} \cdot \bm{V} \right)\right)
+ = \frac{1}{2} \left( \vec{\nabla} \times \vec{\nabla} \right) \left( \bm{V} \cdot \bm{V} \right)
+ = 0
+\end{displaymath}
+%
+We then use the vector identity
+$\vec{\nabla} \times \left( \vec{\omega} \times \bm{V} \right) =
+       \left( \bm{V} \cdot \vec{\nabla} \right) \vec{\omega}
+      -\left( \vec{\omega} \cdot \vec{\nabla} \right) \bm{V}
+      +\vec{\omega} \left( \vec{\nabla} \cdot \bm{V} \right)
+      -\bm{V} \left( \vec{\nabla} \cdot \vec{\omega} \right)$ and get:
+%
+\begin{align}
+  \mfd\frac{\partial}{\partial t} \vec{\omega}
+      &+\left( \bm{V} \cdot \vec{\nabla} \right) \vec{\omega}
+      -\left( \vec{\omega} \cdot \vec{\nabla} \right) \bm{V}
+      +\vec{\omega} \left( \vec{\nabla} \cdot \bm{V} \right)
+      -\bm{V} \left( \vec{\nabla} \cdot \vec{\omega} \right)
+      -\vec{\nabla} \times \left( \frac{1}{\rho} \vec{\nabla} \cdot t_{ij} \right)\nonumber\alb
+     &+\vec{\nabla} \times \left( \frac{1}{\rho} \vec{\nabla} P \right)
+     =0
+ \label{eqn:SDR:vorticity2}
+\end{align}
+%
+But from the vector identity $\vec{u} \cdot \left( \vec{u} \times \bm{V} \right)=0$,
+we can say:
+%
+\begin{displaymath}
+\vec{\nabla} \cdot \vec{\omega}
+   = \vec{\nabla} \cdot \left( \vec{\nabla} \times \bm{V} \right)
+   = 0
+\end{displaymath}
+%
+which leads to the Helmholtz vorticity equation:
+\begin{equation}
+ \label{eqn:Helmholtz}
+ \begin{array}{r}
+  \mfd\frac{\partial}{\partial t} \vec{\omega}
+      +\left( \bm{V} \cdot \vec{\nabla} \right) \vec{\omega}
+      -\left( \vec{\omega} \cdot \vec{\nabla} \right) \bm{V}
+      +\vec{\omega} \left( \vec{\nabla} \cdot \bm{V} \right)
+      -\vec{\nabla} \times \left( \frac{1}{\rho} \vec{\nabla} \cdot t_{ij} \right)
+     +\vec{\nabla} \times \left( \frac{1}{\rho} \vec{\nabla} P \right)
+     =0
+ \end{array}
+\end{equation}
+%
+Defining the baroclinic torque as:
+%
+\begin{equation}
+  \vec{B} = - \vec{\nabla} \times \left( \frac{1}{\rho}  \vec{\nabla} P\right)
+          = -\vec{\nabla} \frac{1}{\rho} \times \vec{\nabla} P
+            -\frac{1}{\rho} \vec{\nabla}  \times \vec{\nabla} P
+          = -\vec{\nabla} \frac{1}{\rho} \times \vec{\nabla} P
+          = \frac{1}{\rho^2}  \vec{\nabla} \rho \times \vec{\nabla} P
+\end{equation}
+%
+and the viscous related term $\vec{S}$ as:
+%
+\begin{equation}
+  \vec{S} = \vec{\nabla} \times \left( \frac{1}{\rho}\vec{\nabla} \cdot t_{ij} \right)
+\end{equation}
+%
+we can rewrite the $i_{\rm th}$ component of the vorticity equation as:
+%
+\begin{displaymath}
+  \frac{\partial \omega_i}{\partial t}
+   + \left( \bm{V} \cdot \vec{\nabla} \right) \omega_i
+   = 
+   \left( \vec{\omega} \cdot \vec{\nabla} \right) \bm{V}_i
+   - \omega_i \left( \vec{\nabla} \cdot \bm{V} \right)
+   + B_i + S_i
+\end{displaymath}
+%
+\begin{displaymath}
+  \frac{\partial \omega_i}{\partial t}
+   + \sum_{j=1}^\nd \bm{V}_j  \frac{\partial\omega_i}{\partial x_j}
+   = 
+  \sum_{j=1}^\nd \omega_j  \frac{\partial \bm{V}_i}{\partial x_j}
+   - \sum_{j=1}^\nd \omega_i  \frac{\partial \bm{V}_j}{\partial x_j}
+   + B_i + S_i
+\end{displaymath}
+%
+To obtain a transport equation for $\overline{\rho  \vec{\omega}^{\prime\prime} \cdot \vec{\omega}^{\prime\prime}}$,
+we multiply the equation for the transport of $\omega_i$ by
+$2 \overline{\eta/\rho}~  \rho  \omega_i^{\prime\prime}$ and take the average of both sides:
+%
+\begin{equation}
+ \begin{array}{c}
+   \mfd 2 \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} \frac{\partial \omega_i}{\partial t}}
+  +2 \overline{\eta/\rho}~ \sum_{j=1}^\nd \overline{\rho  \omega_i^{\prime\prime}  \bm{V}_j  \frac{\partial\omega_i}{\partial x_j}}
+   = \alb
+   \mfd 2 \overline{\eta/\rho}~ \sum_{j=1}^\nd \overline{\rho  \omega_i^{\prime\prime}  \omega_j  \frac{\partial \bm{V}_i}{\partial x_j}}
+  -2 \overline{\eta/\rho}~ \sum_{j=1}^\nd \overline{\rho  \omega_i^{\prime\prime}  \omega_i  \frac{\partial \bm{V}_j}{\partial x_j}}
+  +2 \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} B_i}
+  +2 \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} S_i}
+ \end{array}
+\label{eqn:SDR:1}
+\end{equation}
+%
+Similarly to the derivation of the TKE equation, we will decompose each term
+individually. The time dependant term corresponds to:
+%
+\begin{displaymath}
+    2 \mfd\overline{\rho \omega_i^{\prime\prime} \frac{\partial \omega_i }{\partial t}}
+     =  2 \mfd\overline{\rho \omega_i^{\prime\prime}} \frac{\partial {\wtilde{\omega}_i} }{\partial t}
+          +2 \overline{\rho \omega_i^{\prime\prime} \frac{\partial \omega_i^{\prime\prime} }{\partial t} }
+     =  \mfd \overline{\rho \omega_i^{\prime\prime} \frac{\partial \omega_i^{\prime\prime} }{\partial t} }
+                 +\overline{\rho \omega_i^{\prime\prime} \frac{\partial \omega_i^{\prime\prime} }{\partial t} }
+     =  \mfd \overline{\rho \frac{\partial}{\partial t} \omega_i^{\prime\prime}  \omega_i^{\prime\prime} }
+\end{displaymath}
+%
+\begin{equation}
+   =  \mfd \frac{\partial }{\partial t} \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime} }
+     -\overline{\omega_i^{\prime\prime} \omega_i^{\prime\prime}\frac{\partial }{\partial t} \rho }
+   =  \frac{1}{\overline{\eta/\rho}~} \left[
+         \mfd \frac{\partial }{\partial t} \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime} }
+         -\overline{\omega_i^{\prime\prime} \omega_i^{\prime\prime}\frac{\partial }{\partial t} \overline{\eta/\rho}~  \rho }
+      \right]
+\label{eqn:SDR:time}
+\end{equation}
+%
+and the convection term corresponds to:
+%
+\begin{displaymath}
+     2 \sum_{j=1}^{\nd} \overline{\rho \omega_i^{\prime\prime} \bm{V}_j  \frac{\partial \omega_i }{\partial x_j}}
+   = 2 \sum_{j=1}^{\nd} \left(
+                           \overline{\rho \omega_i^{\prime\prime} \left({\wtilde{\bm{V}}_j}+\bm{V}_j^{\prime\prime}\right)
+                                     \frac{\partial }{\partial x_j} \left({\wtilde{\omega}_i}+\omega_i^{\prime\prime}\right)
+                                    }
+                       \right)
+\end{displaymath}
+%
+%
+\begin{displaymath}
+   = 2 \sum_{j=1}^{\nd} \left(
+                              \overline{\rho \omega_i^{\prime\prime} \left({\wtilde{\bm{V}}_j}+\bm{V}_j^{\prime\prime}\right)
+                                      \frac{\partial }{\partial x_j} {\wtilde{\omega}_i}
+                                    }
+                          +   \overline{\rho \omega_i^{\prime\prime} \left({\wtilde{\bm{V}}_j}+\bm{V}_j^{\prime\prime}\right)
+                                     \frac{\partial }{\partial x_j} \omega_i^{\prime\prime}
+                                    }
+                       \right)
+\end{displaymath}
+%
+%
+\begin{displaymath}
+  =2 \sum_{j=1}^{\nd} \left(
+                              \overline{\rho \omega_i^{\prime\prime}} {\wtilde{\bm{V}}_j}
+                                      \frac{\partial }{\partial x_j} {\wtilde{\omega}_i}
+                          +   \overline{\rho \omega_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+                                      \frac{\partial }{\partial x_j} {\wtilde{\omega}_i}
+                          +   \overline{\rho \omega_i^{\prime\prime} \bm{V}_j
+                                      \frac{\partial }{\partial x_j} \omega_i^{\prime\prime}
+                                    }
+                       \right)
+\end{displaymath}
+%
+\begin{displaymath}
+  =2 \sum_{j=1}^{\nd} \left(
+                              \overline{\rho \omega_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+                                      \frac{\partial }{\partial x_j} {\wtilde{\omega}_i}
+                          +   \overline{\rho \bm{V}_j \omega_i^{\prime\prime}
+                                      \frac{\partial }{\partial x_j} \omega_i^{\prime\prime}
+                                    }
+                       \right)
+  =\sum_{j=1}^{\nd} \left(
+                              2 \overline{\rho \omega_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+                                      \frac{\partial }{\partial x_j} {\wtilde{\omega}_i}
+                          +   \overline{\rho \bm{V}_j 
+                                     \frac{\partial }{\partial x_j} \omega_i^{\prime\prime} \omega_i^{\prime\prime}
+                                    }
+                     \right)
+\end{displaymath}
+%
+\begin{displaymath}
+  =\sum_{j=1}^{\nd} \left(
+                             2 \overline{\rho \omega_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+                                      \frac{\partial }{\partial x_j} {\wtilde{\omega}_i}
+                          -  \overline{\omega_i^{\prime\prime} \omega_i^{\prime\prime} \frac{\partial }{\partial x_j} \rho \bm{V}_j}
+                          +  \frac{\partial }{\partial x_j} \overline{\rho \bm{V}_j \omega_i^{\prime\prime} \omega_i^{\prime\prime}}
+                     \right)
+\end{displaymath}
+%
+\begin{displaymath}
+  =\sum_{j=1}^{\nd} \left(
+                              2 \overline{\rho \omega_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+                                      \frac{\partial }{\partial x_j} {\wtilde{\omega}_i}
+                          -  \overline{\omega_i^{\prime\prime} \omega_i^{\prime\prime} \frac{\partial }{\partial x_j} \rho \bm{V}_j}
+                          +  \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_j} \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}}
+                          +  \frac{\partial }{\partial x_j} \overline{\rho {\bm{V}_j^{\prime\prime}} \omega_i^{\prime\prime} \omega_i^{\prime\prime}}
+                     \right)
+\end{displaymath}
+%
+\begin{equation}
+ \begin{array}{r}
+  =\mfd\frac{1}{\overline{\eta/\rho}~}\sum_{j=1}^{\nd}
+         \mfd\left[
+           2 \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+           \frac{\partial }{\partial x_j} {\wtilde{\omega}_i}
+            -  \overline{\eta/\rho}~ \overline{\omega_i^{\prime\prime} \omega_i^{\prime\prime} \frac{\partial }{\partial x_j} \rho \bm{V}_j}
+            +  \frac{\partial }{\partial x_j} \overline{\eta/\rho}~ {\wtilde{\bm{V}}_j} \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}}         \right.\alb
+         \mfd\left.
+            -  {\wtilde{\bm{V}}_j} \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}} \frac{\partial }{\partial x_j}  \overline{\eta/\rho}~
+            +   \overline{\eta/\rho}~ \frac{\partial }{\partial x_j} \overline{\rho {\bm{V}_j^{\prime\prime}} \omega_i^{\prime\prime} \omega_i^{\prime\prime}}
+         \right] 
+ \end{array}
+\label{eqn:SDR:convection}
+\end{equation}
+%
+Inserting the convection and
+time-dependant equations into Eq.\ (\ref{eqn:SDR:1}) results in:
+%
+\begin{equation}
+ \begin{array}{l}
+         \mfd \frac{\partial }{\partial t}  \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime} }
+         -\overline{\omega_i^{\prime\prime} \omega_i^{\prime\prime}\frac{\partial }{\partial t} \overline{\eta/\rho}~  \rho }
+        +\mfd\sum_{j=1}^{\nd}
+         \mfd\left[
+           2 \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+           \frac{\partial }{\partial x_j} {\wtilde{\omega}_i}
+            -  \overline{\eta/\rho}~ \overline{\omega_i^{\prime\prime} \omega_i^{\prime\prime} \frac{\partial }{\partial x_j} \rho \bm{V}_j}
+         \right.\alb~~
+         \mfd\left.
+            +  \frac{\partial }{\partial x_j} \overline{\eta/\rho}~ {\wtilde{\bm{V}}_j} \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}}
+            -  {\wtilde{\bm{V}}_j} \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}} \frac{\partial }{\partial x_j}  \overline{\eta/\rho}~
+            +   \overline{\eta/\rho}~ \frac{\partial }{\partial x_j} \overline{\rho {\bm{V}_j^{\prime\prime}} \omega_i^{\prime\prime} \omega_i^{\prime\prime}}
+         \right]
+    \alb~~
+   =\mfd 2 \overline{\eta/\rho}~ \sum_{j=1}^\nd \overline{\rho  \omega_i^{\prime\prime}  \omega_j  \frac{\partial \bm{V}_i}{\partial x_j}}
+  -2 \overline{\eta/\rho}~ \sum_{j=1}^\nd \overline{\rho  \omega_i^{\prime\prime}  \omega_i  \frac{\partial \bm{V}_j}{\partial x_j}}
+  +2 \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} B_i}
+  +2 \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} S_i}
+ \end{array}
+\label{eqn:SDR:2}
+\end{equation}
+%
+Multiplying the global continuity equation by $\overline{\eta/\rho}~~ \omega_i^{\prime\prime} \omega_i^{\prime\prime}$ and time averaging:
+%
+\begin{equation}
+  \begin{array}{c}
+  -\mfd\overline{\overline{\eta/\rho}~ \omega_i^{\prime\prime} \omega_i^{\prime\prime}\frac{\partial }{\partial t}  \rho }
+       -  \sum_{j=1}^\nd \overline{\overline{\eta/\rho}~ \omega_i^{\prime\prime} \omega_i^{\prime\prime} \frac{\partial }{\partial x_j}  \rho \bm{V}_j} = 0 \alb
+  {\rm ~~or~~   }-\mfd\overline{\omega_i^{\prime\prime} \omega_i^{\prime\prime}\frac{\partial }{\partial t}  \overline{\eta/\rho}~ \rho }
+       = - \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}\frac{\partial }{\partial t}  \overline{\eta/\rho}~ }
+          +  \sum_{j=1}^\nd \overline{\eta/\rho}~ \overline{\omega_i^{\prime\prime} \omega_i^{\prime\prime} \frac{\partial }{\partial x_j}  \rho \bm{V}_j}
+  \end{array}
+\label{eqn:SDR:continuity}
+\end{equation}
+%
+and inserting the latter in Eq.\ (\ref{eqn:SDR:2}), one obtains:
+%
+\begin{equation}
+ \begin{array}{l}
+         \mfd \frac{\partial }{\partial t} \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime} }
+        - \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}}\frac{\partial }{\partial t} \overline{\eta/\rho}~
+        +\mfd\sum_{j=1}^{\nd}
+         \mfd\left[
+           2 \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} \bm{V}_j^{\prime\prime}}
+           \frac{\partial }{\partial x_j} {\wtilde{\omega}_i}
+         \right.\alb~~
+         \mfd\left.
+            +  \frac{\partial }{\partial x_j} \overline{\eta/\rho}~ {\wtilde{\bm{V}}_j} \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}}
+            -  {\wtilde{\bm{V}}_j} \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}} \frac{\partial }{\partial x_j}  \overline{\eta/\rho}~
+            +   \overline{\eta/\rho}~ \frac{\partial }{\partial x_j} \overline{\rho {\bm{V}_j^{\prime\prime}} \omega_i^{\prime\prime} \omega_i^{\prime\prime}}
+         \right]
+    \alb~~
+   =\mfd 2\overline{\eta/\rho}~ \sum_{j=1}^\nd \overline{\rho  \omega_i^{\prime\prime}  \omega_j  \frac{\partial \bm{V}_i}{\partial x_j}}
+  -2\overline{\eta/\rho}~ \sum_{j=1}^\nd \overline{\rho  \omega_i^{\prime\prime}  \omega_i  \frac{\partial \bm{V}_j}{\partial x_j}}
+  +2\overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} B_i}
+  +2\overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} S_i}
+ \end{array}
+\label{eqn:SDR:3}
+\end{equation}
+%
+which can be reformatted to:
+%
+\begin{equation}
+ \begin{array}{l}
+         \mfd \frac{\partial }{\partial t} \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime} }
+        +\mfd\sum_{j=1}^{\nd}
+           \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_j} \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}}
+     \alb~~=
+        \overline{\eta/\rho}~ \mfd\sum_{j=1}^{\nd}
+         \mfd\left(
+              2 \overline{\rho  \omega_i^{\prime\prime}  \omega_j  \frac{\partial \bm{V}_i}{\partial x_j}}
+            - 2 \overline{\rho  \omega_i^{\prime\prime}  \omega_i  \frac{\partial \bm{V}_j}{\partial x_j}}
+            - 2 \overline{\rho \omega_i^{\prime\prime} \bm{V}_j^{\prime\prime}} \frac{\partial }{\partial x_j} {\wtilde{\omega}_i}
+            - \frac{\partial }{\partial x_j} \overline{\rho {\bm{V}_j^{\prime\prime}} \omega_i^{\prime\prime} \omega_i^{\prime\prime}}
+         \right) \alb~~
+   + \mfd 2 \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} B_i}
+   + 2 \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} S_i}
+   + \sum_{j=1}^\nd{\wtilde{\bm{V}}_j} \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}} \frac{\partial }{\partial x_j}  \overline{\eta/\rho}~
+   + \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}} \frac{\partial }{\partial t} \overline{\eta/\rho}~
+ \end{array}
+\label{eqn:SDR:4}
+\end{equation}
+%
+Taking the sum along $i$ on both sides, and using the definition of the
+solenoidal dissipation in Eq.\ (\ref{eqn:BDR:solenoidal}),
+we can rewrite the latter as:
+%
+%
+\begin{equation}
+ \begin{array}{l}
+         \mfd \frac{\partial }{\partial t} \wbar{\rho}\, \epsilon_s
+        +\mfd\sum_{j=1}^{\nd}
+           \frac{\partial }{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} \epsilon_s
+     \alb~~=
+   \overline{\eta/\rho}~ \mfd\sum_{i=1}^{\nd} \mfd\sum_{j=1}^{\nd}
+    \mfd\left(
+         2 \overline{\rho  \omega_i^{\prime\prime}  \omega_j  \frac{\partial \bm{V}_i}{\partial x_j}}
+       - 2 \overline{\rho  \omega_i^{\prime\prime}  \omega_i  \frac{\partial \bm{V}_j}{\partial x_j}}
+       - 2 \overline{\rho \omega_i^{\prime\prime} \bm{V}_j^{\prime\prime}}  \frac{\partial {\wtilde{\omega}_i}}{\partial x_j}
+       - \frac{\partial }{\partial x_j} \overline{\rho {\bm{V}_j^{\prime\prime}} \omega_i^{\prime\prime} \omega_i^{\prime\prime}}
+    \right) \alb
+ ~~+ \mfd\sum_{i=1}^{\nd} 
+    \mfd\left(
+         \mfd 2 \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} B_i}
+       + 2 \overline{\eta/\rho}~ \overline{\rho \omega_i^{\prime\prime} S_i}
+       + \sum_{j=1}^\nd{\wtilde{\bm{V}}_j} \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}} \frac{\partial }{\partial x_j}  \overline{\eta/\rho}~
+       + \overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}} \frac{\partial }{\partial t} \overline{\eta/\rho}~
+    \right) 
+ \end{array}
+\label{eqn:SDR:5}
+\end{equation}
+%
+We will now seek to decompose the second term on the RHS of Eq.\ (\ref{eqn:SDR:5}).
+%
+\begin{displaymath}
+  \overline{\rho  \omega_i^{\prime\prime}  \omega_i  \frac{\partial \bm{V}_j}{\partial x_j}}
+   = \overline{\rho  \omega_i^{\prime\prime}  \left({\wtilde{\omega}_i}+\omega_i^{\prime\prime} \right) \frac{\partial \left({\wtilde{\bm{V}}_j}+\bm{V}_j^{\prime\prime}\right)}{\partial x_j}}
+   = \overline{\rho  \omega_i^{\prime\prime}  {\wtilde{\omega}_i} \frac{\partial \left({\wtilde{\bm{V}}_j}+\bm{V}_j^{\prime\prime}\right)}{\partial x_j}}
+       + \overline{\rho  \omega_i^{\prime\prime}  \omega_i^{\prime\prime} \frac{\partial \left({\wtilde{\bm{V}}_j}+\bm{V}_j^{\prime\prime}\right)}{\partial x_j}}
+\end{displaymath}
+%
+\begin{displaymath}
+   = \overline{\rho  \omega_i^{\prime\prime}  {\wtilde{\omega}_i} \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}}
+       + \overline{\rho  \omega_i^{\prime\prime}  \omega_i^{\prime\prime} \frac{\partial \left({\wtilde{\bm{V}}_j}+\bm{V}_j^{\prime\prime}\right)}{\partial x_j}}
+   = {\wtilde{\omega}_i} \overline{\rho  \omega_i^{\prime\prime}  \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}}
+       + \overline{\rho  \omega_i^{\prime\prime}  \omega_i^{\prime\prime}} \frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_j}
+       + \overline{\rho  \omega_i^{\prime\prime}  \omega_i^{\prime\prime} \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}}
+\end{displaymath}
+%
+similarly, the first term on the RHS of Eq.\ (\ref{eqn:SDR:5}) can be transformed to:
+%
+\begin{displaymath}
+  \overline{\rho  \omega_i^{\prime\prime}  \omega_j  \frac{\partial \bm{V}_i}{\partial x_j}}
+   = {\wtilde{\omega}_j} \overline{\rho  \omega_i^{\prime\prime}  \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}}
+       + \overline{\rho  \omega_i^{\prime\prime}  \omega_j^{\prime\prime}} \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+       + \overline{\rho  \omega_i^{\prime\prime}  \omega_j^{\prime\prime} \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}}
+\end{displaymath}
+%
+The two latter are inserted back into Eq.\ (\ref{eqn:SDR:5}) to give:
+%
+%
+\begin{equation}
+ \begin{array}{l}
+         \mfd \frac{\partial }{\partial t} \wbar{\rho}\, \epsilon_s
+        +\mfd\sum_{j=1}^{\nd}
+           \frac{\partial }{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} \epsilon_s
+ = 
+   2 \overline{\eta/\rho}~ \mfd\sum_{i=1}^{\nd} \left[ \mfd\sum_{j=1}^{\nd}
+    \mfd\left(
+         {\wtilde{\omega}_j} \overline{\rho  \omega_i^{\prime\prime}  \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}}
+             + \overline{\rho  \omega_i^{\prime\prime}  \omega_j^{\prime\prime}} \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+             + \overline{\rho  \omega_i^{\prime\prime}  \omega_j^{\prime\prime} \frac{\partial \bm{V}_i^{\prime\prime}}{\partial x_j}}
+    \right. \right.\alb~~
+    \mfd\left.
+       - {\wtilde{\omega}_i} \overline{\rho  \omega_i^{\prime\prime}  \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}}
+             - \overline{\rho  \omega_i^{\prime\prime}  \omega_i^{\prime\prime}} \frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_j}
+             - \overline{\rho  \omega_i^{\prime\prime}  \omega_i^{\prime\prime} \frac{\partial \bm{V}_j^{\prime\prime}}{\partial x_j}}
+       - \overline{\rho \omega_i^{\prime\prime} \bm{V}_j^{\prime\prime}}  \frac{\partial {\wtilde{\omega}_i}}{\partial x_j}
+       - \frac{1}{2} \frac{\partial }{\partial x_j} \overline{\rho {\bm{V}_j^{\prime\prime}} \omega_i^{\prime\prime} \omega_i^{\prime\prime}}
+    \right) \alb~~
+ + \mfd\left.
+         \mfd \overline{\rho \omega_i^{\prime\prime} B_i}
+       + \overline{\rho \omega_i^{\prime\prime} S_i}
+       + \sum_{j=1}^\nd{\wtilde{\bm{V}}_j} \frac{\overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}}}{2 \overline{\eta/\rho}~} \frac{\partial }{\partial x_j}  \overline{\eta/\rho}~
+       + \frac{\overline{\rho \omega_i^{\prime\prime} \omega_i^{\prime\prime}}}{2 \overline{\eta/\rho}~} \frac{\partial }{\partial t} \overline{\eta/\rho}~
+    \right] 
+ \end{array}
+\label{eqn:SDR:final}
+\end{equation}
+%
+
+
+
+
+
+
+
+
+
+
+\section{Modeling}
+
+This section will outline the different approximations needed
+to close the system of exact Favre-averaged equations. Several correlations
+need to be transformed into more palpable algebraic relations involving
+known fluxes or turbulent properties. We will perform our modeling with
+a two-equation turbulence model in mind of the $k\epsilon$ or $k\omega$
+flavor.
+
+In order to close the system of equations, two equations models
+use heavily the Boussinesq approximation, i.e.
+%
+\begin{equation}
+  \overline{\rho  \bm{V}_i^{{\prime\prime}}  \phi^{{\prime\prime}}}   \approx   -\etat  \frac{\partial \wtilde{\phi}}{\partial x_i}
+  \label{eqn:boussinesq}
+\end{equation}
+%
+
+
+
+
+
+
+\subsection{Continuity}
+
+From Eq.\ (\ref{eqn:C:final}), the continuity equation can be observed not
+to need any modeling and can be used as is:
+%
+\begin{equation}
+    \mfd\frac{\partial}{\partial t} \wbar{\rho}\,
+     + \sum_{i=1}^{\nd}
+       \frac{\partial}{\partial x_i}
+          \wbar{\rho}\, {\wtilde{\bm{V}}_i}
+           =0 
+    \label{eqn:C:modeled:final}
+\end{equation}
+%
+
+
+
+
+
+
+\subsection{Species Conservation}
+
+Recalling Eq.\ (\ref{eqn:SC:final}):
+%
+\begin{equation}
+  \mfd\frac{\partial}{\partial t}  \wbar{\rho}\,  {\wtilde{w}_k}
+      +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+        \wbar{\rho}\, {\wtilde{\bm{V}}_j} {\wtilde{w}_k}
+      + \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} 
+            \overline{\rho \bm{V}_j^{{\prime\prime}} w_k^{{\prime\prime}}}
+      -  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+         \overline{d_{kj}}
+      = 0
+  \label{eqn:SC:modeled:1}
+\end{equation}
+%
+where the Boussinesq approximation is used to simplify $\overline{\rho \bm{V}_j^{{\prime\prime}} w_k^{{\prime\prime}}}$:
+%
+\begin{equation}
+  \overline{\rho \bm{V}_j^{{\prime\prime}} w_k^{{\prime\prime}}}
+    = -\frac{\etat}{\Sct} \frac{\partial {\wtilde{w}_k}}{\partial x_j}
+  \label{eqn:SC:modeled:2}
+\end{equation}
+%
+It might seem strange that an equality is used between the exact and
+the modeled term, when clearly an approximation is involved. There is
+no mistake however, as Eq.\ (\ref{eqn:SC:modeled:2}) must be understood
+as the definition of $\Sct$, with $\Sct$ a nonconstant.
+The modeling comes when setting the turbulent Schmidt number
+$\Sct$ to a constant.
+
+The laminar diffusion term in Eq.\ (\ref{eqn:SC:modeled:2}) is approximated
+simply as:
+%
+\begin{equation}
+  \overline{d_{kj}}
+ = 
+  \overline{\nu_k  \frac{\partial w_k}{\partial x_j}}
+ \approx 
+  \overline{\nu_k}  \frac{\partial {\wtilde{w}_k}}{\partial x_j}
+  \label{eqn:dkj:modeled}
+\end{equation}
+%
+which is an excellent approximation considering the negligible
+impact of the laminar terms on the solution of a turbulent flowfield
+where $\etat$ is expected to be orders of magnitude greater than
+$\nu_k$. The laminar terms will become important where no or very
+little turbulence is present, hence where the Favre-averaged species
+conservation equation should collapse to its laminar counterpart, further
+justifying the latter approximation.
+
+Equation (\ref{eqn:SC:modeled:1}) therefore becomes:
+%
+\begin{equation}
+  \mfd\frac{\partial}{\partial t}  \wbar{\rho}\,  {\wtilde{w}_k}
+      +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+        \wbar{\rho}\, {\wtilde{\bm{V}}_j} {\wtilde{w}_k}
+      -  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+             \left( \overline{\nu_k} + \frac{\etat}{\Sct} \right)
+              \frac{\partial {\wtilde{w}_k}}{\partial x_j}
+      \approx 0
+  \label{eqn:SC:modeled:final}
+\end{equation}
+%
+
+
+\subsection{Nitrogen Vibration Energy}
+
+Recalling the exact form of the Favre-averaged nitrogen vibration energy conservation equation, Eq.\ (\ref{eqn:NV:final}):
+%
+\begin{align}
+     \frac{\partial}{\partial t} &\wbar{\rho} \left( {\wtilde{w}_{\rm N_2}}  \wtilde{\ev} + g_{\rm v}\right)
+  +  \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} \left( {\wtilde{w}_{\rm N_2}} {\wtilde{\ev}} + g_{\rm v}\right)
+  +  \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}{\wtilde{\ev}} \overline{\rho \bm{V}_j^{\prime\prime} \cNtwo^{\prime\prime}}
+  +  \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}{\wtilde{w}_{\rm N_2}} \overline{\rho \bm{V}_j^{\prime\prime} \ev^{\prime\prime}}\nonumber\alb
+%
+       &+\sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}\overline{\rho \bm{V}_j^{\prime\prime} \cNtwo^{\prime\prime} \ev^{\prime\prime}} 
+- \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \wtilde{\ev} \overline{d_{{\rm N_2}j}}
+   - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{\ev^{\prime\prime} d_{{\rm N_2}j}}
+         + \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{q_j^{\rm v}} = \wbar{Q}_{\rm v}
+\end{align}
+%
+Using the Boussinesq approximation, the last two terms on the first line can be approximated
+as:
+%
+\begin{equation}
+  \overline{\rho \bm{V}_j^{{\prime\prime}} w_{\rm N_2}^{{\prime\prime}}}
+    = -\frac{\etat}{\Sct} \frac{\partial {\wtilde{w}_{\rm N_2}}}{\partial x_j}
+\end{equation}
+%
+%
+\begin{equation}
+  \overline{\rho \bm{V}_j^{{\prime\prime}} \ev^{{\prime\prime}}}=-\frac{\etat}{\sigmav} \frac{\partial \wtilde{\ev}}{\partial x_j}
+  \label{eqn:NV:modelled:3}
+\end{equation}
+%
+Further, it is decided to model the laminar diffusion term to:
+%
+\begin{equation}
+\frac{\partial }{\partial x_j} \overline{q^{\rm v}_j    }
+\approx
+-\frac{\partial }{\partial x_j} \frac{\wbar{\eta}}{\Pr}\wtilde{w}_{\rm N_2} \frac{\partial \wtilde{\ev}}{\partial x_j}
+  \label{eqn:NV:modelled:4}
+\end{equation}
+%
+and the terms related to the enthalpic energy of turbulence as:
+%
+\begin{equation}
+   \overline{d_{{\rm N_2}j}\ev^{{\prime\prime}} }    -\overline{\rho \bm{V}_j^{{\prime\prime}} \cNtwo^{{\prime\prime}} \ev^{{\prime\prime}}} 
+ = \left( \wbar{\eta}+\frac{\etat}{\sigma_g} \right) \frac{\partial g_{\rm v}}{\partial x_j}
+\end{equation}
+%
+Then, the modelled form of the nitrogen vibration transport equation corresponds
+to:
+%
+\begin{align}
+ \frac{\partial}{\partial t} &\wbar{\rho} \left( {\wtilde{w}_{\rm N_2}}  \wtilde{\ev} + g_{\rm v}\right)
+  + \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} \left( {\wtilde{w}_{\rm N_2}} {\wtilde{\ev}} + g_{\rm v}\right)
+  -  \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}\left({\wtilde{\ev}} \left(\overline{\nu_{\rm N_2}}+ \frac{\etat}{\Sct}\right) \frac{\partial {\wtilde{w}_{\rm N_2}}}{\partial x_j}\right)\nonumber\alb
+  &-  \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}\left({\wtilde{w}_{\rm N_2}} \frac{\etat}{\sigmav} \frac{\partial \wtilde{\ev}}{\partial x_j}\right)
+      - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \left(
+            \frac{\wbar{\eta}}{\Pr} \wtilde{w}_{\rm N_2} \frac{\partial \wtilde{\ev}}{\partial x_j}\right)
+   -\sum_{j=1}^{\nd} \left( \left( \wbar{\eta}+\frac{\etat}{\sigma_g} \right) \frac{\partial g_{\rm v}}{\partial x_j} \right)
+ \approx \wbar{Q}_{\rm v}
+\end{align}
+%
+Simplify:
+%
+\begin{align}
+ \frac{\partial}{\partial t} &\wbar{\rho} \left( {\wtilde{w}_{\rm N_2}}  \wtilde{\ev} + g_{\rm v}\right)
+  + \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} \left( {\wtilde{w}_{\rm N_2}} {\wtilde{\ev}} + g_{\rm v}\right)
+  -  \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}\left({\wtilde{\ev}} \left(\overline{\nu_{\rm N_2}}+ \frac{\etat}{\Sct}\right) \frac{\partial {\wtilde{w}_{\rm N_2}}}{\partial x_j}\right)\nonumber\alb
+  &-  \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}\left({\wtilde{w}_{\rm N_2}} \left(\frac{\wbar{\eta}}{\Pr}+\frac{\etat}{\sigmav}\right) \frac{\partial \wtilde{\ev}}{\partial x_j}\right)
+   -\sum_{j=1}^{\nd} \left( \left( \wbar{\eta}+\frac{\etat}{\sigma_g} \right) \frac{\partial g_{\rm v}}{\partial x_j} \right)
+ \approx \wbar{Q}_{\rm v}
+  \label{eqn:NV:modelled:final}
+\end{align}
+%
+
+
+
+
+\subsection{Momentum}
+
+Recalling Eq.\ (\ref{eqn:M:final})
+%
+\begin{equation}
+  \mfd\frac{\partial}{\partial t}  \wbar{\rho}\,  {\wtilde{\bm{V}}_i}
+      +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+             \wbar{\rho}\, {\wtilde{\bm{V}}_j} {\wtilde{\bm{V}}_i}
+      + \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+             \overline{\rho \bm{V}_j^{{\prime\prime}} \bm{V}_i^{{\prime\prime}}}
+      +  \frac{\partial }{\partial x_i} \wbar{P}
+      -  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \overline{t_{ij}}
+      = 0
+  \label{eqn:M:modeled:1}
+\end{equation}
+%
+Should we perform a straightforward
+application of the Boussinesq approximation to the
+Reynolds stress term $\overline{\rho \bm{V}_j^{{\prime\prime}} \bm{V}_i^{{\prime\prime}}}$:
+%
+\begin{equation}
+  \overline{\rho \bm{V}_j^{{\prime\prime}} \bm{V}_i^{{\prime\prime}}}
+   \approx 
+   -\etat \left(
+             \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+          +\frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_i}
+       \right)
+  \label{eqn:M:modeled:boussinesq:1}
+\end{equation}
+%
+which includes two derivatives on the RHS  since, in all fairness,
+there is no reason to favour $\bm{V}_i$ to $\bm{V}_j$. Equation
+(\ref{eqn:M:modeled:boussinesq:1}) however does not preserve one important
+property of the exact Reynolds stress term, i.e.:
+%
+\begin{equation}
+    \sum_{i=1}^{\nd} \sum_{j=1}^{\nd} \delta_{ij} \overline{\rho \bm{V}_j^{{\prime\prime}} \bm{V}_i^{{\prime\prime}}}
+ =  \sum_{i=1}^{\nd}  \overline{\rho \bm{V}_i^{{\prime\prime}} \bm{V}_i^{{\prime\prime}}}
+ =  2 \wbar{\rho}\, k
+  \label{eqn:M:modeled:boussinesq:2}
+\end{equation}
+%
+Consequently the modeled form of $\overline{\rho \bm{V}_j^{{\prime\prime}} \bm{V}_i^{{\prime\prime}}}$
+should, if possible, preserve this feature when submitted to the same summation
+operators.
+Inspired by the Boussinesq approximation and the molecular diffusion terms
+of the Navier-Stokes equations, we can write:
+%
+\begin{equation}
+  \overline{\rho \bm{V}_j^{{\prime\prime}} \bm{V}_i^{{\prime\prime}}}
+   = 
+   -\etat \left(
+             \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+          +\frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_i}
+          -\frac{2}{3} \delta_{ij} \sum_{k=1}^\nd \frac{\partial {\wtilde{\bm{V}}_k}}{\partial x_k}
+       \right)
+   + \frac{2}{3} \delta_{ij} \wbar{\rho}\, k
+  \label{eqn:M:modeled:boussinesq:3}
+\end{equation}
+%
+applying the operator outlined in Eq.\ (\ref{eqn:M:modeled:boussinesq:2}) and summing along
+the three dimensions results in:
+%
+\begin{equation}
+ \begin{array}{cl}
+    &\mfd\sum_{i=1}^{3} \sum_{j=1}^{3} \delta_{ij}
+    \left[
+       -\etat \left(
+             \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+          +\frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_i}
+          -\frac{2}{3}  \delta_{ij} \sum_{k=1}^3 \frac{\partial {\wtilde{\bm{V}}_k}}{\partial x_k}
+           \right)
+       + \frac{2}{3} \delta_{ij} \wbar{\rho}\, k
+    \right] \alb
+  =&\mfd\sum_{i=1}^{3}
+    \left[
+       -\etat \left(
+             \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_i}
+          +\frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_i}
+          -\frac{2}{3} \sum_{k=1}^3 \frac{\partial {\wtilde{\bm{V}}_k}}{\partial x_k}
+           \right)
+       + \frac{2}{3} \wbar{\rho}\, k
+    \right] \alb
+  =&\mfd
+       -\etat \left(
+           2 \sum_{i=1}^3 \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_i}
+          -2 \sum_{k=1}^3 \frac{\partial {\wtilde{\bm{V}}_k}}{\partial x_k}
+           \right)
+       + 2  \wbar{\rho}\, k\alb
+  =&\mfd 2  \wbar{\rho}\, k
+ \end{array}
+  \label{eqn:M:modeled:boussinesq:4}
+\end{equation}
+%
+which is the same trace as spitted by Eq.\ (\ref{eqn:M:modeled:boussinesq:2}).
+
+Although the summation must be taken along 3 dimensions for the above to hold true,
+this does not imply that the system of equations cannot be used in 2D or 1D.
+For example, the 2D formulation can be obtained by (1) starting from the 3D equations,
+and (2) getting rid of all derivatives related to the third dimension,
+without worrying about the original derivation of the 3D equations.
+
+Further, it should come as no surprise that the viscous derivatives cancel out
+in Eq.\ (\ref{eqn:M:modeled:boussinesq:4}) as they are similar in form to the Navier-Stokes
+equations which guarantee the vanishing of the normal shear stresses
+to avoid any contribution to the pressure from the viscous stresses
+(the Stokes hypothesis).
+
+The viscous related term in Eq.\ (\ref{eqn:M:modeled:1}) is, similarly
+to the molecular mass diffusion term in the previous section, modeled as:
+%
+\begin{equation}
+  \overline{t_{ij}}  \approx 
+     \wbar{\eta} \left( \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+              +  \frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_i}
+              -  \frac{2}{3} \delta_{ij} \sum_{k=1}^{\nd} \frac{\partial {\wtilde{\bm{V}}_k}}{\partial x_k}
+         \right)
+  \label{eqn:M:modeled:tij}
+\end{equation}
+%
+Using Eqs.\ (\ref{eqn:M:modeled:tij}) and (\ref{eqn:M:modeled:boussinesq:4}),
+the turbulent form of the momentum equations becomes:
+%
+\begin{equation}
+ \begin{array}{ll}
+  \mfd\frac{\partial}{\partial t}  \wbar{\rho}\,  {\wtilde{\bm{V}}_i}
+      +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+             \wbar{\rho}\, {\wtilde{\bm{V}}_j} {\wtilde{\bm{V}}_i}
+      - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+            \etat
+          \left(
+                \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+              + \frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_i}
+              - \frac{2}{3} \delta_{ij} \sum_{k=1}^\nd \frac{\partial {\wtilde{\bm{V}}_k}}{\partial x_k}
+          \right) & \alb
+     ~~\mfd + \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+          \frac{2}{3} \delta_{ij} \wbar{\rho}\, k
+      +  \frac{\partial }{\partial x_i} \wbar{P}
+      -  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} 
+        \wbar{\eta}
+          \left( \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+              +  \frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_i}
+              -  \frac{2}{3} \delta_{ij} \sum_{k=1}^{\nd} \frac{\partial {\wtilde{\bm{V}}_k}}{\partial x_k}
+          \right)
+     &\approx 0
+ \end{array}
+ \label{eqn:M:modeled:2}
+\end{equation}
+%
+which is reformatted to:
+%
+\begin{equation}
+ \begin{array}{l}
+  \mfd\frac{\partial}{\partial t}  \wbar{\rho}\,  {\wtilde{\bm{V}}_i}
+      +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+             \wbar{\rho}\, {\wtilde{\bm{V}}_j} {\wtilde{\bm{V}}_i}
+      - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+            \left( \wbar{\eta}+\etat \right)
+          \left(
+                \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+              + \frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_i}
+              - \frac{2}{3} \delta_{ij} \sum_{k=1}^\nd \frac{\partial {\wtilde{\bm{V}}_k}}{\partial x_k}
+          \right) \alb
+     ~~\mfd  +  \frac{\partial }{\partial x_i} \left( \wbar{P}  +  \frac{2}{3} \wbar{\rho}\, k\right)
+      \approx 0 
+ \end{array}
+ \label{eqn:M:modeled:final}
+\end{equation}
+%
+
+
+
+
+\subsection{Equation of State}
+
+Recalling the exact equation of state (Eq.\ (\ref{eqn:EOS:final})):
+%
+\begin{equation}
+ \wbar{P}
+     =   \sum_{k=1}^\ns R_k \wbar{\rho}\,  {\wtilde{w}_k} \wtilde{T}
+       + \sum_{k=1}^\ns R_k \overline{\rho w_k^{{\prime\prime}} T^{{\prime\prime}}}
+ \label{eqn:EOS:modeled:1}
+\end{equation}
+%
+which, assuming a calorically perfect gas (such an assumption has been issued
+while deriving the exact energy balance equation), becomes:
+%
+\begin{equation}
+ \begin{array}{rcl}
+   \wbar{P}
+    &=&  \mfd\sum_{k=1}^\ns R_k \wbar{\rho}\,  {\wtilde{w}_k} \wtilde{T}
+       + \sum_{k=1}^\ns \frac{R_k}{\Cp_k} \overline{\rho w_k^{{\prime\prime}} h_k^{{\prime\prime}}} \alb
+     
+    &=&  \mfd\sum_{k=1}^\ns R_k \wbar{\rho}\,  {\wtilde{w}_k} \wtilde{T}
+       + \sum_{k=1}^\ns \frac{\Cp_k-\Cv_k}{\Cp_k} \overline{\rho w_k^{{\prime\prime}} h_k^{{\prime\prime}}} \alb
+     
+    &=&  \mfd\sum_{k=1}^\ns R_k \wbar{\rho}\,  {\wtilde{w}_k} \wtilde{T}
+       + \sum_{k=1}^\ns \frac{\gamma_k-1}{\gamma_k} \overline{\rho w_k^{{\prime\prime}} h_k^{{\prime\prime}}}
+ \end{array}
+ \label{eqn:EOS:modeled:2}
+\end{equation}
+%
+If we assume $\gamma_k$ to be constant for all species, the latter becomes:
+%
+\begin{equation}
+ \wbar{P}
+     \approx   \sum_{k=1}^\ns R_k \wbar{\rho}\,  {\wtilde{w}_k} \wtilde{T}
+       + \frac{\gamma-1}{\gamma} \wbar{\rho}\, g
+ \label{eqn:EOS:modeled:3}
+\end{equation}
+%
+
+
+
+\subsection{Energy}
+
+From Eq.\ (\ref{eqn:etstar:final}), the exact form of the energy equation corresponds to:
+%
+%
+\begin{equation}
+ \begin{array}{l}
+    % unsteady terms
+    \mfd\frac{\partial}{\partial t}  \wbar{\rho}\,
+       \left(  \wtilde{e}
+           + 
+          {\wtilde{w}_{\rm N_2}}\wtilde{\ev}
+           + 
+          k
+           + 
+          g
+           + \frac{1}{2}\sum_{i=1}^{\nd}  {\wtilde{\bm{V}}_i}  {\wtilde{\bm{V}}_i}
+       \right)\alb\mfd
+~~    % convection terms
+     + \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \left\{ \wbar{\rho}\, {\wtilde{\bm{V}}_j}
+       \left(
+            \sum_{k=1}^{\ns} {\wtilde{w}_k}  {\wtilde{h}_k}
+          + {\wtilde{w}_{\rm N_2}}\wtilde{\ev}  + k + g
+          + \frac{1}{2}\sum_{i=1}^{\nd} {\wtilde{\bm{V}}_i}  {\wtilde{\bm{V}}_i}
+       \right) \right.\alb
+~~    % turbulence and molecular diffusion terms
+    \mfd+ \overline{q_j}+\overline{\Cp}  \overline{\rho  \bm{V}_j^{{\prime\prime}}  T^{{\prime\prime}}} +{\wtilde{w}_{\rm N_2}} \overline{\rho \bm{V}_j^{{\prime\prime}} \ev^{{\prime\prime}}}
+      -\sum_{k=1}^{\ns}{\wtilde{h}_k} \left( \overline{ d_{kj} }
+
+      -\overline{\rho  \bm{V}_j^{{\prime\prime}}  w_k^{{\prime\prime}}}\right)
+      -\wtilde{\ev} \left(\overline{d_{{\rm N_2}j} }       - \overline{\rho \bm{V}_j^{{\prime\prime}} \cNtwo^{{\prime\prime}}}\right)\alb
+  ~~  \mfd
+
+        - \sum_{k=1}^{\ns}\left( \overline{ d_{kj}  h_k^{{\prime\prime}} } - \overline{\rho  \bm{V}_j^{{\prime\prime}}  w_k^{{\prime\prime}}  h_k^{{\prime\prime}} } \right)
+   -\left(\overline{d_{{\rm N_2}j}\ev^{{\prime\prime}} }    -\overline{\rho \bm{V}_j^{{\prime\prime}} \cNtwo^{{\prime\prime}} \ev^{{\prime\prime}}} \right)
+        \alb
+    ~~\mfd \left.  - \sum_{i=1}^{\nd}
+       \left[
+          {\wtilde{\bm{V}}_i} \left( \overline{ t_{ij} } -\overline{\rho  \bm{V}_j^{{\prime\prime}}  \bm{V}_i^{{\prime\prime}}}\right)
+        + \left( \overline{ t_{ij}  \bm{V}_i^{{\prime\prime}} } -\frac{1}{2}\overline{\rho  \bm{V}_j^{{\prime\prime}}  \bm{V}_i^{{\prime\prime}}  \bm{V}_i^{{\prime\prime}} } \right)
+       \right]
+    \right\}= 0
+ \end{array}
+ \label{eqn:etstar:modeled:1}
+\end{equation}
+%
+where the terms $ \overline{ d_{kj} } $, $ \overline{\rho  \bm{V}_j^{{\prime\prime}}  w_k^{{\prime\prime}}} $,
+$ \overline{ t_{ij} } $ and $ \overline{\rho  \bm{V}_j^{{\prime\prime}}  \bm{V}_i^{{\prime\prime}}} $   have been
+modeled through Eqs.\ (\ref{eqn:dkj:modeled}), (\ref{eqn:SC:modeled:2}),
+(\ref{eqn:M:modeled:tij}) and (\ref{eqn:M:modeled:boussinesq:4}) respectively.
+The laminar heat transfer term, $\overline{q_j}$ is modeled similarly to
+the previous laminar terms found in the momentum and species conservation equations:
+%
+\begin{equation}
+  \overline{q_j} \approx -\wbar{\kappa} 
+                         \frac{\partial \wtilde{T}}{\partial x_j}
+                         +\overline{q^{\rm v}_j}
+                 \approx -\wbar{\kappa} 
+                         \frac{\partial \wtilde{T}}{\partial x_j}
+                         - {\wtilde{w}_{\rm N_2}}\frac{\wbar{\eta}}{\Pr}\frac{\partial \wtilde{\ev}}{\partial x_j}
+\label{eqn:etstar:modeled:Tdiffusionlaminar}
+\end{equation}
+%
+while the heat transfer term is modeled using the Boussinesq approximation:
+%
+\begin{equation}
+     -\overline{\Cp}  \overline{\rho  \bm{V}_j^{{\prime\prime}}  T^{{\prime\prime}}}
+   = \frac{\overline{\Cp} \etat}{\Prt} \frac{\partial \wtilde{T}}{\partial x_j}
+\label{eqn:etstar:modeled:Tdiffusion_boussinesq}
+\end{equation}
+%
+The most commonly used approximation for the kinetic energy
+laminar and turbulent diffusion terms is:
+%
+\begin{equation}
+   \sum_{i=1}^\nd \left( \overline{ t_{ij}  \bm{V}_i^{{\prime\prime}} } -\frac{1}{2}\overline{\rho  \bm{V}_j^{{\prime\prime}}  \bm{V}_i^{{\prime\prime}}  \bm{V}_i^{{\prime\prime}} } \right)
+ = \left( \wbar{\eta}+\frac{\etat}{\sigma_k} \right) \frac{\partial k}{\partial x_j}
+\label{eqn:etstar:modeled:kdiffusion}
+\end{equation}
+%
+and similarly, for the  $g$-related diffusion terms, we can say:
+%
+\begin{equation}
+   \sum_{k=1}^\ns \left( \overline{ d_{kj}  h_k^{{\prime\prime}} } -  \overline{\rho  \bm{V}_j^{{\prime\prime}}  w_k^{{\prime\prime}}  h_k^{{\prime\prime}} } \right)
+   +\left(\overline{d_{{\rm N_2}j}\ev^{{\prime\prime}} }    -\overline{\rho \bm{V}_j^{{\prime\prime}} \cNtwo^{{\prime\prime}} \ev^{{\prime\prime}}} \right)
+ = \left( \wbar{\eta}+\frac{\etat}{\sigma_g} \right) \frac{\partial g}{\partial x_j}
+\label{eqn:etstar:modeled:gdiffusion}
+\end{equation}
+%
+Also, as outlined previously in Eq.\ (\ref{eqn:NV:modelled:3}):
+%
+\begin{equation}
+  \overline{\rho \bm{V}_j^{{\prime\prime}} \ev^{{\prime\prime}}}=-\frac{\etat}{\sigmav} \frac{\partial \wtilde{\ev}}{\partial x_j}
+  \label{eqn:NV:modelled:5}
+\end{equation}
+%
+
+Therefore, using Eqs.\ (\ref{eqn:dkj:modeled}), (\ref{eqn:SC:modeled:2}),
+(\ref{eqn:M:modeled:tij}), (\ref{eqn:M:modeled:boussinesq:4}), (\ref{eqn:etstar:modeled:kdiffusion}),
+(\ref{eqn:etstar:modeled:gdiffusion}), (\ref{eqn:etstar:modeled:Tdiffusionlaminar}),
+(\ref{eqn:etstar:modeled:Tdiffusion_boussinesq}), (\ref{eqn:NV:modelled:5}),  the energy balance becomes:
+%
+\begin{equation}
+ \begin{array}{l}
+    % unsteady terms
+    \mfd\frac{\partial}{\partial t}  \wbar{\rho}\,
+       \left(  \wtilde{e}
+           + {\wtilde{w}_{\rm N_2}}\wtilde{\ev}
+           + k + g
+           + \frac{1}{2}\sum_{i=1}^{\nd}  {\wtilde{\bm{V}}_i}  {\wtilde{\bm{V}}_i}
+       \right)\alb\mfd~~
+    % convection terms
+     + \sum_{j=1}^{\nd} \left\{ \frac{\partial}{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j}
+       \left(
+            \sum_{k=1}^{\ns} {\wtilde{w}_k}  {\wtilde{h}_k}
+          + {\wtilde{w}_{\rm N_2}}\wtilde{\ev}
+          + k + g
+          + \frac{1}{2}\sum_{i=1}^{\nd} {\wtilde{\bm{V}}_i}  {\wtilde{\bm{V}}_i}
+       \right)        -\frac{\partial }{\partial x_j} \left( \wbar{\eta}+\frac{\etat}{\sigma_k} \right) \frac{\partial k}{\partial x_j}
+ \right.\alb
+    % turbulence and molecular diffusion terms
+~~    \mfd - \frac{\partial }{\partial x_j} \left(
+       \wbar{\kappa} \frac{\partial \wtilde{T}}{\partial x_j}
+       +\frac{\overline{\Cp} \etat}{\Prt} \frac{\partial \wtilde{T}}{\partial x_j}
+       + {\wtilde{w}_{\rm N_2}} \left( \frac{\wbar{\eta}}{\Pr}+\frac{ \etat}{\sigmav} \right) \frac{\partial \wtilde{\ev}}{\partial x_j}
+       \right)\alb
+  ~~  \mfd - \sum_{k=1}^{\ns}
+       \left[
+         \frac{\partial }{\partial x_j} {\wtilde{h}_k} \left(
+              \overline{\nu_k}
+             +\frac{\etat}{\Sct} \right) \frac{\partial {\wtilde{w}_k}}{\partial x_j}
+       \right]- \frac{\partial }{\partial x_j} \wtilde{\ev} \left( \overline{\nu_{\rm N_2}}+ \frac{\etat}{\Sct} \right) \frac{\partial {\wtilde{w}_{\rm N_2}}}{\partial x_j}
+        -\frac{\partial }{\partial x_j}
+            \left( \wbar{\eta}+\frac{\etat}{\sigma_g} \right) \frac{\partial g}{\partial x_j}
+        \alb
+    ~~\mfd \left.  - \sum_{i=1}^{\nd}
+       \left[
+         \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_i} \left(
+            \left(\wbar{\eta}+\etat\right) \left(
+               \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+               +\frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_i}
+               -\frac{2}{3} \delta_{ij} \sum_{k=1}^\nd \frac{\partial {\wtilde{\bm{V}}_k}}{\partial x_k}
+            \right)
+            - \frac{2}{3} \delta_{ij} \wbar{\rho}\, k
+         \right)
+       \right]
+      \right\} \approx 0
+ \end{array}
+ \label{eqn:etstar:modeled:2}
+\end{equation}
+%
+which after using the definition of $\wtilde{h}\equiv \wtilde{e}+\wbar{P}/\wbar{\rho}\,$, and
+defining $\etstar$ as:
+%
+\begin{equation}
+  \etstar  \equiv  \wtilde{e}+{\wtilde{w}_{\rm N_2}}\wtilde{\ev}+ k+g+\frac{1}{2}\sum_{i=1}^{\nd}  {\wtilde{\bm{V}}_i}  {\wtilde{\bm{V}}_i}
+ \label{eqn:etstar}
+\end{equation}
+%
+we can reduce Eq.\ (\ref{eqn:etstar:modeled:2}) to:
+%
+\begin{equation}
+ \begin{array}{l}
+    % unsteady terms
+    \mfd\frac{\partial}{\partial t}  \wbar{\rho}\, \etstar
+    % convection terms
+     + \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \left\{ {\wtilde{\bm{V}}_j}
+       \left(
+            \wbar{\rho}\, \etstar
+            +\wbar{P}
+            +\frac{2}{3} \wbar{\rho}\, k
+       \right) 
+    % turbulence and molecular diffusion terms
+    -\left( \wbar{\kappa}+\frac{\overline{\Cp} \etat}{\Prt} \right)
+       \frac{\partial \wtilde{T}}{\partial x_j}
+    - {\wtilde{w}_{\rm N_2}} \left( \frac{\wbar{\eta}}{\Pr}+\frac{ \etat}{\sigmav} \right) \frac{\partial \wtilde{\ev}}{\partial x_j}\right.\alb\mfd~~   
+-\left( \wbar{\eta}+\frac{\etat}{\sigma_k} \right) \frac{\partial k}{\partial x_j}
+ -\sum_{k=1}^{\ns}
+          {\wtilde{h}_k} 
+            \left( \overline{\nu_k}+\frac{\etat}{\Sct} \right)
+               \frac{\partial {\wtilde{w}_k}}{\partial x_j}
+- \wtilde{\ev} \left( \overline{\nu_{\rm N_2} }+\frac{\etat}{\Sct} \right) \frac{\partial {\wtilde{w}_{\rm N_2}}}{\partial x_j}
+       \alb~~
+    \mfd \left. -\sum_{i=1}^{\nd}
+         {\wtilde{\bm{V}}_i} 
+            \left(\wbar{\eta}+\etat\right) \left(
+               \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+               +\frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_i}
+               -\frac{2}{3} \delta_{ij} \sum_{k=1}^\nd \frac{\partial {\wtilde{\bm{V}}_k}}{\partial x_k}
+            \right)
+        
+    - \left( \wbar{\eta}+\frac{\etat}{\sigma_g} \right) \frac{\partial g}{\partial x_j}
+      \right\}
+      \approx 0
+ \end{array}
+ \label{eqn:etstar:modeled:final}
+\end{equation}
+%
+
+
+
+
+
+
+
+\subsection{Turbulence kinetic energy}
+
+
+The exact form of the TKE is taken from Eq.\ (\ref{eqn:TKE:final})
+but with the pressure term expanded to:
+%
+\begin{displaymath}
+     \overline{\bm{V}_i^{{\prime\prime}} \frac{\partial P}{\partial x_i}}
+   = \overline{\bm{V}_i^{{\prime\prime}} \frac{\partial }{\partial x_i} \left( \wbar{P}+P^{\prime}\right) }
+   = \overline{\bm{V}_i^{{\prime\prime}}} \frac{\partial }{\partial x_i} \wbar{P}
+       + \overline{\bm{V}_i^{{\prime\prime}} \frac{\partial }{\partial x_i} P^{\prime} }
+   = \overline{\bm{V}_i^{{\prime\prime}}} \frac{\partial }{\partial x_i} \wbar{P}
+       + \frac{\partial }{\partial x_i} \overline{ P^{\prime} \bm{V}_i^{{\prime\prime}}}
+       - \overline{P^{\prime} \frac{\partial }{\partial x_i} \bm{V}_i^{{\prime\prime}} }
+\end{displaymath}
+%
+which only applies to a mono-species gas. In the case of multi-species,
+the instantaneous pressure cannot be simply decomposed as sum of
+a mean and fluctuating part, due to the extra fluctuations present
+in the averaged equation of state.
+%
+\begin{equation}
+  \begin{array}{l}
+  \mfd
+   % unsteady term
+    \frac{\partial }{\partial t} \wbar{\rho}\, k
+   % convection term
+   +  \sum_{j=1}^{\nd}\frac{\partial }{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} k
+   % molecular and turbulent diffusion term
+   - \mfd\sum_{i=1}^\nd\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j} \left( \overline{\bm{V}_i^{{\prime\prime}} t_{ij}}
+                     - {\frac{1}{2}} \overline{\rho {\bm{V}_j^{{\prime\prime}}} \bm{V}_i^{{\prime\prime}} \bm{V}_i^{{\prime\prime}}} \right)
+   % production of TKE
+   + \sum_{i=1}^\nd \mfd\sum_{j=1}^{\nd}
+                              \overline{\rho \bm{V}_i^{{\prime\prime}} \bm{V}_j^{{\prime\prime}}}
+                                     \frac{\partial }{\partial x_j} {\wtilde{\bm{V}}_i} \alb~~
+   % dissipation of TKE
+   + \wbar{\rho} \epsilon 
+   % pressure related source terms
+   + \mfd\underbrace{\sum_{i=1}^\nd\overline{\bm{V}_i^{{\prime\prime}}} \frac{\partial }{\partial x_i} \wbar{P}}_{\begin{tabular}{c}\small $P$ {\rm work}\end{tabular}}
+       + \underbrace{\sum_{i=1}^\nd\frac{\partial }{\partial x_i} \overline{ P^{\prime} \bm{V}_i^{{\prime\prime}}}}_{\begin{tabular}{c}\small $P$ {\rm diffusion}\end{tabular}}
+       - \underbrace{\sum_{i=1}^\nd\overline{P^{\prime} \frac{\partial }{\partial x_i} \bm{V}_i^{{\prime\prime}} }}_{\begin{tabular}{c}\small $P$ {\rm dilatation}\end{tabular}}
+   = 0
+  \end{array}
+  \label{eqn:TKE:modeled:1}
+\end{equation}
+%
+The pressure work vanishes for incompressible flow since:
+%
+\begin{displaymath}
+  \overline{\bm{V}_i^{{\prime\prime}}}
+   = -\overline{\left(\frac{\rho^{\prime}}{\wbar{\rho}\,}\right) \bm{V}_i^{\prime}}
+   = 0
+  {       \rm ~~~if~   }\rho^{\prime} \rightarrow 0
+\end{displaymath}
+%
+Similarly, the pressure dilatation disappears in the limit of incompressible
+flow since the continuity equation can be written, in the absence of
+density gradients, as:
+%
+\begin{displaymath}
+     \sum_{i=1}^\nd \frac{\partial }{\partial x_i} \bm{V}_i
+   = \sum_{i=1}^\nd \frac{\partial }{\partial x_i} \left( {\wtilde{\bm{V}}_i}+\bm{V}_i^{{\prime\prime}}  \right)
+   = \sum_{i=1}^\nd \frac{\partial }{\partial x_i} {\wtilde{\bm{V}}_i}
+     + \sum_{i=1}^\nd \frac{\partial }{\partial x_i} \bm{V}_i^{{\prime\prime}}
+   = 0
+  {      \rm ~~~for~zero~gradient~of~}\rho
+\end{displaymath}
+%
+which further simplifies to, if using Eq.\ (\ref{eqn:C:final}) under the assumption
+of incompressibility:
+%
+\begin{displaymath}
+  \sum_{i=1}^\nd \frac{\partial }{\partial x_i} \bm{V}_i^{{\prime\prime}}
+   = 0{      \rm ~~~for~zero~gradient~of~}\rho
+\end{displaymath}
+%
+We have hence shown that the pressure work and the pressure dilatation terms
+arise from the compressible form only of the Navier-Stokes equations and
+are hence compressibility effects. No generally accepted modeling exists
+for the latter although some work on this topic can be found in
+Krishnamurty \cite{turb:krish}.
+
+Due to a lack of experimental and DNS information regarding the importance
+of the pressure diffusion, dilatation and work terms, we prefer at this stage
+to simply ignore their modeling.
+
+Equations (\ref{eqn:M:modeled:boussinesq:3}) and (\ref{eqn:etstar:modeled:kdiffusion})
+are then used to model $ \overline{\rho \bm{V}_i^{{\prime\prime}} \bm{V}_j^{{\prime\prime}}} $ and
+$ {\frac{1}{2}} \overline{\rho {\bm{V}_j^{{\prime\prime}}} \bm{V}_i^{{\prime\prime}} \bm{V}_i^{{\prime\prime}}} $ respectively,
+resulting in a TKE balance of:
+%
+\begin{equation}
+  \begin{array}{l}
+  \mfd
+   % unsteady term
+    \frac{\partial }{\partial t} \wbar{\rho}\, k
+   % convection term
+   +  \sum_{j=1}^{\nd}\frac{\partial }{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} k
+   % molecular and turbulent diffusion term
+   - \mfd\sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+     \left( \wbar{\eta}+\frac{\etat}{\sigma_k} \right) \frac{\partial k}{\partial x_j}
+   % dissipation of TKE
+   + \wbar{\rho}\,\left( \epsilon_s+\epsilon_d \right) \alb~~
+   % production of TKE
+   - \mfd\sum_{i=1}^\nd \sum_{j=1}^{\nd}
+         \left[ \etat \left(
+           \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+           +\frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_i}
+           -\frac{2}{3} \delta_{ij} \sum_{k=1}^\nd \frac{\partial {\wtilde{\bm{V}}_k}}{\partial x_k}
+            \right)
+           - \frac{2}{3} \delta_{ij} \wbar{\rho}\, k
+         \right]
+         \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+   \approx 0 
+  \end{array}
+  \label{eqn:TKE:modeled:2}
+\end{equation}
+%
+Defining the TKE production as:
+%
+\begin{equation}
+  Q_k = \mfd\sum_{i=1}^\nd \sum_{j=1}^{\nd}
+         \left[ \etat \left(
+           \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+           +\frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_i}
+           -\frac{2}{3} \delta_{ij} \sum_{k=1}^\nd \frac{\partial {\wtilde{\bm{V}}_k}}{\partial x_k}
+            \right)
+           - \frac{2}{3} \delta_{ij} \wbar{\rho}\, k
+         \right]
+         \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+\label{eqn:Pk}
+\end{equation}
+%
+the modeled TKE becomes:
+%
+%
+\begin{equation}
+   % unsteady term
+    \frac{\partial }{\partial t} \wbar{\rho}\, k
+   % convection term
+   +  \sum_{j=1}^{\nd}\frac{\partial }{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} k
+   % molecular and turbulent diffusion term
+   - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+     \left( \wbar{\eta}+\frac{\etat}{\sigma_k} \right) \frac{\partial k}{\partial x_j}
+   \approx 
+   % production of TKE
+  Q_k
+   % dissipation of TKE
+   - \wbar{\rho}\, \left( \epsilon_s+\epsilon_d \right)
+  \label{eqn:TKE:modeled:final}
+\end{equation}
+%
+
+
+
+
+\subsection{Dilatational Dissipation}
+
+Equation (\ref{eqn:BDR:dilatation}) defined the dilatational dissipation rate as:
+%
+\begin{equation}
+ \wbar{\rho}\, \epsilon_d = 
+    \overline{\eta/\rho}~ 
+    \left[
+      2 \sum_{i=1}^\nd \sum_{j=1}^\nd \overline{\rho \frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_j}  \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_i}}
+     -  \frac{2}{3}  \sum_{i=1}^{\nd} \sum_{j=1}^{\nd}
+           \overline{ \rho  \frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_i}  \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}}
+    \right]
+ \label{eqn:DDR:modeled:1}
+\end{equation}
+%
+However, part of the first term on the RHS can be rewritten as \cite{turb:sarkar1991}:
+%
+\begin{align*}
+  \sum_{i=1}^\nd &\sum_{j=1}^\nd \frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_j}  \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_i}
+      = \mfd\sum_{i=1}^\nd \sum_{j=1}^\nd \left[
+         \frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_j} \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_i}
+        +\frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_i} \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}
+       -2\frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_i} \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}
+        +\frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_i}  \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}
+       \right]\alb
+     &=\sum_{i=1}^\nd \sum_{j=1}^\nd \left[
+         \frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_j} \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_i}
+        +\bm{V}_i^{{\prime\prime}}\frac{\partial^2 \bm{V}_j^{{\prime\prime}}}{\partial x_i \partial x_j}
+        +\frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j} \frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_i}
+        +\bm{V}_j^{{\prime\prime}}\frac{\partial^2 \bm{V}_i^{{\prime\prime}} }{\partial x_j \partial x_i}
+       -2\frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_i} \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}
+        \right.\alb
+     &~~~~~~\left.
+       -2 \bm{V}_i^{{\prime\prime}}  \frac{\partial^2 \bm{V}_j^{{\prime\prime}}}{\partial x_i \partial x_j}
+        +\frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_i}  \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}
+       \right]\alb
+     &= \mfd\sum_{i=1}^\nd \sum_{j=1}^\nd \left[
+         \frac{\partial }{\partial x_j} \left( \bm{V}_i^{{\prime\prime}} \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_i} \right)
+        +\frac{\partial }{\partial x_j} \left( \bm{V}_j^{{\prime\prime}} \frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_i} \right)
+       -2\frac{\partial }{\partial x_i} \left( \bm{V}_i^{{\prime\prime}} \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}   \right)
+        +\frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_i}  \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}
+       \right]\alb
+     &= \mfd\sum_{i=1}^\nd \sum_{j=1}^\nd \left[
+         \frac{\partial }{\partial x_j} \left( \frac{\partial}{\partial x_i}\bm{V}_i^{{\prime\prime}}  \bm{V}_j^{{\prime\prime}}\right)
+       -2\frac{\partial }{\partial x_i} \left( \bm{V}_i^{{\prime\prime}} \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}   \right)
+        +\frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_i}  \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}
+       \right]
+\end{align*}
+%
+since the following equality holds:
+%
+\begin{displaymath}
+  \mfd\sum_{i=1}^\nd \sum_{j=1}^\nd
+     \bm{V}_i^{{\prime\prime}}\frac{\partial^2 \bm{V}_j^{{\prime\prime}}}{\partial x_i \partial x_j}
+ = \mfd\sum_{i=1}^\nd \sum_{j=1}^\nd
+     \bm{V}_j^{{\prime\prime}}\frac{\partial^2 \bm{V}_i^{{\prime\prime}}}{\partial x_j \partial x_i}
+\end{displaymath}
+%
+Equation (\ref{eqn:DDR:modeled:1}) then becomes:
+%
+\begin{equation}
+ \wbar{\rho}\, \epsilon_d = 
+    \overline{\eta/\rho}~ \sum_{i=1}^\nd \sum_{j=1}^\nd
+    \left[
+        2 \overline{\rho \frac{\partial }{\partial x_j} \left( \frac{\partial}{\partial x_i}\bm{V}_i^{{\prime\prime}}  \bm{V}_j^{{\prime\prime}}\right)}
+       -4 \overline{ \rho \frac{\partial }{\partial x_i} \left( \bm{V}_i^{{\prime\prime}} \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}   \right)}
+       +\frac{4}{3} \overline{ \rho \frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_i}  \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}}
+    \right]
+ \label{eqn:DDR:modeled:2}
+\end{equation}
+%
+For homogeneous turbulence, the two second derivatives involving velocity fluctuations
+will disappear \cite{turb:sarkar1991}, resulting in:
+%
+\begin{equation}
+ \wbar{\rho}\, \epsilon_d \approx 
+    \frac{4}{3} \overline{\eta/\rho}~ \sum_{i=1}^\nd \sum_{j=1}^\nd
+        \overline{ \rho \frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_i}  \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}}
+ \label{eqn:DDR:modeled:3}
+\end{equation}
+%
+As shown previously, since the divergence of the velocity fluctuation vanishes for constant density (and hence incompressible)
+flow, it is noted that the solenoidal dissipation rate as defined by Eq.\ (\ref{eqn:DDR:modeled:3}) is strictly a compressible flow feature.
+Through DNS studies of constant viscosity, homogeneous
+turbulent flow, Sarkar et al. observed  the solenoidal dissipation rate to be insensible
+to the turbulent Mach number ${\rm M}\turb$, while the dilatational dissipation
+showed a linear relationship with ${\rm M}\turb$. They further postulate the dilatational
+dissipation to be function of its solenoidal counterpart, resulting in a
+modeling of:
+%
+\begin{equation}
+ \wbar{\rho}\, \epsilon_d \approx 
+    \wbar{\rho}\, \epsilon_s {\rm M}\turb^2
+ \label{eqn:DDR:modeled:sarkar}
+\end{equation}
+%
+with the turbulent Mach number defined as:
+%
+\begin{equation}
+ {\rm M}\turb = \frac{\sqrt{2 k}}{a}
+ \label{eqn:Mturb}
+\end{equation}
+%
+with $a$ the sound speed. The modeling by Sarkar influencing boundary layer shear stress
+in a negative way when integrated through the laminar subregion motivated Wilcox\cite{turb:wilcoxcomp}
+in developing his own $\epsilon_d$:
+%
+\begin{equation}
+ \wbar{\rho}\, \epsilon_d \approx 
+    \frac{3}{2} \wbar{\rho}\, \epsilon_s
+       {\rm  ~max\,}\left( {\rm M}\turb^2 - \frac{1}{16} ,  0 \right)
+ \label{eqn:DDR:modeled:wilcox}
+\end{equation}
+%
+which has the advantage of not introducing any additional dissipation at low
+turbulent Mach numbers, i.e. in boundary layers upto Mach 6, above which
+the Morkovin's hypothesis is not expected to be valid.
+
+
+
+
+
+\subsection{Solenoidal Dissipation Rate}
+
+From Eq.\ (\ref{eqn:SDR:final}), the solenoidal dissipation transport
+equation corresponds to:
+%
+\begin{equation}
+ \begin{array}{l}
+         \mfd \frac{\partial }{\partial t} \wbar{\rho}\, \epsilon_s
+        +\mfd\sum_{j=1}^{\nd}
+           \frac{\partial }{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} \epsilon_s
+ = 
+   2 \overline{\eta/\rho}~ \mfd\sum_{i=1}^{\nd} \left[ \mfd\sum_{j=1}^{\nd}
+    \mfd\left(
+         {\wtilde{\omega}_j} \overline{\rho  \omega_i^{{\prime\prime}}  \frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_j}}
+             + \overline{\rho  \omega_i^{{\prime\prime}}  \omega_j^{{\prime\prime}}} \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+             + \overline{\rho  \omega_i^{{\prime\prime}}  \omega_j^{{\prime\prime}} \frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_j}}
+    \right. \right.\alb~~
+    \mfd\left.
+       - {\wtilde{\omega}_i} \overline{\rho  \omega_i^{{\prime\prime}}  \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}}
+             - \overline{\rho  \omega_i^{{\prime\prime}}  \omega_i^{{\prime\prime}}} \frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_j}
+             - \overline{\rho  \omega_i^{{\prime\prime}}  \omega_i^{{\prime\prime}} \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}}
+       - \overline{\rho \omega_i^{{\prime\prime}} \bm{V}_j^{{\prime\prime}}}  \frac{\partial {\wtilde{\omega}_i}}{\partial x_j}
+       - \frac{1}{2} \frac{\partial }{\partial x_j} \overline{\rho {\bm{V}_j^{{\prime\prime}}} \omega_i^{{\prime\prime}} \omega_i^{{\prime\prime}}}
+    \right) \alb~~
+ + \mfd\left.
+         \mfd \overline{\rho \omega_i^{{\prime\prime}} B_i}
+       + \overline{\rho \omega_i^{{\prime\prime}} S_i}
+       + \sum_{j=1}^\nd{\wtilde{\bm{V}}_j} \frac{\overline{\rho \omega_i^{{\prime\prime}} \omega_i^{{\prime\prime}}}}{2 \overline{\eta/\rho}~} \frac{\partial }{\partial x_j}  \overline{\eta/\rho}~
+       + \frac{\overline{\rho \omega_i^{{\prime\prime}} \omega_i^{{\prime\prime}}}}{2 \overline{\eta/\rho}~} \frac{\partial }{\partial t} \overline{\eta/\rho}~
+    \right] 
+ \end{array}
+\label{eqn:SDR:modeled:1}
+\end{equation}
+%
+Similarly to the TKE equation, the turbulent diffusion of the dissipation rate can be modeled from:
+%
+\begin{equation}
+ -\sum_{i=1}^\nd \frac{\partial}{\partial x_j}\overline{\eta / \rho} \overline{\rho {\bm{V}_j^{{\prime\prime}}} \omega_i^{{\prime\prime}} \omega_i^{{\prime\prime}}}
+   = \frac{\partial}{\partial x_j} \left( \frac{\etat}{\sigma_{\epsilon_s}} \frac{\partial \epsilon_s}{\partial x_j} \right)
+\end{equation}
+%
+while the sum of the laminar diffusion and dissipation of dissipation can be found in:
+%
+\begin{equation}
+ 2 \overline{\eta/\rho}~ \sum_{i=1}^\nd \overline{\rho \omega_i^{{\prime\prime}} S_i}
+  = \sum_{j=1}^\nd \frac{\partial }{\partial x_j} \left( \wbar{\eta} \frac{\partial \epsilon_s}{\partial x_j}\right) + \Phi
+\end{equation}
+%
+with $\Phi$ the dissipation of dissipation. Equation (\ref{eqn:SDR:modeled:1}) hence becomes:
+%
+\begin{equation}
+ \begin{array}{l}
+         \mfd \frac{\partial }{\partial t} \wbar{\rho}\, \epsilon_s
+        +\mfd\sum_{j=1}^{\nd}
+           \frac{\partial }{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} \epsilon_s
+        -\sum_{j=1}^\nd \frac{\partial }{\partial x_j} \left( \wbar{\eta} +\frac{\etat}{\sigma_{\epsilon_s}} \right)\frac{\partial \epsilon_s}{\partial x_j}
+ = 
+   2 \overline{\eta/\rho}~ \mfd\sum_{i=1}^{\nd} \left[ \mfd\sum_{j=1}^{\nd}
+    \mfd\left(
+         {\wtilde{\omega}_j} \overline{\rho  \omega_i^{{\prime\prime}}  \frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_j}}
+    \right. \right.\alb~~
+    \mfd\left.
+             + \overline{\rho  \omega_i^{{\prime\prime}}  \omega_j^{{\prime\prime}}} \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+             + \overline{\rho  \omega_i^{{\prime\prime}}  \omega_j^{{\prime\prime}} \frac{\partial \bm{V}_i^{{\prime\prime}}}{\partial x_j}}
+       - {\wtilde{\omega}_i} \overline{\rho  \omega_i^{{\prime\prime}}  \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}}
+             - \overline{\rho  \omega_i^{{\prime\prime}}  \omega_i^{{\prime\prime}}} \frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_j}
+             - \overline{\rho  \omega_i^{{\prime\prime}}  \omega_i^{{\prime\prime}} \frac{\partial \bm{V}_j^{{\prime\prime}}}{\partial x_j}} - \overline{\rho \omega_i^{{\prime\prime}} \bm{V}_j^{{\prime\prime}}}  \frac{\partial {\wtilde{\omega}_i}}{\partial x_j}
+    \right)\alb~~
+    \mfd\left.
+       + \overline{\rho \omega_i^{{\prime\prime}} B_i}
+    \right] + \Phi
+   \mfd + \sum_{i=1}^\nd  \left[
+     \overline{\rho \omega_i^{{\prime\prime}} \omega_i^{{\prime\prime}}}\frac{\partial }{\partial t} \overline{\eta/\rho}~
+      + \sum_{j=1}^\nd \left(
+       \overline{\rho \bm{V}_j^{{\prime\prime}} \omega_i^{{\prime\prime}} \omega_i^{{\prime\prime}}}+{\wtilde{\bm{V}}_j} \overline{\rho \omega_i^{{\prime\prime}} \omega_i^{{\prime\prime}}}
+     \right)\frac{\partial}{\partial x_j}\overline{\eta/\rho}~
+   \right]
+ \end{array}
+\label{eqn:SDR:modeled:2}
+\end{equation}
+%
+
+The latter contains quite a few new terms and unknown correlations, and an attempt
+at its direct modeling seems to the author a bit far fetched.
+We will hence refrain of a term-by-term analysis of the dissipation equation,
+as it is generally
+accepted that a more global and simple approach to its modeling \cite{turb:vandromme}
+yields in practice better results.
+
+The idea is, using dimensional analysis arguments,
+to model the source terms based on the source terms present in the TKE equation.
+This is physically sound, as one might expect the dissipation of turbulence to
+increase whenever the TKE increases, as turbulence by nature provides
+its own energy-dissipation mechanism \cite{turb:tennekes}.
+
+The solenoidal dissipation rate equation is therefore modeled as:
+%
+\begin{equation}
+ \begin{array}{r}
+         \mfd \frac{\partial }{\partial t} \wbar{\rho}\, \epsilon_s
+        +\mfd\sum_{j=1}^{\nd}
+           \frac{\partial }{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} \epsilon_s
+        -\sum_{j=1}^\nd \frac{\partial }{\partial x_j} \left( \wbar{\eta} +\frac{\etat}{\sigma_{\epsilon_s}} \right)\frac{\partial \epsilon_s}{\partial x_j}
+ \approx 
+ \frac{\epsilon_s}{k} \left( C_{\epsilon_1}  Q_k - C_{\epsilon_2} \wbar{\rho}\, \epsilon_s   \right)
+ \end{array}
+\label{eqn:SDR:modeled:final}
+\end{equation}
+%
+
+
+\subsubsection{Specific Dissipation Rate}
+
+By defining the length-scale determining variable $\omega$ from:
+%
+\begin{equation}
+  \epsilon_s \equiv k \omega
+  \label{eqn:omega}
+\end{equation}
+%
+and taking the partial derivative wrt time on both sides results in:
+%
+\begin{equation}
+  \frac{\partial \epsilon_s}{\partial t}
+   =  k \frac{\partial \omega}{\partial t}
+    +\omega \frac{\partial k}{\partial t}
+\end{equation}
+%
+Multiplying both sides by the density and rearranging:
+%
+\begin{equation}
+  \wbar{\rho}\,  \frac{\partial \omega}{\partial t}
+   = 
+  \frac{\wbar{\rho}\,}{k} \frac{\partial \epsilon_s}{\partial t}
+  -\frac{\wbar{\rho}\, \omega}{k} \frac{\partial k}{\partial t}
+\end{equation}
+%
+Based on the above, it should be clear that should we define
+the substantive derivative operator as:
+%
+\begin{equation}
+  \frac{{\rm D}}{{\rm D}t} \equiv 
+   \frac{\partial}{\partial t} + \sum_{j=1}^\nd {\wtilde{\bm{V}}_j} \frac{\partial}{\partial x_j}
+\end{equation}
+%
+we can claim the following relationship:
+%
+\begin{equation}
+  \wbar{\rho}\,  \frac{{\rm D} \omega}{{\rm D} t}
+   = 
+  \frac{\wbar{\rho}\,}{k} \frac{{\rm D} \epsilon_s}{{\rm D} t}
+  -\frac{\wbar{\rho}\, \omega}{k} \frac{{\rm D} k}{{\rm D} t}
+\end{equation}
+%
+Expanding and making use of the global continuity equation, we get:
+%
+\begin{equation}
+  \frac{\partial }{\partial t}\wbar{\rho}\,\omega+\sum_{j=1}^\nd \frac{\partial}{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} \omega
+   = 
+  \frac{1}{k}\left[ \frac{\partial }{\partial t}\wbar{\rho}\,\epsilon_s+\sum_{j=1}^\nd \frac{\partial}{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} \epsilon_s\right]
+  -\frac{\omega}{k}\left[ \frac{\partial }{\partial t}\wbar{\rho}\,k+\sum_{j=1}^\nd \frac{\partial}{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} k\right]
+ \label{eqn:SPDR:modeled:1}
+\end{equation}
+%
+By using Eqs.\ (\ref{eqn:TKE:modeled:final}) and (\ref{eqn:SDR:modeled:final}),
+we can transform the latter to:
+%
+\begin{equation}
+  \begin{array}{l}
+    \mfd\frac{\partial }{\partial t}\wbar{\rho}\,\omega+\sum_{j=1}^\nd \frac{\partial}{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} \omega
+       \approx 
+      \frac{1}{k}\left[
+            \sum_{j=1}^\nd \frac{\partial }{\partial x_j} \left(\left( \wbar{\eta} +\frac{\etat}{\sigma_{\epsilon_s}} \right)\frac{\partial \epsilon_s}{\partial x_j} \right)
+           +\omega \left( C_{\epsilon_1}  Q_k - C_{\epsilon_2} \wbar{\rho}\, \epsilon_s   \right)
+      \right]
+  \alb~~
+  -\mfd\frac{\omega}{k}\left[
+     \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+     \left( \left( \wbar{\eta}+\frac{\etat}{\sigma_k} \right) \frac{\partial k}{\partial x_j} \right)
+     +Q_k-\wbar{\rho}\, \left( \epsilon_s+\epsilon_d \right)
+   \right]
+  \end{array}
+ \label{eqn:SPDR:modeled:2}
+\end{equation}
+%
+We can expand the second derivative of $\epsilon_s$ to:
+%
+\begin{equation}
+ \begin{array}{l}
+  \mfd\frac{\partial }{\partial x_j} \left( \left( \wbar{\eta} +\frac{\etat}{\sigma_{\epsilon_s}} \right)\frac{\partial \epsilon_s}{\partial x_j} \right)
+    =\mfd\frac{\partial }{\partial x_j} \left( \left( \wbar{\eta} +\frac{\etat}{\sigma_{\epsilon_s}} \right)\left( k \frac{\partial \omega}{\partial x_j} +\omega \frac{\partial k}{\partial x_j}\right)\right)
+   \alb~~
+    =\mfd\frac{\partial }{\partial x_j} \left( k\left( \wbar{\eta} +\frac{\etat}{\sigma_{\epsilon_s}} \right)\frac{\partial \omega}{\partial x_j} \right)
+          +\frac{\partial }{\partial x_j} \left( \omega \left( \wbar{\eta} +\frac{\etat}{\sigma_{\epsilon_s}} \right) \frac{\partial k}{\partial x_j}\right)
+   \alb~~
+    =
+          \mfd k\frac{\partial }{\partial x_j} \left( \left( \wbar{\eta} +\frac{\etat}{\sigma_{\epsilon_s}} \right)\frac{\partial \omega}{\partial x_j} \right)
+          +2\left( \wbar{\eta} +\frac{\etat}{\sigma_{\epsilon_s}} \right)\frac{\partial \omega}{\partial x_j}    \frac{\partial k}{\partial x_j}
+          +\mfd\omega\frac{\partial }{\partial x_j} \left( \left( \wbar{\eta} +\frac{\etat}{\sigma_{\epsilon_s}} \right) \frac{\partial k}{\partial x_j}\right)
+ \end{array}
+\end{equation}
+%
+Inserting the latter into (\ref{eqn:SPDR:modeled:2}) gives:
+%
+\begin{equation}
+  \begin{array}{l}
+    \mfd\frac{\partial }{\partial t}\wbar{\rho}\,\omega+\sum_{j=1}^\nd \frac{\partial}{\partial x_j}
+            \left[
+                \wbar{\rho}\, {\wtilde{\bm{V}}_j} \omega
+               +\left( \wbar{\eta} +\frac{\etat}{\sigma_{\epsilon_s}} \right)\frac{\partial \omega}{\partial x_j}
+            \right]
+       \approx  \frac{\omega}{k}
+         \left[
+            \left(C_{\epsilon_1}-1\right) Q_k
+           -\left(C_{\epsilon_2}-1\right) \wbar{\rho}\, \epsilon_s
+           +\wbar{\rho}\, \epsilon_d
+         \right]
+  \alb~~
+  +\mfd\sum_{j=1}^\nd \frac{2}{k}\left( \wbar{\eta} +\frac{\etat}{\sigma_{\epsilon_s}} \right)\frac{\partial \omega}{\partial x_j}    \frac{\partial k}{\partial x_j}
+  -\mfd\frac{\omega}{k}
+     \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+     \left( \left( \frac{\etat}{\sigma_k}-\frac{\etat}{\sigma_{\epsilon_s}} \right) \frac{\partial k}{\partial x_j} \right)
+  \end{array}
+  \label{eqn:SPDR:modeled:final}
+\end{equation}
+%
+
+
+
+
+
+\section{2-equation models}
+
+Two-equation turbulence models solve the Favre-averaged
+species conservation, momentum conservation and energy conservation
+equations, while introducing two additional equations: the
+conservation of turbulence kinetic energy, and a length scale
+determining transport equation.
+
+The turbulent enthalpic energy, $g$ is set to zero, i.e.
+%
+\begin{equation}
+ g \sim 0
+\end{equation}
+%
+which is exactly true for a one-species gas, but a
+bit of an approximation for a multi-species mixture.
+To the author's knowledge however, there is no known modeling of this
+term at the time of this writing. Multi-species flows involving high
+variations of specific enthalpies and high
+mass concentration gradients, which are conditions usually encountered
+when dealing with combustion, are believed to be subject to a
+non-ignorable dependance on $g$. However, we choose to ignore
+such a dependance for the time being.
+
+The $g$-less equations of motion are hence listed below.
+%
+\\  \\Species Conservation:
+\begin{displaymath}
+  \mfd\frac{\partial}{\partial t}  \wbar{\rho}\,  {\wtilde{w}_k}
+      +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+        \wbar{\rho}\, {\wtilde{\bm{V}}_j} {\wtilde{w}_k}
+      -  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+             \left( \overline{\nu_k} + \frac{\etat}{\Sct} \right)
+              \frac{\partial {\wtilde{w}_k}}{\partial x_j}
+      \approx 0
+\end{displaymath}
+%
+Momentum:
+\begin{displaymath}
+ \begin{array}{l}
+  \mfd\frac{\partial}{\partial t}  \wbar{\rho}\,  {\wtilde{\bm{V}}_i}
+      +  \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+             \wbar{\rho}\, {\wtilde{\bm{V}}_j} {\wtilde{\bm{V}}_i}
+      - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+            \left( \wbar{\eta}+\etat \right)
+          \left(
+                \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+              + \frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_i}
+              - \frac{2}{3} \delta_{ij} \sum_{k=1}^\nd \frac{\partial {\wtilde{\bm{V}}_k}}{\partial x_k}
+          \right) \alb~~
+     \mfd  +  \frac{\partial }{\partial x_i} \left( \wbar{P}  +  \frac{2}{3} \wbar{\rho}\, k\right)
+      \approx 0
+ \end{array}
+\end{displaymath}
+%
+%
+Nitrogen Vibration Energy:
+%
+\begin{align}
+ \frac{\partial}{\partial t} &\wbar{\rho} \left( {\wtilde{w}_{\rm N_2}}  \wtilde{\ev} \right)
+  + \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} \left( {\wtilde{w}_{\rm N_2}} {\wtilde{\ev}} \right)
+  -  \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}\left({\wtilde{\ev}} \left(\overline{\nu_{\rm N_2}}+ \frac{\etat}{\Sct}\right) \frac{\partial {\wtilde{w}_{\rm N_2}}}{\partial x_j}\right)\nonumber\alb
+  &-  \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j}\left({\wtilde{w}_{\rm N_2}} \left(\frac{\wbar{\eta}}{\Pr}+\frac{\etat}{\sigmav}\right) \frac{\partial \wtilde{\ev}}{\partial x_j}\right)
+ \approx \wbar{Q}_{\rm v}
+\end{align}
+%
+Energy:
+%
+\begin{displaymath}
+ \begin{array}{l}
+    % unsteady terms
+    \mfd\frac{\partial}{\partial t}  \wbar{\rho}\, \etstar
+    % convection terms
+     + \sum_{j=1}^{\nd} \frac{\partial}{\partial x_j} \left\{ {\wtilde{\bm{V}}_j}
+       \left(
+            \wbar{\rho}\, \etstar
+            +\wbar{P}
+            +\frac{2}{3} \wbar{\rho}\, k
+       \right)
+    % turbulence and molecular diffusion terms
+    -\left( \wbar{\kappa}+\frac{\overline{\Cp} \etat}{\Prt} \right)
+       \frac{\partial \wtilde{T}}{\partial x_j}
+    - {\wtilde{w}_{\rm N_2}} \left( \frac{\wbar{\eta}}{\Pr}+\frac{ \etat}{\sigmav} \right) \frac{\partial {\wtilde{\ev}}}{\partial x_j}\right.\alb\mfd~~
+        -\left( \wbar{\eta}+\frac{\etat}{\sigma_k} \right) \frac{\partial k}{\partial x_j}
+    -\sum_{k=1}^{\ns}
+          {\wtilde{h}_k} 
+            \left( \overline{\nu_k}+\frac{\etat}{\Sct} \right)
+               \frac{\partial {\wtilde{w}_k}}{\partial x_j}
+- {\wtilde{\ev}} \left( \overline{\nu_{\rm N_2} }+\frac{\etat}{\Sct} \right) \frac{\partial {\wtilde{w}_{\rm N_2}}}{\partial x_j}
+       \alb~~
+    \mfd \left. -\sum_{i=1}^{\nd}
+         {\wtilde{\bm{V}}_i} 
+            \left(\wbar{\eta}+\etat\right) \left(
+               \frac{\partial {\wtilde{\bm{V}}_i}}{\partial x_j}
+               +\frac{\partial {\wtilde{\bm{V}}_j}}{\partial x_i}
+               -\frac{2}{3} \delta_{ij} \sum_{k=1}^\nd \frac{\partial {\wtilde{\bm{V}}_k}}{\partial x_k}
+            \right)
+      \right\}
+      \approx 0
+ \end{array}
+\end{displaymath}
+%
+%
+Turbulence Kinetic Energy:
+\begin{displaymath}
+   % unsteady term
+    \frac{\partial }{\partial t} \wbar{\rho}\, k
+   % convection term
+   +  \sum_{j=1}^{\nd}\frac{\partial }{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} k
+   % molecular and turbulent diffusion term
+   - \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+     \left( \wbar{\eta}+\frac{\etat}{\sigma_k} \right) \frac{\partial k}{\partial x_j}
+   \approx 
+  S_k
+\end{displaymath}
+%
+%
+Length Scale Determining - Dissipation Rate:
+\begin{displaymath}
+ \begin{array}{r}
+         \mfd \frac{\partial }{\partial t} \wbar{\rho}\, \psi
+        +\mfd\sum_{j=1}^{\nd}
+           \frac{\partial }{\partial x_j} \wbar{\rho}\, {\wtilde{\bm{V}}_j} \psi
+        -\sum_{j=1}^\nd \frac{\partial }{\partial x_j} \left( \wbar{\eta} +\frac{\etat}{\sigma_{\psi}} \right)\frac{\partial \psi}{\partial x_j}
+ \approx 
+ S_\psi
+ \end{array}
+\end{displaymath}
+%
+Auxiliary Relations:
+\begin{displaymath}
+ \wbar{P}
+     \approx   \sum_{k=1}^\ns R_k \wbar{\rho}\,  {\wtilde{w}_k} \wtilde{T}
+ {    \rm ~~and~~     }
+ \etstar =  \wtilde{e}+{\wtilde{w}_{\rm N_2}}{\wtilde{\ev}} +k+\frac{1}{2} \sum_{i=1}^\nd {\wtilde{\bm{V}}_i}^2
+\end{displaymath}
+
+
+Further, we note that ${\wtilde{\ev}}$ at one point in space-time is only a function of ${\wtilde{T}_{\rm v}}$. Therefore, we can rewrite the spatial derivatives of ${\wtilde{\ev}}$  to:
+%
+\begin{equation}
+  \frac{\partial {\wtilde{\ev}}}{\partial x_j} = \frac{\partial {\wtilde{\ev}}}{\partial {\wtilde{T}_{\rm v}}}\frac{\partial {\wtilde{T}_{\rm v}}}{\partial x_j}
+\end{equation}
+%
+
+The terms above can be rewritten in elegant matrix form by
+grouping together the unsteady, convective, diffusive and source
+terms of each equation:
+%
+\begin{equation}
+\frac{\partial \bm{U}}{\partial t} + \sum_{j=1}^\nd \left( \frac{\partial \bm{F}_j}{\partial x_j}
+ - \sum_{i=1}^\nd \frac{\partial }{\partial x_j}
+     \left( K_{ij} \frac{\partial \bm{G}}{\partial x_i} \right)\right)
+  \approx \bm{S}
+ \label{eqn:favre}
+\end{equation}
+%
+with:
+%
+\begin{displaymath}
+  \bm{U}=\left[\!
+      \begin{array}{@{}c@{}}
+        \wbar{\rho}\, \wtilde{w}_1 \alb
+        \vdots \alb
+        \wbar{\rho}\, \wtilde{w}_{\ns-1} \alb
+        \wbar{\rho}\, \wtilde{w}_{\rm N_2} \alb
+        \wbar{\rho}\, \wtilde{\bm{V}}_1 \alb
+        \vdots \alb
+        \wbar{\rho}\, \wtilde{\bm{V}}_\nd \alb
+        \wbar{\rho}\, \etstar \alb
+        \wbar{\rho}\, \wtilde{w}_{\rm N_2} {\wtilde{\ev}} \alb
+        \wbar{\rho}\, k \alb
+        \wbar{\rho}\, \psi \alb
+      \end{array}
+    \!\right]
+~~    
+  \bm{F}_j=\left[\!
+      \begin{array}{@{}c@{}}
+        \wbar{\rho}\, {\wtilde{\bm{V}}_j} \wtilde{w}_1 \alb
+        \vdots \alb
+        \wbar{\rho}\, {\wtilde{\bm{V}}_j} \wtilde{w}_{\ns-1} \alb
+        \wbar{\rho}\, {\wtilde{\bm{V}}_j} \wtilde{w}_{\rm N_2} \alb
+        \wbar{\rho}\, {\wtilde{\bm{V}}_j} \wtilde{\bm{V}}_1 + \delta_{1j}\left(\wbar{P}+\frac{2}{3} \wbar{\rho}\, k\right)\alb
+        \vdots \alb
+        \wbar{\rho}\, {\wtilde{\bm{V}}_j} \wtilde{\bm{V}}_\nd + \delta_{\nd j}\left(\wbar{P}+\frac{2}{3} \wbar{\rho}\, k\right)\alb
+        \wbar{\rho}\, {\wtilde{\bm{V}}_j} \etstar+{\wtilde{\bm{V}}_j} \wbar{P}+\frac{2}{3}\wbar{\rho}\, {\wtilde{\bm{V}}_j} k \alb
+        \wbar{\rho}\, \wtilde{w}_{\rm N_2} {\wtilde{\bm{V}}_j} {\wtilde{\ev}} \alb
+        \wbar{\rho}\, {\wtilde{\bm{V}}_j} k \alb
+        \wbar{\rho}\, {\wtilde{\bm{V}}_j} \psi \alb
+      \end{array}
+    \!\right]
+~~    
+  \bm{G}=\left[\!
+      \begin{array}{@{}c@{}}
+        \wtilde{w}_1 \alb
+        \vdots \alb
+        \wtilde{w}_{\ns-1} \alb
+        {\wtilde{w}_{\rm N_2}} \alb
+        \wtilde{\bm{V}}_1 \alb
+        \vdots \alb
+        \wtilde{\bm{V}}_\nd \alb
+        \wtilde{T} \alb
+        {\wtilde{T}_{\rm v}}\alb
+        k \alb
+        \psi \alb
+      \end{array}
+   \!\right]
+~~  
+  \bm{S}=\left[\!
+      \begin{array}{@{}c@{}}
+      0 \alb
+      \vdots \alb
+      0 \alb
+      0 \alb
+      0 \alb
+      \vdots \alb
+      0 \alb
+      0 \alb
+      \wbar{Q}_{\rm v} \alb
+      S_k \alb
+      S_\psi \alb
+      \end{array}
+   \!\right]
+\end{displaymath}
+%
+and, should we define $\beta^{ij}$ as,
+%
+\begin{displaymath}
+  \beta^{ij}=\left[
+    \begin{array}{ccccc}
+      \delta_{ij}+\delta_{1i}\delta_{1j}-\frac{2}{3}\delta_{1j}\delta_{1 i}  &   &  \delta_{1i}\delta_{2 j}-\frac{2}{3}\delta_{1j}\delta_{2 i}  &    & \delta_{1i}\delta_{3 j}-\frac{2}{3}\delta_{1j}\delta_{3 i} \alb
+      \delta_{2i}\delta_{1j}-\frac{2}{3}\delta_{2j}\delta_{1 i}  &   &  \delta_{ij}+\delta_{2i}\delta_{2 j}-\frac{2}{3}\delta_{2j}\delta_{2 i}  &    & \delta_{2i}\delta_{3 j}-\frac{2}{3}\delta_{2j}\delta_{3 i} \alb
+      \delta_{3i}\delta_{1j}-\frac{2}{3}\delta_{3j}\delta_{1 i}  &   &  \delta_{3i}\delta_{2 j}-\frac{2}{3}\delta_{3j}\delta_{2 i}  &    & \delta_{ij}+\delta_{3i}\delta_{3 j}-\frac{2}{3}\delta_{3j}\delta_{3 i} \alb
+    \end{array}
+  \right]
+\end{displaymath}
+%
+and denote by an asterisk the sum of the laminar and turbulent
+diffusion coefficients:
+%
+\begin{displaymath}
+ \begin{array}{c}\mfd
+ \nu_k^\star\equiv\overline{\nu_k}+\frac{\etat}{\Sct}
+~,~~~          \eta^\star\equiv\wbar{\eta}+\etat
+~,~~~         \kappa^\star\equiv\wbar{\kappa}+\overline{\Cp} \frac{\etat}{\Prt}
+~,~~~          \eta_k^\star\equiv\wbar{\eta}+\frac{\etat}{\sigma_k}
+~,~~~          \eta_\psi^\star\equiv\wbar{\eta}+\frac{\etat}{\sigma_\psi}~,\alb\mfd
+ \kappa_{\rm v}^\star \equiv \left( \frac{\wbar{\eta}}{\rm Pr}+\frac{\etat}{\sigma_{\rm v}} \right)\wtilde{w}_{\rm N_2}
+       \frac{\partial {\wtilde{\ev}}}{\partial {\wtilde{T}_{\rm v}}}
+ \end{array}
+\end{displaymath}
+%
+
+It is noted that $\wbar{\kappa}$ includes the molecular diffusion of
+the species internal energies \emph{at equilibrium}, since the molecular diffusion
+of the non-equilibrium internal energy of nitrogen is included in the total energy equation through the term $\eta_{\ev}^\star$. Should the molecular thermal conductivity
+be obtained through polynomials dependent on the mass fractions and temperature, it is then necessary to modify the thermal conductivity obtained from such polynomials to exclude the contribution from the nitrogen vibration energy. This can be done as follows. Should the nitrogen vibrational energy always be at equilibrium, a different specific heat at constant pressure would then be obtained, which we denote as $\overline{\Cp}^\prime$.
+Also, we denote the total thermal conductivity (including the contribution from the nitrogen equilibrium vibration energy) as $\wbar{\kappa}^\prime$.
+From the definition of the Prandtl number, it follows that:
+%
+\begin{equation}
+  \wbar{\kappa}^\prime=\overline{\Cp}^\prime \frac{\wbar{\eta}}{\rm Pr}
+\end{equation}
+%
+Assuming that the Prandtl number related to the diffusion of the nitrogen vibration energy is the same as the one related to the diffusion of all energies, we can further say:
+%
+\begin{equation}
+  \wbar{\kappa}=\overline{\Cp} \frac{\wbar{\eta}}{\rm Pr}
+\end{equation}
+%
+Isolating the Prandtl number in the former and substituting it in the latter yields:
+%
+\begin{equation}
+  \wbar{\kappa}= \wbar{\kappa}^\prime\frac{\overline{\Cp}}{\overline{\Cp}^\prime }
+\end{equation}
+%
+Then, noting that the following relationship exists between $\overline{\Cp}$
+and $\overline{\Cp}^\prime$:
+%
+\begin{equation}
+  \overline{\Cp}^\prime=  \overline{\Cp}+ {\wtilde{w}_{\rm N_2}} \frac{\partial \tildeevzero}{\partial \wtilde{T}}
+\label{eqn:cpprime}
+\end{equation}
+%
+where $\tildeevzero$ is the nitrogen vibrational energy at equilibrium (should $\wtilde{T}=\wtilde{T}_{\rm v}$).
+Then:
+%
+\begin{equation}
+  \wbar{\kappa}= \wbar{\kappa}^\prime\frac{\overline{\Cp}}{\overline{\Cp}+ {\wtilde{w}_{\rm N_2}} \frac{\partial \tildeevzero}{\partial \wtilde{T}}}
+\end{equation}
+%
+Also, we note that $\sigma_{\rm v}$ must be equal to the turbulent Prandtl number to ensure that when $\wtilde{T}_v=\wtilde{T}$ the turbulent diffusion of the total energy becomes $\overline{\Cp}^\prime \frac{\etat}{\rm Pr_t}$.
+For convenience, we can then write $\kappa^\star$ and $\kappa_{\rm v}^\star$ as:
+%
+\begin{displaymath}
+  \kappa^\star= \overline{\Cp} \left( \frac{\wbar{\eta}}{\rm Pr}+\frac{\etat}{\rm Pr_t} \right)  {\rm       ~~and~~      }
+\kappa_{\rm v}^\star = \wtilde{w}_{\rm N_2}\frac{\partial {\wtilde{\ev}}}{\partial {\wtilde{T}_{\rm v}}} \left( \frac{\wbar{\eta}}{\rm Pr}+\frac{\etat}{\rm Pr_t} \right)
+\end{displaymath}
+%
+with the Prandtl number obtained from:
+%
+\begin{equation}
+  {\rm Pr} \equiv
+  \overline{\Cp}^\prime \frac{\wbar{\eta}}{\wbar{\kappa}^\prime}
+\end{equation}
+%
+Thus, after substituting $\overline{\Cp}^\prime$ from  Eq.\ (\ref{eqn:cpprime}) we obtained the \emph{modified Prandtl number} applicable to a gas with the nitrogen vibrational energy in non-equilibrium:
+%
+\begin{equation}
+  {\rm Pr} =
+   \frac{\wbar{\eta}}{\wbar{\kappa}^\prime} \left(\overline{\Cp}+ {\wtilde{w}_{\rm N_2}} \frac{\partial \tildeevzero}{\partial \wtilde{T}} \right)
+\end{equation}
+%
+where $\wbar{\kappa}^\prime$ and $\wbar{\eta}$ are the conductivity and the viscosity of the total mixture obtained as usual  through the Mason and Saxena relation and the Wilke's mixing rule, and where $\overline{\Cp}=\partial \wtilde{h}/\partial \wtilde{T}$ with $\wtilde{h}$ the enthalpy of the mixture \emph{excluding} the nitrogen vibrational energy.
+
+Further, we can then write $K_{ij}$:
+%
+\begin{displaymath}
+ K_{ij}=\left[
+     \begin{array}{@{}c@{}c@{}ccc@{}c@{}c}
+        \delta_{ij} \nu_1^\star&\cdots&0&0&0&\cdots&0\alb
+        \vdots&\ddots&\vdots&\vdots&\vdots&\ddots&\vdots\alb
+        0&\cdots&\delta_{ij} \nu_{\ns-1}^\star&0&0&\cdots&0\alb
+        0&\cdots&0&\delta_{ij} \nu_{\rm N_2}^\star&0&\cdots&0\alb
+        0&\cdots&0&0&\eta^\star \beta^{ij}_{1,1}&\cdots& \eta^\star \beta^{ij}_{1,\nd}\alb
+        \vdots&\ddots&\vdots&\vdots&\vdots&\ddots& \vdots \alb
+        0&\cdots&0&0&\eta^\star \beta^{ij}_{\nd,1}&\cdots& \eta^\star \beta^{ij}_{\nd,\nd} \alb
+        \delta_{ij} \wtilde{h}_1 \nu^\star_1&\cdots&\delta_{ij} {\wtilde{h}_{\ns-1}} \nu^\star_{\ns-1}&\delta_{ij} (\wtilde{h}_{\rm N_2}+{\wtilde{\ev}}) \nu^\star_{\rm N_2}&\eta^\star \sum_k {\wtilde{\bm{V}}_k} \beta^{ij}_{k,1}&\cdots&\eta^\star \sum_k {\wtilde{\bm{V}}_k} \beta^{ij}_{k,\nd}\alb
+        0&\cdots&0&\delta_{ij} {\wtilde{\ev}} \nu^\star_{\rm N_2}&0&\cdots&0\alb
+        0&\cdots&0&0&0&\cdots&0\alb
+        0&\cdots&0&0&0&\cdots&0\alb
+     \end{array}
+   \right. ...
+\end{displaymath}
+%
+%
+\begin{displaymath}
+ ...\left.
+     \begin{array}{cccc}
+        0&0&0&0\alb
+        \vdots&\vdots&\vdots&\vdots\alb
+        0&0&0&0\alb
+        0&0&0&0\alb
+        \vdots&\vdots&\vdots&\vdots\alb
+        0&0&0&0\alb
+        \delta_{ij}  \kappa^\star &\delta_{ij} \kappa_{\rm v}^\star&\delta_{ij} \eta_k^\star&0\alb
+        0&\delta_{ij} \kappa_{\rm v}^\star&0&0\alb
+        0&0&\delta_{ij} \eta_k^\star&0\alb
+        0&0&0&\delta_{ij} \eta_\psi^\star\alb
+     \end{array}
+   \right]
+\end{displaymath}
+%
+
+The two equations models presented in this section will
+all make use of Eq.\ (\ref{eqn:favre}) but
+will differ on the following points: (1) the choice of the length-scale
+determining variable $\psi$, i.e. either $\epsilon_s$ or $\omega$,
+(2) the definition of the source terms $S_k$ and $S_\psi$,
+(3) the value of the closure coefficients $\Prt$, $\Sct$, $\sigma_\psi$,
+   $\sigma_k$, $C_{\epsilon_1}$, $C_{\epsilon_2}$
+and (4) the definition of $\etat$.
+
+
+
+\subsection{Launder-Sharma $k\epsilon_s$}
+
+By far the most popular of all 2-equation turbulence models
+is the Launder Jones\cite{turb:jones} $k \epsilon_s$ model, whose closure coefficients
+were later readjusted by Launder and Sharma \cite{turb:launder}.
+Although it is commonly referred to as a $k \epsilon$ type of model,
+the second equation clearly solves only for the solenoidal dissipation, i.e.:
+%
+\begin{displaymath}
+  \psi \equiv \epsilon_s
+\end{displaymath}
+%
+The source terms are comprised of high and low Reynolds number
+terms neessary to enable integration of the equations through the laminar sublayer:
+%
+\begin{eqnarray}
+  S_k&=&Q_k-\wbar{\rho}\, \left( \epsilon_s+\epsilon_d \right)
+        \underbrace{+2 \wbar{\eta} \sum_{i=1}^\nd \left( \frac{\partial \sqrt{k}}{\partial x_i} \right)^2}_{\rm \begin{tabular}{c}\small low Reynolds number terms\end{tabular}}\alb
+  S_\psi&=&\frac{\epsilon_s}{k}
+         \left(
+            C_{\epsilon_1} Q_k
+           -C_{\epsilon_2} \wbar{\rho}\, \epsilon_s
+         \right)
+         \underbrace{+ \frac{3 C_{\epsilon_2}}{10} \frac{\epsilon_s^2}{k} \wbar{\rho}\,  {\rm exp}\left( -{\rm Re}\turb^2\right)
+        +2 \frac{\wbar{\eta} \etat}{\rho} \sum_{i=1}^\nd\left( \frac{\partial^2 \bm{V}_\perp}{\partial x_i \partial x_i}  \right)^2}_{\begin{tabular}{c}\small\rm low Reynolds number terms\end{tabular}}
+\end{eqnarray}
+%
+where $\bm{V}_\perp$ corresponds to the velocity component perpendicular to the wall. Based on dimensional analysis arguments the turbulent viscosity is set to:
+%
+\begin{equation}
+  \etat\approx\frac{9}{100} \wbar{\rho}\, \frac{k^2}{\epsilon_s}
+      \underbrace{ {\rm exp}\left( \frac{-3.4}{\left( 1+{\rm Re}\turb/50 \right)^2}\right)}_{\begin{tabular}{c}\small\rm low Reynolds number terms\end{tabular}}
+\end{equation}
+%
+while the closure coefficients are equal to:
+%
+\begin{equation}
+ \begin{array}{ccccc}
+   \Prt \approx 0.9 &   & \Sct \approx 1.0 &   & \sigma_\psi \approx 1.3 \alb
+   \sigma_k \approx 1 &   & \mfd C_{\epsilon_1} \approx 1.45  &   & \mfd C_{\epsilon_2} \approx 1.92 \alb
+ \end{array}
+\end{equation}
+%
+In the latter, the turublent Reynolds number has the following definition:
+%
+\begin{equation}
+  {\rm Re}\turb = \frac{\wbar{\rho}\,  k^2}{\wbar{\eta}  \epsilon_s}
+\end{equation}
+%
+
+
+
+
+
+
+\subsection{Wilcox $k\omega$}
+
+The motivation behind the development of the $k\omega$
+model\cite{turb:wilcox1988} (i.e. $\psi=\omega$) originated from the inability of
+the $k\epsilon$ model in simulating low Reynolds number flow regions
+without introducing additional source terms in the $k$ and $\epsilon_s$
+transport equations.
+
+It is important at this stage not to confuse $\omega$ with the
+vorticity $\vec{\omega}$. Although they both have the same units,
+they do not share the same physical definition: in the
+$k\omega$ model, $\omega$ is to be physically understood as
+the specific dissipation rate, or the solenoidal dissipation rate per
+unit of kinetic energy of turbulence (see Eq.\ (\ref{eqn:omega})):
+%
+\begin{displaymath}
+  \psi \equiv \omega \equiv \frac{\epsilon_s}{k}
+\end{displaymath}
+%
+From the modeled form of the solenoidal dissipation rate balance
+(Eq.\ (\ref{eqn:SDR:modeled:final})) and the change of variable
+outlined above, one can get a transport equation for $\wbar{\rho}\, \omega$
+(Eq.\ (\ref{eqn:SPDR:modeled:final})):
+%
+\begin{equation}
+  \begin{array}{l}
+    \mfd\frac{\partial }{\partial t}\wbar{\rho}\,\omega+\sum_{j=1}^\nd \frac{\partial}{\partial x_j}
+            \left[
+                \wbar{\rho}\, {\wtilde{\bm{V}}_j} \omega
+               +\left( \wbar{\eta} +\frac{\etat}{\sigma_{\epsilon_s}} \right)\frac{\partial \omega}{\partial x_j}
+            \right]
+       \approx  \frac{\omega}{k}
+         \left[
+            \left(C_{\epsilon_1}-1\right) Q_k
+           -\left(C_{\epsilon_2}-1\right) \wbar{\rho}\, \epsilon_s
+           +\wbar{\rho}\, \epsilon_d
+         \right]
+  \alb~~
+  +\mfd\sum_{j=1}^\nd \frac{2}{k}\left( \wbar{\eta} +\frac{\etat}{\sigma_{\epsilon_s}} \right)\frac{\partial \omega}{\partial x_j}    \frac{\partial k}{\partial x_j}
+  -\mfd\frac{\omega}{k}
+     \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+     \left( \left( \frac{\etat}{\sigma_k}-\frac{\etat}{\sigma_{\epsilon_s}} \right) \frac{\partial k}{\partial x_j} \right)
+  \end{array}
+  \label{eqn:SPDR:modeled:4}
+\end{equation}
+%
+It is noted that so far, we haven't made much progress over the original
+$k\epsilon$ model. In fact, should we solve the latter using the same coefficients
+($\sigma_k$, $\sigma_{\epsilon_s}$, etc.) as the ones used in the $k\epsilon$
+model, we would end up with the same answer.
+
+Wilcox\cite{turb:wilcox1988} observes however that by ignoring the terms on the second line,
+i.e.
+%
+\begin{displaymath}
+\sum_{j=1}^\nd \frac{2}{k}
+\left(\wbar{\eta} +\frac{\etat}{\sigma_{\epsilon_s}} \right)
+\frac{\partial \omega}{\partial x_j}    \frac{\partial k}{\partial x_j} \approx 0
+{    \rm ~~and~~      }
+   \mfd\frac{\omega}{k}
+     \sum_{j=1}^{\nd} \frac{\partial }{\partial x_j}
+     \left( \left( \frac{\etat}{\sigma_k}-\frac{\etat}{\sigma_{\epsilon_s}} \right) \frac{\partial k}{\partial x_j} \right) \approx 0
+\end{displaymath}
+%
+and hence obtaining a transport equation for $\wbar{\rho}\, \omega$ of:
+%
+\begin{equation}
+    \frac{\partial }{\partial t}\wbar{\rho}\,\omega+\sum_{j=1}^\nd \frac{\partial}{\partial x_j}
+            \left[
+                \wbar{\rho}\, {\wtilde{\bm{V}}_j} \omega
+               +\left( \wbar{\eta} +\frac{\etat}{\sigma_{\epsilon_s}} \right)\frac{\partial \omega}{\partial x_j}
+            \right]
+       \approx  \frac{\omega}{k}
+         \left[
+            \left(C_{\epsilon_1}-1\right) Q_k
+           -\left(C_{\epsilon_2}-1\right) \wbar{\rho}\, \epsilon_s
+           +\wbar{\rho}\, \epsilon_d
+         \right]
+  \label{eqn:SPDR:modeled:5}
+\end{equation}
+%
+it is possible to solve both the high and low Reynolds number
+zones of a turbulent boundary layer using the same set of
+coefficients while not introducing any additional source terms.
+
+Therefore, the source terms of the turbulent kinetic energy and length-scale
+determining equations correspond to:
+%
+\begin{eqnarray}
+  S_k&=&Q_k - \wbar{\rho}\, \left( \epsilon_s+\epsilon_d \right) \alb
+  S_\psi&=&\frac{\omega}{k}
+         \left[
+            \left(C_{\epsilon_1}-1\right) Q_k
+           -\left(C_{\epsilon_2}-1\right) \wbar{\rho}\, \epsilon_s
+           +\wbar{\rho}\, \epsilon_d
+         \right]
+\end{eqnarray}
+%
+along with the following closure coefficients:
+%
+\begin{equation}
+ \begin{array}{ccccc}
+   \Prt \approx 0.9 &   & \Sct \approx 1.0 &   & \sigma_\psi \approx 2 \alb
+   \sigma_k \approx 2 &   & \mfd C_{\epsilon_1} \approx \frac{14}{9}  &   & \mfd C_{\epsilon_2} \approx \frac{11}{6} \alb
+ \end{array}
+\end{equation}
+%
+and $\etat$ defined as, similarly to the $k\epsilon$ model but without
+the need for any damping terms to account for low Reynolds number effects:
+%
+\begin{equation}
+   \etat\approx\frac{9}{100} \wbar{\rho}\, \frac{k}{\omega}
+\end{equation}
+%
+Note that the definition of $\etat$ is based purely on dimensional
+analysis, assuming that $\etat/\rho$, or the turbulent kinematic
+diffusion coefficient, depends solely on $\epsilon_s$ and $k$.
+
+\appendix
+
+
+
+
+
+\section{Scalar and Vectorial Products Properties}
+
+The curl, rotation or vectorial product correspond to:
+%
+\begin{displaymath}
+      {\rm curl} \left(\vec{\phi} \right)
+   =  {\rm rot} \left(\vec{\phi} \right)
+   =  \vec{\nabla} \times \vec{\phi}
+\end{displaymath}
+%
+Some useful properties of vectorial products:
+%
+\begin{displaymath}
+ \begin{array}{c}
+  \vec{u} \times \vec{v} = -\vec{v} \times \vec{u} \alb
+  \left( \vec{u}+\vec{v}  \right)  \times \vec{w} = \vec{u} \times \vec{w} + \vec{v} \times \vec{w} \alb
+  \vec{u} \times \left( \vec{v} + \vec{w} \right)  =  \vec{u} \times \vec{v} + \vec{u} \times \vec{w} \alb
+  \left( t \vec{u} \right) \times \vec{v}  =  \vec{u} \times \left( t \vec{v} \right) = t \left( \vec{u} \times \vec{v}\right)\alb
+  \vec{u} \times \vec{u}  =  0 \alb
+  \vec{u} \cdot \left( \vec{u} \times \vec{v} \right) = \vec{v}\cdot\left( \vec{u} \times \vec{v} \right) = 0 \alb
+  \left( \vec{v} \cdot \vec{\nabla} \right) \vec{u}
+     + \left( \vec{u} \cdot \vec{\nabla} \right) \vec{v}  = 
+        \vec{\nabla} \left( \vec{u} \cdot \vec{v} \right)
+       -\vec{v} \times \left( \vec{\nabla} \times \vec{u} \right)
+       -\vec{u} \times \left( \vec{\nabla} \times \vec{v} \right) \alb
+  \left( \vec{v} \cdot \vec{\nabla} \right) \vec{v}  = 
+        \frac{1}{2} \vec{\nabla} \left( \vec{v} \cdot \vec{v} \right)
+       -\vec{v} \times \left( \vec{\nabla} \times \vec{v} \right) \alb
+  \vec{\nabla} \times \left( \vec{u} \times \vec{v} \right)  = 
+       \left( \vec{v} \cdot \vec{\nabla} \right) \vec{u}
+      -\left( \vec{u} \cdot \vec{\nabla} \right) \vec{v}
+      +\vec{u} \left( \vec{\nabla} \cdot \vec{v} \right)
+      -\vec{v} \left( \vec{\nabla} \cdot \vec{u} \right) \alb
+  \vec{\nabla} \times \left( \frac{1}{t} \vec{\nabla} s \right)
+       = \frac{1}{t^2} \vec{\nabla}t \times \vec{\nabla}s
+  \end{array}
+\end{displaymath}
+%
+where $t$ and $s$ are scalars.
+Also, the vectorial product is equal, in long form to:
+%
+\begin{displaymath}
+  \vec{u} \times \vec{v}  =  \left( u_2 \vec{v}_3 - u_3 \vec{v}_2  \right)\vec{i}
+                            +\left( u_3 \vec{v}_1 - u_1 \vec{v}_3  \right)\vec{j}
+                            +\left( u_1 \vec{v}_2 - u_2 \vec{v}_1  \right)\vec{k}
+\end{displaymath}
+%
+
+
+
+
+
+
+
+\section{Crocco's Theorem}
+
+
+Starting from the curl of the momentum Eq.\ (see Eq.\ (\ref{eqn:SDR:vorticity1}))
+%
+\begin{equation}
+ \label{eqn:Crocco:vorticity1}
+ \begin{array}{r}
+  \mfd\frac{\partial}{\partial t} \vec{\omega}
+      + \frac{1}{2} \vec{\nabla} \times \left( \vec{\nabla} \left( \bm{V} \cdot \bm{V} \right)\right)
+       +\vec{\nabla} \times \left(\vec{\omega} \times \bm{V}\right)
+      - \vec{\nabla} \times \left( \frac{1}{\rho} \vec{\nabla} \cdot t_{ij} \right)
+      + \vec{\nabla} \times \left( \frac{1}{\rho} \vec{\nabla} P \right)
+      = 0
+ \end{array}
+\end{equation}
+%
+and using the thermodynamic relationship $T ds=dh - \frac{1}{\rho} dP$
+along each spatial direction:
+%
+\begin{equation}
+  \label{eqn:Crocco:Tds}
+  T \vec{\nabla} s = \vec{\nabla} h - \frac{1}{\rho} \vec{\nabla} P
+\end{equation}
+%
+we can write:
+%
+\begin{equation}
+ \label{eqn:Crocco:vorticity2}
+ \begin{array}{r}
+  \mfd\frac{\partial}{\partial t} \vec{\omega}
+      + \frac{1}{2} \vec{\nabla} \times \left( \vec{\nabla} \left( \bm{V} \cdot \bm{V} \right)\right)
+       +\vec{\nabla} \times \left(\vec{\omega} \times \bm{V}\right)
+      - \vec{\nabla} \times \left( \frac{1}{\rho} \vec{\nabla} \cdot t_{ij} \right)
+      + \vec{\nabla} \times \left( \vec{\nabla} h - T \vec{\nabla} s\right)
+      = 0
+ \end{array}
+\end{equation}
+%
+or, regrouping two terms:
+%
+\begin{equation}
+ \label{eqn:Crocco:vorticity3}
+ \begin{array}{r}
+  \mfd\frac{\partial}{\partial t} \vec{\omega}
+       +\vec{\nabla} \times \left(\vec{\omega} \times \bm{V}\right)
+      - \vec{\nabla} \times \left( \frac{1}{\rho} \vec{\nabla} \cdot t_{ij} \right)
+      + \vec{\nabla} \times \left( \vec{\nabla} h - T \vec{\nabla} s
+           +\frac{1}{2}\vec{\nabla} \left( \bm{V} \cdot \bm{V} \right) \right)
+      = 0
+ \end{array}
+\end{equation}
+%
+Using the definition of the stagnation enthalpy
+$H \equiv h+\frac{1}{2} (\bm{V}\cdot\bm{V})$, we can say:
+%
+\begin{equation}
+  \vec{\nabla}{H}=\vec{\nabla}h+\frac{1}{2} \vec{\nabla} (\bm{V}\cdot\bm{V})
+\end{equation}
+%
+which results in one form of Crocco's theorem:
+%
+\begin{equation}
+ \label{eqn:Crocco:vorticity4}
+ \begin{array}{r}
+  \mfd\frac{\partial}{\partial t} \vec{\omega}
+       +\vec{\nabla} \times \left(\vec{\omega} \times \bm{V}\right)
+      - \vec{\nabla} \times \left( \frac{1}{\rho} \vec{\nabla} \cdot t_{ij} \right)
+      + \vec{\nabla} \times \left( \vec{\nabla} H - T \vec{\nabla} s
+           \right)
+      = 0
+ \end{array}
+\end{equation}
+%
+Note that the above is the curl of the usual form of Crocco's
+theorem.
+Similarly to the derivation of the Helmholtz vorticity equation,
+we then use the vector identity
+$\vec{\nabla} \times \left( \vec{\omega} \times \bm{V} \right) =
+       \left( \bm{V} \cdot \vec{\nabla} \right) \vec{\omega}
+      -\left( \vec{\omega} \cdot \vec{\nabla} \right) \bm{V}
+      +\vec{\omega} \left( \vec{\nabla} \cdot \bm{V} \right)
+      -\bm{V} \left( \vec{\nabla} \cdot \vec{\omega} \right)$ and get:
+%
+\begin{equation}
+ \label{eqn:Crocco:vorticity5}
+ \begin{array}{r}
+  \mfd\frac{\partial}{\partial t} \vec{\omega}
+      +\left( \bm{V} \cdot \vec{\nabla} \right) \vec{\omega}
+      -\left( \vec{\omega} \cdot \vec{\nabla} \right) \bm{V}
+      +\vec{\omega} \left( \vec{\nabla} \cdot \bm{V} \right)
+      -\bm{V} \left( \vec{\nabla} \cdot \vec{\omega} \right) \alb
+      - \vec{\nabla} \times \left( \frac{1}{\rho} \vec{\nabla} \cdot t_{ij} \right)
+      + T^2 \vec{\nabla}\frac{1}{T} \times \vec{\nabla} s 
+      = 0
+ \end{array}
+\end{equation}
+%
+since $\vec{\nabla} \times \vec{\nabla} H=0$ and
+$\vec{\nabla} \times \left( T \vec{\nabla} s \right)=
+T^2 \vec{\nabla}\frac{1}{T} \times \vec{\nabla} s $.
+
+
+
+
+  \bibliographystyle{warpdoc}
+  \bibliography{all}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+

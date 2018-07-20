@@ -1,0 +1,5 @@
+
+U = {rho, rho*u, rho*a*a/g/(g - 1) + rho*(u*u)/2}
+Linv={{1,1,1},{u,u+a,u-a},{u^2/2,a^2/(g-1)+u^2/2+a*u,a^2/(g-1)+u^2/2-a*u}}
+L=Simplify[Inverse[Linv]]
+LU=Simplify[L.U]

@@ -1,0 +1,442 @@
+{
+  _______________________________________________________________________________________________
+
+                                           C F D W A R P
+
+                               A CFD Code for Plasma & Reactive Flow
+  _______________________________________________________________________________________________
+
+  Version                          18jun07b
+  Compiler                         gcc 4.9.2 with OPENMP threads
+  Compiled on                      Jun  7 2018 at 18:40:40 by parent on CLEO
+  Cycle Strategy                   Predictor-Corrector
+  Fluid Relaxation                 None
+  EM Field Relaxation              None
+  Convection Discretization        MUSCL with flux FVS [1], FDS [3], and primitive interpolation
+                                   TVD [2], WENO [4], CWENO [6], AOWENO [5], and eigenvalue
+                                   conditioning HARTEN, GNOFFO [7], PECLET [8]
+  Temporal Discretization          Total Variation Diminishing Runge Kutta [9]
+  Fluid Model                      Navier-Stokes Perfect Gas
+  Thermodynamic Model              Perfect Gas
+  Chemical Model                   Air 1 species 0 reaction
+  EM Field Model                   None
+  Beam Model                       None
+  Number of Dimensions             2
+  Number of Flux Components        4
+  _______________________________________________________________________________________________
+
+  [1]  JL Steger and RF Warming. "Flux Vector Splitting of the Inviscid Gasdynamic Equations
+       with Application to Finite-Difference Methods", Journal of Computational Physics
+       40:263-293, 1981.
+  [2]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume Flux Vector
+       Splittings for the Euler Equations", AIAA Journal 24:1453-1460, 1986.
+  [3]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes", Journal
+       of Computational Physics 43:357-372, 1981.
+  [4]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes", Journal of
+       Computational Physics 126:202-228, 1996.
+  [5]  DS Balsara, S Garain, and CW Shu. "An Efficient Class of WENO schemes with Adaptive
+       Order", Journal of Computational Physics 326:780-804, 2016.
+  [6]  M Dumbser and M Kaser. "Arbitrary High Order Non-oscillatory Finite Volume Schemes on
+       Unstructured Meshes for Linear Hyperbolic Systems", Journal of Computational Physics,
+       221:693-723, 2007.
+  [7]  P Gnoffo and  JA White. "Computational Aerothermodynamic Simulation Issues on
+       Unstructured Grids", 37th AIAA Thermophysics Conference, AIAA Paper 2004-2371, 2004.
+  [8]  B Parent. "Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows", AIAA
+       Journal, 55:141-152, 2017.
+  [9]  S Gottlieb and CW Shu. "Total Variation Diminishing Runge Kutta Schemes", Mathematics of
+       Computation, 67:73-85, 1998.
+
+  CFDWARP is a Copyright (c) 1998-2018 of Bernard Parent. Copying and distribution of CFDWARP is
+  prohibited.
+
+}
+
+
+mf=1.3^0; 
+
+is=1;
+im=round(mf*90);
+ie=im+round(mf*12);
+js=1;
+je=round(mf*30);
+
+Grid(
+  Size(is,js, ie,je);
+
+  Corners(im,js,ie,je, -1.585862E-01, -1.559604E-01, 0, 0.2);
+  Point(ie,js, 0, tan(rad(30))*1.585862E-01-1.559641E-01);
+  JoinCorners(im,js, ie,je,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
+
+  Corners(is,js,im,je, -7.937234E+00, 0, -1.585862E-01, 0.2);
+  Point(is,je, -7.937234E+00, -8.608462E-01+0.2);
+  Point(im,js, -1.585862E-01, -1.559604E-01);
+  JoinCorners(is,js, im,je,  EG,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
+  Spline(is,js,im,js, y(x), 
+-7.937234E+00,    -1.000000E+00,
+-7.735984E+00,    -9.997378E-01,
+-7.540606E+00,    -9.989717E-01,
+-7.350907E+00,    -9.977313E-01,
+-7.166698E+00,    -9.960444E-01,
+-6.987799E+00,    -9.939378E-01,
+-6.814036E+00,    -9.914366E-01,
+-6.645241E+00,    -9.885650E-01,
+-6.481253E+00,    -9.853457E-01,
+-6.321917E+00,    -9.818003E-01,
+-6.167083E+00,    -9.779495E-01,
+-6.016605E+00,    -9.738129E-01,
+-5.870346E+00,    -9.694090E-01,
+-5.728171E+00,    -9.647555E-01,
+-5.589949E+00,    -9.598691E-01,
+-5.455557E+00,    -9.547658E-01,
+-5.324874E+00,    -9.494606E-01,
+-5.197783E+00,    -9.439680E-01,
+-5.074173E+00,    -9.383016E-01,
+-4.953936E+00,    -9.324742E-01,
+-4.836966E+00,    -9.264983E-01,
+-4.723163E+00,    -9.203854E-01,
+-4.612430E+00,    -9.141466E-01,
+-4.504672E+00,    -9.077924E-01,
+-4.399800E+00,    -9.013328E-01,
+-4.297725E+00,    -8.947772E-01,
+-4.198363E+00,    -8.881345E-01,
+-4.101631E+00,    -8.814133E-01,
+-4.007452E+00,    -8.746217E-01,
+-3.915747E+00,    -8.677671E-01,
+-3.826445E+00,    -8.608570E-01,
+-3.739473E+00,    -8.538980E-01,
+-3.654762E+00,    -8.468967E-01,
+-3.572245E+00,    -8.398593E-01,
+-3.491859E+00,    -8.327915E-01,
+-3.413541E+00,    -8.256989E-01,
+-3.337230E+00,    -8.185865E-01,
+-3.262868E+00,    -8.114595E-01,
+-3.190399E+00,    -8.043223E-01,
+-3.119769E+00,    -7.971794E-01,
+-3.050923E+00,    -7.900349E-01,
+-2.983811E+00,    -7.828927E-01,
+-2.918385E+00,    -7.757565E-01,
+-2.854594E+00,    -7.686298E-01,
+-2.792394E+00,    -7.615158E-01,
+-2.731740E+00,    -7.544177E-01,
+-2.672587E+00,    -7.473382E-01,
+-2.614894E+00,    -7.402803E-01,
+-2.558620E+00,    -7.332463E-01,
+-2.503725E+00,    -7.262387E-01,
+-2.450171E+00,    -7.192598E-01,
+-2.397921E+00,    -7.123117E-01,
+-2.346940E+00,    -7.053963E-01,
+-2.297191E+00,    -6.985155E-01,
+-2.248642E+00,    -6.916710E-01,
+-2.201260E+00,    -6.848645E-01,
+-2.155012E+00,    -6.780973E-01,
+-2.109869E+00,    -6.713710E-01,
+-2.065800E+00,    -6.646867E-01,
+-2.022777E+00,    -6.580458E-01,
+-1.980770E+00,    -6.514492E-01,
+-1.939754E+00,    -6.448980E-01,
+-1.899702E+00,    -6.383932E-01,
+-1.860588E+00,    -6.319356E-01,
+-1.822387E+00,    -6.255260E-01,
+-1.785075E+00,    -6.191651E-01,
+-1.748628E+00,    -6.128535E-01,
+-1.713025E+00,    -6.065919E-01,
+-1.678243E+00,    -6.003807E-01,
+-1.644260E+00,    -5.942205E-01,
+-1.611056E+00,    -5.881116E-01,
+-1.578611E+00,    -5.820545E-01,
+-1.546905E+00,    -5.760493E-01,
+-1.515918E+00,    -5.700965E-01,
+-1.485634E+00,    -5.641961E-01,
+-1.456032E+00,    -5.583485E-01,
+-1.427097E+00,    -5.525537E-01,
+-1.398811E+00,    -5.468119E-01,
+-1.371158E+00,    -5.411231E-01,
+-1.344122E+00,    -5.354873E-01,
+-1.317687E+00,    -5.299047E-01,
+-1.291838E+00,    -5.243750E-01,
+-1.266560E+00,    -5.188984E-01,
+-1.241840E+00,    -5.134747E-01,
+-1.217663E+00,    -5.081039E-01,
+-1.194016E+00,    -5.027857E-01,
+-1.170886E+00,    -4.975201E-01,
+-1.148260E+00,    -4.923070E-01,
+-1.126125E+00,    -4.871460E-01,
+-1.104470E+00,    -4.820370E-01,
+-1.083283E+00,    -4.769798E-01,
+-1.062552E+00,    -4.719742E-01,
+-1.042266E+00,    -4.670198E-01,
+-1.022415E+00,    -4.621165E-01,
+-1.002989E+00,    -4.572640E-01,
+-9.839758E-01,    -4.524619E-01,
+-9.653669E-01,    -4.477100E-01,
+-9.471522E-01,    -4.430079E-01,
+-9.293223E-01,    -4.383553E-01,
+-9.118682E-01,    -4.337520E-01,
+-8.947808E-01,    -4.291975E-01,
+-8.780515E-01,    -4.246915E-01,
+-8.616718E-01,    -4.202336E-01,
+-8.456336E-01,    -4.158235E-01,
+-8.299287E-01,    -4.114609E-01,
+-8.145495E-01,    -4.071453E-01,
+-7.994882E-01,    -4.028763E-01,
+-7.847375E-01,    -3.986537E-01,
+-7.702903E-01,    -3.944769E-01,
+-7.561394E-01,    -3.903457E-01,
+-7.422780E-01,    -3.862595E-01,
+-7.286995E-01,    -3.822181E-01,
+-7.153974E-01,    -3.782210E-01,
+-7.023653E-01,    -3.742678E-01,
+-6.895971E-01,    -3.703582E-01,
+-6.770868E-01,    -3.664916E-01,
+-6.648285E-01,    -3.626678E-01,
+-6.528165E-01,    -3.588862E-01,
+-6.410453E-01,    -3.551466E-01,
+-6.295094E-01,    -3.514484E-01,
+-6.182035E-01,    -3.477913E-01,
+-6.071226E-01,    -3.441749E-01,
+-5.962615E-01,    -3.405988E-01,
+-5.856154E-01,    -3.370625E-01,
+-5.751795E-01,    -3.335657E-01,
+-5.649492E-01,    -3.301079E-01,
+-5.549198E-01,    -3.266888E-01,
+-5.450870E-01,    -3.233079E-01,
+-5.354464E-01,    -3.199649E-01,
+-5.259939E-01,    -3.166593E-01,
+-5.167253E-01,    -3.133908E-01,
+-5.076366E-01,    -3.101590E-01,
+-4.987239E-01,    -3.069634E-01,
+-4.899833E-01,    -3.038037E-01,
+-4.814112E-01,    -3.006795E-01,
+-4.730038E-01,    -2.975905E-01,
+-4.647578E-01,    -2.945361E-01,
+-4.566695E-01,    -2.915161E-01,
+-4.487356E-01,    -2.885300E-01,
+-4.409528E-01,    -2.855775E-01,
+-4.333179E-01,    -2.826582E-01,
+-4.258278E-01,    -2.797718E-01,
+-4.184793E-01,    -2.769179E-01,
+-4.112694E-01,    -2.740960E-01,
+-4.041953E-01,    -2.713059E-01,
+-3.972541E-01,    -2.685472E-01,
+-3.904430E-01,    -2.658195E-01,
+-3.837592E-01,    -2.631225E-01,
+-3.772001E-01,    -2.604559E-01,
+-3.707632E-01,    -2.578192E-01,
+-3.644457E-01,    -2.552121E-01,
+-3.582454E-01,    -2.526344E-01,
+-3.521597E-01,    -2.500856E-01,
+-3.461863E-01,    -2.475654E-01,
+-3.403229E-01,    -2.450735E-01,
+-3.345672E-01,    -2.426096E-01,
+-3.289169E-01,    -2.401734E-01,
+-3.233700E-01,    -2.377644E-01,
+-3.179244E-01,    -2.353825E-01,
+-3.125779E-01,    -2.330272E-01,
+-3.073286E-01,    -2.306983E-01,
+-3.021745E-01,    -2.283955E-01,
+-2.971136E-01,    -2.261184E-01,
+-2.921441E-01,    -2.238667E-01,
+-2.872642E-01,    -2.216403E-01,
+-2.824720E-01,    -2.194387E-01,
+-2.777657E-01,    -2.172616E-01,
+-2.731438E-01,    -2.151088E-01,
+-2.686044E-01,    -2.129800E-01,
+-2.641460E-01,    -2.108750E-01,
+-2.597669E-01,    -2.087933E-01,
+-2.554656E-01,    -2.067348E-01,
+-2.512405E-01,    -2.046991E-01,
+-2.470902E-01,    -2.026861E-01,
+-2.430131E-01,    -2.006954E-01,
+-2.390078E-01,    -1.987267E-01,
+-2.350729E-01,    -1.967799E-01,
+-2.312071E-01,    -1.948546E-01,
+-2.274090E-01,    -1.929505E-01,
+-2.236772E-01,    -1.910675E-01,
+-2.200105E-01,    -1.892053E-01,
+-2.164077E-01,    -1.873637E-01,
+-2.128674E-01,    -1.855423E-01,
+-2.093885E-01,    -1.837409E-01,
+-2.059699E-01,    -1.819594E-01,
+-2.026102E-01,    -1.801974E-01,
+-1.993085E-01,    -1.784548E-01,
+-1.960636E-01,    -1.767313E-01,
+-1.928744E-01,    -1.750267E-01,
+-1.897399E-01,    -1.733407E-01,
+-1.866590E-01,    -1.716731E-01,
+-1.836307E-01,    -1.700238E-01,
+-1.806541E-01,    -1.683924E-01,
+-1.777281E-01,    -1.667788E-01,
+-1.748517E-01,    -1.651828E-01,
+-1.720241E-01,    -1.636042E-01,
+-1.692444E-01,    -1.620427E-01,
+-1.665116E-01,    -1.604981E-01,
+-1.638248E-01,    -1.589703E-01,
+-1.611833E-01,    -1.574590E-01,
+-1.585862E-01,    -1.559641E-01
+);
+  Join(is,js,im,je,j,EE,0.5,1.0,1.0);
+
+
+);
+
+
+Bdry(
+  NavierStokesPerfect(
+    {
+    _________________________________________________________________________________________
+
+    Boundary Condition Type    ID    Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC      0     Inflow, supersonic
+    BDRY_OUTFLOWSUPERSONIC1    1     Outflow, supersonic, 1o
+    BDRY_SYMMETRICAL1          2     Symmetrical, 1o
+    BDRY_SYMMETRICAL2          3     Symmetrical, 2o
+    BDRY_SYMMETRICAL3          8     Symmetrical, 3o
+    BDRY_WALLTFIXED1           4     Wall, T specified, 1o
+    BDRY_WALLTFIXED2           a     Wall, T specified, 2o
+    BDRY_WALLADIABATIC1        5     Wall, adiabatic, 1o
+    BDRY_WALLADIABATIC2        b     Wall, adiabatic, 2o
+    BDRY_INFLOWSUBSONIC1       6     Subsonic Inflow 1o (Constant Tstag, Pstag at inflow)
+    BDRY_OUTFLOWSUBSONIC1      7     Subsonic Outflow 1o (Constant P at outflow)
+    BDRY_FREESTREAM1           9     Freestream, 1o, params Vx,Vy, P, T
+    _________________________________________________________________________________________
+    }
+    All(BDRY_OUTFLOWSUPERSONIC1);
+    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_SYMMETRICAL2,BDRY_INFLOWSUPERSONIC);
+    {
+    Cut(is,js,  ie,je);
+    Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
+    Link(i1,j1,  i2,j2);
+    Param(is,js,  ie,je,  BDRY_FREESTREAM1, Vx,Vy,P,T);
+    }
+  );
+);
+ 
+ 
+Model(
+  NavierStokesPerfect(
+    gamma=1.4;
+    R=286.0;        {J/kgK }
+    eta=2e-5;       {kg/ms}
+    kappa=0.03;     {W/mK}
+    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
+    Tmin=1.0e1;     Tmax=6.0e3;    {K}
+    AXISYMMETRIC=FALSE;
+    SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
+    SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
+    {
+    AddHeatPoint(0.0{x,m},0.0{y,m}, 0.1{radius,m}, 0.0{W/m});
+    }
+  );
+);
+
+
+Init(
+  NavierStokesPerfect(
+    {
+    _______________________________________________________________________________________
+
+    Initial Condition Type       Parameters
+    _______________________________________________________________________________________
+
+    INIT_TYPE1                   V[1]..V[nd],  P,  T     
+    INIT_TYPE2                   M[1]..M[nd],  P,  T     
+    INIT_TYPE3                   V[1]..V[nd],  P,  rho   
+    _______________________________________________________________________________________
+    }
+    Mx=8;
+    My=0;
+    P=5000; {Pa}
+    T=300; {K}
+    All(INIT_TYPE2,Mx,My,P,T);
+    {
+    Bdry(BDRY_WALLTFIXED1, INIT_TYPE2, Mx,My,P,T);
+    Region(is,js,  ie,je,  INIT_TYPE2, Mx,My,P,T);
+    }
+  );
+);
+
+
+Disc(
+  NavierStokesPerfect(
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.85;
+    AOWENO_gammahi=0.85;
+    INTERPOL=INTERPOL_WENO3;
+    EIGENVALCOND=EIGENVALCOND_HARTEN;
+  );
+  TVDRK(
+    METHOD=METHOD_TVDRK2;
+  );
+);
+
+
+Cycle(
+  NavierStokesPerfect(
+    xiverge=1e-3;          {residual convergence threshold}
+    rhoref=1.0;            {reference density in kg/m3}
+    aref=300.0;            {reference sound speed in m/s}
+    Uref[0]=rhoref;            
+    Uref[1]=rhoref*aref;       
+    Uref[2]=rhoref*aref;   
+    Uref[3]=rhoref*aref*aref;  
+  );
+  PredictorCorrector(
+    tmax=1e-2;    {simulation time span in seconds}
+    dt=0.025/(8*300)/mf/4;   {physical time step in seconds}
+    if (time>tmax-0.1*dt,
+      WriteDataFile(outputfilename"."round(time/dt));
+      exit(EXIT_SUCCESS);
+    );
+    if (mod(iter,50)==1,
+      WriteDataFile(outputfilename"."round(time/dt));
+    );
+    UpdateFluid(dt);
+    printf("%E %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
+           time,iter,effiter_U,ximax,i_ximax,
+           j_ximax,clipinfo);
+  );
+);
+
+
+Post(
+  {take xstation at -0.1m because xtation at -0.0001m includes a singular point and converges erratically }
+  xstation[1]=-0.1; {m}
+  numsteps=300;
+  qmin=1.0; {m/s, as small a value as possible}
+  Pback_min=400; {Pa}
+  Pback_max=40000; {Pa}
+  Aback=1.0; {m2/m}
+  for (cnt,1,1,
+    SetXstation(xstation[cnt]);
+    Pback=_Pback_xstation(Aback, Pback_min, Pback_max, numsteps, qmin);
+    Fpot=_Fpot_xstation(Pback, numsteps, qmin);
+    mdot=_mdot_xstation();
+    Tstag=_Tstag_xstation();
+    Pstag=_Pstag_xstation(numsteps);
+    Pstar=_Pstar_xstation();
+    T=_T_xstation();
+    q=_q_xstation();
+    rho=_rho_xstation();
+    htstar=_htstar_xstation();
+    printf("x      = %E m\n"
+           "Pback  = %E Pa\n"
+           "Fpot   = %E Ns/kg\n"
+           "mdot   = %E kg/ms\n"
+           "htstar = %E J/kg\n"
+           "Tstag  = %E K\n"
+           "Pstag  = %E Pa\n"
+           "Pstar  = %E Pa\n"
+           "T      = %E K\n"
+           "q      = %E m/s\n"
+           "rho    = %E kg/m3\n\n"
+           ,xstation[cnt],Pback,Fpot,mdot,htstar,Tstag,Pstag,Pstar,T,q,rho);
+  );
+);

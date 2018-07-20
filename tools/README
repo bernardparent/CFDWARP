@@ -1,0 +1,25 @@
+prandtlmeyer.c     find the x and y position of a prandtl-meyer compression surface
+inlet.c            for an external compression shcramjet, find the altitude of flight as well
+                   as all properties in the inlet given the flight Mach number and inlet length
+bdry.c             find the boundary layer thickness and skin friction coefficient of laminar
+                   and turbulent compressible/incompressible boundary layers
+shear.c            find the convective Mach number and shear layer growth of a turbulent shear layer
+inletgeom.c        finds an external compression inlet geometry given the two flow turning angles
+                   and the flight mach number and inlet length
+shock.c            finds the properties after a normal shock, given the mach number and gamma of the flow
+                   before the shock (shock is assumed stable in reference frame glued to shock)
+wedge.c            finds the properties after an oblique shock (weak solution) given gamma, and the
+                   Mach number, and the flow turning angle
+rocket_v2.c        find the x,y contours of a nozzle 
+
+
+search.sh          a script from caldera that lists the files (recursively in all subdirectories)
+                   that contain the string specified as the first argument
+subword.sh         a script that substitutes in all .c .h .i files (recursively in all subdirectories)
+                   word A (=argument 1) by word B (=argument 2)
+substr.sh          same as subword but string A (=argument 1) by string B (=argument 2)
+tarwarp.sh         a script that (if run from the directory where the warp directory is) creates
+                   a new version of warp. For example, tarwarp.sh 01nov15 would create a new directory
+                   named warp.01nov15 and create a tarball warp.01nov15.tgz copied from the current
+                   warp directory.
+                   

@@ -1,0 +1,60 @@
+mf=1.0;
+
+is=1; 
+im=round(30*mf);
+ie=round(60*mf); 
+js=1;  
+jm=round(15*mf);
+je=round(40*mf); 
+ks=1;
+km=round(10*mf);
+ke=round(20*mf);
+ 
+angleup=rad(25);
+angledown=rad(25); 
+
+
+Linj=0.1525/3;
+Lmix=0.25/2;
+Hinj=Linj*(tan(angleup)+tan(angledown));
+Hinjstart=Hinj/20.0;
+Hdom=Hinj*3.0;
+Dinj=0.0127/2;
+Ddom=0.0572/2;
+
+
+Grid3D(
+  Size(is,js,ks, ie,je,ke);
+
+  { grid injector}
+  Point(is,js,ks, -Linj,tan(angledown)*Linj,0.0e0);
+  Point(is,jm,ks, -Linj,tan(angledown)*Linj+Hinjstart,0.0e0);
+  Point(im,js,ks, 0.0,0.0,0.0e0);
+  Point(im,jm,ks, 0.0,Hinj,0.0);
+  Block(is,js,ks,im,jm,ks, EE,0.5e0,1.0,1.0, EE,0.5e0,1.0,1.0);
+  Copy(is,js,ks,im,jm,ks, is,js,km);
+  Translate(is,js,km,im,jm,km, 0.0,0.0,Dinj);
+  Join(is,js,ks,im,jm,km, k, EE,0.5e0,1.0,1.0);
+
+  {grid domain beside injector}
+  Copy(is,js,ks,im,jm,ks, is,js,ke);
+  Translate(is,js,ke,im,jm,ke, 0.0,0.0,Ddom);
+  Join(is,js,km,im,jm,ke, k, GE,0.5e0,1.0,1.0);
+
+  {grid domain above injector}
+  Point(is,je,ks, -Linj,Hdom/2.0,0.0e0);
+  Point(im,je,ks, 0.0,  Hdom,0.0);
+  Point(is,je,ke, -Linj,Hdom/2.0,Ddom);
+  Point(im,je,ke, 0.0,Hdom,Ddom);
+  Block(is,je,ks, im,je,ke, EE,0.5e0,1.0,1.0, EE,0.5e0,1.0,1.0);
+  Join(is,jm,ks, im,je,ke, j, GE,0.5e0,1.0,1.0);
+
+  {grid domain downstream of injection}   
+  Point(ie,js,ks, Lmix,0.0e0,0.0e0);
+  Point(ie,je,ks, Lmix,Hdom,0.0e0);
+  Point(ie,js,ke, Lmix,0.0e0,Ddom);
+  Point(ie,je,ke, Lmix,Hdom,Ddom);
+  Block(ie,js,ks, ie,je,ke,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
+  Join(im,js,ks, ie,je,ke, i, GE, 0.5e0,1.0e0,1.0e0);
+);
+

@@ -1,0 +1,526 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{amsmath}
+\usepackage{bm}
+
+
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\nd}{{n_{\rm d}}}
+\newcommand{\M}{{\bf M}}
+\newcommand{\N}{{\bf N}}
+\newcommand{\B}{{\bf B}}
+\newcommand{\BI}{\wbar{{\bf B}}}
+\newcommand{\A}{{\bf A}}
+\newcommand{\C}{{\bf C}}
+\newcommand{\T}{{\bf T}}
+\newcommand{\Dstar}{D^{\!\star}}
+\newcommand{\Fstar}{F^{\!\star}}
+\newcommand{\Ustar}{U^{\!\star}}
+\newcommand{\Sstar}{S^{\!\star}}
+\newcommand{\Kstar}{K^{\!\star}}
+\newcommand{\Ystar}{Y^{\!\star}}
+\newcommand{\co}{,~~}
+\newcommand{\band}{{\rm Band}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{1.0}}
+\renewcommand{\fontsizefigure}{\footnotesize}
+\renewcommand{\vec}[1]{\bm{#1}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcounter{tocdepth}{3}
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\author{
+  Bernard Parent
+}
+
+\email{
+  bernparent@gmail.com
+}
+
+\department{
+  Dept. of Aerospace Engineering	
+}
+
+\institution{
+  Pusan National University
+}
+
+\title{
+  Electromagnetic Fields Relaxation Schemes
+}
+
+\date{
+  March 2018
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+  \tableofcontents
+%  \makenomenclature
+%%  \listoftables
+%%  \listoffigures
+\sloppy
+
+\nocite{misc:1955:douglas}
+
+\section{Multigrid}
+
+\subsection{Multigrid 2D Constant Coefficients}
+
+First, let's derive the delta form on a mesh two times coarser for a 2D system with constant coefficients.
+Consider the delta form of a scalar diffusion equation with constant conductivity in 2D:
+%
+\begin{equation}
+  \sigma(\Delta^n u_{i+1,j} -4 \Delta^n u_{i,j} +\Delta^n u_{i-1,j}
+        +\Delta^n u_{i,j+1}  +\Delta^n u_{i,j-1})
+      = -r_{i,j}^n
+\label{eqn:mg2Dcc1}
+\end{equation}
+%
+Now consider the same equation evaluated at node $i+1$, $i-1$, $j+1$, $j-1$:
+%
+\begin{equation}
+  \sigma(\Delta^n u_{i+2,j} -4 \Delta^n u_{i+1,j} +\Delta^n u_{i,j}
+        +\Delta^n u_{i+1,j+1}  +\Delta^n u_{i+1,j-1})
+      = -r_{i+1,j}^n
+\label{eqn:mg2Dcc2}
+\end{equation}
+%
+%
+\begin{equation}
+  \sigma(\Delta^n u_{i,j} -4 \Delta^n u_{i-1,j} +\Delta^n u_{i-2,j}
+        +\Delta^n u_{i-1,j+1}  +\Delta^n u_{i-1,j-1})
+      = -r_{i-1,j}^n
+\label{eqn:mg2Dcc3}
+\end{equation}
+%
+%
+\begin{equation}
+  \sigma(\Delta^n u_{i+1,j+1} -4 \Delta^n u_{i,j+1} +\Delta^n u_{i-1,j+1}
+        +\Delta^n u_{i,j+2}  +\Delta^n u_{i,j})
+      = -r_{i,j+1}^n
+\label{eqn:mg2Dcc4}
+\end{equation}
+%
+%
+\begin{equation}
+  \sigma(\Delta^n u_{i+1,j-1} -4 \Delta^n u_{i,j-1} +\Delta^n u_{i-1,j-1}
+        +\Delta^n u_{i,j}  +\Delta^n u_{i,j-2})
+      = -r_{i,j-1}^n
+\label{eqn:mg2Dcc5}
+\end{equation}
+%
+Multiply Eq.\ (\ref{eqn:mg2Dcc1}) by 4 and add to it the latter four equations:
+%
+\begin{align}
+  \sigma(&
+        - 12 \Delta^n u_{i,j} 
+        +    \Delta^n u_{i+2,j} 
+        +    \Delta^n u_{i-2,j}
+        +    \Delta^n u_{i,j+2}  
+        +    \Delta^n u_{i,j-2}
+        + 2  \Delta^n u_{i+1,j+1}  
+        + 2  \Delta^n u_{i-1,j+1}\nonumber\\  
+        &+ 2  \Delta^n u_{i+1,j-1}
+        + 2  \Delta^n u_{i-1,j-1}
+       )
+      = -4 r_{i,j}^n -r_{i+1,j}^n -r_{i-1,j}^n -r_{i,j+1}^n -r_{i,j-1}^n
+\label{eqn:mg2Dcc6}
+\end{align}
+%
+Then, can say that:
+%
+\begin{equation}
+         \Delta^n u_{i+1,j+1}  
+        +   \Delta^n u_{i-1,j+1}\\  
+        +   \Delta^n u_{i+1,j-1}
+        +   \Delta^n u_{i-1,j-1}
+\approx 4 \Delta^n u_{i,j}
+\end{equation}
+%
+Thus:
+%
+\begin{align}
+  \sigma(
+        &- 4 \Delta^n u_{i,j} 
+        +    \Delta^n u_{i+2,j} 
+        +    \Delta^n u_{i-2,j}
+        +    \Delta^n u_{i,j+2}  
+        +    \Delta^n u_{i,j-2}
+       )\nonumber\\
+      &= -4 r_{i,j}^n -r_{i+1,j}^n -r_{i-1,j}^n -r_{i,j+1}^n -r_{i,j-1}^n
+\label{eqn:mg2Dcc7}
+\end{align}
+%
+
+\subsection{Multigrid 1D}
+
+Here we will derive the delta form on a mesh 2 times coarser for a 1D system with non constant coefficients. 
+%
+\begin{equation}
+  \sigma_{i+1/2} \Delta^n u_{i+1} - (\sigma_{i+1/2}+\sigma_{i-1/2}) \Delta^n u_{i} +\sigma_{i-1/2}\Delta^n u_{i-1}
+      = -r_{i}^n
+\label{eqn:mg1D1}
+\end{equation}
+%
+Now consider the same equation evaluated at node $i+1$, $i-1$:
+%
+\begin{equation}
+  \sigma_{i+3/2} \Delta^n u_{i+2} - (\sigma_{i+3/2}+\sigma_{i+1/2}) \Delta^n u_{i+1} +\sigma_{i+1/2}\Delta^n u_{i}
+      = -r_{i+1}^n
+\label{eqn:mg1D2}
+\end{equation}
+%
+%
+\begin{equation}
+  \sigma_{i-1/2} \Delta^n u_{i} - (\sigma_{i-1/2}+\sigma_{i-3/2}) \Delta^n u_{i-1} +\sigma_{i-3/2}\Delta^n u_{i-2}
+      = -r_{i-1}^n
+\label{eqn:mg1D3}
+\end{equation}
+%
+Isolate $\Delta^n u_{i+1}$ in Eq.\ (\ref{eqn:mg1D2}) and isolate $\Delta^n u_{i-1}$ in Eq.\ (\ref{eqn:mg1D3}):
+%
+\begin{equation}
+     \Delta^n u_{i+1} 
+      = \frac{r_{i+1}^n}{\sigma_{i+3/2}+\sigma_{i+1/2}} + \frac{\sigma_{i+3/2}}{\sigma_{i+3/2}+\sigma_{i+1/2}} \Delta^n u_{i+2} + \frac{\sigma_{i+1/2}}{\sigma_{i+3/2}+\sigma_{i+1/2}}\Delta^n u_{i}
+\label{eqn:mg1D4}
+\end{equation}
+%
+%
+\begin{equation}
+     \Delta^n u_{i-1} 
+      = \frac{r_{i-1}^n}{\sigma_{i-1/2}+\sigma_{i-3/2}}  + \frac{\sigma_{i-1/2}}{\sigma_{i-1/2}+\sigma_{i-3/2}} \Delta^n u_{i}  + \frac{\sigma_{i-3/2}}{\sigma_{i-1/2}+\sigma_{i-3/2}}\Delta^n u_{i-2}
+\label{eqn:mg1D5}
+\end{equation}
+%
+Substitute the latter 2 equations in Eq.\ (\ref{eqn:mg1D1}):
+%
+\begin{align}
+  \sigma_{i+1/2} \left( \frac{r_{i+1}^n}{\sigma_{i+3/2}+\sigma_{i+1/2}} + \frac{\sigma_{i+3/2}}{\sigma_{i+3/2}+\sigma_{i+1/2}} \Delta^n u_{i+2} + \frac{\sigma_{i+1/2}}{\sigma_{i+3/2}+\sigma_{i+1/2}}\Delta^n u_{i}  \right)\nonumber\\
++\sigma_{i-1/2}\left( \frac{r_{i-1}^n}{\sigma_{i-1/2}+\sigma_{i-3/2}}  + \frac{\sigma_{i-1/2}}{\sigma_{i-1/2}+\sigma_{i-3/2}} \Delta^n u_{i}  + \frac{\sigma_{i-3/2}}{\sigma_{i-1/2}+\sigma_{i-3/2}}\Delta^n u_{i-2}\right)\nonumber\\
+ - (\sigma_{i+1/2}+\sigma_{i-1/2}) \Delta^n u_{i} 
+      = -r_{i}^n
+\label{eqn:mg1D6}
+\end{align}
+%
+Simplify:
+%
+\begin{align}
+    + \frac{\sigma_{i+1/2} \sigma_{i+3/2}}{\sigma_{i+3/2}+\sigma_{i+1/2}} \Delta^n u_{i+2} + \frac{\sigma_{i+1/2}^2}{\sigma_{i+3/2}+\sigma_{i+1/2}}\Delta^n u_{i}  \nonumber\\
+  + \frac{\sigma_{i-1/2}^2}{\sigma_{i-1/2}+\sigma_{i-3/2}} \Delta^n u_{i}  + \frac{\sigma_{i-1/2}\sigma_{i-3/2}}{\sigma_{i-1/2}+\sigma_{i-3/2}}\Delta^n u_{i-2}\nonumber\\
+ - (\sigma_{i+1/2}+\sigma_{i-1/2}) \Delta^n u_{i} 
+      = -r_{i}^n - \frac{\sigma_{i+1/2} r_{i+1}^n}{\sigma_{i+3/2}+\sigma_{i+1/2}}  -  \frac{\sigma_{i-1/2} r_{i-1}^n}{\sigma_{i-1/2}+\sigma_{i-3/2}} 
+\label{eqn:mg1D6}
+\end{align}
+%
+But note that:
+%
+\begin{align}
+\frac{\sigma_{i+1/2}^2}{\sigma_{i+3/2}+\sigma_{i+1/2}} - \sigma_{i+1/2} &= \left(\frac{\sigma_{i+1/2}}{\sigma_{i+3/2}+\sigma_{i+1/2}}  -1 \right) \sigma_{i+1/2} \nonumber\\
+        &= \left(\frac{\sigma_{i+1/2}}{\sigma_{i+3/2}+\sigma_{i+1/2}}  -\frac{{\sigma_{i+3/2}+\sigma_{i+1/2}}}{{\sigma_{i+3/2}+\sigma_{i+1/2}}} \right) \sigma_{i+1/2} \nonumber\\
+        &= \left(\frac{-\sigma_{i+3/2}}{\sigma_{i+3/2}+\sigma_{i+1/2}}  \right) \sigma_{i+1/2} \nonumber\\
+        &= \frac{-\sigma_{i+1/2}\sigma_{i+3/2}}{\sigma_{i+3/2}+\sigma_{i+1/2}}   
+\end{align}
+%
+and that:
+%
+\begin{align}
+\frac{\sigma_{i-1/2}^2}{\sigma_{i-3/2}+\sigma_{i-1/2}} - \sigma_{i-1/2} = \frac{-\sigma_{i-1/2}\sigma_{i-3/2}}{\sigma_{i-3/2}+\sigma_{i-1/2}}   
+\end{align}
+%
+Substitute the latter two expressions in the former:
+%
+\begin{align}
+    + \frac{\sigma_{i+1/2} \sigma_{i+3/2}}{\sigma_{i+3/2}+\sigma_{i+1/2}} \Delta^n u_{i+2} 
+  - \left( \frac{\sigma_{i+1/2}\sigma_{i+3/2}}{\sigma_{i+3/2}+\sigma_{i+1/2}} +\frac{\sigma_{i-1/2}\sigma_{i-3/2}}{\sigma_{i-1/2}+\sigma_{i-3/2}}\right)\Delta^n u_{i}  
++ \frac{\sigma_{i-1/2}\sigma_{i-3/2}}{\sigma_{i-1/2}+\sigma_{i-3/2}}\Delta^n u_{i-2}\nonumber\\
+      = -r_{i}^n - \frac{\sigma_{i+1/2} r_{i+1}^n}{\sigma_{i+3/2}+\sigma_{i+1/2}}  -  \frac{\sigma_{i-1/2} r_{i-1}^n}{\sigma_{i-1/2}+\sigma_{i-3/2}} 
+\label{eqn:mg1D7}
+\end{align}
+%
+
+\section{Multigrid Zero-Gradient Boundary}
+
+Suppose we have a boundary condition at the boundary node $i$ such that the gradient of $u$ is maintained to zero:
+%
+\begin{equation}
+  \Delta^n u_i - \Delta^n u_{i-1} =0
+\label{eqn:mgBC1}
+\end{equation}
+%
+Further, note that the delta form at the nearby boundary node $i-1$ can be expressed as:
+%
+\begin{equation}
+  \sigma_{i-1/2} \Delta^n u_{i} - (\sigma_{i-1/2}+\sigma_{i-3/2}) \Delta^n u_{i-1} +\sigma_{i-3/2}\Delta^n u_{i-2}
+      = -r_{i-1}^n
+\label{eqn:mgBC2}
+\end{equation}
+%
+Isolate $\Delta^n u_{i-1}$ in Eq.\ (\ref{eqn:mgBC1}) and substitute in Eq.\ (\ref{eqn:mgBC2}):
+%
+\begin{equation}
+  \sigma_{i-1/2} \Delta^n u_{i} - (\sigma_{i-1/2}+\sigma_{i-3/2}) \Delta^n u_{i} +\sigma_{i-3/2}\Delta^n u_{i-2}
+      = -r_{i-1}^n
+\end{equation}
+%
+Simplify:
+%
+\begin{equation}
+   - \sigma_{i-3/2} \Delta^n u_{i} +\sigma_{i-3/2}\Delta^n u_{i-2}
+      = -r_{i-1}^n
+\end{equation}
+%
+
+
+\section{Multigrid 1D Boundary}
+
+Consider the discretization equation at the right boundary node $i,j$:
+%
+\begin{equation}
+   a_{i,j} \Delta^n u_{i-1,j} 
++  b_{i,j} \Delta^n u_{i,j} 
+=  {\rm RHS}_{i,j}  
+\end{equation}
+%
+and the discretization equation at the near boundary node:
+%
+\begin{equation}
+   a_{i-1,j} \Delta^n u_{i-2,j} 
++  b_{i-1,j} \Delta^n u_{i-1,j} 
++  c_{i-1,j} \Delta^n u_{i,j} 
+= {\rm RHS}_{i-1,j}  
+\end{equation}
+%
+Isolate $\Delta^n u_{i-1,j}$ in the latter and substitute in the former:
+%
+\begin{equation}
+-  \frac{a_{i,j} a_{i-1,j}}{b_{i-1,j}} \Delta^n u_{i-2,j} 
++  \left( b_{i,j} -  \frac{a_{i,j} c_{i-1,j}}{b_{i-1,j}}\right) \Delta^n u_{i,j} 
+=  {\rm RHS}_{i,j}  
+-\frac{a_{i,j} {\rm RHS}_{i-1,j}}{b_{i-1,j}}  
+\end{equation}
+%
+Consider the discretization equation at the left boundary node $i,j$:
+%
+\begin{equation}
+   b_{i,j} \Delta^n u_{i,j} 
++  c_{i,j} \Delta^n u_{i+1,j} 
+=  {\rm RHS}_{i,j}  
+\end{equation}
+%
+and the discretization equation at the near boundary node:
+%
+\begin{equation}
+   a_{i+1,j} \Delta^n u_{i,j} 
++  b_{i+1,j} \Delta^n u_{i+1,j} 
++  c_{i+1,j} \Delta^n u_{i+2,j} 
+= {\rm RHS}_{i+1,j}  
+\end{equation}
+%
+Isolate $\Delta^n u_{i+1,j}$ in the latter and substitute in the former:
+%
+\begin{equation}
+-  \frac{c_{i+1,j}c_{i,j}}{b_{i+1,j}} \Delta^n u_{i+2,j} 
++ \left( b_{i,j} -  \frac{a_{i+1,j}c_{i,j}}{b_{i+1,j}}  \right)\Delta^n u_{i,j} 
+=  {\rm RHS}_{i,j}  
+ -\frac{c_{i,j} {\rm RHS}_{i+1,j}}{b_{i+1,j}}  
+\end{equation}
+%
+
+
+
+
+
+\section{Multigrid 2D}
+
+Here we will derive the delta form on a mesh 2 times coarser for a 1D system with non constant coefficients. 
+%
+\begin{align}
+   a_{i,j} \Delta^n u_{i-1,j} 
++  b_{i,j} \Delta^n u_{i,j} 
++  c_{i,j} \Delta^n u_{i+1,j} 
++  d_{i,j} \Delta^n u_{i,j-1} 
++  e_{i,j} \Delta^n u_{i,j+1} 
+= -r_{i,j}^n
+\label{eqn:mg2D1}
+\end{align}
+%
+Now consider the same equation evaluated at node $i+1$, $i-1$, $j+1$, $j-1$:
+%
+\begin{align}
+   a_{i+1,j} \Delta^n u_{i,j} 
++  b_{i+1,j} \Delta^n u_{i+1,j} 
++  c_{i+1,j} \Delta^n u_{i+2,j} 
++  d_{i+1,j} \Delta^n u_{i+1,j-1} 
++  e_{i+1,j} \Delta^n u_{i+1,j+1} 
+= -r_{i+1,j}^n
+\label{eqn:mg2D2}
+\end{align}
+%
+%
+\begin{align}
+   a_{i-1,j} \Delta^n u_{i-2,j} 
++  b_{i-1,j} \Delta^n u_{i-1,j} 
++  c_{i-1,j} \Delta^n u_{i,j} 
++  d_{i-1,j} \Delta^n u_{i-1,j-1} 
++  e_{i-1,j} \Delta^n u_{i-1,j+1} 
+= -r_{i-1,j}^n
+\label{eqn:mg2D3}
+\end{align}
+%
+%
+\begin{align}
+   a_{i,j+1} \Delta^n u_{i-1,j+1} 
++  b_{i,j+1} \Delta^n u_{i,j+1} 
++  c_{i,j+1} \Delta^n u_{i+1,j+1} 
++  d_{i,j+1} \Delta^n u_{i,j} 
++  e_{i,j+1} \Delta^n u_{i,j+2} 
+= -r_{i,j+1}^n
+\label{eqn:mg2D4}
+\end{align}
+%
+%
+\begin{align}
+   a_{i,j-1} \Delta^n u_{i-1,j-1} 
++  b_{i,j-1} \Delta^n u_{i,j-1} 
++  c_{i,j-1} \Delta^n u_{i+1,j-1} 
++  d_{i,j-1} \Delta^n u_{i,j-2} 
++  e_{i,j-1} \Delta^n u_{i,j} 
+= -r_{i,j-1}^n
+\label{eqn:mg2D5}
+\end{align}
+%
+
+
+Rearrange:
+%
+\begin{align}
+   \Delta^n u_{i+1,j} 
+=-   \frac{a_{i+1,j}}{b_{i+1,j}} \Delta^n u_{i,j} 
+-  \frac{c_{i+1,j}}{b_{i+1,j}} \Delta^n u_{i+2,j} 
+-  \frac{d_{i+1,j}}{b_{i+1,j}} \Delta^n u_{i+1,j-1} 
+-  \frac{e_{i+1,j}}{b_{i+1,j}} \Delta^n u_{i+1,j+1} 
+ -\frac{r_{i+1,j}^n}{b_{i+1,j}}
+\label{eqn:mg2D6}
+\end{align}
+%
+%
+\begin{align}
+   \Delta^n u_{i-1,j} 
+= - \frac{a_{i-1,j}}{b_{i-1,j}} \Delta^n u_{i-2,j} 
+-  \frac{c_{i-1,j}}{b_{i-1,j}} \Delta^n u_{i,j} 
+-  \frac{d_{i-1,j}}{b_{i-1,j}} \Delta^n u_{i-1,j-1} 
+-  \frac{e_{i-1,j}}{b_{i-1,j}} \Delta^n u_{i-1,j+1} 
+-  \frac{r_{i-1,j}^n}{b_{i-1,j}}
+\label{eqn:mg2D7}
+\end{align}
+%
+%
+\begin{align}
+   \Delta^n u_{i,j+1} 
+=
+-   \frac{a_{i,j+1}}{b_{i,j+1}} \Delta^n u_{i-1,j+1} 
+-  \frac{c_{i,j+1}}{b_{i,j+1}} \Delta^n u_{i+1,j+1} 
+-  \frac{d_{i,j+1}}{b_{i,j+1}} \Delta^n u_{i,j} 
+-  \frac{e_{i,j+1}}{b_{i,j+1}} \Delta^n u_{i,j+2} 
+-  \frac{r_{i,j+1}^n}{b_{i,j+1}}
+\label{eqn:mg2D8}
+\end{align}
+%
+%
+\begin{align}
+   \Delta^n u_{i,j-1} 
+=
+-  \frac{a_{i,j-1}}{b_{i,j-1}} \Delta^n u_{i-1,j-1} 
+-  \frac{c_{i,j-1}}{b_{i,j-1}} \Delta^n u_{i+1,j-1} 
+-  \frac{d_{i,j-1}}{b_{i,j-1}} \Delta^n u_{i,j-2} 
+-  \frac{e_{i,j-1}}{b_{i,j-1}} \Delta^n u_{i,j} 
+-  \frac{r_{i,j-1}^n}{b_{i,j-1}}
+\label{eqn:mg2D9}
+\end{align}
+%
+Substitute the latter 4 equations in Eq.\ (\ref{eqn:mg2D10}):
+%
+\begin{align}
++ \left( b_{i,j} -  \frac{a_{i,j} c_{i-1,j}}{b_{i-1,j}} -   \frac{c_{i,j} a_{i+1,j}}{b_{i+1,j}} 
+        -  \frac{d_{i,j} e_{i,j-1}}{b_{i,j-1}} -  \frac{e_{i,j} d_{i,j+1}}{b_{i,j+1}} \right) \Delta^n u_{i,j} 
+ \nonumber\\
+- \frac{a_{i,j} a_{i-1,j}}{b_{i-1,j}} \Delta^n u_{i-2,j} 
+-  \frac{c_{i,j} c_{i+1,j}}{b_{i+1,j}} \Delta^n u_{i+2,j} 
+-  \frac{d_{i,j} d_{i,j-1}}{b_{i,j-1}} \Delta^n u_{i,j-2} 
+-  \frac{e_{i,j} e_{i,j+1}}{b_{i,j+1}} \Delta^n u_{i,j+2} 
+\nonumber\\
+-  \left(\frac{c_{i,j} d_{i+1,j}}{b_{i+1,j}}+\frac{d_{i,j} c_{i,j-1}}{b_{i,j-1}}\right) \Delta^n u_{i+1,j-1} 
+-  \left(\frac{c_{i,j} e_{i+1,j}}{b_{i+1,j}}+\frac{e_{i,j} c_{i,j+1}}{b_{i,j+1}} \right)\Delta^n u_{i+1,j+1} 
+\nonumber\\
+-  \left(\frac{d_{i,j} a_{i,j-1}}{b_{i,j-1}}+\frac{a_{i,j} d_{i-1,j}}{b_{i-1,j}}\right) \Delta^n u_{i-1,j-1} 
+-   \left(\frac{e_{i,j} a_{i,j+1}}{b_{i,j+1}}+\frac{a_{i,j} e_{i-1,j}}{b_{i-1,j}}\right) \Delta^n u_{i-1,j+1} 
+\nonumber\\
+= -r_{i,j}^n
++  \frac{a_{i,j} r_{i-1,j}^n}{b_{i-1,j}}
++  \frac{c_{i,j} r_{i+1,j}^n}{b_{i+1,j}}
++  \frac{d_{i,j} r_{i,j-1}^n}{b_{i,j-1}}
++  \frac{e_{i,j} r_{i,j+1}^n}{b_{i,j+1}}
+\label{eqn:mg2D10}
+\end{align}
+%
+
+
+
+  \bibliographystyle{warpdoc}
+  \bibliography{all}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

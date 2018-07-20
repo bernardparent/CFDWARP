@@ -1,0 +1,22 @@
+
+  _______________________________________________________________________________________________
+
+                                           C F D W A R P
+
+                               A CFD Code for Plasma & Reactive Flow
+  _______________________________________________________________________________________________
+
+
+
+  CFDWARP is a Copyright of Bernard Parent. Copyright (c) 1998-2018. All Rights Reserved.                                
+
+
+  - Please read the file LICENSE for terms of usage.
+
+  - Please read the file COMPILE for compilation instructions on a UNIX machine.
+
+  - Please read the file USAGE for instructions on how to operate the CFDWARP code.
+ 
+  - Please refer to the manuals lib/gridg/doc/report.pdf and lib/soap/doc/report.pdf for 
+    information on the SOAP interpreter language and the GRIDG grid generation library used 
+    within the CFDWARP control file.

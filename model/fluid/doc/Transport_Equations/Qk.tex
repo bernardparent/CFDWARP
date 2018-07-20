@@ -1,0 +1,118 @@
+
+The turbulent kinetic energy production term can be written in Cartesian coordinates as:
+%
+%
+\begin{equation}
+Q_k=\sum_{i=1}^{3} \sum_{j=1}^{3} \frac{\partial \vec{V}^{\rm n}_i}{\partial x_j} \left( \eta^\star \left( \frac{\partial \vec{V}^{\rm n}_i}{\partial x_j}
+   + \frac{\partial \vec{V}^{\rm n}_j}{\partial x_i} -\frac{2}{3} \delta_{ij} \sum_{k=1}^{3} \frac{\partial \vec{V}^{\rm n}_k}{\partial x_k}\right) -\frac{2}{3} \rho k \delta_{ij}\right)
+\end{equation}
+%
+where the velocity of the neutrals can be expressed in generalized coordinates as:
+%
+\begin{equation}
+\frac{\partial \vec{V}^{\rm n}_i}{\partial x_j}=\sum_{\theta=1}^{3} X_{\theta,j} \frac{\partial \vec{V}^{\rm n}_i}{\partial X_\theta}
+\end{equation}
+%
+Sustitute the latter in the former:
+%
+\begin{align}
+Q_k=&\sum_{i=1}^{3} \sum_{j=1}^{3} \sum_{\vartheta=1}^{3} X_{\vartheta,j} \frac{\partial \vec{V}^{\rm n}_i}{\partial X_\vartheta} \left( \eta^\star \left( \sum_{\theta=1}^{3} X_{\theta,j} \frac{\partial \vec{V}^{\rm n}_i}{\partial X_\theta}
+   + \sum_{\theta=1}^{3} X_{\theta,i} \frac{\partial \vec{V}^{\rm n}_j}{\partial X_\theta} 
+-\frac{2}{3} \delta_{ij} \sum_{k=1}^{3} \sum_{\theta=1}^{3} X_{\theta,k} \frac{\partial \vec{V}^{\rm n}_k}{\partial X_\theta}\right)
+\right. \nonumber \alb\mfd
+&\left.
+ -\frac{2}{3} \rho k \delta_{ij}\right)
+\end{align}
+%
+%
+\begin{align}
+Q_k=&\sum_{i=1}^{3} \sum_{j=1}^{3} \sum_{\vartheta=1}^{3} \sum_{\theta=1}^{3} X_{\vartheta,j} \frac{\partial \vec{V}^{\rm n}_i}{\partial X_\vartheta}
+  \eta^\star
+    \left(  X_{\theta,j} \frac{\partial \vec{V}^{\rm n}_i}{\partial X_\theta}
+       + X_{\theta,i} \frac{\partial \vec{V}^{\rm n}_j}{\partial X_\theta} 
+-\frac{2}{3} \delta_{ij} \sum_{k=1}^{3}  X_{\theta,k} \frac{\partial \vec{V}^{\rm n}_k}{\partial X_\theta}
+    \right)
+ \nonumber \alb\mfd
+&
+ -\sum_{i=1}^{3} \sum_{\vartheta=1}^{3} X_{\vartheta,i} \frac{\partial \vec{V}^{\rm n}_i}{\partial X_\vartheta} \frac{2}{3} \rho k
+\end{align}
+%
+%
+\begin{align}
+Q_k=&\sum_{i=1}^{3} \sum_{j=1}^{3} \sum_{\vartheta=1}^{3} \sum_{\theta=1}^{3} X_{\vartheta,j} \frac{\partial \vec{V}^{\rm n}_i}{\partial X_\vartheta}
+  \eta^\star
+    \left(  X_{\theta,j} \frac{\partial \vec{V}^{\rm n}_i}{\partial X_\theta}
+       + X_{\theta,i} \frac{\partial \vec{V}^{\rm n}_j}{\partial X_\theta} -\frac{2}{3} \delta_{ij} \sum_{k=1}^{3}  X_{\theta,k} \frac{\partial \vec{V}^{\rm n}_k}{\partial X_\theta}
+    \right)\nonumber
+\alb\mfd
+ &-\sum_{\theta=1}^{3} \sum_{\vartheta=1}^{3} X_{\theta,\vartheta} \frac{\partial \vec{V}^{\rm n}_\vartheta}{\partial X_\theta} \frac{2}{3} \rho k
+\end{align}
+%
+%
+\begin{align}
+Q_k=& \sum_{\vartheta=1}^{3} \sum_{\theta=1}^{3}
+  \left[
+    \sum_{i=1}^{3} \sum_{j=1}^{3} X_{\vartheta,j} \frac{\partial \vec{V}^{\rm n}_i}{\partial X_\vartheta}
+    \eta^\star
+    \left(  X_{\theta,j} \frac{\partial \vec{V}^{\rm n}_i}{\partial X_\theta}
+       + X_{\theta,i} \frac{\partial \vec{V}^{\rm n}_j}{\partial X_\theta} -\frac{2}{3} \delta_{ij} \sum_{k=1}^{3}  X_{\theta,k} \frac{\partial \vec{V}^{\rm n}_k}{\partial X_\theta}
+    \right)
+\right.\nonumber\alb\mfd
+&\left.
+    -\frac{2}{3} \rho k X_{\theta,\vartheta} \frac{\partial \vec{V}^{\rm n}_\vartheta}{\partial X_\theta}
+  \right]
+\end{align}
+%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%
+\begin{align}
+Q_k= &\sum_{\vartheta=1}^{3} \sum_{\theta=1}^{3}
+  \left[
+    \sum_{i=1}^{3} \sum_{j=1}^{3} \sum_{m=1}^{3} \sum_{n=1}^{3}
+    \eta^\star X_{\theta,n} X_{\vartheta,m} \frac{\partial \vec{V}^{\rm n}_i}{\partial X_\theta} \frac{\partial \vec{V}^{\rm n}_j}{\partial X_\vartheta}
+    \left(
+     \delta_{ij} \delta_{mn} +\delta_{mi} \delta_{nj} - \frac{2}{3} \delta_{mj} \delta_{ni}
+    \right)
+\right.\nonumber\alb\mfd
+&\left.
+    -\frac{2}{3} \rho k X_{\theta,\vartheta} \frac{\partial \vec{V}^{\rm n}_\vartheta}{\partial X_\theta}
+  \right]
+\end{align}
+%
+we can express $\beta$ as:
+%
+%
+\begin{equation}
+  \beta_{\theta, \vartheta}^{ij}
+  =\sum_{m=1}^3 \sum_{n=1}^3 \frac{1}{J}  X_{\vartheta,m} X_{\theta,n}
+    \left(
+      \delta_{mn}\delta_{ij}+\delta_{im}\delta_{jn}-\frac{2}{3} \delta_{in}\delta_{jm}
+    \right)
+\end{equation}
+%
+hence resulting in:
+%
+\begin{equation}
+Q_k=\sum_{\theta=1}^{3} \sum_{\vartheta=1}^{3}
+\left( -\frac{2}{3}  \rho k X_{\theta,\vartheta} \frac{\partial \vec{V}^{\rm n}_\vartheta}{\partial X_\theta}
++ \sum_{i=1}^{3} \sum_{j=1}^{3} \eta^\star
+ J \beta_{\theta,\vartheta}^{i,j} \frac{\partial \vec{V}^{\rm n}_i}{\partial X_\theta} \frac{\partial \vec{V}^{\rm n}_j}{\partial X_\vartheta}\right)
+\end{equation}
+%
+

@@ -1,0 +1,765 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{amsmath}
+\usepackage{bm}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\nd}{{n_{\rm d}}}
+\newcommand{\M}{{\bf M}}
+\newcommand{\N}{{\bf N}}
+\newcommand{\B}{{\bf B}}
+\newcommand{\BI}{\overline{{\bf B}}}
+\newcommand{\A}{{\bf A}}
+\newcommand{\C}{{\bf C}}
+\newcommand{\T}{{\bf T}}
+\newcommand{\co}{,~~}
+\newcommand{\band}{{\rm Band}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{1.0}}
+\renewcommand{\fontsizefigure}{\footnotesize}
+\renewcommand{\vec}[1]{\bm{#1}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcounter{tocdepth}{3}
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\author{
+  Bernard Parent
+}
+
+\email{
+  bernparent@gmail.com
+}
+
+\department{
+  Department of Aerospace Engineering	
+}
+
+\institution{
+  Pusan National University
+}
+
+\title{
+  Residual Discretization 
+}
+
+\date{
+  August 2015
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+\sloppy
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+  \tableofcontents
+%  \makenomenclature
+%%  \listoftables
+%%  \listoffigures
+
+
+
+\section{Discretized Form of the Residual}
+
+The residual associated with the governing equations solved in WARP can be written in Cartesian coordinates as:
+%
+\begin{equation}
+ R=   Z\frac{\partial U}{\partial t} + \sum_{i=1}^3  \frac{\partial }{\partial x_i} D_i U
+   + \sum_{i=1}^3 \frac{\partial F_i}{\partial x_i} 
+     - \sum_{i=1}^3 \sum_{j=1}^3 \frac{\partial }{\partial x_j}\left( K_{ij} \frac{\partial G}{\partial x_i} \right)
+     +\sum_{i=1}^3 Y_i \frac{\partial H}{\partial x_i}  
+   -S
+\end{equation}
+%
+We can write the latter in more compact form as follows:
+%
+\begin{equation}
+ R=   Z \partial_t U + \sum_{i=1}^3  \partial_{x_i} (D_i U)
+   + \sum_{i=1}^3 \partial_{x_i} F_i 
+     - \sum_{i=1}^3 \sum_{j=1}^3 \partial_{x_j}\left( K_{ij}  \partial_{x_i}G \right)
+     +\sum_{i=1}^3 Y_i  \partial_{x_i} H  
+   -S
+\end{equation}
+%
+When discretized, the latter becomes:
+%
+\begin{equation}
+R_\Delta = Z\delta_t U + \sum_{i=1}^3  \delta_{x_i} (D_i U)
+   + \sum_{i=1}^3 \delta_{x_i} F_i 
+     - \sum_{i=1}^3 \sum_{j=1}^3 \delta_{x_j}\left( K_{ij} \delta_{x_i} G \right)
+     +\sum_{i=1}^3 Y_i \delta_{x_i} H -S_\Delta
+\end{equation}
+%
+In the following sections the discretization stencils needed for all terms within the discretized residual are outlined.
+Although the stencils are here given in Cartesian coordinates, they can also be used in curvilinear coordinates simply by setting $\Delta x =\Delta y =\Delta z =1$ and by substituting the vectors and matrices by their curvilinear analogues (i.e.\ $F \rightarrow F^\star$, $K \rightarrow K^\star$, $Y \rightarrow Y^\star$, etc).
+
+
+
+\section{Discretization of $\partial_x F$}
+
+The discretization of the convective flux $F$ is particularly challenging to accomplish for compressible flow. Several schemes using the eigenstructure of the convective flux Jacobian $A$ are here presented. For the schemes that rely on a dimensional splitting strategy, the discretization stencil is the following:
+%
+\begin{equation}
+\delta_x F = \frac{F_{i+1/2}-F_{i-1/2}}{\Delta x}
+\end{equation}
+%
+where the flux at the interface $F_{i+1/2}$ is outlined for each scheme below. Note that the latter is not used for the genuinely multidimensional schemes that do not resort to dimensional splitting. More details on how the multidimensional schemes are discretized will be given in their respective subsections.   
+
+
+\subsection{Flux Vector Splitting First-Order Steger-Warming}
+
+
+For the Steger-Warming flux vector splitting scheme, the flux at the interface becomes \cite{jcp:1981:steger}:
+%
+\begin{equation}
+F_{i+1/2}=F^+_{i}
+         +F^-_{i+1}
+\label{eqn:FVS_1o}
+\end{equation}
+%
+where 
+%
+\begin{equation}
+F^\pm \equiv  L^{-1} \Lambda^\pm L U
+\label{eqn:Fplusminus}
+\end{equation}
+%
+with 
+%
+\begin{equation}
+\Lambda^\pm \equiv \frac{1}{2}(\Lambda\pm|\Lambda|)
+\label{eqn:Lambdaplusminus}
+\end{equation}
+%
+In the latter, $\Lambda$ is the eigenvalue matrix, $L$  the left eigenvector matrix, and $L^{-1}$ the right eigenvector matrix.
+
+
+
+
+\subsection{Flux Vector Splitting Second-Order MUSCL}
+
+Following the so-called MUSCL-TVD approach outlined in Ref.\ \citen{aiaa:1986:anderson}, the Steger-Warming scheme can be extended to second-order accuracy by rewriting the flux at the interface in the following form:
+%
+\begin{equation}
+F_{i+1/2}=F^+\left(U^{\rm L}_{i+1/2}\right)
+         +F^-\left(U^{\rm R}_{i+1/2}\right)
+\end{equation}
+%
+where $F^\pm$ is determined as in Eq.\ (\ref{eqn:Fplusminus}) and where $U^{\rm L}_{i+1/2}$ and $U^{\rm R}_{i+1/2}$ are vectors reconstructed from extrapolated primitive variables. For instance, the temperature, velocity, and density needed to reconstruct $U^{\rm L}_{i+1/2}$ are extrapolated using a limiter with a leftward bias such as:
+%
+\begin{equation}
+T^{\rm L}_{i+1/2}=T_i + \mfd\frac{1}{2}(T_i-T_{i-1}) f_{\rm lim}\left(\frac{T_{i+1}-T_i}{T_i-T_{i-1}}   \right)
+\end{equation}
+%
+On the other hand, the temperature, velocity, and density needed to reconstruct the vector $U^{\rm R}_{i+1/2}$ are extrapolated using a limiter with a rightward bias such as: 
+%
+\begin{equation}
+T^{\rm R}_{i+1/2}=T_{i+1} + \mfd\frac{1}{2}(T_{i+1}-T_{i+2}) \, f_{\rm lim}\left(\frac{T_{i}-T_{i+1}}{T_{i+1}-T_{i+2}}  \right) 
+\end{equation}
+%
+where $f_{\rm lim}$ is the limiter function. The limiter function  must fall within a certain admissible limiter region to yield high-resolution TVD schemes. Three such limiter functions are the Van Leer, minmod, and superbee limiters \cite{jcp:1974:vanleer,arfm:1986:roe}:
+%
+\begin{equation}
+{f_{\rm lim}}(b) =
+\left\{
+\begin{array}{ll}
+{\rm max} \left( 0,~ 
+{\rm min} \left( 1, \, b  \right) \right)&{\rm (minmod)}\alb
+  (b+|b|)/(1+|b|) & ({\rm Van~Leer})\alb
+  {\rm max} \left( 0,~ 
+{\rm min} \left( 2, \, b  \right) ,~
+{\rm min} \left( 1, \, 2 b  \right) 
+\right) & {\rm (superbee)}
+\end{array}
+\right.
+\label{eqn:limiterfunction}
+\end{equation}
+%
+When used in conjunction with Eq.\ (\ref{eqn:FVS_2o}) the latter limiter functions have the property to yield symmetric discretization stencils. That is, the discretization stencils are such that the discrete solution of a leftward-travelling wave is symmetric to the one of a rightward-travelling wave.
+
+The latter has been shown to be positivity-preserving \cite{aiaaconf:1997:linde}. However, more recent studies indicate that the Steger-Warming MUSCL scheme is not positivity-preserving for 2D or 3D flows.
+
+
+
+\subsection{Flux Vector Splitting Second-Order Van Leer}
+
+
+The Steger-Warming Flux Vector Splitting (FVS) scheme \cite{jcp:1981:steger} can be extended to second-order accuracy through a Total Variation Diminishing (TVD) scheme as follows:
+%
+\begin{equation}
+\begin{array}{r}
+\mfd
+F_{i+1/2}=
+  F_i^+ 
++\frac{1}{2} \Phi^+_{i+1/2} \left(  F_i^+  -  F_{i-1}^+\right)  
++F_{i+1}^-
++\frac{1}{2} \Phi^-_{i+1/2} \left( F_{i+1}^- -  F_{i+2}^-\right) 
+\end{array}
+\label{eqn:FVS_2o}
+\end{equation}
+%
+where $F^\pm$ is determined as in Eq.\ (\ref{eqn:Fplusminus}) and where the flux limiter matrix $\Phi$ is a diagonal matrix with the elements on the diagonal being greater or equal to 0 and less or equal to 2.  By setting the limiter matrix to the identity matrix (i.e. $\Phi^\pm=I$), a piecewise-linear distribution of the convective fluxes is in effect, hence resulting in a second-order-accurate scheme. On the other hand, setting  the flux limiter matrix to zero (i.e. $\Phi^\pm=0$) yields a first-order-accurate scheme by forcing a piecewise-constant spatial distribution of the convective fluxes. Because the diagonal elements of the limiter matrix are not necessarily equal to each other, it is possible to limit each flux component independently (i.e. component-wise flux limiting). 
+
+For a scalar conservation law, the monotonicity of the solution can be preserved by imposing the Total Variation Diminishing (TVD) condition on the limiter. For a system of conservation laws, it is a common practice to impose the TVD condition on each flux component, independently of the other components (while this does not guarantee monotonicity-preservation of all properties per se, this yields a solution that is close to being monotonicity-preserving). This can be done by setting the diagonal elements of the limiter matrices $\Phi^+$ and $\Phi^-$ as follows: 
+%
+\begin{equation}
+\left[\Phi_{i+1/2}^-\right]_{r,r} =  {f_{\rm lim}}\left(\mfd\frac{\left[F_{i}^-\right]_r -\left[F_{i+1}^-\right]_r}{\left[F_{i+1}^-\right]_r-\left[F_{i+2}^-\right]_r}  \right) 
+\label{eqn:psiminus}
+\end{equation}
+%
+\begin{equation}
+\left[\Phi_{i+1/2}^+\right]_{r,r} =  {f_{\rm lim}}\left(\mfd\frac{\left[F_{i+1}^+\right]_r -\left[F_{i}^+\right]_r}{\left[F_{i}^+\right]_r-\left[F_{i-1}^+\right]_r}  \right)
+\label{eqn:psiplus}
+\end{equation}
+%
+%
+where $f_{\rm lim}$ is the limiter function outlined in Eq.\ (\ref{eqn:limiterfunction}). 
+
+
+
+
+
+\subsection{Flux Vector Splitting Second-Order Van Leer Positive}
+
+
+Following Parent \cite{jcp:2012:parent}, a second-order accurate positivity-preserving version of the Steger-Warming flux vector splitting is the following:
+%
+\begin{equation}
+F_{i+1/2}=
+  F_i^+ 
++\frac{1}{2} L^{-1}_i \Psi^+_{i+1/2} \left(  G_i^+  -  G_{i-1}^+\right)  
++F_{i+1}^-
++\frac{1}{2} L^{-1}_{i+1} \Psi^-_{i+1/2} \left( G_{i+1}^- -  G_{i+2}^-\right) 
+\label{eqn:FVS_2o_plus}
+\end{equation}
+%
+where $G^\pm=\Lambda^\pm L U$, $F^\pm = L^{-1} G^\pm$, $\Lambda^\pm=\frac{1}{2}(\Lambda\pm|\Lambda|)$,  $L$ the left eigenvector matrix, $L^{-1}$ the right eigenvector matrix, $\Lambda$ the eigenvalue matrix, $U$ the vector of conserved variables, and $\Psi^\pm$ some diagonal matrices. The diagonal matrices $\Psi^-$ and $\Psi^+$ correspond to:
+%
+\begin{align}
+  \left[\Psi^-_{i+1/2}\right]_{r,r}
+=
+{\rm max} &\left\{-\left|  \frac{\xi  \left[G_{i+1}^-\right]_r}{\left[G_{i+1}^- - G_{i+2}^-\right]_r } \right|,
+\right.\nonumber\alb
+&~~~{\rm min} \left.\left(\frac{ \left[L_{i+1} \Phi^-_{i+1/2} \left( F_{i+1}^- -  F_{i+2}^-\right) \right]_r }{ \left[ G_{i+1}^- -  G_{i+2}^-\right]_r },
+ \left|  \frac{\xi   \left[G_{i+1}^-\right]_r}{\left[G_{i+1}^- - G_{i+2}^-\right]_r } \right|
+\right)\right\}
+\end{align}
+%
+%
+\begin{align}
+  \left[\Psi^+_{i+1/2}\right]_{r,r} 
+= 
+{\rm max} &\left\{
+-\left| \frac{\xi  \left[G_{i}^+\right]_r}{\left[G_{i}^+ - G_{i-1}^+\right]_r}\right|,~
+\right.\nonumber\alb
+&~~~{\rm min} \left. \left(
+ \frac{\left[L_i \Phi^+_{i+1/2} \left(  F_i^+  -  F_{i-1}^+\right)\right]_r}{\left[  G_i^+  -  G_{i-1}^+\right]_r}~,
+\left| \frac{\xi  \left[G_{i}^+\right]_r}{\left[G_{i}^+ - G_{i-1}^+\right]_r}\right|
+\right)
+\right\}
+\end{align}
+%
+where the limiter matrices $\Phi^-$ and $\Phi^+$ are determined as:
+%
+\begin{equation}
+\left[\Phi_{i+1/2}^-\right]_{r,r} =  {f_{\rm lim}}\left(\mfd\frac{\left[F_{i}^-\right]_r -\left[F_{i+1}^-\right]_r}{\left[F_{i+1}^-\right]_r-\left[F_{i+2}^-\right]_r}  \right) 
+\end{equation}
+%
+%
+\begin{equation}
+\left[\Phi_{i+1/2}^+\right]_{r,r} =  {f_{\rm lim}}\left(\mfd\frac{\left[F_{i+1}^+\right]_r -\left[F_{i}^+\right]_r}{\left[F_{i}^+\right]_r-\left[F_{i-1}^+\right]_r}  \right)
+\end{equation}
+%
+where $f_{\rm lim}$ is the flux limiter function outlined in Eq.\ (\ref{eqn:limiterfunction}).
+The schemes outlined above achieve high resolution through the use of component-wise flux limiting and are guaranteed to be positivity-preserving as long as the user-specified constant $\xi$ is within the following range:
+%
+\begin{equation}
+0 < \xi < 2
+\label{eqn:xi}
+\end{equation}
+%
+The higher $\xi$ is, the less dissipative the stencil becomes. Because of round-off errors due to the use of real or double precision numbers, and because of small errors due to compiler optimization, $\xi$ should be set to a value slightly below 2. For the 1D problems considered herein, $\xi$ can be set to as high 1.99 without resulting in negative internal energies or densities. However, for certain 2D or 3D problems, it is necessary to decrease $\xi$ further. As well, it is found that fixing $\xi$ to a value 10\% less than its theoretical maximum helps to prevent divergence at high time steps. For these reasons,  $\xi$ is set to 1.8 for all test cases here considered.  
+
+
+For the scheme to be positivity-preserving, it is further necessary to restrict the local time step as follows:
+%
+\begin{equation}
+\Delta t
+<
+\frac{\Delta x}{   
+2 \left(\left[\Lambda^+ \right]_{r,r}-\left[\Lambda^- \right]_{r,r}\right)
+}~~\forall r
+\end{equation}
+%
+Or, noting that $\Lambda^\pm=\frac{1}{2} (\Lambda \pm |\Lambda|)$, we can also write the latter condition as:
+%
+\begin{equation}
+\Delta t
+<
+\frac{\Delta x}{   
+2 \left|\Lambda \right|_{r,r}
+}~~\forall r
+\end{equation}
+%
+When solving the Euler equations, the latter can be easily shown to correspond to the CFL condition. In 2D and 3D, the time step would need to be further decreased by 2 and 3 times, respectively.
+
+
+
+
+\subsection{Flux Difference Splitting First-Order Roe}
+
+The Roe flux difference splitting scheme yields a flux at the interface of the form \cite{jcp:1981:roe}:
+%
+\begin{equation}
+F_{i+1/2}=\frac{1}{2} F_i + \frac{1}{2} F_{i+1} - \frac{1}{2}|A|_{i+1/2} (U_{i+1}-U_i)
+\label{eqn:FDS_1o}
+\end{equation}
+%
+where $F$ is the convective flux,  $U$ the vector of conserved variables, and $|A|$ the Roe matrix equivalent to:
+%
+\begin{equation}
+|A|\equiv L^{-1} |\Lambda| L
+\end{equation}
+%
+where $L$  is the left eigenvector matrix, $L^{-1}$ is the right eigenvector matrix, $\Lambda$ is the eigenvalue matrix of the convective flux Jacobian $A\equiv \partial F / \partial U$, and $|\Lambda|$ is the absolute value of the eigenvalue matrix obtained from $\Lambda$ by taking the absolute value of all elements. To ensure that the scheme does not induce non-physical phenomena, it is necessary to correct the acoustic waves part of the matrix $|A|$ as follows:
+%
+\begin{equation}
+|\Lambda|_{r,r} \rightarrow \sqrt{|\Lambda|_{r,r}^2 + \zeta_A^{\rm a} a^2}
+\end{equation}
+%
+with $a$ the speed of sound and $\zeta_A^{\rm a}$ a user-defined parameter typically set to 0.3. Note that the eigenvalue correction is done only for the acoustic waves (eigenvalues of the form $V_x+a$ or $V_x-a$) but not the convective waves (i.e.\ eigenvalues of the form $V_x$).
+
+
+
+\subsection{Flux Difference Splitting First-Order Roe Positive}
+
+As suggested by Parent in Ref.\ \cite{jcp:2013:parent:2}, a positivity-preserving variant of the Roe scheme can be written as:
+%
+\begin{equation}
+F_{i+1/2}=L^{-1}_{i} G_{i}^+  + L^{-1}_{i+1} G_{i+1}^- 
+\label{eqn:FDS_1o_positive}
+\end{equation}
+%
+with 
+%
+\begin{equation}
+G^\pm\equiv \Lambda^\pm LU
+\label{eqn:Gplusminus}
+\end{equation}
+%
+with
+%
+\begin{align}
+ \left[\Lambda_{i+1}^-\right]_{r,r}  &= {\min\left(0,~\frac{1}{2} \left[\Lambda_{i+1}\right]_{r,r}  - \frac{1}{2}\frac{\left[L_{i+1} |A|_{i+1/2} U_{i+1}\right]_r}{\left[L_{i+1} U_{i+1}\right]_r}\right)}\nonumber\alb
+&+
+{\min\left(0,~\frac{1}{2}\left[\Lambda_i\right]_{r,r}    + \frac{1}{2}\frac{\left[L_i |A|_{i+1/2} U_i\right]_r}{\left[L_i U_i\right]_r}\right)}
+\label{eqn:lambdaminus_Roepos}
+\end{align}
+%
+%
+\begin{align}
+ \left[ \Lambda_{i}^+\right]_{r,r}  &= {\max\left(0,~\frac{1}{2}\left[\Lambda_i\right]_{r,r}    + \frac{1}{2}\frac{\left[L_i |A|_{i+1/2} U_i\right]_r}{\left[L_i U_i\right]_r}\right)}\nonumber\alb
+&+
+{\max\left(0,~\frac{1}{2} \left[\Lambda_{i+1}\right]_{r,r}  - \frac{1}{2}\frac{\left[L_{i+1} |A|_{i+1/2} U_{i+1}\right]_r}{\left[L_{i+1} U_{i+1}\right]_r}\right)}
+\label{eqn:lambdaplus_Roepos}
+\end{align}
+%
+The approach proposed here has the advantage of not altering the Roe wave speed at the interface: the amount of wave speed lost on the left node corresponds to the amount of wave speed gained on the right node and vice versa.  Because of this, the flux function yields results that are very close to those obtained with the conventional Roe method within shocks, expansion fans, and contact discontinuities, but introduces slightly more dissipation within high-Reynolds-number laminar viscous layers. To obtain a positivity-preserving Roe scheme that is less dissipative within high-Reynolds-number viscous layers, it is necessary to obtain the $\Lambda^\pm$ eigenvalues through an iterative algorithm as explained in Section 4.1 of Ref.\ \cite{jcp:2013:parent:2}. 
+
+For the scheme to be positivity-preserving, it is further necessary to restrict the local time step as follows:
+%
+\begin{equation}
+\Delta t
+<
+\frac{\Delta x}{   
+ \left[\Lambda^+ \right]_{r,r}-\left[\Lambda^- \right]_{r,r}
+}~~\forall r
+\end{equation}
+%
+In 2D and 3D, the time step would need to be further decreased by 2 and 3 times, respectively.
+
+
+
+\subsection{Flux Difference Splitting First-Order Parent}
+
+Consider a system of conservation laws in differential form in three dimensions as follows:
+%
+\begin{equation}
+ \frac{\partial U}{\partial t} + \frac{\partial F}{\partial x} + \frac{\partial G}{\partial y} + \frac{\partial H}{\partial z} =0
+\end{equation}
+%
+where $U$ is the vector of conserved variables, while $F$, $G$, and $H$ are the convective flux vectors along $x$, $y$, and $z$, respectively. When written in finite-volume form, the discretization equation associated with the latter can be written as:
+%
+\begin{equation}
+  \frac{U^{n+1}-U^{n}}{\Delta t} + \frac{F_{i+1/2}-F_{i-1/2}}{\Delta x} + \frac{G_{j+1/2}-G_{j-1/2}}{\Delta y}
++ \frac{H_{k+1/2}-H_{k-1/2}}{\Delta z} = 0
+\end{equation}
+%
+where $F_{i+1/2}$, $G_{j+1/2}$, and $H_{k+1/2}$ denote the flux functions at the interfaces perpendicular to the $x$, $y$, and $z$ axis, respectively. Following Parent in Ref.\ \cite{aiaa:2015:parent}, it can be shown that the proposed flux functions at the interfaces correspond to:  
+%
+\begin{equation}
+\begin{array}{l}
+ F_{i+1/2}=
+    \frac{1}{2}\bigl(F_i+F_{i+1}\bigr) 
+  -\frac{1}{2}|A|_{i+1/2} \bigl( U_{i+1}- U_i\bigr) \alb
+~~~~  - \frac{1}{4} {B_{i+1/2}}\bigl(\frac{\Delta y}{\Delta x}|A|_{i+1/2}  + |B|_{i+1/2} \bigr)^{-1} A_{i+1/2} \bigl( U_{i+1,j+1} -U_{i+1,j-1}+U_{i,j+1} -U_{i,j-1}\bigr)\alb
+~~~~  - \frac{1}{4} {C_{i+1/2}}\bigl(\frac{\Delta z}{\Delta x}|A|_{i+1/2}  + |C|_{i+1/2} \bigr)^{-1} A_{i+1/2}\bigl(U_{i+1,k+1} -U_{i+1,k-1}+U_{i,k+1} -U_{i,k-1}\bigr)
+\end{array}
+\end{equation}
+%
+%
+\begin{equation}
+\begin{array}{l}
+ G_{j+1/2}=
+    \frac{1}{2}\bigl(G_{j}+G_{j+1}\bigr) 
+  -\frac{1}{2}|B|_{j+1/2} \bigl( U_{j+1}- U_j\bigr) \alb
+~~~~  - \frac{1}{4} {A_{j+1/2}}\bigl(\frac{\Delta x}{\Delta y}|B|_{j+1/2}  + |A|_{j+1/2} \bigr)^{-1} B_{j+1/2} \bigl( U_{i+1,j+1}-U_{i-1,j+1} +U_{i+1,j}-U_{i-1,j}\bigr)\alb
+~~~~  - \frac{1}{4} {C_{j+1/2}}\bigl(\frac{\Delta z}{\Delta y}|B|_{j+1/2}  + |C|_{j+1/2} \bigr)^{-1} B_{j+1/2}\bigl(U_{j+1,k+1} - U_{j+1,k-1} + U_{j,k+1} - U_{j,k-1}\bigr)
+\end{array}
+\end{equation}
+%
+%
+\begin{equation}
+\begin{array}{l}
+ H_{k+1/2}=
+   \frac{1}{2}\bigl(H_{k}+H_{k+1}\bigr) 
+  -\frac{1}{2}|C|_{k+1/2}\bigl( U_{k+1}- U_k \bigr) \alb
+~~~~  -\frac{1}{4} A_{k+1/2} \bigl(\frac{\Delta x}{\Delta z}|C|_{k+1/2}+|A|_{k+1/2}\bigr)^{-1} C_{k+1/2} \bigl( U_{i+1,k+1} - U_{i-1,k+1} + U_{i+1,k} - U_{i-1,k} \bigr) \alb
+~~~~  -\frac{1}{4} B_{k+1/2} \bigl( \frac{\Delta y}{\Delta z}|C|_{k+1/2} + |B|_{k+1/2} \bigr)^{-1} C_{k+1/2} \bigl( U_{j+1,k+1}-U_{j-1,k+1} +U_{j+1,k}-U_{j-1,k} \bigr)
+\end{array}
+\end{equation}
+%
+In the latter, $A$, $B$, and $C$ correspond to the flux Jacobians while $|A|$, $|B|$, and $|C|$ correspond to the Roe matrices along $x$, $y$, and $z$, respectively.
+
+
+
+As well, to prevent aphysical phenomena from forming, the eigenvalues within the Roe matrices are altered using the following entropy correction:
+%
+\begin{equation}
+  \left|\left[\Lambda \right]_{r,r}\right| \rightarrow \sqrt{\left[\Lambda \right]_{r,r}^2 + \zeta_A a^2}
+\end{equation}
+%
+where $a$ is the speed of sound and $\zeta_A$ is a user-specified parameter which is either set to $\zeta_A^{\rm c}$ for the convective waves, to $\zeta_A^{\rm a}$ for the acoustic waves, or the $\zeta_A^{\rm d}$ when applied to the terms on the denominator of the flux function. In order to prevent excessive dissipation within viscous layers, $\zeta_A^{\rm c}$ is typically set to zero while $\zeta_A^{\rm a}$ is set to 0.3. On the other hand, the entropy correction applied to all waves for the Roe matrices on the denominator of the flux function, $\zeta_A^{\rm d}$, is set to 0.1 . It is necessary to do so (that is, to apply the entropy correction to all waves for the Roe matrices part of the cross-derivative terms) to prevent the possible formation of a singular matrix which can not be inverted.
+
+
+
+
+
+
+\subsection{Flux Difference Splitting Second-Order MUSCL}
+
+
+For a MUSCL-TVD Roe FDS scheme, the flux at the interface is as follows:
+%
+\begin{equation}
+F_{i+1/2}=\frac{1}{2} F\left(U^{\rm L}_{i+1/2}\right) + \frac{1}{2} F\left(U^{\rm R}_{i+1/2} \right) - \frac{1}{2}|A|\left(U^{\rm L}_{i+1/2}~,~U^{\rm R}_{i+1/2}\right) \cdot \left\{U^{\rm R}_{i+1/2}-U^{\rm L}_{i+1/2}\right\}
+\label{eqn:FDS_2o_MUSCL}
+\end{equation}
+%
+where $U^{\rm L}_{i+1/2}$ and $U^{\rm R}_{i+1/2}$ are vectors reconstructed from extrapolated primitive variables and where $F(U)$ stands for the vector $F$ evaluated from $U$ and $|A|(U)$ stands for the Roe matrix $|A|$ evaluated from $U$. The vector $U$ itself is constructed from primitive variables extrapolated from nearby nodes through TVD stencils to reach second-order accuracy. For instance, the temperature, velocity, and density needed to reconstruct $U^{\rm L}_{i+1/2}$ are extrapolated using a limiter with a leftward bias such as:
+%
+\begin{equation}
+T^{\rm L}_{i+1/2}=T_i + \mfd\frac{1}{2}(T_i-T_{i-1}) f_{\rm lim}\left(\frac{T_{i+1}-T_i}{T_i-T_{i-1}}   \right)
+\end{equation}
+%
+On the other hand, the temperature, velocity, and density needed to reconstruct the vector $U^{\rm R}_{i+1/2}$ are extrapolated using a limiter with a rightward bias such as: 
+%
+\begin{equation}
+T^{\rm R}_{i+1/2}=T_{i+1} + \mfd\frac{1}{2}(T_{i+1}-T_{i+2}) \, f_{\rm lim}\left(\frac{T_{i}-T_{i+1}}{T_{i+1}-T_{i+2}}  \right) 
+\end{equation}
+%
+where $f_{\rm lim}$ is the limiter function taken from Eq.\ (\ref{eqn:limiterfunction}).
+
+
+
+
+
+\subsection{Flux Difference Splitting Second-Order Yee}
+
+One way the Roe scheme can be extended to second-order accuracy while remaining monotonicity-preserving is through the use of TVD limiters applied to the characteristic variables as proposed by Yee \cite{jcp:1990:yee}. Commonly denoted as the ``Yee-Roe'' scheme, such a strategy has enjoyed considerable popularity in solving compressible viscous flows because it is second-order accurate and, like the first-order Roe scheme, it introduces little dissipation in viscous layers, it is monotonicity-preserving, and it converges reliably for a wide variety of flow conditions.  
+
+The Yee-Roe flux at the interface can be written as follows:
+%
+\begin{equation}
+F_{i+1/2}=\underbrace{\frac{1}{2} F_i + \frac{1}{2} F_{i+1} 
+- \frac{1}{2}L^{-1}_{i+1/2} |\Lambda|_{i+1/2} M_{i+1/2}}_{\textrm{\small first-order~Roe~terms}} 
++ \underbrace{\frac{1}{2}L^{-1}_{i+1/2} |\Lambda|_{i+1/2} \Phi_{i+1/2} M_{i+1/2}}_{\textrm{\small second-order~Yee~terms}} 
+\label{eqn:FDS_2o_TVD}
+\end{equation}
+%
+where the vector $M_{i+1/2}$ is defined as: 
+%
+\begin{equation}
+M_{i+1/2} \equiv L_{i+1/2} (U_{i+1}-U_i)
+\label{eqn:M}
+\end{equation}
+%
+and where the diagonal elements within the limiter matrix are set as follows:
+%
+\begin{equation}
+\left[\Phi_{i+1/2}\right]_{r,r}=\frac{{\rm minmod}\left( \left[M_{i-1/2}\right]_r, ~ \left[M_{i+1/2}\right]_r, ~\left[M_{i+3/2}\right]_r \right)}{\left[M_{i+1/2}\right]_r}
+\label{eqn:Phi}
+\end{equation}
+%
+where the minmod function returns the argument with the smallest magnitude if the arguments all share the same sign and zero if the arguments are of mixed signs. A possible division by zero on the RHS of Eq.\ (\ref{eqn:Phi}) can be avoided by adding a small constant to the denominator, as is common practice when implementing the Yee-Roe scheme. This does not pose problems when doing computations because the minmod function on the numerator will always be as low in magnitude as the denominator, hence keeping the limiter function bounded. 
+
+
+
+
+\subsection{Flux Difference Splitting Second-Order Yee Positive}
+
+A positivity-preserving version of the Yee-Roe FDS-TVD scheme was derived by Parent as \cite{jcp:2013:parent:2}:
+%
+\begin{equation}
+\begin{array}{l}\mfd
+F_{i+1/2}=L^{-1}_{i} G_{i}^+  
+        + L^{-1}_{i+1} G_{i+1}^-  
+        + \frac{1}{2}L^{-1}_{i}  \Psi_{i+1/2}^+ \Delta G_{i+1/2}^+ 
+        - \frac{1}{2} L^{-1}_{i+1} \Psi_{i+1/2}^- \Delta G_{i+1/2}^- 
+\end{array}
+\label{eqn:FDS_2o_TVD_pos}
+\end{equation}
+%
+where the limiter matrices correspond to:
+%
+\begin{align}
+   \left[\Psi_{i+1/2}^-\right]_{r,r}  
+&=
+{\rm max}\left\{ -\left|\frac{\xi\left[ G_{i+1}^-\right]_r}{\left[\Delta G_{i+1/2}^-\right]_r} \right|, \right.\nonumber\alb
+&\left.{\rm min}\left(
+\frac{\left[L_{i+1} L^{-1}_{i+1/2} \left( \Lambda_{i+1/2} - |\Lambda|_{i+1/2}  \right) \Phi_{i+1/2} M_{i+1/2} \right]_r}{2 \left[\Delta G_{i+1/2}^- \right]_r}
+,~\left|\frac{\xi\left[ G_{i+1}^-\right]_r}{\left[\Delta G_{i+1/2}^-\right]_r} \right|
+\right)\right\}
+\end{align}
+%
+%
+\begin{align}
+   \left[\Psi_{i+1/2}^+\right]_{r,r}  
+&=
+{\rm max}\left\{ -\left|\frac{\xi\left[ G_{i}^+\right]_r}{\left[\Delta G_{i+1/2}^+\right]_r} \right|,\right.\nonumber\alb
+&\left.{\rm min}\left(
+\frac{\left[L_{i} L^{-1}_{i+1/2} \left( \Lambda_{i+1/2} + |\Lambda|_{i+1/2}  \right) \Phi_{i+1/2} M_{i+1/2}  \right]_r}{2 \left[\Delta G_{i+1/2}^+ \right]_r}
+,~\left|\frac{\xi\left[ G_{i}^+\right]_r}{\left[\Delta G_{i+1/2}^+\right]_r} \right|
+\right)\right\}
+\end{align}
+%
+where the matrix $M$ is determined as in Eq.\ (\ref{eqn:M}) and where 
+%
+\begin{equation}
+\Delta G_{i+1/2}^\pm \equiv G_{i+1}^\pm - G_i^\pm
+\end{equation}
+%
+with $G^\pm$ determined from Eq.\ (\ref{eqn:Gplusminus}). For the stencil to be positivity-preserving, the positive and negative eigenvalues $\Lambda^\pm$ (which are used to calculate the vectors $G^\pm$) must be determined as in Eqs.\ (\ref{eqn:lambdaminus_Roepos})-(\ref{eqn:lambdaplus_Roepos}) or through an iterative algorithm as explained in Section 4.1 of Ref.\ \cite{jcp:2013:parent:2} for less dissipation within viscous layers.   As well, the user-defined constant $\xi$ must be less than 2:
+%
+\begin{equation}
+0< \xi<2
+\end{equation}
+%
+Because of errors due to round-off when using double-precision variables within the computer code, it is necessary to fix $\xi$ to 1.99 for most problems. Further, and rather interestingly, lowering $\xi$ to within the range $0.5<\xi<1.0$ can help prevent the solution from diverging to aphysical states when using high time steps, and can also help prevent convergence hangs when solving steady-state problems. For these reasons, $\xi$ is typically given a value of 0.5.
+
+
+For the scheme to be positivity-preserving, it is further necessary to restrict the local time step as follows:
+%
+\begin{equation}
+\Delta t
+<
+\frac{\Delta x}{   
+2 \left(\left[\Lambda^+ \right]_{r,r}-\left[\Lambda^- \right]_{r,r}\right)
+}~~\forall r
+\end{equation}
+%
+In 2D and 3D, the time step needs to be further decreased by 2 and 3 times, respectively.
+
+
+
+
+
+
+
+\section{Discretization of $\partial_x (DU)$}
+
+
+The term $\partial (DU)/\partial x$ is here discretized as
+%
+\begin{equation}
+\delta_x (DU) = \frac{(DU)_{i+1/2}-(DU)_{i-1/2}}{\Delta x}
+\end{equation}
+%
+where the flux at the interface is found from a Steger-Warming Flux Vector Splitting (FVS) scheme \cite{jcp:1981:steger} extended to second-order accuracy through a Total Variation Diminishing (TVD) scheme:
+%
+\begin{align}
+(DU)_{i-1/2}&=
+  D_{i-1}^+ U_{i-1} 
++\frac{1}{2} \Phi^+_{i-1/2} \left(  D_{i-1}^+ U_{i-1}  -  D_{i-2}^+ U_{i-2}\right)  \nonumber\alb
+&+ D_{i}^- U_i
++\frac{1}{2} \Phi^-_{i-1/2} \left(  D_{i}^- U_i -  D_{i+1}^- U_{i+1}\right) 
+\end{align}
+%
+In the latter, the flux limiter matrix $\Phi$ is a diagonal matrix with the elements on the diagonal being greater or equal to 0 and less or equal to 2: 
+%
+\begin{equation}
+\left[\Phi_{i-1/2}^+\right]_{r,r} =  {f_{\rm lim}}\left(\mfd\frac{\left[D_{i}^+ U_i\right]_r -\left[D_{i-1}^+ U_{i-1}\right]_r}{\left[D_{i-1}^+ U_{i-1}\right]_r-\left[D_{i-2}^+ U_{i-2}\right]_r}  \right)
+\end{equation}
+%
+%
+\begin{equation}
+\left[\Phi_{i-1/2}^-\right]_{r,r} =  {f_{\rm lim}}\left(\mfd\frac{\left[D_{i-1}^- U_{i-1}\right]_r -\left[D_{i}^- U_i\right]_r}{\left[D_{i}^- U_i\right]_r-\left[D_{i+1}^- U_{i+1}\right]_r}  \right) 
+\end{equation}
+%
+where $f_{\rm lim}$ is the limiter function outlined in Eq.\ (\ref{eqn:limiterfunction}). 
+It could be argued that the use of a Steger-Warming-like stencil leads to excessive dissipation within viscous layers and hence prevents boundary layers to be resolved with high-resolution. However, this is only the case if it is used to discretize the term $\partial_x F$. When discretizing the term $\partial_x (DU)$, the use of flux vector splitting does not lead to any problem. 
+
+
+
+
+
+\section{Discretization of $Y \partial_{x} H$}
+
+Following Parent et al.\ \cite{jcp:2013:parent}, the discretization of the derivative $Y \partial_x H$ can be achieved as follows:
+%
+\begin{equation}
+Y \delta_x H = 
+  \left(\frac{ Y_{i-1/2} + |Y_{i-1/2}|}{2}\right)\left( \frac{ H_{i} - H_{i-1} }{\Delta x}\right)
++ \left(\frac{ Y_{i+1/2} - |Y_{i+1/2}|}{2}\right)\left( \frac{ H_{i+1} - H_{i} }{\Delta x}\right)\alb
+\end{equation}
+%
+It is noted that the latter use a first-order accurate stencil in contrast to the other terms which utilize second-order accurate stencils. A first-order stencil is here chosen because  it is not clear how to obtain second-order accuracy while keeping the monotonicity-preserving property. Some grid convergence studies performed for steady-state problems in Ref.\ \cite{jcp:2013:parent} have demonstrated that the use of a first-order stencil here for the term $Y\delta_x H$ is not a particular source of concern because most of the numerical error originates from the $\delta_x F$ and $\delta_x(K\delta_x G)$ terms which use second-order stencils.
+
+
+
+\section{Discretization of $\partial_{x_j}( K_{ij}  \partial_{x_i}G )$}
+
+Contrarily to the convection terms, the viscous terms can be discretized
+in a straightforward way as this will not create
+a situation leading to even-odd node discoupling:
+%
+\begin{equation}
+\delta_{x_j}\left( {K_{ij}}\delta_{x_i} G \right)
+=\frac{\left( {K_{ij}}\delta_{x_i} G \right)^{X_j+1/2}-
+\left({K_{ij}}\delta_{x_i} G \right)^{X_j-1/2} }{\Delta x_j}
+\end{equation}
+%
+Should $i=j$ then the expression is discretized as follows:
+%
+\begin{equation}
+\left( {K_{ij}}\delta_{x_i} G \right)^{X_j+1/2}
+=
+K_{jj}^{X_j+1/2} \frac{G^{X_j+1}-G^{X_j}}{\Delta x_j}
+\end{equation}
+% 
+Should $i \neq j$ the discretization would become:
+%
+\begin{equation}
+\left( {K_{ij}}\delta_{x_i} G \right)^{X_j+1/2}
+   =K_{ij}^{X_j+1/2} 
+   \frac{G^{X_i+1,X_j}+G^{X_i+1,X_j+1}
+   -G^{X_i-1,X_j}-G^{X_i-1,X_j+1}  }{4 \Delta x_i} 
+\end{equation}
+%
+where $K^{X_j+1/2}_{ij}$ midway between nodes is 
+taken as half the value of $K^{X_j+1}_{ij}$ and $K^{X_j}_{ij}$.
+
+
+
+\section{Discretization of $Z\partial_t U$}
+
+\subsection{Taylor Series Expansion}
+
+The first-order, second-order, and third-order backward stencils used here to discretize the time derivatives using Taylor series expansion can be shown to correspond to:
+%
+\begin{equation}
+  \delta_t U =  \frac{U_{m}-U_{m-1}}{\Delta t} + O(\Delta t)
+\end{equation}
+%
+%
+\begin{equation}
+  \delta_t U =  \frac{\frac{3}{2} U_{m}
+                       -2 U_{m-1} + \frac{1}{2} U_{m-2}}{\Delta t} + O(\Delta t^2)
+\end{equation}
+%
+%
+\begin{equation}
+  \delta_t U =  \frac{\frac{11}{6}U_{m}-3 U_{m-1} + \frac{3}{2} U_{m-2} - \frac{1}{3} U_{m-3} }{\Delta t} + O(\Delta t^3)
+\end{equation}
+%
+
+\subsection{Weighted Essentially Non-Oscillatory}
+
+Consider the following backward stencils (obtained from first-order polynomials) to approximate $U$ at the interface $m+1/2$:
+%
+\begin{equation}
+  U^{(1)}_{m+1/2}=\frac{3}{2} U_{m} - \frac{1}{2} U_{m-1}
+\end{equation}
+% 
+%
+\begin{equation}
+  U^{(2)}_{m+1/2}=\frac{5}{2} U_{m-1} - \frac{3}{2} U_{m-2}
+\end{equation}
+% 
+If substituted in  $(U_{m+1/2}-U_{m-1/2})/\Delta t$, either polynomial would
+yield a second-order accurate discretization equation. Let's now combine these two stencils as follows:
+%
+\begin{equation}
+  U_{m+1/2}=w U^{(1)}_{m+1/2} + (1-w) U^{(2)}_{m+1/2}
+\end{equation}
+%
+Note that if $w$ is given value of $11/9$, the discretization equation would become third order accurate. We will here choose $w$ so that the stencil introduces little oscillations in regions of discontinuities and becomes third-order accurate in smooth regions. Let us choose $w$ as follows:
+%
+\begin{equation}
+w=\frac{11}{9}\left(1-\frac{|U_{m}-2 U_{m-1}+U_{m-2}|}{|U_{m}-U_{m-1}|+|U_{m-1}-U_{m-2}|}\right)
+\end{equation}
+% 
+
+\bibliographystyle{warpdoc}
+\bibliography{all}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

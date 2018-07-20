@@ -1,0 +1,12 @@
+Other methods of interest:
+
+* Conjugate Gradient method
+https://en.wikipedia.org/wiki/Conjugate_gradient_method
+
+* Delphi PBE
+- A rapid finite difference algorithm, utilizing successive over-relaxation to solve the Poisson–Boltzmann equation
+Anthony Nicholls, Barry Honig
+- Rocchia W, Alexov E, Honig B. Extending the applicability of the nonlinear Poisson-Boltzmann equation: multiple dielectric constants and multivalent ions. Journal of Physical Chemistry B. 2001;105(28):6507–6514.
+
+Preconditioner:
+https://en.wikipedia.org/wiki/Preconditioner

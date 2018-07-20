@@ -1,0 +1,3 @@
+the data shown in this directory was taken from Joe Shepherd's site:
+
+http://www.galcit.caltech.edu/EDL/projects/pde/pde_resources.html

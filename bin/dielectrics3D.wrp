@@ -1,0 +1,255 @@
+{
+  Number of Dimensions    : nd           : 3
+  Number of Species       : ns           : 3
+    [  e-  N2+  N2  ]
+}
+L=5e-4;
+H=5e-4;
+D=5e-4;
+Qbeam=1e5;
+Ne=1e13;
+Nn=1e24;
+
+mf=1.0;
+
+  is=1;  js=1;  ks=1;
+  ie=round(20*mf); je=round(20*mf); ke=round(20*mf);
+
+Grid(
+  Size(is,js,ks, ie,je,ke);
+  Point(is,js,ks, 0.0e0,0.0e0,0.0e0);
+  Point(ie,js,ks, L,0.0e0,0.0e0);
+  Point(ie,je,ks, L,H,0.0e0);
+  Point(is,je,ks, 0.0e0,H,0.0e0);
+  Point(is,js,ke, 0.0e0,0.0e0,D);
+  Point(ie,js,ke, L,0.0e0,D);
+  Point(ie,je,ke, L,H,D);
+  Point(is,je,ke, 0.0e0,H,D);
+  JoinCorners(is,js,ks, ie,je,ke,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
+);
+
+
+Bdry(
+  DriftDiffusion(
+    {
+    ******************************************************************  
+    * Fluid Flow Boundary Conditions Types:                             
+    ******************************************************************  
+    *  0   : Wall                                                       
+    ******************************************************************  
+    }
+    { first, create cuts in the computational domain; a cut is a region 
+     which is not computed by the solver }
+    { Cut(10{is},10{js},10{ks},  17{ie},17{je},17{ke});}
+    { second, apply a default boundary condition (BC) type to all boundary nodes }
+    All(0{BC type});
+    { impose BC type at faces i=is, i=ie, j=js, j=je, k=ks, k=ke}
+    Faces(0,0,  0,0,  0,0);
+    { apply BC type only to the boundary nodes in a specific region of the computational domain}
+    { Region(10{is},10{js},10{ks},  17{ie},17{je},17{ke},  3{BC type});}
+  );
+
+  Ohm(
+    {
+    ******************************************************************
+    * Electric Field Potential Boundary Conditions Types:             
+    ******************************************************************
+    *  0 : Fixed                                                      
+    *  1 : Extrapolated                                               
+    *  2 : Insulated  (dielectric)                                    
+    ******************************************************************
+    }
+   
+    All(0{BC type});
+    {All(), Faces(), Region(), and Cut() commands have the same syntax as for the fluid action}
+  );
+);
+ 
+ 
+Model(
+ 
+  DriftDiffusion(
+    Te=10000.0;       {the electron temperature in K}
+    CONSTANT_TE=FALSE; {fix the electron temperature to a constant}
+    Ti=300.0;         {the ions and neutrals temperature in K}
+    gamma=0.1;        {the secondary emission coefficient }
+    Nminbdry=1e8;     {the number density for the charged species at the bdry nodes in 1/m3}
+    Nemin=1e2;        {the minimum allowed number density for the electrons in 1/m3}
+    Nimin=1e2;        {the minimum allowed number density for the electrons in 1/m3}
+    Nkmin=1e2;        {the minimum allowed number density for the other charged species in 1/m3}
+    Nkmax=1e19;       {the maximum allowed number density for the charged species in 1/m3}
+    Temin=300;
+    Temax=60000;
+    sigmadiv=1e-20;   {minimum value for conductivity when it appears on denominator in S/m }
+    aref=300.0;       {reference speed of sound in m/s used when conditioning Dstar eigenvalues  }
+    zetaD=0.2;        {conditions the Dstar eigenvalues for the charged species}
+  );
+ 
+  Ohm(
+    Te_buffer=200.0; {when determining mue: Te=max(Te,T+Te_buffer);  
+                      needed to prevent convergence hangs where |E| becomes close to 0;
+                      set to as little a value as possible}
+    sigmasolid=1.0e7; {the conductivity of all non-flow nodes in mho/m}
+    Ediv=10.0; {a small positive number in V/m, needed to prevent a division by zero when
+                 discretizing the electron pressure gradients within the potential equation}
+    Jmax=1000.0; {the maximum current density in A/m2 expected in the domain; this will affect only
+                  the Townsend ionization rates; make sure Jmax > sigma*Emag in the converged solution.}
+  );
+ 
+  EbeamFixed(
+    SetQbeam(is, js, ks, ie, je, ke,   {Qbeam, W/m3}Qbeam);
+  );
+);
+ 
+ 
+Init(
+    DriftDiffusion(
+      {
+      ************************************************************
+      *Initial Conditions Types:                                  
+      ************************************************************
+      *1, N[1]..N[ns], Te   
+      ************************************************************
+      }
+      { Init all nodes in the domain}
+      All(1,Ne,Ne,Nn,10000);
+      {
+        { Init bdry nodes numbered 3}
+        Bdry(3, 1,0.0,0.0,0.0,0.0);
+        { Init nodes in region}
+        Region(3,3,3,  6,6,6,
+         1,0.0,0.0,0.0,0.0);
+      }
+    );
+    Ohm(
+      {
+      ************************************************************
+      *Electric Field Potential Initial Conditions Types:         
+      ************************************************************
+      *1, phi                                                     
+      ************************************************************
+      }
+      { Init all nodes in the domain}
+      All(1,0.0);
+      {
+        { Init bdry nodes numbered 3}
+        Bdry(3, 1,0.0);
+        { Init nodes in region}
+        Region(3,3,3,  6,6,6,
+           1,0.0);
+      }
+    );
+);
+
+
+
+Disc(
+  DriftDiffusion(
+    aref=300.0;       {reference speed of sound in m/s used when conditioning Dstar eigenvalues  }
+    zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
+  );
+  Ohm(
+    Ediv=10.0;        {a small positive number in V/m, needed to prevent a division by zero when
+                       discretizing the electron pressure gradients within the potential equation}
+  );
+);
+
+
+
+Cycle(
+  DriftDiffusion(
+    xiverge=1e-3;         {residual convergence threshold}
+    zetaGammai=0.1;       {factor multiplying the pseudotime step of the ion species transport equations
+                           when PRECONDITIONER is set to TRUE} 
+    zetaGammae=0.001;     {factor multiplying the pseudotime step of the electron species transport equations
+                           near cathode when PRECONDITIONER is set to TRUE} 
+    relaxNi_bdry=1.0; {the ion density relaxation factor at the boundary }
+    relaxNe_bdry=0.3;    {the electron density relaxation factor at the boundary }
+    relaxTe=0.7;      {the electron temperature relaxation factor }
+    aref=300.0;           {reference speed of sound in m/s when determining the pseudotime step  }
+    Nref=1e18;            {reference number density in 1/m3}
+    Teref=5000;           {reference electron temperature in K}
+    Uref[0]=Nref;   
+    Uref[1]=Nref;   
+    Uref[2]=Nref*1e99;   
+    Uref[3]=Teref*1e99;   
+  );
+  Ohm(
+    xiverge_emfield=1e-2; {residual convergence threshold for the potential equation}
+    relaxphi_bdry=1.0; {relaxation factor for phi at the dielectric boundaries}
+    sigmaref=0.003; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
+    Uref_emfield[0]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
+  );
+  SteadyState(
+    if (mod(iter,50)==0,
+      WriteDataFile(outputfilename);
+    );
+    sigma1=0.5;      {exponent of largest pseudotime step in all dimensions}
+    sigma2=0.0;      {exponent of largest pseudotime step in all flux components}
+    PRECONDITIONER=PRECON_LOCALEIGENVALUE;
+    if (iter==1,
+      CFL=0.1;
+    );
+    CFL=min(CFL*1.03,2.0);
+    system("date");
+    UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2);
+    Lc=5e-3;  {characteristic length scale used to solve the emfield equation}
+    relaxfact_emfield=1.0;  {relaxation factor forced on the update of the emfield variables}
+    UpdateEMField(Lc*1000,relaxfact_emfield,TSEMF_SOR2,1000);
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld,%4ld)  %6.0f %E (%4ld,%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,k_ximax,Lc,ximax_emfield,i_ximax_emfield,j_ximax_emfield,k_ximax_emfield,clipinfo);
+  );
+
+);
+
+
+Post(
+  xcut[1]=0.1;
+  xcut[2]=0.2;
+  xcut[3]=0.3;
+  {the following loop outputs to a file integrated properties at x=0.1,0.2,0.3}
+  for (cnt,1,3,
+    SetPostDomainToXcuts(xcut[cnt]);
+    Pback=_BackPressure({Aback,m2}1.0, {Pback_min,Pa}400, {Pback_max,Pa}4000, {numsteps}300,
+                 {q_min (as small a positive value as possible)}1.0);
+    Fpot=_ThrustPotentialPerMassFlowRate(Pback,{numsteps}300, {q_min}1.0);
+    mdotreacting=_MassFlowRateReacting(
+        2       {rank of the reacting species},
+        0.235*(1-0.02876){stoichio. mass fraction of reacting species},
+        1       {rank of the species reacted with},
+        0.02876 {stoichio. mass fraction of species reacted with});
+    Fx=_MomentumForcePerMassFlowRate();  {momentum*crossarea/mdot}
+    mdot=_MassFlowRate();
+    Tstag=_MassFlowRateAveStagTemperature();
+    Pstag=_MassFlowRateAveStagPressure({numsteps} 300);
+    Pave=_MassFlowRateAvePressure();
+    Tave=_MassFlowRateAveTemperature();
+    qave=_MassFlowRateAveSpeed();
+    rhoave=_MassFlowRateAveDensity();
+    htstarave=_MassFlowRateAveTotalEnthalpy();
+    fprintf("perfparam.txt",
+            "x              =%E m\n"
+            "Pback          =%E Pa\n"
+            "Fpot           =%E Ns/kg\n"
+            "mdotreacting   =%E kg/s\n"
+            "mdot           =%E kg/s\n"
+            "Tstag          =%E K\n"
+            "Pstag          =%E Pa\n"
+            "Pave           =%E Pa\n"
+            "Tave           =%E K\n"
+            "qave           =%E m/s\n"
+            "rhoave         =%E kg/m3\n\n"
+            ,xcut[cnt],Pback,Fpot,mdotreacting,mdot,Tstag,Pstag,Pave,Tave,qave,rhoave);
+  );
+  {here, reset the post domain from one xcut to the entire computational domain}
+  ResetPostDomain();
+  {then, restrict the post domain to the region between is,js,ks and ie,je,ke}
+  RestrictPostDomainToRegion(is,js,ks, ie,je,ke);
+  {output the body forces in the post domain to a file (both shear and pressure)}
+  WriteBodyForcesFile("bodyforces.txt",3 {node type on the surface of the body});
+  {write a post file that includes only the post domain}
+  WritePostFile("post.01", "tecplot",POSTFILE_ALL);
+  {write a grid post file that includes only the post domain}
+  WritePostFile("grid.01", "tecplot",POSTFILE_GRID);
+);

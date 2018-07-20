@@ -1,0 +1,642 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{amsbsy}
+\usepackage{bm}
+\usepackage{amsmath}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.1cm}\\} % array line break
+\newcommand{\rhos}{\rho}
+\newcommand{\cv}{{c_v}}
+\newcommand{\cp}{{c_p}}
+\newcommand{\Sct}{{{\rm Sc}_{\rm T}}}
+\newcommand{\Prt}{{{\rm Pr}_{\rm T}}}
+\newcommand{\nd}{{{n}_{\rm d}}}
+\newcommand{\ns}{{{n}_{\rm s}}}
+\newcommand{\nn}{{{n}_{\rm n}}}
+\newcommand{\ndm}{{\bar{n}_{\rm d}}}
+\newcommand{\nsm}{{\bar{n}_{\rm s}}}
+\newcommand{\turb}{_{\rm T}}
+\newcommand{\mut}{{\mu\turb}}
+\newcommand{\mfa}{\scriptscriptstyle}
+\newcommand{\mfb}{\scriptstyle}
+\newcommand{\mfc}{\textstyle}
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\hlinex}{\vspace{-0.34cm}~~\\ \hline \vspace{-0.31cm}~~\\}
+\newcommand{\hlinextop}{\vspace{-0.46cm}~~\\ \hline \hline \vspace{-0.32cm}~~\\}
+\newcommand{\hlinexbot}{\vspace{-0.37cm}~~\\ \hline \hline \vspace{-0.50cm}~~\\}
+\newcommand{\tablespacing}{\vspace{-0.4cm}}
+\newcommand{\fontxfig}{\footnotesize\scalefont{0.918}}
+\newcommand{\fontgnu}{\footnotesize\scalefont{0.896}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{1.0}}
+\renewcommand{\fontsizefigure}{\footnotesize}
+%\renewcommand{\vec}[1]{\pmb{#1}}
+%\renewcommand{\vec}[1]{\boldsymbol{#1}}
+\renewcommand{\vec}[1]{\bm{#1}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+\newcommand\frameeqn[1]{\fbox{$\displaystyle #1$}}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcounter{tocdepth}{3}
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\author{
+  Bernard Parent
+}
+
+\email{
+  bernparent@gmail.com
+}
+
+\department{
+  Institute for Aerospace Studies	
+}
+
+\institution{
+  University of Toronto
+}
+
+\title{
+  Thermodynamic Properties
+}
+
+\date{
+  1998--2015
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+  \tableofcontents
+%  \makenomenclature
+%%  \listoftables
+%%  \listoffigures
+
+
+
+
+
+\section{Specific heats, Enthalpies, and Entropies}
+
+It is assumed that the mixture
+is thermally perfect, but calorically imperfect. The assumption
+of a thermally perfect gas has been used successfully in the
+past to simulate high speed flight, and has the advantage of being
+considerably easier to solve than a real gas. The reader is invited
+to consult Anderson\cite{gen:anderson2} or Dudebout \cite{cfd:dudebout}
+for more details.
+%
+\begin{table*}[ht]
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Constants to determine $h_k$ for some example species \tnote{a}}
+    \label{table:species-real}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}ll}
+    \toprule
+Species $k$                                               & ${\rm He}        $ & ${\rm H}_2        $  \\
+\midrule
+${\cal M}_k$       $\left[ {\rm kg}/{\rm mol} \right]$    & $+4.00260$E$-3   $ & $+2.01588000$E$-3 $  \\
+    \midrule
+$T_{\rm min}$     [K]                                     & $+200.0          $ & $+200.0           $  \\
+$T_{\rm max}$     [K]                                     & $+1000.0         $ & $+1000.0          $   \\
+$a_{1,k}$                                                 & $+2.50000000$E$+0$ & $+4.078322810$E$+4$  \\
+$a_{2,k}$                                                 & $+0.00000000$E$+0$ & $-8.009185450$E$+2$   \\
+$a_{3,k}$                                                 & $+0.00000000$E$+0$ & $+8.214701670$E$+0$   \\
+$a_{4,k}$                                                 & $+0.00000000$E$+0$ & $-1.269714360$E$-2$   \\
+$a_{5,k}$                                                 & $+0.00000000$E$+0$ & $+1.753604930$E$-5$   \\
+$a_{6,k}$                                                 & $-7.45375000$E$+2$ & $-1.202860160$E$-8$   \\
+$a_{7,k}$                                                 & $+9.28723974$E$-1$ & $+3.368093160$E$-12$   \\
+\midrule                                
+$T_{\rm min}$     [K]                                     & $+1000.0      $ & $+1000.0          $   \\
+$T_{\rm max}$     [K]                                     & $+6000.0      $ & $+6000.0          $   \\
+$a_{1,k}$                                                 & $+2.50000000$E$+0$ & $+5.608123380$E$+5 $   \\
+$a_{2,k}$                                                 & $+0.00000000$E$+0$ & $-8.371491340$E$+2 $   \\
+$a_{3,k}$                                                 & $+0.00000000$E$+0$ & $+2.975363040$E$+0 $   \\
+$a_{4,k}$                                                 & $+0.00000000$E$+0$ & $+1.252249930$E$-3$  \\
+$a_{5,k}$                                                 & $+0.00000000$E$+0$ & $-3.740718420$E$-7$   \\
+$a_{6,k}$                                                 & $-7.45375000$E$+2$ & $+5.936628250$E$-11 $  \\
+$a_{7,k}$                                                 & $+9.28723974$E$-1$ & $-3.606995730$E$-15 $   \\
+            
+    \bottomrule
+    \end{tabular*}
+    \begin{tablenotes}
+      \item[a] Properties taken from McBride \cite{nasa:2002:mcbride}; {${\cal R}=8.3144126 ~~\left[ {\rm J}/{\rm mol~K} \right]$}
+    \end{tablenotes}
+  \end{threeparttable}
+\end{table*}
+%
+
+
+
+The pressure $P$ is related to the temperature and densities 
+through the equation of state
+which is assumed to correspond to the one of a thermally perfect gas
+using Dalton's law of partial pressures, i.e.
+the pressure is the sum of the partial pressure for each species:
+%
+\begin{equation}
+P=\sum_{k=1}^{\ns} \frac{\rho_k {\cal R} T}{{\cal M}_k}
+\end{equation}
+%
+where ${\cal R}$ and ${\cal M}$ are tabulated for various species
+in table \ref{table:species-real}. 
+Let's define $R$ as the gas constant of the mixture, equal to 
+$\sum w_k {\cal R} /{\cal M}_k$.
+Also the enthalpy $h$, entropy $s$ and $\cp\equiv \partial h / \partial T$
+are determined from a mass weighted average:
+%
+\begin{align}
+h&=\mfd\sum_{k=1}^{\ns} w_k h_k \\
+s&=\mfd\sum_{k=1}^{\ns} w_k s_k \\
+\cp&=\mfd\sum_{k=1}^{\ns} w_k \cp_k 
+\end{align}
+%
+where the species specific enthalpy, specific entropy, and specific heat at constant pressure correspond to: 
+%
+\begin{align}
+        h_k&=\mfd\frac{\cal R}{{\cal M}_k}\left( a_{1,k} T
+          + \mfd\frac{a_{2,k}}{2} T^2 + \mfd\frac{a_{3,k}}{3} T^3 + \mfd\frac{a_{4,k}}{4} T^4 + \mfd\frac{a_{5,k}}{5} T^5 + a_{6,k} \right)\\
+        s_k&=\mfd\frac{\cal R}{{\cal M}_k}\left( a_{1,k} {\rm ln}(T)
+          + a_{2,k} T + \mfd\frac{a_{3,k}}{2} T^2 + \mfd\frac{a_{4,k}}{3} T^3 + \mfd\frac{a_{5,k}}{4} T^4 + a_{7,k} \right) \\
+        \cp_k&=\mfd\frac{\cal R}{{\cal M}_k}\left( a_{1,k}
+          + a_{2,k} T + a_{3,k} T^2 + a_{4,k} T^3 + a_{5,k} T^4  \right)
+\end{align}
+%
+
+
+Another variable needed by the primitive variables module is the static 
+temperature. When dealing with a calorically imperfect gas, the static
+temperature cannot be readily determined with a simple algebraic expression
+from the internal energy. Solving for $T$ hence requires an iterative
+process minimizing the function $\Phi(T)=e +  R T - h(T)$. 
+A Newton iteration is chosen for its simplicity:
+%
+\begin{equation}
+T^{n+1}=T^{n}-\left(\frac{\Phi} {\Phi^\prime}\right)^{n}
+\end{equation}
+%
+where the number of steps $n$ can either be fixed to a constant (like 2 or 3)
+or the iteration can be performed until acceptable accuracy is achieved.
+$\Phi^\prime$ corresponds to the derivative of $\Phi$ with respect
+to $T$.
+
+Another important property to be outlined in this section is the
+reference sound speed or ``thermodynamic'' sound speed $a_{\rm thermo}$:
+%
+\begin{equation}
+a_{\rm thermo} \equiv \sqrt{\frac{R \cp T}{\cp - R}}
+\end{equation}
+%
+It is noted that a sound speed cannot be by definition simply thermodynamic:
+it must be derived from a set of governing equations including derivatives
+in time and space. However, the above is commonly referred to in the
+gas dynamic literature as the ``sound speed'', and for this reason is listed
+here. It shall be used solely as a means to compute initial conditions in
+the domain.
+
+Further, in the determination of the linearization matrix $A$, these derivatives were needed:
+%
+\begin{equation}
+\begin{array}{lll}
+  \left. \mfd\frac{\partial e(P,\rho)}{\partial P} \right|_\rho=\mfd\frac{\cp-R}{\rho R}
+  &~~~~&\left. \mfd\frac{\partial e(P,\rho)}{\partial \rho_k} \right|_{P,\rho_{\ne k}}
+             =\mfd\frac{h_k-h+RT-\cp T R_k/R}{\rho} \\
+~~&~~&~~\\
+  \left. \mfd\frac{\partial e(T,\rho)}{\partial T} \right|_\rho=\cp-R
+  &~~~~&  \left. \mfd\frac{\partial e(T,\rho)}{\partial \rho_k} \right|_{T,\rho_{\ne k}}
+             =\mfd\frac{h_k-h+RT-R_k T}{\rho}
+\end{array}
+\end{equation}
+%
+
+
+
+
+\section{Molecular Viscosity, Thermal Conductivity and Mass Diffusion Coefficients}
+
+The molecular
+viscosity of a mixture of gases $\eta$ is computed using Wilke's mixing rule:
+%
+\begin{equation}
+\eta= \mfd\sum_{\mfa k=1}^{\ns}   \frac{\mfd \eta_k {\chi}_k}
+                     {\mfd {\chi}_k +
+                          \mfd\sum_{\mfa l=1}^{\ns}{\chi}_l \phi_{k,l}}
+            ~~~~~~~~l \neq k
+\label{eqn:molvisc-mixture}
+\end{equation}
+%
+%
+\begin{equation}
+{\rm with~~~~~}\phi_{k,l}=\mfd \frac{ \left[  1 + \sqrt{ \mfd {\eta_k }/{\eta_l }}
+                              \left( \mfd {{\cal M}_l}/{{\cal M}_k}  \right)^ \frac{1}{4}  \right]^2}
+{ \sqrt{\mfd 8\left(1+\mfd {{\cal M}_k}/{{\cal M}_l}\right)}}
+~~~~~~~~~~~
+{\chi}_k= \mfd\frac{w_k / {\cal M}_k}
+              {\mfd\sum_{\mfa l=1}^{\ns} \left( w_l / {\cal M}_l \right)}
+\label{eqn:molvisc-phi}
+\end{equation}
+%
+where $w_k$ is the mass fraction and $\chi_k$ the molar fraction. The molecular thermal conductivity of a mixture of gases
+$\kappa$ is found similarly to the molecular dynamic
+viscosity from the Mason and Saxena \cite{gen:mason-saxena} relation:
+%
+\begin{equation}
+\kappa= \mfd\sum_{\mfa k=1}^{\ns}  \mfd \frac{\mfd\kappa_k \chi_k}
+                     {\mfd \chi_k + \mfd 1.0654
+                          \mfd\sum_{\mfa l=1}^{\ns}  {\chi}_l \phi_{k,l}}
+            ~~~~~~~~l \neq k
+\label{eqn:moltherm-mixture}
+\end{equation}
+%
+%
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+  \begin{threeparttable}
+    \tablecaption{$\epsilon$ and $\sigma$ for some species \tnote{1}}
+    \fontsizetable
+    \begin{tabular}{lllll}
+      \toprule
+species$_k$     &  ${\rm He}$    &  ${\rm H}_2$   &  ${\rm O}_2$   &  ${\rm N}_2$  \\
+\midrule
+$\epsilon_k$ [K]&  $10.22$       &  $59.7$        &  $106.7$       &  $71.4$       \\
+$\sigma_k$ [nm] &  $0.2576$      &  $0.2827$      &  $0.3467$      &  $0.3798$     \\
+      \bottomrule
+    \end{tabular}
+    \label{table:species-epssig}
+    \begin{tablenotes}
+      \item [1] taken from Dixon-Lewis; $T^\star_k=T/ \epsilon_k$
+    \end{tablenotes}
+  \end{threeparttable}
+\end{center}
+\end{table}
+%
+The molecular diffusion coefficient of species $k$, $\nu_k$,
+is found from the kinetic theory of gases as outlined in Dixon-Lewis \cite{gen:dixon-lewis}:
+%
+\begin{equation}
+\mfd\nu_k= \frac{\rhos \left( 1 - {\chi}_k \right)}
+            {\mfd\sum_{\mfa l=1}^{\ns} \frac{{\chi}_l}{{\cal D}_{k,l}} +1.0E-20   }
+            ~~~~~~~{\rm for}~~~l \neq k
+\label{eqn:moldiff-nu}
+\end{equation}
+%
+where ${\cal D}_{k,l}$ is the binary diffusion coefficient, or
+a measure of how much gas $k$ diffuses into gas $l$.
+We now need the polynomials taken from the literature necessary to determine
+${\cal D}_{k,l}$, $\eta_k$ and $\kappa_k$.
+The species dynamic viscosity $\eta_k$ is
+derived from kinetic theory assuming that species $k$ is a pure gas:
+%
+\begin{equation}
+\eta_k= \left( 8.44107 \times 10^{-7} \right) \frac{  \sqrt{{\cal M}_k T}}
+                          {\sigma_k^2 \Omega^{22}_k}
+\label{eqn:molvisc-muk1}
+\end{equation}
+%
+%
+\begin{table*}[|t]
+\fontsizetable
+\begin{center}
+  \begin{threeparttable}
+    \tablecaption{Polynomial constants needed to determine $\Omega^{22}$ 
+             $\Omega^{11}$ and $A^\star$ taken from Dixon-Lewis}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}llllll}
+      \toprule
+$T^\star_k$& $d_0$          & $d_1$           & $d_2$          & $d_3$           & $d_4$ \\
+\midrule
+$<5$       & $2.3527333$E$+0$ & $-1.3589968$E$+0$ & $5.2202460$E$-1$ & $-9.4262883$E$-2$ & $6.4354629$E$-3$ \\
+$5-10$     & $1.2660308$E$+0$ & $-1.6441443$E$-1$ & $2.2945928$E$-2$ & $-1.6324168$E$-3$ & $4.5833672$E$-5$ \\
+$>10$      & $8.5263337$E$-1$ & $-1.3552911$E$-2$ & $2.6162080$E$-4$ & $-2.4647654$E$-6$ & $8.6538568$E$-9$ \\
+\midrule
+$T^\star_k$& $e_0$          & $e_1$           & $e_2$           &~&~\\
+\midrule
+$<5$       & $1.1077725$E$+0$ & $-9.4802344$E$-3$ & $+1.6918277$E$-3$ &~&~ \\
+$5-10$     & $1.0871429$E$+0$ & $+3.1964282$E$-3$ & $-8.9285689$E$-5$ &~& ~\\
+$>10$      & $1.1059000$E$+0$ & $+6.5136364$E$-4$ & $-3.4090910$E$-6$ &~&~ \\
+      \bottomrule
+    \end{tabular*}
+    \label{table:species-Omega}
+    \begin{tablenotes}
+      \item  $\Omega^{22}(T^\star_k)= A^\star (T^\star_k) \Omega^{11}(T^\star_k)$ 
+      \item  $\Omega^{11}(T^\star_k)=d_0+d_1 {T^\star_k}+d_2 {T^\star_k}^2+d_3 {T^\star_k}^3+d_4 {T^\star_k}^4$ 
+      \item  $A^\star (T^\star_k)=e_0+e_1 {T^\star_k}+e_2 {T^\star_k}^2$ 
+    \end{tablenotes}
+  \end{threeparttable}
+\end{center}
+\end{table*}
+%
+where $\sigma_k$ is the collision diameter, tabulated for all species,
+$\Omega^{22}_k$ is the reduced
+collision integral involving polynomials function only of
+$T^\star_k$
+which is the reduced temperature corresponding to
+$T/ \epsilon_k$ with $\epsilon_k$ being the maximum energy of
+attraction between colliding molecules for species $k$ (tabulated
+versus T). The thermal conductivity of species $k$, $\kappa_k$ is determined
+differently depending on whether
+species $k$ is polyatomic (such as H$_2$O) or monoatomic
+(such as H and O); for a monoatomic gas, only the
+translational energy of the particle is considered,
+neglecting the vibrational energy. For a polyatomic gas,
+both the translational and vibrational energies are taken into
+account, the Eucken correction being used. Hence $\kappa_k$
+is found from:
+%
+\begin{equation}
+\kappa_k = \left\{ \begin{array}{ll}
+\vspace{0.2cm}
+\mfd\frac{15}{4} \mfd\frac{\cal R}{{\cal M}_k} \eta_k & {\rm for~a~monatomic~gas} \\
+\mfd\frac{15}{4} \mfd\frac{\cal R}{{\cal M}_k} \eta_k \left(  0.115 +
+   \mfd\frac{ \left( 0.354 \right) {\cp}_k{\cal M}_k}{\cal R}  \right)
+        & {\rm for~a~polyatomic~gas} \\
+\end{array}
+\right.
+\label{eqn:moltherm-kappa}
+\end{equation}
+%
+The binary diffusion coefficient of species $k$ with respect to species $l$,
+${\cal D}_{k,l}$, is given by:
+%
+\begin{equation}
+{\cal D}_{k,l}=\left( 2.381112 \times 10^{-5} \right) \frac{\sqrt{T^3 \mfd  \left(\frac{1}{{\cal M}_l} + \frac{1}{{\cal M}_k} \right)}}
+              {  \left( \sigma_k + \sigma_l \right)^2 P \Omega^{11}_{k,l}}
+\label{eqn:moldiff-binary}
+\end{equation}
+%
+where $\Omega^{11}_{k,l}$ involves
+polynomials dependent on the reduced temperature $T^\star_k$
+and can be found in Dixon-Lewis, noting that in this case, $T^\star=T/\epsilon_{k,l}$
+where $\epsilon_{k,l}=\sqrt{\epsilon_k \epsilon_l}$; the units are Pascal for $P$, nm for $\sigma$,
+K for $T$ and $m^2/s$ for $\cal D$.
+
+
+
+\section{Plasma Properties $\mu_k$, $T_{\rm e}$, $\zeta_{\rm v}$}
+
+%
+\begin{table*}[b]
+  \center
+  \begin{threeparttable}
+    \tablecaption{Ion and electron mobilities in dry air.\tnote{a}}
+    \label{tab:mobilities}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}ll}
+    \toprule
+    Charged species & Mobility, $\rm m^2\cdot V^{-1}\cdot s^{-1}$  & Reference\\
+    \midrule
+    Air$^+$         & $N^{-1} \cdot {\rm min}\left(0.84\cdot 10^{23}\cdot T^{-0.5},~~2.35 \cdot 10^{12}\cdot \left(E^\star\right)^{-0.5}\right)$  & \cite{misc:1968:sinnott}\tnote{b}\alb
+    N$_2^+$         & $N^{-1} \cdot {\rm min}\left(0.75\cdot 10^{23}\cdot T^{-0.5},~~2.03 \cdot 10^{12}\cdot \left(E^\star\right)^{-0.5}\right)$  & \cite{misc:1968:sinnott}\alb
+    O$_2^+$         & $N^{-1} \cdot {\rm min}\left(1.18\cdot 10^{23}\cdot T^{-0.5},~~3.61 \cdot 10^{12}\cdot\left(E^\star\right)^{-0.5}\right)$  & \cite{misc:1968:sinnott}\alb
+    O$_2^-$         & $N^{-1} \cdot {\rm min}\left(0.97 \cdot 10^{23}\cdot T^{-0.5},~~3.56 \cdot 10^{19} \cdot \left(E^\star\right)^{-0.1}\right)$  & \cite{misc:1983:gosho}\alb
+    e$^-$         & $N^{-1} \cdot 3.74\cdot 10^{19} \cdot {\rm exp}\left(33.5 \cdot \left({\rm ln}\, T_{\rm e} \right)^{-0.5}\right)$  & \cite[Ch.\ 21]{book:1997:grigoriev}\tnote{c}\\
+    \bottomrule
+    \end{tabular*}
+    \begin{tablenotes}
+      \item[a] Notation and units:  $T_{\rm e}$ is in Kelvin; $T$ is in Kelvin; $N$ is the total number density of the plasma in 1/m$^3$; $E^\star$ is the reduced effective electric field  ($E^\star \equiv |\vec{E}|/N$) in units of V$\cdot$m$^2$.
+      \item[b] The ``air ion'' mobility is obtained from the N$_2^+$ and O$_2^+$ ion mobilities assuming a N$_2^+$:O$_2^+$ ratio of 4:1. 
+      \item[c] The expression approximates the data given in Chapter 21 of Ref.\ \cite{book:1997:grigoriev}; The equation can be used in the range $1000~{\rm K} \le T_{\rm e} \le 57900 ~{\rm K}$ with a relative error on the mobility not exceeding 20\%. In the range $287~{\rm K} \le T_{\rm e} < 1000~{\rm K}$, the relative error is less than 30\%.
+    \end{tablenotes}
+   \end{threeparttable}
+\end{table*}
+%
+
+
+
+The mobilities of the various charged species are taken from Table \ref{tab:mobilities} while the fraction of the Joule heating that is consumed in the excitation of the vibration levels of the nitrogen molecule, $\zeta_{\rm v}$,  is as specified in Table \ref{table:etavcoefficients}.
+
+
+
+
+%
+\begin{table*}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Polynomial coefficients needed for the fraction of energy consumed in the excitation of vibration levels of the nitrogen molecule, $\zeta_{\rm v}=\sum_{n=0}^{10} k_n T_{\rm e}^n$.\tnote{a,b,c}} 
+    \label{table:etavcoefficients}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\hspace{0.1\textwidth}}l}
+    \toprule
+      Coefficient & Value    \\
+    \midrule
+      $k_0$          & $\texttt{+1.8115947E-3}$   \\
+      $k_1$     &  $\texttt{+2.1238526E-5}$  \\
+      $k_2$ & $\texttt{-2.2082300E-8}$  \\
+      $k_3$ & $\texttt{+7.3911515E-12}$  \\
+      $k_4$ & $\texttt{-8.0418868E-16}$  \\
+      $k_5$ & $\texttt{+4.3999729E-20}$  \\
+      $k_6$ & $\texttt{-1.4009604E-24}$  \\
+      $k_7$ & $\texttt{+2.7238062E-29}$  \\
+      $k_8$ & $\texttt{-3.1981279E-34}$  \\
+      $k_9$ & $\texttt{+2.0887979E-39}$  \\
+      $k_{10}$ & $\texttt{-5.8381036E-45}$  \\
+    \bottomrule
+    \end{tabular*}
+ \begin{tablenotes}
+   \item[a] The expression for $\zeta_{\rm v}$ can be used in the range $0<T_{\rm e}<60000$~K
+   \item[b] The polynomial approximates the experimental data in Ref.\ \cite{misc:1981:aleksandrov} and Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev}
+   \item[c] $T_{\rm e}$ is in Kelvin
+ \end{tablenotes}
+   \end{threeparttable}
+\end{table*}
+%
+
+%
+\begin{table*}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Polynomial coefficients needed to determine the electron temperature, $T_{\rm e}=\max\left(T,~\exp\left(\sum_{n=0}^{8} k_n (\ln E^\star)^n\right)\right)$.\tnote{a,b,c}} 
+    \label{table:Te}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\hspace{0.1\textwidth}}l}
+    \toprule
+      Coefficient & Value    \\
+    \midrule
+      $k_0$ & $\texttt{-3.69167532692495882511E+08}$   \\
+      $k_1$ & $\texttt{-6.26956713747712671757E+07}$   \\
+      $k_2$ & $\texttt{-4.65528490607805550098E+06}$   \\
+      $k_3$ & $\texttt{-1.97394448288739687996E+05}$   \\
+      $k_4$ & $\texttt{-5.22784662897089219769E+03}$   \\
+      $k_5$ & $\texttt{-8.85545617874565635930E+01}$   \\
+      $k_6$ & $\texttt{-9.36914737923363882821E-01}$   \\
+      $k_7$ & $\texttt{-5.66073394421067171284E-03}$   \\
+      $k_8$ & $\texttt{-1.49535882691330832494E-05}$   \\
+    \bottomrule
+    \end{tabular*}
+ \begin{tablenotes}
+   \item[a] The expression for $T_{\rm e}$ can be used in the range $0<E^\star<3\times 10^{-19}$~Vm$^2$
+   \item[b] The polynomial approximates the experimental data in Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev}
+   \item[c] $E^\star$ is in Vm$^2$, $T_{\rm e}$ in Kelvin, $T$ in Kelvin
+ \end{tablenotes}
+   \end{threeparttable}
+\end{table*}
+%
+
+
+%
+\begin{table*}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Electron temperature as a function of the effective electric field.\cite{misc:1981:aleksandrov}}
+    \label{tab:Te}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\hspace{0.13\textwidth}}l@{\hspace{0.1\textwidth}}l}
+    \toprule
+    $|\vec{E}+\vec{V}^{\rm e} \times \vec{B}|/N_{\rm n}$ [V~m$^2$]  & $T_{\rm e}$ [eV]   &  $T_{\rm e}$ [K] \\
+    \midrule
+      0.1 $\times 10^{-20}$    &  0.20          &  2321.0\\
+      0.2 $\times 10^{-20}$    &  0.34          &  3945.7\\
+      0.3 $\times 10^{-20}$    &  0.46          &  5338.3\\
+      0.4 $\times 10^{-20}$    &  0.57          &  6614.9\\
+      0.5 $\times 10^{-20}$    &  0.67          &  7775.4\\
+      0.6 $\times 10^{-20}$    &  0.75          &  8703.8\\
+      0.8 $\times 10^{-20}$    &  0.90          & 10444.5\\
+      1.0 $\times 10^{-20}$    &  0.98          & 11372.9\\
+      2.0 $\times 10^{-20}$    &  1.10          & 12765.5\\
+      3.0 $\times 10^{-20}$    &  1.20          & 13926.0\\
+      4.0 $\times 10^{-20}$    &  1.32          & 15318.6\\
+      5.0 $\times 10^{-20}$    &  1.46          & 16943.3\\
+      6.0 $\times 10^{-20}$    &  1.67          & 19380.4\\
+      8.0 $\times 10^{-20}$    &  2.02          & 23442.1\\
+     10.0 $\times 10^{-20}$    &  2.40          & 27852.0\\
+     20.0 $\times 10^{-20}$    &  4.00          & 46420.0\\
+    \bottomrule
+    \end{tabular*}
+   \end{threeparttable}
+\end{table*}
+%
+
+%
+\begin{table*}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Electron temperature as a function of the effective electric field as taken from Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev}.}
+    \label{tab:Te2}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}llll}
+    \toprule
+    {$|\vec{E}+\vec{V}^{\rm e} \times \vec{B}|/N_{\rm n}$ [V~m$^2$]}  & {$(T_{\rm e})_{\rm N_2}$ [eV]} & {$(T_{\rm e})_{\rm O_2}$ [eV]} & {$T_{\rm e}$ [eV]} &  {$T_{\rm e}$ [K]} \\
+    \midrule
+      0.003 $\times 10^{-20}$  &  0.028  &  --  &  0.02471       &  286.8\\
+      0.005 $\times 10^{-20}$  &  0.031  &  --  &  0.02736       &  317.5\\
+      0.007 $\times 10^{-20}$  &  0.035  &  --  &  0.03089       &  358.5\\
+      0.01 $\times 10^{-20}$   &  0.042  &  --  &  0.03707       &  430.2\\
+      0.03 $\times 10^{-20}$   &  0.10   &  --  &  0.08825       & 1024.1\\
+      0.05 $\times 10^{-20}$   &  0.16   &  --  &  0.1412        & 1638.6\\
+      0.07 $\times 10^{-20}$   &  0.20   &  --  &  0.1765        & 2048.3\\
+      0.1 $\times 10^{-20}$    &  0.28   &  0.14                    &  0.2470        & 2866.4\\
+      0.3 $\times 10^{-20}$    &  0.61   &  0.30                    &  0.5371        & 6233.0\\
+      0.5 $\times 10^{-20}$    &  0.74   &  0.49                    &  0.6813        & 7906.5\\
+      0.7 $\times 10^{-20}$    &  0.84   &  0.73                    &  0.8142        & 9448.8\\
+      1.0 $\times 10^{-20}$    &  0.93   &  1.1                     &  0.9700        &11256.9\\
+      3.0 $\times 10^{-20}$    &  1.20   &  2.4                     &  1.4820        &17198.6\\
+      5.0 $\times 10^{-20}$    &  1.40   &  2.9                     &  1.7525        &20337.8\\
+      7.0 $\times 10^{-20}$    &  1.50   &  3.0                     &  1.8525        &21498.3\\
+     10.0 $\times 10^{-20}$    &  1.90   &  3.4                     &  2.2525        &26140.3\\
+     20.0 $\times 10^{-20}$    &  3.40   &  --  &  4.0392        &46874.9\\
+     30.0 $\times 10^{-20}$    &  4.20   &  --  &  4.9896        &57904.3\\
+    \bottomrule
+    \end{tabular*}
+   \end{threeparttable}
+\end{table*}
+%
+
+
+
+The electron temperature needed to obtain the mobility, the effective pressure, the specific enthalpy, and the specific internal energy of the electron species is here obtained through the ``local approximation'' by assuming that the electron temperature is a function of the local reduced electric field and does not depend on its gradients in space or time. This can be shown to yield an expression for  $T_{\rm e}$ function of $E^\star$, as tabulated in Table \ref{table:Te}.  This is generally accepted to yield a good approximation of the electron temperature except within the cathode sheath. Such is not a cause of concern, however, because the latter is primarily ion dominated and does not depend significantly on electron temperature for many problems of interest.  
+
+It is preferred to use polynomials fits to find $\zeta_{\rm v}$ and $T_{\rm e}$ rather than interpolate through the raw data directly as was done in previous simulations of weakly-ionized plasmas (see raw data in Tables \ref{tab:Te} and \ref{tab:Te2}). Using either strategy would yield similar results when using explicit schemes to integrate the governing equations. However, when using an implicit scheme as done herein, it is important to use smooth polynomials to obtain optimal convergence rates. Should we interpolate through the raw data instead of using polynomials, the derivatives within the Jacobians could change abruptly from one time step to the other and this could lead to slower convergence or even convergence hangs.
+
+
+
+
+
+
+
+
+
+
+
+\appendix
+
+
+  \bibliographystyle{warpdoc}
+  \bibliography{all}
+
+
+\end{document}
+
+
+
+
+
+
+
+Old stuff
+
+electron energy loss function: 
+- not used anymore but kept just in case
+- see derivation in prim/fluid/doc/Transport_Equations/report.pdf
+
+%
+\begin{table}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Polynomial coefficients needed for the electron energy loss function $\zeta_{\rm e}=k_0+k_1 T_{\rm e}+k_2 T_{\rm e}^2 + k_3 T_{\rm e}^3 + k_4 T_{\rm e}^4 + k_5 T_{\rm e}^5+ k_6 T_{\rm e}^6$.\tnote{a,b,c}} 
+    \label{tab:xicoefficients}
+    \fontsizetable
+    \begin{tabular}{llll}
+    \toprule
+      Coefficient & Value for $T_{\rm e}<19444$~K & Value for $T_{\rm e}\ge 19444$~K  \\
+    \midrule
+      $k_0$          & $+5.1572656\times 10^{-4}$ & $+2.1476152\times 10^{-1}$  \\
+      $k_1$, 1/K     & $+3.4153708\times 10^{-8}$ & $-4.4507259\times 10^{-5}$  \\
+      $k_2$, 1/K$^2$ & $-3.2100688\times 10^{-11}$ & $+3.5155106\times 10^{-9}$ \\
+      $k_3$, 1/K$^3$ & $+1.0247332\times 10^{-14}$ & $-1.3270119\times 10^{-13}$ \\
+      $k_4$, 1/K$^4$ & $-1.2153348\times 10^{-18}$ & $+2.6544932\times 10^{-18}$ \\
+      $k_5$, 1/K$^5$ & $+7.2206246\times 10^{-23}$ & $-2.7145800\times 10^{-23}$ \\
+      $k_6$, 1/K$^6$ & $-1.4498434\times 10^{-27}$ & $+1.1197905\times 10^{-28}$ \\
+    \bottomrule
+    \end{tabular}
+ \begin{tablenotes}
+   \item[a] The expression for $\zeta_{\rm e}$ can be used in the range $0<T_{\rm e}<60000$~K
+   \item[b] In the range $287~{\rm K}<T_{\rm e}<1500$~K, the relative error that the loss function induces on the electron temperature is not more than 30\%.
+   \item[c] In the range $1500~{\rm K}<T_{\rm e}<57000$~K, the relative error that the loss function induces on the electron temperature is not more than 5\%.
+ \end{tablenotes}
+   \end{threeparttable}
+\end{table}
+%
+

@@ -1,0 +1,236 @@
+{
+  _____________________________________________________________________________
+
+  WARP: a CFD Code for Plasma & Reactive Flows [a]
+  _____________________________________________________________________________
+
+  Cycle Strategy                          Standard Cycle
+  Fluid Transport Integration             Block DDADI [2,1]
+  EM Field Integration                    none
+  Convection Derivative Discretization    Positivity-Preserving FDS [3] Total
+                                          Variation Diminishing 2nd Order [4]
+  Time Derivative Discretization          Steady-State
+  Fluid Transport Model                   Navier-Stokes Multispecies
+  Chemical Model                          Air Plasma 4 species 13 reactions
+  Beam Model                              None
+  EM Field Model                          None
+  Thermodynamic Model                     NASA Glenn Polynomials [5]
+  Number of Dimensions                    2
+  Number of Flux Components               7
+  Number of Species                       4
+  Number of Charged Species               0
+  List of Species                         O2, N2, O, N
+  _____________________________________________________________________________
+
+  [a]  B Parent. "WARP: a CFD Code for Plasma & Reactive Flows", WARP version
+       17apr06a compiled on Apr  7 2017 at 11:53:58 by parent on WAFL101 using
+       gcc 4.9.2 with OPENMP threads. WARP is a Copyright (c) 1998-2017 of
+       Bernard Parent. Copying and distribution of WARP is prohibited.
+  [1]  RW MacCormack. "A New Implicit Algorithm for Fluid Flow", 13th
+       Computational Fluid Dynamics Conference, AIAA Paper 97-2100, 1997.
+  [2]  J Bardina and CK Lombard. "Three Dimensional Hypersonic Flow Simulations
+       with the CSCM Implicit Upwind Navier-Stokes Method", Proceedings of the
+       8th Computational Fluid Dynamics Conference, AIAA Paper 87-1114, 1987.
+  [3]  B Parent. "Positivity-Preserving Flux Difference Splitting Schemes",
+       Journal of Computational Physics 243:194-209, 2013.
+  [4]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume
+       Flux Vector Splittings for the Euler Equations", AIAA Journal
+       24:1453-1460, 1986.
+  [5]  BJ McBride, MJ Zehe, and S Gordon. "NASA Glenn Coefficients for
+       Calculating Thermodynamic Properties of Individual Species", NASA TP
+       2002-211556, 2002.
+
+}
+
+ mf=1;
+
+is=1;  js=1; 
+ie=round(100*mf); je=round(20*mf);
+
+Grid(
+  Size(is,js, ie,je);
+  Point(is,js, 0.0e0,0.0e0);
+  Point(ie,js, 1.0e0,0.0e0);
+  Point(ie,je, 1.0e0,1.0e0);
+  Point(is,je, 0.0e0,1.0e0);
+  JoinCorners(is,js, ie,je,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
+);
+
+
+Bdry(
+  NavierStokes(
+    {
+    _________________________________________________________________________________________
+
+    Boundary Condition Type           Number  Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC             0       Inflow, supersonic
+    BDRY_INFLOWSUBSONIC1              7       Inflow, subsonic, Tstag, Pstag fixed, 1o
+    BDRY_INFLOWSUBSONICMASSFLOWFIXED1 16      Inflow, subsonic, Pstag, Massflow/Area fixed, 1o
+    BDRY_OUTFLOWSUPERSONIC1           1       Outflow, supersonic, 1o
+    BDRY_OUTFLOWSUBSONIC1             4       Outflow, subsonic, P fixed, 1o
+    BDRY_OUTFLOWSUBSONICMFIXED1       15      Outflow, subsonic, M fixed, 1o
+    BDRY_SYMMETRICAL2                 14      Symmetrical, 2o
+    BDRY_SYMMETRICAL1                 9       Symmetrical, 1o
+    BDRY_WALLTFIXED1                   3       Wall, T specified
+    BDRY_WALLADIABATIC1                6       Wall, Adiabatic
+    BDRY_SLIPWALL1                    12      Slip wall, Adiabatic, 1o
+    _________________________________________________________________________________________
+    }
+    All(BDRY_WALLTFIXED1);
+    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_SLIPWALL1,BDRY_SLIPWALL1);
+    {
+    Cut(is,js,  ie,je);
+    Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
+    }
+  );
+);
+ 
+ 
+Model(
+  NavierStokes(
+    DIFFUSION=NO;
+    REACTING=NO;
+    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
+    Tmin=1.0e1;     Tmax=6.0e3;    {K}
+    Twmin=Tmin;     Twmax=Tmax;    {K}
+    wmin=1.0e-50;
+    zetaA1=0.1e0;     {conditions the eigenvalues of the A jacobian}
+    EIGENVALCOND=EIGENVALCOND_PECLET; {Recommended: EIGENVALCOND_PARENT}
+    AXISYMMETRIC=NO;
+  );
+);
+
+
+Init(
+  NavierStokes(
+    {
+    _______________________________________________________________________________________
+
+    Initial Condition Type       Parameters
+    _______________________________________________________________________________________
+
+    INIT_TYPE1                   V[1]..V[nd],  T,  rho, w[1]..w[ns]
+    INIT_TYPE2                   M[1]..M[nd],  P,  T,   w[1]..w[ns]
+    INIT_TYPE3                   M[1]..M[nd],  Re, T,   w[1]..w[ns]
+    INIT_TYPE4                   Mmag, angles, P,  T,   w[1]..w[ns]
+    INIT_TYPE5                   V[1]..V[nd],  P,  T,   w[1]..w[ns]
+    INIT_TYPE6                   V[1]..V[nd],  P,  T,   chi[1]..chi[ns]
+    _______________________________________________________________________________________
+
+    }
+    Vx=600;
+    Vy=0;
+    P=10000; {Pa}
+    T=300; {K}
+    w_O2=0.235;
+    w_N2=0.765;
+    w_O=1.0e-30;
+    w_N=1.0e-30;
+    All(INIT_TYPE5,Vx,Vy,P,T,w_O2,w_N2,w_O,w_N);
+
+
+    T=900; {K}
+    w_N2=0.135;
+    w_O2=0.665;
+    w_O=0.1;
+    w_N=0.1;
+    Region(round(is+(ie-is)/5),round(js+(je-js)/4),  round(is+(ie-is)/2),round(js+3*(je-js)/4),  INIT_TYPE5, Vx,Vy,P,T,w_O2,w_N2,w_O,w_N);
+
+    {
+    Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_O,w_N);
+    Region(is,js,  ie,je, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_O,w_N);
+    }
+  );
+);
+
+
+Cycle(
+  NavierStokes(
+    xiverge=1e0;  {residual convergence threshold}
+    rhoref=1.0;  {reference density in kg/m3}
+    aref=300.0;  {reference sound speed in m/s}
+    Uref[0]=rhoref;   
+    Uref[1]=rhoref;   
+    Uref[2]=rhoref;   
+    Uref[3]=rhoref;   
+    Uref[4]=rhoref*aref;   
+    Uref[5]=rhoref*aref;   
+    Uref[6]=rhoref*aref*aref;  
+  );
+  SteadyState(
+    tmax=6e-4;    {simulation time span in seconds}
+    dt=tmax/(60*mf);   {physical time step in seconds}
+    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
+    PRECONDITIONER=PRECON_LOCALTIMESTEP;
+    if (iter==1,
+      CFL=0.3;
+    );
+    CFL=min(CFL*1.2,2.5);
+    UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,dt);
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,clipinfo);
+    if (ximax<xiverge || iter>30,
+      IncreaseTimeLevel();
+      WriteDataFile(outputfilename"."round(time/dt));
+      printf("dt=%E time=%Es\n",dt,time);
+      if (time>tmax-0.1*dt,
+        exit(EXIT_SUCCESS);
+      );
+    );
+  );
+
+);
+
+
+Post(
+  xstation[1]=0.1; {m}
+  xstation[2]=0.2; {m}
+  xstation[3]=0.3; {m}
+  numsteps=300;
+  qmin=1.0; {m/s, as small a value as possible}
+  Pback_min=400; {Pa}
+  Pback_max=40000; {Pa}
+  Aback=1.0; {m2/m}
+  for (cnt,1,3,
+    SetXstation(xstation[cnt]);
+    Pback=_Pback_xstation(Aback, Pback_min, Pback_max, numsteps, qmin);
+    Fpot=_Fpot_xstation(Pback, numsteps, qmin);
+    mdot=_mdot_xstation();
+    Tstag=_Tstag_xstation();
+    Pstag=_Pstag_xstation(numsteps);
+    Pstar=_Pstar_xstation();
+    T=_T_xstation();
+    q=_q_xstation();
+    rho=_rho_xstation();
+    htstar=_htstar_xstation();
+    printf("x      = %E m\n"
+           "Pback  = %E Pa\n"
+           "Fpot   = %E Ns/kg\n"
+           "mdot   = %E kg/ms\n"
+           "htstar = %E J/kg\n"
+           "Tstag  = %E K\n"
+           "Pstag  = %E Pa\n"
+           "Pstar  = %E Pa\n"
+           "T      = %E K\n"
+           "q      = %E m/s\n"
+           "rho    = %E kg/m3\n\n"
+           ,xstation[cnt],Pback,Fpot,mdot,htstar,Tstag,Pstag,Pstar,T,q,rho);
+  );
+  printf("\n");
+  for (dim,1,2,
+    Fshear[dim]=_Fshear(is,js, ie,je, dim,BDRY_WALLTFIXED1);
+    Fpressure[dim]=_Fpressure(is,js, ie,je, dim,BDRY_WALLTFIXED1);
+  );
+  printf("Fshear    = (%+E,%+E) N/m\n",Fshear[1],Fshear[2]);
+  printf("Fpressure = (%+E,%+E) N/m\n",Fpressure[1],Fpressure[2]);
+  printf("Qheat     = %+E W/m\n",_Qheat(is,js, ie,je, BDRY_WALLTFIXED1));
+  printf("\n");
+  {
+  POSTGRIDONLY=FALSE;
+  WritePostFile(is,js, ie,je, "post.01", "tecplot", POSTGRIDONLY);
+  }
+);

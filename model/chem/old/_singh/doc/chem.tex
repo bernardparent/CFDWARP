@@ -1,0 +1,89 @@
+\section{Singh Combustion Model}
+
+The calculation of a chemical source term is explained in detail in Anderson. \cite{gen:anderson2}.
+A brief summary of that exaplanation follows here.
+Each species conservation equation has a source term for each species $k$ given by:
+
+\begin{displaymath}
+\dot{W}_k = {\cal M}_k \sum_{l=1}^{N_e} \left( \nu''_{l,k} - \nu'_{l,k} \right)
+\left[ k_{f,l} \prod_{m=1}^{N_l} \left[ \chi_m \right]^{\nu'_{l,m}}
+- k_{b,l} \prod_{m=1}^{N_l} \left[ \chi_m \right]^{\nu''_{l,m}} \right]
+\end{displaymath}
+
+$N_e$ is the number of elementary reactions involving species $k$.
+$N_l$ is the number of species involved in the elementary reaction.
+${\cal M}_k$ is the molecular weight of species $k$.
+$\chi_m$ is the mole fraction of species $m$.
+$\nu'_{l,k}$ is the stoichiometric coefficient for the reactants of reaction $l$.
+$\nu''_{l,k}$ is the stoichiometric coefficient for the products of reaction $l$.
+$k_b$ is the backward reaction rate constant and
+$k_f$ is the forward reaction rate constant, given by the
+modified Arrhenius equation:
+\begin{displaymath}
+k_f = AT^n \exp(-E/{\cal R}T)
+\end{displaymath}
+where the coefficients $A$, $n$ and $E$ are germane to a particular combustion
+model. In this study, the Singh hydrogen-air combustion model is used 
+\cite{chem:singh} and the coefficients are given in table \ref{model} 
+below.
+
+The backward and the forward reaction rate constants are related by the
+equilibrium constant, $K_c$
+\begin{displaymath}
+\frac{k_f}{k_b} = K_c
+\end{displaymath}
+The equilibrium constant, $K_c$ is given by:
+\begin{displaymath}
+K_c = ({\cal R} T)^{-\Delta \nu}
+       \exp \left( \frac{-\Delta G^0}{{\cal R} T} \right)
+\end{displaymath}
+
+where
+\begin{displaymath}
+\Delta \nu = \sum_{i=1}^{N_l} (\nu''_i - \nu'_i)
+\end{displaymath}
+The Gibbs free energy for species $i$
+is defined as $G_i = H_i - T S_i$, where $H_i$ is the
+enthalpy, $T$ is the temperature and $S_i$ is the entropy.
+The difference in Gibbs free energy $\Delta G^0$ of products and reactants is
+\begin{displaymath}
+\Delta G^0 = \sum_{i=1}^{N_l} (\nu''_i - \nu'_i) \left( h^0_i - T s^0_i \right)
+\end{displaymath}
+where $h^0_i$ is the molar enthalpy (including the heat of formation at a
+reference temperature of 298 K)
+of the species $i$, and $s^0_i$ is its the molar entropy,
+each calculated at a reference pressure (one atmosphere).\\
+\\
+
+\begin{table}
+\begin{threeparttable}
+\caption{Singh Hydrogen-Air Combustion Model with Nitrogen Inert}
+\begin{tabular}{|cc|c|c|c|} \hline
+\multicolumn{2}{|c|}{Reaction} & A & n & E  \\ \hline \hline
+(1) & H$_{2}$ + O$_{2} \rightarrow$ OH + OH & 1.70 $\times$ 10$^{13}$ & 0 & 48 000 \\
+(2) & H + O$_{2} \rightarrow$ OH + O & 1.42 $\times$ 10$^{14}$ & 0 & 16 400 \\
+(3) & O + H$_{2} \rightarrow$ OH + H & 2.07 $\times$ 10$^{14}$ & 0 & 13 750 \\
+(4) & OH + H$_{2} \rightarrow$ H$_{2}$O + H & 3.16 $\times$ 10$^{7}$ & 1.80 & 3 030 \\
+(5) & OH + OH $\rightarrow$ H$_{2}$O + O & 5.50 $\times$ 10$^{13}$ & 0 & 7 000 \\
+(6) & H + OH + M $\rightarrow$ H$_{2}$O + M & 2.21 $\times$ 10$^{22}$ & -2.00 & 0 \\
+(7) & H + H + M $\rightarrow$ H$_{2}$ + M & 6.53 $\times$ 10$^{17}$ & -1.00 & 0 \\
+\hline
+\end{tabular}
+\label{model}
+\end{threeparttable}
+\end{table}
+
+The units for $A$ are in $[\frac{cm^{3b}}{(gmol-s)^b}]$ where $b=1$ for two body reactions and 
+$b=2$ for three body reactions. $E$ is in $[\frac{cal}{gmol}]$.\\
+\\
+
+The symbol $M$ denotes a third-body collision partner, a species acting as a catalyst only.
+The concentration of $M$ is simply determined from the equation :\\
+
+\begin{displaymath}
+X_M = \sum_{k=1}^{n_s} \eta_k X_k
+\end{displaymath}
+
+where $\eta_k$ is the third-body efficiency. $\eta_k$ is unity
+for all species and reactions in this case. 
+

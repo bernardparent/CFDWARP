@@ -1,0 +1,5 @@
+#/usr/bin/sh
+
+gcc -c -Wall -O4 -I../../../../lib/include test.c 
+gcc test.o -lm -L../../../../lib -lexm -o test
+./test

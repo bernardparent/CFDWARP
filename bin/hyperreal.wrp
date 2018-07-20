@@ -1,0 +1,227 @@
+{
+  Number of Dimensions    : nd           : 2
+  Number of Species       : ns           : 2
+    [  O2  N2  ]
+}
+
+meshfact=1.0;
+L=1.0;
+H=0.15; 
+
+Mx=8.0;
+My=1.9;
+P=10000;
+T=300;
+R=286;{only used for initial conditions and xi}
+gamma=1.4; {only used for initial conditions}
+
+Grid(
+  is=1;  js=1; 
+  ie=round(meshfact*70); je=round(meshfact*40);
+  Size(is,js, ie,je);
+  Point(is,js, 0.0e0,0.0e0);
+  Point(ie,js, L,0.0e0);
+  Point(ie,je, L,H);
+  Point(is,je, 0.0e0,H);
+  JoinCorners(is,js, ie,je,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
+);
+
+
+Bdry(
+  FavreReynolds(
+    {
+    ******************************************************************
+    * Fluid Flow Boundary Conditions Types:                           
+    ******************************************************************
+    *  0 : Inflow, supersonic                                         
+    *  7 : Inflow, subsonic, Tstag, Pstag specified                   
+    * 16 : Inflow, subsonic, Pstag, Massflow/Area                     
+    *  1 : Outflow, supersonic                                        
+    *  4 : Outflow, subsonic, P specified                             
+    * 15 : Outflow, subsonic, M specified                             
+    * 14 : Symmetrical, 2nd order                                     
+    *  9 : Symmetrical, 1st order                                     
+    *  3 : Wall, T specified                                          
+    *  6 : Wall, Adiabatic                                            
+    * 12 : Slip wall, 1st order, Adiabatic                            
+    * 21 : Wall, Adiabatic, Cathode                                   
+    * 22 : Wall, Adiabatic, Anode                                     
+    * 23 : Wall, Adiabatic, Dielectric                                
+    ******************************************************************
+    }
+    { first, create cuts in the computational domain; a cut is a region 
+     which is not computed by the solver }
+    { Cut(10{is},10{js},  17{ie},17{je});}
+    { second, apply a default boundary condition (BC) type to all boundary nodes }
+    All(3{BC type});
+    { impose BC type at faces i=is, i=ie, j=js, j=je}
+    Faces(0,1,  12,12);
+    { apply BC type only to the boundary nodes in a specific region of the computational domain}
+    { Region(10{is},10{js},  17{ie},17{je},  3{BC type});}
+  );
+);
+ 
+ 
+Model(
+ 
+  FavreReynolds(
+    TURBMODEL=TURBMODEL_KOMEGA2008;      {set TURBMODEL to 
+                     - TURBMODEL_KOMEGA1988 for Wilcox k-omega model (1988)
+                     - TURBMODEL_KOMEGA2008 for new Wilcox k-omega model (2008)
+                     - TURBMODEL_KEPSILON for Launder-Sharma k-epsilon model}
+    DILATDISSIP=DILATDISSIP_NONE; {the dilatational dissipation can be set to DILATDISSIP_WILCOX or DILATDISSIP_SARKAR or NO}
+    RAPCOMP=NO;     {the rapid compression correction by Coakley et altrui? (either YES or NO)}
+    TURBSOURCE=YES; {solve the turbulence source terms? if set to NO and if the turbulence 
+                     kinetic energy k is set to zero in the freestream, then will solve the 
+                     flow as laminar}
+    
+    REACTING=YES;   {reacting flow? say either YES or NO -> only effective when a chemical solver is used}
+    Prt=0.9e0;      {the turbulent Prandtl number;
+                      - recommended value of 0.9 in boundary layers
+                      - recommended value of 0.5 in shear layers}
+    Sct=1.0e0;      {the turbulent Schmidt number;
+                      - set it to a value between 0.2 and 2}
+    kdiv=1.0e0;     {set kdiv in m2/s2 to as low a value as possible and
+                   - at most one tenth the maximum value of k in the boundary layer
+                     profile exhibiting the lowest maximum k for supersonic flow
+                   - at most one hundredth the maximum value of k in the boundary layer}
+    ADD_ETA_TO_ETAT_WITHIN_QK=NO;  {say NO for standard kinetic energy transport model}
+    psidiv=0.1e-3;   {set psidiv to as low a positive value as possible}
+    Pmin=1.0e-2;    Pmax=9.9e99;   {min and max pressure allowed in the domain in Pa}
+    Tmin=1.0e1;     Tmax=6.0e3;    {min and max temperature allowed in the domain in K}
+    Twmin=Tmin;     Twmax=Tmax;    {min and max wall temperature allowed on any wall boundary node in K}
+    kmin=-1.0e3;   kmax=9.9e99;   {min and max TKE allowed in the domain in m2/s2}
+    psimin=1e-10;   psimax=9.9e99; {min and max omega/epsilon allowed in the domain}
+    wmin=-1.0e-9;                  {min mass fraction allowed in the domain}
+    zetaA1=0.1e0;  {conditions the convective waves of the A jacobian}
+    zetaA1=0.1e0;  {conditions the acoustic waves of the A jacobian}
+    zetaA2=0.2;
+    zetaA3=0.1e0;{conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
+     {minimum Peclet number allowed within conditioning of convective waves}
+    AXISYMMETRIC=NO; {not tested yet!!}
+  );
+);
+ 
+ 
+Init(
+  if (!READDATAFILE,
+    FavreReynolds(
+      {
+      ************************************************************
+      *Initial Conditions Types:                                  
+      ************************************************************
+      *1, V[1]..V[nd],  T,  rho,  w[1]..w[ns], k, psi     
+      *2, M[1]..M[nd],  P,  T,    w[1]..w[ns], k, psi     
+      *3, M[1]..M[nd],  Re, T,    w[1]..w[ns], k, psi     
+      *4, Mmag, angles, P,  T,    w[1]..w[ns], k, psi     
+      *5, V[1]..V[nd],  P,  T,    w[1]..w[ns], k, psi     
+      *6, V[1]..V[nd],  P,  T,    chi[1]..chi[ns], k, psi   
+      ************************************************************
+      NOTE: in the freestream inflow conditions, it is suggested to
+            set psi to:
+              10*(flow speed) for the 1988 k-omega model          
+              110*(flow speed) for the 2008 k-omega model         
+      }
+      { Init all nodes in the domain}
+      All(2,Mx,My,P,T,0.235,0.765,0.01,110*sqrt(gamma*R*T)*sqrt(Mx*Mx+My*My));
+      {
+        { Init bdry nodes numbered 3}
+        Bdry(3, 1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0);
+        { Init nodes in region}
+        Region(3,3,  6,6,
+         1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0);
+      }
+    );
+  );
+  ReadDataFile();
+  {the initial conditions that must be applied after reading the data file
+   can be put here}
+);
+
+
+Cycle(
+  FavreReynolds(
+    xiverge=1e0;  {residual convergence threshold}
+    rhoref=P/R/T;  {reference density in kg/m3}
+    aref=300.0;  {reference sound speed in m/s}
+    kref=1e4;  {reference turbulence kinetic energy in m2/s2}
+    psiref=1e8;  {reference specific dissipation rate of the TKE in 1/s if TURBMODEL=TURBMODEL_KOMEGA*
+                  reference dissipation rate of the TKE in m2/s3 if TURBMODEL=TURBMODEL_KEPSILON}
+    Uref[0]=rhoref;   
+    Uref[1]=rhoref;   
+    Uref[2]=rhoref*aref;   
+    Uref[3]=rhoref*aref;   
+    Uref[4]=rhoref*aref*aref;  
+    Uref[5]=rhoref*kref;  
+    Uref[6]=rhoref*psiref;  
+  );
+  MultizoneSteady(
+    if (mod(iter,50)==0,
+      WriteDataFile();
+    );
+    sigma1=0.5;      {exponent of largest pseudotime step in all dimensions}
+    sigma2=0.0;      {exponent of largest pseudotime step in all flux components}
+    PRECONDITIONER=PRECON_LOCALTIMESTEP;
+    if (iter==1,
+      CFL=0.1;
+    );
+    CFL=min(CFL*1.1,1.0);
+    phi1=20;     {maximum number of gridlines per zone in each dimension}
+    UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,phi1);
+
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld) %3ld/%3ld%s \n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,numzones_updated,numzones_total,clipinfo);
+  );
+);
+
+
+Post(
+  xcut[1]=0.1;
+  xcut[2]=0.2;
+  xcut[3]=0.3;
+  {the following loop outputs to a file integrated properties at x=0.1,0.2,0.3}
+  for (cnt,1,3,
+    SetPostDomainToXcuts(xcut[cnt]);
+    Pback=_BackPressure({Aback,m2}1.0, {Pback_min,Pa}400, {Pback_max,Pa}4000, {numsteps}300,
+                 {q_min (as small a positive value as possible)}1.0);
+    Fpot=_ThrustPotentialPerMassFlowRate(Pback,{numsteps}300, {q_min}1.0);
+    mdotreacting=_MassFlowRateReacting(
+        2       {rank of the reacting species},
+        0.235*(1-0.02876){stoichio. mass fraction of reacting species},
+        1       {rank of the species reacted with},
+        0.02876 {stoichio. mass fraction of species reacted with});
+    Fx=_MomentumForcePerMassFlowRate();  {momentum*crossarea/mdot}
+    mdot=_MassFlowRate();
+    Tstag=_MassFlowRateAveStagTemperature();
+    Pstag=_MassFlowRateAveStagPressure({numsteps} 300);
+    Pave=_MassFlowRateAvePressure();
+    Tave=_MassFlowRateAveTemperature();
+    qave=_MassFlowRateAveSpeed();
+    rhoave=_MassFlowRateAveDensity();
+    htstarave=_MassFlowRateAveTotalEnthalpy();
+    fprintf("perfparam.txt",
+            "x              =%E m\n"
+            "Pback          =%E Pa\n"
+            "Fpot           =%E Ns/kg\n"
+            "mdotreacting   =%E kg/s\n"
+            "mdot           =%E kg/s\n"
+            "Tstag          =%E K\n"
+            "Pstag          =%E Pa\n"
+            "Pave           =%E Pa\n"
+            "Tave           =%E K\n"
+            "qave           =%E m/s\n"
+            "rhoave         =%E kg/m3\n\n"
+            ,xcut[cnt],Pback,Fpot,mdotreacting,mdot,Tstag,Pstag,Pave,Tave,qave,rhoave);
+  );
+  {here, reset the post domain from one xcut to the entire computational domain}
+  ResetPostDomain();
+  {then, restrict the post domain to the region between is,js and ie,je}
+  RestrictPostDomainToRegion(is,js, ie,je);
+  {output the body forces in the post domain to a file (both shear and pressure)}
+  WriteBodyForcesFile("bodyforces.txt",3 {node type on the surface of the body});
+  {write a post file that includes only the post domain}
+  WritePostFile("post.01", "tecplot",POSTFILE_ALL);
+  {write a grid post file that includes only the post domain}
+  WritePostFile("grid.01", "tecplot",POSTFILE_GRID);
+);

@@ -1,0 +1,735 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{amsmath}
+\usepackage{bm}
+
+
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\nd}{{n_{\rm d}}}
+\newcommand{\M}{{\bf M}}
+\newcommand{\N}{{\bf N}}
+\newcommand{\B}{{\bf B}}
+\newcommand{\BI}{\wbar{{\bf B}}}
+\newcommand{\A}{{\bf A}}
+\newcommand{\C}{{\bf C}}
+\newcommand{\T}{{\bf T}}
+\newcommand{\Dstar}{D^{\!\star}}
+\newcommand{\Fstar}{F^{\!\star}}
+\newcommand{\Ustar}{U^{\!\star}}
+\newcommand{\Sstar}{S^{\!\star}}
+\newcommand{\Kstar}{K^{\!\star}}
+\newcommand{\Ystar}{Y^{\!\star}}
+\newcommand{\co}{,~~}
+\newcommand{\band}{{\rm Band}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{1.0}}
+\renewcommand{\fontsizefigure}{\footnotesize}
+\renewcommand{\vec}[1]{\bm{#1}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcounter{tocdepth}{3}
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\author{
+  Bernard Parent
+}
+
+\email{
+  bernparent@gmail.com
+}
+
+\department{
+  Institute for Aerospace Studies	
+}
+
+\institution{
+  University of Toronto
+}
+
+\title{
+  Fluid Relaxation Schemes
+}
+
+\date{
+  June 2001, July-August 2015
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+  \tableofcontents
+%  \makenomenclature
+%%  \listoftables
+%%  \listoffigures
+\sloppy
+
+
+
+\section{Explicit Pseudo-Time Stepping}
+
+After adding a pseudo-time derivative, the discretized form of the governing equations, using explicit Euler
+time-marching corresponds to:
+%
+\begin{align}
+   \Gamma^n {\Delta^n {\Ustar}}
+  &+  Z^n \left(\delta_t \Ustar\right)^n \nonumber\alb
+  &+ \sum_{i=1}^{\nd}
+      \left(  \delta_{X_i} {\Fstar_i}^{n} 
+            + \delta_{X_i} \left({\Dstar_i} \Ustar\right)^n
+            + {\Ystar_i}^n \delta_{X_i} H^n
+            - \sum_{j=1}^{\nd} \delta_{X_i} \left(  {\Kstar_{ij}}^{\!\! n} \delta_{X_j} G^{n}\right) \right)
+ ={\Sstar}^{n}
+\end{align}
+%
+where the superscript $n$ refers to the pseudo-time step,
+and $\Delta^n {\Ustar}\equiv {\Ustar}^{n+1}-{\Ustar}^n$. Recall the definition of the discretized
+residual:
+%
+\begin{align}
+R_\Delta^n &\equiv  Z^n \left(\delta_t \Ustar\right)^n \nonumber\alb
+  &+ \sum_{i=1}^{\nd}
+      \left(  \delta_{X_i} {\Fstar_i}^{n} 
+            + \delta_{X_i} \left({\Dstar_i} \Ustar\right)^n
+            + {\Ystar_i}^n \delta_{X_i} H^n
+            - \sum_{j=1}^{\nd} \delta_{X_i} \left(  {\Kstar_{ij}}^{\!\! n} \delta_{X_j} G^{n}\right) \right)
+ -{\Sstar}^{n}
+\label{eqn:Rdelta}
+\end{align}
+%
+Then, the former can be rewritten as
+%
+\begin{equation}
+     \Delta^n{\Ustar}=   - \left(\Gamma^n\right)^{-1} R_\Delta^n
+\end{equation}
+%
+
+
+
+
+\section{Implicit Pseudo-Time Stepping}
+
+Despite its simplicity and the small amount of computing per iteration, explicit time stepping generally has a poor computational efficiency. This is due to the chemical reactions and diffusion terms being particularly stiff and restricting the pseudo-time step to very small values, hence leading to very slow convergence rates. This can be remedied through the use of \emph{implicit} pseudo-time stepping.
+
+\subsection{Delta Form}
+
+After adding a pseudo-time derivative, the discretized form of the governing equations using implicit Euler
+time-marching corresponds to:
+%
+\begin{align}
+   \Gamma^n {\Delta^n {\Ustar}}&+  Z^n \left(\delta_t \Ustar\right)^{n+1}+   \sum_{i=1}^{\nd}
+      \Bigg(  \delta_{X_i} {{\Fstar_i}^{n+1}}
+            + \delta_{X_i} {\Dstar_i}^{n} {\Ustar}^{n+1}
+\nonumber\alb
+            &+ {\Ystar_i}^n \delta_{X_i} H^{n+1}
+            - \sum_{j=1}^{\nd} \delta_{X_i} \left( {\Kstar_{ij}}^{\!\! n} \delta_{X_j} G^{n+1}\right) \Bigg) 
+ - {\Sstar}^{n+1}=0
+\label{eqn:govdisc2}
+\end{align}
+%
+where we took some liberty in assuming that $\Gamma$, $\Kstar$, $Z$, $\Dstar$, and $\Ystar$ do not change in
+pseudo-time.
+Let's substract the residual evaluated at pseudo-time level $n$ as shown in Eq.\ (\ref{eqn:Rdelta}) on both sides of the latter:
+%
+\begin{align}
+   \mfd \Gamma^n {\Delta^n {\Ustar}}
+ +   \sum_{i=1}^{\nd}
+      &\Bigg( \delta_{X_i} \left({{\Fstar_i}^{n+1}}-{{\Fstar_i}^{n}}\right)
+          + \delta_{X_i} {\Dstar_i}^{n} \left( {\Ustar}^{n+1}-{\Ustar}^{n}\right)
+          + {\Ystar_i}^n \delta_{X_i} \left(H^{n+1}-H^n \right)
+              \nonumber\alb
+          &- \sum_{j=1}^{\nd} \delta_{X_i}
+        \left({\Kstar_{ij}}^{\!\! n} \delta_{X_j} G^{n+1}
+        -{\Kstar_{ij}}^{\!\! n} \delta_{X_j} G^{n}\right)
+          \Bigg)-\left({\Sstar}^{n+1} -{\Sstar}^n \right)\nonumber\alb
+        &+ Z^n \left(\left(\delta_t \Ustar\right)^{n+1}-\left(\delta_t \Ustar\right)^n \right)
+= -R_\Delta^n
+\label{eqn:govdisc3}
+\end{align}
+%
+Rewriting Eq.~(\ref{eqn:govdisc3}) in a more compact form, one gets the
+delta form:
+%
+\begin{align}
+   \mfd\Gamma^n{\Delta^n {\Ustar}}
+   &+\sum_{i=1}^{\nd}\left( \delta_{X_i}  {\Delta^n {\Fstar_i}}
+          + \delta_{X_i} \left({\Dstar_i}^{n} \Delta^n {\Ustar}\right)
+          + {\Ystar_i}^n \delta_{X_i}  \Delta^n H
+            - \sum_{j=1}^{\nd} \delta_{X_i}
+           \left( {\Kstar_{ij}}^{\!\! n} \delta_{X_j}
+                 {\Delta^{n} G}\right) \right)\nonumber\alb
+  &-\Delta^n {\Sstar}+ Z^n \Delta^n(\delta_t \Ustar) = -R_{\Delta}^n
+\label{eqn:deltaform}
+\end{align}
+%
+where the operator $\Delta^n(\cdot)$ corresponds to:
+%
+\begin{equation}
+\Delta^n(\cdot) = (\cdot)^{n+1}-(\cdot)^n
+\end{equation}
+%
+
+
+
+\subsection{Block Alternate Direction Implicit (ADI)}
+
+Equation (\ref{eqn:deltaform}) involves solving a huge banded matrix
+which would require too much computer memory storage and CPU
+time for multidimensional problems. One alternative is to approximate
+the delta form with a multiplication of one-dimensional operators,
+a technique usually referred to as approximate factorization \cite{misc:1955:peaceman,
+misc:1955:douglas}. However, contrarily to the scalar approximate factorization in \cite{misc:1955:peaceman}, we here apply the approximate factorization to the matrix form of the delta form, hence resulting in a \emph{block implicit} method (see Refs.\ \cite{jcp:1980:briley} and \cite[pp.\ 318--319]{book:2001:oran} for a discussion of block implicit algorithms):
+%
+\begin{align}
+\Bigg\{   \prod_{i=1}^{\nd}
+  \Bigg[ I
+        &+{(\Gamma^n)}^{-1} \delta_{X_i} \left(\frac{\partial \Fstar_i}{ \partial \Ustar}\right)^n
+        +{(\Gamma^n)}^{-1} \delta_{X_i} {\Dstar_i}^n
+        +{(\Gamma^n)}^{-1} {\Ystar_i}^n\delta_{X_i} \left(\frac{\partial H}{ \partial \Ustar}\right)^n
+\nonumber\alb
+&
+        - {(\Gamma^n)}^{-1} \sum_{j=1}^{\nd} \delta_{X_i} \left( {\Kstar_{ij}}^{\!\! n}\delta_{X_j} \left(\frac{\partial G}{ \partial \Ustar}\right)^n \right) 
+        -\delta_{1i} {(\Gamma^n)}^{-1} \left(\frac{\partial \Sstar}{ \partial \Ustar}\right)^n \nonumber\alb
+&
+        +\delta_{1i} {(\Gamma^n)}^{-1} Z^n \left(\frac{\partial (\delta_t \Ustar)}{  \partial \Ustar}\right)^n
+\Bigg] \Bigg\} \Delta^n {\Ustar}
+        = - {(\Gamma^n)}^{-1} R_{\Delta}^n
+\label{eqn:approxfact}
+\end{align}
+%
+where $\delta_{1i}$ here refers to the Kronecker delta and not to
+a discretization. 
+Equation (\ref{eqn:approxfact}) corresponds to Eq.~(\ref{eqn:deltaform})
+if, when the multiplication is expanded, all terms involving ${(\Gamma^n)}^{-2}$
+or ${(\Gamma^n)}^{-3}$ are neglected.
+It is noted that the linearization matrix $\partial \Fstar_i / \partial \Ustar$ is symbolic
+and stands for the Jacobian of the FDS or FVS scheme (more on this below).
+The equation to solve for each node at $X_i$ for the $i$th sweep can be written as
+(using the linearization matrices $\A_i$, $\B_i$, $\C_i$ listed in the appendix:
+%
+\begin{equation}
+\begin{array}{r}
+\A_i^{X_i} \Delta \widetilde{\Ustar}_i^{X_i-1} +
+\B_i^{X_i} \Delta \widetilde{\Ustar}_i^{X_i} +
+\C_i^{X_i} \Delta \widetilde{\Ustar}_i^{X_i+1} =
+{\Delta \widetilde{\Ustar}^{X_i}_{i-1}}
+\end{array}
+\end{equation}
+%
+where ${\Delta \widetilde{\Ustar}^{X_i}_1}=- (\Gamma^{-1})^{X_i} R_{\Delta}^{X_i}$
+and the total flux increment $\Delta {\Ustar}^{X_i}$ is set to ${\Delta \widetilde{\Ustar}^{X_i}_{\nd}}$.
+
+The latter is also referred to in the litterature as Alternate-Direction-Implicit (ADI). It is noted that we are here applying the ADI scheme for the system of equations as a whole by solving block tdmas along each direction as outlined in Ref.\ \cite{jcp:1980:briley} rather than applying the ADI scheme in scalar form for each equation independently of the other.
+
+
+\subsection{Block Diagonally-Dominant Alternate Direction Implicit (DD-ADI)}
+
+The Diagonally-Dominant Alternate Direction Implicit (DD-ADI) is similar to the ADI
+but the factorization is such that all terms of the original inversion matrix
+are returned. It was first proposed by MacCormack \cite{aiaaconf:1997:maccormack}
+as the  modified approximate factorization (MAF) and by Bardina \cite{aiaaconf:1987:bardina} as the DD-ADI.
+Linearizing the delta-form of Eq.~(\ref{eqn:deltaform}),
+an implicit Euler time-stepping can be expressed in any number of dimensions as:
+%
+\begin{equation}
+  \M [ \Delta^n \Ustar ] = [- {(\Gamma^n)}^{-1} R_{\Delta}]
+\end{equation}
+%
+with $\M$ the linearization matrix corresponding to, in three dimensions for
+example:
+%
+\begin{equation}
+\M=
+ \left[
+   \begin{array}{@{}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{\;\;}c@{}}
+   \ddots &  0     &  0   & \ddots   &\ddots   & \ddots   & 0     &  0   &\ddots   &      &    &\ddots    &    &     &      \alb
+       &\A_2^1    &  0   &     0  &\A_3^1   &\B^1      & \C_3^1  & 0    &   0   &\C_2^1  &    &    &\C_1^1 &     &      \alb
+    &       &\A_2^2  &   0    &    0  &\A_3^2    & \B^2    &\C_3^2  &   0   &  0   &\C_2^2 &    &    & \C_1^2 &      \\
+   \ddots &    &  &\ddots    &  0    &    0   &\ddots   &\ddots  &\ddots   &   0  &  0  &\ddots  & &  & \ddots  \alb
+       &\A_1^{13} &     &    &\A_2^{13}&0 & 0 &\A_3^{13}&\B^{13} &\C_3^{13}& 0    & 0   &\C_2^{13}&     &      \alb
+       &       &\A_1^{14}&   &      &\A_2^{14} &   0   &  0   &\A_3^{14}&\B^{14}   & \C_3^{14} &0&0& \C_2^{14}&     \\
+       &       &     &\ddots    &      &       &\ddots   &  0   &   0   &\ddots&\ddots   & \ddots &0&0&\ddots\\
+   \end{array}
+ \right]
+\end{equation}
+%
+Defining the tridiagonal matrices:
+%
+%
+\begin{align*}
+\T_3&=
+ \left[
+   \begin{array}{cccccc}
+     \ddots&\ddots& 0   & 0   & 0           \\
+     \ddots& \B^1   & \C_3^1  & 0   & 0           \alb
+     0   & \A_3^2 & \B^2    & \C_3^2  & 0           \\
+     0   & 0  & \A_3^3  & \B^3    & \ddots          \\
+     0   & 0  & 0   & \ddots& \ddots      \alb
+   \end{array}
+ \right]\alb
+ &=\left[ \A_3 \co \B \co \C_3 \right]^\band
+\end{align*}
+%
+and
+%
+\begin{align*}
+\T_2&=
+ \left[
+   \begin{array}{ccccccccccccc}
+     \ddots    & 0  & 0   & 0   & \ddots  & 0   & 0        \alb
+     0   & \B^1   & 0  & 0   & 0   & \C_2^1  & 0       \\
+     0   & 0  & \B^2    & 0  & 0   & 0   & \ddots      \alb
+     0   & 0  & 0  & \B^3    & 0  & 0   & 0       \\
+     \ddots  & 0  & 0   & 0  & \B^4    & 0  & 0       \alb
+     0   & \A_2^5 & 0   & 0   & 0  & \B^5    & 0      \\
+     0   & 0  & \ddots& 0   & 0   & 0  & \ddots        \alb
+   \end{array}
+ \right]\alb
+ &= \left[ \A_2\co 0\co  0\co  0\co  \B\co 0\co  0\co  0\co\C_2 \right]^\band
+\end{align*}
+%
+The product $\T_2 \T_3$ gives
+%
+\begin{equation}
+\T_2 \T_3=
+ \left[
+   \begin{array}{cccccccccccccc}
+     \ddots   & \ddots  & 0     & \ddots     & \ddots   & \ddots   & 0        & 0 \\
+     \ddots & \B^1 \B^1    & \B^1 \C_3^1 & 0         & \C_2^1 \A_3^5& \C_2^1 \B^5     & \C_2^1 \C_3^5 & 0 \\
+     0     & \B^2 \A_3^2  & \B^2 \B^2   & \B^2 \C_3^2     & 0      & \C_2^2 \A_3^6   & \C_2^2 \B^6  & \ddots  \\
+     \ddots  &  0     & \B^3 \A_3^3 & \B^3 \B^3       & \B^3 \C_3^3  & 0         & \C_2^3 \A_3^7 & \ddots \\
+     \ddots  & \A_2^4 \C_3^0& 0     & \B^4 \A_3^4     & \B^4 \B^4    & \B^4 \C_3^4     & 0      & \ddots  \\
+     \ddots  & \A_2^5 \B^1 & \A_2^5 \C_3^1& 0     & \B^5 \A_3^5     & \B^5 \B^5    & \B^5 \C_3^5     & 0  \\
+     0     & \A_2^6 \A_3^2& \A_2^6 \B^2 & \A_2^6 \C_3^2& 0     & \B^6 \A_3^6     & \B^6 \B^6      & \ddots \\
+     0     &  0    & \ddots   & \ddots  & \ddots   & 0     & \ddots    & \ddots \\
+   \end{array}
+ \right]
+\end{equation}
+%
+or,
+%
+\begin{equation}
+\T_2 \T_3=\left[
+ \A_2 \A_3^{-4} \co
+ \A_2 \B^{-4} \co
+ \A_2 \C_3^{-4} \co
+ 0 \co
+ \B \A_3     \co
+ \B \B   \co
+ \B \C_3 \co
+ 0 \co
+ \C_2 \A_3^{+4} \co
+ \C_2 \B^{+4} \co
+ \C_2 \C_3^{+4}
+\right]^\band
+\end{equation}
+%
+while the product $\T_2 \BI \T_3$ gives (with $\BI \equiv \B^{-1}$):
+%
+\begin{equation}
+\T_2 \BI \T_3=
+ \left[
+   \begin{array}{c@{\;}c@{\;}c@{\;}c@{\;}c@{\;}c@{\;}c@{\;}c@{\;}c@{\;}c@{\;}c@{\;}c@{\;}c@{\;}c}
+     \ddots  & \ddots  & 0     & \ddots     & \ddots   & \ddots   & 0        & 0 \\
+     \ddots  & \B^1     & \C_3^1 & 0         & \C_2^1 \BI^5 \A_3^5& \C_2^1     & \C_2^1 \BI^5 \C_3^5 & 0 \\
+     0     & \A_3^2  & \B^2   & \C_3^2     & 0      & \C_2^2 \BI^6 \A_3^6   & \C_2^2  & \ddots  \\
+     \ddots  &  0     & \A_3^3 & \B^3       & \C_3^3  & 0         & \C_2^3 \BI^7 \A_3^7 & \ddots \\
+     \ddots  & \A_2^4 \BI^0 \C_3^0& 0     &  \A_3^4     &  \B^4    &  \C_3^4     & 0      & \ddots  \\
+     \ddots  & \A_2^5  & \A_2^5 \BI^1 \C_3^1& 0     & \A_3^5     & \B^5    & \C_3^5     & 0  \\
+     0     & \A_2^6 \BI^2 \A_3^2& \A_2^6  & \A_2^6 \BI^2 \C_3^2& 0     &  \A_3^6     & \B^6       & \ddots \\
+     0     &  0    & \ddots   & \ddots  & \ddots   & 0     & \ddots    & \ddots \\
+   \end{array}
+ \right]
+\end{equation}
+%
+or,
+%
+\begin{align}
+\T_2 \BI \T_3=\left[
+ \A_2 \BI^{-4} \A_3^{-4} \co
+ \A_2 \co
+ \A_2 \BI^{-4} \C_3^{-4} \co
+ 0 \co
+ \A_3     \co
+ \B    \co
+ \C_3 \co
+ 0 \co
+ \C_2 \BI^{+4} \A_3^{+4} \co
+ \C_2 \co \right.\nonumber\alb
+\left.
+ \C_2 \BI^{+4} \C_3^{+4}
+\right]^\band
+\end{align}
+%
+Defining the matrix
+%
+\begin{equation}
+\T_1=
+ \left[
+   \begin{array}{ccccccccccccccc}
+   \ddots &0       & 0    &\ddots    &0    & 0    & 0     \alb
+   0    &\B^1      & 0    &\cdots    &\C_1^1 & 0    & 0     \alb
+   0    &0       & \B^2   &\cdots    &0    & \C_1^2 & 0     \\
+   \ddots &\vdots    & \vdots &\ddots    &\vdots & \vdots & \ddots  \alb
+   0    &\A_1^{13} & 0    &\cdots    &\B^{13}& 0    & 0     \alb
+   0    &0       &\A_1^{14}& \cdots  &0    &\B^{14} & 0     \\
+   0    &0       &0     &\ddots    &0    &0     &\ddots   \alb
+   \end{array}
+ \right]
+\end{equation}
+%
+then,
+%
+\begin{displaymath}
+\begin{array}{l}
+\T_1 \BI \T_2 \BI \T_3=  \alb
+  \begin{array}{l}
+   \left[
+   \A_1 \BI^{-12}\A_2^{-12} \BI^{-16} \A_3^{-16}\co
+   \A_1 \BI^{-12}\A_2^{-12}\co
+   \A_1 \BI^{-12}\A_2^{-12} \BI^{-16} \C_3^{-16}\co
+   0\co
+   \A_1 \BI^{-12} \A_3^{-12}\co \right. \alb
+   \A_1\co
+   \A_1 \BI^{-12} \C_3^{-12}\co
+   0\co
+   \A_1 \BI^{-12}\C_2^{-12} \BI^{-8} \A_3^{-8}\co
+   \A_1 \BI^{-12}\C_2^{-12}\co
+   \A_1 \BI^{-12}\C_2^{-12} \BI^{-8} \C_3^{-8}\co
+   0\co \alb
+   \A_2 \BI^{-4} \A_3^{-4}\co
+   \A_2\co
+   \A_2 \BI^{-4} \C_3^{-4}\co
+   0\co
+   \A_3\co
+   \B\co
+   \C_3\co
+   0\co
+   \C_2 \BI^{+4} \A_3^{+4}\co
+   \C_2\co
+   \C_2 \BI^{+4} \C_3^{+4}\co
+   0\co\alb
+
+
+   \C_1 \BI^{+12}\A_2^{+12} \BI^{+8} \A_3^{+8}\co
+   \C_1 \BI^{+12}\A_2^{+12}\co
+   \C_1 \BI^{+12}\A_2^{+12} \BI^{+8} \C_3^{+8}\co
+   0\co
+   \C_1 \BI^{+12} \A_3^{+12}\co
+   \C_1\co\alb
+   \left.
+   \C_1 \BI^{+12} \C_3^{+12}\co
+   0\co
+   \C_1 \BI^{+12}\C_2^{+12} \BI^{+16} \A_3^{+16}\co
+   \C_1 \BI^{+12}\C_2^{+12}\co
+   \C_1 \BI^{+12}\C_2^{+12} \BI^{+16} \C_3^{+16}
+   \right]^\band\alb
+  \end{array}
+\end{array}
+\end{displaymath}
+%
+where the decomposition error terms can be identified by comparing the latter
+to matrix $\M$:
+%
+\begin{displaymath}
+  \begin{array}{r}
+  \M=
+   \left[ 0\co
+   0\co
+   0\co
+   0\co
+   0\co
+   \A_1\co
+   0\co
+   0\co
+   0\co
+   0\co
+   0\co
+   0\co
+   0\co
+   \A_2\co
+   0\co
+   0\co
+   \A_3\co
+   \B\co
+   \C_3\co \right. \alb
+   \left.
+   0\co
+   0\co
+   \C_2\co
+   0\co
+   0\co
+   0\co
+   0\co
+   0\co
+   0\co
+   0\co
+   \C_1\co
+   0\co
+   0\co
+   0\co
+   0\co
+   0 \right]^\band
+  \end{array}
+\end{displaymath}
+%
+The decomposition error matrix, $\N$ can then be written as:
+%
+\begin{equation}
+  \N\equiv \T_1 \BI \T_2 \BI \T_3- \M
+\end{equation}
+%
+\begin{displaymath}
+\begin{array}{l}
+\N=  \alb
+  \begin{array}{l}
+   \left[
+   \A_1 \BI^{-12}\A_2^{-12} \BI^{-16} \A_3^{-16}\co
+   \A_1 \BI^{-12}\A_2^{-12}\co
+   \A_1 \BI^{-12}\A_2^{-12} \BI^{-16} \C_3^{-16}\co
+   0\co
+   \A_1 \BI^{-12} \A_3^{-12}\co \right. \alb
+   0 \co
+   \A_1 \BI^{-12} \C_3^{-12}\co
+   0\co
+   \A_1 \BI^{-12}\C_2^{-12} \BI^{-8} \A_3^{-8}\co
+   \A_1 \BI^{-12}\C_2^{-12}\co
+   \A_1 \BI^{-12}\C_2^{-12} \BI^{-8} \C_3^{-8}\co
+   0\co \alb
+   \A_2 \BI^{-4} \A_3^{-4}\co
+   0\co
+   \A_2 \BI^{-4} \C_3^{-4}\co
+   0\co
+   0\co
+   0\co
+   0\co
+   0\co
+   \C_2 \BI^{+4} \A_3^{+4}\co
+   0\co
+   \C_2 \BI^{+4} \C_3^{+4}\co
+   0\co\alb
+
+
+   \C_1 \BI^{+12}\A_2^{+12} \BI^{+8} \A_3^{+8}\co
+   \C_1 \BI^{+12}\A_2^{+12}\co
+   \C_1 \BI^{+12}\A_2^{+12} \BI^{+8} \C_3^{+8}\co
+   0\co
+   \C_1 \BI^{+12} \A_3^{+12}\co
+   0\co\alb
+   \left.
+   \C_1 \BI^{+12} \C_3^{+12}\co
+   0\co
+   \C_1 \BI^{+12}\C_2^{+12} \BI^{+16} \A_3^{+16}\co
+   \C_1 \BI^{+12}\C_2^{+12}\co
+   \C_1 \BI^{+12}\C_2^{+12} \BI^{+16} \C_3^{+16}
+   \right]^\band\alb
+  \end{array}
+\end{array}
+\end{displaymath}
+%
+The advantage of DD-ADI versus standard ADI is that all the original terms in
+$\M$ are present in $\T_1 \BI \T_2 \BI \T_3$.
+Recalling that $\M [ \Delta^n \Ustar ] = [- \Gamma^{-1} R_{\Delta}]$ (for a direct inversion),
+and that $\M \approx \T_1 \BI \T_2 \BI \T_3$
+the DD-ADI algorithm can be implemented in three dimensions as:
+%
+\begin{displaymath}
+\begin{array}{rcl}
+  {\rm step~1} & ~~ & \T_1 [\Delta^n \Ustar_1] = [- \Gamma^{-1} R_{\Delta}]\alb
+  {\rm step~2} & ~~ & \T_2 [\Delta^n \Ustar_2] = [\B]^\band [\Delta^n \Ustar_1] \alb
+  {\rm step~3} & ~~ & \T_3 [\Delta^n \Ustar] = [\B]^\band [\Delta^n \Ustar_2]
+\end{array}
+\end{displaymath}
+%
+and in two dimensions as:
+%
+\begin{displaymath}
+\begin{array}{rcl}
+  {\rm step~1} & ~~ & \T_1 [\Delta^n \Ustar_1] = [- \Gamma^{-1} R_{\Delta}]\alb
+  {\rm step~2} & ~~ & \T_2 [\Delta^n \Ustar] = [\B]^\band [\Delta^n \Ustar_1] \alb
+\end{array}
+\end{displaymath}
+%
+
+
+\subsection{Block Iterative DD-ADI Algorithm: Removal of Decomposition Error}
+
+The DD-ADI can be further improved through an iterative method to reduce the decomposition error as suggested by MacCormack in Ref.\ \cite{caf:2001:maccormack}.
+
+The direct inversion can be written as:
+%
+\begin{displaymath}
+  \begin{array}{c}
+  \M [ \Delta^n \Ustar ] = [- \Gamma^{-1} R_{\Delta}] \alb
+{\rm or~~}  \M [ \Delta^n \Ustar ] + \N [ \Delta^n \Ustar ]= [- \Gamma^{-1} R_{\Delta}] + \N [ \Delta^n \Ustar ]\alb
+{\rm or~~}  \T_1 \BI \T_2 \BI \T_3 [ \Delta^n \Ustar ] = [- \Gamma^{-1} R_{\Delta}] + \N [ \Delta^n \Ustar ]
+  \end{array}
+\end{displaymath}
+%
+since $\N+\M=\T_1 \BI \T_2 \BI \T_3$.
+The idea behind removing the decomposition error is in performing
+$k$ times the approximate factorization on the same residual, each
+time using a more updated decomposition error term on the RHS:
+%
+\begin{equation}
+  \T_1 \BI \T_2 \BI \T_3 [ \Delta^n {\Ustar}^{(k)} ] = [- \Gamma^{-1} R_{\Delta}] + \N [ \Delta^n {\Ustar}^{(k-1)} ]
+\end{equation}
+%
+where $k=1,2,3,4,5,..,\infty$ and where it is assumed that
+$\N [ \Delta^n {\Ustar}^{(k-1)} ] \rightarrow 0$ as $k \rightarrow \infty$.
+The latter can also be written as:
+%
+\begin{equation}
+    \T_1 \BI \T_2 \BI \T_3 [ \Delta^n {\Ustar}^{(k)} ]
+  = [- \Gamma^{-1} R_{\Delta}] + \T_1 \BI \T_2 \BI \T_3 [ \Delta^n {\Ustar}^{(k-1)} ]
+    - \M [ \Delta^n {\Ustar}^{(k-1)} ]
+\end{equation}
+%
+with $\Delta^n {\Ustar}^{(0)}=0$. Step by step, this becomes:
+%
+%
+\begin{displaymath}
+ \begin{array}{rcl}
+   k=1 & ~~&
+    \T_1 \BI \T_2 \BI \T_3 [ \Delta^n {\Ustar}^{(1)} ]
+    = [- \Gamma^{-1} R_{\Delta}]  \alb
+   k=2 & ~~&
+    \T_1 \BI \T_2 \BI \T_3 [ \Delta^n {\Ustar}^{(2)} ]
+    = [- 2 \Gamma^{-1} R_{\Delta}] - \M [ \Delta^n {\Ustar}^{(1)} ] \alb
+   k=3 & ~~&
+    \T_1 \BI \T_2 \BI \T_3 [ \Delta^n {\Ustar}^{(3)} ]
+    = [- 3 \Gamma^{-1} R_{\Delta}] - \M [ \Delta^n {\Ustar}^{(1)} + \Delta^n {\Ustar}^{(2)} ]  \alb
+   k=4 & ~~&
+    \T_1 \BI \T_2 \BI \T_3 [ \Delta^n {\Ustar}^{(4)} ]
+    = [- 4 \Gamma^{-1} R_{\Delta}] - \M [ \Delta^n {\Ustar}^{(1)} + \Delta^n {\Ustar}^{(2)} + \Delta^n {\Ustar}^{(3)}]
+ \end{array}
+\end{displaymath}
+%
+
+
+
+
+
+\appendix
+
+\section{Linearization Matrices for FDS First Order Scheme}
+
+
+We here list the linearization matrices for the first-order Roe flux difference splitting (FDS) scheme. 
+The matrices $\A_i$, $\B$ and $\C_i$ are defined as, assuming a linearization
+of the Roe scheme with the Roe Jacobian frozen:
+%
+\begin{align}
+\A_i =
+  \Gamma^{-1}
+  \Bigg\{
+    &-K^{X_i-\frac{1}{2}}_{ii} \left(\frac{\partial G}{\partial \Ustar}\right)^{X_i-1}
+    -\mfd\frac{\left( {\Omega} |A| \right)_i^{X_i-\frac{1}{2}}}{2 {\Omega}^{X_i-1}}
+                         -\frac{A^{X_i-1}}{2}\nonumber\alb
+    &-\big({\Dstar_i}^+\big)^{X_i-1}
+     -\big({\Ystar_i}^+\big)^{X_i-1/2} \left(\frac{\partial H}{\partial \Ustar}\right)^{X_i-1}
+  \Bigg\}
+\end{align}
+%
+\begin{align}
+\B_i &=
+I+\Gamma^{-1}
+ \Bigg\{
+     -\delta_{1i} \left(\frac{\partial \Sstar}{\partial \Ustar}\right)^{X_i}
+    +\delta_{1i} Z^{X_i} \left(\frac{\partial (\delta_t \Ustar)}{\partial \Ustar}\right)^{X_i} \nonumber\alb
+    &+\left( K^{X_i-\frac{1}{2}}_{ii}+K^{X_i+\frac{1}{2}}_{ii} \right)\left(\frac{\partial G}{\partial \Ustar}\right)^{X_i} 
+    + \mfd\frac{\left( {\Omega} |A| \right)_i^{X_i-\frac{1}{2}}+
+           \left( {\Omega} |A| \right)_i^{X_i+\frac{1}{2}}}{2 {\Omega}^{X_i}} \nonumber\alb
+    &+\big({\Dstar_i}^+\big)^{X_i}-\big({\Dstar_i}^-\big)^{X_i}
+     +\big({\Ystar_i}^+\big)^{X_i-1/2} \left(\frac{\partial H}{\partial \Ustar}\right)^{X_i}
+     -\big({\Ystar_i}^-\big)^{X_i+1/2} \left(\frac{\partial H}{\partial \Ustar}\right)^{X_i}
+  \Bigg\}
+\end{align}
+%
+\begin{align}
+\B &=
+I+\Gamma^{-1}
+ \Bigg\{
+    -\left(\frac{\partial \Sstar}{\partial \Ustar}\right)^{X_i}
+    + Z^{X_i} \left(\frac{\partial (\delta_t \Ustar)}{\partial \Ustar}\right)^{X_i}
+   \nonumber\alb
+    &+ \sum_{j=1}^\nd \Bigg[
+     \left( K^{X_j-\frac{1}{2}}_{jj}+K^{X_j+\frac{1}{2}}_{jj} \right)\left(\frac{\partial G}{\partial \Ustar}\right)^{X_j}
+    +\frac{\left( {\Omega} |A| \right)_j^{X_j-\frac{1}{2}}+
+           \left( {\Omega} |A| \right)_j^{X_j+\frac{1}{2}}}{2 {\Omega}^{X_j}}
+   \nonumber\alb
+    &+\big({\Dstar_j}^+\big)^{X_j}-\big({\Dstar_j}^-\big)^{X_j}    
+     +\big({\Ystar_j}^+\big)^{X_j-1/2} \left(\frac{\partial H}{\partial \Ustar}\right)^{X_j}
+     -\big({\Ystar_j}^-\big)^{X_j+1/2} \left(\frac{\partial H}{\partial \Ustar}\right)^{X_j}
+    \Bigg]
+  \Bigg\}
+\end{align}
+%
+\begin{align}
+\C_i =
+  \Gamma^{-1}
+  \Bigg\{
+    &-K^{X_i+\frac{1}{2}}_{ii} \left(\frac{\partial G}{\partial \Ustar}\right)^{X_i+1}
+    -\mfd\frac{\left( {\Omega} |A| \right)_i^{X_i+\frac{1}{2}}}{2 {\Omega}^{X_i+1}}
+                           +\frac{A^{X_i+1}}{2}\nonumber\alb
+    &+\big({\Dstar_i}^-\big)^{X_i+1}
+    +\big({\Ystar_i}^-\big)^{X_i+1/2} \left(\frac{\partial H}{\partial \Ustar}\right)^{X_i+1}
+  \Bigg\}
+\end{align}
+%
+where $|A|=L^{-1}  |\Lambda|  L$, where $A=\partial \Fstar_i/\partial \Ustar$, where ${\Ystar}^\pm=\frac{1}{2}(\Ystar\pm|\Ystar|)$, and where $\Omega$ is the inverse of the metrics Jacobian.
+
+  \bibliographystyle{warpdoc}
+  \bibliography{all}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

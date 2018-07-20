@@ -1,0 +1,314 @@
+
+
+
+Rgas=286.0;
+rhoref=1;
+aref=300;
+
+
+
+Mx=2;
+My=0.0;
+P=10200;
+T=300;
+
+kinit=1.0;
+Tvinit=1.0;
+
+CFLref=0.5;
+
+L=2.0;
+H1=0.5;
+H2=0.4/(Mx/2);
+theta=rad(30);
+
+x1=0.0; y1=0.0;
+x2=0.5; y2=0.0;
+x3=x2+(H1-H2)/tan(theta); 
+y3=H1-H2;
+
+meshfact=1.0;
+
+is=1;  js=1; 
+ie=round(100*meshfact)+1; je=round(25*meshfact)+1;
+
+Grid(
+  Size(is,js, ie,je);
+  Point(is,js, 0,0.0e0);
+  Point(ie,js, L,0.0e0);
+  Point(ie,je, L,H1);
+  Point(is,je, 0,H1);
+  JoinCorners(is,js, ie,je,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
+  {Equation(is,js,ie,js, y, {y=min(y3,max(0,(x-x2)/(x3-x2))*(y3-y2)+y2) );} }
+  Equation(is,js,ie,js, y, y=sin(x*3*pi)*0.02/(Mx/2) );
+  Join(is,js,ie,je,j,EE,0.5,1,1);
+  
+  {Rotate(is,js,ie,je, 0.0, 0.0, rad(30));}
+);
+
+
+Bdry(
+
+  NavierStokesPerfect(
+    {
+      ———————————————————————————————————————————————————————————————————————————————————
+      Bdry Condition Type      Description
+      ———————————————————————————————————————————————————————————————————————————————————
+      BDRY_INFLOWSUPERSONIC    Inflow, supersonic
+      BDRY_OUTFLOWSUPERSONIC1       Outflow, supersonic
+      BDRY_SYMMETRICAL1             Slip wall, 1st order
+      BDRY_SYMMETRICAL2             Slip wall, 2nd order
+      WALL_FIXED_TEMPERATURE   Wall, T specified
+      BDRY_WALLADIABATIC1           Wall, adiabatic
+      BDRY_INFLOWSUBSONIC1     Subsonic Inflow (Constant Tstag, Pstag at inflow)
+      BDRY_OUTFLOWSUBSONIC1         Subsonic Outflow (Constant P at outflow)
+      ———————————————————————————————————————————————————————————————————————————————————
+    }
+
+    All(BDRY_SYMMETRICAL2  );
+    Faces(BDRY_INFLOWSUPERSONIC,  BDRY_OUTFLOWSUPERSONIC1,  BDRY_SYMMETRICAL2  ,  BDRY_SYMMETRICAL2  );
+  );
+);
+ 
+ 
+Model(
+  NavierStokesPerfect(
+    gamma=1.4;    {the specific heat ratio }
+    R=286.0;    {the gas constant in J/kgK }
+    eta=0e-5;    {the viscosity of the gas in kg/ms }
+    kappa=0.00;     {the thermal conductivity of the gas in W/mK }
+    Pmin=P/10;    Pmax=9.9e99;   {min and max pressure allowed in the domain}
+    Tmin=T/10;     Tmax=6.0e5;    {min and max temperature allowed in the domain}
+    
+    AXISYMMETRIC=FALSE;
+    SetHeatDeposited(is,js, ie,je, 0.0{W/m3});
+    SetBodyForce(ie,js, ie,je, 0.0{N/m3},0.0{N/m3});
+  );
+
+);
+
+
+Init(
+    NavierStokesPerfect(
+      {
+      _______________________________________________________________________________________
+
+      Initial Condition Type       Parameters
+      _______________________________________________________________________________________
+
+      INIT_TYPE1                   V[1]..V[nd],  P,  T     
+      INIT_TYPE2                   M[1]..M[nd],  P,  T     
+      _______________________________________________________________________________________
+
+      }
+      All(2,Mx,My,P,T);
+    );
+);
+
+
+Disc(
+  NavierStokesPerfect(
+    zetaA1=0.1e0; {conditions the convective waves of the A jacobian; set it to 0.0 usually but make
+                   sure that the shock structure obtained is similar to when zetaA1 is set to 0.3}
+    zetaA2=0.2;
+    zetaA3=0.1e0; {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
+  );
+  MUSCLplus(
+    FLUX=FLUX_FDSplus;
+    AVERAGING=AVERAGING_ROE;
+    numiter=2;
+    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.95;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    
+    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.95;
+    INTERPOL=INTERPOL_TVD2_SUPERBEE;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+  );
+  FVS(
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.85;
+    AOWENO_gammahi=0.85;
+    INTERPOL=INTERPOL_WENO5;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+  );
+  FDS(
+    AVERAGING=AVERAGING_ROE;
+    ACCURACY=ACCURACY_SECONDORDER;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+  );
+  FDSplus(
+    AVERAGING=AVERAGING_ROE;
+    ACCURACY=ACCURACY_FIRSTORDER;
+    numiter=2;
+    xi=1.99;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+  );
+  FVSplus(
+    LIMITER=LIMITER_VANLEER;
+    ACCURACY=ACCURACY_SECONDORDER;
+    xi=1.99;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+  );
+  FDSCauchy(
+    AVERAGING=AVERAGING_ROE;
+    ACCURACY=ACCURACY_SECONDORDER;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+  );
+
+);
+ 
+ 
+
+Cycle(
+  NavierStokesPerfect(
+    xiverge=2e2;          {residual convergence threshold}
+    rhoref=1.0e-1;            {reference density in kg/m3}
+    aref=300.0;            {reference sound speed in m/s}
+    Uref[0]=rhoref;            
+    Uref[1]=rhoref*aref;       
+    Uref[2]=rhoref*aref;   
+    Uref[3]=rhoref*aref*aref;  
+  );
+  MultizoneMarching(
+    if (mod(iter,50)==0,
+      WriteDataFile();
+    );
+    sigma1=0.5;      {exponent of largest pseudotime step in all dimensions}
+    sigma2=0.0;      {exponent of largest pseudotime step in all flux components}
+    PRECONDITIONER=PRECON_LOCALTIMESTEP;
+    if (iter==1,
+      CFL=0.1;
+    );
+    CFL=min(CFL*1.1,CFLref);
+    phi1=20;         {maximum number of gridlines per zone in each dimension}
+    phi2=3;          {minimum number of iterations before advancing the marching-window downstream boundary}
+    phi3=15; {round(50*sqrt(meshfact));}         {minimum width of the marching window}
+    varphiverge=1e4; {parameter related to the streamwise ellipticity sensor}
+    entrance=1;      {force the marching window upstream boundary to be at least as high as entrance}
+    UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,phi1,phi2,phi3,varphiverge,entrance);
+    printf("%6.2f %4ld %4ld %6ld %9.3f   %E (%4ld,%4ld) %3ld/%3ld    %s \n",
+           CFL,window.is,window.ie,iter,effiter_U,ximax,i_ximax,
+           j_ximax,numzones_updated,numzones_total,clipinfo);
+  );
+  MultizoneSteady(
+    if (mod(iter,50)==0,
+      WriteDataFile();
+    );
+    sigma1=0.5;      {exponent of largest pseudotime step in all dimensions}
+    sigma2=0.0;      {exponent of largest pseudotime step in all flux components}
+    PRECONDITIONER=PRECON_LOCALTIMESTEP;
+    if (iter==1,
+      CFL=0.1;
+    );
+    CFL=min(CFL*1.1,CFLref);
+    phi1=20;     {maximum number of gridlines per zone in each dimension}
+    UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,phi1,1e-5);
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld) %3ld/%3ld%s \n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,numzones_updated,numzones_total,clipinfo);
+  );
+  DualTimeStepping(
+    tmax=1e-4;   {simulation time span in seconds}
+    dt=tmax/30;  {physical time step in seconds}
+    sigma1=0.3;      {exponent of largest pseudotime step in all dimensions}
+    sigma2=0.3;      {exponent of largest pseudotime step in all flux components}
+    PRECONDITIONER=PRECON_LOCALTIMESTEP;
+    if (iter==1,
+      CFL=3.0;
+    );
+    CFL=max(CFL*0.9,1.0);
+    UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,dt);
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,clipinfo);
+    if (ximax<xiverge || iter>20,
+      IncreaseTimeLevel();
+      WriteDataFile(outputfilename"."round(time/dt));
+      printf("dt=%E time=%Es\n",dt,time);
+      if (time>tmax-0.1*dt,
+        exit(EXIT_SUCCESS);
+      );
+    );
+  );
+
+  SteadyState(
+    if (mod(iter,50)==0,
+      WriteDataFile();
+    );
+    sigma1=0.5;      {exponent of largest pseudotime step in all dimensions}
+    sigma2=0.0;      {exponent of largest pseudotime step in all flux components}
+    PRECONDITIONER=PRECON_LOCALTIMESTEP;
+    if (iter==1,
+      CFL=0.1;
+    );
+    {if (iter==1 || iter==25,
+      system("date");
+    );}
+    CFL=min(CFL*1.1,CFLref);
+    {if (iter==200, exit(1););}
+    UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2);
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,clipinfo);
+  );
+);
+
+
+
+Post(
+  xstation[1]=0.1;{m}
+  xstation[2]=0.2;{m}
+  xstation[3]=0.3;{m}
+  for (cnt,1,3,
+    SetXstation(xstation[cnt]);
+    Pback=_Pback_xstation({Aback,m2}1.0, {Pback_min,Pa}400, {Pback_max,Pa}4000, {numsteps}300,
+                 {q_min (as small a positive value as possible)}1.0);
+    Fpot=_Fpot_xstation(Pback,{numsteps}300, {q_min}1.0);
+    mdot=_mdot_xstation();
+    Tstag=_Tstag_xstation();
+    Pstag=_Pstag_xstation({numsteps} 300);
+    Pstar=_Pstar_xstation();
+    T=_T_xstation();
+    q=_q_xstation();
+    rho=_rho_xstation();
+    htstar=_htstar_xstation();
+    printf(
+           "x      = %E m\n"
+           "Pback  = %E Pa\n"
+           "Fpot   = %E Ns/kg\n"
+           "mdot   = %E kg/s\n"
+           "Tstag  = %E K\n"
+           "Pstag  = %E Pa\n"
+           "Pstar  = %E Pa\n"
+           "T      = %E K\n"
+           "q      = %E m/s\n"
+           "rho    = %E kg/m3\n\n"
+           ,xstation[cnt],Pback,Fpot,mdot,Tstag,Pstag,Pstar,T,q,rho);
+  );
+
+  printf("\n");
+  for (dim,1,2,
+    Fshear[dim]=_Fshear(is,js, ie,je,dim,BDRY_SYMMETRICAL2  );
+    Fpressure[dim]=_Fpressure(is,js, ie,je,dim,BDRY_SYMMETRICAL2  );
+  );
+  printf("Fshear    = (%+E,%+E) N/m\n",Fshear[1],Fshear[2]);
+  printf("Fpressure = (%+E,%+E) N/m\n",Fpressure[1],Fpressure[2]);
+  {
+  WritePostFile("post.01", "tecplot",POSTFILE_ALL);
+  WritePostFile("grid.01", "tecplot",POSTFILE_GRID);
+  }
+  printf("et        = %+E J/m\n",_et(is,js, ie,je));
+
+);
+
+
+

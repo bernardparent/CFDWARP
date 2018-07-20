@@ -1,0 +1,29 @@
+\begin{thebibliography}{1}
+\newcommand{\enquote}[1]{``#1''}
+
+\bibitem{jcp:2002:parent}
+{\sc Parent, B. and Sislian, J.~P.}, \enquote{The Use of Domain Decomposition
+  in Accelerating the Convergence of Quasi-Hyperbolic Systems,} {\em Journal of
+  Computational Physics\/}, Vol.~179, No.~1, pp.~140--169.
+
+\bibitem{misc:1994:sawley}
+{\sc Sawley, M.~L. and Tegner, J.~K.}, \enquote{A Data Parallel Approach to
+  Multi-Block Flow Computations,} {\em International Journal for Numerical
+  Methods in Fluids\/}, Vol.~19, No.~8, 1994, pp.~707--721.
+
+\bibitem{jcp:1994:rosenfeld}
+{\sc Rosenfeld, M.}, \enquote{The Alternating Direction Multi-zone Implicit
+  Method,} {\em Journal of Computational Physics\/}, Vol.~110, 1994,
+  pp.~212--220.
+
+\bibitem{aiaa:1997:nakahashi}
+{\sc Nakahashi, K. and Saitoh, E.}, \enquote{Space-Marching Method on
+  Unstructured Grid for Supersonic Flows with Embedded Subsonic Regions,} {\em
+  AIAA Journal\/}, Vol.~35, No.~8, 1997, pp.~1280--1285.
+
+\bibitem{aiaaconf:1978:vigneron}
+{\sc Vigneron, Y.~C., Rakich, J.~V., and Tannehill, J.~C.},
+  \enquote{Calculations of Supersonic Viscous Flow Over Delta Wings with Sharp
+  Subsonic Leading Edges,} 1978, AIAA Paper 78-1137.
+
+\end{thebibliography}

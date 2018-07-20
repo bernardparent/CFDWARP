@@ -1,0 +1,364 @@
+
+q2 = (u*u + v*v + w*w)
+V = (u*X1 + v*X2 + w*X3)
+
+U = {rho, rho*u, rho*v, rho*w, rho*a*a/g/(g - 1) + rho*q2/2}
+
+F = {rho*(u*X1 + v*X2 + w*X3), 
+  rho*u*(u*X1 + v*X2 + w*X3) + rho*a*a/g*X1, 
+  rho*v*(u*X1 + v*X2 + w*X3) + rho*a*a/g*X2, 
+  rho*w*(u*X1 + v*X2 + w*X3) + rho*a*a/g*X3, 
+  rho*(u*X1 + v*X2 + w*X3)*(a*a/(g - 1) + (q2)/2)}
+
+Xmag = Sqrt[X1*X1 + X2*X2 + X3*X3]
+
+Lambda = DiagonalMatrix[{V, V, V, V + a*Xmag, V - a*Xmag}]
+
+A = {{0, X1, X2, X3, 
+   0}, {(g - 3)*X1*u*u/2 - X2*u*v - 
+    X3*u*w + (g - 1)*X1*(v*v + w*w)/2, (3 - g)*X1*u + v*X2 + 
+    w*X3, (1 - g)*X1*v + u*X2, (1 - g)*X1*w + u*X3, (g - 1)*
+    X1}, {(g - 3)*X2*v*v/2 - X1*v*u - 
+    X3*v*w + (g - 1)*X2*(u*u + w*w)/2, (1 - g)*X2*u + 
+    v*X1, (3 - g)*X2*v + u*X1 + w*X3, (1 - g)*X2*w + v*X3, (g - 1)*
+    X2}, {(g - 3)*X3*w*w/2 - X1*w*u - 
+    X2*w*v + (g - 1)*X3*(u*u + v*v)/2, (1 - g)*X3*u + 
+    w*X1, (1 - g)*X3*v + w*X2, (3 - g)*X3*w + u*X1 + v*X2, (g - 1)*
+    X3}, {-(X1*u + X2*v + X3*w)*(a*
+       a/(g - 1) + (1 - g/2)*(u*u + v*v + w*w)), (2*a*a/(g - 1) + 
+       v*v + w*w + (3 - 2*g)*u*u)*X1/2 + X2*(1 - g)*u*v + 
+    X3*(1 - g)*u*w, (2*a*a/(g - 1) + u*u + w*w + (3 - 2*g)*v*v)*X2/2 +
+     X1*(1 - g)*v*u + 
+    X3*(1 - g)*v*w, (2*a*a/(g - 1) + u*u + v*v + (3 - 2*g)*w*w)*X3/2 +
+     X1*(1 - g)*w*u + X2*(1 - g)*w*v, g*(u*X1 + v*X2 + w*X3)}}
+
+
+zeta = (1 + 4*g - 2*g*g)/(3*(g - 1))
+
+Minv = {{1, 1, 1, 1, 1}, {u + a*(+X2 + X3)/Xmag, u + a*(-X2)/Xmag, 
+   u + a*(-X3)/Xmag, u + a*X1/Xmag, u - a*X1/Xmag}, {v + a*(-X1)/Xmag,
+    v + a*(+X1 + X3)/Xmag, v + a*(-X3)/Xmag, v + a*X2/Xmag, 
+   v - a*X2/Xmag}, {w + a*(-X1)/Xmag, w + a*(-X2)/Xmag, 
+   w + a*(+X1 + X2)/Xmag, w + a*X3/Xmag, 
+   w - a*X3/Xmag}, {q2/2 + a*(u*(+X2 + X3) + v*(-X1) + w*(-X1))/Xmag +
+     a*a*(1 + X1/Xmag*X1/Xmag)/2, 
+   q2/2 + a*(u*(-X2) + v*(+X1 + X3) + w*(-X2))/Xmag + 
+    a*a*(1 + X2/Xmag*X2/Xmag)/2, 
+   q2/2 + a*(u*(-X3) + v*(-X3) + w*(X1 + X2))/Xmag + 
+    a*a*(1 + X3/Xmag*X3/Xmag)/2, zeta*a*a + q2/2 + a*V/Xmag, 
+   zeta*a*a + q2/2 - a*V/Xmag}}
+
+
+M = Simplify[Inverse[Minv]]
+MU = Simplify[M.U]
+
+Zero = Simplify[F - A.U]
+Zero = Simplify[F - Minv.Lambda.M.U]
+
+
+
+
+X32=X3^2
+X22=X2^2
+X12=X1^2
+
+X33=X3^3
+X23=X2^3
+X13=X1^3
+
+X34=X3^4
+X24=X2^4
+X14=X1^4
+
+aXmag=a Sqrt[X12 + X22 + X32]
+q2=u^2 + v^2 + w^2
+a2=a^2
+gm1=-1+g
+
+sum1=-1 - 4 g + 2 g^2
+sum2=-5 - 5 g + 4 g^2
+sum3=-4 - g + 2 g^2
+sum4=5 + 5 g - 4 g^2
+sum5=-13 - 7 g + 8 g^2
+sum6=10 + 10 g - 8 g^2
+sum7=8 + 2 g - 4 g^2
+sum8=-3 - 2 g + 2 g^2
+sum9=7 + 3 g - 4 g^2
+
+sum10=26 + 14 g - 16 g^2
+sum11=2 + 3 g - 2 g^2
+sum12=6 + 4 g - 4 g^2
+sum13=-2 - 3 g + 2 g^2
+sum14=-7 - 3 g + 4 g^2
+sum15=-4 - 6 g + 4 g^2
+
+Xsum1=(X1 + X2 + X3) (X12 + X22 + X32)^2
+X22pX32=(X22 + X32)
+X22pX322=X22pX32^2
+
+
+denom1=(6 a2 (sum8) Xsum1)
+denom2=(4 a2 (sum8) Xsum1)
+denom3=(2 a2 (sum8))
+denom4=(a2 (sum8))
+sum20=2 a2 (sum1) Xsum1 + 3 (gm1) (q2) Xsum1
+
+X2X3=X2 X3
+X2X32=X2 X32
+X2X33=X2 X33
+X13X2=X13 X2
+X13X3=X13 X3
+X1X2=X1 X2
+X1X3=X1 X3
+X22X3=X22 X3
+X23X3=X23 X3
+X22X32=X22 X32
+X2pX3=X2+X3
+X2mX3=X2-X3
+X1X2X22pX32=X1X2 X22pX32
+X12X22pX32=X12 X22pX32
+X1X3X22pX32=X1X3 X22pX32
+X13X2pX3=X13 X2pX3
+X1X2pX3=X1 X2pX3
+X2X2mX3=X2 X2mX3
+X3X2mX3=X3 X2mX3
+
+
+sum43=3 (gm1) X2X3
+sum21=X3X2mX3 ((sum2) X22 - sum43 + (sum2) X32)
+sum22=(sum2) X2X3 
+sum23=(sum2) X2X32 
+sum24=(sum3) X32
+sum25=(sum2) X13X2pX3
+sum26=(-sum2) X14
+sum27=(sum6) X22
+sum28=-6 (gm1) Xsum1
+sum29=sum25 + 2 (sum2) X12X22pX32 + (sum5) X22pX322
+sum30=sum26 + 2 (-sum2) X13X2 - (sum5) X1X2X22pX32
+sum31=sum26 + 2 (-sum2) X13X3 - (sum5) X1X3X22pX32
+sum32=2 (-sum3) X13X3 - (-sum4) X1X3X22pX32
+sum33=2 (sum3) X12X22pX32
+sum34=(-sum4) X1X2X22pX32
+sum35=2 (sum3) X13X2
+sum36=2 (sum13) X22X32
+sum37=(sum14) X1X3X22pX32
+sum38=2 (sum3) X13X3
+sum39=2 (sum13) X12X22pX32
+sum40=2 (-sum3) X22X3
+sum41=2 (-sum3) X22X32
+sum42=2 (-sum2) X32
+sum44=2 (sum2) X22
+sum45=(2 sum3) X22
+sum46=2 (gm1) X32
+sum47=2 (-sum2) X22X3
+sum48=2 (-sum3) X2X32
+sum49=(2 sum3) X23
+sum50=2 (sum11) X13X2
+sum51=2 (sum3) X33
+sum52=2 (-sum2) X33
+sum53=2 (sum11) X2X33
+sum54=2 (sum11) X13X3
+sum55=2 (sum13) X32
+sum56=2 (sum11) X23X3
+sum57=2 (gm1) X22
+sum58=2 (-sum8) X34
+sum59=2 (sum11) X22X32
+sum60=2 (sum3) X2X32
+sum61=(gm1) X22pX322
+sum62=(sum12) X14 - (sum14) X13X2pX3 - sum33 + sum61 - X1X2pX3 ((sum15) X22 + sum43 + sum55)
+sum63=(sum12) X14  - sum39 - sum61 - X1X2pX3 (sum45 - sum43 + 2 sum24)
+sum64=4 a2 (gm1) Xsum1 - 3 (gm1) (q2) Xsum1
+sum65=(sum5) X23 + (-sum40) + 2 sum23 + (-sum4) X33
+sum66=(sum2) X1X3X22pX32
+sum67=(gm1) X14
+sum68=(gm1) X24
+sum69=(gm1) X34
+sum70=X1 (sum49 + (-sum5) X22X3 + sum23 + sum52)
+sum71=X13 ((sum2) X2 + (-sum5) X3)
+sum72=(sum4) X22X3 + (sum5) X2X32 + (-sum51)
+sum73=-sum67 + (-sum35) + (sum12) X24 + (sum4) X23X3
+sum74=sum67 + sum50 + (sum12) X24 + (sum9) X23X3 + sum41 + sum53 + sum69 - (sum14) X1X2X22pX32 + X12 ((sum7) X22 + (sum9) X2X3 + sum46)
+
+Mnew={{(sum20 + 
+     aXmag (u (-sum29 - 
+           X1X2pX3 ((2 sum3) X22pX32 - sum43 )) + 
+        w (-sum31 + 
+           X12 (sum44 + (sum4) X2X3 + 2 sum24) + 
+           X2X2mX3 ((sum2) X22 - 
+              sum43 + (sum2) X32)) + 
+        v (-sum30 - sum21 + 
+           X12 (sum45 - sum22+ 
+              (-sum42)))))/denom1, 
+
+   (u sum28 + 
+     aXmag (sum29 + 
+        X1X2pX3 (sum45 - sum43 + 
+           2 sum24)))/denom1, 
+
+   (v sum28 + 
+     aXmag (sum30 + 
+        X12 ((sum7) X22 + sum22+ 
+           sum42) + sum21))/denom1, 
+
+   (w sum28 + 
+     aXmag (sum31 + 
+        X12 (sum27 + sum22+ 
+           2 (-sum24)) - 
+        X2X2mX3 ((sum2) X22 - 
+           sum43 + (sum2) X32)))/denom1, 
+
+   (gm1)/denom4}, 
+
+
+
+  {(sum20 + 
+     aXmag (v ((-sum5) X14 + 
+           (-sum35) - sum34 + 
+           X12 (sum27 - sum22+ 
+              2 (-sum5) X32) + 
+           X3 ((-sum2) X23 + sum47 + 
+              sum48 + (-sum5) X33)) + 
+        u (X13 ((sum5) X2 + (-sum2) X3) + 
+           sum33 + (-sum4) X22pX322 + 
+           
+           X1 (2 (sum2) X23 + sum72)) + 
+        w (-sum26 + 
+           sum32 + 
+           X12 (sum44 + (sum5) X2X3 + 2 sum24) + 
+           X2 ((sum2) X23 + 
+              (-sum47) + 
+              sum60 + (sum5) X33))))/denom1, 
+
+    (u sum28 + 
+     aXmag (X13 ((-sum5) X2 + (sum2) X3) - 
+        sum33 - (sum2) X22pX322 + 
+        X1 ((sum6) X23 - sum72 )))/denom1, 
+
+
+    (v sum28 + 
+     aXmag ((sum5) X14 + 
+        sum35 + (sum2) X1X2X22pX32 + 
+        X12 (sum44 + sum22+ 
+           2 (sum5) X32) + 
+        X3 ((sum2) X23 + (-sum47) + 
+           sum60 + (sum5) X33)))/denom1, 
+
+    (w sum28 + 
+     aXmag (sum26 + 
+        sum38 + sum66 + 
+        X12 (sum27 + (-sum5) X2X3 + 
+           2 (-sum24)) + 
+        X2 ((-sum2) X23 + sum47 + 
+           sum48 + (-sum5) X33)))/denom1, 
+
+    (gm1)/denom4}, 
+
+
+   {(sum20 + 
+     aXmag (w ((-sum5) X14 + 
+           sum32 + 
+           X12 ((sum10) X22 + (sum4) X2X3 + sum42) + 
+           X2 ((-sum5) X23 + sum40 + 
+              2 (-sum23) + (-sum2) X33)) -
+         u (sum71 - 
+           sum33 - (-sum4) X22pX322 + 
+           sum70 ) + 
+        v (-sum26 + 
+           (-sum35) - sum34 + 
+           X12 (sum45 + (sum5) X2X3 + (-sum42)) + 
+           X3 ((sum5) X23 + 
+              (-sum40) + 
+              
+              2 sum23 + (-sum4) X33))))/denom1, 
+
+    (u sum28 + 
+     aXmag (sum71 - 
+        sum33 - (sum2) X22pX322 + 
+        sum70  ))/denom1, 
+
+
+
+    (v sum28 + 
+     aXmag (sum26 + 
+        sum35 + (sum2) X1X2X22pX32 + 
+        X12 ((sum7) X22 + (-sum5) X2X3 + 
+           sum42) + 
+        X3 (  (-sum65)    )))/denom1, 
+
+    (w sum28 + 
+     aXmag ((sum5) X14 + 
+        sum38 + sum66 + 
+        X12 (2 (sum5) X22 + sum22+ 
+           (-sum42)) + 
+        X2 (  sum65   )  ))/denom1, 
+
+    (gm1)/denom4}, 
+
+    
+    {(sum64 + 
+     aXmag (v (sum74) + 
+        w (sum67 + sum68 + 
+           sum54 + 
+           sum56 + 
+           sum41 + (sum9) X2X33 + 
+           sum58 - sum37 + 
+           X12 (sum57 + (sum9) X2X3 + 
+              2 (-sum24))) + 
+        u ( sum62 ) ) )/denom2, 
+
+     (-u sum28 +
+      aXmag ( -sum62 ) )/denom2, 
+
+     (-v sum28 -
+      aXmag (sum74 ))/denom2, 
+
+     (-w sum28 -
+      aXmag (sum67 + sum68 + 
+        sum54 + sum56 + 
+        sum41 + (sum9) X2X33 + 
+        sum58 - sum37 + 
+        X12 (sum57 + (sum9) X2X3 + 
+           2 (-sum24))))/denom2, 
+
+    -((3 (gm1))/denom3)}, 
+
+
+
+   {(sum64 + 
+     aXmag (v (-sum73 + 
+           sum36 + 
+           2 (sum3) X2X33 + sum69 + sum34 + 
+           X12 ((sum15) X22 + sum22+ 
+              sum46)) + 
+        w (sum67 + sum68 + 
+           sum38 + 2 (sum3) X23X3 + 
+           sum36 + (-sum4) X2X33 + 
+           (-sum58) + (-sum4) X1X3X22pX32 + 
+           X12 (sum57 + sum22+ 
+              sum55)) + 
+        u (  + sum25  - sum63 )) )/denom2, 
+
+    (-u sum28 +
+      aXmag ( - (sum2) X13X2pX3  + sum63  ))/denom2, 
+
+    (-v sum28 +
+      aXmag (sum73 
+        + sum59 + 
+        2 (-sum3) X2X33 - sum69 - (sum2) X1X2X22pX32 + 
+        X12 ((-sum15) X22 - sum22- 
+           sum46)))/denom2, 
+
+    (-w sum28 +
+      aXmag (-sum67 - sum68 + 
+        2 (-sum3) X13X3 + 2 (-sum3) X23X3 + sum59 + (-sum2) X2X33 + 
+        sum58 - sum66 + 
+        X12 (-sum57 - sum22+ 
+           2 (sum11) X32)))/denom2, 
+
+   -((3 (gm1))/denom3)}}
+
+
+
+
+Zero=Simplify[M-Mnew]
+

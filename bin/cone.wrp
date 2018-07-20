@@ -1,0 +1,214 @@
+{
+   ___________________________________________________________________________________________________________
+
+   WARP: a CFD Code for Plasma Aerodynamics [a]
+   ___________________________________________________________________________________________________________
+
+   Cycle Strategy                             Multizone [1]
+   Pseudo-Time-Step Integration               Block Implicit ADI [2,3]
+   Convection Derivatives Discretization      Flux Difference Splitting 2nd Order Yee [4]
+   Time Derivative Discretization             Steady-State
+   Fluid Transport Model                      Navier-Stokes Perfect Gas
+   Chemical Model                             Air 1 species 0 reaction
+   Electron Beam Model                        None
+   Electromagnetic Fields Model               None
+   Thermodynamic Model                        Perfect gas
+   Number of Dimensions                       2
+   Number of Flux Components                  4
+   ___________________________________________________________________________________________________________
+
+   [a]  Parent, B. "Weakly-ionized Airflow Resolver and Post-processor: A CFD Code for Plasma Aerodynamics",
+        WARP version 16feb05a compiled on Feb  5 2016 at 20:13:42 with ANSI C compiler with POSIX zone
+        threads with assertions. WARP is a Copyright (c) 1998-2016 of Bernard Parent. Copying and
+        distribution of WARP is prohibited.
+   [1]  Parent, B. and Sislian, J.P. "The Use of Domain Decomposition in Accelerating the Convergence of
+        Quasihyperbolic Systems", Journal of Computational Physics 179:140-169, 2002.
+   [2]  Briley, W.R. and McDonald, H., "On the Structure and Use of Linearized Block Implicit Schemes,"
+        Journal of Computational Physics 34:54-73, 1980.
+   [3]  Beam, R.M. and Warming, R.F. "An Implicit Finite-Difference Algorithm for Hyperbolic Systems in
+        Conservation-Law-Form", Journal of Computational Physics 22:87-110, 1976.
+   [4]  Yee, H.C., Klopfer, G.H., and Montagne, J.-L., "High-Resolution Shock-Capturing Schemes for Inviscid
+        and Viscous Hypersonic Flows," Journal of Computational Physics 88:31-61, 1990.
+
+}
+
+
+Mx=5.0;
+My=0.0;
+P=10000;
+T=300; 
+
+
+mf=3.0;
+
+is=1;  js=1; 
+ie=round(30*mf); je=round(30*mf);
+
+L=1.0;
+rmin=1e-2;
+rmax=0.3;
+Hlayer=0.18;
+
+Grid(
+  Size(is,js, ie,je);
+  Point(is,js, 0.0e0,rmin);
+  Point(ie,js, L,rmax);
+  Point(ie,je, L,rmax+Hlayer);
+  Point(is,je, 0.0e0,rmin+Hlayer);
+  JoinCorners(is,js, ie,je,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
+);
+
+
+Bdry(
+  NavierStokesPerfect(
+    {
+    _________________________________________________________________________________________
+
+    Boundary Condition Type    Number   Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC      0        Inflow, supersonic
+    BDRY_OUTFLOWSUPERSONIC1         1        Outflow, supersonic
+    BDRY_SYMMETRICAL1               2        Symmetrical, 1st order (can be used as a "slip wall")
+    BDRY_SYMMETRICAL2               3        Symmetrical, 2nd order (can be used as a "slip wall")
+    BDRY_WALLTFIXED1               4        Wall, T specified
+    BDRY_WALLADIABATIC1             5        Wall, adiabatic
+    BDRY_INFLOWSUBSONIC1       6        Subsonic Inflow (Constant Tstag, Pstag at inflow)
+    BDRY_OUTFLOWSUBSONIC1           7        Subsonic Outflow (Constant P at outflow)
+    _________________________________________________________________________________________
+    }
+    All(BDRY_OUTFLOWSUPERSONIC1);
+    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_SYMMETRICAL1,BDRY_INFLOWSUPERSONIC);
+    {
+    Cut(is,js,  ie,je);
+    Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
+    }
+  );
+);
+ 
+ 
+Model(
+ 
+  NavierStokesPerfect(
+    gamma=1.4;      {the specific heat ratio }
+    R=286.0;        {the gas constant in J/kgK }
+    eta=2e-5;       {the viscosity of the gas in kg/ms }
+    kappa=0.03;     {the thermal conductivity of the gas in W/mK }
+    Pmin=1.0e-2;    Pmax=9.9e99;   {min and max pressure allowed in the domain in Pa}
+    Tmin=1.0e1;     Tmax=6.0e3;    {min and max temperature allowed in the domain in K}
+    zetaA1=0.1e0;   {conditions the convective waves of the A jacobian}
+    zetaA1=0.1e0;   {conditions the acoustic waves of the A jacobian}
+    zetaA2=0.2;
+    zetaA3=0.1e0;   {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
+    
+    AXISYMMETRIC=TRUE; {axisymmetric coordinates rather than planar}
+    SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
+    SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
+  );
+);
+
+
+Init(
+  if (!READDATAFILE,
+    NavierStokesPerfect(
+      {
+      _______________________________________________________________________________________
+
+      Initial Condition Type       Parameters
+      _______________________________________________________________________________________
+
+      INIT_TYPE1                   V[1]..V[nd],  P,  T     
+      INIT_TYPE2                   M[1]..M[nd],  P,  T     
+      _______________________________________________________________________________________
+
+      }
+      All(2,Mx,My,P,T);
+      {
+      Bdry(BDRY_WALLTFIXED1, 2, Mx,My,P,T);
+      Region(is,js,  ie,je,  2, Mx,My,P,T);
+      }
+    );
+  );
+);
+
+
+Cycle(
+  NavierStokesPerfect(
+    xiverge=1e-3;          {residual convergence threshold}
+    rhoref=1.0;            {reference density in kg/m3}
+    aref=300.0;            {reference sound speed in m/s}
+    Uref[0]=rhoref;            
+    Uref[1]=rhoref*aref;       
+    Uref[2]=rhoref*aref;   
+    Uref[3]=rhoref*aref*aref;  
+  );
+  MultizoneSteady(
+    if (mod(iter,50)==0,
+      WriteDataFile(outputfilename);
+    );
+    sigma1=0.5;      {exponent of largest pseudotime step in all dimensions}
+    sigma2=0.0;      {exponent of largest pseudotime step in all flux components}
+    PRECONDITIONER=PRECON_LOCALTIMESTEP;
+    if (iter==1,
+      CFL=0.1;
+    );
+    CFL=min(CFL*1.1,4.0);
+    phi1=20;     {maximum number of gridlines per zone in each dimension}
+    UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,phi1);
+
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld) %3ld/%3ld%s \n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,numzones_updated,numzones_total,clipinfo);
+  );
+);
+
+
+Post(
+  xcut[1]=0.1;
+  xcut[2]=0.2;
+  xcut[3]=0.3;
+  {the following loop outputs to a file integrated properties at x=0.1,0.2,0.3}
+  for (cnt,1,3,
+    SetPostDomainToXcuts(xcut[cnt]);
+    Pback=_BackPressure({Aback,m2}1.0, {Pback_min,Pa}400, {Pback_max,Pa}4000, {numsteps}300,
+                 {q_min (as small a positive value as possible)}1.0);
+    Fpot=_ThrustPotentialPerMassFlowRate(Pback,{numsteps}300, {q_min}1.0);
+    mdotreacting=_MassFlowRateReacting(
+        2       {rank of the reacting species},
+        0.235*(1-0.02876){stoichio. mass fraction of reacting species},
+        1       {rank of the species reacted with},
+        0.02876 {stoichio. mass fraction of species reacted with});
+    Fx=_MomentumForcePerMassFlowRate();  {momentum*crossarea/mdot}
+    mdot=_MassFlowRate();
+    Tstag=_MassFlowRateAveStagTemperature();
+    Pstag=_MassFlowRateAveStagPressure({numsteps} 300);
+    Pave=_MassFlowRateAvePressure();
+    Tave=_MassFlowRateAveTemperature();
+    qave=_MassFlowRateAveSpeed();
+    rhoave=_MassFlowRateAveDensity();
+    htstarave=_MassFlowRateAveTotalEnthalpy();
+    fprintf("perfparam.txt",
+            "x              =%E m\n"
+            "Pback          =%E Pa\n"
+            "Fpot           =%E Ns/kg\n"
+            "mdotreacting   =%E kg/s\n"
+            "mdot           =%E kg/s\n"
+            "Tstag          =%E K\n"
+            "Pstag          =%E Pa\n"
+            "Pave           =%E Pa\n"
+            "Tave           =%E K\n"
+            "qave           =%E m/s\n"
+            "rhoave         =%E kg/m3\n\n"
+            ,xcut[cnt],Pback,Fpot,mdotreacting,mdot,Tstag,Pstag,Pave,Tave,qave,rhoave);
+  );
+  {here, reset the post domain from one xcut to the entire computational domain}
+  ResetPostDomain();
+  {then, restrict the post domain to the region between is,js and ie,je}
+  RestrictPostDomainToRegion(is,js, ie,je);
+  {output the body forces in the post domain to a file (both shear and pressure)}
+  WriteBodyForcesFile("bodyforces.txt",3 {node type on the surface of the body});
+  {write a post file that includes only the post domain}
+  WritePostFile("post.01", "tecplot",POSTFILE_ALL);
+  {write a grid post file that includes only the post domain}
+  WritePostFile("grid.01", "tecplot",POSTFILE_GRID);
+);

@@ -1,0 +1,85 @@
+\begin{thebibliography}{10}
+\newcommand{\enquote}[1]{``#1''}
+
+\bibitem{noz:dude}
+{\sc Dudebout, R.}, {\em Axisymmetric Hypersonic Contoured Nozzle Design\/},
+  Master's thesis, University of Toronto, Institute for Aerospace Studies,
+  August 1989.
+
+\bibitem{noz:zucrow1}
+{\sc Zucrow, M.~J. and Hoffman, J.~D.}, {\em Gas Dynamics:Multidimensional
+  Flow\/}, Vol.~2, John Wiley and Sons, 1977.
+
+\bibitem{noz:zucrow2}
+{\sc Zucrow, M.~J. and Hoffman, J.~D.}, {\em Gas Dynamics\/}, Vol.~1, John
+  Wiley and Sons, 1976.
+
+\bibitem{noz:sivells}
+{\sc Sivells, J.~C.}, \enquote{Aerodynamic Design of Axisymmetric Hypersonic
+  Wind-Tunnel Nozzles,} {\em Journal of Spacecraft\/}, November 1970,
+  pp.~1292--1299.
+
+\bibitem{noz:foel}
+{\sc Foelsch, K.}, \enquote{The Analytical Design of an Axially Symmetric Laval
+  Nozzle for a Parallel and Uniform Jet,} {\em Journal of the Aeronautical
+  Sciences\/}, March 1949, pp.~161--188.
+
+\bibitem{noz:kliegel}
+{\sc Kliegel, J.~R. and Levine, J.~N.}, \enquote{Transonic Flow in Small Throat
+  Radius of Curvature Nozzles,} {\em AIAA Journal\/}, Vol.~7, No.~7, July 1969,
+  pp.~1375--1378.
+
+\bibitem{noz:simeon}
+{\sc Simeonides, G.}, \enquote{The Aerodynamic Design of Hypersonic Contoured
+  Axisymmetric Nozzles Including Real Gas Effects,} Tech. rep., von Karman
+  Institute for Fluid Dynamics, Rhode Saint Genese Belgium, March 1987,
+  Technical Memorandum 43.
+
+\bibitem{noz:evvard}
+{\sc Evvard, J.~C. and Maslen, S.~H.}, \enquote{Three-Dimensional Supersonic
+  Nozzles and Inlets of Arbitrary Exit Cross Section,} Tech. rep., National
+  Advisory Committee for Aeronautics, Lewis Flight Propulsion Laboratory, April
+  1952, NACA TN 2688.
+
+\bibitem{noz:eden}
+{\sc Edenfield, E.~E.}, \enquote{Design of a High Reynolds Number Mach Number 8
+  Contoured Nozzle for the Hypersonic Wind Tunnel (F),} Tech. rep., Arnold
+  Engineering Development Centre, Arnold Air Force Station, Tennessee, August
+  1972, AEDC-TR-72-48.
+
+\bibitem{noz:sislian}
+{\sc Sislian, J.~P.}, \enquote{Airbreathing Propulsion Notes,} University of
+  Toronto Institute for Aerospace Studies.
+
+\bibitem{noz:gardiner}
+Jr., W. C.~G., editor, {\em Combustion Chemistry\/}, chap.~2, Springer-Verlag,
+  1984, pp. 37--125.
+
+\bibitem{noz:svehla}
+{\sc Svehla, R.~A.}, \enquote{Estimated Viscosities and Thermal Conductivities
+  of Gases at High Temperatures,} Tech. rep., NASA, 1962.
+
+\bibitem{ker:launder}
+Launder, B.~E., editor, {\em Studies in Convection: Theory, Measurement and
+  Applications\/}, Vol.~2, chap. Calculation of Chemically Reacting Flows with
+  Complex Chemistry, Academic Press, 1977, pp. 191--221.
+
+\bibitem{ker:nasa}
+{\sc McBride, B.~J., Gordon, S., and Reno, M.~A.}, \enquote{Coefficients for
+  Calculating Thermodynamic and Transport Properties of Individual Species,}
+  Tech. Rep. NASA TM 4513, NASA, October 1993.
+
+\bibitem{ker:calculus}
+{\sc Stewart, J.}, {\em Calculus\/}, Brooks/Cole Publishing Company, McMaster
+  University, 2nd ed., 1991.
+
+\bibitem{ker:hill}
+{\sc Hill, P. and Peterson, C.}, {\em Mechanics and Thermodynamics of
+  Propulsion\/}, chap.~12, Addison-Wesley, 2nd ed., 1992, pp. 569--614.
+
+\bibitem{ker:fusina}
+{\sc Fusina, G.}, {\em An Investigation of Standing Oblique Detonation Waves
+  with Hydrogen-Air Equilibrium Chemical Reactions\/}, Master's thesis,
+  University of Toronto, Institute for Aerospace Studies, April 1995.
+
+\end{thebibliography}

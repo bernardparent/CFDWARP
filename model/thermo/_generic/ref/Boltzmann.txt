@@ -1,0 +1,37 @@
+Good derivation of NS equations from the kinetic theory of gases point of view:
+Hirschfelder, J. O., Curtiss and Bird (1954) Molecular Theory of Gases and Liquids
+
+check these books out:
+
+
+"The Mathematical Theory of Non-Uniform Gases", S. Chapman, T.G. Cowling, Cambridge University Press
+  Gerstein, chemistry, physics  QC 175 C5 197
+
+"Statistical Mechanics", K. Huang, John Wiley & Sons., Inc. Chapters 3-6
+  Gerstein, physics, chemistry  QC 175 .H83
+
+Present, R. D., "Kinetic Theory of Gases," McGraw-Hill, 1958.
+  Engineering, Gerstein, Physics  Library   QC 175 P7
+
+Mayer & Mayer, "Statistical Mechanics," Wiley, 1940.
+  Chemistry, Gerstein  QC 175 .M3 1977
+
+GODLEWSKI and RAVIART: Numerical Approximations to Hyperbolic Systems of Conservation Laws, Springer.
+  Gerstein QA/930/G63/1996X
+
+
+
+
+
+and these articles:
+
+
+"Digital Physics Approach to Computational Fluid Dynamics: Some Basic Theoretical Features", Chen, Teixeira and Molvig. Journal of Modern Physics C., Vol. 8 (1997) pg. 675
+
+SM DESHPANDE, "Kinetic theory based new upwind methods for inviscid compressible flows", AIAA Paper, 86-0275, 1986
+
+JC MANDAL & SM DESPHANDE, "Kinetic Flux Vector Splitting for the Euler Equations", Computers and Fluids, vol.23, pp. 447-478, 1994
+
+ICASE report 99-21 (www.icase.edu) by Qian et al titled "On higher order dynamics in lattice-based models using Chapman-Ensog method".... You can download that... 
+
+

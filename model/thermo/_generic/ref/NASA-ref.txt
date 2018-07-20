@@ -1,0 +1,9 @@
+S. Gordon and B.J. McBride, "Computer Program for Calculation of Complex Chemical Equilibrium Composition, Rocket Performance, Incident and Reflected Shocks and Chapman-Jouguet Detonations", NASA Report SP-273, 1971.
+
+ B.J. McBride, S. Gordon, and M.A. Reno, "Coefficients for Calculating Thermodynamic and Transport Properties of Individual Species", NASA Report TM-4513, October 1993.
+
+ The new format file is discussed in
+
+ S. Gordon and B.J. McBride, "Computer Program for Calculation of Complex Chemical Equilibrium Compositions and Applications: I. Analysis", NASA Reference Publication 1311, October 1994.
+
+ B.J. McBride and S. Gordon, "Computer Program for Calculation of Complex Chemical Equilibrium Compositions and Applications: II. Users Manual and Program Description", NASA Reference Publication 1311, June 1996.

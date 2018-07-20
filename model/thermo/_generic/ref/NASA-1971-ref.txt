@@ -1,0 +1,71 @@
+The original NASA thermo data file format was documented in:
+
+S. Gordon and B.J. McBride, "Computer Program for Calculation of Complex
+Chemical Equilibrium Composition, Rocket Performance, Incident and Reflected
+Shocks and Chapman-Jouguet Detonations", NASA SP-273 (1971).
+
+The following information is quoted directly from that document.
+Eqs. 90, 91, and 92 give polynomial functions for the specific heat,
+enthalpy, and entropy.  The coefficients are given as data.
+
+Eq. 90: cp0/R=a1+a2T+a3*T^2+a4*T^3+a5*T^4
+Eq. 91: H0_T/(RT)=a1+a2/2*T+a3/3*T^2+a4/4*T^3+a5/5*T^4+a6/T
+Eq. 92: S0_T/R=a1*ln(T)+a2*T+a3/2*T^2+a4/3*T^3+a5/4*T^4+a7
+
+Appendix D: Thermo Data (Format and Listing)
+
+Card             Contents                              Format        Card
+Order                                                               Column
+1      THERMO                                           3A4         1 to 6
+2      Temperature ranges for 2 sets of coefficients:   3F10.3      1 to 30
+        lowest T, common T, and highest T
+3      Species name                                     3A4         1 to 12
+       Date                                             2A3         19 to 24
+       Atomic symbols and formula                       4(A2,F3.0)  25 to 44
+       Phase of species (S, L, or G for solid, liquid,  A1          45
+        or gas, respectively) 
+       Temperature range                                2F10.3      46 to 65
+       Integer 1                                        I5          80
+4      Coefficients ai (i=1 to 5) in equations (90)     5(E15.8)    1 to 75
+        to (92) (for upper temperature interval)
+       Integer 2                                        I5          80
+5      Coefficients in equations (90) to (92) (a6, a7,  5(E15.8)    1 to 75
+        for upper temperature interval, and a1, a2, and
+        a3 for lower)
+       Integer 3                                        I5          80
+6      Coefficients in equations (90) to (92) (a4, a5,  4(E15.8)    1 to 60
+        a6, a7 for lower temperature interval)
+       Integer 4                                        I20         80
+(a)    Repeat cards numbered 1 to 4 in cc 80 for each
+       species
+(Final END (Indicates end of thermodynamic data)        3A4         1 to 3
+ card)
+
+Gaseous species and condensed species with only one condensed phase can be in
+any order.  However, the sets for two or more condensed phases of the same
+species must be adjacent.  If there are more than two condensed phases of
+a species, their sets must be either in increasing or decreasing order
+according to their temperature intervals.
+
+The following example illustrates a thermo data file with a single species.
+Additional species would be added by duplicating lines 3 through 6:
+
+THERMO
+ 200.0   1000.0   6000.0
+Br                J6/82BR  1    0     0    0G 200.000  6000.000                1
+ 2.08851053E+00 7.12118611E-04-2.70003073E-07 4.14986299E-11-2.31188294E-15    2
+ 1.28568767E+04 9.07351144E+00 2.48571711E+00 1.50647525E-04-5.37267333E-07    3
+ 7.20921065E-10-2.50205558E-13 1.27092168E+04 6.86030804E+00 1.34535890E+04    4
+END
+
+Notes:
+1. The minimum and maximum temperatures given on the second line of the
+ file are meant to be global min and max values, where each species
+ provides a specific, presumably more restrictive, range.  The middle
+ temperature on the second line is the common temperature for the high
+ and low temperature ranges for all species in the file.
+2. Some files (such as the example, above) provide an additional value
+ in the normally unused last field.  This is the enthalpy of formation,
+ divided by the gas constant, and is redundant with Eq. 91.
+3. Although the use of columns 66 to 79 of the first line of species data 
+ is not specified, it is often used for the molecular weight.

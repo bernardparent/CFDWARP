@@ -1,0 +1,4 @@
+#!MC 1200
+# Created by Tecplot 360 build 12.0.0.3454
+$!ALTERDATA 
+  EQUATION = '{Jtmag}=sqrt({Jt[0]}**2+{Jt[1]}**2)'

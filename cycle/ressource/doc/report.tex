@@ -1,0 +1,445 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{amsmath}
+\usepackage{bm}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\nd}{{n_{\rm d}}}
+\newcommand{\M}{{\bf M}}
+\newcommand{\N}{{\bf N}}
+\newcommand{\B}{{\bf B}}
+\newcommand{\BI}{\overline{{\bf B}}}
+\newcommand{\A}{{\bf A}}
+\newcommand{\C}{{\bf C}}
+\newcommand{\T}{{\bf T}}
+\newcommand{\co}{,~~}
+\newcommand{\band}{{\rm Band}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{1.0}}
+\renewcommand{\fontsizefigure}{\footnotesize}
+\renewcommand{\vec}[1]{\bm{#1}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcounter{tocdepth}{3}
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\author{
+  Bernard Parent
+}
+
+\email{
+  bernparent@gmail.com
+}
+
+\department{
+  Department of Aerospace Engineering	
+}
+
+\institution{
+  Pusan National University
+}
+
+\title{
+  Source Terms Discretization
+}
+
+\date{
+  September 2016
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+\sloppy
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+  \tableofcontents
+%  \makenomenclature
+%%  \listoftables
+%%  \listoffigures
+
+
+
+\section{Splitting of the Source Terms to Obtain Positivity}
+
+Consider an ordinary differential equation of the form:
+%
+\begin{equation}
+\frac{d U}{d t}  = S 
+\end{equation}
+%
+where $t$ is time, $S$ is the source term vector, and $U$ is the vector of conserved variables. Discretize the latter using a first-order backward operator for the time derivative (a usual strategy when solving chemically-reacting flow). Then:
+%
+\begin{equation}
+\frac{U_{m}-U_{m-1}}{\Delta t} = S_{m} 
+\label{eqn:disceq}
+\end{equation}
+%
+where $m$ refers to the time level and $\Delta t$ to the physical time step.   
+
+Now, let's rewrite $S$ as a function of the flux eigenvectors and eigenvalues:
+%
+\begin{equation}
+ S_{m} = L^{-1}_{m} \Lambda_{m}^S L_{m} U_{m}
+\label{eqn:S1}
+\end{equation}
+%
+The latter should be understood as a definition of the $S$ eigenvalues, $\Lambda_{m}^S$. Multiply both sides by $L_{m}$:
+%
+\begin{equation}
+ L_{m} S_{m} =  \Lambda_{m}^S L_{m} U_{m}
+\end{equation}
+%
+or,
+%
+\begin{equation}
+ \left[ L_{m} S_{m} \right]_{r} =  \left[ \Lambda_{m}^S\right]_{r,r} \left[L_{m} U_{m}\right]_r
+\end{equation}
+%
+Isolate the eigenvalues:
+%
+\begin{equation}
+\left[ \Lambda_{m}^S\right]_{r,r}=\frac{ \left[ L_{m} S_{m} \right]_{r}}{\left[L_{m} U_{m}\right]_r}  
+\label{eqn:Lambda_S}
+\end{equation}
+%
+It can be easily shown that the discretization equation would conform to the rule of the positive coefficients (and hence lead to a positivity-preserving algorithm) only if all the terms within $\Lambda_{m}^S$ are negative \cite{jcp:2012:parent}. Unfortunately, this is seldom the case and this is why the solution can become tainted with negative mass fractions, negative temperature, or negative pressure. For this reason, we will seek a discretization of the source term of the form:
+%
+\begin{equation}
+  S_{m} = L^{-1}_{m} \Lambda_{m}^- L_{m} U_{m} + L^{-1}_{m-1} \Lambda_{m-1}^+ L_{m-1} U_{m-1}
+  \label{eqn:source_split}
+\end{equation}
+%
+where $\Lambda^-$ and $\Lambda^+$ are diagonal matrices composed strictly of negative and positive eigenvalues, respectively. 
+
+To see why this would lead to a positivity-preserving algorithm, substitute the latter in Eq.\ (\ref{eqn:disceq}):
+%
+\begin{equation}
+\frac{U_{m}-U_{m-1}}{\Delta t} = L^{-1}_{m} \Lambda_{m}^- L_{m} U_{m} + L^{-1}_{m-1} \Lambda_{m-1}^+ L_{m-1} U_{m-1}
+\end{equation}
+%
+Put the $U_m$ terms on the LHS and the $U_{m-1}$ terms on the RHS:
+%
+\begin{equation}
+\frac{1}{\Delta t} U_{m} - L^{-1}_{m} \Lambda_{m}^- L_{m} U_{m}
+=
+   L^{-1}_{m-1} \Lambda_{m-1}^+ L_{m-1} U_{m-1} + \frac{1}{\Delta t} U_{m-1}
+\end{equation}
+%
+Rearrange:
+%
+\begin{equation}
+ L^{-1}_{m} \left(\frac{1}{\Delta t} I -  \Lambda_{m}^-  \right) L_{m} U_{m}
+=
+   L^{-1}_{m-1} \left( \Lambda_{m-1}^+ + \frac{1}{\Delta t} I \right) L_{m-1} U_{m-1} 
+\end{equation}
+%
+Because the  eigenvalues are strictly positive within both terms, the latter adheres to the rule of the positive coefficients and will hence be positivity preserving. 
+
+
+\section{Source Vector Splitting}
+
+Perhaps the simplest way the source term eigenvalues $\Lambda^+$ and $\Lambda^-$ can be found is through vector splitting. This is accomplished by first defining the source eigenvalues $\Lambda_{m}^S$ and $\Lambda_{m-1}^S$ such that the following two equations hold:
+%
+\begin{equation}
+ S_{m} = L^{-1}_{m} \Lambda_{m}^S L_{m} U_{m}
+\end{equation}
+%
+%
+\begin{equation}
+ S_{m} = L^{-1}_{m-1} \Lambda_{m-1}^S L_{m-1} U_{m-1}
+\end{equation}
+%
+From the latter it can be easily shown that the source eigenvalues correspond to:
+%
+\begin{equation}
+\left[ \Lambda_{m}^S\right]_{r,r}=\frac{ \left[ L_{m} S_{m} \right]_{r}}{\left[L_{m} U_{m}\right]_r}  
+\end{equation}
+%
+%
+\begin{equation}
+\left[ \Lambda_{m-1}^S\right]_{r,r}=\frac{ \left[ L_{m-1} S_{m} \right]_{r}}{\left[L_{m-1} U_{m-1}\right]_r}  
+\end{equation}
+%
+From the latter we can obtain the negative and positive eigenvalues as follows:
+%
+\begin{equation}
+\Lambda_m^- = \frac{1}{2} \left( \Lambda_m^S - |\Lambda_m^S| \right)
+\end{equation}
+%
+%
+\begin{equation}
+\Lambda_{m-1}^+ = \frac{1}{2} \left( \Lambda_{m-1}^S + |\Lambda_{m-1}^S| \right)
+\end{equation}
+%
+
+
+\section{Source Difference Splitting}
+
+
+We now wish to outline an algorithm which would yield the source terms positive and negative eigenvalues, $\Lambda^+$ and $\Lambda^-$ from the source term $S$.
+
+This is accomplished by first substituting the $S$ eigenvalues outlined in Eq.\ (\ref{eqn:Lambda_S}) in Eq.\  (\ref{eqn:S1}). After some reformatting, the following is obtained:
+%
+\begin{equation}
+S_{m}=
+\underbrace{ L^{-1}_{m-1} Y^+_{m-1} L_{m-1} U_{m-1} 
++ L^{-1}_{m} Z^-_{m} L_{m} U_{m}}_\textrm{\small positivity-preserving}
++\underbrace{ L^{-1}_{m-1} Y^-_{m-1} L_{m-1} U_{m-1} 
++ L^{-1}_{m} Z^+_{m} L_{m} U_{m}}_\textrm{\small not~necessarily~positivity-preserving}
+\label{eqn:S_split}
+\end{equation}
+%
+with the diagonal matrices $Y^{\pm}$ and $Z^{\pm}$ set equal to: 
+%
+\begin{equation}
+ \left[Y_{m-1}^-\right]_{r,r}  = 0
+\label{eqn:Yminus1}
+\end{equation}
+%
+%
+\begin{equation}
+ \left[Z_{m}^-\right]_{r,r}  = \min\left(0,~\left[ \Lambda_{m}^S\right]_{r,r}\right)
+\label{eqn:Zminus1}
+\end{equation}
+%
+%
+\begin{equation}
+ \left[ Y_{m-1}^+\right]_{r,r}  = 0
+\label{eqn:Yplus1}
+\end{equation}
+%
+%
+\begin{equation}
+ \left[Z_{m}^+\right]_{r,r}  = \max\left(0,~\left[ \Lambda_{m}^S\right]_{r,r}\right)
+\label{eqn:Zplus1}
+\end{equation}
+%
+Thus far, the souce terms have not been modified and the stencil is still not positivity-preserving. 
+
+One way that the stencil could be made positivity-preserving is simply by dropping the last two terms on the RHS of Eq.\ (\ref{eqn:S_split}). But, by doing so, the source terms would be modified substantially. For this reason, instead of discarding the two terms that are not necessarily positivity-preserving, let us recast them into new terms, some of which being guaranteed to be positivity-preserving. This can be accomplished by first defining the diagonal matrices $Q$ and $R$ such that the following two statements hold:
+%
+\begin{equation}
+L^{-1}_{m} R_{m} L_{m} U_{m} \equiv L^{-1}_{m-1} Y^-_{m-1} L_{m-1} U_{m-1}
+\label{eqn:R_definition}
+\end{equation}
+%
+%
+\begin{equation}
+L^{-1}_{m-1} Q_{m-1} L_{m-1} U_{m-1} \equiv L^{-1}_{m} Z^+_{m} L_{m} U_{m}
+\label{eqn:Q_definition}
+\end{equation}
+%
+Then, using the latter two definitions, the split source terms outlined in Eq.\ (\ref{eqn:S_split}) can be rewritten as:
+%
+\begin{equation}
+S_{m}=
++ L^{-1}_{m-1} (Y^+_{m-1}+Q_{m-1}) L_{m-1} U_{m-1} 
++ L^{-1}_{m} (Z^-_{m}+R_{m}) L_{m} U_{m}
+\label{eqn:S_split_2}
+\end{equation}
+%
+where the matrices $R$ and $Q$ can  be obtained in terms of the other matrices by multiplying both sides of Eqs.\ (\ref{eqn:R_definition}) and (\ref{eqn:Q_definition}) by $L_{m}$, writing in tensor form, and then isolating $R$ and $Q$:
+%
+\begin{equation}
+\left[R_{m}\right]_{r,r}  = \frac{\left[L_{m} L^{-1}_{m-1} Y^-_{m-1} L_{m-1} U_{m-1}\right]_r}{\left[L_{m} U_{m}\right]_r}
+\label{eqn:R_2}
+\end{equation}
+%
+%
+\begin{equation}
+\left[Q_{m-1}\right]_{r,r} = \frac{\left[L_{m-1} L^{-1}_{m} Z^+_{m} L_{m} U_{m}\right]_r}{\left[L_{m-1} U_{m-1}\right]_r}
+\label{eqn:Q_2}
+\end{equation}
+%
+Now, let us split again $S$ as a sum of positivity-preserving terms and not-necessarily-positivity-preserving terms. This can be done by rewriting Eq.\ (\ref{eqn:S_split_2}) as:
+%
+\begin{align}
+S_{m}&=
+\underbrace{ 
+ L^{-1}_{m-1} (Y^+_{m-1})^{k+1} L_{m-1} U_{m-1}+L^{-1}_{m} (Z^-_{m})^{k+1} L_{m} U_{m}}_\textrm{\small positivity-preserving}\nonumber\alb
+&+\underbrace{  L^{-1}_{m-1} (Y^-_{m-1})^{k+1} L_{m-1} U_{m-1} 
++ L^{-1}_{m} (Z^+_{m})^{k+1} L_{m} U_{m}}_\textrm{\small not~necessarily~positivity-preserving} 
+\label{eqn:S_split_3}
+\end{align}
+%
+where the superscript $k$ is an iteration counter such that $(\cdot)^{k+1}$ refers to an update of the properties $(\cdot)$. Then, for Eq.\ (\ref{eqn:S_split_3}) to be equal to the split source terms, Eq.\ (\ref{eqn:S_split_2}), the  updated $Y^\pm$ and $Z^\pm$ diagonal matrices must be equal to: 
+%
+\begin{equation}
+\left[ Y^-_{m-1}\right]^{k+1}_{r,r} = \min \left(0,~\left[Y^+_{m-1}\right]^k_{r,r}+\left[Q_{m-1}\right]^k_{r,r}  \right) 
+\label{eqn:Yminus2}
+\end{equation}
+%
+%
+\begin{equation}
+\left[ Z^-_{m}\right]^{k+1}_{r,r} = \min \left(0,~\left[Z^-_{m}\right]^k_{r,r}+\left[R_{m}\right]^k_{r,r}  \right) 
+\label{eqn:Zminus2}
+\end{equation}
+%
+%
+\begin{equation}
+\left[ Y^+_{m-1}\right]^{k+1}_{r,r} = \max \left(0,~\left[Y^+_{m-1}\right]^k_{r,r}+\left[Q_{m-1}\right]^k_{r,r}  \right) 
+\label{eqn:Yplus2}
+\end{equation}
+%
+%
+\begin{equation}
+\left[ Z^+_{m}\right]^{k+1}_{r,r} = \max \left(0,~\left[Z^-_{m}\right]^k_{r,r}+\left[R_{m}\right]^k_{r,r}  \right) 
+\label{eqn:Zplus2}
+\end{equation}
+%
+where the notation  $(\cdot)^k$ denotes the property $(\cdot)$ at the previous iteration count. Then, after substituting $R$ and $Q$ from Eq.\ (\ref{eqn:R_2}) and (\ref{eqn:Q_2}) the latter 4 equations become:
+%
+\begin{equation}
+\left[ Y^-_{m-1}\right]^{k+1}_{r,r} = \min \left(0,~\left[Y^+_{m-1}\right]^k_{r,r}+\frac{\left[L_{m-1} L^{-1}_{m} (Z^+_{m})^k L_{m} U_{m}\right]_r}{\left[L_{m-1} U_{m-1}\right]_r}  \right) 
+\label{eqn:Yminus3}
+\end{equation}
+%
+%
+\begin{equation}
+\left[ Z^-_{m}\right]^{k+1}_{r,r} = \min \left(0,~\left[Z^-_{m}\right]^k_{r,r}+\frac{\left[L_{m} L^{-1}_{m-1} (Y^-_{m-1})^k L_{m-1} U_{m-1}\right]_r}{\left[L_{m} U_{m}\right]_r}  \right) 
+\label{eqn:Zminus3}
+\end{equation}
+%
+%
+\begin{equation}
+\left[ Y^+_{m-1}\right]^{k+1}_{r,r} = \max \left(0,~\left[Y^+_{m-1}\right]^k_{r,r}+\frac{\left[L_{m-1} L^{-1}_{m} (Z^+_{m})^k L_{m} U_{m}\right]_r}{\left[L_{m-1} U_{m-1}\right]_r}  \right) 
+\label{eqn:Yplus3}
+\end{equation}
+%
+%
+\begin{equation}
+\left[ Z^+_{m}\right]^{k+1}_{r,r} = \max \left(0,~\left[Z^-_{m}\right]^k_{r,r}+\frac{\left[L_{m} L^{-1}_{m-1} (Y^-_{m-1})^k L_{m-1} U_{m-1}\right]_r}{\left[L_{m} U_{m}\right]_r}  \right) 
+\label{eqn:Zplus3}
+\end{equation}
+%
+By performing several iterations $k=1,2,3,..$, the latter set of equations essentially transforms (as much as possible) the not-necessarily-positivity-preserving terms into positivity-preserving terms (see Eq.\ (\ref{eqn:S_split_3})). However, it is noted that when used in conjunction with Eq.\ (\ref{eqn:S_split_3}), the latter expressions for $Y^\pm$ and $Z^\pm$ will yield exactly the original source terms independently of how many times the matrices $Y^\pm$ and $Z^\pm$ are updated. To make the scheme positivity-preserving, rewrite the source terms, Eq.\ (\ref{eqn:S_split_3}), as:
+%
+\begin{equation}
+S_{m}=
+ L^{-1}_{m-1} \Lambda^+_{m-1} L_{m-1} U_{m-1} 
++ L^{-1}_{m} \Lambda^-_{m} L_{m} U_{m}
+\label{eqn:S_split_3_2}
+\end{equation}
+%
+with the positive eigenvalues $\Lambda^+$ being set to the sum of the positive wave speeds from both the previous time level $m-1$ and the current time level $m$:  
+%
+\begin{equation}
+\Lambda_{m-1}^+ = Y^+_{m-1} + Z^+_{m} 
+\label{eqn:lambdapluQ_2}
+\end{equation}
+%
+and with the negative eigenvalues $\Lambda^-$ defined as the sum of the negative wave speeds originating from both the previous time level $m-1$ and the current time level $m$:
+%
+\begin{equation}
+\Lambda_{m}^- = Z^-_{m} + Y^-_{m-1} 
+\label{eqn:lambdaminuQ_2}
+\end{equation}
+%
+Compared to the original source terms, the latter source terms formulation does not modify the wave speed:  the wave speed lost by the source term at the previous iteration is gained by the source term at the next iteration and vice-versa. 
+
+In summary, the ``iterative form'' of the positivity-preserving source terms presented in this section consists of (i) initializing the $Y^\pm$ and $Z^\pm$ diagonal matrices using Eqs.\ (\ref{eqn:Yminus1}) to (\ref{eqn:Zplus1}), (ii) updating the $Y^\pm$ and $Z^\pm$ diagonal matrices through an iterative process by using Eqs.\ (\ref{eqn:Yminus3}) to (\ref{eqn:Zplus3}), (iii) determining the positive and negative eigenvalues through Eqs.\ (\ref{eqn:lambdapluQ_2}) and (\ref{eqn:lambdaminuQ_2}) using the latest updates of the $Y^\pm$ and $Z^\pm$ matrices, and (iv) determining the flux at the interface as in Eq.\ (\ref{eqn:S_split_3_2}). It is here recommended to update the $Y^\pm$ and $Z^\pm$ matrices only two times, as further updating the latter matrices seldomly results in a noticeable improvement of the solution while requiring more computing effort. 
+
+%Finally, it is noted that the flux function presented in this section yields exactly the one presented in Section 3.1 when no iterations are performed (that is, when the $Y^\pm$ and $Z^\pm$ matrices are set as in Eqs.\ (\ref{eqn:Yminus1})-(\ref{eqn:Zplus1}) and not subsequently updated).
+
+
+\section{Local Pseudotime Step}
+
+Recall the discretization equation Eq.\ (\ref{eqn:disceq}):
+%
+\begin{equation}
+\frac{U_{m}-U_{m-1}}{\Delta t} = S_{m} 
+\end{equation}
+%
+Add a pseudotime derivative:
+%
+\begin{equation}
+\frac{U^{n+1}_m-U_m}{\Delta \tau}
++\frac{U_{m}-U_{m-1}}{\Delta t} = S_{m} 
+\end{equation}
+%
+Split the source term in positive and negative vectors following Eq.\ (\ref{eqn:source_split}):
+%
+\begin{equation}
+  S_{m} = L^{-1}_{m} \Lambda_{m}^- L_{m} U_{m} + L^{-1}_{m-1} \Lambda_{m-1}^+ L_{m-1} U_{m-1}
+\end{equation}
+%
+Substituting the latter in the former:
+%
+\begin{equation}
+\frac{U^{n+1}_m-U_m}{\Delta \tau}
++\frac{U_{m}-U_{m-1}}{\Delta t} = L^{-1}_{m} \Lambda_{m}^- L_{m} U_{m} + L^{-1}_{m-1} \Lambda_{m-1}^+ L_{m-1} U_{m-1}
+\end{equation}
+%
+On  the LHS, keep only the $n+1$ term:
+%
+\begin{equation}
+\frac{1}{\Delta \tau} U^{n+1}_m
+ = L^{-1}_{m} \Lambda_{m}^- L_{m} U_{m} + L^{-1}_{m-1} \Lambda_{m-1}^+ L_{m-1} U_{m-1}
+-\frac{1}{\Delta t} U_{m}+\frac{1}{\Delta t} U_{m-1}
++\frac{1}{\Delta \tau} U_m
+\end{equation}
+%
+Regroup similar terms together:
+%
+\begin{equation}
+\frac{1}{\Delta \tau} U^{n+1}_m
+ = L^{-1}_{m} \left( \Lambda_{m}^- + \frac{1}{\Delta \tau}I -\frac{1}{\Delta t}I\right) L_{m} U_{m} 
+ + L^{-1}_{m-1} \left( \Lambda_{m-1}^+ + \frac{1}{\Delta t}I \right) L_{m-1} U_{m-1}
+\end{equation}
+%
+ 
+
+
+\bibliographystyle{warpdoc}
+\bibliography{all}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,240 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\mfd}{\displaystyle}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{0.7}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\ns}{{{n}_{\rm s}}}
+\newcommand{\efficiency}{\eta}
+\newcommand{\ordi}{{\rm d}}
+\newcommand{\unitvecdiff}[2]{\overline{\vec{#1} - \vec{#2}}}
+%\let\vec\bf
+%\renewcommand{\vec}[1]{\pmb{#1}}
+\newcommand{\betae}{\beta_{\rm e}}
+\newcommand{\betai}{\beta_{\rm i}}
+\newcommand{\sigmatilde}{\widetilde{\sigma}}
+\newcommand{\mdot}{\dot{m}}
+\newcommand{\efp}{\psi}
+\newcommand{\vion}{\vec{v^{\rm i}}}
+\newcommand{\vneutral}{\vec{v^{\rm n}}}
+\newcommand{\velectron}{\vec{v^{\rm e}}}
+\newcommand{\vflow}{\vec{v}}
+\newcommand{\betaiprime}{\betai^\prime}
+\newcommand{\betaeprime}{\betae^\prime}
+\newcommand{\Eprime}{\vec{E}^\prime}
+\newcommand{\tauei}{\tau_{\rm ei}}
+\newcommand{\tauen}{\tau_{\rm en}}
+\newcommand{\tauin}{\tau_{\rm in}}
+\newcommand{\momin}{{k_{\rm in}}}
+\newcommand{\momen}{{k_{\rm en}}}
+\newcommand{\momei}{{k_{\rm ei}}}
+\newcommand{\ie}{{\it i.e.}}
+\newcommand{\rhoeDveDt}{\rho_{\rm e} \frac{{\rm D}v_{\rm e}}{{\rm D} t}}
+\newcommand{\rhoiDviDt}{\rho_{\rm i} \frac{{\rm D}v_{\rm i}}{{\rm D} t}}
+\newcommand{\gradPe}{\nabla P_{\rm e}}
+\newcommand{\gradPi}{\nabla P_{\rm i}}
+\newcommand{\zetae}{\zeta_{\rm e}}
+\newcommand{\zetai}{\zeta_{\rm i}}
+\newcommand{\zetan}{\zeta_{\rm n}}
+\newcommand{\ev}{{e_{\rm v}}}
+\newcommand{\ee}{{e_{\rm e}}}
+\newcommand{\evzero}{{e_{\rm v}^0}}
+\newcommand{\eezero}{{e_{\rm e}^0}}
+
+\author{
+  Bernard Parent
+}
+
+\email{
+  bparent@princeton.edu
+}
+
+\department{
+  Dept.\ of Mechanical and Aerospace Engineering
+}
+
+\institution{
+  Princeton University
+}
+
+\title{
+ Electron Beam Models
+}
+
+\date{
+  January -- February 2005
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+%  \tableofcontents
+%  \makenomenclature
+%%  \listoftables
+%%  \listoffigures
+
+\section{Fixed E-Beam Model}
+
+For the ``fixed'' electron beam model, the power deposited per unit volume, $Q_{\rm b}$ is fixed to a constant within the control file as a function of the node position and is not altered as the solution converges.
+
+
+\section{Albebraic E-Beam Model}
+
+
+ The power deposited by the e-beam can be taken as:
+%
+\begin{equation}
+  Q_{\rm b} = b_a + \frac{b_b}{b_w} \exp \left[ \frac{-2 \left( s- b_m \right)^2}{b_w^2 }  \right]
+\end{equation}
+%
+where $b_m=b_{L}/3.21$ and $b_w=1.64 b_m$. The constants $b_a$ and $b_b$ can be determined from two conditions.
+The first condition is to set $Q_{\rm b}$ to zero when $s=b_{L}$, yielding the following expression for $b_a$
+%
+\begin{equation}
+  b_a =  - \frac{b_b}{b_w} \exp \left[ \frac{-2 \left( b_{L}- b_m \right)^2}{b_w^2 }  \right]
+      =  - \frac{b_b}{b_w} \exp \left[ \frac{-2 \times 2.21^2}{1.64^2 }  \right]
+  \label{eqn:ba}
+\end{equation}
+%
+and the second condition consists of finding the total heat deposited to the flow from $s=0$ to $s=b_{L}$ and setting it equal to $J_{\rm b} \epsilon_{\rm b}$:
+%
+\begin{equation}
+  \epsilon_{\rm b} J_{\rm b}= \int_{s=0}^{s=b_{L}} Q_{\rm b} {\rm d} s
+\end{equation}
+%
+or
+%
+\begin{equation}
+  \epsilon_{\rm b} J_{\rm b}=  
+   b_{a} b_{L}  +    \frac{b_b}{b_w} \int_{s=0}^{s=b_{L}} 
+\exp \left[ \frac{-2 \left( s- b_m \right)^2}{b_w^2 }  \right]
+   {\rm d} s
+\end{equation}
+%
+Then, substituting $b_a$ from Eq.\ (\ref{eqn:ba}) and isolating $b_b$:
+%
+\begin{equation}
+  {b_b}=  
+\frac{
+\epsilon_{\rm b} J_{\rm b} b_w
+}{\mfd      \int_{s=0}^{s=b_L} 
+\exp \left[ \frac{-2 \left( s- b_m \right)^2}{b_w^2 }  \right]
+   {\rm d} s
+   - b_{L} \exp \left[ \frac{-2 \times 2.21^2}{1.64^2 }  \right] 
+}
+\end{equation}
+%
+where the RHS is all known since $J_{\rm b}$ is user-specified and $\epsilon_{\rm b}$ is set to:
+%
+\begin{equation}
+  \epsilon_{\rm b} = 10^3 \left(\frac{b_{L} \overline{N}}{1.1 \times 10^{21}}  \right)^{1/1.7}
+\end{equation}
+%
+where $b_{L}$ is user-defined and corresponds to the total length of the path along which air is ionized by the e-beam. The average number density is computed from the local number density as follows:
+%
+\begin{equation}
+  \overline{N} = \frac{1}{b_{L}} \int_{s=0}^{s=b_{L}} N {\rm d} s
+\end{equation}
+% 
+
+
+
+In order to determine the power deposited by the e-beam, the following constants must be user-specified: the number density $N$ in 1/m$^3$, the average cost of ionization for an air particule $W_{\rm i}$ is in eV, the length of ionization $b_L$ is in meters, and the e-beam current density at the surface $J_{\rm b}$ in A/m$^2$, and the power deposited $Q_{\rm b}$ is in W/m$^3$. Since $Q_{\rm b} \sim \epsilon_{\rm b} J_{\rm b}/b_L$, and since $J_{\rm b}$ is in A/m$^2$ and $b_L$ is in m, it follows that $\epsilon_{\rm b}$ is the electron beam electromotive force in Volts.
+
+Once $Q_{\rm b}$ is found through the above, it can be used to find the local ionization rate $Q_{\rm b}/(34~{\rm eV} \cdot e)$  where $e$ is the electron charge in Coulomb and 34 eV is the average cost of ionization for an air particule  \citen{misc:1968:peterson}. 
+
+
+
+
+\section{Kinetic Model}
+
+Following \cite[Ch. 5]{book:1991:raizer}, let us first consider an electron distribution function $f(t,x,y,z,v_x,v_y,v_z)$ which is such that $f\, dx \, dy \, dz \, dv_x \, dv_y \, dv_z$ gives the number of electrons at a time $t$ within the volume $dx \, dy \, dz$ that have an $x$-velocity component located between $v_x$ and $v_x+dv_x$, a $y$-velocity component located between $v_y$ and $v_y+dv_y$, etc. The integral of $f$ over all velocities would yield the electron number density $N_{\rm e}$. 
+
+The change in time of $f$ (in a reference frame following the particules) can be written as:
+%
+\begin{equation}
+  \frac{d f}{d t} = \left(\frac{\partial f}{\partial t}  \right)_{\rm coll}
+\end{equation}
+%
+where the RHS refers to the change in time of the distribution function due to collisions. We can expand the total derivative on the LHS as follows:
+%
+\begin{equation}
+  \frac{d f}{d t} = \frac{\partial f}{\partial t} 
+                  + \frac{\partial f}{\partial x} \frac{dx }{dt} 
+                  + \frac{\partial f}{\partial y} \frac{dy }{dt} 
+                  + \frac{\partial f}{\partial z} \frac{dz }{dt} 
+                  + \frac{\partial f}{\partial v_x} \frac{d v_x }{dt} 
+                  + \frac{\partial f}{\partial v_y} \frac{d v_y }{dt} 
+                  + \frac{\partial f}{\partial v_z} \frac{d v_z }{dt} 
+\end{equation}
+%
+or,
+%
+\begin{equation}
+  \frac{d f}{d t} = \frac{\partial f}{\partial t} 
+                  + v_x \frac{\partial f}{\partial x}  
+                  + v_y \frac{\partial f}{\partial y}  
+                  + v_z \frac{\partial f}{\partial z}  
+                  + F_x \frac{\partial f}{\partial v_x}  
+                  + F_y \frac{\partial f}{\partial v_y}  
+                  + F_z \frac{\partial f}{\partial v_z}  
+\end{equation}
+%
+where $F$ is the specific force (the force per unit mass) acting on the electrons. Substituting the latter in the former, we get the Boltzman equation:
+%
+\begin{equation}
+  \frac{\partial f}{\partial t} 
+                  + v_x \frac{\partial f}{\partial x}  
+                  + v_y \frac{\partial f}{\partial y}  
+                  + v_z \frac{\partial f}{\partial z}  
+                  + F_x \frac{\partial f}{\partial v_x}  
+                  + F_y \frac{\partial f}{\partial v_y}  
+                  + F_z \frac{\partial f}{\partial v_z} 
+ = \left(\frac{\partial f}{\partial t}  \right)_{\rm coll}
+\label{eqn:boltzman}
+\end{equation}
+%
+The main difficulty is solving the Boltzman equation (other than the fact that it is 6-dimensional) is the determination of the collision terms on the RHS. See Chapter 5 in Ref.\ \cite{book:1991:raizer} for more information on this point. However, the collision terms become simplified should we neglect the electron flux in the ``backward'' direction (the electrons that bounce off the neutrals in the direction opposite of the one in which the e-beam points). I.e., this is equivalent to assuming that the elastic collisions are negligible compared to the non-elastic collisions. An example of a modified 1D Boltzmann equation in which the elastic collisions are neglected can be found in Eq.\ (8) in Ref.\ \cite{tvt:1989:raizer}.    
+
+
+
+\bibliographystyle{warpdoc}
+\bibliography{local}
+
+
+\end{document}
+
+

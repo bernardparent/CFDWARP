@@ -1,0 +1,11 @@
+#!/usr/local/bin/soap
+Te=20000;
+E=1e6;
+kB=1.38e-23;
+me=9.1e-31;
+N=1e24;
+mue=1.0/N*3.74e19*exp(33.5*(ln(Te))^(-0.5));
+Ekin=(mue*E)^2/2;
+Eenthalpy=5/2*kB/me;
+
+printf("Ekin=%E  Eenthalpy=%E\n",Ekin,Eenthalpy);

@@ -1,0 +1,30 @@
+#!/usr/local/bin/soap
+gamma=1.4;
+R=286;
+v=1000;
+T=300;
+Pstar=1000.0;
+Pstar3=100.0;
+k=300;
+
+rho=Pstar/(R*T+2/3*k);
+a=sqrt(gamma*R*T+2/3*gamma*k);
+v3=sqrt(2*a^2/(gamma-1)+v^2-2*a^2/(gamma-1)*(Pstar3/Pstar)^((gamma-1)/gamma));
+Fpot1=v3+ Pstar^(1/gamma)/(rho*v3*Pstar3^((1-gamma)/gamma));
+
+M=v/a;
+j=(gamma-1)/gamma;
+Pstag=Pstar*(1+(gamma-1)/2*M^2)^(gamma/(gamma-1));
+Fpot2=a*(2*Pstag^j+(j-2)*Pstar3^j)/
+      sqrt(2*j*gamma*Pstar^j*(Pstag^j-Pstar3^j));
+
+Mt=sqrt(2*k/(gamma*R*T));
+Tstag=T*(1+(gamma-1)/2*M^2*(1+gamma/3*Mt^2));
+Fpot3=sqrt(2*gamma/(gamma-1)*(R*Tstag+2/3*k));
+
+Pstar3_over_Pstag=Pstar3/Pstag;
+Fpot4=sqrt((2*R*Tstag+4/3*k)/j)
+     *(1+(j/2-1)*(Pstar3_over_Pstag)^j)
+     /sqrt(1-Pstar3_over_Pstag^j);
+
+printf("Fpot1=%25.15E  Fpot2=%25.15E  Fpot3=%25.15E  Fpot4=%25.15E\n",Fpot1,Fpot2,Fpot3,Fpot4);

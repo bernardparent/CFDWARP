@@ -1,0 +1,20 @@
+is=1;
+js=1;
+ie=40;
+je=40;
+
+Grid2D(
+  Size ( is,js, ie,je );
+  Point( is,js, 0,0 );
+  Point( ie,js, 1,0.3 );
+  Point( ie,je, 1,0.8 );
+  Point( is,je, 0,0.5 );
+  Block( is,js, ie,je, EE,0.5, 1,1, EE,0.5, 1.2,1 );
+  Equation(is,js,ie,js, y, y=sin(x*20)/40);
+  Equation(is,js,is,je, x, x=-sin(y*20)/40);
+  Block( ie,js, ie,je, NO,0.5, 1,1, EE,0.5, 1.2,1 );
+  Block( is,je, ie,je, EE,0.5, 1,1, NO,0.5, 1,1 );
+  JoinAll(is,js, ie,je);
+  Rotate(is,js,ie,je, 0.3,0.3, rad(20));
+);
+

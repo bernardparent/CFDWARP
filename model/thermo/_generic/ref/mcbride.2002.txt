@@ -1,0 +1,45 @@
+TITLE AND SUBTITLE: 
+ NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species
+ 
+ AUTHOR(S): 
+ Bonnie J. McBride, Michael J. Zehe, and Sanford Gordon
+ 
+ REPORT DATE: 
+ September 2002
+ 
+ FUNDING NUMBERS: 
+ WU-708-87-13-00
+ 
+ PERFORMING ORGANIZATION NAME(S) AND ADDRESS(ES): 
+ National Aeronautics and Space Administration
+ John H. Glenn Research Center at Lewis Field
+ Cleveland, Ohio 44135-3191
+ 
+ PERFORMING ORGANIZATION REPORT NUMBER: 
+ E-13336
+ 
+ SPONSORING/MONITORING AGENCY NAME(S) AND ADDRESS(ES): 
+ National Aeronautics and Space Administration
+ Washington, DC 20546-0001
+ 
+ REPORT TYPE AND DATES COVERED: 
+ Technical Paper
+ 
+ SPONSORING/MONITORING AGENCY REPORT NUMBER: 
+ NASA TP-2002-211556
+ 
+ SUPPLEMENTARY NOTES: 
+ Responsible person, Bonnie J. McBride, organization code 5830, 216-433-5870.
+ 
+ ABSTRACT: 
+ This report documents the library of thermodynamic data used with the NASA Glenn computer program CEA (Chemical Equilibrium with Applications). This library, containing data for over 2000 solid, liquid, and gaseous chemical species for temperatures ranging from 200 to 20 000 K, is available for use with other computer codes as well. The data are expressed as least-squares coefficients to a seven-term functional form for with integration constants for Ho(T)/RT and So(T)/R. The NASA Glenn computer program PAC (Properties and Coefficients) was used to calculate thermodynamic functions and to generate the least-squares coefficients. PAC input was taken from a variety of sources. A complete listing of the database is given along with a summary of thermodynamic properties at 0 and 298.15 K.
+ 
+ SUBJECT TERMS: 
+ Heats of formation; CEA; McBride; Gordon; Thermodynamics; Thermodynamic properties; NASA; NASA Lewis; Specific heat; NASA Glenn; Enthalpy; Entropy; Heat capacity
+ 
+ NUMBER OF PAGES: 
+ 291
+ 
+ PDF AVAILABLE FROM URL: 
+ftp://ftp.grc.nasa.gov/users/xxminna/PDF/xTP-2002-211556.pdf 
+ (3,066 KB ) 

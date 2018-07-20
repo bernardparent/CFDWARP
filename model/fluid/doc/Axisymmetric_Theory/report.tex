@@ -1,0 +1,150 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{bm}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\rhos}{\rho}
+\newcommand{\Cv}{{C_{\rm v}}}
+\newcommand{\Cp}{{C_{\rm p}}}
+\newcommand{\Sct}{{{\rm Sc}_{\rm T}}}
+\newcommand{\Prt}{{{\rm Pr}_{\rm T}}}
+\newcommand{\nd}{{{n}_{\rm d}}}
+\newcommand{\ns}{{{n}_{\rm s}}}
+\newcommand{\nn}{{{n}_{\rm n}}}
+\newcommand{\ndm}{{\bar{n}_{\rm d}}}
+\newcommand{\nsm}{{\bar{n}_{\rm s}}}
+\newcommand{\turb}{_{\rm T}}
+\newcommand{\mut}{{\mu\turb}}
+\newcommand{\mfa}{\scriptscriptstyle}
+\newcommand{\mfb}{\scriptstyle}
+\newcommand{\mfc}{\textstyle}
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\hlinex}{\vspace{-0.34cm}~~\\ \hline \vspace{-0.31cm}~~\\}
+\newcommand{\hlinextop}{\vspace{-0.46cm}~~\\ \hline \hline \vspace{-0.32cm}~~\\}
+\newcommand{\hlinexbot}{\vspace{-0.37cm}~~\\ \hline \hline \vspace{-0.50cm}~~\\}
+\newcommand{\tablespacing}{\vspace{-0.4cm}}
+\newcommand{\fontxfig}{\footnotesize\scalefont{0.918}}
+\newcommand{\fontgnu}{\footnotesize\scalefont{0.896}}
+\newcommand{\ev}{e_{\rm v}}
+\newcommand{\evzero}{e_{\rm v0}}
+\newcommand{\cNtwo}{c_{\rm N_2}}
+\newcommand{\tauvt}{\tau_{\rm vt}}
+\newcommand{\sigmaev}{\sigma_{e_{\rm v}}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{1.0}}
+\renewcommand{\fontsizefigure}{\footnotesize}
+\renewcommand{\vec}[1]{\bm{#1}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcounter{tocdepth}{3}
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\author{
+  Jason Etele
+}
+
+\email{
+  jason.etele@utoronto.ca
+}
+
+\department{
+  Institute for Aerospace Studies	
+}
+
+\institution{
+  University of Toronto
+}
+
+\title{
+  Derivation of the Axisymmetric Favre-Averaged
+Navier Stokes Equations
+}
+
+\date{
+  June 2001
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+	This document contains the derivation of the Axisymmetric Favre Averaged Navier-Stokes equations.  
+The first section focuses on the derivation of the axisymmetric set of equations with little attention paid to 
+the details of turbulence other than to assume the existence of two quantities, $k$ and $\omega$, which are then
+assumed to be conserved quantities.  Thus the flow variables used in this section are not explicitly assumed to
+be averaged values while the viscosity as well is not explicitly said to account for the characteristics of turbulent flow.
+Thus these equations, with the $k$ and $\omega$ variables removed, correspond to the axisymmetric laminar Navier-Stokes
+equations.  
+
+	The second section goes back and details the evolution from the laminar to the turbulent set of equations using
+Favre averaged values.  Thus the variables are treated more carefully, making the distinction between the actual variable
+and its Favre averaged counterpart.  As well, the co-efficient of viscosity is explicitly defined as containing 
+turbulent terms.  Although the derived equations at the end of section one and two are identical in form, the equations
+at the end of section two contain stricter nomenclature specifically identifying them as turbulent equations.  However,
+it should be noted that these two sets of equations are \emph{identical} but for the fact the ones in section one
+are implicitly assumed to represent the quantities explicitly shown in section two.
+
+	The third section details the transformation into generalized co-ordinates of the terms specific to the
+axisymmetric version of the Navier-Stokes equations.
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+  \makeabstract
+  \tableofcontents
+%  \makenomenclature
+%%  \listoftables
+%%  \listoffigures
+
+
+
+
+\input{axisym}
+\input{turb}
+\input{transform}
+%\appendix
+% \input{appendix} 
+
+\nocite{*}
+  \bibliographystyle{warpdoc}
+  \bibliography{dac2refs}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+

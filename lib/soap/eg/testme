@@ -1,0 +1,21 @@
+#!./soap
+
+X0=0.9;
+X1=0.5;
+X2=0.7;
+
+d1=(X1*(X1-X0)-X2*(X0-X2))^2+
+   (X2*(X2-X1)-X0*(X1-X0))^2+
+   (X0*(X0-X2)-X1*(X2-X1))^2;
+d2=((X2-X1)^2+(X0-X2)^2+(X1-X0)^2)
+  *(X1^2+X0^2+X2^2);
+
+writeln(d1,d2);
+printf("d1=%E  d2=%E \n",d1,d2);
+printf("bernard et michel %10.2E \nnouvelle ligne\n",sin(rad(10)));
+printf("autre ligne\n");
+
+  a=10.1;
+  printf("\n\n");
+  printf("begin\na=%E and sin(a) is equal to %13.2E\nend\n",a,sin(a));
+

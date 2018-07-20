@@ -1,0 +1,91 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                            %
+%  SINGLE-SIDED REPORT FOR PROPULSION GROUP USE                              %
+%                                                                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt,oneside]{ProReport}
+\usepackage{times}         % can use utopia, or palatino
+\usepackage{mathptm}       % math font is times
+\DeclareMathSizes{12}{12}{8.2}{7.2}
+\usepackage{setspace}
+\usepackage{overcite}
+\usepackage{psfrag}
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{scalefnt}
+\usepackage{pstricks}
+\usepackage[nooneline,footnotesize,sc]{caption}
+\usepackage[innercaption]{sidecap}
+\usepackage{threeparttable}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\rhos}{\rho}
+\newcommand{\Cv}{{C_{\rm v}}}
+\newcommand{\Cp}{{C_{\rm p}}}
+\newcommand{\Sct}{{{\rm Sc}_{\rm T}}}
+\newcommand{\Prt}{{{\rm Pr}_{\rm T}}}
+\newcommand{\nd}{{{n}_{\rm d}}}
+\newcommand{\ns}{{{n}_{\rm s}}}
+\newcommand{\nn}{{{n}_{\rm n}}}
+\newcommand{\ndm}{{\bar{n}_{\rm d}}}
+\newcommand{\nsm}{{\bar{n}_{\rm s}}}
+\newcommand{\turb}{_{\rm T}}
+\newcommand{\mut}{{\mu\turb}}
+\newcommand{\mfa}{\scriptscriptstyle}
+\newcommand{\mfb}{\scriptstyle}
+\newcommand{\mfc}{\textstyle}
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\hlinex}{\vspace{-0.34cm}~~\\ \hline \vspace{-0.31cm}~~\\}
+\newcommand{\hlinextop}{\vspace{-0.46cm}~~\\ \hline \hline \vspace{-0.32cm}~~\\}
+\newcommand{\hlinexbot}{\vspace{-0.37cm}~~\\ \hline \hline \vspace{-0.50cm}~~\\}
+\newcommand{\tablespacing}{\vspace{-0.4cm}}
+\newcommand{\fontxfig}{\footnotesize\scalefont{0.918}}
+\newcommand{\fontgnu}{\footnotesize\scalefont{0.896}}
+\setcounter{tocdepth}{3}
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\author{Giovanni Fusina}
+\title{Singh Combustion Model}
+\date{December 2000}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\begin{spacing}{1.25}
+\pagestyle{headings}
+\pagenumbering{roman}
+%%%%%%%%%%%%%=--PRELIMINARY BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \setcounter{page}{1}
+  \maketitle
+  \setcounter{page}{2}
+  \tableofcontents
+  \newpage
+%%%%%%%%%%%%%=--PRELIMINARY ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\pagenumbering{arabic}
+\normalsize
+%%%%%%%%%%%%%=--REPORT CORE BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \input{chem}
+  \clearpage
+
+%%%%%%%%%%%%%=--REPORT CORE ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%=--APPENDIX BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%\appendix
+%% \input{appendix} \newpage
+
+%%%%%%%%%%%%%=--APPENDIX ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%=--CLOSURE BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  \listoftables
+%%  \listoffigures
+  \bibliographystyle{plain}
+  \bibliography{general,cfd,chem}
+  \newpage
+%%%%%%%%%%%%%=--CLOSURE ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\end{spacing}
+\end{document}

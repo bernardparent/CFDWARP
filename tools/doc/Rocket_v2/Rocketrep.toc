@@ -1,0 +1,21 @@
+\contentsline {section}{\numberline {1}Introduction}{1}
+\contentsline {section}{\numberline {2}Combustion Chamber Theory}{1}
+\contentsline {subsection}{\numberline {2.1}Gibbs Minimization Technique}{2}
+\contentsline {subsection}{\numberline {2.2}Numerical Solution}{7}
+\contentsline {section}{\numberline {3}Axisymmetric Nozzle Design Theory}{8}
+\contentsline {subsection}{\numberline {3.1}Inviscid Nozzle Design}{8}
+\contentsline {subsubsection}{\numberline {3.1.1}Radial Flow Region}{9}
+\contentsline {subsubsection}{\numberline {3.1.2}Final Expansion Region}{11}
+\contentsline {subsubsection}{\numberline {3.1.3}Initial Expansion Region}{13}
+\contentsline {subsubsection}{\numberline {3.1.4}Nozzle Wall Determination}{16}
+\contentsline {subsubsection}{\numberline {3.1.5}Dimensionalizing Nozzle Wall Co-Ordinates}{17}
+\contentsline {subsection}{\numberline {3.2}Viscous Nozzle Design}{18}
+\contentsline {subsection}{\numberline {3.3}Subsonic Nozzle Contour}{20}
+\contentsline {section}{\numberline {4}Results}{20}
+\contentsline {subsection}{\numberline {4.1}Kerosene/Air Combustion}{20}
+\contentsline {subsection}{\numberline {4.2}Kerosene/Pure Oxygen Combustion}{22}
+\contentsline {subsection}{\numberline {4.3}Nozzle Design Results}{24}
+\contentsline {subsection}{\numberline {4.4}Computational Results}{27}
+\contentsline {section}{\numberline {A}Two Dimensional Method of Characteristics (Irrotational Flow)}{28}
+\contentsline {subsection}{\numberline {A.1}Derivation of Characteristic and Compatibility Equations}{28}
+\contentsline {subsection}{\numberline {A.2}Numerical Implementation of the Method of Characteristics}{31}

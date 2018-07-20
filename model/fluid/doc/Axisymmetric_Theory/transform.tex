@@ -1,0 +1,1017 @@
+\section{Computational Co-Ordinates Transformation}
+
+	Having phrased the Navier-Stokes equations in matrix form (Eqs. \ref{eqn:final}-\ref{eqn:finalHv}), 
+the next step is to cast these equations in a form suitable for numerical simulation.  To do this, two things
+are required to make this transformation as useful as possible.  The first, and most involved
+step, is to transform the equations onto computational co-ordinates.  This will allow 
+for the fact that the orthogonal computational grid need not necessarily be aligned with the space 
+physical co-ordinates  
+of the system under consideration, and thus cannot be applied directly to an arbitrary physical gridding.  However,
+by using computational co-ordinates one can easily allow for any type of grid (i.e.
+clustered along given directions or in specified areas) through the incorporation of metric 
+terms in the governing equations.
+
+	The second step is to phrase the variables in a language suitable for computation, which
+involves only direct substitution and is hence fairly straightforward.  However one would like to 
+have indices that match those used by the programming language, as although in reality the number of
+species goes from 1 to $n_s$, for a programming language such as \emph{C} the indices would vary 
+from 0 to $n_s - 1$.  As well, common variables differentiated by subscripts alone rather than distinct
+Greek or arithmetic symbols are easier to program, as these can be represented by arrays of various dimensions.
+
+
+%---------------------------------------------------------------------------------------------------------
+\subsection{Metric Derivatives}
+
+	In order to properly transform the governing equations from the Cartesian to the computational
+co-ordinate system metric derivatives will be needed, as it is these terms that describe the geometrical
+relationship between the two domains.  Thus before tackling the main set of equations, it is helpful to 
+derive relations for the metric terms and have them at the ready for substitution into the governing
+equations when needed.   We can make use of the fact that there are only two independent space variables, 
+$x$ and $r$, (in axisymmetric flow) and one variable in time, $t$, which allows a slight simplification from
+a fully three dimensional transformation.  Making use of the relationship between differential quantities as 
+defined by the Calculus one can write,
+
+\begin{displaymath}
+	\begin{array}{c}
+		dt=\frac{\partial t}{\partial \tau}d\tau + \frac{\partial t}{\partial \xi}d\xi +
+		\frac{\partial t}{\partial \eta}d\eta \\
+		dx=\frac{\partial x}{\partial \tau}d\tau + \frac{\partial x}{\partial \xi}d\xi +
+		\frac{\partial x}{\partial \eta}d\eta \\
+		dr=\frac{\partial r}{\partial \tau}d\tau + \frac{\partial r}{\partial \xi}d\xi +
+		\frac{\partial r}{\partial \eta}d\eta
+	\end{array}
+\end{displaymath}
+
+	Now since real time is independent of the physical grid location (and hence independent of the computational
+grid location as there is a one to one correspondence between points in the two domains) then one can write 
+$\frac{\partial t}{\partial \xi}$ = 
+$\frac{\partial t}{\partial \eta}$ = 0, and if one further assumes that computational time is identical to
+real time then $\frac{\partial t}{\partial \tau}$ = 1, the above relations can be expressed in matrix form
+as,
+
+\begin{equation}
+	\begin{array}{cccc}
+		\left\{
+		\begin{array}{c}
+		dt \\ dx \\ dr 
+		\end{array} 
+		\right\}
+		& = &
+		\left[
+		\begin{array}{ccc}
+		1 & 0 & 0 \\ x_{t} & x_{\xi} & x_{\eta} \\ r_{t} & r_{\xi} & r_{\eta} 
+		\end{array}
+		\right] 
+		&
+		\left\{
+		\begin{array}{c}
+		d\tau \\ d\xi \\ d\eta 
+		\end{array}
+		\right\}
+	\end{array} 
+\label{eqn:matrix1}
+\end{equation}
+
+	Using the Calculus again, one can express these relations from the opposite point of view 
+expressing the differential computational quantities in terms of derivatives with respect to the 
+original Cartesian co-ordinates,
+
+\begin{displaymath}
+	\begin{array}{c}
+		d\tau=\frac{\partial \tau}{\partial t}dt + \frac{\partial \tau}{\partial x}dx +
+		\frac{\partial \tau}{\partial r}dr \\
+		d\xi=\frac{\partial \xi}{\partial t}dt + \frac{\partial \xi}{\partial x}dx +
+		\frac{\partial \xi}{\partial r}dr \\
+		d\eta=\frac{\partial \eta}{\partial t}dt + \frac{\partial \eta}{\partial x}dx +
+		\frac{\partial \eta}{\partial r}dr
+	\end{array}
+\end{displaymath}
+
+	which again, after applying the same logic as before, can be simplified and rewritten as
+
+\begin{equation}
+	\begin{array}{cccc}
+		\left\{
+		\begin{array}{c}
+		d\tau \\ d\xi \\ d\eta 
+		\end{array} 
+		\right\}
+		& = &
+		\left[
+		\begin{array}{ccc}
+		1 & 0 & 0 \\ \xi_t & \xi_x & \xi_r \\ \eta_t & \eta_x & \eta_r 
+		\end{array}
+		\right] 
+		&
+		\left\{
+		\begin{array}{c}
+		dt \\ dx \\ dr 
+		\end{array}
+		\right\}
+	\end{array} 
+\label{eqn:matrix2}
+\end{equation}
+
+	Examining Eqs. \ref{eqn:matrix1} and \ref{eqn:matrix2} it can be seen that the square matrices in 
+each equation are inverses of each other, thus using the property of inverse matrices that states $AA^{-1} = I$ one can
+write
+
+\begin{equation}
+\begin{array}{ccccc}
+	\begin{array}{c}
+		\left[
+		\begin{array}{ccc}
+		1 & 0 & 0 \\ x_{\tau} & x_{\xi} & x_{\eta} \\ r_{\tau} & r_{\xi} & r_{\eta} 
+		\end{array}
+		\right] 
+	\end{array} 
+& \cdot  &
+	\begin{array}{c}
+		\left[
+		\begin{array}{ccc}
+		1 & 0 & 0 \\ \xi_t & \xi_x & \xi_r \\ \eta_t & \eta_x & \eta_r 
+		\end{array}
+		\right] 
+	\end{array}
+& = &
+	\begin{array}{c}
+		\left[
+		\begin{array}{ccc}
+		1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1
+		\end{array}
+		\right]
+	\end{array}
+\end{array}
+\label{eqn:identity} 
+\end{equation}
+
+	Eq. \ref{eqn:identity} yields nine equations when multiplied out, three of which provide no useful
+relations (i.e. 0 = 0), two provide relations for the metric derivatives with respect to time (which in the case of a grid
+that is constant in time reduce to zero) and the remaining four express relations for the pertinent metric derivatives
+
+\begin{displaymath}
+	\begin{array}{c}
+	\xi_t = -x_t \xi_x - r_t \xi_r \\
+	\eta_t = -x_t \eta_x - r_t \eta_r \\
+	\xi_x = \frac{1}{x_\xi}(1 - r_\xi \xi_r) \\
+	\xi_x = -\frac{1}{x_\eta}(r_\eta \xi_r) \\
+	\eta_r = -\frac{1}{r_\xi}(x_\xi \eta_x) \\
+	\eta_r = \frac{1}{r_\eta}(1 - x_\eta \eta_x)
+	\end{array}
+\end{displaymath}
+
+	After suitable manipulations of the last four equations above (eliminating one of the metric derivatives, 
+solving for the remaining metric derivative, and then substituting this result back into the equations to solve
+for the eliminated variable) one arrives at the following results,
+
+\begin{displaymath}
+	\begin{array}{c}
+	\xi_x = J r_\eta \\
+	\xi_r = -J x_\eta \\
+	\eta_x = -J r_\xi \\
+	\eta_r = J x_\xi
+	\end{array}
+\end{displaymath}
+
+	where is J is the Jacobian of transformation (also known as the metric Jacobian) and is defined as,
+
+\begin{equation}
+	J = \frac{1}{x_\xi r_\eta - x_\eta r_{\xi}}
+\label{eqn:J}
+\end{equation}
+
+	Substituting the above results in the previous expressions for $\xi_t$ and $\eta_t$ also yields
+
+\begin{equation}
+	\xi_t = J(-x_t r_\eta + r_t x_\eta)
+\label{eqn:xit}
+\end{equation}
+
+\begin{equation}
+	\eta_t = J(x_t r_\xi - r_t x_\xi)
+\label{eqn:etat}
+\end{equation}
+
+	Going one step further and rephrasing the above relations (except for Eqs. \ref{eqn:xit} and \ref{eqn:etat}) 
+in variables more suited to a programming
+language, we will let the Cartesian co-ordinates be represented as $x$ = $x_0$ and $r$ = $x_1$ while the 
+computational co-ordinates as $\xi$ = $X_0$, $\eta$ = $X_1$.  Therefore,
+
+\begin{displaymath}
+	\begin{array}{c}
+	\xi_x = \frac{\partial \xi}{\partial x} = \frac{\partial X_0}{\partial x_0} = X_{0,0} = 
+		J \frac{\partial x_1}{\partial X_1} \\
+	\xi_r = \frac{\partial \xi}{\partial r} = \frac{\partial X_0}{\partial x_1} = X_{0,1} = 
+		-J \frac{\partial x_0}{\partial X_1} \\
+	\eta_x = \frac{\partial \eta}{\partial x} = \frac{\partial X_1}{\partial x_0} = X_{1,0} = 
+		-J \frac{\partial x_1}{\partial X_0} \\
+	\eta_r = \frac{\partial \eta}{\partial r} = \frac{\partial X_1}{\partial x_1} = X_{1,1} = 
+		J \frac{\partial x_0}{\partial X_0} 
+	\end{array}
+\end{displaymath}
+
+	These relations can be succinctly described by a single formula 
+
+\begin{equation}
+	X_{i,j} = J(2\delta_{i,j} -1)\frac{\partial x_{j+1}}{\partial X_{i+1}}
+\label{eqn:metrics}
+\end{equation}
+
+	where $\delta_{i,j}$ is the Kronecker delta which is equal to 1 if $i = j$ and 0 
+otherwise (i.e. $i \neq j$).  Also note that when the index goes higher than the number of dimensions
+minus one, it cycles back to its lowest value (i.e. for two dimensions $i$ = 0,1 thus $i+1$ = 1,0 and
+similarly for $j$).
+
+%--------------------------------------------------------------------------------------------------------------
+\subsection{Governing Equations} 
+
+	Starting with the axisymmetric, multi-species, viscous, turbulent Navier-Stokes equations as
+shown in Eqs. \ref{eqn:final}-\ref{eqn:finalHv}, it is desired to transform these 
+equations onto the general computational co-ordinates $\xi$ and $\eta$, as well as the computational time
+$\tau$.  In the following derivations, the Euler equations will be considered (i.e. the viscous terms will be
+neglected) however the analysis applies equally as well to these terms and hence the results will be simply be 
+extended to include the full set of equations.  Thus the axisymmetric Euler equations can be written as
+
+\begin{equation}
+	\frac{\partial Q}{\partial t} + \frac{\partial E}{\partial x} + \frac{\partial F}{\partial r} + S_{be3D} = 0
+\label{eqn:euler}
+\end{equation}
+
+	Now if we divide each term in Eq. \ref{eqn:euler} by the metric Jacobian $J$ (as defined by Eq. \ref{eqn:J}) 
+one can write
+
+\begin{displaymath}
+	\frac{1}{J}\frac{\partial Q}{\partial t} + \frac{1}{J}\frac{\partial E}{\partial x} 
+	+ \frac{1}{J}\frac{\partial F}{\partial r} + \frac{1}{J}S_{be3D} = 0
+\end{displaymath}
+
+	Taking a closer look at the first term, the conservative variables vector, one can express the 
+derivative with respect to time using the Calculus as
+
+\begin{displaymath}
+	\frac{1}{J}\frac{\partial Q}{\partial t} = \frac{1}{J}\Big[\frac{\partial \tau}{\partial t}
+	\frac{\partial Q}{\partial \tau} + \frac{\partial \xi}{\partial t}
+	\frac{\partial Q}{\partial \xi} + \frac{\partial \eta}{\partial t} \frac{\partial Q}{\partial \eta}\Big]
+\end{displaymath}
+
+	Now if one adds groups of terms which in and of themselves sum to zero (these terms are shown in curly braces $\{\}$) 
+one can write for the conservative variables vector 
+
+\begin{displaymath}
+	\frac{\tau_t}{J}\frac{\partial Q}{\partial \tau} + 
+	\frac{\xi_t}{J} \frac{\partial Q}{\partial \xi} + \frac{\eta_t}{J} \frac{\partial Q}{\partial \eta}
+	+ \{ Q\frac{\partial}{\partial \tau}(\frac{\tau_t}{J}) - Q\frac{\partial}{\partial \tau}(\frac{\tau_t}{J}) \}
+	+ \{ Q\frac{\partial}{\partial \xi}(\frac{\xi_t}{J}) - Q\frac{\partial}{\partial \xi}(\frac{\xi_t}{J}) \}
+	+ \{ Q\frac{\partial}{\partial \eta}(\frac{\eta_t}{J}) - Q\frac{\partial}{\partial \eta}(\frac{\eta_t}{J}) \}
+\end{displaymath}
+
+	which can be regrouped as
+
+\begin{equation}
+	\Big[\frac{\tau_t}{J}\frac{\partial Q}{\partial \tau} + Q\frac{\partial}{\partial \tau}(\frac{\tau_t}{J})\Big] +
+	\Big[\frac{\xi_t}{J}\frac{\partial Q}{\partial \xi} + Q\frac{\partial}{\partial \xi}(\frac{\xi_t}{J})\Big] + 
+	\Big[\frac{\eta_t}{J}\frac{\partial Q}{\partial \eta} + Q\frac{\partial}{\partial \eta}(\frac{\eta_t}{J})\Big]
+	-Q \Big\{\frac{\partial}{\partial \tau}(\frac{\tau_t}{J}) + \frac{\partial}{\partial \xi}(\frac{\xi_t}{J})
+	+ \frac{\partial}{\partial \eta}(\frac{\eta_t}{J}) \Big\}
+\label{eqn:Qbig}
+\end{equation}
+
+	In this form it can be seen that the terms in the square brackets can be combined into a single derivative
+using the inverse of the chain rule from the Calculus, while the last term in curly braces sums to zero as follows.  
+Since time in both Cartesian and computational co-ordinates is the same (as was specified in the derivation of the 
+metric terms) then $\tau$ = $t$ and thus $\tau_t$ = 1.  Now if the
+relation between the Cartesian and computational co-ordinates is held constant in time, then the derivative of the metric 
+Jacobian with respect to time must be zero which eliminates the first term in the curly braces (note however, that 
+this assumption does not require a grid that is constant in time, only that the relation between the physical and 
+computational domains remains fixed).  Substitution of Eqs. \ref{eqn:xit} and \ref{eqn:etat} into the last two terms 
+in the curly braces yields,
+
+\begin{displaymath}
+	\frac{\partial}{\partial \xi}J^{-1}\Big\{J(-x_t r_\eta + r_t x_\eta)\Big\} 
+	+ \frac{\partial}{\partial \eta}J^{-1}\Big\{J(x_t r_\xi - r_t x_\xi)\Big\}
+\end{displaymath}
+
+	If we further assume that the derivatives with respect to time are independent of grid location (i.e. changes
+in gridding with time are applied uniformly over the entire grid), then $x_t$ and $r_t$
+can be pulled outside of the derivatives.  Also, using Clairaut's Theorem which states that
+
+\begin{equation}
+	\frac{\partial r^2}{\partial \eta \partial \xi} = \frac{\partial r^2}{\partial \xi \partial \eta}
+\label{eqn:clairaut}
+\end{equation}
+
+	then the above equation sums to zero.  It should be noted that although restrictions
+were placed on the manner in which the grid may change in time, it was not stated that the grid must stay constant in time
+(although in most circumstances this will indeed be the case).  Thus Eq. \ref{eqn:Qbig} can be written
+
+\begin{displaymath}
+	\frac{1}{J}\frac{\partial Q}{\partial t} = \frac{\partial}{\partial t}(\frac{Q}{J}) 
+	+ \frac{\partial}{\partial \xi}(\xi_t \frac{Q}{J}) + \frac{\partial}{\partial \eta}(\eta_t \frac{Q}{J})
+\end{displaymath}  
+
+	which when combined with the assertion that the grid spacing is constant in time reduces to 
+
+\begin{equation}
+	\frac{1}{J}\frac{\partial Q}{\partial t} = \frac{\partial}{\partial t}(\frac{Q}{J}) 
+\label{eqn:Q}
+\end{equation}
+
+	It is worth noting here that the above expression in Eq. \ref{eqn:Q} could have been arrived at quite
+easily by specifying at the outset a physical domain that remains constant in time, and that time in both the Cartesian
+and computational domains is equivalent.
+
+	Considering next the flux vector along the $x$ direction and remembering that one has already divided by the
+metric Jacobian, one can write 
+
+\begin{displaymath}
+	\frac{1}{J}\frac{\partial E}{\partial x} = \frac{1}{J}\Big[\frac{\partial \xi}{\partial x}\frac{\partial E}{\partial \xi}
+	+ \frac{\partial \eta}{\partial x}\frac{\partial E}{\partial \eta}\Big]
+\end{displaymath} 
+
+	Adding terms that sum to zero in a fashion similar to that done for the $Q$ vector
+
+\begin{displaymath}
+	\frac{1}{J}\frac{\partial E}{\partial x} = \frac{\xi_x}{J}\frac{\partial E}{\partial \xi}
+	+\frac{\eta_x}{J}\frac{\partial E}{\partial \eta} + \Big\{E \frac{\partial}{\partial \xi}
+	(\frac{\xi_x}{J}) - E\frac{\partial}{\partial \xi}(\frac{\xi_x}{J})\Big\}
+	+ \Big\{E\frac{\partial}{\partial \eta}(\frac{\eta_x}{J}) - E\frac{\partial}{\partial \eta}(\frac{\eta_x}{J})\Big\}
+\end{displaymath}
+
+	Regrouping terms yields
+
+\begin{displaymath}
+	\frac{1}{J}\frac{\partial E}{\partial x} = 
+	\Big[\frac{\xi_x}{J}\frac{\partial E}{\partial \xi}
+	+ E \frac{\partial}{\partial \xi}(\frac{\xi_x}{J})\Big]
+	+ \Big[\frac{\eta_x}{J}\frac{\partial E}{\partial \eta} 
+	+ E \frac{\partial}{\partial \eta}(\frac{\eta_x}{J}) \Big]
+	-E \Big\{\frac{\partial}{\partial \xi}(\frac{\xi_x}{J})
+	+ \frac{\partial}{\partial \eta}(\frac{\eta_x}{J})\Big\}
+\end{displaymath}
+
+	The first two groups of terms in square brackets can be combined into a single derivative while the last
+term in the curly braces sums to zero by substituting for the definitions of the metric derivatives as follows,
+
+\begin{displaymath}
+	-E \Big\{\frac{\partial}{\partial \xi}(\frac{\xi_x}{J})
+	+ \frac{\partial}{\partial \eta}(\frac{\eta_x}{J})\Big\} = 
+	-E \Big\{\frac{\partial}{\partial \xi}J^{-1}(J r_\eta)
+	+ \frac{\partial}{\partial \eta}J^{-1}(J r_\xi)\Big\}
+\end{displaymath}
+
+	Again applying Clairaut's Theorem (Eq. \ref{eqn:clairaut}) the above relation reduces to zero.  Therefore, the
+derivative of the flux vector $E$ can be expressed as,
+
+\begin{equation}
+	\frac{1}{J}\frac{\partial E}{\partial x} = 
+	\frac{\partial}{\partial \xi} (\xi_x \frac{E}{J})
+	+ \frac{\partial}{\partial \eta} (\eta_x \frac{E}{J}) 
+\label{eqn:E}
+\end{equation}
+
+	The exact same procedure is followed for the $F$ flux vector resulting in
+
+\begin{equation}
+	\frac{1}{J}\frac{\partial F}{\partial r} = 
+	\frac{\partial}{\partial \xi} (\xi_r \frac{F}{J})
+	+ \frac{\partial}{\partial \eta} (\eta_r \frac{F}{J}) 
+\label{eqn:F}
+\end{equation}
+
+	Combining the results of Eqs. \ref{eqn:Q}, \ref{eqn:E}, and \ref{eqn:F} into Eq. \ref{eqn:euler} and
+realizing that since the axisymmetric source term $S_{be3D}$ is not differentiated it can be left as is yields the
+result
+
+\begin{displaymath}
+	\frac{\partial}{\partial t}(\frac{Q}{J}) + \frac{\partial}{\partial \xi} \Big[\frac{1}{J}(\xi_x E
+	+ \xi_r F)\Big] + \frac{\partial}{\partial \eta}\Big[\frac{1}{J} (\eta_x E 
+	+ \eta_r F)\Big] + \frac{1}{J}S_{be3D} = 0
+\end{displaymath}
+
+	As a final step, one would like to substitute computational variables for those above, thus following the
+conventions established when deriving the metric terms ($x$ = $x_0$, $r$ = $x_1$, $\xi$ = $X_0$, and $\eta$ = $X_1$)
+and defining a new variable 
+
+\begin{equation}
+	\Omega = J^{-1}
+\label{eqn:omega}
+\end{equation} 
+
+	one can write
+
+\begin{equation}
+	\frac{\partial \bar{Q}}{\partial t} + \frac{\partial \bar{E}}{\partial \xi} 
+	+ \frac{\partial \bar{F}}{\partial \eta} + \bar{S}_{be3D} = 0	
+\label{eqn:eulerbar}
+\end{equation}
+
+	where
+
+\begin{equation}
+	\begin{array}{ccc}
+		\bar{Q} &=& \Omega Q \\
+		\bar{E} &=& \Omega (X_{0,0}E + X_{0,1}F) \\
+		\bar{F} &=& \Omega (X_{1,0}E + X_{1,1}F) \\
+		\bar{S}_{be3D} &=& \Omega S_{be3D}
+	\end{array}
+\label{eqn:eulerbars}
+\end{equation}
+
+	with $Q$, $E$, $F$, and $S_{be3D}$ defined by Eqs. \ref{eqn:finalQ}, \ref{eqn:finalEF}, and \ref{eqn:finalH} 
+respectively.  Extending the same logic to the viscous terms yields the desired form of the governing equations,
+
+\begin{equation}
+	\frac{\partial \bar{Q}}{\partial t} + \frac{\partial \bar{E}}{\partial \xi} 
+	+ \frac{\partial \bar{F}}{\partial \eta} + \bar{S}_{be3D} -\frac{\partial \bar{E}_v}{\partial \xi} 
+	- \frac{\partial \bar{F}_v}{\partial \eta} - \bar{S}_{be3D_v} = 0	
+\label{eqn:finalbar}
+\end{equation}
+
+	with
+
+\begin{equation}
+	\begin{array}{ccc}
+		\bar{Q} &=& \Omega Q \\
+		\bar{E}_v &=& \Omega (X_{0,0}E_v + X_{0,1}F_v) \\
+		\bar{F}_v &=& \Omega (X_{1,0}E_v + X_{1,1}F_v) \\
+		\bar{S}_{be3D_v} &=& \Omega S_{be3D_v}
+	\end{array}
+\label{eqn:viscousbars}
+\end{equation}
+
+	However, it must be noted here that the viscous terms themselves contain derivatives and hence
+Eqs. \ref{eqn:finalEvFv} and \ref{eqn:finalHv} must be modified to account for the transformation
+as well.
+
+%-------------------------------------------------------------------------------------------------------------------
+\subsection{Axisymmetric Source Term Transformation}
+
+	Given that without the axisymmetric source terms, the governing equations are simply those for
+normal two-dimensional flow, the transformation of the viscous flux vectors will not be demonstrated as these can
+be found in other sources.  However of particular interest here are the source terms, which will be transformed
+explicitly given that there exist numerous ways in which these terms can be expressed depending on the 
+form of the computational governing equations used (i.e. definition of $\Omega$ or  $Q$).
+
+\subsubsection{Inviscid Axisymmetric Source Term}
+
+	Although this term contains no derivatives, it is useful to cast the variables in ones similar in form
+to the computational space variables, i.e., similar terms differentiated by subscripts alone.  This would also
+apply to the conservative variable vector $Q$ and to the inviscid flux vectors $E$ and $F$ although the process 
+will not be shown here.  If we let the physical space velocities $u$ and $v$ be represented by $v_o$ and $v_1$ 
+respectively then one can write
+
+\begin{equation}
+	\bar{S}_{be3D} = \frac{\Omega}{x_1}\left[ \begin{array}{c}
+		\rho_1 v_1 \\
+		\vdots \\
+		\rho_k v_1 \\
+		\rho v_0v_1 \\
+		\rho {v_1}^2 \\
+		(\rho E + p)v_1 \\
+		\rho k v_1 \\
+		\rho \omega v_1
+		   \end{array}
+	    \right]
+\label{eqn:finalHbar}
+\end{equation}
+
+
+\subsubsection{Viscous Axisymmetric Source Term}
+
+	Since this term contains derivatives in the Cartesian domain, these quantities must be appropriately
+transformed in addition to substituting computational variables for Cartesian ones as was done for the inviscid source
+term.  Although the viscous flux vectors require the appropriate transformations as well, given that these vectors
+are exactly the same as those for two-dimensional flow, their transformation will not be shown here.  Rewriting the 
+viscous source term here for clarity,
+
+\begin{displaymath}
+	S_{be3D_v} = \frac{1}{r}\left[ \begin{array}{c}
+		\nu_1 \frac{\partial c_1}{\partial r} \\
+		\vdots \\
+		\nu_k \frac{\partial c_k}{\partial r} \\
+		\tau_{rx} - r\frac{2}{3}\frac{\partial}{\partial x}(\mu \frac{v}{r}) \\
+		\hat{ \tau}_{rr} -\tau_{\theta \theta} - \frac{2}{3}\mu \frac{v}{r} 
+		- r\frac{2}{3}\frac{\partial}{\partial r}(\mu \frac{v}{r}) \\
+		\sum_k (\nu_k \frac{\partial c_k}{\partial r}h_k) - q_{c_r} + \tau_{rx}u 
+		+ \hat{ \tau}_{rr}v + {\mu_k}^* \frac{\partial k}{\partial r} - \frac{2}{3} \mu \frac{v^2}{r}
+			- r\frac{2}{3} \frac{\partial}{\partial x}(\mu \frac{uv}{r})
+			- r\frac{2}{3} \frac{\partial}{\partial r}(\mu \frac{v^2}{r}) \\
+		{\mu_k}^* \frac{\partial k}{\partial r} + rS_k\\
+		{\mu_\omega}^* \frac{\partial \omega}{\partial r} + rS_\omega
+		   \end{array}
+	    \right]
+\end{displaymath}
+
+	Remembering that $r$ = $x_1$ and that $\bar{S}_{be3D_v}$ = $\Omega S_{be3D_v}$ one can immediately
+rewrite the above as
+
+\begin{equation}
+	\bar{S}_{be3D_v} = \frac{\Omega}{x_1}\left[ \begin{array}{c}
+		\nu_1 \frac{\partial c_1}{\partial r} \\
+		\vdots \\
+		\nu_k \frac{\partial c_k}{\partial r} \\
+		\tau_{rx} - x_1\frac{2}{3}\frac{\partial}{\partial x}(\mu \frac{v}{r}) \\
+		\hat{ \tau}_{rr} -\tau_{\theta \theta} - \frac{2}{3}\mu \frac{v}{r} 
+		- x_1\frac{2}{3}\frac{\partial}{\partial r}(\mu \frac{v}{r}) \\
+		\sum_k (\nu_k \frac{\partial c_k}{\partial r}h_k) - q_{c_r} + \tau_{rx}u 
+		+ \hat{ \tau}_{rr}v + {\mu_k}^* \frac{\partial k}{\partial r} - \frac{2}{3} \mu \frac{v^2}{r}
+			- x_1\frac{2}{3} \frac{\partial}{\partial x}(\mu \frac{uv}{r})
+			- x_1\frac{2}{3} \frac{\partial}{\partial r}(\mu \frac{v^2}{r}) \\
+		{\mu_k}^* \frac{\partial k}{\partial r} + x_1S_k\\
+		{\mu_\omega}^* \frac{\partial \omega}{\partial r} + x_1S_\omega
+		   \end{array}
+	    \right]
+\label{eqn:beginHvbar}
+\end{equation}
+
+%---------------------------------------------------------------------------------------------------------------
+\subsubsection{Species Continuity Source Term}
+
+	For the remaining transformations, each equation will be considered separately.  Starting with the
+species conservation source terms, and letting the number of species vary between 0 and $n_s -1 = \bar{n}_s$
+one can write for the first species
+
+\begin{displaymath}
+	\nu_0 \frac{\partial}{\partial r}(c_0) = \nu_0 \Big\{\xi_r \frac{\partial c_0}{\partial \xi}
+	+ \eta_r \frac{\partial c_0}{\partial \eta}\Big\} = \nu_0 \Big\{X_{0,1} \frac{\partial c_0}{\partial X_0}
+	+ X_{1,1} \frac{\partial c_0}{\partial X_1} \Big\}
+\end{displaymath}
+
+	Thus for a general species \emph{i} one can write
+
+\begin{equation}
+	\nu_i \frac{\partial c_i}{\partial r} = \nu_i \sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1} 
+	\frac{\partial c_i}{\partial X_\theta}
+\label{eqn:speciescomp}
+\end{equation}
+
+	where $\bar{n}_d$ is the number of dimensions minus one, which for axisymmetric flow has a value equal
+to 1.  Therefore combining Eq. \ref{eqn:speciescomp} and Eq. \ref{eqn:beginHvbar} yields
+
+\begin{displaymath}
+	\bar{S}_{be3D_v} = \frac{\Omega}{x_1}\left[ \begin{array}{c}
+		\nu_0 \sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1} 
+		\frac{\partial c_0}{\partial X_\theta} \\
+		\vdots \\
+		\nu_{\bar{n}_s} \sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1} 
+		\frac{\partial c_{\bar{n}_s}}{\partial X_\theta} \\
+		\vdots
+		   \end{array}
+	    \right]
+\end{displaymath}
+
+%----------------------------------------------------------------------------------------------------------------------
+\subsubsection{$x$ Momentum Source Term}
+
+	Considering next the equation of motion along the first physical co-ordinate, by substitution
+of Eq. \ref{eqn:taurx} and replacing Cartesian variables one can write
+
+\begin{displaymath}
+	\tau_{rx} - x_1\frac{2}{3}\frac{\partial}{\partial x}(\mu \frac{v}{r}) = \mu\Big[\frac{\partial}{\partial x}(v_1) 
+	+ \frac{\partial}{\partial r}(v_0)\Big] - x_1\frac{2}{3} \frac{\partial}{\partial x}(\mu \frac{v_1}{x_1})
+\end{displaymath}
+
+	Rewriting the Cartesian derivatives using the Calculus as functions of metrics and derivatives along
+computational co-ordinate directions yields
+
+\begin{displaymath}
+  \begin{array}{c}
+	\mu \Big\{\xi_x \frac{\partial v_1}{\partial \xi} + \eta_x \frac{\partial v_1}{\partial \eta} 
+	+ \xi_r \frac{\partial v_0}{\partial \xi} + \eta_r \frac{\partial v_0}{\partial \eta}\Big\}
+	- x_1 \frac{2}{3} \Big\{\xi_x \frac{\partial}{\partial \xi}(\mu \frac{v_1}{x_1}) 
+	+ \eta_x \frac{\partial}{\partial \eta}(\mu \frac{v_1}{x_1}) \Big\}  
+	\\
+	\mu \Big\{X_{0,0} \frac{\partial v_1}{\partial X_0} + X_{1,0} \frac{\partial v_1}{\partial X_1} 
+	+ X_{0,1} \frac{\partial v_0}{\partial X_0} + X_{1,1} \frac{\partial v_0}{\partial X_1}\Big\}
+	- x_1 \frac{2}{3} \Big\{X_{0,0} \frac{\partial}{\partial X_0}(\mu \frac{v_1}{x_1}) 
+	+ X_{1,0} \frac{\partial}{\partial X_1}(\mu \frac{v_1}{x_1}) \Big\}  
+	\\
+	\mu \Big\{ \sum_{\theta = 0}^{\bar{n}_d} X_{\theta,1}\frac{\partial v_0}{\partial X_\theta}
+	+ \sum_{\theta = 0}^{\bar{n}_d} X_{\theta,0} \frac{\partial v_1}{\partial X_\theta} \Big\}
+	- x_1 \frac{2}{3} \sum_{\theta = 0}^{\bar{n}_d} X_{\theta,0} \frac{\partial}{\partial X_\theta}
+	(\mu \frac{v_1}{x_1})
+  \end{array}
+\end{displaymath}
+
+	which can be simplified to 
+
+\begin{equation}
+	\tau_{rx} - x_1\frac{2}{3}\frac{\partial}{\partial x}(\mu \frac{v}{r}) =
+	\mu \sum_{\theta = 0}^{\bar{n}_d} X_{\theta,1}\frac{\partial v_0}{\partial X_\theta}
+	+ \sum_{\theta = 0}^{\bar{n}_d} X_{\theta,0} \Big\{\mu \frac{\partial v_1}{\partial X_\theta} 
+	- x_1 \frac{2}{3} \frac{\partial}{\partial X_\theta}(\mu \frac{v_1}{x_1}) \Big\}
+\label{eqn:xmomcomp}
+\end{equation}
+
+	which when combined with Eqs. \ref{eqn:speciescomp} and Eq. \ref{eqn:beginHvbar} yields
+
+\begin{displaymath}
+	\bar{S}_{be3D_v} = \frac{\Omega}{x_1}\left[ \begin{array}{c}
+		\nu_0 \sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1} 
+		\frac{\partial c_0}{\partial X_\theta} \\
+		\vdots \\
+		\nu_{\bar{n}_s} \sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1} 
+		\frac{\partial c_{\bar{n}_s}}{\partial X_\theta} \\
+		\mu \sum_{\theta = 0}^{\bar{n}_d} X_{\theta,1}\frac{\partial v_0}{\partial X_\theta}
+		+ \sum_{\theta = 0}^{\bar{n}_d} X_{\theta,0} \Big\{\mu \frac{\partial v_1}{\partial X_\theta} 
+		- x_1 \frac{2}{3} \frac{\partial}{\partial X_\theta}(\mu \frac{v_1}{x_1}) \Big\} \\
+		\vdots
+		   \end{array}
+	    \right]
+\end{displaymath}
+
+%--------------------------------------------------------------------------------------------------------------
+\subsubsection{$r$ Momentum Source Term}
+
+	Considering the momentum equation source term along the second co-ordinate direction and 
+substituting the results of Eqs. \ref{eqn:taurrhat} and \ref{eqn:tauthetatheta} in for
+the viscous stress terms yields,
+
+\begin{displaymath}
+	\hat{ \tau}_{rr} -\tau_{\theta \theta} - \frac{2}{3}\mu \frac{v}{r} 
+	- x_1\frac{2}{3}\frac{\partial}{\partial r}(\mu \frac{v}{r}) =  
+	\mu ( - \frac{2}{3} \frac{\partial u}{\partial x} + \frac{4}{3} \frac{\partial v}{\partial r})
+	- \mu \Big\{- \frac{2}{3} (\frac{\partial u}{\partial x} + \frac{\partial v}{\partial r})  
+	+ \frac{4}{3} \frac{v}{r} \Big\} - \frac{2}{3}\mu \frac{v}{r} 
+	- x_1\frac{2}{3}\frac{\partial}{\partial r}(\mu \frac{v}{r})
+\end{displaymath}
+
+	Rearranging and simplifying results in
+
+\begin{displaymath}
+	\mu \Big\{\frac{4}{3}\frac{\partial v}{\partial r} + \frac{2}{3}\frac{\partial v}{\partial r}
+	- \frac{2}{3}\frac{\partial u}{\partial x} + \frac{2}{3}\frac{\partial u}{\partial x}  \Big\}
+	-\frac{4}{3}(\mu \frac{v}{r}) - \frac{2}{3}(\mu \frac{v}{r}) - x_1\frac{2}{3}\frac{\partial}{\partial r}
+	(\mu \frac{v}{r})
+\end{displaymath}
+
+\begin{displaymath}
+	2\mu \frac{\partial}{\partial r}(v) - x_1\frac{2}{3}\frac{\partial}{\partial r}(\mu \frac{v}{r})
+	-2\mu \frac{v}{r}
+\end{displaymath}
+	
+	Rewriting the derivatives and substituting for the computational variables
+
+\begin{displaymath}
+  \begin{array}{c}
+	2\mu\Big\{\xi_r \frac{\partial v_1}{\partial \xi} + \eta_r \frac{\partial v_1}{\partial \eta} \Big\}
+	-x_1\frac{2}{3}\Big\{\xi_r\frac{\partial}{\partial \xi}(\mu\frac{v_1}{x_1}) + \eta_r\frac{\partial}
+	{\partial \eta}(\mu\frac{v_1}{x_1})\Big\} - 2\mu \frac{v_1}{x_1}
+	\\
+	2\mu\Big\{X_{0,1} \frac{\partial v_1}{\partial X_0} + X_{1,1} \frac{\partial v_1}{\partial X_1} \Big\}
+	-x_1\frac{2}{3}\Big\{X_{0,1}\frac{\partial}{\partial X_0}(\mu\frac{v_1}{x_1}) + X_{1,1}\frac{\partial}
+	{\partial X_1}(\mu\frac{v_1}{x_1})\Big\} - 2\mu \frac{v_1}{x_1}
+	\\
+	2\mu\Big\{\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1}\frac{\partial v_1}{\partial X_\theta} 
+	-\frac{v_1}{x_1} \Big\}
+	-x_1\frac{2}{3}\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1}\frac{\partial}{\partial X_\theta}(\mu\frac{v_1}{x_1})
+  \end{array}
+\end{displaymath}
+
+	and thus one can finally write
+
+\begin{equation}
+	\hat{ \tau}_{rr} -\tau_{\theta \theta} - \frac{2}{3}\mu \frac{v}{r} 
+	- x_1\frac{2}{3}\frac{\partial}{\partial r}(\mu \frac{v}{r}) = 
+	\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1}\Big\{2\mu\frac{\partial v_1}{\partial X_\theta} 
+	-x_1\frac{2}{3}\frac{\partial}{\partial X_\theta}(\mu\frac{v_1}{x_1})\Big\} - 2\mu\frac{v_1}{x_1}
+\label{eqn:rmomcomp}
+\end{equation}
+
+	which when combined with Eqs. \ref{eqn:speciescomp}, \ref{eqn:xmomcomp}, \ref{eqn:rmomcomp}, 
+and \ref{eqn:beginHvbar} yields
+
+\begin{displaymath}
+	\bar{S}_{be3D_v} = \frac{\Omega}{x_1}\left[ \begin{array}{c}
+		\nu_0 \sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1} 
+		\frac{\partial c_0}{\partial X_\theta} \\
+		\vdots \\
+		\nu_{\bar{n}_s} \sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1} 
+		\frac{\partial c_{\bar{n}_s}}{\partial X_\theta} \\
+		\mu \sum_{\theta = 0}^{\bar{n}_d} X_{\theta,1}\frac{\partial v_0}{\partial X_\theta}
+		+ \sum_{\theta = 0}^{\bar{n}_d} X_{\theta,0} \Big\{\mu \frac{\partial v_1}{\partial X_\theta} 
+		- x_1 \frac{2}{3} \frac{\partial}{\partial X_\theta}(\mu \frac{v_1}{x_1}) \Big\} \\
+		\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1}\Big\{2\mu\frac{\partial v_1}{\partial X_\theta} 
+		-x_1\frac{2}{3}\frac{\partial}{\partial X_\theta}(\mu\frac{v_1}{x_1})\Big\} - 2\mu\frac{v_1}{x_1} \\
+		\vdots
+		   \end{array}
+	    \right]
+\end{displaymath}
+
+%----------------------------------------------------------------------------------------------------------------------
+\subsubsection{Energy Equation Source Term}
+
+	The next term to be considered is the energy equation source term, which will be broken down into its
+individual components given the number of terms that need to be rewritten.  Starting with the species diffusion
+contribution and setting $k$ equal to  0 to $\bar{n}_s$
+
+\begin{displaymath}
+	\sum_{k = 0}^{\bar{n}_s}(\nu_k \frac{\partial c_k}{\partial r}h_k) = 
+	\sum_{k = 0}^{\bar{n}_s}\nu_k h_k \Big\{\xi_r \frac{\partial c_k}{\partial \xi} +
+	\eta_r \frac{\partial c_k}{\partial \eta}\Big\} =
+	\sum_{k = 0}^{\bar{n}_s}\nu_k h_k \Big\{X_{0,1}\frac{\partial c_k}{\partial X_0} +
+	X_{1,1} \frac{\partial c_k}{\partial X_1}\Big\}
+\end{displaymath}
+
+	which can be simplified to 
+
+\begin{equation}
+	\sum_{k = 0}^{\bar{n}_s}(\nu_k \frac{\partial c_k}{\partial r}h_k) = 
+	\sum_{k = 0}^{\bar{n}_s}\nu_k h_k \Big\{\sum_{\theta = 0}^{\bar{n}_d} X_{\theta,1}
+	\frac{\partial c_k}{\partial X_\theta}\Big\}
+\label{eqn:energyA}
+\end{equation}
+	
+	Next is the heat transfer term, where we will let $k^*$ represent the turbulent coefficient of
+thermal conductivity, so as not to confuse it with $k$, the specific turbulent kinetic energy
+
+\begin{displaymath}
+	- q_{c_r} = -(-k^* \frac{\partial T}{\partial r}) = k^* \Big\{\xi_r \frac{\partial T}{\partial \xi}
+	+ \eta_r \frac{\partial T}{\partial \eta}\Big\} = k^*\Big\{X_{0,1} \frac{\partial T}{\partial X_0}
+	+ X_{1,1} \frac{\partial T}{\partial X_1}\Big\}
+\end{displaymath}
+
+	where it is noted that Eq. \ref{eqn:rheatflux} was used to describe the heat flux term.  Simplifying
+the above yields,
+
+\begin{equation}
+	- q_{c_r} = k^*\sum_{\theta = 0}^{\bar{n}_d} X_{\theta,1} \frac{\partial T}{\partial X_\theta}
+\label{eqn:energyB}
+\end{equation}
+	
+	Considering next the first stress term $\tau_{rx}$ and using the results of Eq. \ref{eqn:taurx}
+
+\begin{displaymath}
+	\tau_{rx}u = u\Big\{\mu\Big[\frac{\partial}{\partial x}(v) + \frac{\partial}{\partial r}(u)\Big]\Big\} =
+	u\mu\Big\{\xi_x \frac{\partial v}{\partial \xi} + \eta_x \frac{\partial v}{\partial \eta} +
+	\xi_r \frac{\partial u}{\partial \xi} + \eta_r \frac{\partial u}{\partial \eta} \Big\} 
+\end{displaymath}
+
+\begin{displaymath}
+	\tau_{rx}u = 
+	v_0 \mu \Big\{X_{0,0} \frac{\partial v_1}{\partial X_0} + X_{1,0} \frac{\partial v_1}{\partial X_1} +
+	X_{0,1} \frac{\partial v_0}{\partial X_0} + X_{1,1} \frac{\partial v_0}{\partial X_1} \Big\}
+\end{displaymath}
+
+	which can be simplified to
+
+\begin{equation}
+	\tau_{rx}u = v_0\mu
+	\Big\{\sum_{\theta = 0}^{\bar{n}_d} X_{\theta,1}\frac{\partial v_0}{\partial X_\theta} +
+	\sum_{\theta = 0}^{\bar{n}_d} X_{\theta,0}\frac{\partial v_1}{\partial X_\theta}\Big\}
+\label{eqn:energyC}
+\end{equation}
+
+	The second stress term can be written with the help of Eq. \ref{eqn:taurrhat} as
+	
+\begin{displaymath}
+	\hat{ \tau}_{rr}v = v\Big\{\mu\Big[ -\frac{2}{3} \frac{\partial}{\partial x}(u) 
+	+ \frac{4}{3} \frac{\partial}{\partial r}(v)\Big]\Big\} = v\mu\Big\{-\frac{2}{3}\Big[
+	\xi_x\frac{\partial u}{\partial \xi} + \eta_x\frac{\partial u}{\partial \eta}\Big] + \frac{4}{3}\Big[
+	\xi_r\frac{\partial v}{\partial \eta} + \eta_r\frac{\partial v}{\partial \eta}\Big] \Big\}
+\end{displaymath}
+
+\begin{displaymath}
+	\hat{ \tau}_{rr}v = v_1\mu\Big\{-\frac{2}{3}\Big[
+	X_{0,0}\frac{\partial v_0}{\partial X_0} + X_{1,0}\frac{\partial v_0}{\partial X_1}\Big] + \frac{4}{3}\Big[
+	X_{0,1}\frac{\partial v_1}{\partial X_0} + X_{1,1}\frac{\partial v_1}{\partial X_1}\Big] \Big\} 
+\end{displaymath}
+
+	which can be simplified to
+
+\begin{equation}
+	\hat{ \tau}_{rr}v = v_1\mu\Big\{-\frac{2}{3}\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,0}
+	\frac{\partial v_0}{\partial X_\theta} + \frac{4}{3}\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1}
+	\frac{\partial v_1}{\partial X_\theta} \Big\}	
+\label{eqn:energyD}
+\end{equation}
+
+	The turbulent energy diffusion term is similar to the heat transfer term
+
+\begin{displaymath}
+	{\mu_k}^* \frac{\partial k}{\partial r} = {\mu_k}^* \Big\{\xi_r\frac{\partial k}{\partial \xi} 
+	+ \eta_r\frac{\partial k}{\partial \eta}\Big\} = {\mu_k}^* \Big\{X_{0,1}\frac{\partial k}{\partial X_0}
+	+ X_{1,1}\frac{\partial k}{\partial X_1}\Big\}
+\end{displaymath}	
+
+	which is simplified to
+
+\begin{equation}
+	{\mu_k}^* \frac{\partial k}{\partial r} = {\mu_k}^* \Big\{\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1}
+	\frac{\partial k}{\partial X_\theta}\Big\}
+\label{eqn:energyE}
+\end{equation}
+
+	The next term has no derivative terms and hence requires only direct substitution for the computational 
+variables
+
+\begin{equation}
+	- \frac{2}{3}\mu\frac{v^2}{r} = - \frac{2}{3}\mu\frac{{v_1}^2}{x_1}
+\label{eqn:energyF}
+\end{equation}
+
+	The last two terms are treated as follows
+
+\begin{displaymath}
+	- x_1\frac{2}{3}\frac{\partial}{\partial x}(\mu \frac{uv}{r}) = -x_1\frac{2}{3}\Big\{\xi_x
+	\frac{\partial}{\partial \xi}(\mu\frac{v_0 v_1}{x_1}) + \eta_x\frac{\partial}{\partial \eta}
+	(\mu\frac{v_0 v_1}{x_1})\Big\} = -x_1\frac{2}{3}\Big\{X_{0,0}
+	\frac{\partial}{\partial X_0}(\mu\frac{v_0 v_1}{x_1}) + X_{1,0}\frac{\partial}{\partial X_1}
+	(\mu\frac{v_0 v_1}{x_1})\Big\}	
+\end{displaymath}
+
+\begin{displaymath}
+	- x_1\frac{2}{3}\frac{\partial}{\partial r}(\mu \frac{v^2}{r}) = -x_1\frac{2}{3}\Big\{\xi_r
+	\frac{\partial}{\partial \xi}(\mu\frac{{v_1}^2}{x_1}) + \eta_r\frac{\partial}{\partial \eta}(\mu\frac{{v_1}^2}{x_1})\Big\}
+	= -x_1\frac{2}{3}\Big\{X_{0,1}
+	\frac{\partial}{\partial X_0}(\mu\frac{{v_1}^2}{x_1}) + X_{1,1}\frac{\partial}{\partial X_1}(\mu\frac{{v_1}^2}{x_1})\Big\}
+\end{displaymath}
+
+	which can combined and rewritten as
+
+\begin{equation}
+	- x_1\frac{2}{3}\frac{\partial}{\partial x}(\mu \frac{uv}{r}) - x_1\frac{2}{3}\frac{\partial}{\partial r}
+	(\mu \frac{v^2}{r}) = -x_1\frac{2}{3}\Big\{\sum_{\theta = 0}^{\bar{n}_d} \sum_{\vartheta = 0}^{\bar{n}_d}
+	X_{\theta,\vartheta}\frac{\partial}{\partial X_\theta}(\mu\frac{v_\vartheta v_1}{x_1}) \Big\}
+\label{eqn:energyG}
+\end{equation}
+
+	At this point all the individual terms have been rewritten using the appropriate metric terms and hence the
+axisymmetric energy equation source term can be expressed as a combination of Eqs. \ref{eqn:energyA} - \ref{eqn:energyG}
+
+\begin{equation}
+  \begin{array}{c}
+	\sum_{k = 0}^{\bar{n}_s}\nu_k h_k \Big\{\sum_{\theta = 0}^{\bar{n}_d} X_{\theta,1}
+	\frac{\partial c_k}{\partial X_\theta}\Big\} + k^*\sum_{\theta = 0}^{\bar{n}_d} X_{\theta,1} 
+	\frac{\partial T}{\partial X_\theta} + v_0\mu\Big\{\sum_{\theta = 0}^{\bar{n}_d} X_{\theta,1}
+	\frac{\partial v_0}{\partial X_\theta} + \sum_{\theta = 0}^{\bar{n}_d} X_{\theta,0}
+	\frac{\partial v_1}{\partial X_\theta}\Big\} \\
+	+ v_1\mu\Big\{-\frac{2}{3}\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,0}
+	\frac{\partial v_0}{\partial X_\theta} + \frac{4}{3}\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1}
+	\frac{\partial v_1}{\partial X_\theta} \Big\} 
+	+ {\mu_k}^* \Big\{\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1}
+	\frac{\partial k}{\partial X_\theta}\Big\} \\
+	- \frac{2}{3}\mu\frac{{v_1}^2}{x_1}
+	 -x_1\frac{2}{3}\Big\{\sum_{\theta = 0}^{\bar{n}_d} \sum_{\vartheta = 0}^{\bar{n}_d}
+	X_{\theta,\vartheta}\frac{\partial}{\partial X_\theta}(\mu\frac{v_\vartheta v_1}{x_1}) \Big\}
+  \end{array}
+\label{eqn:energycomp}
+\end{equation}
+
+	which when combined with Eqs. \ref{eqn:speciescomp}, \ref{eqn:xmomcomp}, \ref{eqn:rmomcomp}, 
+and \ref{eqn:beginHvbar} yields 
+
+\begin{displaymath}
+	\bar{S}_{be3D_v} = \frac{\Omega}{x_1}\left[ \begin{array}{c}
+		\nu_0 \sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1} 
+		\frac{\partial c_0}{\partial X_\theta} \\
+		\vdots \\
+		\nu_{\bar{n}_s} \sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1} 
+		\frac{\partial c_{\bar{n}_s}}{\partial X_\theta} 
+		\\
+		\mu \sum_{\theta = 0}^{\bar{n}_d} X_{\theta,1}\frac{\partial v_0}{\partial X_\theta}
+		+ \sum_{\theta = 0}^{\bar{n}_d} X_{\theta,0} \Big\{\mu \frac{\partial v_1}{\partial X_\theta} 
+		- x_1 \frac{2}{3} \frac{\partial}{\partial X_\theta}(\mu \frac{v_1}{x_1}) \Big\} 
+		\\
+		\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1}\Big\{2\mu\frac{\partial v_1}{\partial X_\theta} 
+		-x_1\frac{2}{3}\frac{\partial}{\partial X_\theta}(\mu\frac{v_1}{x_1})\Big\} - 2\mu\frac{v_1}{x_1} 
+		\\
+	\left(\begin{array}{c}
+		\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,0} \Big\{v_0\mu\frac{\partial v_1}{\partial X_\theta} -\frac{2}{3}
+		v_1\mu\frac{\partial v_0}{\partial X_\theta} \Big\} + \sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1}\Big\{
+		\sum_{k = 0}^{\bar{n}_s}\nu_k h_k \frac{\partial c_k}{\partial X_\theta} + 
+		k^*\frac{\partial T}{\partial X_\theta} + {\mu_k}^*\frac{\partial k}{\partial X_\theta} \\ 
+		+ v_0 \mu \frac{\partial v_0}{\partial X_\theta} + \frac{4}{3}v_1 \mu \frac{\partial v_1}{\partial X_\theta}
+		\Big\} -\frac{2}{3}\Big\{\mu\frac{{v_1}^2}{x_1} + x_1\sum_{\theta = 0}^{\bar{n}_d}\sum_{\vartheta = 0}^{\bar{n}_d}
+		X_{\theta,\vartheta}(\mu\frac{v_\vartheta v_1}{x_1})\Big\}
+	\end{array}\right)
+		\\	
+		\vdots
+		   \end{array}
+	    \right]
+\end{displaymath}
+
+%--------------------------------------------------------------------------------------------------------------------------
+\subsubsection{Turbulent Source Terms}
+
+	Examining the remaining source terms for the turbulence quantities one can write
+
+\begin{displaymath}
+	{\mu_k}^* \frac{\partial k}{\partial r} + x_1S_k = {\mu_k}^* \Big\{\xi_r \frac{\partial k}{\partial \xi}
+	+\eta_r \frac{\partial k}{\partial \eta}\Big\} + x_1S_k = {\mu_k}^* \Big\{X_{0,1} \frac{\partial k}{\partial X_0}
+	+ X_{1,1} \frac{\partial k}{\partial X_1}\Big\} + x_1S_k
+\end{displaymath}	
+
+\begin{displaymath}
+	{\mu_\omega}^* \frac{\partial \omega}{\partial r} + x_1S_\omega = {\mu_\omega}^* 
+	\Big\{\xi_r \frac{\partial \omega}{\partial \xi}
+	+\eta_r \frac{\partial \omega}{\partial \eta}\Big\} + x_1S_\omega = {\mu_\omega}^* 
+	\Big\{X_{0,1} \frac{\partial \omega}{\partial X_0}
+	+ X_{1,1} \frac{\partial \omega}{\partial X_1}\Big\} + x_1S_\omega
+\end{displaymath}	
+
+	both of which can be simplified similarly to
+
+\begin{equation}
+	{\mu_k}^*\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1}\frac{\partial k}{\partial X_\theta} + x_1S_k
+\label{eqn:kcomp}
+\end{equation}
+
+\begin{equation}
+	{\mu_\omega}^*\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1}\frac{\partial \omega}{\partial X_\theta} + x_1S_\omega
+\label{eqn:omegacomp}
+\end{equation}
+
+	As a last step, since both $S_k$ and $S_\omega$ contain the variable $P_k$ which itself contains an axisymmetric
+term (Eq. \ref{eqn:pkbe3d}), this term must be transformed as well.  Starting from the definition of $P_{k_be3D}$ (where
+the $\tilde v$ has been removed for simplicity but is still understood),
+
+\begin{displaymath}
+	P_{k_{be3D}} = -\mu_T\frac{2}{3}\frac{v}{r}(\frac{\partial u}{\partial x} + \frac{\partial v}{\partial r})
+\end{displaymath}
+
+	Making the substitution for $u$ and $v$ into the computational space variables $v_0$ and $v_1$ respectively while at the 
+same time replacing the physical space variables in a similar fashion yields,
+
+\begin{displaymath}
+	P_{k_{be3D}} = -\mu_T\frac{2}{3}\frac{v_1}{x_1}(\frac{\partial v_0}{\partial x_0} + \frac{\partial v_1}{\partial x_1})
+\end{displaymath}
+
+	Using the Calculus to rewrite the Cartesian derivatives in terms of metrics and derivatives along the computational
+co-ordinates,
+
+\begin{displaymath}
+	P_{k_{be3D}} = -\mu_T\frac{2}{3}\frac{v_1}{x_1}\Big\{\xi_x \frac{\partial v_o}{\partial \xi} +
+	\eta_x \frac{\partial v_o}{\partial \eta} + \xi_r \frac{\partial v_1}{\partial \xi} + \eta_r
+	\frac{\partial v_1}{\partial \eta}\Big\}
+\end{displaymath}
+
+\begin{displaymath}
+	= -\mu_T\frac{2}{3}\frac{v_1}{x_1}\Big\{X_{0,0} \frac{\partial v_o}{\partial X_O} +
+	X_{1,0} \frac{\partial v_o}{\partial X_1} + X_{0,1} \frac{\partial v_1}{\partial X_0} + X_{1,1}
+	\frac{\partial v_1}{\partial X_1}\Big\}
+\end{displaymath}
+
+	which can be simplified in summation form to,
+
+\begin{equation}
+	P_{k_{be3D}}= -\mu_T\frac{2}{3}\frac{v_1}{x_1}\sum_{\theta=0}^{\theta=1}\sum_{\vartheta=0}^{\vartheta=1}
+	X_{\theta,\vartheta}\frac{\partial v_{\vartheta}}{\partial X_{\theta}}
+\label{eqn:pkbe3dtrans}
+\end{equation}
+
+%----------------------------------------------------------------------------------------------------------------------
+\subsubsection{Summary of Axisymmetric Source Terms}
+
+	Therefore the final form of the axisymmetric, multi-species, viscous, turbulent source term can be written as
+the combination of Eqs. \ref{eqn:speciescomp}, \ref{eqn:xmomcomp}, \ref{eqn:rmomcomp}, \ref{eqn:kcomp}, and 
+\ref{eqn:omegacomp} 
+ 
+\begin{equation}
+	\bar{S}_{be3D_v} = \frac{\Omega}{x_1}\left[ \begin{array}{c}
+		\nu_0 \sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1} 
+		\frac{\partial c_0}{\partial X_\theta} \\
+		\vdots \\
+		\nu_{\bar{n}_s} \sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1} 
+		\frac{\partial c_{\bar{n}_s}}{\partial X_\theta} 
+		\\
+		\mu \sum_{\theta = 0}^{\bar{n}_d} X_{\theta,1}\frac{\partial v_0}{\partial X_\theta}
+		+ \sum_{\theta = 0}^{\bar{n}_d} X_{\theta,0} \Big\{\mu \frac{\partial v_1}{\partial X_\theta} 
+		- x_1 \frac{2}{3} \frac{\partial}{\partial X_\theta}(\mu \frac{v_1}{x_1}) \Big\} 
+		\\
+		\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1}\Big\{2\mu\frac{\partial v_1}{\partial X_\theta} 
+		-x_1\frac{2}{3}\frac{\partial}{\partial X_\theta}(\mu\frac{v_1}{x_1})\Big\} - 2\mu\frac{v_1}{x_1} 
+		\\
+	\left(\begin{array}{c}
+		\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,0} \Big\{v_0\mu\frac{\partial v_1}{\partial X_\theta} -\frac{2}{3}
+		v_1\mu\frac{\partial v_0}{\partial X_\theta} \Big\} + \sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1}\Big\{
+		\sum_{k = 0}^{\bar{n}_s}\nu_k h_k \frac{\partial c_k}{\partial X_\theta} + 
+		k^*\frac{\partial T}{\partial X_\theta} + {\mu_k}^*\frac{\partial k}{\partial X_\theta} \\ 
+		+ v_0 \mu \frac{\partial v_0}{\partial X_\theta} + \frac{4}{3}v_1 \mu \frac{\partial v_1}{\partial X_\theta}
+		\Big\} -\frac{2}{3}\Big\{\mu\frac{{v_1}^2}{x_1} + x_1\sum_{\theta = 0}^{\bar{n}_d}\sum_{\vartheta = 0}^{\bar{n}_d}
+		X_{\theta,\vartheta}(\mu\frac{v_\vartheta v_1}{x_1})\Big\}
+	\end{array}\right)
+		\\	
+		{\mu_k}^*\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1}\frac{\partial k}{\partial X_\theta} + x_1S_k 
+		\\
+		{\mu_\omega}^*\sum_{\theta = 0}^{\bar{n}_d}X_{\theta,1}\frac{\partial \omega}{\partial X_\theta} + x_1S_\omega
+		   \end{array}
+	    \right]
+\label{finalHvbar}
+\end{equation} 
+
+	while the inviscid source term is defined by Eq. \ref{eqn:finalHbar}
+
+\begin{displaymath}
+	\bar{S}_{be3D} = \frac{\Omega}{x_1}\left[ \begin{array}{c}
+		\rho_1 v_1 \\
+		\vdots \\
+		\rho_k v_1 \\
+		\rho v_0v_1 \\
+		\rho {v_1}^2 \\
+		(\rho E + p)v_1 \\
+		\rho k v_1 \\
+		\rho \omega v_1
+		   \end{array}
+	    \right]
+\end{displaymath}

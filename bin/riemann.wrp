@@ -1,0 +1,280 @@
+{
+  Number of Dimensions    : nd           : 2
+
+}
+
+meshfact=2;
+tf=1;
+
+is=1;  js=1;
+im=round(25*meshfact)+1; jm=round(25*meshfact)+1; 
+ie=round(49*meshfact)+1; je=round(49*meshfact)+1;
+timelevels=round(20*meshfact*tf)*10;
+
+tmax=4e-4;
+ 
+itermax=15;
+CFLfact=0.8;
+
+
+MxL=0.0;    MxR=0.0;
+MyL=0.0;    MyR=0.0;
+PL=10000;   PR=100000;
+TL=300;     TR=3000;
+
+Grid(
+  Size(is,js, ie,je);
+  Point(is,js, 0.0e0,0.0e0);
+  Point(ie,js, 1.0e0,0.0e0);
+  Point(ie,je, 1.0e0,1.0e0);
+  Point(is,je, 0.0e0,1.0e0);
+  JoinCorners(is,js, ie,je,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
+  Rotate(is,js,ie,je,0.0,0.0,rad(0));
+{  printf("%E  %E\n",_x(im,jm),_y(im,jm));}
+);
+
+
+Bdry(
+  NavierStokesPerfect(
+    {
+    ******************************************************************  
+    * Fluid Flow Boundary Conditions Types:                             
+    ******************************************************************  
+    *  0   : Inflow, supersonic                                         
+    *  1   : Outflow, supersonic                                        
+    *  2   : Slip wall, 1st order                                       
+    *  3   : Slip wall, 2nd order                                       
+    *  4   : Wall, T specified                                          
+    *  5   : Wall, adiabatic                                            
+    *  6   : Subsonic Inflow (CBut onstant Tstag, Pstag at inflow)           
+    *  7   : Subsonic Outflow (Constant P at outflow)                   
+    *  104 : Wall, T specified, flux at the interface set to bdry flux  
+    ***************************But ***************************************  
+    }
+    { first, create cuts in the computational domain; a cut is a region 
+     which is not computed by the solver }
+    Cut(is,js, im,jm);
+    { second, apply a default boundary condition (BC) type to all boundary nodes }
+    All(2{BC type});
+    { impose BC type at faces i=is, i=ie, j=js, j=je}
+    Faces(0,2,  2,2);
+    { apply BC type only to the boundary nodes in a specific region of the computational domain}
+    { Region(10{is},10{js},  17{ie},17{je},  3{BC type});}
+  );
+);
+ 
+ 
+Model(
+ 
+  NavierStokesPerfect(
+    gamma=1.4;    {the specific heat ratio }
+    R=286.0;      {the gas constant in J/kgK }
+    eta=2e-5;     {the viscosity of the gas in kg/ms }
+    kappa=0.03;       {the thermal conductivity of the gas in W/mK }
+    Pmin=1.0e-2;    Pmax=9.9e99;   {min and max pressure allowed in the domain}
+    Tmin=1.0e1;     Tmax=6.0e5;    {min and max temperature allowed in the domain}
+    AXISYMMETRIC=FALSE;
+  );
+);
+
+ 
+Init(
+    NavierStokesPerfect(
+      {
+      ************************************************************
+      *Initial Conditions Types:                                  
+      ************************************************************
+      *1, V[1]..V[nd],  P,  T     
+      *2, M[1]..M[nd],  P,  T     
+      ************************************************************
+      }
+      { Init all nodes in the domain}  
+
+      All(2,MxL,MyL,PL,TL);
+      Region(im,js,ie,je,
+             2,MxR,MyR,PR,TR);
+      {
+        { Init bdry nodes numbered 3}
+        Bdry(3, 1,0.0,0.0,0.0,0.0);
+        { Init nodes in region}
+        Region(3,3,  6,6,
+         1,0.0,0.0,0.0,0.0);
+      }
+    );
+);
+
+
+Disc(
+  NavierStokesPerfect(
+    zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  FVS(
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.85;
+    AOWENO_gammahi=0.85;
+    INTERPOL=INTERPOL_AOWENO5;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO; 
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
+    AOWENO_gammalo=0.85;
+    AOWENO_gammahi=0.85;
+    INTERPOL=INTERPOL_TVD2_SMART;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO; 
+  );
+  MUSCLplus(
+    FLUX=FLUX_FDSplus;
+    numiter=2;
+    AVERAGING=AVERAGING_ARITH;
+    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.95;
+    INTERPOL=INTERPOL_AOWENO5;
+    EIGENVALCOND=EIGENVALCOND_PARENT; 
+  );
+  BDF(
+    STENCIL=STENCIL_BDF3;
+  );
+  CDFplus(
+    xi1=1.0;
+    xi2=0.5;
+    xi3=0.5;
+  );
+  TVDRK(
+    METHOD=METHOD_TVDRK2;
+  );
+);
+
+
+
+
+Cycle(
+  NavierStokesPerfect(
+    xiverge=1e0;          {residual convergence threshold}
+    rhoref=1.0;            {reference density in kg/m3}
+    aref=300.0;            {reference sound speed in m/s}
+    Uref[0]=rhoref;            
+    Uref[1]=rhoref*aref;       
+    Uref[2]=rhoref*aref;   
+    Uref[3]=rhoref*aref*aref;  
+  );
+
+  DualTimeStepping(
+    sigma1=0.5;      {exponent of largest pseudotime step in all dimensions}
+    sigma2=0.0;      {exponent of largest pseudotime step in all flux components}
+    PRECONDITIONER=PRECON_LOCALTIMESTEP;
+    dt=tmax/timelevels;
+    CFLmax=CFLfact*min(1.0,(dt*20*meshfact)/tmax);
+    CFL=min(CFL*1.1,CFLfact*2.0);
+    UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,dt);
+    { dtau=1e-7; {time step imposed on all nodes in seconds}
+      UpdateFluidConstantTimeStep(dtau); }
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,clipinfo);
+    if (ximax<xiverge || iter>itermax,
+      IncreaseTimeLevel();
+      WriteDataFile(outputfilename"."round(time/dt));
+      printf("dt=%E time=%Es\n",dt,time);
+      if (time>tmax-dt/10.0,
+        exit(EXIT_SUCCESS);
+      );
+    );
+  );
+  PredictorCorrector(
+    dt=tmax/timelevels;   {physical time step in seconds}
+    if (time>tmax-0.1*dt,
+      WriteDataFile(outputfilename"."round(time/dt));
+      exit(EXIT_SUCCESS);
+    );
+    if (mod(iter,50)==1,
+      WriteDataFile(outputfilename"."round(time/dt));
+    );
+    UpdateFluid(dt);
+    printf("%E %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
+           time,iter,effiter_U,ximax,i_ximax,
+           j_ximax,clipinfo);
+  );
+
+  Multizone(
+    sigma1=0.3;      {exponent of largest pseudotime step in all dimensions}
+    sigma2=0.3;      {exponent of largest pseudotime step in all flux components}
+    PRECONDITIONER=PRECON_LOCALEIGENVALUE;
+    dt=tmax/timelevels;
+    CFL=(15-min(iter,15))/15*5+0.3;
+    CFL=0.6;
+    phi1=round(20*meshfact);     {maximum number of gridlines per zone in each dimension}
+    UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,phi1,dt);
+
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld) %3ld/%3ld%s \n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,numzones_updated,numzones_total,clipinfo);
+
+    if (ximax<xiverge || iter>itermax,
+      IncreaseTimeLevel();
+      WriteDataFile(outputfilename"."round(time/dt));
+      printf("dt=%E time=%Es\n",dt,time);
+      if (time>tmax-dt/10.0,
+        exit(EXIT_SUCCESS);
+      );
+    );
+
+  );
+
+);
+
+
+Post(
+  xstation[1]=0.1; {m}
+  xstation[2]=0.2; {m}
+  xstation[3]=0.3; {m}
+  numsteps=300;
+  qmin=1.0; {m/s, as small a value as possible}
+  Pback_min=400; {Pa}
+  Pback_max=40000; {Pa}
+  Aback=1.0; {m2/m}
+  for (cnt,1,3,
+    SetXstation(xstation[cnt]);
+    Pback=_Pback_xstation(Aback, Pback_min, Pback_max, numsteps, qmin);
+    Fpot=_Fpot_xstation(Pback, numsteps, qmin);
+    mdot=_mdot_xstation();
+    Tstag=_Tstag_xstation();
+    Pstag=_Pstag_xstation(numsteps);
+    Pstar=_Pstar_xstation();
+    T=_T_xstation();
+    q=_q_xstation();
+    rho=_rho_xstation();
+    htstar=_htstar_xstation();
+    printf("x      = %E m\n"
+           "Pback  = %E Pa\n"
+           "Fpot   = %E Ns/kg\n"
+           "mdot   = %E kg/ms\n"
+           "htstar = %E J/kg\n"
+           "Tstag  = %E K\n"
+           "Pstag  = %E Pa\n"
+           "Pstar  = %E Pa\n"
+           "T      = %E K\n"
+           "q      = %E m/s\n"
+           "rho    = %E kg/m3\n\n"
+           ,xstation[cnt],Pback,Fpot,mdot,htstar,Tstag,Pstag,Pstar,T,q,rho);
+  );
+  printf("\n");
+  for (dim,1,2,
+    Fshear[dim]=_Fshear(is,js, ie,je, dim,BDRY_WALLTFIXED1);
+    Fpressure[dim]=_Fpressure(is,js, ie,je, dim,BDRY_WALLTFIXED1);
+  );
+  printf("Fshear    = (%+E,%+E) N/m\n",Fshear[1],Fshear[2]);
+  printf("Fpressure = (%+E,%+E) N/m\n",Fpressure[1],Fpressure[2]);
+  printf("Qheat     = %+E W/m\n",_Qheat(is,js, ie,je, BDRY_WALLTFIXED1));
+  printf("\n");
+  {
+  POSTGRIDONLY=FALSE;
+  WritePostFile(is,js, ie,je, "post.01", "tecplot", POSTGRIDONLY);
+  }
+  printf("metotal   = %+E J/m\n",_metotal(is,js, ie,je));
+  printf("m         = %+E kg/m\n",_m(is,js, ie,je));
+  printf("metotal/m = %+E J/kg\n",_metotal(is,js, ie,je)/_m(is,js, ie,je));
+);

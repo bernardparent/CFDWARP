@@ -1,0 +1,264 @@
+{
+  _______________________________________________________________________________________________
+
+  WARP: a CFD Code for Plasma Aerodynamics [a]
+  _______________________________________________________________________________________________
+
+  Cycle Strategy                          Multizone [1]
+  Fluid Transport Integration             Block ADI [2,3]
+  EM Field Integration                    none
+  Convection Derivative Discretization    FDS [5] Total Variation Diminishing 2nd Order [4]
+  Time Derivative Discretization          Steady-State
+  Fluid Transport Model                   Favre-Reynolds Multispecies
+  Chemical Model                          Air 1 species 0 reaction
+  Beam Model                              None
+  EM Field Model                          None
+  Thermodynamic Model                     NASA Glenn Polynomials [6]
+  Number of Dimensions                    2
+  Number of Flux Components               6
+  Number of Species                       1
+  Number of Charged Species               0
+  List of Species                         Air
+  _______________________________________________________________________________________________
+
+  [a]  B Parent. "Weakly-ionized Airflow Resolver and Post-processor: a CFD Code for Plasma
+       Aerodynamics", WARP version 16dec30b compiled on Dec 31 2016 at 22:25:06 using gcc 4.8.4
+       with OPENMP threads. WARP is a Copyright (c) 1998-2016 of Bernard Parent. Copying and
+       distribution of WARP is prohibited.
+  [1]  B Parent and JP Sislian. "The Use of Domain Decomposition in Accelerating the Convergence
+       of Quasihyperbolic Systems", Journal of Computational Physics 179:140-169, 2002.
+  [2]  WR Briley and H McDonald. "On the Structure and Use of Linearized Block Implicit Schemes",
+       Journal of Computational Physics 34:54-73, 1980.
+  [3]  RM Beam and RF Warming. "An Implicit Finite-Difference Algorithm for Hyperbolic Systems in
+       Conservation-Law-Form", Journal of Computational Physics 22:87-110, 1976.
+  [4]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume Flux Vector
+       Splittings for the Euler Equations", AIAA Journal 24:1453-1460, 1986.
+  [5]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes", Journal
+       of Computational Physics 43:357-372, 1981.
+  [6]  BJ McBride, MJ Zehe, and S Gordon. "NASA Glenn Coefficients for Calculating Thermodynamic
+       Properties of Individual Species", NASA TP 2002-211556, 2002.
+
+}
+
+Mx_top=8.0;
+Mx_bot=2.0;
+
+mf=1.0; 
+
+is=1;   
+im=round(mf*30);
+ie=round(mf*70); 
+
+js=1;
+jm1=round(mf*30);
+jm2=round(mf*40);
+je=round(mf*70);
+
+dwall=2e-5/mf;
+
+Lbdry=0.02;
+Lmix=1.0;
+
+Htop=0.04;
+Hbot=0.04;
+dH=dwall*(jm2-jm1);
+
+
+
+Grid(
+  Size(is,js, ie,je);
+
+  Corners(is,js,im,jm1, -Lbdry,-Hbot,0,-dH/2.0);
+  JoinCorners(is,js, im,jm1,  FF,0.5e0,dwall*2,dwall*2,  EF,0.5e0,1.0e0,dwall);
+
+  Corners(is,jm2,im,je, -Lbdry,dH/2.0,0,Htop);
+  JoinCorners(is,jm2, im,je,  FF,0.5e0,dwall*2,dwall*2,  FE,0.5e0,dwall,1.0);
+
+  JoinCorners(is,jm1, im,jm2, FF,0.5,dwall*2,dwall*2, GG,0.5e0, 1.0,1.0);
+
+  Corners(ie,js,ie,je, Lmix,-Hbot,Lmix,Htop);
+  JoinCorners(ie,js,ie,je, NO,0.5,1.0,1.0, EE,0.5,1.0,1.0);
+
+  Join(im,js,ie,je, i, GE, 0.5, 1.0, 1.0);
+
+);
+
+
+Bdry(
+  FavreReynolds(
+    {
+    _________________________________________________________________________________________
+
+    Boundary Condition Type            Number    Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC              0         Inflow, supersonic
+    BDRY_INFLOWSUBSONIC1               7         Inflow, subsonic, Tstag, Pstag fixed
+    BDRY_INFLOWSUBSONICMASSFLOWFIXED1  16        Inflow, subsonic, Pstag, Massflow/Area fixed
+    BDRY_OUTFLOWSUPERSONIC1            1         Outflow, supersonic
+    BDRY_OUTFLOWSUBSONIC1              4         Outflow, subsonic, P fixed
+    BDRY_OUTFLOWSUBSONICMFIXED1        15        Outflow, subsonic, M fixed
+    BDRY_SYMMETRICAL2                  14        Symmetrical, 2nd order
+    BDRY_SYMMETRICAL1                  9         Symmetrical, 1st order
+    BDRY_WALLTFIXED1                    3         Wall, T specified
+    BDRY_WALLADIABATIC1                 6         Wall, Adiabatic
+    BDRY_SLIPWALL1                     12        Slip wall, 1st order, Adiabatic
+    _________________________________________________________________________________________
+    }
+    Cut(is,jm1,  im,jm2);
+    All(BDRY_WALLTFIXED1);
+    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_OUTFLOWSUPERSONIC1,BDRY_OUTFLOWSUPERSONIC1);
+    {
+    Cut(is,js,  ie,je);
+    Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
+    }
+  );
+);
+ 
+ 
+Model(
+  FavreReynolds(
+    TURBMODEL=TURBMODEL_KOMEGA1988;  {TURBMODEL_KOMEGA2008 [RECOMMENDED], TURBMODEL_KOMEGA1988, TURBMODEL_KEPSILON}
+    DILATDISSIP=DILATDISSIP_WILCOX; {DILATDISSIP_WILCOX [RECOMMENDED], DILATDISSIP_SARKAR, NO}
+    RAPCOMP=NO;     {Coakley rapid compression correction}
+    TURBSOURCE=YES; {solve the turbulence source terms?}
+    REACTING=YES;   {Chemical reactions?}
+    Prt=0.9e0;      {turbulent Prandtl number}
+    Sct=1.0e0;      {turbulent Schmidt number}
+    ADD_ETA_TO_ETAT_WITHIN_QK=NO;  {say NO for standard kinetic energy transport model}
+    kdiv=1.0e-20;   {minimum magnitude of k in m2/s2 allowed when k appears on the denominator}
+    psidiv=0.1e-3;   {minimum magnitude of psi allowed when psi appears on the denominator}
+    Pmin=1.0e-2;    Pmax=9.9e99;   {min and max pressure allowed in the domain in Pa}
+    Tmin=1.0e1;     Tmax=6.0e3;    {min and max temperature allowed in the domain in K}
+    Twmin=Tmin;     Twmax=Tmax;    {min and max wall temperature allowed on any wall boundary node in K}
+    kmin=1.0e-10;   kmax=9.9e99;   {min and max TKE allowed in the domain in m2/s2}
+    psimin=1e-10;   psimax=9.9e99; {min and max omega/epsilon allowed in the domain}
+    wmin=1.0e-50;                  {min mass fraction allowed in the domain}
+    zetaA1=0.1e0;     {conditions the eigenvalues of the A jacobian}
+    EIGENVALCOND=EIGENVALCOND_PECLET; {set the eigenvalue conditioning to EIGENVALCOND_PECLET, EIGENVALCOND_PARENT [RECOMMENDED], or EIGENVALCOND_HARTEN}
+    AXISYMMETRIC=NO;
+  );
+);
+
+
+Init(
+  FavreReynolds(
+    {
+    _______________________________________________________________________________________
+
+    Initial Condition Type       Parameters
+    _______________________________________________________________________________________
+
+    INIT_TYPE1                   V[1]..V[nd],  T,  rho, w[1]..w[ns],     k, psi
+    INIT_TYPE2                   M[1]..M[nd],  P,  T,   w[1]..w[ns],     k, psi
+    INIT_TYPE3                   M[1]..M[nd],  Re, T,   w[1]..w[ns],     k, psi
+    INIT_TYPE4                   Mmag, angles, P,  T,   w[1]..w[ns],     k, psi
+    INIT_TYPE5                   V[1]..V[nd],  P,  T,   w[1]..w[ns],     k, psi
+    INIT_TYPE6                   V[1]..V[nd],  P,  T,   chi[1]..chi[ns], k, psi
+    _______________________________________________________________________________________
+
+    (a) in the freestream inflow conditions, it is suggested to set psi to 10*(flow speed)
+        for the 1988 k-omega model and 110*(flow speed) for the 2008 k-omega model
+    (b) for hypersonic flows, the freestream value of psi can be further multiplied by
+        up to 5 times if necessary
+    }
+    My=0;
+    P=10000; {Pa}
+    T=300; {K}
+    k=1e0; {J/kg}
+    psi=110*sqrt(Mx_bot^2+My^2)*sqrt(1.4*287*T); {1/s for TURBMODEL_KOMEGA*}
+    w_Air=1.000000;
+    All(2,Mx_bot,My,P,T,w_Air,k,psi);
+    psi=110*sqrt(Mx_top^2+My^2)*sqrt(1.4*287*T); {1/s for TURBMODEL_KOMEGA*}
+    Region(is,jm2,  ie,je, 2,Mx_top,My,P,T,w_Air,k,psi);
+    {
+    Bdry(BDRY_WALLTFIXED1, 2,Mx,My,P,T,w_Air,k,psi);
+    Region(is,js,  ie,je, 2,Mx,My,P,T,w_Air,k,psi);
+    }
+  );
+);
+
+
+Cycle(
+  FavreReynolds(
+    xiverge=3e2;{residual convergence threshold}
+    rhoref=1.0;  {reference density in kg/m3}
+    aref=300.0;  {reference sound speed in m/s}
+    kref=1e4;    {reference turbulence kinetic energy in m2/s2}
+    psiref=1e8;  {reference specific dissipation rate of the TKE in 1/s if for TURBMODEL_KOMEGA*
+                  reference dissipation rate of the TKE in m2/s3 for TURBMODEL_KEPSILON}
+    Uref[0]=rhoref;   
+    Uref[1]=rhoref*aref;   
+    Uref[2]=rhoref*aref;   
+    Uref[3]=rhoref*aref*aref;  
+    Uref[4]=rhoref*kref;  
+    Uref[5]=rhoref*psiref;  
+  );
+  MultizoneSteady(
+    if (mod(iter,50)==0,
+      WriteDataFile(outputfilename);
+    );
+    sigma1=0.35;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.35;   {exponent of maximum pseudotime step in all fluxes}
+    PRECONDITIONER=PRECON_LOCALTIMESTEP;
+    if (iter==1,
+      CFL=0.01;
+    );
+    CFL=min(CFL*1.05,0.5);
+    phi1=20;      {maximum number of gridlines per zone in each dimension}
+    UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,phi1);
+
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld) %3ld/%3ld%s \n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,numzones_updated,numzones_total,clipinfo);
+  );
+);
+
+
+Post(
+  xstation[1]=0.1;{m}
+  xstation[2]=0.2;{m}
+  xstation[3]=0.3;{m}
+  for (cnt,1,3,
+    SetPostDomainToXstation(xstation[cnt]);
+    printf("    Processing x-station..");
+    Pback=_Pback_xstation({Aback,m2/m}1.0, {Pback_min,Pa}400, {Pback_max,Pa}4000, {numsteps}300,
+                 {q_min,m (as small a positive value as possible)}1.0);
+    Fpot=_Fpot_xstation(Pback,{numsteps}300, {q_min,m}1.0);
+    mdot=_mdot_xstation();
+    Tstag=_Tstag_xstation();
+    Pstag=_Pstag_xstation({numsteps} 300);
+    Pstar=_Pstar_xstation();
+    T=_T_xstation();
+    q=_q_xstation();
+    rho=_rho_xstation();
+    htstar=_htstar_xstation();
+    printf("\n"
+           "    x      = %E m\n"
+           "    Pback  = %E Pa\n"
+           "    Fpot   = %E Ns/kg\n"
+           "    mdot   = %E kg/ms\n"
+           "    htstar = %E J/kg\n"
+           "    Tstag  = %E K\n"
+           "    Pstag  = %E Pa\n"
+           "    Pstar  = %E Pa\n"
+           "    T      = %E K\n"
+           "    q      = %E m/s\n"
+           "    rho    = %E kg/m3\n\n"
+           ,xstation[cnt],Pback,Fpot,mdot,htstar,Tstag,Pstag,Pstar,T,q,rho);
+  );
+  ResetPostDomain();
+  RestrictPostDomainToRegion(is,js, ie,je);
+  printf("\n");
+  for (dim,1,2,
+    Fshear[dim]=_Fshear(dim,BDRY_WALLTFIXED1);
+    Fpressure[dim]=_Fpressure(dim,BDRY_WALLTFIXED1);
+  );
+  printf("    Fshear    = (%+E,%+E) N/m\n",Fshear[1],Fshear[2]);
+  printf("    Fpressure = (%+E,%+E) N/m\n",Fpressure[1],Fpressure[2]);
+  printf("\n");
+  {
+  WritePostFile("post.01", "tecplot",POSTFILE_ALL);
+  WritePostFile("grid.01", "tecplot",POSTFILE_GRID);
+  }
+);

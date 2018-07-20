@@ -1,0 +1,358 @@
+\documentclass{warpdoc}
+\usepackage{times}         % can use utopia, or palatino
+\usepackage{mathptmx}       % math font is times
+\DeclareMathSizes{10}{10}{6.8}{6.0}   % redefine the math font sizes for 10pt document
+\DeclareMathSizes{11}{11}{7.48}{6.6}  % redefine the math font sizes for 11pt document
+\DeclareMathSizes{12}{12}{8.16}{7.2}  % redefine the math font sizes for 12pt document
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\mfd}{\displaystyle}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{0.9}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\ns}{{{n}_{\rm s}}}
+\newcommand{\efficiency}{\eta}
+\newcommand{\ordi}{{\rm d}}
+\newcommand{\unitvecdiff}[2]{\overline{\vec{#1} - \vec{#2}}}
+%\let\vec\bf
+%\renewcommand{\vec}[1]{\pmb{#1}}
+\newcommand{\betae}{\beta_{\rm e}}
+\newcommand{\betai}{\beta_{\rm i}}
+\newcommand{\sigmatilde}{\widetilde{\sigma}}
+\newcommand{\mdot}{\dot{m}}
+\newcommand{\efp}{\psi}
+\newcommand{\vion}{\vec{v^{\rm i}}}
+\newcommand{\vneutral}{\vec{v^{\rm n}}}
+\newcommand{\velectron}{\vec{v^{\rm e}}}
+\newcommand{\vflow}{\vec{v}}
+\newcommand{\betaiprime}{\betai^\prime}
+\newcommand{\betaeprime}{\betae^\prime}
+\newcommand{\Eprime}{\vec{E}^\prime}
+\newcommand{\tauei}{\tau_{\rm ei}}
+\newcommand{\tauen}{\tau_{\rm en}}
+\newcommand{\tauin}{\tau_{\rm in}}
+\newcommand{\momin}{{k_{\rm in}}}
+\newcommand{\momen}{{k_{\rm en}}}
+\newcommand{\momei}{{k_{\rm ei}}}
+\newcommand{\ie}{{\it i.e.}}
+\newcommand{\rhoeDveDt}{\rho_{\rm e} \frac{{\rm D}v_{\rm e}}{{\rm D} t}}
+\newcommand{\rhoiDviDt}{\rho_{\rm i} \frac{{\rm D}v_{\rm i}}{{\rm D} t}}
+\newcommand{\gradPe}{\nabla P_{\rm e}}
+\newcommand{\gradPi}{\nabla P_{\rm i}}
+\newcommand{\zetae}{\zeta_{\rm e}}
+\newcommand{\zetai}{\zeta_{\rm i}}
+\newcommand{\zetan}{\zeta_{\rm n}}
+\newcommand{\ev}{{e_{\rm v}}}
+\newcommand{\ee}{{e_{\rm e}}}
+\newcommand{\evzero}{{e_{\rm v}^0}}
+\newcommand{\eezero}{{e_{\rm e}^0}}
+
+\author{
+  Bernard Parent
+}
+
+\email{
+  bparent@princeton.edu
+}
+
+\department{
+  Department of Mechanical and Aerospace Engineering
+}
+
+\institution{
+  Princeton University
+}
+
+\title{
+ 8 species Low Temperature Air Chemical Model
+}
+
+\date{
+  January -- February 2005
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+%  \tableofcontents
+%  \makenomenclature
+%%  \listoftables
+%%  \listoffigures
+
+
+
+  
+
+
+
+
+
+
+
+\section{Reaction Rates}
+
+
+
+
+%
+\begin{table}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{8-species 15-reactions low-temperature air chemical model based on the reaction rates outlined in Ref.\ \citen{misc:2002:macheret}. The species consist of $\rm e^-$, $\rm O_2$, $\rm N_2$, $\rm O$, $\rm N$, $\rm O_2^+$, $\rm N_2^+$, $\rm O_2^-$.}
+    \label{tab:reactions}
+    \fontsizetable
+    \begin{tabular}{llll}
+    \toprule
+    No.&Reaction & Rate Coefficient [cm$^3$/s or cm$^6$/s] & Reference \\
+    \midrule
+    1a  & $\rm e^- + N_2   \rightarrow N_2^+ + e^- + e^-$  
+       &  $10^{-8.3 -36.5/\vartheta}$ cm$^3$/s~~ for $3\le\vartheta\le 30$
+       & Ref.\ \citen{misc:1992:kossyi} \\
+    1b  & $\rm e^- + O_2   \rightarrow O_2^+ + e^- + e^-$  
+       &  $10^{-8.8 -28.1/\vartheta}$ cm$^3$/s~~ for $3\le\vartheta\le 30$
+       & Ref.\ \citen{misc:1992:kossyi} \\
+    2a & $\rm e^-+O_2^+ \rightarrow O + O$  
+       & $2.0 \times 10^{-7} (300/T_{\rm e})^{0.7}  $ cm$^3$/s
+       & Ref.\ \citen{misc:1997:aleksandrov}\\
+    2b & $\rm e^-+N_2^+ \rightarrow N + N$  
+       & $2.8 \times 10^{-7} (300/T_{\rm e})^{0.5}  $ cm$^3$/s 
+       & Ref.\ \citen{misc:1992:kossyi}\\
+    3a & $\rm O_2^{-}+N_2^{+} \rightarrow O_2 + N_2$ 
+       & $2.0 \times 10^{-7} (300/T)^{0.5}$ cm$^3$/s
+       & Ref.\ \citen{misc:1992:kossyi}\\
+    3b & $\rm O_2^{-}+O_2^{+} \rightarrow O_2 + O_2$ 
+       & $2.0 \times 10^{-7} (300/T)^{0.5}$ cm$^3$/s
+       & Ref.\ \citen{misc:1992:kossyi}\\
+    4a & $\rm O_2^{-}+N_2^{+} + N_2\rightarrow O_2 + N_2 +N_2$ 
+       & $2.0 \times 10^{-25} (300/T)^{2.5}$ cm$^6$/s  
+       & Ref.\ \citen{misc:1992:kossyi}\\
+    4b & $\rm O_2^{-}+O_2^{+} + N_2\rightarrow O_2 + O_2 +N_2$ 
+       & $2.0 \times 10^{-25} (300/T)^{2.5}$ cm$^6$/s  
+       & Ref.\ \citen{misc:1992:kossyi}\\
+    4c & $\rm O_2^{-}+N_2^{+} + O_2\rightarrow O_2 + N_2 +O_2$ 
+       & $2.0 \times 10^{-25} (300/T)^{2.5}$ cm$^6$/s  
+       & Ref.\ \citen{misc:1992:kossyi}\\
+    4d & $\rm O_2^{-}+O_2^{+} + O_2\rightarrow O_2 + O_2 +O_2$ 
+       & $2.0 \times 10^{-25} (300/T)^{2.5}$ cm$^6$/s  
+       & Ref.\ \citen{misc:1992:kossyi}\\
+    5a & $\rm e^- + O_2 +O_2 \rightarrow O_2^- + O_2$  
+       & $1.4 \times 10^{-29} \frac{300}{T_{\rm e}} \exp \left( \frac{-600}{T}\right)
+         \exp \left( \frac{700(T_{\rm e}-T)}{T_{\rm e} T}  \right)$ cm$^6$/s
+       & Ref.\ \citen{misc:1992:kossyi}\\
+    5b & $\rm e^- + O_2 + N_2 \rightarrow O_2^- + N_2$  
+       & $1.07 \times 10^{-31} \left( \frac{300}{T_{\rm e}} \right)^2 \exp \left( \frac{-70}{T}\right)
+         \exp \left( \frac{1500(T_{\rm e}-T)}{T_{\rm e} T}  \right)$ cm$^6$/s
+       & Ref.\ \citen{misc:1992:kossyi}\\
+    6  & $\rm O_2^- + O_2 \rightarrow e + O_2 + O_2$  
+       & $8.6 \times 10^{-10} \exp \left( \frac{-6030}{T}\right)
+               \left[1-\exp \left( \frac{-1570}{T} \right)  \right]$ cm$^3$/s
+       & Ref.\ \citen{book:1997:bazelyan}, Ch.\ 2\\
+    7a  & $\rm O_2 \rightarrow e^- + O_2^+$   
+       & $1.8 \times 10^{17} ~Q_{\rm b}/N$ 1/s &\\
+    7b  & $\rm N_2 \rightarrow e^- + N_2^+$   
+       & $1.8 \times 10^{17} ~Q_{\rm b}/N$ 1/s &\\
+    \bottomrule
+    \end{tabular}
+   \end{threeparttable}
+\end{table}
+%
+
+
+
+
+
+
+
+Two good sources of reaction rates: Kossyi \cite{misc:1992:kossyi}
+and M\"atzing \cite{misc:1991:matzing}. M\"atzing is especially important to determine the
+chemical reactions that would occur due to the electron beam: we'll check this out later.
+Another paper listing chemical reactions of ionized air is Ref.\ \citen{misc:1997:aleksandrov} where a model is proposed to tackle air ionized with a discharge for a temperature varying between 300 K and 5000 K. Yet other papers worth looking into are Refs.\ \citen{misc:2000:bourdon} and \citen{aiaaconf:1999:laux}.
+
+
+For now, we'll base our set of chemical reactions on the one outlined in Ref.\ \citen{misc:2002:macheret} which was developped to solve low temperature air (300 K to 600 K) ionized with electron beams. For simplicity, chemical reactions related to the electron beam as well as chemical reactions that would occur at higher temperature are not taken into account at this stage. The 8-species 13-reaction model is shown in Table \ref{tab:reactions}.
+The species consist of $\rm O_2$, $\rm N_2$, $\rm O$, $\rm N$, $\rm O_2^+$, $\rm N_2^+$,  $\rm O_2^-$, $\rm e^-$. The symbol $\vartheta$ stands for the reduced electric field $|\vec{E}^\star|/N$ in units of $10^{-16}$ V cm$^2$. The heat deposited by the electron beam  corresponds, $Q_{\rm b}$, has units of Watts per cubic meter while the number density N is in 1/m$^3$. Reactions 7a and 7b are simplifications of the following rate coefficient:
+%
+\begin{equation}
+  k_{\rm 7a,~7b}=\frac{Q_{\rm b}}{N} \frac{1}{34.67 {\rm ~eV} ~\times~ 1.6022 \times 10^{-19}~C}
+\end{equation}
+%
+
+As outlined in Ch.\ 13 of Ref.\ \citen{book:1989:anderson}, we can write the $n$th reaction in the form:
+%
+\begin{equation}
+  \sum_{k=1}^\ns m_{n,k}^{\rm R} X_k \rightarrow \sum_{k=1}^\ns m_{n,k}^{\rm P} X_k
+\end{equation}
+%
+where $X_k$ refers to the name of the $k$th species, while $m_{n,k}^{\rm R}$ and $m_{n,k}^{\rm P}$
+refer to integer numbers preceding the reactants and products, respectively. 
+ Should the reaction rate of the $n$th reaction be denoted as ${k_f}_n$,
+the rate of change of the number density $N_{k}$ due to the $n$th reaction can be expressed as:
+%
+\begin{equation}
+  \left. \frac{{\rm d} N_{k}}{{\rm d} t} \right|_n = \left( m_{n,k}^{\rm P} - m_{n,k}^{\rm R} \right) {k_f}_n \prod_{i=1}^\ns N_{i}^{m_{n,i}^{\rm R}}
+\end{equation}
+%
+where the number density $N_{k}$ is in  1/cm$^3$ and can be obtained from the partial density as follows:
+%
+\begin{equation}
+  N_{k} {\rm ~~(1/cm^3)}= \frac{\rho_k {\rm ~~(kg/m^3)}~~~{\cal A ~~{\rm (1/mole)}}}{{\cal M}_k {\rm ~~(kg/mole)}} \times 10^{-6} {\rm ~~(m^3/cm^3)}
+\end{equation}
+%
+where ${\cal M}_k$ is the molecular weight of the $k$th species. 
+Then, the continuity equations source terms related to the chemical reactions can be expressed as:
+%
+\begin{equation}
+ W_k  = \frac{10^6 \times {\cal M}_k}{\cal A} \sum_{n=1}^{n_{\rm r}} \left. \frac{{\rm d} N_{k}}{{\rm d} t} \right|_n     
+\end{equation}
+%
+where $W_k$ is in $\rm kg/m^3 s$, ${{\rm d} n_k}/{{\rm d} t}$ in $\rm 1/cm^3 s$, and ${\cal M}_k$ in $\rm kg/mole$ and $\cal A$ is in 1/mole.
+
+
+\section{Possible Future Additions}
+
+
+\subsection{Ionization by Electron Impact}
+
+
+
+
+%
+\begin{table}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Drift velocities as a function of the effective electric field from Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev}.}
+    \label{tab:vdr}
+    \fontsizetable
+    \begin{tabular}{r@{.}lr@{.}lr@{.}lr@{.}lr@{.}l}
+    \toprule
+    \multicolumn{2}{c}{$|\vec{E^\star}|/N$}  & \multicolumn{2}{c}{${v_{\rm dr,~N_2}}$}   &  \multicolumn{2}{c}{$v_{\rm dr,~O_2}$} &  \multicolumn{2}{c}{$(\mu_{\rm e} n)_{\rm air}$} &  \multicolumn{2}{c}{$(\betaeprime)_{\rm air}$}\\
+    \multicolumn{2}{c}{V~m$^2$}  & \multicolumn{2}{c}{m/s}   &  \multicolumn{2}{c}{m/s} &  \multicolumn{2}{c}{$\rm 1/V\,m\,s$} &  \multicolumn{2}{c}{$\rm kg/V\,m\,s$}\\
+    \midrule
+      0&003 $\times 10^{-20}$  &  1&1 $\times 10^{3}$  &  2&6 $\times 10^{3}$ &  4&8417 $\times 10^{25}$&  2&3313\\
+      0&005 $\times 10^{-20}$  &  1&6 $\times 10^{3}$  &  3&7 $\times 10^{3}$ &  4&1870 $\times 10^{25}$&  2&0160\\
+      0&007 $\times 10^{-20}$  &  2&0 $\times 10^{3}$  &  4&1 $\times 10^{3}$ &  3&5621 $\times 10^{25}$&  2&0160\\
+      0&01 $\times 10^{-20}$  &  2&4 $\times 10^{3}$  &  4&3 $\times 10^{3}$ &  2&8465 $\times 10^{25}$&  1&7152\\
+      0&03 $\times 10^{-20}$  &  3&1 $\times 10^{3}$  &  5&4 $\times 10^{3}$ &  1&2135 $\times 10^{25}$&  1&3706\\
+      0&05 $\times 10^{-20}$  &  3&5 $\times 10^{3}$  &  7&3 $\times 10^{3}$ &  0&87860 $\times 10^{25}$&  0&42305\\
+      0&07 $\times 10^{-20}$  &  3&9 $\times 10^{3}$  &  9&2 $\times 10^{3}$ &  0&73507 $\times 10^{25}$&  0&35394\\
+      0&1 $\times 10^{-20}$  &  4&4 $\times 10^{3}$  & 10&0 $\times 10^{3}$ &  0&57160 $\times 10^{25}$&  0&27523\\
+      0&3 $\times 10^{-20}$  &  7&5 $\times 10^{3}$  & 22&0 $\times 10^{3}$ &  0&36358 $\times 10^{25}$&  0&17506\\
+      0&5 $\times 10^{-20}$  & 11&0 $\times 10^{3}$  & 26&0 $\times 10^{3}$ &  0&29050 $\times 10^{25}$&  0&13988\\
+      0&7 $\times 10^{-20}$  & 14&0 $\times 10^{3}$  & 28&0 $\times 10^{3}$ &  0&24700 $\times 10^{25}$&  0&11893\\
+     1&0 $\times 10^{-20}$  & 18&0 $\times 10^{3}$  & 31&0 $\times 10^{3}$ &  0&21055 $\times 10^{25}$ &  0&10138\\
+     3&0 $\times 10^{-20}$  & 42&0 $\times 10^{3}$  & 72&0 $\times 10^{3}$ &  0&16350 $\times 10^{25}$ &  0&078725\\
+     5&0 $\times 10^{-20}$  & 61&0 $\times 10^{3}$  &110&0 $\times 10^{3}$ &  0&14503 $\times 10^{25}$ &  0&069832\\
+     7&0 $\times 10^{-20}$  & 79&0 $\times 10^{3}$  &120&0 $\times 10^{3}$ &  0&12662 $\times 10^{25}$ &  0&060968\\
+    10&0 $\times 10^{-20}$  &100&0 $\times 10^{3}$  &160&0 $\times 10^{3}$ &  0&11410 $\times 10^{25}$  &  0&054939\\
+    20&0 $\times 10^{-20}$  &200&0 $\times 10^{3}$  &260&0 $\times 10^{3}$ &  0&10705 $\times 10^{25}$  &  0&051545\\
+    30&0 $\times 10^{-20}$  &290&0 $\times 10^{3}$  &330&0 $\times 10^{3}$ &  0&099800 $\times 10^{25}$  &  0&048054\\
+    50&0 $\times 10^{-20}$  &420&0 $\times 10^{3}$  &450&0 $\times 10^{3}$ &  0&085410 $\times 10^{25}$  &  0&041125\\
+    80&0 $\times 10^{-20}$  &530&0 $\times 10^{3}$  &640&0 $\times 10^{3}$ &  0&069481 $\times 10^{25}$  &  0&033455\\
+   100&0 $\times 10^{-20}$  &590&0 $\times 10^{3}$  &710&0 $\times 10^{3}$ &  0&061820 $\times 10^{25}$   &  0&029766\\             
+    \bottomrule
+    \end{tabular}
+   \end{threeparttable}
+\end{table}
+%
+
+
+The ionization by electron impact is here modeled as in Ref.\ \citen{misc:2002:macheret} as a function of the ratio between the effective electric field $|\vec{E^\star}|$,
+which corresponds to  $\vec{E^\star}=\vec{E}+\vec{v}\times\vec{B}$.
+We can express the ionization rate, $\nu_i$, as:\cite{misc:1975:dutton,misc:1983:gallagher}
+%
+\begin{equation}
+\begin{array}{l}
+\mfd {\nu_i} = k_{\rm v} n 10^{-14.25} \times 10^{-3.65\times 10^{-19} n/|\vec{E^\star}|}, {~~\rm 1/s} \\
+\mfd {\rm for}~~~3\times 10^{-20} \leq \frac{|\vec{E^\star}|}{n} \leq 3\times 10^{-19} {\rm V m^2} {\rm ~[Ref.~\citen{book:1987:mnatsakanyan}]}
+\end{array}
+\label{eqn:nui1}
+\end{equation}
+%
+where $n$ is in 1/m$^3$ and $|\vec{E^\star}|$ is in V/m. For other ranges of $|\vec{E^\star}|/n$, the ionization rate can be expressed as a product of the Townsend ionization coefficient $\alpha$ and the drift velocity ${v_{\rm dr}}$:
+%
+\begin{equation}
+\begin{array}{l}
+  \mfd {\nu_i}=k_{\rm v}  {v_{\rm dr}} \alpha=k_{\rm v}  n {v_{\rm dr}}  10^{-24.4406}  \left(3.2271 \times 10^{20}\frac{|\vec{E^\star}|}{n} - 32.2   \right)^2, ~~{\rm 1/s}  \\
+  \mfd {\rm for~~} 1.3635 \times 10^{-19} < \frac{|\vec{E^\star}|}{ n} < 5.4542 \times 10^{-19} {\rm V~m^2}{\rm ~[Ref.~\citen{book:1991:Raizer}]}
+\end{array}
+\label{eqn:nui2}
+\end{equation}
+%
+and
+%
+\begin{equation}
+\begin{array}{l}
+  \mfd {\nu_i}=k_{\rm v} n {v_{\rm dr}} 4.6483 \times 10^{-20} \exp \left( -1.1311 \times 10^{-18} \frac{n} {|\vec{E^\star}|}  \right),  ~~{\rm 1/s} \\
+  \mfd {\rm for~~} 3.0988 \times 10^{-19} < \frac{|\vec{E^\star}|}{n} < 2.4791 \times 10^{-18} {\rm V m^2} {\rm ~[Ref.~\citen{book:1991:Raizer}]}
+\end{array}
+\label{eqn:nui3}
+\end{equation}
+%
+with $n$ in $\rm 1/m^3$ and $|\vec{E^\star}|$ in V/m, and where ${v_{\rm dr}}$ is taken
+from Table \ref{tab:vdr} in m/s, which reproduces the data compiled in Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev}. In Eqs.\ (\ref{eqn:nui1}), (\ref{eqn:nui2}), and (\ref{eqn:nui3}),
+the Townsend ionization includes the term $k_{\rm v}$ to account for vibrational excitation which is known to enhance ionization in steady-state discharges \cite{book:1987:mnatsakanyan,misc:1978:aleksandrov,misc:1978:son}. To account for this effect, $k_{\rm v}$ is here set to:\cite{book:1987:mnatsakanyan,misc:1978:aleksandrov,misc:1978:son}
+%
+\begin{equation}
+ \begin{array}{l}
+\mfd  k_{\rm v}= 10^{28.3 \left(10^{-20}{ n }/{|\vec{E^\star}|}\right)^2 \exp\left(-{\Theta_{\rm v}}/{T_{\rm v}}\right) }\\
+\mfd{\rm for~~}\frac{|\vec{E^\star}|}{n} \geq 3 \times 10^{-20} {\rm ~~V~m^2}
+\end{array}
+\end{equation}
+%
+where $\Theta_{\rm v}$ can be taken as 3353 K for nitrogen and $|\vec{E^\star}|/n$ is in V\,m$^2$. 
+
+
+
+
+       In the reactions due to ionization by electron impact,
+the rate includes the term $k_{\rm v}$ to account for vibrational excitation which is known to enhance ionization in steady-state discharges \cite{book:1987:mnatsakanyan,misc:1978:aleksandrov,misc:1978:son}. To account for this effect, $k_{\rm v}$ is here set to:\cite{book:1987:mnatsakanyan,misc:1978:aleksandrov,misc:1978:son}
+%
+\begin{equation}
+ \begin{array}{l}
+\mfd  k_{\rm v}= 10^{-28.3  \exp\left(-{\Theta_{\rm v}}/{T_{\rm v}}\right)/\vartheta^2 }
+\end{array}
+\end{equation}
+%
+where $\Theta_{\rm v}$ can be taken as 3353 K for nitrogen.
+
+
+
+\bibliographystyle{warpdoc}
+\bibliography{local}
+
+
+\end{document}
+
+

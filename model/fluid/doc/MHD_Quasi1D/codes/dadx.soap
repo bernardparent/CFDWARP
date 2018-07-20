@@ -1,0 +1,10 @@
+#!/usr/local/bin/soap
+K=0.5;
+gamma=1.4;
+M=10;
+
+for(i,1,1000,
+  K=-1+i/1000*3;
+  dAdx=(K-1)*(K-1)*(gamma*M^2-1-1/(K-1));
+  printf("%E %E\n",K,dAdx);
+);

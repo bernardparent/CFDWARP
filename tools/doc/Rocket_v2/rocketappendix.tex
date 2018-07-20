@@ -1,0 +1,365 @@
+\section{Two Dimensional Method of Characteristics (Irrotational Flow)}
+
+\subsection{Derivation of Characteristic and Compatibility Equations}
+
+	The gas dynamic equation (Eq. \ref{eqn:gasdynq}), stated again here for convenience,
+can be rewritten as follows.  
+
+\begin{displaymath}
+	\vec{q}\cdot\nabla(\frac{q^2}{2}) - a^2(\nabla \cdot \vec{q}) = 0 	
+\end{displaymath}
+
+	Taking $\vec{q} = u + v$ where $u$ and $v$ are the velocities parallel and normal to the axisymmetric 
+axis respectively, then the dot product $\nabla \cdot \vec{q}$ can be expressed in cylindrical co-ordinates as,
+
+\begin{equation}
+	\nabla\cdot\vec{q} = \frac{\partial u}{\partial x} + \frac{\partial v}{\partial r} 
+	+ \frac{v}{r}
+\label{eqn:dotprod}
+\end{equation}
+
+	Substituting this into the gas dynamic equation yields,
+
+\begin{displaymath}
+	\vec{q}\cdot\nabla(\frac{q^2}{2}) - a^2\Big\{\frac{\partial u}{\partial x} + \frac{\partial v}
+	{\partial r} + \frac{v}{r}\Big\} = 0 	
+\end{displaymath}
+
+	Expanding out the first term one can write,
+
+\begin{displaymath}
+	(u+v)\cdot\Big\{\frac{1}{2}(\frac{\partial q^2}{\partial x} + \frac{\partial q^2}{\partial r})\Big\}
+	- a^2\Big\{\frac{\partial u}{\partial x} + \frac{\partial v}
+	{\partial r} + \frac{v}{r}\Big\}=\frac{1}{2}(u\frac{\partial q^2}{\partial x} + v\frac{\partial q^2}
+	{\partial r})- a^2\Big\{\frac{\partial u}{\partial x} + \frac{\partial v}
+	{\partial r} + \frac{v}{r}\Big\} = 0 	
+\end{displaymath}
+
+	Given the definition of $q$ one can write for the derivative of its square,
+
+\begin{displaymath}
+	\frac{\partial q^2}{\partial x} = \frac{\partial}{\partial x}(u^2 + v^2) = 
+	2(u\frac{\partial u}{\partial x} + v\frac{\partial v}{\partial x})
+\end{displaymath}
+
+	and
+
+\begin{displaymath}
+	\frac{\partial q^2}{\partial r} = \frac{\partial}{\partial r}(u^2 + v^2) = 
+	2(u\frac{\partial u}{\partial r} + v\frac{\partial v}{\partial r})
+\end{displaymath}
+
+	which when substituted into the gas dynamic equation yields,
+
+\begin{displaymath}
+	u(u\frac{\partial u}{\partial x} + v\frac{\partial v}{\partial x}) + 
+	v(u\frac{\partial u}{\partial r} + v\frac{\partial v}{\partial r}) 
+	- a^2(\frac{\partial u}{\partial x} + \frac{\partial v}
+	{\partial r} + \frac{v}{r}) = 0 	
+\end{displaymath}
+
+	If the flow is assumed irrotational then one also write the relation
+
+\begin{equation}
+	\frac{du}{dr} - \frac{dv}{dx} = 0
+\label{eqn:irrotational}
+\end{equation}
+
+	which allows the above to be simplified to,
+
+\begin{equation}
+	(u^2-a^2)\frac{du}{dx} + (v^2-a^2)\frac{dv}{dr} + 2uv\frac{du}{dr} 
+	- \frac{a^2v}{r} = 0
+\label{eqn:gasdynaxi}
+\end{equation}
+
+	Equations \ref{eqn:irrotational} and \ref{eqn:gasdynaxi} form the basis of the two dimensional axisymmetric
+method of characteristics,
+as from these one can develop both the compatibility and characteristic equations.  Starting
+by multiplying Eq. \ref{eqn:gasdynaxi} by $\sigma_1$ and Eq. \ref{eqn:irrotational} by
+$\sigma_2$ (where $\sigma_1$ and $\sigma_2$ are arbitrary functions to be determined later)
+and summing the resulting equations to zero yields,
+
+\begin{displaymath}	
+	\sigma_1(u^2-a^2)\frac{du}{dx} + \sigma_1(v^2-a^2)\frac{dv}{dr} + \sigma_1 2uv\frac{du}{dr} 
+	- \sigma_1\frac{a^2v}{r} + \sigma_2\frac{du}{dr} - \sigma_2\frac{dv}{dx} = 0
+\end{displaymath}
+
+	which after grouping the derivatives of a single velocity together and rearranging yields,
+
+\begin{equation}
+	\sigma_1(u^2-a^2)\Big\{\frac{\partial u}{\partial x} + \frac{\sigma_1 2uv + \sigma_2}
+	{\sigma_1(u^2-a^2)}\frac{\partial u}{\partial r}\Big\} - \sigma_2\Big\{\frac{\partial v}
+	{\partial x} + \frac{\sigma_1(v^2-a^2)}{-\sigma_2}\frac{\partial v}{\partial r}\Big\}
+	- \sigma_1\frac{a^2v}{r} = 0
+\label{eqn:big}
+\end{equation}
+
+	Since one of the properties enforced on the dependent variables ($u(x,y)$ and $v(x,y)$)  
+is that they be continuous functions across the characteristic curves one can write,
+
+\begin{displaymath}
+	\frac{du}{dx} = \frac{\partial u}{\partial x} + \lambda\frac{\partial u}{\partial r}
+	\hspace{2cm}\textrm{and}\hspace{2cm} \frac{dv}{dx} = \frac{\partial v}{\partial x} + 
+	\lambda\frac{\partial v}{\partial r}
+\end{displaymath}
+
+	where $\lambda = \frac{dy}{dx}$ and is hence the slope of the characteristic in the
+physical plane along which the total derivatives can be defined as above.  Therefore the 
+characteristic curves for Eq. \ref{eqn:big} must have slopes of,
+
+\begin{equation}
+	\lambda = \frac{\sigma_1 2uv + \sigma_2}{\sigma_1(u^2-a^2)} \hspace{2cm}\textrm{and}\hspace{2cm}
+	\lambda = \frac{\sigma_1(v^2-a^2)}{-\sigma_2}
+\label{eqn:lambdasig}
+\end{equation}
+
+	which then allows Eq. \ref{eqn:big} to be written as,
+
+\begin{equation}
+	\sigma_1(u^2-a^2)du - \sigma_2 dv - \sigma_1\frac{a^2v}{r}dx = 0
+\label{eqn:small}
+\end{equation}
+
+	Equation \ref{eqn:small} is the compatibility equation for axisymmetric irrotational flow,
+as defined by Eqs. \ref{eqn:irrotational} and \ref{eqn:gasdynaxi}.  However, for this equation to 
+be of use, the arbitrary functions must be phrased in terms of known quantities.  Therefore,
+rewriting Eqs. \ref{eqn:lambdasig} in matrix form gives,
+
+\begin{displaymath}
+	\left[\begin{array}{cc}
+	(u^2-a^2)\lambda - 2uv & -1 \\ (v^2-a^2) & \lambda
+	\end{array}\right] 
+	\left[\begin{array}{c}
+	\sigma_1 \\ \sigma_2
+	\end{array}\right] = 0 
+\end{displaymath}
+
+	Taking the determinant of the co-efficient matrix and setting this equal to zero yields,
+
+\begin{displaymath}
+	(u^2-a^2)\lambda^2 -2uv\lambda + (v^2-a^2) = 0 
+\end{displaymath}
+
+	which can be solved using the quadratic formula to give the result,
+
+\begin{equation}
+	\lambda_\pm = \frac{uv \pm a^2\sqrt{M^2-1}}{u^2-a^2}
+\label{eqn:lambdamach}
+\end{equation}
+
+	where the $+$ sign refers to the positive square root and the $-$ refers to the negative.
+Since $\lambda$ is the slope of the characteristic in the physical plane, this means that for flows
+where $M > 1$ there exist two distinct characteristic curves.  Equation \ref{eqn:lambdamach} can
+be rephrased by noting that,
+
+\begin{displaymath}
+	\theta  = \tan^{-1}(\frac{v}{u}) \hspace{1.5cm} \textrm{,} \hspace{1.5cm} 
+	u = q\cos\theta \hspace{1.5cm} \textrm{,} \hspace{1.5cm} v = q\sin\theta 
+\end{displaymath}
+
+	while from the Mach triangle one can write (where $\alpha$ is the Mach angle),
+
+\begin{displaymath}
+	\alpha = \sin^{-1}(\frac{1}{M}) \hspace{1.5cm} \textrm{,} \hspace{1.5cm}
+	\tan\alpha = \frac{1}{\sqrt{M^2-1}}
+\end{displaymath}
+
+	Substituting these relations into Eq. \ref{eqn:lambdamach} yields,
+
+\begin{displaymath}
+	\lambda_\pm = \frac{(q\cos\theta) (q\sin\theta) \pm a^2(\frac{1}{\tan\alpha})}
+	{(q\cos\theta)^2-a^2}
+\end{displaymath}	
+
+	while dividing through by $q^2$ and noting that $\frac{a^2}{q^2} = M^{-2}$ yields,
+
+\begin{displaymath}
+	\lambda_\pm = \frac{\cos\theta \sin\theta \pm \frac{1}{\tan\alpha}M^{-2}}
+	{\cos^2\theta-M^{-2}}
+\end{displaymath}	
+
+	Using the definition of the Mach angle allows the above to be simplified to,
+
+\begin{displaymath}
+	\lambda_\pm = \frac{\cos\theta \sin\theta \pm \cos\alpha \sin\alpha}
+	{\cos^2\theta-\sin^2\alpha}
+\end{displaymath}
+
+	The above can be further simplified by making use of trigonometric identities
+allowing an alternate form for $\lambda$ to be expressed as,
+
+\begin{equation}
+	\fbox{$
+	\lambda_\pm = (\frac{dy}{dx})_\pm = \tan(\theta \pm \alpha)
+	$}
+\label{eqn:lambda}
+\end{equation}
+
+	Equation \ref{eqn:lambda} is the characteristic equation for axisymmetric irrotational
+flow.  Having determined the characteristic equation one can return to the compatibility equation
+to eliminate the arbitrary functions $\sigma_1$ and $\sigma_2$ as follows.  From Eqs. 
+\ref{eqn:lambdasig} one can express $\sigma_2$ as,
+
+\begin{displaymath}
+	\sigma_1\Big\{(u^2-a^2)\lambda -2uv\Big\} = \sigma_2 = -\frac{\sigma_1(v^2-a^2)}{\lambda}
+\end{displaymath}
+ 
+	Although not immediately apparent, these two equations are not independent and thus either
+one can be substituted back into Eq. \ref{eqn:small} to eliminate both arbitrary functions,
+
+\begin{displaymath}
+	\sigma_1(u^2-a^2)du - \Big\{\sigma_1\Big[(u^2-a^2)\lambda -2uv\Big]\Big\}dv 
+	- \sigma_1\frac{a^2v}{r}dx = 0
+\end{displaymath}
+
+	which after dividing through by $\sigma_1$ yields,
+
+\begin{equation}
+	\fbox{$
+	(u^2-a^2)du_{\pm} - \Big[(u^2-a^2)\lambda_{\pm} -2uv\Big]dv_{\pm} - \frac{a^2v}{r}dx_{\pm} = 0
+	$}
+\label{eqn:compatibility}
+\end{equation}
+
+	where if the positive value of $\lambda$ is used, then Eq. \ref{eqn:compatibility}
+applies along the $C_+$ characteristic and hence all values $du$, $dv$, and $dx$ apply to
+this curve.  It is noted that if the other definition of $\sigma_2$ is substituted into
+Eq. \ref{eqn:small} to eliminate the arbitrary values, then a slightly different form of the
+compatibility equation is obtained.  However, this merely produces an alternate form of the
+same equation, not an independent relation that is also applicable along the characteristic.
+
+%--------------------------------------------------------------------------------------------
+\subsection{Numerical Implementation of the Method of Characteristics}
+
+	Having derived the characteristic (Eq. \ref{eqn:lambda}) and compatibility (Eq. 
+\ref{eqn:compatibility}) equations, one can now use these in a numerical integration 
+scheme to completely determine a supersonic flow field.  If one defines the following 
+parameters,
+
+\begin{equation}
+	Q = u^2 - a^2 \hspace {1.5cm} R = 2uv - Q\lambda \hspace{1.5cm} S = \frac{a^2v}{y}
+\label{eqn:variables}
+\end{equation}
+
+	then the characteristic and compatibility equations can be written in finite difference
+form as,
+
+\begin{equation}
+	\Delta y_{\pm} = \lambda_{\pm} \Delta x_{\pm}
+\label{eqn:charfinite}
+\end{equation}
+
+\begin{equation}
+	Q_{\pm}\Delta u_{\pm} + R_{\pm}\Delta v_{\pm} - S_{\pm}\Delta x_{\pm} = 0
+\label{eqn:compfinite}
+\end{equation}
+
+	If one considers a line along which the flow field in completely known, then from 
+two points (points 1 and 2) along this line, two opposing characteristic curves will intersect 
+each other at some unknown point 4.  Using these three points, one can use Eq. \ref{eqn:charfinite}
+to determine the intersection point (4) as follows,
+
+\begin{displaymath}
+	y_4 = y_1 + \lambda_-(x_4 - x_1)
+\end{displaymath}
+
+	while from the other characteristic,
+
+\begin{equation}
+	\fbox{$
+	y_4 = y_2 + \lambda_+(x_4 - x_2) 
+	$}
+\label{eqn:y4}
+\end{equation}
+
+	thus yielding for $x_4$,
+
+\begin{equation}
+	\fbox{$
+	x_4 = \frac{y_1 - y_2 - \lambda_-x_1 + \lambda_+x_2}{\lambda_+ - \lambda_-}
+	$}
+\label{eqn:x4}
+\end{equation}
+
+	Once $x_4$ is found, expression in Eq. \ref{eqn:y4} can be used to completely
+determine the physical location of the intersection point of the two opposing characteristic
+curves emanating from points 1 and 2.  To determine the flow properties at this point one
+can make use of Eq. \ref{eqn:compfinite} by calculating along each characteristic,
+
+\begin{equation}
+	\begin{array}{c}
+	T_{-} = S_{-}(x_4 - x_1) + Q_{-}u_1 + R_{-}v_1 \\ \vspace{0.5cm}
+	T_{+} = S_{+}(x_4 - x_2) + Q_{+}u_2 + R_{+}v_2
+	\end{array}
+\label{eqn:tpm}
+\end{equation}
+
+	which then from Eq. \ref{eqn:compfinite} along the $C_-$ characteristic,
+
+\begin{displaymath}
+	Q_-(u_4 - u_1) + R_-(v_4 - v_1) -S_-(x_4 - x_1) = 0
+\end{displaymath}
+
+	while rearranging and substituting Eq. \ref{eqn:tpm} yields,
+
+\begin{displaymath}
+	Q_-u_4 + R_-v_4 = S_-(x_4 - x_1) + Q_-u_1 + R_-v_1 = T_-
+\end{displaymath}
+
+	therefore,
+
+\begin{equation}
+	\fbox{$
+	v_4 = \frac{T_- - Q_-u_4}{R_-}
+	$}
+\label{eqn:v4}
+\end{equation}
+
+	Along the $C_+$ characteristic one can write,
+
+\begin{displaymath}
+	Q_+u_4 + R_+v_4 = S_+(x_4 - x_2) + Q_+u_2 + R_+v_2 = T_+ 
+\end{displaymath}
+
+	which when Eq. \ref{eqn:v4} is used to replace $v_4$ yields a solution for $u_4$,
+
+\begin{displaymath}
+	Q_+u_4 + R_+\Big\{\frac{T_- - Q_-u_4}{R_-}\Big\} = T_+ 
+\end{displaymath}
+
+\begin{displaymath}
+	R_+T_- - R_+Q_-u_4 = R_-T_+ - R_-Q_+u_4 
+\end{displaymath}
+
+\begin{equation}
+	\fbox{$
+	u_4 = \frac{R_+T_- - R_-T_+}{R_+Q_- -  R_-Q_+}
+	$}
+\label{eqn:u4}
+\end{equation}
+
+	with the velocity components found from Eqs. \ref{eqn:v4} and \ref{eqn:u4} at
+the intersection point 4, one has now determined the flow conditions at a
+point further downstream (or upstream, depending on the direction chosen) of the original
+line at which the flow conditions are known (noting that each subsequent intersection point
+must still lie within a supersonic flow field).  
+
+	The accuracy of the characteristic mesh being 
+built can be improved by employing a predictor-corrector scheme to the solution of point 4
+as follows.  After having completely determined the intersection point as outlined above (the predictor step), 
+the procedure is repeated using the average values of the flow properties along each characteristic
+(between points 1 and 4 and points 2 and 4) to recalculate the values found from Eqs. \ref{eqn:variables} 
+and \ref{eqn:tpm} which are then used to find a new intersection point 4.  This procedure can be repeated until a 
+specified tolerance level is reached.
+
+\begin{equation}
+	\begin{array}{c}
+	y_-^{corr}= \frac{1}{2}(y_1 + y_4) \hspace{1.5cm} u_-^{corr} = \frac{1}{2}(u_1 + u_4)
+	\hspace{1.5cm} v_-^{corr} = \frac{1}{2}(v_1 + v_4) \\
+	y_+^{corr}= \frac{1}{2}(y_2 + y_4) \hspace{1.5cm} u_+^{corr} = \frac{1}{2}(u_2 + u_4)
+	\hspace{1.5cm} v_+^{corr} = \frac{1}{2}(v_2 + v_4)
+	\end{array}
+\label{eqn:corrector}
+\end{equation} 
+
