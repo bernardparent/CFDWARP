@@ -361,9 +361,10 @@ static void read_config_file(type_str dirname, type_str current, type_str messag
     read_line_from_config_file(configfile,str1,str2);
     if (strcmp(str1,"END")==0) CONTINUE=FALSE;
     if (strcmp(str1,"option")==0) (*numoption)++;
-    #ifdef EXPERIMENTAL
-      if (strcmp(str1,"optionX")==0) (*numoption)++;  //experimental module
-    #endif
+#ifdef EXPERIMENTAL
+    if (strcmp(str1,"optionX")==0) (*numoption)++;  //experimental module
+    if (strcmp(str1,"optionPX")==0) (*numoption)++;  //experimental and proprietary module
+#endif
     if (strcmp(str1,"optionP")==0) (*numoption)++;  //proprietary module
     if (strcmp(str1,"branch")==0) (*numbranch)++;
   }
@@ -391,6 +392,11 @@ static void read_config_file(type_str dirname, type_str current, type_str messag
 #ifdef EXPERIMENTAL
     if (strcmp(str1,"optionX")==0) {
       strcpy((*optioncomment)[cntoption],"[EXPERIMENTAL]");
+      strcpy((*option)[cntoption],str2);
+      cntoption++;
+    }
+    if (strcmp(str1,"optionPX")==0) {
+      strcpy((*optioncomment)[cntoption],"[PROPRIETARY] [EXPERIMENTAL]");
       strcpy((*option)[cntoption],str2);
       cntoption++;
     }
@@ -794,9 +800,8 @@ int main(){
   long COMPILER;
   FILE *scriptfile_applyconfig;
   FILE *scriptfile_removeproprietary;
-
-  type_str tmpstr;
   type_str dirname;
+
   scriptfile_applyconfig=fopen("applyconfig.sh", "w");
   scriptfile_removeproprietary=fopen("removeproprietary.sh", "w");
   fprintf(scriptfile_applyconfig,"#!/bin/sh\n");
@@ -808,10 +813,10 @@ int main(){
   process_config_files(scriptfile_applyconfig,scriptfile_removeproprietary,dirname);    
   output_makefileheader(scriptfile_applyconfig,nd,numopt,DEBUG,DEBUGGER,PROFIL,
                      THREADTYPE,COMPILER,STATIC,TEST,M32);
-  sprintf(tmpstr,"  %sCOMPILATION%s\n\n  1. \"make clean\" to clean the directories.\n  2. \"make src\" to create src/warp executable.",FONT_BOLD,FONT_STANDARD);
-  printf("\n\n%s\n\n",strwrpind(tmpstr, 50, -2));
+
   fclose(scriptfile_applyconfig);
   fclose(scriptfile_removeproprietary);
+
   return(EXIT_SUCCESS);
 }
 

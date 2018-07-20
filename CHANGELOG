@@ -7,6 +7,27 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 JUL 21c
+   * in tools/gitnewversion_open.sh
+     - fixed a few bugs
+
+
+2018 JUL 21b
+   * in tools/gitnewversion_open.sh
+     - changed automatic creation of warpopen directory in case it doesn't exist to clone 
+       from github
+
+
+2018 JUL 21a
+   * in tools/gitnewversion_open.sh
+     - added automatic creation of warpopen directory in case it doesn't exist
+   * in config/config.c
+     - in read_config_file(), added code to take care of optionPX
+     - in main(), got rid of section COMPILATION
+   * in config/_proprietary/proprietary.c
+     - changed default message
+
+
 2018 JUL 20e
    * in tools/gitnewversion_open.sh
      - added more error checks
