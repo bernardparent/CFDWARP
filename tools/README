@@ -1,25 +1,110 @@
-prandtlmeyer.c     find the x and y position of a prandtl-meyer compression surface
-inlet.c            for an external compression shcramjet, find the altitude of flight as well
-                   as all properties in the inlet given the flight Mach number and inlet length
-bdry.c             find the boundary layer thickness and skin friction coefficient of laminar
-                   and turbulent compressible/incompressible boundary layers
-shear.c            find the convective Mach number and shear layer growth of a turbulent shear layer
-inletgeom.c        finds an external compression inlet geometry given the two flow turning angles
-                   and the flight mach number and inlet length
-shock.c            finds the properties after a normal shock, given the mach number and gamma of the flow
-                   before the shock (shock is assumed stable in reference frame glued to shock)
-wedge.c            finds the properties after an oblique shock (weak solution) given gamma, and the
-                   Mach number, and the flow turning angle
-rocket_v2.c        find the x,y contours of a nozzle 
+bdrylayer.c                  finds the thickness and skin friction coefficient of laminar 
+                             and turbulent compressible and incompressible boundary layers
+
+calc.c                       command line calculator that uses the SOAP language
+
+cathode.c                    finds the voltage drop through a cathode plasma sheath
+
+compressionfan.c             finds the x and y position of a prandtl-meyer compression 
+                             surface
+
+inlet.c                      finds properties in a 2-oblique-shock Oswatitch supersonic 
+                             inlet 
+
+inletgeom.c                  finds an external compression inlet geometry given the two 
+                             flow turning angles and the flight mach number and inlet 
+                             length
+
+mpitest.c                    program to test MPI installation
+
+normalshock.c                finds the properties after a normal shock, given the Mach 
+                             number and gamma of the flow before the shock
+
+obliqueshock.c               finds the properties after an oblique shock (weak solution) 
+                             given gamma, and the Mach number, and the flow turning angle
+
+openmptest.c                 program to test OPENMP threads
+
+ringleb.c                    generates exact solution for the Ringleb problem including 
+                             CFDWARP Grid() and Init()
+
+shearlayer.c                 finds the convective Mach number and shear layer growth of 
+                             a turbulent shear layer
+
+tauvt.c                      finds the nitrogen vibrational energy relaxation time
+
+tecgrid2D.c                  reads a 2D GRIDG script and creates a TECPLOT post file 
+
+tecgrid3D.c                  reads a 3D GRIDG script and creates a TECPLOT post file 
 
 
-search.sh          a script from caldera that lists the files (recursively in all subdirectories)
-                   that contain the string specified as the first argument
-subword.sh         a script that substitutes in all .c .h .i files (recursively in all subdirectories)
-                   word A (=argument 1) by word B (=argument 2)
-substr.sh          same as subword but string A (=argument 1) by string B (=argument 2)
-tarwarp.sh         a script that (if run from the directory where the warp directory is) creates
-                   a new version of warp. For example, tarwarp.sh 01nov15 would create a new directory
-                   named warp.01nov15 and create a tarball warp.01nov15.tgz copied from the current
-                   warp directory.
+countlines.sh                counts the number of lines of code in all files with a 
+                             given extension
+
+gitnewversion.sh             creates a new version (a new tag) of CFDWARP [DO NOT USE
+                             UNLESS YOU ARE THE CFDWARP MAINTAINER]
+
+gitnewversion_open.sh        creates a new version (a new tag) of the non-proprietary 
+                             modules of CFDWARP on github [DO NOT USE UNLESS YOU ARE
+                             THE CFDWARP MAINTAINER]
+
+gitpull.sh                   downloads latest CFDWARP using git
+
+indentwithwarpstyle.sh       automatically indents a C file according to the CFDWARP 
+                             style
+
+makemissing.sh               creates symbolic links of "missing" data or post files 
+                             within a series
+
+makemovie.sh                 creates a mp4 movie given various post files at different 
+                             time levels by specifying a tecplot style and macro
+
+makepng.sh                   creates png files from various post files by specifying a 
+                             tecplot style and macro
+
+makepost.sh                  creates tecplot post files from data files
+
+openmptest.sh                tests OPENMP threads (used in conjunction with 
+                             openmptest.c)
+
+renamebatch.sh               renames a batch of files that share the same prefix or 
+                             suffix (with a number in between) [USE WITH CARE] 
+
+searchstr.sh                 a script that lists the files (recursively in all 
+                             subdirectories) that contain the string specified as the 
+                             first argument
+
+searchword.sh                a script that lists the files (recursively in all 
+                             subdirectories) that contain the word specified as the 
+                             first argument
+
+substr_perl.sh               substitutes a string (first argument) by another string 
+                             (second argument) in all .c, .h, and .hh files recursively 
+                             using perl [USE WITH CARE]
+
+substr_perl_Makefiles.sh     substitutes a string (first argument) by another string 
+                             (second argument) in all Makefiles recursively 
+                             [USE WITH CARE]
+
+substr_perl_texfiles.sh      substitutes a string (first argument) by another string 
+                             (second argument) in all .tex files recursively 
+                             [USE WITH CARE]
+
+substr_perl_wrpfiles.sh      substitutes a string (first argument) by another string 
+                             (second argument) in all .wrp files recursively 
+                             [USE WITH CARE]
+
+substr_rpl*.sh               similar functionality as substr_perl*.sh but using the 
+                             rpl program instead of perl to do the substitutions 
+                             [USE WITH CARE]
+
+subword_perl.sh              substitutes a word (first argument) by a string (second 
+                             argument) in all .c, .h, and .hh files recursively using 
+                             perl [USE WITH CARE]
+
+subword_rpl.sh               substitutes a word (first argument) by a string (second 
+                             argument) in all .c, .h, and .hh files recursively using 
+                             rpl [USE WITH CARE]
+
+tarwarp.sh                   creates a tarball of the warp directory
                    

@@ -7,6 +7,23 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+
+2018 JUL 21e
+   * in tools/gitnewversion_open.sh
+     - fixed bug: the $tmpfile was not deleted before calling git
+
+
+2018 JUL 21d
+   * in tools/README
+     - Rewrote most of the README (was out of date significantly)
+   * in tools/gitnewversion_open.sh
+     - added additional checks
+     - now does not call gitnewversion.sh within warpopen but calls git directly
+     - does not call make config within warpopen
+   * in tools/tarwarp.sh
+     - added additional checks
+
+
 2018 JUL 21c
    * in tools/gitnewversion_open.sh
      - fixed a few bugs

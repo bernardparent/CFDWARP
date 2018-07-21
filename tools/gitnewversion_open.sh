@@ -5,6 +5,7 @@ filecheck=".makefile-header-default"
 warpopen="../warpopen"
 tmpfile="UHFGHnhKJLJGHGGHKJkljk_tmpfile_from_gitnewversion_open.txt"
 
+command -v git >/dev/null 2>&1 || { echo "gitnewversion_open.sh requires git but it is not installed.  Aborting." >&2; exit 1; }
 
 
 if [ -f "$filecheck" ]; then
@@ -67,6 +68,7 @@ if [ -f "$tmpfile" ]; then
   exit 1
 else
   echo "Checking that the current directory is not $warpopen. [OK]";
+  rm -f "$warpopen/$tmpfile"
 fi
 
 
@@ -77,20 +79,61 @@ else
   exit 1
 fi
 
+echo "Pulling latest warpopen from github..";
+cd $warpopen
+git pull
+if [ -n "$(git status --porcelain)" ]; then
+  echo "ERROR: Changes or untracked files reported by git on warpopen. Can not proceed. Exiting.";
+  exit 1
+else
+  echo "Checking that there is no changes or untracked files reported by git on warpopen. [OK]";
+fi
+cd -
+
+echo -n "Create new version $1 on github? (y/n)"
+read answer
+
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    echo Yes
+else
+    echo No
+    exit 1
+fi
 
 rm -rf "$warpopen"/* 
 rm -f "$warpopen"/.*
 cp -a * "$warpopen"
 cp .* "$warpopen"
 cd "$warpopen"
-make config
 cd config
 chmod u+x removeproprietary.sh
 ./removeproprietary.sh
 chmod u-x removeproprietary.sh
 cd ..
 
-./tools/gitnewversion.sh $1
+
+if [ -f "$filecheck" ]; then
+  if git show-ref --tags $1 ; then
+    echo ERROR: Version $1 already committed. Exiting.
+    exit 1
+  fi
+  if git ls-remote --exit-code --tags origin $1 ; then
+    echo ERROR: Version $1 already committed on github. Exiting.
+    exit 1
+  fi
+  echo 'copy to origin using git..'
+  git add -A .
+  git commit -a -m "$1" 
+  git tag -d $1 > /dev/null 2>&1
+  git tag -a $1 -m "$1"
+  git push --tags origin master
+  echo '[done]'
+else
+ echo "ERROR: couldn't find $filecheck in warpopen directory. Exiting."
+ exit 1
+fi
+
+
 echo '[done]'
 
 
