@@ -67,7 +67,7 @@ makesrc:
 	@echo
 	@echo Finished compiling CFDWARP.  
 	@echo
-	@echo The execuble is named warp and is located in the src directory.
+	@echo The executable is named warp and is located in the src directory.
 	@echo
 	@echo See file USAGE for further instructions.
 	@echo 

@@ -660,34 +660,6 @@ void test_Roe_average ( np_t * np, gl_t * gl, long lL, long lR, long theta ) {
   }
 }
 
-void test_Parent_averaging ( np_t * np, gl_t * gl, long lL, long lR, long theta ) {
-  sqmat_t AL, ARoe, AParent;
-  metrics_t metrics;
-  jacvars_t jacvarsL, jacvarsR, jacvarsRoe, jacvarsParent;
-
-  printf ( "\n" );
-  printf ( "Testing jacvars (the three A jacobians should be the same). \n" );
-  printf ( "The jacobians are determined at the node " );
-  printf_ijk_position_of_node_l ( gl, lL );
-  printf ( ".\n\n" );
-
-  find_metrics_at_interface ( np, gl, lL, lR, theta, &metrics );
-  find_jacvars ( np[lL], gl, metrics, theta, &jacvarsL );
-  find_jacvars ( np[lR], gl, metrics, theta, &jacvarsR );
-  find_jacvars_at_interface_from_jacvars( jacvarsL, jacvarsL, gl, theta, metrics, AVERAGING_ROE, &jacvarsRoe );
-  find_jacvars_at_interface_from_jacvars ( jacvarsL, jacvarsL, gl, theta, metrics, AVERAGING_PARENT, &jacvarsParent );
-
-  find_A_from_jacvars ( jacvarsL, metrics, AL );
-  printf ( "A Jacobian from jacvars on left node\n" );
-  display_matrix ( AL );
-  find_A_from_jacvars ( jacvarsRoe, metrics, ARoe );
-  printf ( "A Jacobian from jacvars using Roe averaging\n" );
-  display_matrix ( ARoe );
-  find_A_from_jacvars ( jacvarsParent, metrics, AParent );
-  printf ( "A Jacobian from jacvars using Parent averaging\n" );
-  display_matrix ( AParent );
-
-}
 
 void test_jacvars ( np_t * np, gl_t * gl, long l, long theta ) {
   metrics_t metrics;
@@ -986,8 +958,6 @@ int main ( int argc, char **argv ) {
         test_MUstar ( npArray, &gl, lL, lR, theta );
       if ( strcmp ( "dUstardUprime", argv[cnt] ) == 0 )
         test_dUstar_dUprime ( npArray, lL, &gl );
-      if ( strcmp ( "Parent", argv[cnt] ) == 0 )
-        test_Parent_averaging ( npArray, &gl, lL, lR, theta );
       if ( strcmp ( "jacvars", argv[cnt] ) == 0 )
         test_jacvars ( npArray, &gl, lL, theta );
     }
@@ -1075,9 +1045,6 @@ int main ( int argc, char **argv ) {
                           lengthcol1, lengthcol2 );
       write_options_row ( stderr, "dUstardUprime", "none", 
                           "dUstar/dUprime Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" dUstardUprime", linewidth,
-                          lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "Parent", "none", 
-                          "Parent and Roe averaging  ./test -r test.wrp -node 10 10"if3D(" 10")" Parent", linewidth,
                           lengthcol1, lengthcol2 );
       write_options_row ( stderr, "Roe", "none", 
                           "Roe Averaging  ./test -r test.wrp -node 10 10"if3D(" 10")" Roe", linewidth, lengthcol1,

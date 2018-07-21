@@ -30,7 +30,7 @@ place and rerun it from the config directory when needed.
 COMPILE CFDWARP
 
 Tweak .makefile-header if necessary in the top directory (this should only be 
-needed if compiling on an esoteric UNIX box or if you want to add additional 
+needed if compiling on an esoteric UNIX system or if you want to add additional 
 flags to the C compiler, or if you wish to use a different compiler from cc, icc,  
 mpicc, or gcc). Then, clean the directories and create the CFDWARP executable with the 
 commands: 
@@ -49,11 +49,10 @@ documentation manuals, type at the prompt:
 
 make tar
 
-This will create a warp_package.tgz file in the tar directory. Note: before 
-creating a warp package, it may help to compile CFDWARP as a statically-linked 
-executable by saying yes to the "Create static binary" question within make 
-config. This will ensure that the warp executable does not depend on any 
-external library and can be run on any Linux distribution.
+This will create a warp_package.tgz file in the tar directory. Compiling CFDWARP 
+as a statically-linked  executable is preferable here as it will ensure that the 
+warp executable does not depend on any external library and can be run on any Linux 
+distribution.
 
 
 
@@ -72,7 +71,6 @@ using gprof with the analysis outputted to an ascii file as follows:
 
 gprof ./warp gmon.out > analysis.txt
 
-Open analysis.txt. 
 
 
 

@@ -17,14 +17,13 @@ CREATE TEMPLATE CONTROL FILE
 
 EDIT CONTROL FILE
 
-Use your favourite editor (vi, emacs, pluma, kate) and edit the control
-file to your taste:
+Use your favourite editor and edit the control file:
 
 pluma control.wrp
 
 The control file uses the SOAP interpreter language, for which a manual
-is provided (SOAP_manual.pdf). As well, the grid generation is done 
-through the GRIDG library (see GRIDG_manual.pdf). Learn how to write 
+is provided (see lib/soap/doc). As well, the grid generation is done 
+through the GRIDG library (see lib/gridg/doc). Learn how to write 
 code in SOAP and how to generate a grid through the examples given in 
 the manuals.
 
@@ -55,14 +54,14 @@ CHECK THE BOUNDARY CONDITIONS
 For a 2D problem, you can verify if your boundary conditions are 
 implemented correctly through the following command:
 
-./warp -r control.wrp -n 20 25 40
+./warp -r control.wrp -on 20 25 40
 
 This will output to the screen the node types around the point i=20, 
 j=25 with a  bandwidth of 40 nodes. To display the node types in 3D 
 around  the point i=120, j=25, k=22 with a bandwidth of 30 nodes, 
 the command becomes:
 
-./warp -r control.wrp -n 120 25 22 30
+./warp -r control.wrp -on 120 25 22 30
 
  
 
@@ -184,7 +183,7 @@ where PID should be substituted by the process ID of CFDWARP found through top.
 
 RUN CFDWARP WITH MPI
 
-If CFDWARP was compiled to be used with MPI, then the following command 
+If CFDWARP was compiled with mpicc, then the following command 
 should be used at the prompt:
 
 mpiexec -np 4 ./warp -r control.wrp -i data.01 -o data.02
@@ -219,14 +218,17 @@ it as usual and wait for it to finish the job normally (don't kill it
 prematurely). This will output the file gmon.out in the local directory.
 Then run the following
 
-gprof ./warp > gprof.out
+When warp finishes, it will output a file called "gmon.out". This can be analyzed
+using gprof with the analysis outputted to an ascii file as follows:
+
+gprof ./warp gmon.out > analysis.txt
 
 or
 
-gprof -D ./warp > gprof.out
+gprof -D ./warp  gmon.out > analysis.txt
 
 Gprof will read in the executable and the file gmon.out and output the
-CPU profiling information in the file gprof.out.
+CPU profiling information in the file analysis.txt.
 
 
 
@@ -235,7 +237,7 @@ OTHER COMMANDS
 For other commands, see the list of possible flags that warp recognizes by
 typing warp without arguments at the prompt:
 
-./warp 
+./warp -h
 
 
 

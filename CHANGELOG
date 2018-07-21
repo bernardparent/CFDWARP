@@ -7,6 +7,23 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 JUL 21h
+   * in src/test.c
+     - removed test_Parent_averaging()
+   * in COMPILE and USAGE
+     - improved the text 
+   * in config/config.c
+     - in main(), made sure that the script removeproprietary.sh is not overwritten with an 
+       incomplete file
+   * in cycle/resconv/_FDS+/resconv.c, cycle/resconv/_FDS_Cauchy/resconv.c, cycle/resconv/_MUSCL+/resconv.c
+     - got rid of AVERAGING_PARENT
+   * in cycle/share/res_share.c
+     - in find_jacvars_at_interface_from_jacvars(), got rid of call to 
+       find_jacvars_at_interface_Parent_average()
+   * in model/fluid/*/fluid_conv.c and model/fluid/_drift-diffusion/fluid.c
+     - got rid of find_jacvars_at_interface_Parent_average()
+
+
 2018 JUL 21g
    * in tools/gitnewversion.sh
      - fixed bug: gitnewversion_public.sh should be called with argument $1

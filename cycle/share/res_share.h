@@ -38,7 +38,6 @@
 
 #define AVERAGING_ARITH 0
 #define AVERAGING_ROE 1
-#define AVERAGING_PARENT 2
 
 
 void find_musclvars_offset(np_t *np, gl_t *gl, long l, long theta, long offset, flux_t musclvars);

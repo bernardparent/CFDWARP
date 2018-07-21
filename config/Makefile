@@ -40,6 +40,7 @@ clean:
 	rm -f applyconfig.sh
 
 cleanall: clean
+	rm -f removeproprietary.sh_tmp
 	( cd _proprietary ; make clean ) 
 
 

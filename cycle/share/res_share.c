@@ -836,9 +836,6 @@ void find_jacvars_at_interface_from_jacvars(jacvars_t jacvarsL, jacvars_t jacvar
     case AVERAGING_ROE:
       find_jacvars_at_interface_Roe_average(jacvarsL, jacvarsR, gl, theta, jacvars);
     break;
-    case AVERAGING_PARENT:
-      find_jacvars_at_interface_Parent_average(jacvarsL, jacvarsR, gl, theta, metrics, jacvars);
-    break;
     case AVERAGING_ARITH:
       find_jacvars_at_interface_arith_average(jacvarsL, jacvarsR, gl, theta, jacvars);
     break;

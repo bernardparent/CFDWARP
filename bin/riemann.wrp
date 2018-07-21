@@ -3,13 +3,13 @@
 
 }
 
-meshfact=2;
+meshfact=1.0;
 tf=1;
 
 is=1;  js=1;
 im=round(25*meshfact)+1; jm=round(25*meshfact)+1; 
 ie=round(49*meshfact)+1; je=round(49*meshfact)+1;
-timelevels=round(20*meshfact*tf)*10;
+timelevels=round(20*meshfact*tf)*2;
 
 tmax=4e-4;
  
@@ -128,7 +128,7 @@ Disc(
   MUSCLplus(
     FLUX=FLUX_FDSplus;
     numiter=2;
-    AVERAGING=AVERAGING_ARITH;
+    AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.95;

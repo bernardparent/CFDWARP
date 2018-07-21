@@ -230,7 +230,9 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_PARENT;
   );
   CDFplus(
-    xi=0.5;
+    xi1=0.5;
+    xi2=0.5;
+    xi3=0.5;
   );
 );
 

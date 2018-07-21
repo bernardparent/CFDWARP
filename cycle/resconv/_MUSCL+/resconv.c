@@ -57,7 +57,6 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"EIGENVALCOND_GNOFFO",EIGENVALCOND_GNOFFO);
     SOAP_add_int_to_vars(codex,"AVERAGING_ROE",AVERAGING_ROE);
     SOAP_add_int_to_vars(codex,"AVERAGING_ARITH",AVERAGING_ARITH);
-    SOAP_add_int_to_vars(codex,"AVERAGING_PARENT",AVERAGING_PARENT);
     SOAP_add_int_to_vars(codex,"FLUX_FDSplus",FLUX_FDSplus); 
     SOAP_add_int_to_vars(codex,"FLUX_FDSplusgen",FLUX_FDSplusgen); 
     SOAP_add_int_to_vars(codex,"FLUX_FVSplus",FLUX_FVSplus); 
@@ -88,8 +87,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     find_int_var_from_codex(codex,"numiter",&gl->cycle.resconv.numiter);
 
     find_int_var_from_codex(codex,"AVERAGING",&gl->cycle.resconv.AVERAGING);
-    if (gl->cycle.resconv.AVERAGING!=AVERAGING_ROE  && gl->cycle.resconv.AVERAGING!=AVERAGING_ARITH && gl->cycle.resconv.AVERAGING!=AVERAGING_PARENT)
-      SOAP_fatal_error(codex,"AVERAGING must be set to either AVERAGING_ROE or AVERAGING_ARITH or AVERAGING_PARENT.");
+    if (gl->cycle.resconv.AVERAGING!=AVERAGING_ROE  && gl->cycle.resconv.AVERAGING!=AVERAGING_ARITH )
+      SOAP_fatal_error(codex,"AVERAGING must be set to either AVERAGING_ROE or AVERAGING_ARITH.");
 
     find_int_var_from_codex(codex,"INTERPOL",&gl->cycle.resconv.INTERPOL);
     if (gl->cycle.resconv.INTERPOL!=INTERPOL_AOWENO5 && gl->cycle.resconv.INTERPOL!=INTERPOL_WENO3

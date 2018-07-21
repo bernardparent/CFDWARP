@@ -1057,67 +1057,6 @@ void find_dUstar_dUprime_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqma
 }
 
 
-/* phiL and phiR must be determinative properties (positive)  */
-static double _f_Parent_average(double phiL, double phiR, double Mtheta){
-  double phi;
-  phiL=max(1.0e-99, phiL);
-  phiR=max(1.0e-99, phiR);
-  phi=min(phiL,phiR);
-  return(phi);
-}
 
 
-void find_jacvars_at_interface_Parent_average(jacvars_t jacvarsL, jacvars_t jacvarsR, gl_t *gl, long theta, metrics_t metrics, jacvars_t *jacvars){
-  spec_t rhok,rhokL,rhokR;
-  long dim,spec;
-  double etstar,T,rho,P,q2;
-  spec_t dedrhok;
-  dim_t VL,VR,V;
-  double eL,eR,e,TL,TR;
-  double Xmag2,Vstar,Mtheta;
-
-  find_primvars_from_jacvars(jacvarsL, rhokL, VL, &TL, &eL);
-  find_primvars_from_jacvars(jacvarsR, rhokR, VR, &TR, &eR);
-
-  q2=0.0e0;
-  Vstar=0.0;
-  Xmag2=0.0;
-  for (dim=0; dim<nd; dim++){
-//    V[dim]=0.5*VL[dim]+0.5*VR[dim];
-    V[dim]=minmod(VL[dim],VR[dim]);
-    jacvars->V[dim]=V[dim];
-    q2+=sqr(V[dim]);
-    Vstar+=V[dim]*metrics.X[dim];
-    Xmag2+=sqr(metrics.X[dim]);
-  }
-  Mtheta=2.0e0*(fabs(Vstar)/sqrt(Xmag2))/(_a_from_jacvars(jacvarsL)+_a_from_jacvars(jacvarsR));
-  rho=0.0;
-  for (spec=0; spec<ns; spec++){
-    rhok[spec]=_f_Parent_average(rhokL[spec],rhokR[spec],Mtheta);
-    rho+=rhok[spec];
-  }  
-  jacvars->rho=rho;
-  for (spec=0; spec<ns; spec++){
-    jacvars->w[spec]=rhok[spec]/rho;
-  }
-
-  T=_f_Parent_average(TL,TR,Mtheta);
-  jacvars->T=T;
-  e=_e_from_w_T(jacvars->w,T);
-  P=_P_from_w_rho_T(jacvars->w,rho,T);
-  jacvars->P=P;
-  etstar = 0.5e0*q2 + e;
-  jacvars->htstar=etstar+P/rho;
-  jacvars->dPdrhoetstar=1.0e0/(rho*_de_dP_at_constant_rho(rhok,T));
-  find_de_drhok_at_constant_P(rhok,T,dedrhok);
-  for (spec=0; spec<ns; spec++){
-      jacvars->dPdrhok[spec]=-(jacvars->dPdrhoetstar)*(etstar-q2
-                                 +dedrhok[spec]*rho);
-  }
-  for (dim=0; dim<nd; dim++){
-    jacvars->dPdrhou[dim]=-jacvars->V[dim]*(jacvars->dPdrhoetstar);
-  }
-
-  set_jacvars_eigenconditioning_constants(gl, jacvars);
-}
 

@@ -55,7 +55,6 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"EIGENVALCOND_GNOFFO",EIGENVALCOND_GNOFFO);
     SOAP_add_int_to_vars(codex,"AVERAGING_ROE",AVERAGING_ROE);
     SOAP_add_int_to_vars(codex,"AVERAGING_ARITH",AVERAGING_ARITH);
-    SOAP_add_int_to_vars(codex,"AVERAGING_PARENT",AVERAGING_PARENT);
     SOAP_add_int_to_vars(codex,"ACCURACY_FIRSTORDER",ACCURACY_FIRSTORDER);
     SOAP_add_int_to_vars(codex,"ACCURACY_SECONDORDER",ACCURACY_SECONDORDER);
 
@@ -71,8 +70,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
       SOAP_fatal_error(codex,"EIGENVALCOND must be set to either EIGENVALCOND_PECLET, EIGENVALCOND_HARTEN, EIGENVALCOND_GNOFFO.");
 
     find_int_var_from_codex(codex,"AVERAGING",&gl->cycle.resconv.AVERAGING);
-    if (gl->cycle.resconv.AVERAGING!=AVERAGING_ROE && gl->cycle.resconv.AVERAGING!=AVERAGING_PARENT && gl->cycle.resconv.AVERAGING!=AVERAGING_ARITH)
-      SOAP_fatal_error(codex,"AVERAGING must be set to either AVERAGING_ROE, AVERAGING_PARENT, or AVERAGING_ARITH.");
+    if (gl->cycle.resconv.AVERAGING!=AVERAGING_ROE  && gl->cycle.resconv.AVERAGING!=AVERAGING_ARITH)
+      SOAP_fatal_error(codex,"AVERAGING must be set to either AVERAGING_ROE, or AVERAGING_ARITH.");
 
     find_int_var_from_codex(codex,"ACCURACY",&gl->cycle.resconv.ACCURACY);
     if (gl->cycle.resconv.ACCURACY!=ACCURACY_FIRSTORDER && gl->cycle.resconv.ACCURACY!=ACCURACY_SECONDORDER)
@@ -211,7 +210,7 @@ static void find_Lambda_minus_plus_Roeplus(np_t *np, gl_t *gl, long lp0, long lp
 }
 
 
-/* the following gives exactly the Roe scheme but with a Parent average at the interface */
+/* the following gives exactly the Roe scheme but with an arithmetic average at the interface */
 static void find_Lambda_minus_plus_Roe(np_t *np, gl_t *gl, long lp0, long lp1, jacvars_t jacvarsp1h, metrics_t metrics, sqmat_t lambdaminus, sqmat_t lambdaplus, long theta){
   sqmat_t lambdap0,lambdap1,Lp0,Linvp0,Linvp1,Lp1,Lp1h,Linvp1h,lambdapp1h;
   long row,col,flux;

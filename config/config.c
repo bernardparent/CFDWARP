@@ -803,7 +803,7 @@ int main(){
   type_str dirname;
 
   scriptfile_applyconfig=fopen("applyconfig.sh", "w");
-  scriptfile_removeproprietary=fopen("removeproprietary.sh", "w");
+  scriptfile_removeproprietary=fopen("removeproprietary.sh_tmp", "w");
   fprintf(scriptfile_applyconfig,"#!/bin/sh\n");
   fprintf(scriptfile_removeproprietary,"#!/bin/sh\n");
 
@@ -816,7 +816,9 @@ int main(){
 
   fclose(scriptfile_applyconfig);
   fclose(scriptfile_removeproprietary);
-
+  if (rename("removeproprietary.sh_tmp","removeproprietary.sh")!=0){
+    fprintf(stderr,"\n\nProblem encountered while trying to rename removeproprietary.sh_tmp to removeproprietary.sh.\n\n");
+  }
   return(EXIT_SUCCESS);
 }
 

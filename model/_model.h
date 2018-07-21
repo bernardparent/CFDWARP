@@ -287,8 +287,6 @@ void find_Uprime_from_U(flux_t U, flux_t Uprime);
 
 void find_dUstar_dUprime_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t dUstardUprime);
 
-void find_jacvars_at_interface_Parent_average(jacvars_t jacvarsL, jacvars_t jacvarsR, gl_t *gl, long theta,  metrics_t metrics, jacvars_t *jacvars);
-
 bool is_node_bdry_no_cross(np_t np, int TYPELEVEL);
 
 
