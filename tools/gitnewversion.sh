@@ -13,18 +13,35 @@ if [ -f "$filecheck" ]; then
     echo Version $1 already committed on origin
     exit 
   fi
+
+  echo ' '
+  echo 'Calling git status to check what changes will be pushed..'
+  echo ' '
+  git status
+  echo ' '
+  echo -n "Add these changes in new version $1 on PRIVATE SERVER? (y/N)"
+  read answer
+
+  if [ "$answer" != "${answer#[Yy]}" ] ;then
+    echo Yes
+  else
+    echo No
+    exit 1
+  fi
+
+
   echo 'setting new version in src/version.hh'
   echo '#define VERSION "'"$1"'"' > src/version.hh
-  echo 'cleaning warp directory..'
-  make cleanall
-  make cleanbin
-  echo 'copy to origin using git..'
+  echo 'Committing and pushing files to private server..'
   git add -A .
   git commit -a -m "$1" 
   git tag -d $1 > /dev/null 2>&1
   git tag -a $1 -m "$1"
   git push --tags origin master
-  echo '[done]'
+
+
+  tools/gitnewversion_public.sh $1
+
  else
   echo "gitnewversion.sh needs one argument: the new version string"
  fi

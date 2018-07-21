@@ -7,6 +7,23 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 JUL 21g
+   * in tools/gitnewversion.sh
+     - fixed bug: gitnewversion_public.sh should be called with argument $1
+
+
+2018 JUL 21f
+   * in tools
+     - renamed gitnewversion_open.sh to gitnewversion_public.sh
+   * in tools/gitnewversion_public.sh
+     - added question on whether to commit files to github or not
+   * in tools/gitnewversion.sh
+     - added question  on whether to commit files to private server or not
+     - got rid of make cleanall and make cleanbin
+     - added call to tools/gitnewversion_public.sh
+   * in tools/README
+     - renamed gitnewversion_open.sh to gitnewversion_public.sh
+
 
 2018 JUL 21e
    * in tools/gitnewversion_open.sh

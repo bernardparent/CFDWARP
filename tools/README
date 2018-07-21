@@ -44,7 +44,7 @@ countlines.sh                counts the number of lines of code in all files wit
 gitnewversion.sh             creates a new version (a new tag) of CFDWARP [DO NOT USE
                              UNLESS YOU ARE THE CFDWARP MAINTAINER]
 
-gitnewversion_open.sh        creates a new version (a new tag) of the non-proprietary 
+gitnewversion_public.sh      creates a new version (a new tag) of the non-proprietary 
                              modules of CFDWARP on github [DO NOT USE UNLESS YOU ARE
                              THE CFDWARP MAINTAINER]
 
