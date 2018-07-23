@@ -13,7 +13,8 @@ if [ -f "$filecheck" ]; then
     echo Version $1 already committed on origin
     exit 
   fi
-
+  make cleanall
+  make cleanbin
   echo ' '
   echo 'Calling git status to check what changes will be pushed..'
   echo ' '

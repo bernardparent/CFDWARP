@@ -39,7 +39,7 @@ tecgrid3D.c                  reads a 3D GRIDG script and creates a TECPLOT post 
 
 
 countlines.sh                counts the number of lines of code in all files with a 
-                             given extension
+                             given extension in all subdirectories recursively
 
 gitnewversion.sh             creates a new version (a new tag) of CFDWARP [DO NOT USE
                              UNLESS YOU ARE THE CFDWARP MAINTAINER]
@@ -70,13 +70,8 @@ openmptest.sh                tests OPENMP threads (used in conjunction with
 renamebatch.sh               renames a batch of files that share the same prefix or 
                              suffix (with a number in between) [USE WITH CARE] 
 
-searchstr.sh                 a script that lists the files (recursively in all 
-                             subdirectories) that contain the string specified as the 
-                             first argument
-
-searchword.sh                a script that lists the files (recursively in all 
-                             subdirectories) that contain the word specified as the 
-                             first argument
+search.sh                    a script that lists the files (recursively in all 
+                             subdirectories) that contain a certain string  
 
 substr_perl.sh               substitutes a string (first argument) by another string 
                              (second argument) in all .c, .h, and .hh files recursively 

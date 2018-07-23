@@ -7,6 +7,16 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 JUL 24a
+   * in tools
+     - deleted searchstr.sh
+     - deleted searchword.sh
+     - created search.sh that combines searchstr.sh and searchword.sh
+     - modified the README in consequence
+   * in tools/gitnewversion.sh
+     - added make cleanall and make cleanbin before calling git
+   
+
 2018 JUL 21h
    * in src/test.c
      - removed test_Parent_averaging()
