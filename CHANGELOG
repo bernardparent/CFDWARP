@@ -7,6 +7,14 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 JUL 28a
+   * in tools/substr.sh
+     - improved the help by listing how to escape various characters in perl and rpl
+     - fixed a bug when calling perl: needed to enclose the stringtofind and stringtoreplace 
+       within double quotes
+     - added flag -dryrun
+
+
 2018 JUL 27a
    * in tools
      - deleted subword*.sh

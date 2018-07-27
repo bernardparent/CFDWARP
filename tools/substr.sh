@@ -8,6 +8,7 @@ stringtofind="";
 stringtoreplace="";
 mode="";
 filename="";
+dryrun="";
 errormessage="";
 nogit="-path *.git -prune -o";
 strtype="any";
@@ -21,6 +22,7 @@ do
     -replace) stringtoreplace="$2"; shift;;
     -git) nogit="";;
     -word) strtype="word";;
+    -dryrun) dryrun="TEST";;
 	--)	shift; break;;
 	*) echo  "Argument $1 not recognized.";
           argerror="1";  
@@ -57,18 +59,33 @@ if [ -n "$argerror" ]; then
 Flag           Arg                                           Required?
 ------------------------------------------------------------------------
 -filename      '*.c' or '*Makefile' or '*.wrp' or '.config'  Y 
-               [string]     
--find          string that should be found [string]          Y
--replace       string that will replace what was found [int] Y
+-find          string that should be found                   Y
+-replace       string that will replace what was found       Y
 -mode          rpl or perl                                   Y
--git           none [will include files within .git          N
-                     directories]
--word          none [will only replace the string if it is   N
-                     a word]
+-git           No argument. If set, will include files       N
+               within .git directories.
+-word          No argument. If set, will only replace the    N
+               string if it is a word.
+-dryrun        No argument. If set, will only list the      N 
+               files that could be altered without 
+               actually doing the find and replace
 
 Eg: 
-$0 -find Bernie -replace Mikey -filename '*.txt' -mode perl
-will search within all *.txt files recursively for the string Bernie and replace it by Mikey using perl." 
+$0 -find 'Bernie' -replace 'Mikey' -filename '*.txt' -mode perl
+will search within all *.txt files recursively for the string Bernie and replace it by Mikey using perl.
+
+When using perl:
+  "'\\'" must be escaped as "'\\''\\'" 
+  ! must be escaped as \!
+  \$ must be escaped as \\\$
+  / must be escaped as \\/
+  ' must be written as '\''  or '\"'\"'
+
+When using rpl:
+  ! must be escaped as \!
+  ' must be written as '\''  
+
+" 
 
   exit 1
 fi
@@ -87,18 +104,24 @@ else
   exit 1
 fi
 
+if [ -n "$dryrun" ]; then
+  
+  echo 'Only the above listed files will be subject to the find & replace.'
+  exit 1
+fi
+
 case "$mode" in
   perl)  
     case "$strtype" in
       any)
-        echo "replacing string "$stringtofind" with "$stringtoreplace" using perl in files named $filename"
-        perl -i.substrperlold -pe 's/'$stringtofind'/'$stringtoreplace'/g;' \
+        echo "Within files named $filename, replacing string.."
+        perl -i.substrperlold -pe 's/'"$stringtofind"'/'"$stringtoreplace"'/g;' \
            `find . $nogit -type f -name "$filename" -print` 
         rm -f `find . $nogit -type f -name '*.substrperlold' -print`
       ;;
       word)
-        echo "replacing word "$stringtofind" with "$stringtoreplace" using perl in files named $filename"
-        perl -i.substrperlold -pe 's/\b'$stringtofind'\b/'$stringtoreplace'/g;' \
+        echo "Within files named $filename, replacing word.."
+        perl -i.substrperlold -pe 's/\b'"$stringtofind"'\b/'"$stringtoreplace"'/g;' \
            `find . $nogit -type f -name "$filename" -print` 
         rm -f `find . $nogit -type f -name '*.substrperlold' -print`
       ;;
@@ -110,12 +133,12 @@ case "$mode" in
   rpl) 
     case "$strtype" in
       any)
-        echo "replacing string "$stringtofind" with "$stringtoreplace" using rpl in files named $filename"
+        echo "Within files named $filename,"
         rpl -b "$stringtofind" "$stringtoreplace" \
           `find . $nogit -type f -name "$filename" -print`
       ;;
       word)
-        echo "replacing word "$stringtofind" with "$stringtoreplace" using rpl in files named $filename"
+        echo "Within files named $filename,"
         rpl -w -b "$stringtofind" "$stringtoreplace" \
           `find . $nogit -type f -name "$filename" -print`
       ;;
