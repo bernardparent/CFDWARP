@@ -7,6 +7,19 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 JUL 27a
+   * in tools
+     - deleted subword*.sh
+     - deleted sub*perl*.sh
+     - deleted sub*rpl*.sh
+     - added substr.sh 
+       o Combines all the substr* and subword* scripts in one script with
+         options
+       o needs further testing
+   * in tools/README
+     - updated the list of tools accordingly
+
+
 2018 JUL 24a
    * in tools
      - deleted searchstr.sh

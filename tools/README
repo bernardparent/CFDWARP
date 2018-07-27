@@ -73,33 +73,9 @@ renamebatch.sh               renames a batch of files that share the same prefix
 search.sh                    a script that lists the files (recursively in all 
                              subdirectories) that contain a certain string  
 
-substr_perl.sh               substitutes a string (first argument) by another string 
-                             (second argument) in all .c, .h, and .hh files recursively 
-                             using perl [USE WITH CARE]
-
-substr_perl_Makefiles.sh     substitutes a string (first argument) by another string 
-                             (second argument) in all Makefiles recursively 
-                             [USE WITH CARE]
-
-substr_perl_texfiles.sh      substitutes a string (first argument) by another string 
-                             (second argument) in all .tex files recursively 
-                             [USE WITH CARE]
-
-substr_perl_wrpfiles.sh      substitutes a string (first argument) by another string 
-                             (second argument) in all .wrp files recursively 
-                             [USE WITH CARE]
-
-substr_rpl*.sh               similar functionality as substr_perl*.sh but using the 
-                             rpl program instead of perl to do the substitutions 
-                             [USE WITH CARE]
-
-subword_perl.sh              substitutes a word (first argument) by a string (second 
-                             argument) in all .c, .h, and .hh files recursively using 
-                             perl [USE WITH CARE]
-
-subword_rpl.sh               substitutes a word (first argument) by a string (second 
-                             argument) in all .c, .h, and .hh files recursively using 
-                             rpl [USE WITH CARE]
+substr.sh                    substitutes a string by another string 
+                             in all files with a specified extension recursively 
+                             using either perl or rpl [USE WITH CARE]
 
 tarwarp.sh                   creates a tarball of the warp directory
                    
