@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 JUL 28b
+   * in tools/substr.sh
+     - added automatic escaping of \, /, and $ signs when perl is specified
+     - changed flag -replace to -sub (more clear)
+
+
 2018 JUL 28a
    * in tools/substr.sh
      - improved the help by listing how to escape various characters in perl and rpl
