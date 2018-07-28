@@ -6,7 +6,7 @@
 
 stringfind="";
 stringsub="";
-mode="";
+mode="rpl";
 filename="";
 dryrun="";
 errormessage="";
@@ -21,7 +21,7 @@ do
     -find) stringfind="$2"; shift;;
     -sub) stringsub="$2"; shift;;
     -git) nogit="";;
-    -word) strtype="word";;
+    -w) strtype="word";;
     -dryrun) dryrun="TEST";;
 	--)	shift; break;;
 	*) echo  "Argument $1 not recognized.";
@@ -56,25 +56,32 @@ fi
 
 if [ -n "$argerror" ]; then
   echo "
-Flag           Arg                                           Required?
+FLAG           ARGUMENT                                      Required?
 ------------------------------------------------------------------------
 -filename      '*.c' or '*Makefile' or '*.wrp' or '.config'  Y 
 -find          string that should be found                   Y
 -sub           string that will replace what was found       Y
--mode          rpl or perl                                   Y
+-mode          rpl or perl (default is rpl)                  N
 -git           No argument. If set, will include files       N
                within .git directories.
--word          No argument. If set, will only replace the    N
+-w             No argument. If set, will only replace the    N
                string if it is a word.
 -dryrun        No argument. If set, will only list the       N 
                files that could be altered without 
                actually doing the find and replace
 
-Eg: 
-$0 -find 'Bernie' -sub 'Mikey' -filename '*.txt' -mode rpl
-will search within all *.txt files recursively for the string Bernie and replace it by Mikey using rpl.
 
-SPECIAL CHARACTERS:
+EXAMPLES
+
+$0 -find 'John' -sub 'Mikey' -filename '*.txt' 
+will search within all *.txt files recursively for the string John and replace it by Mikey using rpl.
+
+$0 -git -w -find 'John' -sub 'Mikey' -filename '*Makefile' -mode perl 
+will search within all Makefiles recursively for the word John and replace it by Mikey using perl.
+
+
+SPECIAL CHARACTERS
+
   ! must be escaped as \!
   ' must be written as '\''  or as '\"'\"'
 " 

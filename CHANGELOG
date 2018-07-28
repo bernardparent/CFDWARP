@@ -7,6 +7,16 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 JUL 29a
+   * in tools/substr.sh
+     - made rpl the default mode
+     - changed -word flag to -w
+   * in tools/search.sh
+     - added flags -git and -filename
+     - improved error message
+     - added help on flags and examples
+
+
 2018 JUL 28b
    * in tools/substr.sh
      - added automatic escaping of \, /, and $ signs when perl is specified
