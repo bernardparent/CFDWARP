@@ -7,6 +7,28 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 JUL 30b
+   * in cycle/res/_generic/res.c
+     - in add_Ystar_dH_residual(), changed the call from find_Ystar_at_interface to
+       find_Y1star_at_interface and find_Y2star_at_interface and from find_H to find_H1 and find_H2
+   * in cycle/share/ts_share.c
+     - in add_Ystar_dH_dUstar_to_TDMA(), changed the call from find_Ystar_at_interface to
+       find_Y1star_at_interface and find_Y2star_at_interface and from find_H to find_H1 and find_H2
+   * in model/fluid/_Navier-Stokes_plasma/fluid_plasma.c
+     - replaced find_H by find_H1 and find_H2
+     - replaced find_dH_dUstar by find_dH1_dUstar and find_dH2_dUstar
+     - replaced find_Ystar_at_interface by find_Y1star_at_interface and find_Y2star_at_interface
+   * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+     - in find_Semfield(), changed _betaplus by _betag
+     - in find_dSemfield_dU(), changed _betaplus by _betag
+     - in find_dSemfield_dU(), changed the linearization to full linearization and moved the
+       partial linearization to within #define OLDIMPLEMENTATION
+   * in model/share/fluid_share.c
+     - added _betag()
+   * in src/test.c
+     - replaced test_dH_dUstar by test_dH1_dUstar and test_dH2_dUstar
+
+
 2018 JUL 30a
    * in lib/latex/warpdoc.cls
      - added \RequirePackage{amsmath} just before calling the fonts (needed to prevent

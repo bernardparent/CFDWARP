@@ -137,29 +137,65 @@ void add_Ystar_dH_residual(long theta, long ls, long le, np_t *np, gl_t *gl, dou
   long l,flux;
   flux_t tmpm1h,tmpp1h;
   flux_t Ystarm1h,Ystarp1h,Hp0,Hm1,Hp1,Hm2,Hp2;
+  int cnt;
 
 
     /* first-order discretization of Ystar*dH/dX 
        note: the stencil is not conservative hence why tmpp1h is not equal to tmpm1h
     */ 
-  for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
-    find_Ystar_at_interface(np, gl, _al(gl,l,theta,-1), _al(gl,l,theta,+0), theta, Ystarm1h);
-    find_Ystar_at_interface(np, gl, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, Ystarp1h);
-    find_H(np, gl, _al(gl,l,theta,-1), Hm1);
-    find_H(np, gl, _al(gl,l,theta,+0), Hp0);
-    find_H(np, gl, _al(gl,l,theta,+1), Hp1);
+  for (cnt=1; cnt<=2; cnt++){
+   for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
+    switch (cnt){
+      case 1:
+        find_Y1star_at_interface(np, gl, _al(gl,l,theta,-1), _al(gl,l,theta,+0), theta, Ystarm1h);
+        find_Y1star_at_interface(np, gl, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, Ystarp1h);
+        find_H1(np, gl, _al(gl,l,theta,-1), Hm1);
+        find_H1(np, gl, _al(gl,l,theta,+0), Hp0);
+        find_H1(np, gl, _al(gl,l,theta,+1), Hp1);
+      break;
+      case 2:
+        find_Y2star_at_interface(np, gl, _al(gl,l,theta,-1), _al(gl,l,theta,+0), theta, Ystarm1h);
+        find_Y2star_at_interface(np, gl, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, Ystarp1h);
+        find_H2(np, gl, _al(gl,l,theta,-1), Hm1);
+        find_H2(np, gl, _al(gl,l,theta,+0), Hp0);
+        find_H2(np, gl, _al(gl,l,theta,+1), Hp1);
+      break;
+      default:
+        fatal_error("cnt can not be set to %d in add_Ystar_dH_residual().",cnt);
+    }
     for (flux=0; flux<nf; flux++){
       tmpm1h[flux]=0.5*(Ystarm1h[flux]+fabs(Ystarm1h[flux]))*(Hp0[flux]-Hm1[flux]);
       tmpp1h[flux]=0.5*(Ystarp1h[flux]-fabs(Ystarp1h[flux]))*(Hp1[flux]-Hp0[flux]);
     }
     if (YSTARDH_SECONDORDER && !is_node_bdry(np[_al(gl,l,theta,-1)],TYPELEVEL_FLUID_WORK) && !is_node_bdry(np[_al(gl,l,theta,+0)],TYPELEVEL_FLUID_WORK)) {
-      find_H(np, gl, _al(gl,l,theta,-2), Hm2);
+      switch (cnt){
+        case 1: 
+          find_H1(np, gl, _al(gl,l,theta,-2), Hm2);
+        break;
+        case 2: 
+          find_H2(np, gl, _al(gl,l,theta,-2), Hm2);
+        break;
+        default:
+          fatal_error("cnt can not be set to %d in add_Ystar_dH_residual().",cnt);
+      }
+
       for (flux=0; flux<nf; flux++){
         tmpm1h[flux]=0.5*(Ystarm1h[flux]+fabs(Ystarm1h[flux]))*(_f_TVD2(Hm1[flux],Hp0[flux],Hp1[flux],TVDLIMITER)-_f_TVD2(Hm2[flux],Hm1[flux],Hp0[flux],TVDLIMITER));
       }
     }
     if (YSTARDH_SECONDORDER && !is_node_bdry(np[_al(gl,l,theta,+1)],TYPELEVEL_FLUID_WORK) && !is_node_bdry(np[_al(gl,l,theta,+0)],TYPELEVEL_FLUID_WORK)) {
-      find_H(np, gl, _al(gl,l,theta,+2), Hp2);
+      switch (cnt){
+        case 1: 
+          find_H1(np, gl, _al(gl,l,theta,+2), Hp2);
+        break;
+        case 2: 
+          find_H2(np, gl, _al(gl,l,theta,+2), Hp2);
+        break;
+        default:
+          fatal_error("cnt can not be set to %d in add_Ystar_dH_residual().",cnt);
+      }
+
+
       for (flux=0; flux<nf; flux++){
         tmpp1h[flux]=0.5*(Ystarp1h[flux]-fabs(Ystarp1h[flux]))*(_f_TVD2(Hp2[flux],Hp1[flux],Hp0[flux],TVDLIMITER)-_f_TVD2(Hp1[flux],Hp0[flux],Hm1[flux],TVDLIMITER));
 
@@ -174,8 +210,8 @@ void add_Ystar_dH_residual(long theta, long ls, long le, np_t *np, gl_t *gl, dou
       
     }
 
+   }
   }
-
 }
 
 

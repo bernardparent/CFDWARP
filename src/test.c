@@ -123,8 +123,9 @@ void test_dUstar_dUprime ( np_t * np, long l, gl_t * gl ) {
   display_matrix ( dUstardUprimenum );
 }
 
+
 #ifdef _FLUID_PLASMA
-void test_dH_dUstar ( np_t * np, gl_t * gl, long l ) {
+void test_dH1_dUstar ( np_t * np, gl_t * gl, long l ) {
   sqmat_t C, Cnum;
 
   printf ( "\n" );
@@ -134,14 +135,35 @@ void test_dH_dUstar ( np_t * np, gl_t * gl, long l ) {
   printf_ijk_position_of_node_l ( gl, l );
   printf ( ".\n\n" );
 
-  find_dH_dUstar ( np, gl, l, C );
-  find_numerical_jacobian_3 ( np, l, gl, &find_H, Cnum );
+  find_dH1_dUstar ( np, gl, l, C );
+  find_numerical_jacobian_3 ( np, l, gl, &find_H1, Cnum );
 
   printf ( "dH/dUstar jacobian (analytical):\n" );
   display_matrix ( C );
   printf ( "dH/dUstar jacobian (numerical):\n" );
   display_matrix ( Cnum );
 }
+
+
+void test_dH2_dUstar ( np_t * np, gl_t * gl, long l ) {
+  sqmat_t C, Cnum;
+
+  printf ( "\n" );
+  printf ( "Testing dH/dUstar jacobian compared to numerically determined one.\n" );
+  printf ( "The numerical jacobian is function of the Uref vector in the control file.\n" );
+  printf ( "The jacobian is determined at node " );
+  printf_ijk_position_of_node_l ( gl, l );
+  printf ( ".\n\n" );
+
+  find_dH2_dUstar ( np, gl, l, C );
+  find_numerical_jacobian_3 ( np, l, gl, &find_H2, Cnum );
+
+  printf ( "dH/dUstar jacobian (analytical):\n" );
+  display_matrix ( C );
+  printf ( "dH/dUstar jacobian (numerical):\n" );
+  display_matrix ( Cnum );
+}
+
 
 void test_Dstar ( np_t * np, gl_t * gl, long l ) {
   sqmat_t Dstar, Dstarplus, Dstarminus, Dstarsum, Dstartest;
@@ -923,8 +945,10 @@ int main ( int argc, char **argv ) {
       if ( strcmp ( "dGdUstar", argv[cnt] ) == 0 )
         test_dG_dUstar ( npArray, lL, &gl );
 #ifdef _FLUID_PLASMA
-      if ( strcmp ( "dHdUstar", argv[cnt] ) == 0 )
-        test_dH_dUstar ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
+      if ( strcmp ( "dH1dUstar", argv[cnt] ) == 0 )
+        test_dH1_dUstar ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
+      if ( strcmp ( "dH2dUstar", argv[cnt] ) == 0 )
+        test_dH2_dUstar ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
       if ( strcmp ( "Dstar", argv[cnt] ) == 0 )
         test_Dstar ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
 #endif
@@ -1000,8 +1024,11 @@ int main ( int argc, char **argv ) {
                           "dG/dUstar Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" dGdUstar", linewidth,
                           lengthcol1, lengthcol2 );
 #ifdef _FLUID_PLASMA
-      write_options_row ( stderr, "dHdUstar", "none", 
-                          "dH/dUstar Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" dHdUstar", linewidth,
+      write_options_row ( stderr, "dH1dUstar", "none", 
+                          "dH1/dUstar Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" dH1dUstar", linewidth,
+                          lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "dH2dUstar", "none", 
+                          "dH2/dUstar Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" dH2dUstar", linewidth,
                           lengthcol1, lengthcol2 );
       write_options_row ( stderr, "Dstar", "none", 
                           "Dstar plus/minus matrices  ./test -r test.wrp -node 10 10"if3D(" 10")" Dstar", linewidth,

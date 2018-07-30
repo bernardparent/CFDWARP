@@ -1770,6 +1770,17 @@ double _betac(long k){
   return(betac);
 }
 
+
+/* determines whether the gauss's law terms are added to the continuity equations */
+double _betag(long k){
+  double betag;
+  betag=0.0;
+  if (speciestype[k]==SPECIES_IONPLUS) betag=1.0; 
+  if (speciestype[k]==SPECIES_IONMINUS) betag=-1.0; 
+  return(betag);
+}
+
+
 double _betaplus(long k){
   double betaplus;
   if (speciestype[k]==SPECIES_IONPLUS) betaplus=1.0; else betaplus=0.0;

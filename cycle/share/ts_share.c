@@ -159,39 +159,53 @@ void add_Ystar_dH_dUstar_to_TDMA(np_t *np, gl_t *gl, long theta, long l, double 
   sqmat_t matm1h,matp1h;
   sqmat_t matm1h_times_dHdUstarm1,matm1h_times_dHdUstarp0,matp1h_times_dHdUstarp0,matp1h_times_dHdUstarp1;
   metrics_t metricsp0;
-
+  int cnt;
 
   find_metrics_at_node(np,gl, l, theta, &metricsp0);
 
-  find_Ystar_at_interface(np, gl, _al(gl,l,theta,-1), _al(gl,l,theta,+0), theta, Ystarm1h);
-  find_Ystar_at_interface(np, gl, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, Ystarp1h);
-  find_dH_dUstar(np, gl, _al(gl,l,theta,-1), dHdUstarm1);  
-  find_dH_dUstar(np, gl, _al(gl,l,theta,+0), dHdUstarp0);  
-  find_dH_dUstar(np, gl, _al(gl,l,theta,+1), dHdUstarp1);  
-
-  for (row=0; row<nf; row++){
-    for (col=0; col<nf; col++){
-      matm1h[row][col]=0.0;
-      matp1h[row][col]=0.0;
+  for (cnt=1; cnt<=2; cnt++){
+    switch (cnt){
+      case 1:
+        find_Y1star_at_interface(np, gl, _al(gl,l,theta,-1), _al(gl,l,theta,+0), theta, Ystarm1h);
+        find_Y1star_at_interface(np, gl, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, Ystarp1h);
+        find_dH1_dUstar(np, gl, _al(gl,l,theta,-1), dHdUstarm1);  
+        find_dH1_dUstar(np, gl, _al(gl,l,theta,+0), dHdUstarp0);  
+        find_dH1_dUstar(np, gl, _al(gl,l,theta,+1), dHdUstarp1);  
+      break;
+      case 2:
+        find_Y2star_at_interface(np, gl, _al(gl,l,theta,-1), _al(gl,l,theta,+0), theta, Ystarm1h);
+        find_Y2star_at_interface(np, gl, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, Ystarp1h);
+        find_dH2_dUstar(np, gl, _al(gl,l,theta,-1), dHdUstarm1);  
+        find_dH2_dUstar(np, gl, _al(gl,l,theta,+0), dHdUstarp0);  
+        find_dH2_dUstar(np, gl, _al(gl,l,theta,+1), dHdUstarp1);  
+      break;
+      default:
+        fatal_error("cnt can not be set to %d in add_Ystar_dH_dUstar_to_TDMA().",cnt);
     }
-  }
-  for (row=0; row<nf; row++){
-    matm1h[row][row]=0.5*(Ystarm1h[row]+fabs(Ystarm1h[row]));
-    matp1h[row][row]=0.5*(Ystarp1h[row]-fabs(Ystarp1h[row]));
-  }
-  multiply_diagonal_matrix_and_matrix(matm1h, dHdUstarm1, matm1h_times_dHdUstarm1);
-  multiply_diagonal_matrix_and_matrix(matm1h, dHdUstarp0, matm1h_times_dHdUstarp0);
-  multiply_diagonal_matrix_and_matrix(matp1h, dHdUstarp0, matp1h_times_dHdUstarp0);
-  multiply_diagonal_matrix_and_matrix(matp1h, dHdUstarp1, matp1h_times_dHdUstarp1);
-
-
-  for (row=0; row<nf; row++){
-    for (col=0; col<nf; col++){
-      A[row][col]+=-fact*matm1h_times_dHdUstarm1[row][col];
-      B[row][col]+=fact*(matm1h_times_dHdUstarp0[row][col]-matp1h_times_dHdUstarp0[row][col]);
-      C[row][col]+=fact*matp1h_times_dHdUstarp1[row][col];
-  
+    for (row=0; row<nf; row++){
+      for (col=0; col<nf; col++){
+        matm1h[row][col]=0.0;
+        matp1h[row][col]=0.0;
+      }
     }
+    for (row=0; row<nf; row++){
+      matm1h[row][row]=0.5*(Ystarm1h[row]+fabs(Ystarm1h[row]));
+      matp1h[row][row]=0.5*(Ystarp1h[row]-fabs(Ystarp1h[row]));
+    }
+    multiply_diagonal_matrix_and_matrix(matm1h, dHdUstarm1, matm1h_times_dHdUstarm1);
+    multiply_diagonal_matrix_and_matrix(matm1h, dHdUstarp0, matm1h_times_dHdUstarp0);
+    multiply_diagonal_matrix_and_matrix(matp1h, dHdUstarp0, matp1h_times_dHdUstarp0);
+    multiply_diagonal_matrix_and_matrix(matp1h, dHdUstarp1, matp1h_times_dHdUstarp1);
+
+
+    for (row=0; row<nf; row++){
+      for (col=0; col<nf; col++){
+        A[row][col]+=-fact*matm1h_times_dHdUstarm1[row][col];
+        B[row][col]+=fact*(matm1h_times_dHdUstarp0[row][col]-matp1h_times_dHdUstarp0[row][col]);
+        C[row][col]+=fact*matp1h_times_dHdUstarp1[row][col];
+      }
+    }
+
   }
 
 }

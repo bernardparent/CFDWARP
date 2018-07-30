@@ -121,6 +121,8 @@ double _betan(long k);
 
 double _betac(long k);
 
+double _betag(long k);
+
 double _betai(long k);
 
 double _betaplus(long k);

@@ -60,11 +60,17 @@ void find_Fstar_given_metrics(np_t np, gl_t *gl, metrics_t metrics, long theta, 
 
 void find_G(np_t np, gl_t *gl, flux_t G);
 
-void find_H(np_t *np, gl_t *gl, long l, flux_t H);
+void find_H1(np_t *np, gl_t *gl, long l, flux_t H);
 
-void find_dH_dUstar(np_t *np, gl_t *gl, long l, sqmat_t dHdUstar);
+void find_H2(np_t *np, gl_t *gl, long l, flux_t H);
 
-void find_Ystar_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, flux_t Ystar);
+void find_dH1_dUstar(np_t *np, gl_t *gl, long l, sqmat_t dHdUstar);
+
+void find_dH2_dUstar(np_t *np, gl_t *gl, long l, sqmat_t dHdUstar);
+
+void find_Y1star_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, flux_t Ystar);
+
+void find_Y2star_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, flux_t Ystar);
 
 void find_metrics_at_interface(np_t *np, gl_t *gl, long lL, long lR,
                               long theta, metrics_t *metrics);
