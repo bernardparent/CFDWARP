@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 JUL 30a
+   * in lib/latex/warpdoc.cls
+     - added \RequirePackage{amsmath} just before calling the fonts (needed to prevent
+       errors with newer LaTeX and amsmath versions)
+
+
 2018 JUL 29a
    * in tools/substr.sh
      - made rpl the default mode
