@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 JUL 30c
+   * in model/fluid/_Navier-Stokes_plasma/fluid_plasma.c
+     - in find_Y1star_at_interface(), changed _betag(spec) to fabs(_betag(spec))
+     - in find_Y2star_at_interface(), changed _betaminus(spec) to fabs(_betaminus(spec))
+
+
 2018 JUL 30b
    * in cycle/res/_generic/res.c
      - in add_Ystar_dH_residual(), changed the call from find_Ystar_at_interface to
