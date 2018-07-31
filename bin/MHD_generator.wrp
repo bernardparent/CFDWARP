@@ -187,17 +187,6 @@ Model(
     wemin=1e-20;    wemax=1e-10;                {min and max electron mass fraction }
     Nminbdry=1e12;  {the number density for the charged species at the bdry nodes}
     gamma=0.1e0;   {secondary emission coefficient used to calculate the electron density at the cathode or dielectric}
-    zetaA1=0.0e0;  {zetabar controls the amount of added artificial dissipation
-                   -> set it to 0.1 for turbulent flows, but ensure that the shear stress at the wall
-                      is the same as when zetabar1 is set to 0.0
-                   -> set it to 0.0 usually for laminar flows, but ensure that the shock structure is the same
-                      as when zetabar1 is set to 0.3 (i.e. make sure the 2nd law of thermo is not violated
-                   -> affects all eigenvalues except last momentum flux and energy flux}
-    EIGENVALCOND=EIGENVALCOND_PECLET;  {same as zetabar1 but only affects eigenvalues of last momentum flux and energy flux}
-    zetaA2=0.05;
-    zetaA3=0.1;  {same as zetabar1 but only affects eigenvalues of last momentum flux and energy flux}
-    
-    zetaD=1.0;
     AXISYMMETRIC=NO; {not tested yet!!}
   );
  
@@ -268,6 +257,31 @@ Init(
       Region(is1,je,is2,je,INITEMF_TYPE1,dphi);
     );
 );
+
+
+Disc(
+  FavreReynoldsPlasma(
+    zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
+  );
+  OhmGeneralized(
+    Ediv=10.0;        {a small positive number in V/m, needed to prevent a division by zero when
+                       discretizing the electron pressure gradients within the potential equation}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ARITH;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.85;
+    AOWENO_gammahi=0.85;
+    INTERPOL=INTERPOL_AOWENO5;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
+  );
+);
+
+
+
 
 
 Cycle(

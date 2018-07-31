@@ -19,7 +19,7 @@ UPDATEMODEL_FLUID_EMFIELD_TOGETHER=FALSE;
 tmax=1e-6;   {simulation time span in seconds}
 
 
-meshfact=2.0;
+meshfact=1.0;
 
 is=1;  js=1; 
 ie=round(meshfact*44)+1; 
@@ -253,17 +253,17 @@ Cycle(
     );
     sigma1=0.5;      {exponent of largest pseudotime step in all dimensions}
     sigma2=0.0;      {exponent of largest pseudotime step in all flux components}
-    PRECONDITIONER=PRECON_LOCALEIGENVALUE;
+    PRECONDITIONER=PRECON_LOCALTIMESTEP;
     if (iter==1,
       CFL=0.01;
     );
     CFL=min(CFL*1.1,5.0);   
-    Lc=0.3e-3*10;  {characteristic length scale used to solve the emfield equation}
+    Lc=0.3e-3*1000;  {characteristic length scale used to solve the emfield equation}
     relaxEMF=1.0;
     if (!UPDATEMODEL_FLUID_EMFIELD_TOGETHER,
       UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2);
-      UpdateEMField(Lc*100000,relaxEMF*1.0,TSEMF_SOR2,800);
-      {UpdateEMField(Lc*100000,relaxEMF*1.0,TSEMF_IMAF,1220);}
+      UpdateEMField(Lc*100000,relaxEMF*1.0,TSEMF_SOR,50);
+      UpdateEMField(Lc*100000,relaxEMF*1.0,TSEMF_IMAF,25);
       {UpdateEMField(Lc*100,relaxEMF*1.0,TSEMF_NEWTON);}
     , {else}
       UpdateFluidEMField(CFL,PRECONDITIONER,sigma1,sigma2,Lc,relaxEMF);

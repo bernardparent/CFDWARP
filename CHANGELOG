@@ -7,6 +7,16 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 JUL 31c
+   * in model/beam/
+     - relinked active to none
+
+
+2018 JUL 31b
+   * in bin
+     - modified MHD_generator.wrp, discharge.wrp and dischargemagnetic.wrp
+
+
 2018 JUL 31a
    * in model/share/fluid_share.c
      - moved here find_Y1star_at_interface() and find_Y2star_at_interface() from fluid_plasma.c

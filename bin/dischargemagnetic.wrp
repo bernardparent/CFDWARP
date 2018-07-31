@@ -205,11 +205,11 @@ Cycle(
     if (iter<10,
       CFL=0.01; 
     );
-    CFL=min(CFL*1.1,10.0);   
+    CFL=min(CFL*1.1,3.0);   
     Lc=1e0;  {characteristic length scale used to solve the emfield equation}
     relaxfact_emfield=1.0;
     UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2);
-    UpdateEMField(Lc,relaxfact_emfield*1.4,TSEMF_SOR,40);
+    UpdateEMField(Lc,relaxfact_emfield*0.8,TSEMF_SOR,40);
     UpdateEMField(Lc*1000,relaxfact_emfield,TSEMF_IMAF,40);
 
     printf("%6.4f %6ld %9.3f   %E (%4ld,%4ld)  %6.0f %E (%4ld,%4ld)  %s\n",
