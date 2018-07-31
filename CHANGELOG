@@ -7,6 +7,21 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 JUL 31a
+   * in model/share/fluid_share.c
+     - moved here find_Y1star_at_interface() and find_Y2star_at_interface() from fluid_plasma.c
+   * in model/fluid/_drift-diffusion/fluid.c and model/fluid/*_plasma/fluid_source.c
+     - in find_Semfield() changed _betaplus for _betag
+     - in find_dSemfield_dU(), changed _betaplus for _betag
+     - in find_dSemfield_dU(), changed the linearization to full linearization and
+       put partial linearization within #ifdef OLDIMPLEMENTATION
+     - in find_dSemfield_dU(), fixed a bug: in various terms, rhoc/(epsilon0*_epsilonr(np[l],gl))
+       should read (rhoc/(epsilon0*_epsilonr(np[l],gl))-sum)
+   * in model/fluid/_drift-diffusion/fluid.c and model/fluid/_Favre-Reynolds_plasma/fluid_plasma.c
+     - replaced find_H() by find_H1() and find_H2() 
+     - replaced find_dH_dUstar by find_dH1_dUstar and find_dH2_dUstar
+
+
 2018 JUL 30c
    * in model/fluid/_Navier-Stokes_plasma/fluid_plasma.c
      - in find_Y1star_at_interface(), changed _betag(spec) to fabs(_betag(spec))

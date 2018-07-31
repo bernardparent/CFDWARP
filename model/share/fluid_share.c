@@ -1975,6 +1975,44 @@ void find_LambdaZ(np_t *np, gl_t *gl, long l, sqmat_t LambdaZ) {
 
 }
 
+
+
+void find_Y1star_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, flux_t Ystar){
+  double Estar;
+  long spec, flux;
+  metrics_t metrics;
+  find_metrics_at_interface(np,gl,lL,lR,theta,&metrics);
+  find_Estar_at_interface(np, gl, lL, lR, theta, &Estar);
+
+  for (flux=0; flux<nf; flux++){
+    Ystar[flux]=0.0;
+  }
+
+  for (spec=0; spec<ns; spec++){
+    Ystar[spec]=metrics.Omega*fabs(_betag(spec))*Estar;  
+  }
+
+}
+
+
+
+void find_Y2star_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, flux_t Ystar){
+  double Jstar;
+  long spec, flux;
+  metrics_t metrics;
+  find_metrics_at_interface(np,gl,lL,lR,theta,&metrics);
+  find_Jstar_at_interface(np, gl, lL, lR, theta, &Jstar);
+
+  for (flux=0; flux<nf; flux++){
+    Ystar[flux]=0.0;
+  }
+
+  for (spec=0; spec<ns; spec++){
+    Ystar[spec]=-metrics.Omega*fabs(_betaminus(spec))*Jstar;  
+  }
+
+}
+
 #endif
 
 
