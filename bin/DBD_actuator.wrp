@@ -1,8 +1,8 @@
-
+ 
 
 
 mf=0.4; {0.8, 1.1, 1.5}
-MULTIPLE_EMF_ITERATIONS=TRUE;
+TSEMF_ITERATIVE=TRUE;
 
 xs0=0.0;
 xs1=0.013; {start of exposed electrode}
@@ -22,16 +22,13 @@ itermin=10;
 
  
 
-freq=50000; {Hz} {was 50000}
-Vpp=50000;{V} {was 120000}
+freq=25000; {Hz} 
+Vpp=50000;{V} 
 timeperiod=1/freq;
-timestreamer_desired=0e-9;
-timepulse=167e-9;
+timepulse=3e-6;
 dtref_desired=1.3e-7/mf;
 dtref=(timeperiod-timepulse)/round((timeperiod-timepulse)/dtref_desired);
 dtref_pulse=min(dtref,timepulse/(20*mf*2));
-timestreamer=(0.99+floor(timestreamer_desired/dtref_pulse))*dtref_pulse;
-dtref_streamer=dtref_pulse/2;
 dtref_extpulse=dtref;
 timeextpulse=dtref_extpulse*1.01*mf/0.8;
 DRYRUN=FALSE;
@@ -205,7 +202,7 @@ Bdry(
     _________________________________________________________________________________________
 
     }
-    Cut(round(is4+mf*60),js, ie,js2);
+    {Cut(round(is4+mf*60),js, ie,js2);}
       {here, the following three actions are performed to encase the power source within dielectrics 
        this is necessary to force the current to go in a specific direction}
       {WARNING: this can create problems when interpolating from fine to coarse mesh}
@@ -248,7 +245,7 @@ Model(
     Te_buffer=3000.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,T+Te_buffer);  
                        needed to prevent convergence hangs where |E| becomes close to 0;
                        set to as little a value as possible}
-    Jmax=200000.0;     {the maximum current density in A/m2 expected in the domain; this will affect only
+    Jmax=200000000.0;     {the maximum current density in A/m2 expected in the domain; this will affect only
                        the Townsend ionization rates; make sure Jmax > sigma*Emag in the converged solution.}
     SetRelativePermittivity(is,js, ie,je, 1.0 );
     SetRelativePermittivity(is,js, ie,js2, 6.0 ); {dielectric, diamond}
@@ -327,7 +324,7 @@ Disc(
     ,{else}
       zetaA2=0.1;
     );
-    zetaD=0.3;        {conditions the Dstar eigenvalues for the charged species}
+    zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
   );
   Ohm(
     Ediv=10.0;        {a small positive number in V/m, needed to prevent a division by zero when
@@ -358,7 +355,9 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_GNOFFO;
   );
   CDFplus(
-    xi=0.5; {should be set to 0.5 or less when used with 2nd order or higher convective fluxes}
+    xi1=0.5; {should be set to 0.5 or less when used with 2nd order or higher convective fluxes}
+    xi2=xi1;
+    xi3=xi1;
   );
 );
 
@@ -366,9 +365,9 @@ Disc(
 Cycle(
   NavierStokesPlasma(
     xiverge=1e2;         {residual convergence threshold}
-    zetaGammai=0.3;{0.036*3/CFLmax}       {factor multiplying the pseudotime step of the ion species transport equations
+    zetaGammai=1.0;{0.036*3/CFLmax}       {factor multiplying the pseudotime step of the ion species transport equations
                            when PRECONDITIONING is set to TRUE} 
-    zetaGammae=0.003;{0.003}      {factor multiplying the pseudotime step of the electron species transport equations
+    zetaGammae=1.0;{0.003}      {factor multiplying the pseudotime step of the electron species transport equations
                            near cathode when PRECONDITIONING is set to TRUE} 
     relaxNi_bdry=1.0; {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.1;    {the electron density relaxation factor at the boundary }
@@ -409,9 +408,6 @@ Cycle(
     timewithinperiod=time-period*floor(time/period);
     if(timewithinperiod<timepulse,
       dt=dtref_pulse;
-      if(timewithinperiod<timestreamer,
-        dt=dtref_streamer;
-      );
 
 
       if (timewithinperiod+dt<0.5*timepulse,
@@ -483,37 +479,15 @@ Cycle(
     );
 
     if (!DRYRUN,
-      UpdateFluid(CFL,PRECON_LOCALEIGENVALUE,sigma1,sigma2,dt);
-
-     if (MULTIPLE_EMF_ITERATIONS,
-      for (cnt,1,iter_tsemf,
-        {ADI}
-        fact=1/2.0*3.3*5; {was fact=1/1.5} 
-        relaxEMF=0.5;
-        Lc=3e-2*fact;  
-        UpdateEMField(Lc,relaxEMF,dt,TSEMF_ADI);
-
-        {IMAF}
+      if (iter>5, UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt););
+      if (TSEMF_ITERATIVE,
         relaxEMF=1.0;
-        Lc=3e-2*10;
-        UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,subiter_tsemf);
-
-
-        {ADI}
-        relaxEMF=0.3; {was 0.3}
-        Lc=5e-3*fact;
-        UpdateEMField(Lc,relaxEMF,dt,TSEMF_ADI);
-
-
-        {IMAF}
-        relaxEMF=1.0;
-        Lc=100.0;
-        UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,subiter_tsemf);
-
-      );
+        Lc=10000;  
+        UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,1000);
+        UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,50);
      ,{ else}
         relaxEMF=1.0;
-        Lc=100;  
+        Lc=10000;  
         UpdateEMField(Lc,relaxEMF,dt,TSEMF_NEWTON);
      );
     );

@@ -218,7 +218,9 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_PARENT; 
   );
   CDFplus(
-    xi=0.5;
+    xi1=0.5;
+    xi2=0.5;
+    xi3=0.5;
   );
 );
 
@@ -230,7 +232,7 @@ Cycle(
     xiverge=1e-3;         {residual convergence threshold}
     zetaGammai=1.0;       {factor multiplying the pseudotime step of the ion species transport equations
                            when PRECONDITIONER is set to PRECON_LOCALTIMESTEPPLASMA} 
-    zetaGammae=0.12;      {factor multiplying the pseudotime step of the electron species transport equations
+    zetaGammae=1.0;      {factor multiplying the pseudotime step of the electron species transport equations
                            near cathode when PRECONDITIONER is set to PRECON_LOCALTIMESTEPPLASMA} 
     relaxNi_bdry=1.0;     {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.8;     {the electron density relaxation factor at the boundary }
@@ -282,27 +284,16 @@ Cycle(
         CFL=min(1.0,CFL*1.4);
       );
     );
-    if (dt>dtref*10,
-      Cycle(NavierStokesPlasma(
-        zetaGammai=0.1;       
-        zetaGammae=0.01;
-      ););
-    );
-    UpdateFluid(CFL*CFLfact,PRECON_LOCALEIGENVALUE,sigma1,sigma2,dt);
+    UpdateFluid(CFL*CFLfact,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
 
     if (iter<2 || TRUE,
       UpdateEMField(1e99,1.0,dt,TSEMF_NEWTON); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
     ,{else}
      for (cnt,0,0,
-      Lc=1e-3*4;      {characteristic length scale in meters used to solve the emfield equation}
-      relaxEMF=0.2; {relaxation factor forced on the update of the emfield variables}
-      UpdateEMField(Lc,relaxEMF,dt,TSEMF_ADI); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
-      relaxEMF=1.0;
-      UpdateEMField(Lc*1e99,relaxEMF,dt,TSEMF_IMAF,10);
-      relaxEMF=0.2; {relaxation factor forced on the update of the emfield variables}
-      UpdateEMField(Lc,relaxEMF,dt,TSEMF_ADI); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
-      relaxEMF=1.0;
-      UpdateEMField(Lc*1e99,relaxEMF,dt,TSEMF_IMAF,10);
+      Lc=1e-3*400;      {characteristic length scale in meters used to solve the emfield equation}
+      relaxEMF=1.0; {relaxation factor forced on the update of the emfield variables}
+      UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,200); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+      UpdateEMField(Lc*1e99,relaxEMF,dt,TSEMF_IMAF,20);
      );
     );
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",

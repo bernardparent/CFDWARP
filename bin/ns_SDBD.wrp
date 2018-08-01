@@ -1,10 +1,9 @@
 
  
 
-mf=1.41; {1.0, 1.41, 2.0, 2.82}
+mf=1.0; {1.0, 1.41, 2.0, 2.82}
 
 tf=0.5; {tf=1 works great}
-itermax=100;  {100 usually.}
 CFLfact=1.0;
 
 dphimax=14000;
@@ -138,11 +137,11 @@ Bdry(
 
     }
     All(BDRYEMF_DIELECTRIC);
-    {cut the exposed electrode}
-    Cut(is2,js3,  is4,js4);
+    {cut below the exposed electrode}
+    Cut(is2,js2,  is4,js3);
     All(BDRYEMF_DIELECTRIC);
 
-    Region(is2,js3,  is4,js4,  BDRYEMF_ELECTRODE);
+    Region(is2,js3,  is4,js3,  BDRYEMF_ELECTRODE);
     Region(is4,js2,  is5,js2,  BDRYEMF_ELECTRODE);
 
     {
@@ -182,7 +181,7 @@ Model(
     SetRelativePermittivity(is,js, ie,js4, 5.0 );
     SetRelativePermittivity(is,js4, ie,je, 1.0 );
     SetSolidConductivity(is,js, ie,je, 0.0 {S/m});
-   
+    SetSolidConductivity(is2,js3,  is4,js4, 1000 {S/m});
     SetElectroMotiveForce(is,js, ie,je, 0.0{V/m},0.0{V/m}, 1e99{max power in W/m3});
   );
 );
@@ -296,25 +295,25 @@ Cycle(
                            near cathode when PRECONDITIONER is set to PRECON_LOCALTIMESTEPPLASMA} 
     relaxNi_bdry=1.0;     {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.8;     {the electron density relaxation factor at the boundary }
-    relaxTe=0.1;          {the electron temperature relaxation factor }
+    relaxTe=0.5;          {the electron temperature relaxation factor }
     rhoref=0.1;           {reference density in kg/m3}
     Tref=300.0;           {reference temperature in K}
     Teref=20000.0;        {reference electron temperature in K}
     Tvref=5000.0;         {reference vibrational temperature in K}
     aref=sqrt(1.4*287*Tref);  {reference sound speed in m/s}
-    wion=1e-7;            {average ion mass fraction}
+    wion=1e-5;            {average ion mass fraction}
     Uref[0]=wion*1.8e-5*rhoref;   
     Uref[1]=wion*rhoref;   
     Uref[2]=wion*rhoref;   
     Uref[3]=wion*rhoref;   
-    Uref[4]=rhoref;   
-    Uref[5]=rhoref;   
-    Uref[6]=rhoref;   
-    Uref[7]=rhoref;   
-    Uref[8]=rhoref*aref;   
-    Uref[9]=rhoref*aref;   
-    Uref[10]=rhoref*aref*aref;  
-    Uref[11]=rhoref*700.0*Tvref;  
+    Uref[4]=rhoref*1e99;   
+    Uref[5]=rhoref*1e99;   
+    Uref[6]=rhoref*1e99;   
+    Uref[7]=rhoref*1e99;   
+    Uref[8]=rhoref*aref*1e99;   
+    Uref[9]=rhoref*aref*1e99;   
+    Uref[10]=rhoref*aref*aref*1e99;  
+    Uref[11]=rhoref*700.0*Tvref*1e99;  
     Uref[12]=rhoref*wion*414*Teref*1e99;  
   );
   Ohm(
@@ -325,7 +324,7 @@ Cycle(
   DualTimeStepping(
     tmax=25e-6;    {simulation time span in seconds}
     dtref=20e-9/(mf*60*tf);   {physical time step in seconds}
-    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
+    sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
     if (time<20e-9,
       dphi=min(dphimax,time/9e-9*dphimax);
@@ -336,7 +335,7 @@ Cycle(
     
     if (iter==1,
       Init(Ohm(
-        Region(is2,js3,  is4,js4,  INITEMF_TYPE1,dphi/2);
+        Region(is2,js3,  is4,js3,  INITEMF_TYPE1,dphi/2);
         Region(is4,js2,  is5,js2,  INITEMF_TYPE1,-dphi/2);
       ););
     );
@@ -347,34 +346,31 @@ Cycle(
       ,{else} 
         CFL=2.0*CFLfact;
       );
+      CFL=CFLfact;
       if (iter<3, CFL=0.0;);
       if (time>5e-9 && time<20e-9,
         dt=dtref/2.0;
       );
+      itermax=150;
     ,{else}
       if (iter==1, 
-        dt=min(dt*2,0.4e-4/(330*mf*tf));
+        dt=min(dt*2,3*0.4e-4/(330*mf*tf));
         CFL=0.2;
+        Model(Ohm(SetSolidConductivity(is2,js3,  is4,js4, 0 {S/m});););
       ,{else}
         CFL=min(1.0,CFL*1.4);
       );
-    );
-    if (dt>dtref*10,
-      Cycle(NavierStokesPlasma(
-        zetaGammai=1;       
-        zetaGammae=1;
-      ););
-      itermax=25;
+      itermax=150;
     );
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
     system("date");
     Lc=1e-3*4;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=1.0; {relaxation factor forced on the update of the emfield variables}
     for (cnt,0,0,
-      UpdateEMField(Lc*100000,relaxEMF*0.8,dt,TSEMF_SOR,1000); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
-      UpdateEMField(Lc*100000,relaxEMF*0.8,dt,TSEMF_IMAF,30); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+      UpdateEMField(Lc*100000,relaxEMF*1.0,dt,TSEMF_SOR,1300); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+      {UpdateEMField(Lc,relaxEMF*0.3,dt,TSEMF_ADI);}
+      UpdateEMField(Lc*100000,relaxEMF*1.0,dt,TSEMF_IMAF,50); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
     );
-    {UpdateEMField(Lc*100,relaxEMF,dt,TSEMF_IMAF,120);}
 
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,

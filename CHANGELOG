@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 AUG 01a
+   * in bin
+     - updated DBD_actuator.wrp
+     - updated ns_SDBD.wrp
+     - updated ns_SDBD_N2.wrp
+
+
 2018 JUL 31c
    * in model/beam/
      - relinked active to none
