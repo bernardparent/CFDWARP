@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 AUG 04a
+   * in tools/search.sh
+     - fixed bug related to filename pattern matching
+
+
 2018 AUG 01a
    * in bin
      - updated DBD_actuator.wrp

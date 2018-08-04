@@ -9,14 +9,14 @@ caseflag="";
 stringtofind="";
 errormessage="";
 nogit="-path *.git -prune -o";
-fileflag="";
+filename='*';
 
 while [ $# -gt 0 ]
 do
   case "$1" in
     -w) wordflag="-w";;
     -i) caseflag="-i";;
-    -filename) fileflag="-name $2";  shift;;
+    -filename) filename="$2";  shift;;
     -git) nogit="";;
 	--)	shift; break;;
 	 *) if [ -z "$stringtofind" ] 
@@ -31,7 +31,6 @@ do
   shift
 done
 
-#echo "fileflag=$fileflag";
 
 if [ -z "$stringtofind" ]; then
   errormessage="$errormessage A string to be searched was not provided within the arguments."
@@ -41,7 +40,7 @@ if [ -z "$errormessage" ] && [ ! -z "$stringtofind" ]
 then {
   echo "Searching for string '$stringtofind' ...";
 #  for i in `find . -path './dev' -prune -o -print 2> /dev/null`
-  for i in `find . $nogit -type f $fileflag -print 2> /dev/null`
+  for i in `find . $nogit -type f -name "$filename" -print 2> /dev/null`
   do {
     fgrep $caseflag $wordflag "$stringtofind" $i > /dev/null 2>&1;
     if [ $? = 0 ]
