@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 AUG 21a
+   * in model/share/fluid_share.c
+     - in find_Y1star_at_interface() and find_Y2star_at_interface() took away dependence of
+       Y1star abd Y2star on betag and betaminus (not needed anymore)
+
+
 2018 AUG 04a
    * in tools/search.sh
      - fixed bug related to filename pattern matching

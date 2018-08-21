@@ -1989,7 +1989,7 @@ void find_Y1star_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, 
   }
 
   for (spec=0; spec<ns; spec++){
-    Ystar[spec]=metrics.Omega*fabs(_betag(spec))*Estar;  
+    Ystar[spec]=metrics.Omega*Estar;  
   }
 
 }
@@ -2008,7 +2008,7 @@ void find_Y2star_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, 
   }
 
   for (spec=0; spec<ns; spec++){
-    Ystar[spec]=-metrics.Omega*fabs(_betaminus(spec))*Jstar;  
+    Ystar[spec]=-metrics.Omega*Jstar;  
   }
 
 }
