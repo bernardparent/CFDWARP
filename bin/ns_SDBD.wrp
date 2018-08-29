@@ -1,10 +1,10 @@
 
  
 
-mf=1.0; {1.0, 1.41, 2.0, 2.82}
+mf=1/1.41; {1.0, 1.41, 2.0, 2.82}
 
-tf=0.5; {tf=1 works great}
-CFLfact=1.0;
+tf=1; {tf=1 works great}
+CFLfact=0.8;
 
 dphimax=14000;
 
@@ -348,9 +348,9 @@ Cycle(
       );
       CFL=CFLfact;
       if (iter<3, CFL=0.0;);
-      if (time>5e-9 && time<20e-9,
+{      if (time>5e-9 && time<20e-9,
         dt=dtref/2.0;
-      );
+      );}
       itermax=150;
     ,{else}
       if (iter==1, 
@@ -367,7 +367,7 @@ Cycle(
     Lc=1e-3*4;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=1.0; {relaxation factor forced on the update of the emfield variables}
     for (cnt,0,0,
-      UpdateEMField(Lc*100000,relaxEMF*1.0,dt,TSEMF_SOR,1300); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+      UpdateEMField(Lc*100000,relaxEMF*0.8,dt,TSEMF_SOR,1300); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
       {UpdateEMField(Lc,relaxEMF*0.3,dt,TSEMF_ADI);}
       UpdateEMField(Lc*100000,relaxEMF*1.0,dt,TSEMF_IMAF,50); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
     );

@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 AUG 29a
+   * in bin/ns_SDBD.wrp
+     - made changes
+   * in model/fluid/_Navier-Stokes_perfect/fluid_source.c
+     - in find_Sstar(), added body force source terms to total energy flux
+
+
 2018 AUG 21a
    * in model/share/fluid_share.c
      - in find_Y1star_at_interface() and find_Y2star_at_interface() took away dependence of
