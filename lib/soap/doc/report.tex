@@ -443,6 +443,29 @@ would execute the code inside the loop 4 times and the variables
 \end{verbatim}
 %
 
+
+\subsubsection{\emph{for_parallel}}
+
+Forming a \verb|for_parallel| loop works in the same way as the \verb|for| loop but distributes
+the load on multiple threads. Thus,
+%
+\begin{verbatim}
+   for_parallel ( i , 3 , 6 ,
+     a[i]=i*10;
+   );
+\end{verbatim}
+%
+would determine \verb|a[i]| correctly. However, the following would be erroneous:
+%
+\begin{verbatim}
+   a=10;
+   for_parallel ( i , 3 , 6 ,
+     a=a*10;
+   );
+\end{verbatim}
+%
+Such is not guaranteed to give the correct answer for \verb|a| because the loop can not be executed in parallel. 
+
 \subsubsection{\emph{if}}
 
 The \verb|if| action  calls for

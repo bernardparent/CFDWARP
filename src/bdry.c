@@ -731,6 +731,7 @@ void display_node_type_window(FILE *outfile, np_t *np, gl_t *gl, int TYPELEVEL,
       }
 #else
       nodetype=_node_type(np[_ai(gl,i,j,k)],TYPELEVEL);
+      link=_node_link(np[_ai(gl,i,j,k)],TYPELEVEL);
       NODERESUMED=is_node_resumed(np[_ai(gl,i,j,k)]);
 #endif
       if (PRINT) {
@@ -739,13 +740,17 @@ void display_node_type_window(FILE *outfile, np_t *np, gl_t *gl, int TYPELEVEL,
         || TYPELEVEL==TYPELEVEL_EMFIELD
 #endif
            ) {
-          if (nodetype>=NODETYPE_BDRY) {
-            if (nodetype>9)
-              wfprintf(outfile,"%c",(int)('A'+nodetype-10));
-              else wfprintf(outfile,"%ld",nodetype);
+          if (link!=LINK_NONE){
+            wfprintf(outfile,"L");
           } else {
-            if (nodetype==NODETYPE_INNER) wfprintf(outfile,"+"); /* Inner flow node */
-            if (nodetype==NODETYPE_UNUSED) wfprintf(outfile,"%c",CHARACTER_BLOCK); /* unused node */
+            if (nodetype>=NODETYPE_BDRY) {
+              if (nodetype>9)
+                wfprintf(outfile,"%c",(int)('A'+nodetype-10));
+                else wfprintf(outfile,"%ld",nodetype);
+            } else {
+              if (nodetype==NODETYPE_INNER) wfprintf(outfile,"+"); /* Inner flow node */
+              if (nodetype==NODETYPE_UNUSED) wfprintf(outfile,"%c",CHARACTER_BLOCK); /* unused node */
+            }
           }
         } else {
           wfprintf(outfile,"S");

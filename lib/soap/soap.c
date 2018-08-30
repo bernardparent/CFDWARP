@@ -1450,6 +1450,60 @@ static void BA_for(char **argum, SOAP_codex_t *codex){
 
 }
 
+
+static void BA_for_parallel(char **argum, SOAP_codex_t *codex){
+  char *cntstr,*loopcode,*cntstr2;
+  long cnts,cnte,cnt,cntvar,numvars,cnttmp;
+  SOAP_codex_t *codexcopy;
+
+  if (SOAP_number_argums(*argum)!=4)
+  SOAP_fatal_error(codex,"the for_parallel() command needs 4 arguments: "
+                          "the first argument is the counter variable name; "
+			  "the second argument is the start of the counting (integer); "
+			  "the third argument is the end of the counting (integer); "
+			  "the fourth argument is the code to be executed at every count.");
+  SOAP_substitute_argum(argum,1,codex);
+  SOAP_substitute_argum(argum,2,codex);
+
+  cnts=SOAP_get_argum_long(codex,*argum,1);
+  cnte=SOAP_get_argum_long(codex,*argum,2);
+  if (cnts>cnte) {
+    cnttmp=cnte;
+    cnte=cnts;
+    cnts=cnttmp;
+  }
+  codexcopy=(SOAP_codex_t *)malloc((cnte-cnts+2)*sizeof(SOAP_codex_t));
+#ifdef OPENMPTHREADS
+#pragma omp parallel for private(cnt,cntstr2,cntstr,loopcode) schedule(dynamic) 
+#endif
+  for (cnt=cnts; cnt<=cnte; cnt++){
+    SOAP_copy_codex(codex, &(codexcopy[cnt-cnts]));
+    (codexcopy[cnt-cnts]).vars=NULL;
+    SOAP_copy_all_vars(codex->vars, &((codexcopy[cnt-cnts]).vars));
+    /* change value of cntstr to cntstr2 in variables */
+    loopcode=(char *)malloc(sizeof(char));
+    cntstr=(char *)malloc(sizeof(char));
+    SOAP_get_argum_straight(&(codexcopy[cnt-cnts]),&cntstr,*argum,0);
+    SOAP_get_argum_straight(&(codexcopy[cnt-cnts]),&loopcode, *argum, 3);
+    cntstr2=(char *)malloc(maxnumlen*sizeof(char));
+    sprintf(cntstr2,"%ld",cnt);
+    update_var(&cntstr, &cntstr2, &(codexcopy[cnt-cnts]));
+    SOAP_process_code(loopcode, &(codexcopy[cnt-cnts]), SOAP_VARS_KEEP_ALL);
+    free(cntstr2);
+    free(cntstr);
+    free(loopcode);
+  }
+  for (cnt=cnts; cnt<=cnte; cnt++){
+    SOAP_count_all_vars(&(codexcopy[cnt-cnts]), &numvars);
+    for (cntvar=0; cntvar<numvars; cntvar++){
+      SOAP_add_to_vars(codex, (codexcopy[cnt-cnts]).vars[cntvar].name, (codexcopy[cnt-cnts]).vars[cntvar].value);
+    }
+    SOAP_free_all_vars(((codexcopy[cnt-cnts]).vars));
+    SOAP_free_codex(&(codexcopy[cnt-cnts]));
+  }
+}
+
+
 static void BA_if(char **argum, SOAP_codex_t *codex){
   char *ifcode;
 
@@ -1573,6 +1627,10 @@ static void builtin_actions(char *action, char **argum, SOAP_codex_t *codex){
   }
   if (strcmp(action,"for")==0) {
     BA_for(argum,codex);
+    codex->ACTIONPROCESSED=TRUE; 
+  }
+  if (strcmp(action,"for_parallel")==0) {
+    BA_for_parallel(argum,codex);
     codex->ACTIONPROCESSED=TRUE; 
   }
   if (strcmp(action,"if")==0) {
@@ -1748,6 +1806,7 @@ void SOAP_init_codex(SOAP_codex_t *codex, const char *filename){
   codex->SCREENOUTPUT=TRUE;
   codex->FILEOUTPUT=TRUE;
   codex->SYSTEMCALL=TRUE;
+  codex->ACTIONPROCESSED=FALSE;
   codex->linenum=0;
   codex->filename=(char *)malloc((2+strlen(filename))*sizeof(char));
   strcpy(codex->filename,filename);
@@ -1763,6 +1822,7 @@ void SOAP_copy_codex(SOAP_codex_t *orig, SOAP_codex_t *copy){
   copy->SCREENOUTPUT=orig->SCREENOUTPUT;
   copy->FILEOUTPUT=orig->FILEOUTPUT;
   copy->SYSTEMCALL=orig->SYSTEMCALL;
+  copy->ACTIONPROCESSED=orig->ACTIONPROCESSED;
   copy->action=orig->action;
   copy->function=orig->function;
   copy->action_args=orig->action_args;

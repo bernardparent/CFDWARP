@@ -13,4 +13,9 @@
     printf("The right price!\n");
   );
 
-  
+  for (i,1,10,
+    printf("i=%ld\n",i);
+  );
+  for (i,10,1,
+    printf("i=%ld\n",i);
+  );  

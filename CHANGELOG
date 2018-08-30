@@ -7,6 +7,17 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 AUG 30a
+   * in src/bdry.c
+     - in display_node_type_window(), fixed a bug: the link nodes were node displayed properly
+       for the j constant cut
+   * in lib/soap/soap.c
+     - added BA_for_parallel()
+     - in SOAP_init_codex() and SOAP_copy_codex(), set codex->ACTIONPROCESSED=FALSE
+   * in lib/soap/doc/report.tex
+     - added section for_parallel
+
+
 2018 AUG 29a
    * in bin/ns_SDBD.wrp
      - made changes
