@@ -40,6 +40,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
   np_t **np;
   gl_t *gl;
   zone_t zone;
+  short linkdim;
   long numparam,BCtype,i,j,k,is,ie,i1,i2,k1,k2,j1,j2,l1,l2;
 #ifdef _2DL 
   long js,je;
@@ -155,6 +156,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
     j2=1;
     k1=1;
     k2=1;
+    linkdim=LINKDIM_NONE;
 #ifdef _2D
     if (sscanf(*argum,"%ld,%ld,%ld,%ld%n",&i1,&j1,&i2,&j2,&eos)!=4
 #endif
@@ -162,32 +164,80 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
     if (sscanf(*argum,"%ld,%ld,%ld,%ld,%ld,%ld%n",&i1,&j1,&k1,&i2,&j2,&k2,&eos)!=6
 #endif
       || (*argum)[eos]!=EOS){
-      SOAP_fatal_error(codex,"One or more argument(s) could not be read properly "
-                             "in Link() part of Bdry(). Arguments: %s .",*argum);
+
+
+#ifdef _2D
+      if (sscanf(*argum,"%ld,%ld,%ld,%ld,%hd%n",&i1,&j1,&i2,&j2,&linkdim,&eos)!=5
+#endif
+#ifdef _3D
+      if (sscanf(*argum,"%ld,%ld,%ld,%ld,%ld,%ld,%hd%n",&i1,&j1,&k1,&i2,&j2,&k2,&linkdim,&eos)!=7
+#endif
+        || (*argum)[eos]!=EOS){
+
+
+        SOAP_fatal_error(codex,"One or more argument(s) could not be read properly "
+                               "in Link() part of Bdry(). Arguments: %s .",*argum);
+      }
     }
-    if (!(   (is_node_bdry((*np)[_ai(gl,i1,j1,k1)],TYPELEVEL) && is_node_inner((*np)[_ai(gl,i2,j2,k2)],TYPELEVEL))
-        || (is_node_bdry((*np)[_ai(gl,i2,j2,k2)],TYPELEVEL) && is_node_inner((*np)[_ai(gl,i1,j1,k1)],TYPELEVEL))
+    if (linkdim<1 || linkdim>nd) SOAP_fatal_error(codex,"The link inner node dimension can not be set to %ld. It must lie within 1 and %ld.\n",linkdim,nd);
+    /* reduce linkdim from 1,2,3 in control file to 0,1,2 in C code*/
+    if (linkdim!=LINKDIM_NONE) linkdim-=1;
+    l1=_ai(gl,i1,j1,k1);
+    l2=_ai(gl,i2,j2,k2);
+    if (!(   (is_node_bdry((*np)[l1],TYPELEVEL) && is_node_inner((*np)[l2],TYPELEVEL))
+        || (is_node_bdry((*np)[l2],TYPELEVEL) && is_node_inner((*np)[l1],TYPELEVEL))
         )){
       SOAP_fatal_error(codex,"When making a link between two nodes, one must be a bdry node and the other an inner node.");
     }
 
     switch (TYPELEVEL){   
       case TYPELEVEL_FLUID: 
-        (*np)[_ai(gl,i1,j1,k1)].link=_ai(gl,i2,j2,k2);
-        (*np)[_ai(gl,i2,j2,k2)].link=_ai(gl,i1,j1,k1);
+        //(*np)[l1].link=l2;
+        (*np)[l1].numlink++;
+        (*np)[l1].linkarray=(long *)realloc((*np)[l1].linkarray,sizeof(long)*(*np)[l1].numlink*2);
+        (*np)[l1].linkarray[(*np)[l1].numlink*2-2]=l2;
+        if (is_node_inner((*np)[l1],TYPELEVEL)) (*np)[l1].linkarray[(*np)[l1].numlink*2-1]=linkdim; 
+          else (*np)[l1].linkarray[(*np)[l1].numlink*2-1]=LINKDIM_NONE;          
+        if (is_node_bdry((*np)[l1],TYPELEVEL) && (*np)[l1].numlink>1) fatal_error("Bdry node can not be linked to more than one inner node. Problem at fluid bdry node (%ld,%ld,%ld).",i1,j1,k1); 
+
+        //(*np)[l2].link=l1;
+        (*np)[l2].numlink++;
+        (*np)[l2].linkarray=(long *)realloc((*np)[l2].linkarray,sizeof(long)*(*np)[l2].numlink*2);
+        (*np)[l2].linkarray[(*np)[l2].numlink*2-2]=l1;
+        if (is_node_inner((*np)[l2],TYPELEVEL)) (*np)[l2].linkarray[(*np)[l2].numlink*2-1]=linkdim; 
+          else (*np)[l2].linkarray[(*np)[l2].numlink*2-1]=LINKDIM_NONE;          
+        if (is_node_bdry((*np)[l2],TYPELEVEL) && (*np)[l2].numlink>1) fatal_error("Bdry node can not be linked to more than one inner node. Problem at fluid bdry node (%ld,%ld,%ld).",i2,j2,k2); 
+
+
+
 #ifdef DISTMPI
-        if (is_node_bdry((*np)[_ai(gl,i1,j1,k1)],TYPELEVEL)){
-          (*np)[_ai(gl,i1,j1,k1)].linkmusclvars=(double *)realloc((*np)[_ai(gl,i1,j1,k1)].linkmusclvars,(max(0,hbw_resconv_fluid-1)*nf)*sizeof(double));
+        if (is_node_bdry((*np)[l1],TYPELEVEL)){
+          (*np)[l1].linkmusclvars=(double *)realloc((*np)[l1].linkmusclvars,(max(0,hbw_resconv_fluid-1)*nf)*sizeof(double));
         } else {
-          assert(is_node_bdry((*np)[_ai(gl,i2,j2,k2)],TYPELEVEL));
-          (*np)[_ai(gl,i2,j2,k2)].linkmusclvars=(double *)realloc((*np)[_ai(gl,i2,j2,k2)].linkmusclvars,(max(0,hbw_resconv_fluid-1)*nf)*sizeof(double));
+          assert(is_node_bdry((*np)[l2],TYPELEVEL));
+          (*np)[l2].linkmusclvars=(double *)realloc((*np)[l2].linkmusclvars,(max(0,hbw_resconv_fluid-1)*nf)*sizeof(double));
         }
 #endif
       break;
 #ifdef EMFIELD
       case TYPELEVEL_EMFIELD: 
-        (*np)[_ai(gl,i1,j1,k1)].link_emf=_ai(gl,i2,j2,k2);
-        (*np)[_ai(gl,i2,j2,k2)].link_emf=_ai(gl,i1,j1,k1);
+        //(*np)[l1].link_emf=l2;
+        (*np)[l1].numlink_emf++;
+        (*np)[l1].linkarray_emf=(long *)realloc((*np)[l1].linkarray_emf,sizeof(long)*(*np)[l1].numlink_emf*2);
+        (*np)[l1].linkarray_emf[(*np)[l1].numlink_emf*2-2]=l2;
+        if (is_node_inner((*np)[l1],TYPELEVEL)) (*np)[l1].linkarray_emf[(*np)[l1].numlink_emf*2-1]=linkdim; 
+          else (*np)[l1].linkarray_emf[(*np)[l1].numlink_emf*2-1]=LINKDIM_NONE;          
+        if (is_node_bdry((*np)[l1],TYPELEVEL) && (*np)[l1].numlink_emf>1) fatal_error("Bdry node can not be linked to more than one inner node. Problem at emfield bdry node (%ld,%ld,%ld).",i1,j1,k1); 
+
+
+        //(*np)[l2].link_emf=l1;
+        (*np)[l2].numlink_emf++;
+        (*np)[l2].linkarray_emf=(long *)realloc((*np)[l2].linkarray_emf,sizeof(long)*(*np)[l2].numlink_emf*2);
+        (*np)[l2].linkarray_emf[(*np)[l2].numlink_emf*2-2]=l1;
+        if (is_node_inner((*np)[l2],TYPELEVEL)) (*np)[l2].linkarray_emf[(*np)[l2].numlink_emf*2-1]=linkdim; 
+          else (*np)[l2].linkarray_emf[(*np)[l2].numlink_emf*2-1]=LINKDIM_NONE;          
+        if (is_node_bdry((*np)[l2],TYPELEVEL) && (*np)[l2].numlink_emf>1) fatal_error("Bdry node can not be linked to more than one inner node. Problem at emfield bdry node (%ld,%ld,%ld).",i2,j2,k2); 
+
       break;
 #endif
       default:
@@ -215,11 +265,18 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
         for3DL(k,zone.ks,zone.ke)
           if (is_node_link((*np)[_ai(gl,i,j,k)],TYPELEVEL)){
             l1=_ai(gl,i,j,k);
-            l2=_node_link((*np)[l1],TYPELEVEL);
+            assert(is_node_bdry((*np)[l1],TYPELEVEL));
+            l2=_node_link((*np)[l1],0,TYPELEVEL);
             switch (TYPELEVEL){   
               case TYPELEVEL_FLUID: 
-                (*np)[l1].link=LINK_NONE;
-                (*np)[l2].link=LINK_NONE;
+                //(*np)[l1].link=LINK_NONE;
+                free((*np)[l1].linkarray);
+                (*np)[l1].linkarray=NULL;
+                (*np)[l1].numlink=0;
+                //(*np)[l2].link=LINK_NONE;
+                free((*np)[l2].linkarray);
+                (*np)[l2].linkarray=NULL;
+                (*np)[l2].numlink=0;
 #ifdef DISTMPI
                 free((*np)[l1].linkmusclvars);
                 free((*np)[l2].linkmusclvars);
@@ -229,8 +286,14 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
               break;
 #ifdef EMFIELD
               case TYPELEVEL_EMFIELD: 
-                (*np)[l1].link_emf=LINK_NONE;
-                (*np)[l2].link_emf=LINK_NONE;
+                //(*np)[l1].link_emf=LINK_NONE;
+                free((*np)[l1].linkarray_emf);
+                (*np)[l1].linkarray_emf=NULL;
+                (*np)[l1].numlink_emf=0;
+                //(*np)[l2].link_emf=LINK_NONE;
+                free((*np)[l2].linkarray_emf);
+                (*np)[l2].linkarray_emf=NULL;
+                (*np)[l2].numlink_emf=0;
               break;
 #endif
               default:
@@ -345,7 +408,49 @@ bool find_bdry_direc(np_t *np, gl_t *gl, long l_A, int TYPELEVEL,
 }
 
 
-void find_link_direc(np_t *np, gl_t *gl, long llink, int TYPELEVEL, long *theta, long *thetasgn){
+void find_link_direc(np_t *np, gl_t *gl, long llink, long lbdry, int TYPELEVEL, long *theta, long *thetasgn){
+  long dim,dimsgn,cntlink;
+  bool FOUND;
+  if (llink==LINK_NONE) fatal_error("The node given must link to another in _al_link().");
+  if (!is_node_inner(np[llink],TYPELEVEL)) fatal_error("The node linked to must be an inner node in _al_link().");
+  /* check if *theta is user-specified */
+  FOUND=FALSE;
+  for (cntlink=0; cntlink<_num_node_link(np[llink],TYPELEVEL); cntlink++){
+    if (np[llink].linkarray[cntlink*2]==lbdry) {
+      if (FOUND) fatal_error("There can not be more than 1 matching lbdry within np[llink] within find_link_direc.");
+      FOUND=TRUE;
+      *theta=np[llink].linkarray[cntlink*2+1];
+    }
+  }
+  if (!FOUND) {
+    fatal_error("Problem finding lbdry within np[llink] within find_link_direc. numlink=%hd. lbdry=%ld.",np[llink].numlink,lbdry);
+  }
+  if (*theta!=LINKDIM_NONE){
+    assert(*theta>=0);
+    assert(*theta<nd);
+    *thetasgn=0;
+    if (is_node_inner(np[_al(gl,llink,*theta,+1)],TYPELEVEL)) *thetasgn+=+1;
+    if (is_node_inner(np[_al(gl,llink,*theta,-1)],TYPELEVEL)) *thetasgn+=-1;
+    if (*thetasgn==0) fatal_error("Problem finding direction of extrapolation at link inner node (%ld,%ld,%ld). Make sure that, along the link dimension specified, the neighbor node is an inner node while another neighbor node is a bdry node.",_i_all(llink,gl,0),_i_all(llink,gl,1),_i_all(llink,gl,2));
+  } else {
+    /* check on which side there is a node that links to another */
+    *theta=-1;
+    *thetasgn=0;
+    for (dim=0; dim<nd; dim++){
+      for (dimsgn=-1; dimsgn<=1; dimsgn+=2){
+        if (is_node_link(np[_al(gl,llink,dim,dimsgn)],TYPELEVEL) && is_node_bdry(np[_al(gl,llink,dim,dimsgn)],TYPELEVEL)){
+          if (*theta!=-1) fatal_error("link node (%ld,%ld,%ld) has more than 1 neighbor node that is both a link node and a bdry node; can't determine the direction of the surface properly.",_i(llink, gl, 0),_i(llink, gl, 1),_i(llink, gl, 2));
+          *theta=dim;
+          *thetasgn=-dimsgn;
+        }
+      }
+    }
+    if (*theta==-1) fatal_error("link node (%ld,%ld,%ld) has no neighbor node that is both a link node and a bdry node; can't determine the direction of the surface properly. Specify the dimension perpendicular to the boundary surface associated with the link at the inner node as an extra (optional) argument to the Link() action.",_i_all(llink, gl, 0),_i_all(llink, gl, 1),_i_all(llink, gl, 2));
+  }
+}
+
+
+void find_link_direc_old(np_t *np, gl_t *gl, long llink, long lbdry, int TYPELEVEL, long *theta, long *thetasgn){
   long dim,dimsgn;
   if (llink==LINK_NONE) fatal_error("The node given must link to another in _al_link().");
   if (!is_node_inner(np[llink],TYPELEVEL)) fatal_error("The node linked to must be an inner node in _al_link().");
@@ -562,8 +667,8 @@ void display_node_type_window(FILE *outfile, np_t *np, gl_t *gl, int TYPELEVEL,
 #ifdef _3DL
   long ks,ke;
 #endif
-  long nodetype,link;
-  int NODERESUMED;
+  long nodetype;
+  int NODERESUMED,NODELINK;
   bool PRINT=TRUE;
 #ifdef DISTMPI
   int rank;
@@ -606,21 +711,21 @@ void display_node_type_window(FILE *outfile, np_t *np, gl_t *gl, int TYPELEVEL,
       if (_node_rank(gl,i,j,k)==rank) {
         NODERESUMED=(int)is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID);
         nodetype=_node_type(np[_ai(gl,i,j,k)],TYPELEVEL);
-        link=_node_link(np[_ai(gl,i,j,k)],TYPELEVEL);
+        NODELINK=is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL);
         if (rank!=0) {
           MPI_IBsend(&NODERESUMED,1,MPI_INT,0,0,MPI_COMM_WORLD);
           MPI_IBsend(&nodetype,1,MPI_LONG,0,0,MPI_COMM_WORLD);
-          MPI_IBsend(&link,1,MPI_LONG,0,0,MPI_COMM_WORLD);
+          MPI_IBsend(&NODELINK,1,MPI_INT,0,0,MPI_COMM_WORLD);
         }
       }
       if (rank==0 && _node_rank(gl,i,j,k)!=0) {
         MPI_Recv(&NODERESUMED,1,MPI_INT,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
         MPI_Recv(&nodetype,1,MPI_LONG,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
-        MPI_Recv(&link,1,MPI_LONG,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
+        MPI_Recv(&NODELINK,1,MPI_INT,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
       }
 #else
       nodetype=_node_type(np[_ai(gl,i,j,k)],TYPELEVEL);
-      link=_node_link(np[_ai(gl,i,j,k)],TYPELEVEL);
+      NODELINK=is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL);
       NODERESUMED=is_node_resumed(np[_ai(gl,i,j,k)]);
 #endif
       if (PRINT){
@@ -629,7 +734,7 @@ void display_node_type_window(FILE *outfile, np_t *np, gl_t *gl, int TYPELEVEL,
         || TYPELEVEL==TYPELEVEL_EMFIELD
 #endif
         ) {
-          if (link!=LINK_NONE){
+          if (NODELINK){
             wfprintf(outfile,"L");
           } else {
             if (nodetype>=NODETYPE_BDRY) {
@@ -668,18 +773,21 @@ void display_node_type_window(FILE *outfile, np_t *np, gl_t *gl, int TYPELEVEL,
       if (_node_rank(gl,i,j,k)==rank) {
         NODERESUMED=(int)is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID);
         nodetype=_node_type(np[_ai(gl,i,j,k)],TYPELEVEL);
+        NODELINK=is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL);
         if (rank!=0) {
           MPI_IBsend(&NODERESUMED,1,MPI_INT,0,0,MPI_COMM_WORLD);
           MPI_IBsend(&nodetype,1,MPI_LONG,0,0,MPI_COMM_WORLD);
+          MPI_IBsend(&NODELINK,1,MPI_INT,0,0,MPI_COMM_WORLD);
         }
       }
       if (rank==0 && _node_rank(gl,i,j,k)!=0) {
         MPI_Recv(&NODERESUMED,1,MPI_INT,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
         MPI_Recv(&nodetype,1,MPI_LONG,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
+        MPI_Recv(&NODELINK,1,MPI_INT,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
       }
 #else
       nodetype=_node_type(np[_ai(gl,i,j,k)],TYPELEVEL);
-      link=_node_link(np[_ai(gl,i,j,k)],TYPELEVEL);
+      NODELINK=is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL);
       NODERESUMED=is_node_resumed(np[_ai(gl,i,j,k)]);
 #endif
       if (PRINT) {
@@ -688,7 +796,7 @@ void display_node_type_window(FILE *outfile, np_t *np, gl_t *gl, int TYPELEVEL,
         || TYPELEVEL==TYPELEVEL_EMFIELD
 #endif
            ) {
-          if (link!=LINK_NONE){
+          if (NODELINK){
             wfprintf(outfile,"L");
           } else {
             if (nodetype>=NODETYPE_BDRY) {
@@ -720,18 +828,21 @@ void display_node_type_window(FILE *outfile, np_t *np, gl_t *gl, int TYPELEVEL,
       if (_node_rank(gl,i,j,k)==rank) {
         NODERESUMED=(int)is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID);
         nodetype=_node_type(np[_ai(gl,i,j,k)],TYPELEVEL);
+        NODELINK=is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL);
         if (rank!=0) {
           MPI_IBsend(&NODERESUMED,1,MPI_INT,0,0,MPI_COMM_WORLD);
           MPI_IBsend(&nodetype,1,MPI_LONG,0,0,MPI_COMM_WORLD);
+          MPI_IBsend(&NODELINK,1,MPI_INT,0,0,MPI_COMM_WORLD);
         }
       }
       if (rank==0 && _node_rank(gl,i,j,k)!=0) {
         MPI_Recv(&NODERESUMED,1,MPI_INT,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
         MPI_Recv(&nodetype,1,MPI_LONG,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
+        MPI_Recv(&NODELINK,1,MPI_INT,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
       }
 #else
       nodetype=_node_type(np[_ai(gl,i,j,k)],TYPELEVEL);
-      link=_node_link(np[_ai(gl,i,j,k)],TYPELEVEL);
+      NODELINK=is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL);
       NODERESUMED=is_node_resumed(np[_ai(gl,i,j,k)]);
 #endif
       if (PRINT) {
@@ -740,7 +851,7 @@ void display_node_type_window(FILE *outfile, np_t *np, gl_t *gl, int TYPELEVEL,
         || TYPELEVEL==TYPELEVEL_EMFIELD
 #endif
            ) {
-          if (link!=LINK_NONE){
+          if (NODELINK){
             wfprintf(outfile,"L");
           } else {
             if (nodetype>=NODETYPE_BDRY) {
@@ -766,7 +877,6 @@ void display_node_type_window(FILE *outfile, np_t *np, gl_t *gl, int TYPELEVEL,
     wfprintf(outfile,"k=%ld\n",km);
   }
 #endif
-  if (PRINT) wfprintf(outfile,"\nNote that boundary nodes numbered 10, 11, ...,  will be shown as %c, %c, ...\n\n",_bdry_ID(10),_bdry_ID(11));
 #ifdef DISTMPI
   MPI_Barrier(MPI_COMM_WORLD);
 #endif
@@ -935,7 +1045,6 @@ void display_node_type_window_local_process(FILE *outfile, np_t *np, gl_t *gl, i
     fprintf(outfile,"k=%ld\n",km);
   }
 #endif
-  if (PRINT) fprintf(outfile,"\nNote that boundary nodes numbered 10, 11, ...,  will be shown as A, B, ...\n\n");
 }
 
 
@@ -1014,11 +1123,15 @@ void read_bdry(char *argum, SOAP_codex_t *codex){
   for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
     for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
       for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
-        np[_ai(gl,i,j,k)].link=LINK_NONE;
+        //np[_ai(gl,i,j,k)].link=LINK_NONE;
+        np[_ai(gl,i,j,k)].numlink=0;
+        np[_ai(gl,i,j,k)].linkarray=NULL;
         np[_ai(gl,i,j,k)].numbdryparam=0;      
         np[_ai(gl,i,j,k)].bdryparam=NULL;      
 #ifdef EMFIELD
-        np[_ai(gl,i,j,k)].link_emf=LINK_NONE;
+        //np[_ai(gl,i,j,k)].link_emf=LINK_NONE;
+        np[_ai(gl,i,j,k)].numlink_emf=0;
+        np[_ai(gl,i,j,k)].linkarray_emf=NULL;
         np[_ai(gl,i,j,k)].numbdryparam_emf=0;      
         np[_ai(gl,i,j,k)].bdryparam_emf=NULL;      
 #endif
@@ -1079,7 +1192,9 @@ void read_bdry(char *argum, SOAP_codex_t *codex){
         (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].type=np[_ai(&gl_all,i,j,k)].type;
         (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].type_wk=np[_ai(&gl_all,i,j,k)].type_wk;
 
-        (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].link=np[_ai(&gl_all,i,j,k)].link;
+//        (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].link=np[_ai(&gl_all,i,j,k)].link;
+        (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].numlink=np[_ai(&gl_all,i,j,k)].numlink;      
+        (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].linkarray=np[_ai(&gl_all,i,j,k)].linkarray;      
         (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].numbdryparam=np[_ai(&gl_all,i,j,k)].numbdryparam;      
         (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].bdryparam=np[_ai(&gl_all,i,j,k)].bdryparam;      
 
@@ -1087,7 +1202,9 @@ void read_bdry(char *argum, SOAP_codex_t *codex){
 #ifdef EMFIELD
         (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].type_emf=np[_ai(&gl_all,i,j,k)].type_emf;
 
-        (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].link_emf=np[_ai(&gl_all,i,j,k)].link_emf;
+//        (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].link_emf=np[_ai(&gl_all,i,j,k)].link_emf;
+        (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].numlink_emf=np[_ai(&gl_all,i,j,k)].numlink_emf;
+        (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].linkarray_emf=np[_ai(&gl_all,i,j,k)].linkarray_emf;
         (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].numbdryparam_emf=np[_ai(&gl_all,i,j,k)].numbdryparam_emf;      
         (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].bdryparam_emf=np[_ai(&gl_all,i,j,k)].bdryparam_emf;      
 

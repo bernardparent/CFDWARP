@@ -337,7 +337,7 @@ void update_bdry_nodes(np_t *np, gl_t *gl, zone_t zone){
 #ifdef DISTMPI
 
 void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
-  long i,j,k,l1,l2,flux,offset,l;
+  long i,j,k,l1,l2,flux,offset,l,cntlink;
   MPI_Status MPI_Status1;
   MPI_Request MPI_Request1;
   flux_t musclvars;
@@ -366,25 +366,26 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
 #ifdef _CYCLE_MULTIZONE_MARCHING
           fatal_error("Linked nodes can not be used with MultizoneMarching cycle yet. Need to update update_linked_nodes() function.");
 #endif
+          for (cntlink=0; cntlink<_num_node_link(np[_ai(gl,i,j,k)],TYPELEVEL); cntlink++){
           if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL)){
             l1=_ai_all(gl,i,j,k);
-            l2=_node_link(np[_ai(gl,i,j,k)],TYPELEVEL);
+            l2=_node_link(np[_ai(gl,i,j,k)],cntlink,TYPELEVEL);
             rank1=_node_rank(gl, i, j, k);
             rank2=_node_rank(gl, _i_all(l2,gl,0), _i_all(l2,gl,1), _i_all(l2,gl,2));
           } else {
             l2=_ai_all(gl,i,j,k);
-            l1=_node_link(np[_ai(gl,i,j,k)],TYPELEVEL);
+            l1=_node_link(np[_ai(gl,i,j,k)],cntlink,TYPELEVEL);
             rank2=_node_rank(gl, i, j, k);
             rank1=_node_rank(gl, _i_all(l1,gl,0), _i_all(l1,gl,1), _i_all(l1,gl,2));
           }
           if (TYPELEVEL==TYPELEVEL_FLUID_WORK || TYPELEVEL==TYPELEVEL_FLUID){
             if (rank1==thisrank) {
               for (flux=0; flux<nf; flux++) mpivars[flux]=np[_l_from_l_all(gl,l1)].bs->U[flux];
-              mpivars[nf]=(double)_nodes_between_link_and_bdry_limited(np, gl, _l_from_l_all(gl,l1), TYPELEVEL, max(0,hbw_resconv_fluid-1));
+              mpivars[nf]=(double)_nodes_between_link_and_bdry_limited(np, gl, _l_from_l_all(gl,l1), l2, TYPELEVEL, max(0,hbw_resconv_fluid-1));
               
               for (offset=1; offset<hbw_resconv_fluid; offset++) {
 //                find_prim_fluid(np, _al_link(np, gl, _l_from_l_all(gl,l1), offset, TYPELEVEL), gl);
-                find_musclvars(np[_al_link(np, gl, _l_from_l_all(gl,l1), offset, TYPELEVEL)], gl, musclvars);
+                find_musclvars(np[_al_link(np, gl, _l_from_l_all(gl,l1), l2, offset, TYPELEVEL)], gl, musclvars);
                 for (flux=0; flux<nf; flux++) mpivars[1+flux+offset*nf]=musclvars[flux];
               }
             }
@@ -438,6 +439,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
           }
 #endif
         }
+        }
       end3DL
     end2DL
   end1DL
@@ -455,20 +457,21 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
     for2DL(j,gl->domain.js,gl->domain.je)
       for3DL(k,gl->domain.ks,gl->domain.ke)
         l1=_ai(gl,i,j,k);
-        if (is_node_inner(np[l1],TYPELEVEL) && is_node_link(np[l1],TYPELEVEL)){
+        if (is_node_bdry(np[l1],TYPELEVEL) && is_node_link(np[l1],TYPELEVEL)){
 #ifdef _CYCLE_MULTIZONE
           fatal_error("Linked nodes can not be used with Multizone cycle yet. Need to update update_linked_nodes() function.");
 #endif
 #ifdef _CYCLE_MULTIZONE_MARCHING
           fatal_error("Linked nodes can not be used with MultizoneMarching cycle yet. Need to update update_linked_nodes() function.");
 #endif
-          l2=_node_link(np[l1],TYPELEVEL);
+          assert(is_node_bdry(np[l1],TYPELEVEL));
+          l2=_node_link(np[l1],0,TYPELEVEL);
           if (TYPELEVEL==TYPELEVEL_FLUID_WORK || TYPELEVEL==TYPELEVEL_FLUID){
-            for (flux=0; flux<nf; flux++) np[l2].bs->U[flux]=np[l1].bs->U[flux];
+            for (flux=0; flux<nf; flux++) np[l1].bs->U[flux]=np[l2].bs->U[flux];
           }
 #ifdef EMFIELD
           if (TYPELEVEL==TYPELEVEL_EMFIELD){
-            for (flux=0; flux<nfe; flux++) np[l2].bs->Uemfield[flux]=np[l1].bs->Uemfield[flux];
+            for (flux=0; flux<nfe; flux++) np[l1].bs->Uemfield[flux]=np[l2].bs->Uemfield[flux];
           }
 #endif
         }

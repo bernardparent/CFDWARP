@@ -230,13 +230,13 @@ long _all(gl_t *gl, long l, long theta1, long offset1, long theta2, long offset2
 
 
 /* find the node number of a node distanced by offset node(s) from llink perpendicular to link surface  
-   note: llink must be an inner node and a link node */
-long _al_link(np_t *np, gl_t *gl, long llink, long offset, int TYPELEVEL){
+   note: llink must be an inner node and a link node; lbdry is the bdry node that is linked to llink */
+long _al_link(np_t *np, gl_t *gl, long llink, long lbdry, long offset, int TYPELEVEL){
   long cnt,theta,thetasgn,lret; 
   assert(is_node_link(np[llink],TYPELEVEL));
   assert(is_node_inner(np[llink],TYPELEVEL));
   cnt=0;
-  find_link_direc(np, gl, llink, TYPELEVEL, &theta, &thetasgn);
+  find_link_direc(np, gl, llink, lbdry, TYPELEVEL, &theta, &thetasgn);
   do {
     cnt++;
   } while(
@@ -384,7 +384,7 @@ long _nodes_from_bdry_limited(np_t *np, gl_t *gl, long l, long theta, int TYPELE
 long _nodes_from_bdry_through_links_limited(np_t *np, gl_t *gl, long l, long theta, int TYPELEVEL, long limit){
   long cnt1,cnt2,cnt,cnt1link,cnt2link;
 #ifndef DISTMPI
-  long llink,thetalink,thetalinksgn;
+  long llink,lbdry,thetalink,thetalinksgn;
 #endif
   cnt1=0;
   cnt1link=0;
@@ -416,8 +416,10 @@ long _nodes_from_bdry_through_links_limited(np_t *np, gl_t *gl, long l, long the
 #ifdef DISTMPI
     cnt1link=np[_al(gl,l,theta,cnt1)].numlinkmusclvars+1;
 #else
-    llink=_node_link(np[_al(gl,l,theta,cnt1)],TYPELEVEL);
-    find_link_direc(np, gl, llink, TYPELEVEL, &thetalink, &thetalinksgn);
+    lbdry=_al(gl,l,theta,cnt1);
+    assert(is_node_bdry(np[lbdry],TYPELEVEL));
+    llink=_node_link(np[lbdry],0,TYPELEVEL);
+    find_link_direc(np, gl, llink, lbdry, TYPELEVEL, &thetalink, &thetalinksgn);
     do {
       cnt1link++;
     } while(
@@ -431,8 +433,10 @@ long _nodes_from_bdry_through_links_limited(np_t *np, gl_t *gl, long l, long the
 #ifdef DISTMPI
     cnt2link=np[_al(gl,l,theta,-cnt2)].numlinkmusclvars+1;
 #else
-    llink=_node_link(np[_al(gl,l,theta,-cnt2)],TYPELEVEL);
-    find_link_direc(np, gl, llink, TYPELEVEL, &thetalink, &thetalinksgn);
+    lbdry=_al(gl,l,theta,-cnt2);
+    assert(is_node_bdry(np[lbdry],TYPELEVEL));
+    llink=_node_link(np[lbdry],0,TYPELEVEL);
+    find_link_direc(np, gl, llink, lbdry, TYPELEVEL, &thetalink, &thetalinksgn);
     do {
       cnt2link++;
     } while(
@@ -450,12 +454,12 @@ long _nodes_from_bdry_through_links_limited(np_t *np, gl_t *gl, long l, long the
 }
 
 
-long _nodes_between_link_and_bdry_limited(np_t *np, gl_t *gl, long llink, int TYPELEVEL, long limit){
+long _nodes_between_link_and_bdry_limited(np_t *np, gl_t *gl, long llink, long lbdry, int TYPELEVEL, long limit){
   long cnt,theta,thetasgn; 
   assert(is_node_link(np[llink],TYPELEVEL));
   assert(is_node_inner(np[llink],TYPELEVEL));
   cnt=0;
-  find_link_direc(np, gl, llink, TYPELEVEL, &theta, &thetasgn);
+  find_link_direc(np, gl, llink, lbdry, TYPELEVEL, &theta, &thetasgn);
   do {
     cnt++;
   } while(
@@ -1132,9 +1136,9 @@ bool is_node_bdry(np_t np, int TYPELEVEL){
 bool is_node_link(np_t np, int TYPELEVEL){
   bool tmp;
   tmp=FALSE;
-  if (np.link!=LINK_NONE && (TYPELEVEL==TYPELEVEL_FLUID || TYPELEVEL==TYPELEVEL_FLUID_WORK)) tmp=TRUE; 
+  if (np.numlink>0 && (TYPELEVEL==TYPELEVEL_FLUID || TYPELEVEL==TYPELEVEL_FLUID_WORK)) tmp=TRUE; 
 #ifdef EMFIELD
-  if (np.link_emf!=LINK_NONE && TYPELEVEL==TYPELEVEL_EMFIELD) tmp=TRUE; 
+  if (np.numlink_emf>0 && TYPELEVEL==TYPELEVEL_EMFIELD) tmp=TRUE; 
 #endif
   return(tmp);
 }
@@ -1338,9 +1342,27 @@ bool is_node_valid(np_t np, int TYPELEVEL){
 }
 
 
-long _node_link(np_t np, int TYPELEVEL){
+long _node_link(np_t np, long cntlink, int TYPELEVEL){
   long tmp;
   /* by default, set to no link */
+  tmp=LINK_NONE;
+  if (TYPELEVEL==TYPELEVEL_FLUID || TYPELEVEL==TYPELEVEL_FLUID_WORK) {
+    assert(cntlink<np.numlink);
+    tmp=np.linkarray[cntlink*2];
+  }
+#ifdef EMFIELD
+  if (TYPELEVEL==TYPELEVEL_EMFIELD) {
+    assert(cntlink<np.numlink_emf);
+    tmp=np.linkarray_emf[cntlink*2];
+  }
+#endif
+  return(tmp);
+}
+
+/*
+long _node_link_old(np_t np, long cntlink, int TYPELEVEL){
+  long tmp;
+//  assert(is_node_bdry(np,TYPELEVEL));
   tmp=LINK_NONE;
   if (TYPELEVEL==TYPELEVEL_FLUID || TYPELEVEL==TYPELEVEL_FLUID_WORK) {
     tmp=np.link;
@@ -1348,6 +1370,21 @@ long _node_link(np_t np, int TYPELEVEL){
 #ifdef EMFIELD
   if (TYPELEVEL==TYPELEVEL_EMFIELD) {
     tmp=np.link_emf;
+  }
+#endif
+  return(tmp);
+}
+*/
+
+long _num_node_link(np_t np, int TYPELEVEL){
+  long tmp;
+  tmp=0;
+  if (TYPELEVEL==TYPELEVEL_FLUID || TYPELEVEL==TYPELEVEL_FLUID_WORK) {
+    tmp=np.numlink;
+  }
+#ifdef EMFIELD
+  if (TYPELEVEL==TYPELEVEL_EMFIELD) {
+    tmp=np.numlink_emf;
   }
 #endif
   return(tmp);

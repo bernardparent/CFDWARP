@@ -56,7 +56,7 @@ void update_inner_and_bdry_to_node_type(np_t *np, gl_t *gl, int TYPELEVEL, long 
 bool find_bdry_direc(np_t *np, gl_t *gl, long l_A, int TYPELEVEL, long *theta,
                      long *thetasgn);
 
-void find_link_direc(np_t *np, gl_t *gl, long llink, int TYPELEVEL,
+void find_link_direc(np_t *np, gl_t *gl, long llink, long lbdry, int TYPELEVEL,
                      long *theta, long *thetasgn);
 
 bool is_multiple_bdry_direc(np_t *np, gl_t *gl, long l_A, int TYPELEVEL);

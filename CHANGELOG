@@ -7,6 +7,57 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 SEP 01a
+   * in bin
+     - added periodic_domain_3D.wrp
+   * in cycle/share/cycle_share.c
+     - in update_linked_nodes(), added cntlink loop that goes from 0 to _num_node_link()
+     - added lbdry parameter to _al_link() and to _nodes_between_link_and_bdry_limited()
+     - added parameter cntlink to calls to _node_link()
+   * in cycle/share/res_share.c
+     - added parameter cntlink to calls to _node_link()
+   * in src/bdry.c
+     - in read_bdry_actions() added error message should linkdim not be within 1 and nd
+     - added parameter cntlink to calls to _node_link()
+     - in display_node_type_window(), got rid of message that boundary nodes greater than 9 will be
+       displayed as A, B, etc. (not valid anymore)
+   * in src/common.c
+     - in _node_link(), added parameter cntlink
+     - added parameter cntlink to calls to _node_link()
+     - in is_node_link(), determine if node is a link using numlink rather than link
+     - added function _num_node_link()
+   * in src/common.h
+     - in npbs_t, fixed bug related to TSEMF_UPDATED (was within a ifdef related to SOR2, needed to
+       be taken out of it)
+
+  
+2018 AUG 31a
+   * in bin/periodic_domain.wrp
+     - made changes
+   * in src/common.h
+     - in np_t added linkarray and numlink
+   * in src/common.c
+     - in _al_link(), added lbdry as a parameter
+     - in _nodes_from_bdry_through_links_limited(), changed call to find_link_direc to include lbdry
+     - in _nodes_between_link_and_bdry_limited(), added lbdry as a parameter
+     - in _node_link(), added an assert to ensure the node is a bdry node
+   * in src/bdry.c
+     - in read_bdry_actions(), added extra parameter to Link() action: the dimension perpendicular
+       to the surface 
+     - in read_bdry_actions(), added initialization of numlink and linkarray
+     - in find_link_direc(), added code to set link dimension to the one that is user specified
+       (if applicable)
+     - in display_node_type_window(), now calls is_node_link instead of _node_link to determine if
+       a node is a link node 
+     - in display_node_type_window(), fixed a few MPI bugs in the 2nd and 3rd loops
+     - in read_bdry(), init numlink to 0 and linkarray to NULL      
+   * in cycle/share/cycle_share.c
+     - in update_linked_nodes(), update all bdry instead of inner nodes (makes a difference if an
+       inner node is linked to more than 1 bdry node)
+   * in cycle/share/res_share.c
+     - in find_musclvars_offset(), changed the call to _al_link
+
+
 2018 AUG 30a
    * in src/bdry.c
      - in display_node_type_window(), fixed a bug: the link nodes were node displayed properly

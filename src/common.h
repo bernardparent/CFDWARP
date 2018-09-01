@@ -126,6 +126,7 @@
 #define NODETYPE_INNER -1
 #define NODETYPE_BDRY 0 /* and more */
 #define LINK_NONE -3
+#define LINKDIM_NONE -3
 #define EOS 0
 
 #define maxlinewidth 97
@@ -306,10 +307,6 @@ typedef struct {
    fluxemfield_t dtauemfield;
 #endif
 
-#ifdef _TSEMF_MULTIGRID
-   int TSEMF_UPDATED;
-#endif
-
 #if (defined(_TSEMF_IMAF) || defined(_TSEMF_IMAF_ADI))
    fluxemfield_t dUincemfield;
 #endif
@@ -373,9 +370,9 @@ typedef struct {
   long *tsemfnode;
   long tsemfnodenum;
   double tsemf_rhs;
+#endif
 #ifndef NDEBUG
   bool TSEMF_UPDATED;
-#endif
 #endif
 
 } npbs_t;
@@ -387,14 +384,20 @@ typedef struct {
    char status;
    bool INIT_FLUID;
    bool FLUIDPRIMMEM;
-   long type,type_wk,link;
+   long type,type_wk;
    short numbdryparam;
    double *bdryparam;
+   //long link;
+   long *linkarray;
+   short numlink;
 #ifdef EMFIELD
    short numbdryparam_emf;
    double *bdryparam_emf;
-   long type_emf,link_emf;
+   long type_emf;
+   //long link_emf;
    bool INIT_EMFIELD;
+   long *linkarray_emf;
+   short numlink_emf;
 #endif
 #ifdef DISTMPI
    short  numlinkmusclvars;
@@ -477,7 +480,7 @@ long _al_check(gl_t *gl, long l, long theta, long offset);
 
 long _all(gl_t *gl, long l, long theta1, long offset1, long theta2, long offset2);
 
-long _al_link(np_t *np, gl_t *gl, long llink, long offset, int TYPELEVEL);
+long _al_link(np_t *np, gl_t *gl, long llink, long lbdry, long offset, int TYPELEVEL);
 
 long _l_plus_one(long l, gl_t *gl, long theta);
 
@@ -495,7 +498,7 @@ long _nodes_from_bdry_limited(np_t *np, gl_t *gl, long l, long theta, int TYPELE
 
 long _nodes_from_bdry_through_links_limited(np_t *np, gl_t *gl, long l, long theta, int TYPELEVEL, long limit);
 
-long _nodes_between_link_and_bdry_limited(np_t *np, gl_t *gl, long llink, int TYPELEVEL, long limit);
+long _nodes_between_link_and_bdry_limited(np_t *np, gl_t *gl, long llink, long lbdry, int TYPELEVEL, long limit);
 
 void find_numerical_jacobian(np_t *np, long l, gl_t *gl, void(*FUNCT)(np_t, gl_t *, long, flux_t), long theta, sqmat_t Ak);
 
@@ -534,7 +537,9 @@ bool is_node_inner_within_n_nodes_of_bdry(np_t *np, gl_t *gl, long l, long n, in
 
 long _node_type(np_t np, int TYPELEVEL);
 
-long _node_link(np_t np, int TYPELEVEL);
+long _node_link(np_t np, long cntlink, int TYPELEVEL);
+
+long _num_node_link(np_t np, int TYPELEVEL);
 
 bool is_node_in_zone(long i, long j, long k, zone_t zone);
 
