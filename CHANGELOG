@@ -7,6 +7,14 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 SEP 07a
+   * in cycle/share/cycle_share.c
+     - in update_linked_nodes(), fixed a memory leak bug: after calling MPI_Isend(), need to free 
+       the MPI_Request1 variable 
+   * in src/bdry.c
+     - in read_bdry_actions(), fixed a bug related to checking the link dimension 
+
+
 2018 SEP 01a
    * in bin
      - added periodic_domain_3D.wrp

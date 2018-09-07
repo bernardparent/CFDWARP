@@ -179,7 +179,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
                                "in Link() part of Bdry(). Arguments: %s .",*argum);
       }
     }
-    if (linkdim<1 || linkdim>nd) SOAP_fatal_error(codex,"The link inner node dimension can not be set to %ld. It must lie within 1 and %ld.\n",linkdim,nd);
+    if (linkdim!=LINKDIM_NONE && (linkdim<1 || linkdim>nd)) SOAP_fatal_error(codex,"The link inner node dimension can not be set to %ld. It must lie within 1 and %ld.\n",linkdim,nd);
     /* reduce linkdim from 1,2,3 in control file to 0,1,2 in C code*/
     if (linkdim!=LINKDIM_NONE) linkdim-=1;
     l1=_ai(gl,i1,j1,k1);

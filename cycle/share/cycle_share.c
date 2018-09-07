@@ -395,6 +395,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
               if (rank1==thisrank) {
 //                fprintf(stderr,"Sent from rank=%d to rank=%d node l1=%ld  l2=%ld  i=%ld  j=%ld  thisrank=%d\n",rank1,rank2,l1,l2,i,j,thisrank);
                 MPI_Isend(mpivars,nf+1+max(0,hbw_resconv_fluid-1)*nf,MPI_DOUBLE,rank2,l2,MPI_COMM_WORLD,&MPI_Request1);
+                MPI_Request_free(&MPI_Request1);
               } 
               if (rank2==thisrank){
 //                fprintf(stderr,"Receiving from rank=%d to rank=%d node l1=%ld  l2=%ld  i=%ld  j=%ld  thisrank=%d\n",rank1,rank2,l1,l2,i,j,thisrank);
@@ -424,7 +425,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
               if (rank1==thisrank) {
 //                fprintf(stderr,"Sent from rank=%d to rank=%d node l1=%ld  l2=%ld  i=%ld  j=%ld  thisrank=%d\n",rank1,rank2,l1,l2,i,j,thisrank);
                 MPI_Isend(mpivars,nfe,MPI_DOUBLE,rank2,l2,MPI_COMM_WORLD,&MPI_Request1);
-
+                MPI_Request_free(&MPI_Request1);
               } 
               if (rank2==thisrank){
 //                fprintf(stderr,"Receiving from rank=%d to rank=%d node l1=%ld  l2=%ld  i=%ld  j=%ld  thisrank=%d\n",rank1,rank2,l1,l2,i,j,thisrank);
