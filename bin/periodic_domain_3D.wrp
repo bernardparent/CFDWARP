@@ -50,14 +50,15 @@
 
 }
 
+mf=1.0;
  
 
 is=1;
-ie=20;
+ie=round(mf*30);
 js=1;
-je=20;
+je=round(mf*30);
 ks=1;
-ke=20;
+ke=round(mf*30);
 
 Grid(
   Size(is,js,ks, ie,je,ke);
@@ -158,7 +159,7 @@ Init(
     P=10000; {Pa}
     T=300; {K}
     All(INIT_TYPE1,Vx,Vy,Vz,P,T);
-    Region(is+5,js+5,ks+5,  ie-5,je-5,ke-5,  INIT_TYPE1, Vx,Vy,Vz,P,T*3);
+    Region(round(is+mf*5),round(js+mf*5),round(ks+mf*5),  round(ie-mf*5),round(je-mf*5),round(ke-mf*5),  INIT_TYPE1, Vx,Vy,Vz,P,T*3);
     {
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE2, Mx,My,Mz,P,T);
     Region(is,js,ks,  ie,je,ke,  INIT_TYPE2, Mx,My,Mz,P,T);

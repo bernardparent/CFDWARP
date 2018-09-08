@@ -7,6 +7,14 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 SEP 08a
+   * in cycle/share/cycle_share.c
+     - in update_linked_nodes(), changed MPI_Isend by MPI_Bsend
+       o added buffer and calls to MPI_Buffer_attach 
+   * in bin/periodic_domain_3D.wrp
+     - added dependence on mf
+
+
 2018 SEP 07a
    * in cycle/share/cycle_share.c
      - in update_linked_nodes(), fixed a memory leak bug: after calling MPI_Isend(), need to free 

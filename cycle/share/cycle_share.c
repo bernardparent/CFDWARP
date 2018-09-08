@@ -339,13 +339,20 @@ void update_bdry_nodes(np_t *np, gl_t *gl, zone_t zone){
 void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   long i,j,k,l1,l2,flux,offset,l,cntlink;
   MPI_Status MPI_Status1;
-  MPI_Request MPI_Request1;
   flux_t musclvars;
   double mpivars[max(nfe,nf+1+max(0,hbw_resconv_fluid-1)*nf)];
   int thisrank,numproc,rank2,rank1;
+  int packsize,buffersize,bbuffersize;
+  double *buffer,*bbuffer;
+
   MPI_Comm_rank(MPI_COMM_WORLD, &thisrank);
   MPI_Comm_size(MPI_COMM_WORLD, &numproc);
+  MPI_Pack_size( 1, MPI_DOUBLE, MPI_COMM_WORLD, &packsize );
+  
+  buffersize = (gl->domain.ie-gl->domain.is)*(gl->domain.je-gl->domain.js)if3DL(*(gl->domain.ke-gl->domain.ks)) * (MPI_BSEND_OVERHEAD + packsize);
+  buffer = (double *)malloc( buffersize );
 
+  MPI_Buffer_attach( buffer, buffersize );
 
 
   for1DL(i,gl->domain.is,gl->domain.ie)
@@ -394,8 +401,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
             if (rank1!=rank2){
               if (rank1==thisrank) {
 //                fprintf(stderr,"Sent from rank=%d to rank=%d node l1=%ld  l2=%ld  i=%ld  j=%ld  thisrank=%d\n",rank1,rank2,l1,l2,i,j,thisrank);
-                MPI_Isend(mpivars,nf+1+max(0,hbw_resconv_fluid-1)*nf,MPI_DOUBLE,rank2,l2,MPI_COMM_WORLD,&MPI_Request1);
-                MPI_Request_free(&MPI_Request1);
+                if (MPI_Bsend(mpivars,nf+1+max(0,hbw_resconv_fluid-1)*nf,MPI_DOUBLE,rank2,l2,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("Problem with MPI_Bsend in update_linked_nodes().");
               } 
               if (rank2==thisrank){
 //                fprintf(stderr,"Receiving from rank=%d to rank=%d node l1=%ld  l2=%ld  i=%ld  j=%ld  thisrank=%d\n",rank1,rank2,l1,l2,i,j,thisrank);
@@ -424,8 +430,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
             if (rank1!=rank2){
               if (rank1==thisrank) {
 //                fprintf(stderr,"Sent from rank=%d to rank=%d node l1=%ld  l2=%ld  i=%ld  j=%ld  thisrank=%d\n",rank1,rank2,l1,l2,i,j,thisrank);
-                MPI_Isend(mpivars,nfe,MPI_DOUBLE,rank2,l2,MPI_COMM_WORLD,&MPI_Request1);
-                MPI_Request_free(&MPI_Request1);
+                if (MPI_Bsend(mpivars,nfe,MPI_DOUBLE,rank2,l2,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("Problem with MPI_Bsend in update_linked_nodes().");
               } 
               if (rank2==thisrank){
 //                fprintf(stderr,"Receiving from rank=%d to rank=%d node l1=%ld  l2=%ld  i=%ld  j=%ld  thisrank=%d\n",rank1,rank2,l1,l2,i,j,thisrank);
@@ -444,9 +449,10 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
       end3DL
     end2DL
   end1DL
+  MPI_Buffer_detach( &bbuffer, &bbuffersize );
+  free(buffer);
   MPI_Barrier(MPI_COMM_WORLD);
 }
-
 
 
 #else//DISTMPI
