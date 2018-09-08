@@ -7,6 +7,17 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 SEP 08b
+   * in cycle/share/cycle_share.c
+     - in update_linked_nodes(), made sure buffersize can not be higher than INT_MAX
+     - in update_linked_nodes(), improved MPI performance by not sending and receiving within
+       the same loop: now, the packets are all sent, and then all received
+   * in cycle/share/tsemf_share.c
+     - in update_dUstar_emfield_SOR_backward, made sure buffersize can not be higher than INT_MAX
+   * in cycle/tsemf/_GS/tsemf.c
+     - in update_dUstar_emfield_SOR2_forward(), made sure buffersize can not be higher than INT_MAX
+
+
 2018 SEP 08a
    * in cycle/share/cycle_share.c
      - in update_linked_nodes(), changed MPI_Isend by MPI_Bsend
