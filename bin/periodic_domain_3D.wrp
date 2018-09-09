@@ -50,7 +50,7 @@
 
 }
 
-mf=1.0;
+mf=1;
  
 
 is=1;
@@ -209,6 +209,7 @@ Cycle(
     if (mod(iter,50)==1,
       WriteDataFile(outputfilename"."round(time/dt));
     );
+    system("date");
     UpdateFluid(dt);
     printf("%E %6ld %9.3f   %E (%4ld,%4ld,%4ld)  %s\n",
            time,iter,effiter_U,ximax,i_ximax,

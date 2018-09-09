@@ -336,19 +336,41 @@ void update_bdry_nodes(np_t *np, gl_t *gl, zone_t zone){
 
 #ifdef DISTMPI
 
+#define numfluidvars (nf+1+max(0,hbw_resconv_fluid-1)*nf)
+
+typedef double sendvars_t[max(nfe,numfluidvars)];
+typedef struct {
+  sendvars_t vars;
+  int proc;
+  long l;
+  bool SENT;
+} sendnode_t;
+
+
 void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   long i,j,k,l1,l2,flux,offset,l,cntlink;
   MPI_Status MPI_Status1;
   flux_t musclvars;
-  double mpivars[max(nfe,nf+1+max(0,hbw_resconv_fluid-1)*nf)];
-  int thisrank,numproc,rank2,rank1;
+  sendvars_t mpivars;
+  int thisrank,numproc,rank2,rank1,thisproc;
   int packsize,buffersize,bbuffersize;
   double *buffer,*bbuffer;
+  sendnode_t *sendnode;
+  long numsendvars,numsend,cntsend,cnt;
+  double *sendvars;
+  int *recvproc;
+  bool FOUND;
+  int cntproc;
+
+  sendnode=(sendnode_t *)malloc(sizeof(sendnode_t));
+  sendvars=(double *)malloc(sizeof(double));
+  cntsend=0;
 
   MPI_Comm_rank(MPI_COMM_WORLD, &thisrank);
   MPI_Comm_size(MPI_COMM_WORLD, &numproc);
   MPI_Pack_size( 1, MPI_DOUBLE, MPI_COMM_WORLD, &packsize );
   
+  recvproc=(int *)malloc((numproc+2)*sizeof(int));
   buffersize = min(INT_MAX,nf*(gl->domain.ie-gl->domain.is)*(gl->domain.je-gl->domain.js)if3DL(*(gl->domain.ke-gl->domain.ks)) * (MPI_BSEND_OVERHEAD + packsize));
   buffer = (double *)malloc( buffersize );
 
@@ -365,6 +387,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   
 
   /* first send the packets */
+  cntsend=0;
   for1DL(i,gl->domain.is,gl->domain.ie)
     for2DL(j,gl->domain.js,gl->domain.je)
       for3DL(k,gl->domain.ks,gl->domain.ke)
@@ -392,7 +415,13 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
                     for (flux=0; flux<nf; flux++) mpivars[1+flux+offset*nf]=musclvars[flux];
                   }
                   if (rank1!=rank2){
-                    if (MPI_Bsend(mpivars,nf+1+max(0,hbw_resconv_fluid-1)*nf,MPI_DOUBLE,rank2,l2,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("Problem with MPI_Bsend in update_linked_nodes().");
+                    for (flux=0; flux<numfluidvars; flux++) sendnode[cntsend].vars[flux]=mpivars[flux];
+                    sendnode[cntsend].proc=(int)rank2;
+                    sendnode[cntsend].l=l2;
+                    sendnode[cntsend].SENT=FALSE;
+                    //if (MPI_Bsend(mpivars,numfluidvars,MPI_DOUBLE,rank2,l2,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("Problem with MPI_Bsend in update_linked_nodes().");
+                    cntsend++;
+                    sendnode=(sendnode_t *)realloc(sendnode,(cntsend+1)*sizeof(sendnode_t));
                   } else {
                     /* no need to send with MPI*/
                     l=_l_from_l_all(gl,l2);
@@ -408,7 +437,126 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
                   } 
                 }
               }
+            }
+          }
+        }
+      end3DL
+    end2DL
+  end1DL
+
+  numsend=cntsend;
+
+
+
+  /* send nodes in block one proc at a time */
+
+  do {
+    thisproc=-1;
+    numsendvars=0;
+    for (cntsend=0; cntsend<numsend; cntsend++){
+      if (thisproc==-1 && !sendnode[cntsend].SENT) thisproc=sendnode[cntsend].proc;
+      if (sendnode[cntsend].proc==thisproc){
+        sendvars=(double *)realloc(sendvars,(numsendvars+numfluidvars)*sizeof(double));
+        for (flux=0; flux<numfluidvars; flux++) sendvars[numsendvars+flux]=sendnode[cntsend].vars[flux];
+        numsendvars+=numfluidvars;
+        sendnode[cntsend].SENT=TRUE;
+      }
+    }
+    if (thisproc!=-1){
+      if (MPI_Bsend(&numsendvars,1,MPI_LONG,thisproc,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("Problem with MPI_Bsend in update_linked_nodes().");    
+      if (MPI_Bsend(sendvars,numsendvars,MPI_DOUBLE,thisproc,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("Problem with MPI_Bsend in update_linked_nodes().");    
+    }
+  } while (thisproc!=-1);
+
+
+  for (cnt=0; cnt<numproc+1; cnt++){
+    recvproc[cnt]=-1;
+  }
+
+
+  for1DL(i,gl->domain.is,gl->domain.ie)
+    for2DL(j,gl->domain.js,gl->domain.je)
+      for3DL(k,gl->domain.ks,gl->domain.ke)
+        if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL) && is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL)){
+          l1=_node_link(np[_ai(gl,i,j,k)],0,TYPELEVEL);
+          rank2=_node_rank(gl, i, j, k);
+          rank1=_node_rank(gl, _i_all(l1,gl,0), _i_all(l1,gl,1), _i_all(l1,gl,2));
+          if (TYPELEVEL==TYPELEVEL_FLUID_WORK || TYPELEVEL==TYPELEVEL_FLUID){
+            if (rank1!=rank2 && rank2==thisrank){
+              FOUND=FALSE;
+              cntproc=-1;
+              do {
+                cntproc++;
+                if (recvproc[cntproc]==rank1) FOUND=TRUE;
+              } while(recvproc[cntproc]!=-1);
+              if (!FOUND) recvproc[cntproc]=rank1;
+            }
+          }
+        }
+      end3DL
+    end2DL
+  end1DL
+
+  cntproc=0;
+  while (recvproc[cntproc]!=-1) {
+    thisproc=recvproc[cntproc];
+    MPI_Recv(&numsendvars,1,MPI_LONG,thisproc,0,MPI_COMM_WORLD,&MPI_Status1);
+    MPI_Recv(sendvars,numsendvars,MPI_DOUBLE,thisproc,0,MPI_COMM_WORLD,&MPI_Status1);
+    cntsend=0;
+    for1DL(i,gl->domain.is,gl->domain.ie)
+      for2DL(j,gl->domain.js,gl->domain.je)
+        for3DL(k,gl->domain.ks,gl->domain.ke)
+          if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL) && is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL)){
+            l2=_ai_all(gl,i,j,k);
+            assert(is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL));
+            l1=_node_link(np[_ai(gl,i,j,k)],0,TYPELEVEL);
+            rank2=_node_rank(gl, i, j, k);
+            rank1=_node_rank(gl, _i_all(l1,gl,0), _i_all(l1,gl,1), _i_all(l1,gl,2));
+            if (TYPELEVEL==TYPELEVEL_FLUID_WORK || TYPELEVEL==TYPELEVEL_FLUID){
+              if (rank1!=rank2 && rank2==thisrank){
+                if (thisproc==rank1){
+                  //MPI_Recv(mpivars,nf+1+max(0,hbw_resconv_fluid-1)*nf,MPI_DOUBLE,rank1,l2,MPI_COMM_WORLD,&MPI_Status1);
+                  for (flux=0; flux<numfluidvars; flux++) mpivars[flux]=sendvars[cntsend+flux];
+                  cntsend+=numfluidvars;
+                  l=_l_from_l_all(gl,l2);
+                  for (flux=0; flux<nf; flux++) np[l].bs->U[flux]=mpivars[flux];
+                  assert(np[l].linkmusclvars!=NULL);
+                  assert(is_node_bdry(np[l],TYPELEVEL));
+                  assert(is_node_link(np[l],TYPELEVEL));
+                  np[l].numlinkmusclvars=(short)round(mpivars[nf]);
+                  for (offset=1; offset<hbw_resconv_fluid; offset++) {
+                    for (flux=0; flux<nf; flux++)
+                      np[l].linkmusclvars[flux+(offset-1)*nf]=mpivars[1+flux+offset*nf];
+                  }
+                }
+              }
+            }
+          }
+        end3DL
+      end2DL
+    end1DL
+    cntproc++;
+  }
+ 
+
+
+
+
+
 #ifdef EMFIELD
+  /* first send the packets */
+  cntsend=0;
+  for1DL(i,gl->domain.is,gl->domain.ie)
+    for2DL(j,gl->domain.js,gl->domain.je)
+      for3DL(k,gl->domain.ks,gl->domain.ke)
+        if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL)){
+          if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL)){
+            for (cntlink=0; cntlink<_num_node_link(np[_ai(gl,i,j,k)],TYPELEVEL); cntlink++){
+              l1=_ai_all(gl,i,j,k);
+              l2=_node_link(np[_ai(gl,i,j,k)],cntlink,TYPELEVEL);
+              rank1=_node_rank(gl, i, j, k);
+              rank2=_node_rank(gl, _i_all(l2,gl,0), _i_all(l2,gl,1), _i_all(l2,gl,2));
+           
               if (TYPELEVEL==TYPELEVEL_EMFIELD){
                 if (rank1==thisrank) {
                   for (flux=0; flux<nfe; flux++) mpivars[flux]=np[_l_from_l_all(gl,l1)].bs->Uemfield[flux];
@@ -422,7 +570,6 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
                 }
 
               }
-#endif
             }
           }
         }
@@ -442,40 +589,31 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
           l1=_node_link(np[_ai(gl,i,j,k)],0,TYPELEVEL);
           rank2=_node_rank(gl, i, j, k);
           rank1=_node_rank(gl, _i_all(l1,gl,0), _i_all(l1,gl,1), _i_all(l1,gl,2));
-          if (TYPELEVEL==TYPELEVEL_FLUID_WORK || TYPELEVEL==TYPELEVEL_FLUID){
-            if (rank1!=rank2 && rank2==thisrank){
-//                fprintf(stderr,"Receiving from rank=%d to rank=%d node l1=%ld  l2=%ld  i=%ld  j=%ld  thisrank=%d\n",rank1,rank2,l1,l2,i,j,thisrank);
-              MPI_Recv(mpivars,nf+1+max(0,hbw_resconv_fluid-1)*nf,MPI_DOUBLE,rank1,l2,MPI_COMM_WORLD,&MPI_Status1);
-              l=_l_from_l_all(gl,l2);
-              for (flux=0; flux<nf; flux++) np[l].bs->U[flux]=mpivars[flux];
-              assert(np[l].linkmusclvars!=NULL);
-              assert(is_node_bdry(np[l],TYPELEVEL));
-              assert(is_node_link(np[l],TYPELEVEL));
-              np[l].numlinkmusclvars=(short)round(mpivars[nf]);
-              for (offset=1; offset<hbw_resconv_fluid; offset++) {
-                for (flux=0; flux<nf; flux++)
-                  np[l].linkmusclvars[flux+(offset-1)*nf]=mpivars[1+flux+offset*nf];
-              }
-            }
-          }
-#ifdef EMFIELD
           if (TYPELEVEL==TYPELEVEL_EMFIELD){
             if (rank1!=rank2 && rank2==thisrank){
-//                fprintf(stderr,"Receiving from rank=%d to rank=%d node l1=%ld  l2=%ld  i=%ld  j=%ld  thisrank=%d\n",rank1,rank2,l1,l2,i,j,thisrank);
                 MPI_Recv(mpivars,nfe,MPI_DOUBLE,rank1,l2,MPI_COMM_WORLD,&MPI_Status1);
               for (flux=0; flux<nfe; flux++) np[_l_from_l_all(gl,l2)].bs->Uemfield[flux]=mpivars[flux];
             }
           }
-#endif
         }
       end3DL
     end2DL
   end1DL
 
+#endif
+
+
+
+
+
 
   MPI_Buffer_detach( &bbuffer, &bbuffersize );
   free(buffer);
   MPI_Barrier(MPI_COMM_WORLD);
+  free(sendnode);
+  free(recvproc);
+  free(sendvars);
+
 }
 
 

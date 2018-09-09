@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 SEP 09a
+   * in cycle/share/cycle_share.c
+     - in update_linked_nodes(), made change to how data is passed with MPI: now, the data is
+       regrouped in one large packet and sent through only two calls from one process to another
+       (much faster than sending one packet at a time with MPI_Bsend)
+ 
+
 2018 SEP 08b
    * in cycle/share/cycle_share.c
      - in update_linked_nodes(), made sure buffersize can not be higher than INT_MAX
