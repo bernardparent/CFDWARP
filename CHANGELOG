@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 SEP 10c
+   * in cycle/share/cycle_share.c
+     - in update_linked_nodes(), merged the EMFIELD code within the FLUID code within the MPI
+       section
+
+
 2018 SEP 10b
    * in cycle/share/cycle_share.c
      - in update_linked_nodes(), fixed a bug related to sendvars not being realloced properly
