@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 SEP 10b
+   * in cycle/share/cycle_share.c
+     - in update_linked_nodes(), fixed a bug related to sendvars not being realloced properly
+       when receiving with MPI
+
+
 2018 SEP 10a
    * in bin/periodic_domain_3D.wrp
      - made some changes

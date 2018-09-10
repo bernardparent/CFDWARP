@@ -359,7 +359,6 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   long numsendvars,numsend,cntsend,cnt;
   double *sendvars;
   int *recvproc;
-  bool FOUND;
   int cntproc;
 
   sendnode=(sendnode_t *)malloc(sizeof(sendnode_t));
@@ -419,7 +418,6 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
                     sendnode[cntsend].proc=(int)rank2;
                     sendnode[cntsend].l=l2;
                     sendnode[cntsend].SENT=FALSE;
-                    //if (MPI_Bsend(mpivars,numfluidvars,MPI_DOUBLE,rank2,l2,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("Problem with MPI_Bsend in update_linked_nodes().");
                     cntsend++;
                     sendnode=(sendnode_t *)realloc(sendnode,(cntsend+1)*sizeof(sendnode_t));
                   } else {
@@ -456,7 +454,8 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
     for (cntsend=0; cntsend<numsend; cntsend++){
       if (thisproc==-1 && !sendnode[cntsend].SENT) thisproc=sendnode[cntsend].proc;
       if (sendnode[cntsend].proc==thisproc){
-        sendvars=(double *)realloc(sendvars,(numsendvars+numfluidvars)*sizeof(double));
+        assert(!sendnode[cntsend].SENT);
+        sendvars=(double *)realloc(sendvars,(numsendvars+2*numfluidvars)*sizeof(double));
         for (flux=0; flux<numfluidvars; flux++) sendvars[numsendvars+flux]=sendnode[cntsend].vars[flux];
         numsendvars+=numfluidvars;
         sendnode[cntsend].SENT=TRUE;
@@ -469,7 +468,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   } while (thisproc!=-1);
 
 
-  for (cnt=0; cnt<numproc+1; cnt++){
+  for (cnt=0; cnt<(numproc+2); cnt++){
     recvproc[cnt]=-1;
   }
 
@@ -483,13 +482,13 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
           rank1=_node_rank(gl, _i_all(l1,gl,0), _i_all(l1,gl,1), _i_all(l1,gl,2));
           if (TYPELEVEL==TYPELEVEL_FLUID_WORK || TYPELEVEL==TYPELEVEL_FLUID){
             if (rank1!=rank2 && rank2==thisrank){
-              FOUND=FALSE;
-              cntproc=-1;
-              do {
+              /* rank1 is one process that we will need to get data from; store it in recvproc */
+              cntproc=0;
+              while(recvproc[cntproc]!=-1 && recvproc[cntproc]!=rank1 ) {
                 cntproc++;
-                if (recvproc[cntproc]==rank1) FOUND=TRUE;
-              } while(recvproc[cntproc]!=-1);
-              if (!FOUND) recvproc[cntproc]=rank1;
+              } 
+              assert(cntproc<numproc);
+              recvproc[cntproc]=rank1;
             }
           }
         }
@@ -501,6 +500,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   while (recvproc[cntproc]!=-1) {
     thisproc=recvproc[cntproc];
     MPI_Recv(&numsendvars,1,MPI_LONG,thisproc,0,MPI_COMM_WORLD,&MPI_Status1);
+    sendvars=(double *)realloc(sendvars,numsendvars*sizeof(double));
     MPI_Recv(sendvars,numsendvars,MPI_DOUBLE,thisproc,0,MPI_COMM_WORLD,&MPI_Status1);
     cntsend=0;
     for1DL(i,gl->domain.is,gl->domain.ie)
@@ -515,7 +515,6 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
             if (TYPELEVEL==TYPELEVEL_FLUID_WORK || TYPELEVEL==TYPELEVEL_FLUID){
               if (rank1!=rank2 && rank2==thisrank){
                 if (thisproc==rank1){
-                  //MPI_Recv(mpivars,nf+1+max(0,hbw_resconv_fluid-1)*nf,MPI_DOUBLE,rank1,l2,MPI_COMM_WORLD,&MPI_Status1);
                   for (flux=0; flux<numfluidvars; flux++) mpivars[flux]=sendvars[cntsend+flux];
                   cntsend+=numfluidvars;
                   l=_l_from_l_all(gl,l2);
