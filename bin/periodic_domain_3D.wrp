@@ -50,7 +50,7 @@
 
 }
 
-mf=1;
+mf=2.0;
  
 
 is=1;
@@ -185,6 +185,21 @@ Disc(
   TVDRK(
     METHOD=METHOD_TVDRK2;
   );
+  MUSCLplus(
+    FLUX=FLUX_FDSplus;
+    numiter=2;
+    AVERAGING=AVERAGING_ARITH;
+    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.95;
+    INTERPOL=INTERPOL_AOWENO5;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+  );
+  CDFplus(
+    xi1=0.5; {except for momentum and energy fluxes}
+    xi2=0.5; {momentum fluxes}
+    xi3=0.5; {total energy flux}
+  );
 );
 
 
@@ -201,7 +216,7 @@ Cycle(
   );
   PredictorCorrector(
     tmax=0.76e-2;    {simulation time span in seconds}
-    dt=1e-2/500;   {physical time step in seconds}
+    dt=1e-2/500/mf;   {physical time step in seconds}
     if (time>tmax-0.1*dt,
       WriteDataFile(outputfilename"."round(time/dt));
       exit(EXIT_SUCCESS);
@@ -215,6 +230,31 @@ Cycle(
            time,iter,effiter_U,ximax,i_ximax,
            j_ximax,k_ximax,clipinfo);
   );
+  DualTimeStepping(
+    tmax=0.76e-2;    {simulation time span in seconds}
+    dt=1e-2/500/mf;   {physical time step in seconds}
+    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
+    if (iter==1,
+      CFL=1.0;
+    );
+    CFL=min(CFL*1.05,1.5);
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
+
+    system("date");
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,k_ximax,clipinfo);
+    if (ximax<xiverge || iter>15,
+      IncreaseTimeLevel();
+      WriteDataFile(outputfilename"."round(time/dt));
+      printf("dt=%E time=%Es\n",dt,time);
+      if (time>tmax-0.1*dt,
+        exit(EXIT_SUCCESS);
+      );
+    );
+  );
+
 );
 
 

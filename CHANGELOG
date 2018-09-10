@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 SEP 10a
+   * in bin/periodic_domain_3D.wrp
+     - made some changes
+
+
 2018 SEP 09a
    * in cycle/share/cycle_share.c
      - in update_linked_nodes(), made change to how data is passed with MPI: now, the data is
