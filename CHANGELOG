@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 SEP 16b
+   * in tools
+     - added upgrade.sh
+
+
 2018 SEP 16a
    * in config/config.c
      - added SANITIZE (for gcc)
