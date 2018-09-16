@@ -78,4 +78,5 @@ substr.sh                    substitutes a string by another string
                              using either perl or rpl [USE WITH CARE]
 
 tarwarp.sh                   creates a tarball of the warp directory
-                   
+            
+upgrade.sh                   upgrades CFDWARP to its latest version       
