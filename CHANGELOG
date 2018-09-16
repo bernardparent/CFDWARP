@@ -7,9 +7,17 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 SEP 16a
+   * in config/config.c
+     - added SANITIZE (for gcc)
+     - in output_makefileheader(), added flag -fno-omit-frame-pointer when DEBUGGER is set
+       and when the compiler is gcc or mpicc (needed to yield adequate debugging info along
+       with -O flag)
+
+
 2018 SEP 10c
    * in cycle/share/cycle_share.c
-     - in update_linked_nodes(), merged the EMFIELD code within the FLUID code within the MPI
+     - in update_linked_nodes(), merged the EMFIELD code with the FLUID code within the MPI
        section
 
 
