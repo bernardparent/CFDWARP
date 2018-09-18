@@ -7,6 +7,15 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 SEP 18a
+   * in model/emfield/_Ohm*/emfield.c
+     - in _E_dot_J_recast(), fixed a bug: the type for Vk should be EXM_vec3D_t not dim_t
+   * in bin/dischargemagnetic.wrp
+     - added DualTimeStepping() and CDFplus()
+   * in bin/discharge.wrp
+     - changed UpdateEMField() so that it calls TSEMF_SOR 
+
+
 2018 SEP 16c
    * in tools/README
      - added description of upgrade.sh
