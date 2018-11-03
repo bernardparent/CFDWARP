@@ -378,7 +378,7 @@ static void Join_argum(char **argum, SOAP_codex_t *codex, GRIDG_gl3d_t gl3d, GRI
 #define z(i,j,k)   xyz[GRIDG_ai3(gl3d,i,j,k)].z
 
 /* algorithm by Derrick Alexander */
-void JoinAll3D(GRIDG_gl3d_t gl3d, GRIDG_xyzgrid_t *xyz, SOAP_codex_t *codex,
+void JoinPlanes3D(GRIDG_gl3d_t gl3d, GRIDG_xyzgrid_t *xyz, SOAP_codex_t *codex,
                long i1, long j1, long k1, long i2, long j2, long k2){
   long i,j,k,cnt;
   bool VALID;
@@ -395,22 +395,22 @@ void JoinAll3D(GRIDG_gl3d_t gl3d, GRIDG_xyzgrid_t *xyz, SOAP_codex_t *codex,
         for (k=k1+1; k<k2; k++){
           VALID=TRUE;
           if (!xyz[GRIDG_ai3(gl3d,i1,j,k)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. JoinAll command failed.",i1,j,k);
+            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. JoinPlanes command failed.",i1,j,k);
           }
           if (!xyz[GRIDG_ai3(gl3d,i2,j,k)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. JoinAll command failed.",i2,j,k);
+            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. JoinPlanes command failed.",i2,j,k);
           }
           if (!xyz[GRIDG_ai3(gl3d,i,j1,k)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. JoinAll command failed.",i,j1,k);
+            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. JoinPlanes command failed.",i,j1,k);
           }
           if (!xyz[GRIDG_ai3(gl3d,i,j2,k)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. JoinAll command failed.",i,j2,k);
+            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. JoinPlanes command failed.",i,j2,k);
           }
           if (!xyz[GRIDG_ai3(gl3d,i,j,k1)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. JoinAll command failed.",i,j,k1);
+            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. JoinPlanes command failed.",i,j,k1);
           }
           if (!xyz[GRIDG_ai3(gl3d,i,j,k2)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. JoinAll command failed.",i,j,k2);
+            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. JoinPlanes command failed.",i,j,k2);
           }
 
           if (cnt==1) {
@@ -494,19 +494,19 @@ void JoinAll3D(GRIDG_gl3d_t gl3d, GRIDG_xyzgrid_t *xyz, SOAP_codex_t *codex,
   }
 
   if (!VALID){
-    SOAP_fatal_error(codex,"When using the JoinAll() command, set i2>i1+1 and j2>j1+1 and k2>k1+1.");
+    SOAP_fatal_error(codex,"When using the JoinPlanes() command, set i2>i1+1 and j2>j1+1 and k2>k1+1.");
   }
 }
 
-static void JoinAll_argum(char **argum, SOAP_codex_t *codex, GRIDG_gl3d_t gl3d, GRIDG_xyzgrid_t *xyzgrid){
+static void JoinPlanes_argum(char **argum, SOAP_codex_t *codex, GRIDG_gl3d_t gl3d, GRIDG_xyzgrid_t *xyzgrid){
   long i1,j1,k1,i2,j2,k2;
   int eos=EOS;
   SOAP_substitute_all_argums(argum, codex);
   if (sscanf(*argum,"%ld,%ld,%ld,%ld,%ld,%ld%n",&i1,&j1,&k1,&i2,&j2,&k2,&eos)!=6 || (*argum)[eos]!=EOS){
-    SOAP_fatal_error(codex,"One or more argument(s) could not be read properly in JoinAll().");
+    SOAP_fatal_error(codex,"One or more argument(s) could not be read properly in JoinPlanes().");
   }
   verify_zone_validity(i1, j1, k1, i2, j2, k2, gl3d, codex);
-  JoinAll3D(gl3d, xyzgrid, codex, i1, j1, k1, i2, j2, k2);
+  JoinPlanes3D(gl3d, xyzgrid, codex, i1, j1, k1, i2, j2, k2);
 }
 
 
@@ -1241,8 +1241,8 @@ static void actions(char *action, char **argum, SOAP_codex_t *codex){
     Join_argum(argum,codex,*gl3d,*xyzgrid);
     codex->ACTIONPROCESSED=TRUE;
   }
-  if (strcmp(action,"JoinAll")==0) {
-    JoinAll_argum(argum,codex,*gl3d,*xyzgrid);
+  if (strcmp(action,"JoinPlanes")==0) {
+    JoinPlanes_argum(argum,codex,*gl3d,*xyzgrid);
     codex->ACTIONPROCESSED=TRUE;
   }
   if (strcmp(action,"Plane")==0) {

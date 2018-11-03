@@ -1,10 +1,11 @@
 
  
+meshlevel=4;
 
-mf=1/1.41; {1.0, 1.41, 2.0, 2.82}
+mf=(1.41)^(-4+meshlevel); {1.0/1.41, 1.0, 1.41, 2.0, 2.82}
 
-tf=1; {tf=1 works great}
-CFLfact=0.8;
+tf=0.5; {tf=1 works great}
+CFLfact=1.2;
 
 dphimax=14000;
 
@@ -21,8 +22,8 @@ ie=is6;
 
 
 js2=1; 
-js3=js2+round(mf*7); {exposed electrode is between js3 and js4}
-js4=js3+round(mf*5);  {start of plasma/gas}
+js3=js2+round(mf*13); {was js2+round(mf*7)} {exposed electrode is between js3 and js4}
+js4=js3+round(mf*9);  {js3+round(mf*5)} {start of plasma/gas}
 js5=js4+round(mf*33*6);
 js6=js5+round(mf*50);
 js=js2;
@@ -325,7 +326,7 @@ Cycle(
     tmax=25e-6;    {simulation time span in seconds}
     dtref=20e-9/(mf*60*tf);   {physical time step in seconds}
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
-    sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
+    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (time<20e-9,
       dphi=min(dphimax,time/9e-9*dphimax);
     ,{else}

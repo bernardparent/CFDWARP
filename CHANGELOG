@@ -7,6 +7,136 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 NOV 03a
+   * in model/fluid/_drift-diffusion/fluid.c 
+     - in find_Dstar(), added electric field term
+   * in model/fluid/_*_plasma/fluid_plasma.c
+     - in find_Dstar(), added electric field term
+   * in model/fluid/doc/Plasma_Model2/report.tex
+     - added second possibility for matrix D
+
+
+2018 NOV 01b
+   * renamed 
+     - betaminus -> betaa
+   * in model/share/fluid_share.c
+     - in _betag(), changed the constant for negative ion from -1 to -0.5
+     - in _betaa(), set betaa=_betag(k)-_s(k) for the charged species
+     - in find_Y1star_at_interface(), added dependence on betag
+     - in find_Y2star_at_interface(), added dependence on betaa
+   * in model/fluid/_Navier-Stokes_plasma/fluid_plasma.c
+     - in find_H1() and find_dH1_dUstar(), removed dependence on betag
+     - in find_H2() and find_dH2_dUstar(), removed dependence on betaa
+   * in model/fluid/_Favre-Reynolds_plasma/fluid_plasma.c
+     - in find_H1() and find_dH1_dUstar(), removed dependence on betag
+     - in find_H2() and find_dH2_dUstar(), removed dependence on betaa
+   * in model/fluid/_drift-diffusion/fluid.c
+     - in find_H1() and find_dH1_dUstar(), removed dependence on betag
+     - in find_H2() and find_dH2_dUstar(), removed dependence on betaa
+   * in model/fluid/doc/Plasma_Model2/report.tex
+     - made improvements
+           
+
+2018 NOV 01a
+   * in model/fluid/_Navier-Stokes_plasma/fluid_plasma.c
+     - changed call to _betaminus() to call to _betaa()
+   * in model/share/fluid_share.c
+     - changed call to _betaminus() to call to _betaa()
+   * in model/fluid/doc/Plasma_Model2/report.tex
+     - made improvements
+
+
+2018 OCT 30a
+   * in model/fluid/doc/Plasma_Model2/report.tex
+     - made improvements
+
+
+2018 OCT 29b
+   * in model/fluid/doc/Plasma_Model2/report.tex
+     - made improvements
+
+
+2018 OCT 29a
+   * in model/fluid/doc/Plasma_Model2/report.tex
+     - made improvements
+
+
+2018 OCT 28a
+   * in model/fluid/doc
+     - added Plasma_Model2
+
+
+2018 OCT 17c
+   * in bin
+     - added LES_bdrylayer.wrp
+
+
+2018 OCT 17b
+   * updated CHANGELOG
+
+
+2018 OCT 17a
+   * renamed
+     - JoinAll -> JoinPlanes
+    
+
+2018 OCT 10a
+   * in bin
+     - improved taylor_green_vortex.wrp
+     - added taylor_green_vortex.mcr
+
+
+2018 OCT 09b
+   * in lib/gridg/share.c
+     - in GRIDG_fatal_error(), changed the output to stderr instead of stdout
+   * in lib/soap/soap.c
+     - in SOAP_fatal_error(), changed the output to stderr instead of stdout
+     - in SOAP_store_file_as_string(), changed the output to stderr instead of stdout
+   * in tools/README
+     - added description of integrate.sh
+
+
+2018 OCT 09a
+   * in bin
+     - updated ns_SDBD.wrp
+   * in model/share/fluid_share.c
+     - in _betag(), changed betag from -0.01 to -0.001 for the electrons (better resolution)
+
+
+2018 OCT 04d
+   * in tools/gitnewversion_public.sh
+     - fixed a bug
+
+
+2018 OCT 04c
+   * in tools/gitnewversion_public.sh
+     - got rid of check of file changes within public warp
+
+
+2018 OCT 04b
+   * in tools/gitnewversion_public.sh
+     - fixed a bug: should user refuse to upload changed to warp on public github,
+       then need to do a hard reset 
+ 
+
+2018 OCT 04a
+   * in bin/taylor_green_vortex.wrp
+     - made small modifications
+   * in tools
+     - added integrate.sh
+   * in bin
+     - added taylor_green_vortex_norm.eqn
+
+
+2018 OCT 03a
+   * in bin
+     - added taylor_green_vortex.wrp
+     - added tke.eqn
+     - added tke_average.mcr
+   * in model/share/fluid_share.c
+     - in _betag(), set betag to 0.01 for electrons 
+
+
 2018 SEP 18a
    * in model/emfield/_Ohm*/emfield.c
      - in _E_dot_J_recast(), fixed a bug: the type for Vk should be EXM_vec3D_t not dim_t

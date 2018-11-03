@@ -53,6 +53,10 @@ gitpull.sh                   downloads latest CFDWARP using git
 indentwithwarpstyle.sh       automatically indents a C file according to the CFDWARP 
                              style
 
+integrate.sh                 integrates a property on various tecplot post files;
+                             the property integrated can be defined by an equation
+                             or by a tecplot macro 
+
 makemissing.sh               creates symbolic links of "missing" data or post files 
                              within a series
 

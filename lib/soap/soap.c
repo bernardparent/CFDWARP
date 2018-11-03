@@ -50,17 +50,17 @@ int SOAP_fatal_error(SOAP_codex_t *codex, const char *formatstr, ...){
   char *newstr;
   int retval,term_height,term_width;
   newstr=(char *)malloc(10000*sizeof(char));
-  fprintf(stdout,"\n\n");
+  fprintf(stderr,"\n\n");
   va_start(ap, formatstr);
   vsprintf(newstr,formatstr, ap);
   va_end(ap);
   find_terminal_window_size(&term_width,&term_height);
-  fprintf(stdout,"%s",strwrp(newstr,min(term_width-1,70)));
+  fprintf(stderr,"%s",strwrp(newstr,min(term_width-1,70)));
   free(newstr);
 
-  fprintf(stdout,"\n\nSOAP fatal error ");
-  if (codex->action_being_processed!=NULL) fprintf(stdout,"within %s() ",codex->action_being_processed);
-  fprintf(stdout,"in the vicinity of line %ld in file %s.\n\nExiting.\n\n",
+  fprintf(stderr,"\n\nSOAP fatal error ");
+  if (codex->action_being_processed!=NULL) fprintf(stderr,"within %s() ",codex->action_being_processed);
+  fprintf(stderr,"in the vicinity of line %ld in file %s.\n\nExiting.\n\n",
           codex->linenum,codex->filename);
   exit(EXIT_FAILURE);
   retval=EXIT_FAILURE;
@@ -97,8 +97,8 @@ void SOAP_store_file_as_string(char *filename, char **str){
 
   file = fopen(filename, "r");
   if (file==NULL) {
-    fprintf(stdout,"\nHaving problems opening file %s.\nExiting.\n\n",filename);
-    exit(1);
+    fprintf(stderr,"\nHaving problems opening file %s.\nExiting.\n\n",filename);
+    exit(EXIT_FAILURE);
   }
   cnt=0;
   do {
@@ -1138,7 +1138,7 @@ void SOAP_insert_line_numbers_in_code_backward(char **code, long linenum_start){
         if ((*code)[cnt2+1]=='}') commentbrackets++;
         if (cnt2<0) {
           CONTINUE=FALSE;
-          /* fprintf(stdout,"\n\nproblem inserting line numbers aroung line %ld\n\n",linenum);
+          /* fprintf(stderr,"\n\nproblem inserting line numbers aroung line %ld\n\n",linenum);
           exit(EXIT_FAILURE); */
         } 
       } while (CONTINUE && (((*code)[cnt2]!='(' && (*code)[cnt2]!=';' && (*code)[cnt2]!=',' && cnt2!=0)
@@ -1152,7 +1152,7 @@ void SOAP_insert_line_numbers_in_code_backward(char **code, long linenum_start){
         if ((*code)[cnt2-1]=='}') commentbrackets--;
         if ((*code)[cnt2]==EOS) {
           CONTINUE=FALSE;
-          /* fprintf(stdout,"\n\nproblem inserting line numbers aroung line %ld\n\n",linenum);
+          /* fprintf(stderr,"\n\nproblem inserting line numbers aroung line %ld\n\n",linenum);
            exit(EXIT_FAILURE); */
         } 
        } while(CONTINUE && ((*code)[cnt2]==' '  || (*code)[cnt2]=='\n'

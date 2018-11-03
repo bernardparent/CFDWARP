@@ -1776,7 +1776,8 @@ double _betag(long k){
   double betag;
   betag=0.0;
   if (speciestype[k]==SPECIES_IONPLUS) betag=1.0; 
-  if (speciestype[k]==SPECIES_IONMINUS) betag=-1.0; 
+  if (speciestype[k]==SPECIES_IONMINUS) betag=-0.5; 
+  if (speciestype[k]==SPECIES_ELECTRON) betag=-0.001; 
   return(betag);
 }
 
@@ -1788,13 +1789,14 @@ double _betaplus(long k){
 }
 
 
-double _betaminus(long k){
-  double betaminus;
-  if (speciestype[k]==SPECIES_IONMINUS || speciestype[k]==SPECIES_ELECTRON) betaminus=1.0; else betaminus=0.0;
+double _betaa(long k){
+  double betaa;
+  //if (speciestype[k]==SPECIES_IONMINUS || speciestype[k]==SPECIES_ELECTRON) betaa=1.0; else betaa=0.0;
 /* FOR TESTING PURPOSES ONLY: uncomment the following to prevent use of ambipolar form on negative ions 
    NOTE: need to also alter find_Dstar() by adding Vkstar-Vstar on the diagonal for negative ions (see fluid_plasma.c)*/
-//  if (speciestype[k]==SPECIES_ELECTRON) betaminus=1.0; else betaminus=0.0;
-  return(betaminus);
+//  if (speciestype[k]==SPECIES_ELECTRON) betaa=1.0; else betaa=0.0;
+  if (speciestype[k]==SPECIES_NEUTRAL) betaa=0.0; else betaa=_betag(k)-_s(k);
+  return(betaa);
 }
 
 
@@ -1896,7 +1898,7 @@ double _sigma_positive(np_t *np, gl_t *gl, long l){
 double _alpha(np_t *np, gl_t *gl, long l, long k, long r){
   double alpha,sigma_positive;
   sigma_positive=_sigma_positive(np,gl,l);
-  alpha=_m(k)/_m(r)*(_delta(r,k)+_betaminus(k)*_C(r)*_mu(np,gl,l,k)*_Nk(np[l],gl,k)/sigma_positive);
+  alpha=_m(k)/_m(r)*(_delta(r,k)+_betaa(k)*_C(r)*_mu(np,gl,l,k)*_Nk(np[l],gl,k)/sigma_positive);
   return(alpha);
 }
 
@@ -1907,14 +1909,14 @@ void find_alpha(np_t *np, gl_t *gl, long l, spec2_t alpha){
   sigma=_sigma_positive(np,gl,l);
   for (k=0; k<ns; k++){
     for (r=0; r<ns; r++){
-      alpha[k][r]=_calM(k)/_calM(r)*(_delta(r,k)+_betaminus(k)*_C(r)*_mu(np,gl,l,k)*_Nk(np[l],gl,k)/sigma);
+      alpha[k][r]=_calM(k)/_calM(r)*(_delta(r,k)+_betaa(k)*_C(r)*_mu(np,gl,l,k)*_Nk(np[l],gl,k)/sigma);
       
     }
 #ifndef NDEBUG
     if (alpha[k][k]<=0.0){
       wfprintf(stderr,"alpha[%ld][%ld]=%E   \n",k,k,alpha[k][k]);
-      wfprintf(stderr,"mu_k=%E N_k=%E betaminus_k=%E C_k=%E \n",_mu(np,gl,l,k),_Nk(np[l],gl,k),_betaminus(k),_C(k));
-      wfprintf(stderr," sigma=%E betaminus_k*C_k*mu_k*N_k=%E\n",sigma,_betaminus(k)*_C(k)*_mu(np,gl,l,k)*_Nk(np[l],gl,k));
+      wfprintf(stderr,"mu_k=%E N_k=%E betaa_k=%E C_k=%E \n",_mu(np,gl,l,k),_Nk(np[l],gl,k),_betaa(k),_C(k));
+      wfprintf(stderr," sigma=%E betaa_k*C_k*mu_k*N_k=%E\n",sigma,_betaa(k)*_C(k)*_mu(np,gl,l,k)*_Nk(np[l],gl,k));
       fatal_error("alpha[k][k] is negative at node i=%ld j=%ld k=%ld.",_i(l,gl,0),_i(l,gl,1),_i(l,gl,2));
     }
 #endif
@@ -1948,13 +1950,13 @@ void find_dZU_dU(np_t *np, gl_t *gl, long l, sqmat_t dZU_dU){
   for (k=0; k<ns; k++){
     for (r=0; r<ns; r++){
       /* wrt rhok[k] */
-      dZU_dU[k][k]+=1.0/_m(r)*_betaminus(k)*_C(r)*_mu(np,gl,l,k)/sigma*_rhok(np[l],r);
+      dZU_dU[k][k]+=1.0/_m(r)*_betaa(k)*_C(r)*_mu(np,gl,l,k)/sigma*_rhok(np[l],r);
       /* wrt rhok[r] */
-      dZU_dU[k][r]+=1.0/_m(r)*_betaminus(k)*_C(r)*_mu(np,gl,l,k)*_rhok(np[l],k)/sigma;
+      dZU_dU[k][r]+=1.0/_m(r)*_betaa(k)*_C(r)*_mu(np,gl,l,k)*_rhok(np[l],k)/sigma;
       /* wrt sigma */
       for (m=0; m<ns; m++){
         dsigma_drhom=_C(m)*_mu(np,gl,l,m)/_m(m);
-        dZU_dU[k][m]+=-1.0/_m(r)*_betaminus(k)*_C(r)*_mu(np,gl,l,k)*_rhok(np[l],k)/sqr(sigma)*_rhok(np[l],r)*dsigma_drhom; 
+        dZU_dU[k][m]+=-1.0/_m(r)*_betaa(k)*_C(r)*_mu(np,gl,l,k)*_rhok(np[l],k)/sqr(sigma)*_rhok(np[l],r)*dsigma_drhom; 
       }
     }
   }
@@ -1969,7 +1971,7 @@ void find_LambdaZ(np_t *np, gl_t *gl, long l, sqmat_t LambdaZ) {
   set_matrix_to_identity(LambdaZ);
   for (k=0; k<ns; k++){
     for (r=0; r<ns; r++){
-      LambdaZ[k][k]+=1.0/_m(r)*_betaminus(k)*_C(r)*_mu(np,gl,l,k)/sigma*_rhok(np[l],r);
+      LambdaZ[k][k]+=1.0/_m(r)*_betaa(k)*_C(r)*_mu(np,gl,l,k)/sigma*_rhok(np[l],r);
     }
   }
 
@@ -1989,7 +1991,7 @@ void find_Y1star_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, 
   }
 
   for (spec=0; spec<ns; spec++){
-    Ystar[spec]=metrics.Omega*Estar;  
+    Ystar[spec]=metrics.Omega*Estar*_betag(spec);  
   }
 
 }
@@ -2008,7 +2010,7 @@ void find_Y2star_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, 
   }
 
   for (spec=0; spec<ns; spec++){
-    Ystar[spec]=-metrics.Omega*Jstar;  
+    Ystar[spec]=-metrics.Omega*Jstar*_betaa(spec);  
   }
 
 }

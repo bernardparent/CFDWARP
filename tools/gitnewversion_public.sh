@@ -83,8 +83,9 @@ echo "Pulling latest public warp from github..";
 cd $warppublic
 git pull
 if [ -n "$(git status --porcelain)" ]; then
-  echo "ERROR: Changes or untracked files reported by git on $warppublic. Can not proceed. Exiting.";
-  exit 1
+#  echo "ERROR: Changes or untracked files reported by git on $warppublic. Can not proceed. Exiting.";
+#  exit 1
+  echo "Changes or untracked files from previous attempt. This may not be a source of concern. "
 else
   echo "Checking that there is no changes or untracked files reported by git on $warppublic. [OK]";
 fi

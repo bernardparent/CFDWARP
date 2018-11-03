@@ -737,15 +737,15 @@ void GRIDG_fatal_error(const char *formatstr, ...){
   char *newstr;
   int term_width,term_height;
   newstr=(char *)malloc(10000*sizeof(char));
-  fprintf(stdout,"\n\n");
+  fprintf(stderr,"\n\n");
   va_start(ap, formatstr);
   vsprintf(newstr,formatstr, ap);
    va_end(ap);
   find_terminal_window_size(&term_width,&term_height);
-  fprintf(stdout,"%s",strwrp(newstr,min(term_width-1,70)));
+  fprintf(stderr,"%s",strwrp(newstr,min(term_width-1,70)));
   free(newstr);
 
-  fprintf(stdout,"\n\nGRIDG fatal error. Exiting.\n\n");
+  fprintf(stderr,"\n\nGRIDG fatal error. Exiting.\n\n");
   exit(EXIT_FAILURE);
 }
 
