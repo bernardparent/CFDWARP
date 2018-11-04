@@ -7,6 +7,15 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 NOV 04a
+   * moved model/fluid/doc/Plasma_Model2 to model/fluid/doc/Plasma_Model
+   * in model/fluid/doc/Transport_Equations/report.tex
+     - made changes to incorporate latest version of the non-stiff plasma model
+       (with betag and betaa instead of betaplus and betaminus)
+   * in model/thermo/doc/report.tex
+     - fixed bug \begin{table*}[|t] should be \begin{table*}[t]
+
+
 2018 NOV 03a
    * in model/fluid/_drift-diffusion/fluid.c 
      - in find_Dstar(), added electric field term

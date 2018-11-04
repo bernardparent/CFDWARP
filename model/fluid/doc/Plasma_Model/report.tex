@@ -375,7 +375,7 @@ The latter constitute what is here denoted as the ``conventional governing equat
 
 
 
-\section{Recast of the Positively-Charged Species Transport Equations}
+\section{Addition of Gauss Law Terms}
 
 
 The ``conventional governing equations'' outlined in the previous section are well known to be exceptionally stiff. Such stiffness has been observed to be independent of the type of integration strategy used, either explicit or fully-implicit. As first outlined in Ref.\ \cite{jcp:2013:parent}, the stiffness originates from the potential equation based on Gauss's law being particularly sensitive to small errors in the electron or ion densities whenever the plasma becomes quasi-neutral. One approach that has been shown successful in relieving the stiffness is by rewriting the governing equations such that the electric field is obtained from a potential based on Ohm's law rather than Gauss's law (see Refs.\ \cite{jcp:2013:parent} and \cite{jcp:2014:parent}). As well, to ensure that Gauss's law is satisfied some source terms need to be added to the positive ion transport equations. 
@@ -391,103 +391,88 @@ We here generalize the approach proposed in Ref.\ \cite{jcp:2014:parent} to a pl
 Isolate $\vec{V}^k$ in the latter and substitute in Eq.\ (\ref{eqn:massconservation}), and simplify noting that $s_k=1$ and $C_k$ is positive for the positive ions: 
 %
 \begin{equation}
-  \frac{\partial N_{k}}{\partial t} + \sum_{i=1}^3 \frac{\partial}{\partial x_i} \left(N_k \Delta \vec{V}_i^k +N_{k} \vec{V}^{\rm n}_i+N_{k}  \mu_k   \vec{E}_i
-             -    \frac{\mu_k }{|C_{k}| } \frac{\partial P_{k}}{\partial x_i}\right) = W_{k}
-\label{eqn:positive_ion_1}
+  \frac{\partial N_k}{\partial t} + \sum_{i=1}^3 \frac{\partial}{\partial x_i}  \left(N_k \Delta \vec{V}^k_i+N_k \vec{V}^{\rm n}_i+ s_k N_k \mu_k  \vec{E}_i
+             -   \frac{\mu_k}{|C_k|} \frac{\partial P_k}{\partial x_i}\right) = W_k
+  \label{eqn:positive_ion_1}
 \end{equation}
 %
-The source terms that must be added to ensure that Gauss's law is satisfied can be obtained by multiplying Gauss's law Eq.\ (\ref{eqn:gauss}) by $\mu_{k} N_{k}$ and rearranging:
+The source terms that must be added to ensure that Gauss's law is satisfied can be obtained by multiplying Gauss's law Eq.\ (\ref{eqn:gauss}) by $\beta_k^{\rm g} \mu_{k} N_{k}$ and rearranging:
 %
 \begin{equation}
-0=\mu_{k} N_{k} \sum_{i=1}^3 \frac{\partial }{\partial x_i}\epsilon_r \vec{E}_i -\mu_{k} N_{k}\frac{1}{\epsilon_0} \sum_{r=1}^\ns C_r N_r 
+0=\beta_k^{\rm g} \mu_{k} N_{k} \sum_{i=1}^3 \frac{\partial }{\partial x_i}\epsilon_r \vec{E}_i - \beta_k^{\rm g}  \mu_{k} N_{k}\frac{1}{\epsilon_0} \sum_{r=1}^\ns C_r N_r 
 \end{equation}
 %
 or
 %
 \begin{equation}
 0=
- \mu_{k} N_{k}  \sum_{i=1}^3 \frac{\partial \vec{E}_i}{\partial x_i}  
-+\mu_{k} N_{k}\frac{1}{\epsilon_r} \sum_{i=1}^3 \vec{E}_i \frac{\partial \epsilon_r}{\partial x_i}  
--\mu_{k} N_{k}\frac{1}{\epsilon_0 \epsilon_r} \sum_{r=1}^\ns C_r N_r 
+ \beta_k^{\rm g} \mu_{k} N_{k}  \sum_{i=1}^3 \frac{\partial \vec{E}_i}{\partial x_i}  
++\beta_k^{\rm g} \mu_{k} N_{k}\frac{1}{\epsilon_r} \sum_{i=1}^3 \vec{E}_i \frac{\partial \epsilon_r}{\partial x_i}  
+-\beta_k^{\rm g} \mu_{k} N_{k}\frac{1}{\epsilon_0 \epsilon_r} \sum_{r=1}^\ns C_r N_r 
 \end{equation}
 %
 
 Then, we add the latter to Eq.\ (\ref{eqn:positive_ion_1}) to obtain:
 %
 \begin{align}
-  \frac{\partial N_{k}}{\partial t} &+ \sum_{i=1}^3 \frac{\partial}{\partial x_i} \left(N_k \Delta \vec{V}_i^k +N_{k} \vec{V}^{\rm n}_i+N_{k}  \mu_k  \vec{E}_i
-             -    \frac{\mu_k }{|C_{k}| } \frac{\partial P_{k}}{\partial x_i}\right) \nonumber \\
-&= W_{k}+\mu_{k} N_{k} \sum_{i=1}^3 \frac{\partial \vec{E}_i}{\partial x_i}-\mu_{k} N_{k}\frac{1}{\epsilon_0 \epsilon_r} \sum_{r=1}^\ns C_r N_r 
-+\mu_{k} N_{k}\frac{1}{\epsilon_r} \sum_{i=1}^3 \vec{E}_i \frac{\partial \epsilon_r}{\partial x_i}  
+  \frac{\partial N_k}{\partial t} &+ \sum_{i=1}^3 \frac{\partial}{\partial x_i}  \left(N_k \Delta \vec{V}^k_i+N_k \vec{V}^{\rm n}_i+ s_k N_k \mu_k  \vec{E}_i
+             -   \frac{\mu_k}{|C_k|} \frac{\partial P_k}{\partial x_i}\right) \nonumber \\
+&= W_k
++\beta_k^{\rm g} \mu_{k} N_{k}  \sum_{i=1}^3 \frac{\partial \vec{E}_i}{\partial x_i}  
+-\beta_k^{\rm g} \mu_{k} N_{k}\frac{1}{\epsilon_0 \epsilon_r} \sum_{r=1}^\ns C_r N_r 
++\beta_k^{\rm g} \mu_{k} N_{k}\frac{1}{\epsilon_r} \sum_{i=1}^3 \vec{E}_i \frac{\partial \epsilon_r}{\partial x_i}  
 \end{align}
 %
+
+
+
 And we note that the following statement holds:
 %
 \begin{equation}
-\mu_{k} N_{k} \sum_{i=1}^3 \frac{\partial \vec{E}_i}{\partial x_i}
-= \sum_{i=1}^3 \frac{\partial }{\partial x_i} \mu_{k} N_{k} \vec{E}_i
- - \sum_{i=1}^3 \vec{E}_i \frac{\partial }{\partial x_i} \mu_{k} N_{k}
+\beta_k^{\rm g} \mu_{k} N_{k} \sum_{i=1}^3 \frac{\partial \vec{E}_i}{\partial x_i}
+= \sum_{i=1}^3 \frac{\partial }{\partial x_i} \beta_k^{\rm g} \mu_{k} N_{k} \vec{E}_i
+ - \sum_{i=1}^3 \beta_k^{\rm g} \vec{E}_i \frac{\partial }{\partial x_i} \mu_{k} N_{k}
 \end{equation}
 %
-Substitute the latter in the former, rewrite the partial pressure term using the ideal gas law outlined in Eq.\ (\ref{eqn:Pk}), expand the pressure derivatives, and rearrange:
+Substitute the latter in the former, and rearrange:
 %
-\begin{equation}
-\begin{array}{l}\mfd
-  \frac{\partial N_{k}}{\partial t} 
-+ \sum_{i=1}^3 \frac{\partial}{\partial x_i} N_k \left(\Delta \vec{V}_i^k + \vec{V}^{\rm n}_i\right) 
-- \sum_{i=1}^3  \frac{\partial}{\partial x_i} \left(
-                 \frac{\mu_k k_{\rm B} T_{k}}{|C_{k}| } \frac{\partial N_{k}}{\partial x_i}
-\right)
-+ \sum_{i=1}^3 \vec{E}_i \frac{\partial }{\partial x_i} \mu_{k} N_{k}
- \alb\mfd~~~~~
-= 
- W_{k}
--\mu_{k} N_{k}\frac{1}{\epsilon_0 \epsilon_r} \sum_{r=1}^\ns C_r N_r 
-+ \sum_{i=1}^3  \frac{\partial}{\partial x_i} \left(
-                 \frac{\mu_k k_{\rm B} N_{k}}{|C_{k}| } \frac{\partial T_{k}}{\partial x_i}
-\right)
-+\mu_{k} N_{k}\frac{1}{\epsilon_r} \sum_{i=1}^3 \vec{E}_i \frac{\partial \epsilon_r}{\partial x_i}  
-\end{array}
-\label{eqn:positivespecies}
-\end{equation}
+\begin{align}
+  \frac{\partial N_k}{\partial t} &+ \sum_{i=1}^3 \frac{\partial}{\partial x_i}  \left(N_k \left( \Delta \vec{V}^k_i + \vec{V}^{\rm n}_i+ (s_k-\beta_k^{\rm g}) \mu_k  \vec{E}_i \right)
+             -   \frac{\mu_k}{|C_k|} \frac{\partial P_k}{\partial x_i}\right) 
++ \sum_{i=1}^3 \beta_k^{\rm g} \vec{E}_i \frac{\partial }{\partial x_i} \mu_{k} N_{k}
+\nonumber \\
+&= W_k
+-\beta_k^{\rm g} \mu_{k} N_{k}\frac{1}{\epsilon_0 \epsilon_r} \sum_{r=1}^\ns C_r N_r 
++\beta_k^{\rm g} \mu_{k} N_{k}\frac{1}{\epsilon_r} \sum_{i=1}^3 \vec{E}_i \frac{\partial \epsilon_r}{\partial x_i}  
+\end{align}
 %
-The latter is the modified transport equation for the positively-charged species, and must be used for all positive ions. It is obtained without introducing assumptions or simplifications from the physical model outlined in Section 2.
+The latter is  obtained without introducing assumptions or simplifications from the physical model outlined in Section 2.
 
 
 
 
-\section{Recast of the Negatively-Charged Species Transport Equations}
+\section{Ambipolar Form}
 
 It can be shown that a system of equations composed of the recast transport equation outlined in Eq.\ (\ref{eqn:positivespecies}) for the positive ions, combined with the standard transport equation for the negative species (Eq.\ (\ref{eqn:massconservation})), and combined with a potential equation based on the generalized Ohm's law \cite{jcp:2011:parent} has the same exact solution as the conventional governing equations outlined in Section 3 while not exhibiting high stiffness. However, such a set of equations would yield a rather low resolution and require significantly more nodes to reach the same accuracy within quasi-neutral regions of the plasma. As was  demonstrated in Ref.\ \cite{jcp:2013:parent}, such can be overcome by rewriting the transport equation for the negative species in \emph{ambipolar form} following the approach outlined in Ref.\ \cite{jcp:2011:parent:2}. Rewriting the transport equations in ambipolar form increases the resolution because it reduces the dependence of the potential equation on the charged species transport equations in quasi-neutral regions.     
 
-The ambipolar form of the negatively-charged species transport equations can be obtained by first isolating $\vec{V}_i^k$ in  Eq.\ (\ref{eqn:deltaV}) and substituting in Eq.\ (\ref{eqn:massconservation}) noting that $s_k=-1$ when the species is negatively-charged:
-%
-\begin{equation}
-\begin{array}{l}\mfd
-  \frac{\partial N_k}{\partial t} 
-+ \sum_{i=1}^3 \frac{\partial}{\partial x_i}  N_k \left(  \Delta \vec{V}_i^k +\vec{V}^{\rm n}_i - \mu_k  \vec{E}_i
-\right) 
-- \sum_{i=1}^3  \frac{\partial}{\partial x_i}  \left( 
-   \frac{\mu_k }{|C_k|} \frac{\partial P_k}{\partial x_i}
-\right) 
-= W_k
-\end{array}
-\end{equation}
-%
-Then, without loss of generality, we can add and subtract the ambipolar electric field $\vec{E}^\prime$ to the electric field:
+Without loss of generality, we can add and subtract the ambipolar electric field $\vec{E}^\prime$ to the electric field:
 %
 \begin{align}
-  \frac{\partial N_k}{\partial t} 
-&+ \sum_{i=1}^3 \frac{\partial}{\partial x_i}  N_k \left(  \Delta \vec{V}_i^k +\vec{V}^{\rm n}_i - \mu_k  \left(\vec{E} -\vec{E}^\prime  \right)_i
-\right) 
-- \sum_{i=1}^3  \frac{\partial}{\partial x_i}  \mu_k N_k \vec{E}^\prime_i \nonumber\alb
-&- \sum_{i=1}^3  \frac{\partial}{\partial x_i}  \left( 
+  \frac{\partial N_k}{\partial t} &+ \sum_{i=1}^3 \frac{\partial}{\partial x_i}  \left(N_k \left( \Delta \vec{V}^k_i + \vec{V}^{\rm n}_i+ (s_k-\beta_k^{\rm g}) \mu_k  \vec{E}_i + \beta^{\rm a}_k \mu_k \vec{E}_i^\prime \right)\right) 
+\nonumber \\
+&+ \sum_{i=1}^3 \beta_k^{\rm g} \vec{E}_i \frac{\partial }{\partial x_i} \mu_{k} N_{k}
+- \sum_{i=1}^3  \frac{\partial}{\partial x_i}  \beta_k^{\rm a}\mu_k N_k \vec{E}^\prime_i
+- \sum_{i=1}^3  \frac{\partial}{\partial x_i}  \left( 
    \frac{\mu_k }{|C_k|} \frac{\partial P_k}{\partial x_i}
-\right) 
-= W_k
+\right)
+\nonumber \\
+&= W_k
+-\beta_k^{\rm g} \mu_{k} N_{k}\frac{1}{\epsilon_0 \epsilon_r} \sum_{r=1}^\ns C_r N_r 
++\beta_k^{\rm g} \mu_{k} N_{k}\frac{1}{\epsilon_r} \sum_{i=1}^3 \vec{E}_i \frac{\partial \epsilon_r}{\partial x_i}  
 \label{eqn:negspecies1}
 \end{align}
 %
+
 As outlined in Ref.\ \cite{jcp:2014:parent}, significant gains in resolution can be reached when $\vec{E}^\prime$ is defined as the component of the electric field that cancels out all components of the current except due to drift. However, defining the ambipolar electric field  in this manner leads to some difficulties when the plasma is in the presence of a magnetic field. Not only does this result in a particularly complicated transport equation in which several terms are expensive to compute, but this  also entails convergence hangs when the magnetic field reaches high values. We here find it necessary to define the ambipolar electric field in a slightly different manner as the component of the electric field that cancels out all components of the \emph{unmagnetized} current except due to drift and due to the motion of the neutrals, with the unmagnetized current being the current that would be obtained locally should the magnetic field be zero. The ambipolar electric field thus takes on the form:
 %
 \begin{equation}
@@ -517,15 +502,33 @@ After substituting Eq.\ (\ref{eqn:Jzero}) in Eq.\ (\ref{eqn:Eprimedefinition}) i
 \label{eqn:Eprime}
 \end{equation}
 %
-Then, after substituting $\vec{E}-\vec{E}^\prime$ from Eq.\ (\ref{eqn:Eprimedefinition}) and $\vec{E}^\prime$ from Eq.\ (\ref{eqn:Eprime}) into Eq.\ (\ref{eqn:negspecies1}) and rearranging, we obtain:
+Then, after substituting $\vec{E}^\prime$ from Eq.\ (\ref{eqn:Eprimedefinition}) and $\vec{E}^\prime$ from Eq.\ (\ref{eqn:Eprime}) into Eq.\ (\ref{eqn:negspecies1}) and rearranging, we obtain:
 %
 \begin{align}
-  \frac{\partial N_k}{\partial t} 
-&+ \sum_{i=1}^3 \frac{\partial}{\partial x_i}   N_k \left(      \sum_{r=1}^\ns \frac{\delta_{rk}\sigma+ C_r N_r \mu_k}{\sigma}   \Delta \vec{V}_i^r +\left(1+\frac{\mu_k \rho_{\rm c}}{\sigma}\right)\vec{V}^{\rm n}_i - \frac{\mu_k}{\sigma}  \vec{J}_i \right)
-\nonumber\alb
-&- \sum_{i=1}^3 \sum_{r=1}^{\ns} \frac{\partial}{\partial x_i} \left( \mu_r \left( \frac{\delta_{rk}}{|C_k|}+ \frac{ \mu_k N_k s_r }{\sigma} \right) \frac{\partial P_r}{\partial x_i}\right) 
-= 
-W_k
+  \frac{\partial N_k}{\partial t} &+ \sum_{i=1}^3 \frac{\partial}{\partial x_i}  \left(N_k \left( \Delta \vec{V}^k_i + \vec{V}^{\rm n}_i+ (s_k-\beta_k^{\rm g}+ \beta^{\rm a}_k) \mu_k  \vec{E}_i -  \frac{\beta^{\rm a}_k \mu_k}{\sigma} \left(\vec{J}_i-\sum_{r=1}^\ns C_r N_r \Delta \vec{V}_i^r -\rho_{\rm c} \vec{V}_i^{\rm n} \right)  \right)\right) 
+\nonumber \\
+&+ \sum_{i=1}^3 \beta_k^{\rm g} \vec{E}_i \frac{\partial }{\partial x_i} \mu_{k} N_{k}
+- \sum_{i=1}^3  \frac{\partial}{\partial x_i}  \beta_k^{\rm a}\mu_k N_k \sum_{r=1}^\ns \frac{s_r \mu_r }{\sigma}  \frac{\partial P_r}{\partial x_i}
+- \sum_{i=1}^3  \frac{\partial}{\partial x_i}  \left( 
+   \frac{\mu_k }{|C_k|} \frac{\partial P_k}{\partial x_i}
+\right)
+\nonumber \\
+&= W_k
+-\beta_k^{\rm g} \mu_{k} N_{k}\frac{1}{\epsilon_0 \epsilon_r} \sum_{r=1}^\ns C_r N_r 
++\beta_k^{\rm g} \mu_{k} N_{k}\frac{1}{\epsilon_r} \sum_{i=1}^3 \vec{E}_i \frac{\partial \epsilon_r}{\partial x_i}  
+\end{align}
+%
+Rearrange:
+%
+\begin{align}
+  \frac{\partial N_k}{\partial t} &+ \sum_{i=1}^3 \frac{\partial}{\partial x_i}  N_k \left(  \sum_{r=1}^\ns \frac{\delta_{rk}\sigma+ \beta^{\rm a}_k C_r N_r \mu_k}{\sigma}   \Delta \vec{V}_i^r + \left(1+\frac{\beta^{\rm a}_k \mu_k \rho_{\rm c}}{\sigma}\right)\vec{V}^{\rm n}_i + (s_k-\beta_k^{\rm g}+ \beta^{\rm a}_k) \mu_k  \vec{E}_i -  \frac{\beta^{\rm a}_k \mu_k}{\sigma} \vec{J}_i   \right) 
+\nonumber \\
+&+ \sum_{i=1}^3 \beta_k^{\rm g} \vec{E}_i \frac{\partial }{\partial x_i} \mu_{k} N_{k}
+- \sum_{i=1}^3 \sum_{r=1}^{\ns} \frac{\partial}{\partial x_i} \left( \mu_r \left( \frac{\delta_{rk}}{|C_k|}+ \frac{ \beta_k^{\rm a} \mu_k N_k s_r  }{\sigma} \right) \frac{\partial P_r}{\partial x_i}\right) 
+\nonumber \\
+&= W_k
+-\beta_k^{\rm g} \mu_{k} N_{k}\frac{1}{\epsilon_0 \epsilon_r} \sum_{r=1}^\ns C_r N_r 
++\beta_k^{\rm g} \mu_{k} N_{k}\frac{1}{\epsilon_r} \sum_{i=1}^3 \vec{E}_i \frac{\partial \epsilon_r}{\partial x_i}  
 \end{align}
 %
 where $\delta_{rk}$ is the Kronecker delta. 
@@ -535,127 +538,132 @@ After splitting the derivative involving the current $\vec{J}$ into two terms an
 \sum_{i=1}^3 \frac{\partial \vec{J}_i}{\partial x_i}=-\sum_{r=1}^\ns C_r \frac{\partial N_r}{\partial t}
 \end{equation}
 %
-the following is obtained:
+we obtain:
 %
-\begin{equation}
-\begin{array}{l}\mfd
-  \sum_{r=1}^{\ns} \frac{\delta_{rk}\sigma+C_r  \mu_k N_k}{\sigma} \frac{\partial N_r}{\partial t}  
-+ \sum_{i=1}^3 \frac{\partial}{\partial x_i}   N_k \left(\sum_{r=1}^\ns \frac{\delta_{rk}\sigma+C_r  \mu_k N_r}{\sigma} \Delta \vec{V}_i^r +\left(1+\frac{\mu_k\rho_{\rm c}}{\sigma}\right)\vec{V}^{\rm n}_i\right) 
-\alb\mfd~~~~
-- \sum_{i=1}^3 \vec{J}_i \frac{\partial}{\partial x_i}  \left( \frac{\mu_k N_k}{\sigma} 
+\begin{align}
+  &\sum_{r=1}^{\ns} \frac{\delta_{rk}\sigma+C_r  \beta_k^{\rm a} \mu_k N_k}{\sigma} \frac{\partial N_r}{\partial t}  
+  + \sum_{i=1}^3 \frac{\partial}{\partial x_i}  N_k \left(  \sum_{r=1}^\ns \frac{\delta_{rk}\sigma+ \beta^{\rm a}_k C_r N_r \mu_k}{\sigma}   \Delta \vec{V}_i^r + \left(1+\frac{\beta^{\rm a}_k \mu_k \rho_{\rm c}}{\sigma}\right)\vec{V}^{\rm n}_i + (s_k-\beta_k^{\rm g}+ \beta^{\rm a}_k) \mu_k  \vec{E}_i    \right) 
+\nonumber \\
+&- \sum_{i=1}^3 \beta_k^{\rm a}\vec{J}_i \frac{\partial}{\partial x_i}  \left( \frac{\mu_k N_k}{\sigma} 
 \right) 
-- \sum_{i=1}^3 \sum_{r=1}^{\ns} \frac{\partial}{\partial x_i} \left(\mu_r \left(\frac{ \delta_{rk} }{ |C_k|}+   \frac{ \mu_k N_k s_r}{\sigma}\right)  \frac{\partial P_r}{\partial x_i}\right) 
-= W_k
-\end{array}
-\end{equation}
++ \sum_{i=1}^3 \beta_k^{\rm g} \vec{E}_i \frac{\partial }{\partial x_i} \mu_{k} N_{k}
+- \sum_{i=1}^3 \sum_{r=1}^{\ns} \frac{\partial}{\partial x_i} \left( \mu_r \left( \frac{\delta_{rk}}{|C_k|}+ \frac{ \beta_k^{\rm a} \mu_k N_k s_r  }{\sigma} \right) \frac{\partial P_r}{\partial x_i}\right) 
+\nonumber \\
+&= W_k
+-\beta_k^{\rm g} \mu_{k} N_{k}\frac{1}{\epsilon_0 \epsilon_r} \sum_{r=1}^\ns C_r N_r 
++\beta_k^{\rm g} \mu_{k} N_{k}\frac{1}{\epsilon_r} \sum_{i=1}^3 \vec{E}_i \frac{\partial \epsilon_r}{\partial x_i}  
+\end{align}
 %
 We then use the ideal gas relationship in Eq.\ (\ref{eqn:Pk}), expand the partial derivatives, and rewrite:
 %
 \begin{align}
-  \sum_{r=1}^{\ns} &\frac{\delta_{rk}\sigma+C_r  \mu_k N_k}{\sigma} \frac{\partial N_r}{\partial t}  
-+ \sum_{i=1}^3 \frac{\partial}{\partial x_i}   N_k \left(\sum_{r=1}^\ns \frac{\delta_{rk}\sigma+C_r  \mu_k N_r}{\sigma} \Delta \vec{V}_i^r +\left(1+\frac{\mu_k\rho_{\rm c}}{\sigma}\right)\vec{V}^{\rm n}_i\right) 
-\nonumber\alb
-&- \sum_{i=1}^3 \vec{J}_i \frac{\partial}{\partial x_i}  \left( \frac{\mu_k N_k}{\sigma} 
+  &\sum_{r=1}^{\ns} \frac{\delta_{rk}\sigma+C_r  \beta_k^{\rm a} \mu_k N_k}{\sigma} \frac{\partial N_r}{\partial t}  \nonumber\alb
+  &+ \sum_{i=1}^3 \frac{\partial}{\partial x_i}  N_k \left(  \sum_{r=1}^\ns \frac{\delta_{rk}\sigma+ \beta^{\rm a}_k C_r N_r \mu_k}{\sigma}   \Delta \vec{V}_i^r + \left(1+\frac{\beta^{\rm a}_k \mu_k \rho_{\rm c}}{\sigma}\right)\vec{V}^{\rm n}_i + (s_k-\beta_k^{\rm g}+ \beta^{\rm a}_k) \mu_k  \vec{E}_i    \right) 
+\nonumber \\
+&- \sum_{i=1}^3 \beta_k^{\rm a}\vec{J}_i \frac{\partial}{\partial x_i}  \left( \frac{\mu_k N_k}{\sigma} 
 \right) 
-- \sum_{i=1}^3 \sum_{r=1}^{\ns} \frac{\partial}{\partial x_i} \left(\mu_r k_{\rm B} T_r\left(\frac{ \delta_{rk} }{ |C_k|}+   \frac{ \mu_k N_k s_r}{\sigma}\right)  \frac{\partial N_r}{\partial x_i}\right) 
-\nonumber\alb
++ \sum_{i=1}^3 \beta_k^{\rm g} \vec{E}_i \frac{\partial }{\partial x_i} \mu_{k} N_{k}
+- \sum_{i=1}^3 \sum_{r=1}^{\ns} \frac{\partial}{\partial x_i} \left(\mu_r k_{\rm B} T_r\left(\frac{ \delta_{rk} }{ |C_k|}+   \frac{ \beta_k^{\rm a}\mu_k N_k s_r}{\sigma}\right)  \frac{\partial N_r}{\partial x_i}\right) 
+\nonumber \\
 &= W_k
-+ \sum_{r=1}^\ns \sum_{i=1}^3  \frac{\partial}{\partial x_i} \left( \mu_r k_{\rm B} N_r   \left(\frac{\delta_{rk}}{|C_k|}+\frac{s_r \mu_k N_k}{\sigma}\right)  \frac{\partial T_r}{\partial x_i} \right)
-\label{eqn:negativespecies}
+-\beta_k^{\rm g} \mu_{k} N_{k}\frac{1}{\epsilon_0 \epsilon_r} \sum_{r=1}^\ns C_r N_r 
++\beta_k^{\rm g} \mu_{k} N_{k}\frac{1}{\epsilon_r} \sum_{i=1}^3 \vec{E}_i \frac{\partial \epsilon_r}{\partial x_i}  
++ \sum_{r=1}^\ns \sum_{i=1}^3  \frac{\partial}{\partial x_i} \left( \mu_r k_{\rm B} N_r   \left(\frac{\delta_{rk}}{|C_k|}+\frac{s_r \mu_k N_k \beta_k^{\rm a}}{\sigma}\right)  \frac{\partial T_r}{\partial x_i} \right)
 \end{align}
 %
-The latter is the proposed ``ambipolar form'' of the transport equation for the negatively-charged species. It must be used not only for the electrons but for all negative ions. It is emphasized that the recast Eq.\ (\ref{eqn:negativespecies}) is obtained from the physical model outlined in Section 2 without making any assumption or simplification. As such, it can be used not only in quasi-neutral regions but also in non-neutral regions including cathode and anode sheaths. 
-
-
-
-
-
-
-\section{Proposed Governing Equations}
-
-We can combine the transport equation for the positively-charged species, Eq.\ (\ref{eqn:positivespecies}) and the transport equation for the negatively-charged species, Eq.\ (\ref{eqn:negativespecies}) into a single equation:
+Multiply by the molecular mass $m_k$ and note that $\rho_k=m_k N_k$:
 %
 \begin{align}
-  \sum_{r=1}^{\ns} &\frac{\delta_{rk}\sigma + \beta^-_k C_r  \mu_k N_k}{\sigma} \frac{\partial N_r}{\partial t}  
--  \sum_{i=1}^3 \beta_k^- \vec{J}_i \frac{\partial}{\partial x_i}  \left( \frac{\mu_k N_k}{\sigma} 
+  &\sum_{r=1}^{\ns} \frac{m_k}{m_r}\frac{\delta_{rk}\sigma+C_r  \beta_k^{\rm a} \mu_k N_k}{\sigma} \frac{\partial \rho_r}{\partial t}  \nonumber\alb
+  &+ \sum_{i=1}^3 \frac{\partial}{\partial x_i}  \rho_k \left(  \sum_{r=1}^\ns \frac{\delta_{rk}\sigma+ \beta^{\rm a}_k C_r N_r \mu_k}{\sigma}   \Delta \vec{V}_i^r + \left(1+\frac{\beta^{\rm a}_k \mu_k \rho_{\rm c}}{\sigma}\right)\vec{V}^{\rm n}_i + (s_k-\beta_k^{\rm g}+ \beta^{\rm a}_k) \mu_k  \vec{E}_i    \right) 
+\nonumber \\
+&- \sum_{i=1}^3 \beta_k^{\rm a}\vec{J}_i \frac{\partial}{\partial x_i}  \left( \frac{\mu_k \rho_k}{\sigma} 
 \right) 
-+ \sum_{i=1}^3 \beta_k^+ \vec{E}_i \frac{\partial }{\partial x_i} \mu_{k} N_{k}\nonumber\alb
-&+ \sum_{i=1}^3 \frac{\partial}{\partial x_i}   N_k \left(\sum_{r=1}^\ns \frac{\delta_{rk}\sigma+\beta_k^- C_r  \mu_k N_r}{\sigma} \Delta \vec{V}_i^r + \left(1+\beta_k^- \frac{\mu_k\rho_{\rm c}}{\sigma}\right)\vec{V}^{\rm n}_i\right) \nonumber\alb
-&- \sum_{i=1}^3 \sum_{r=1}^{\ns} \frac{\partial}{\partial x_i} \left(\mu_r k_{\rm B} T_r\left(\frac{ \delta_{rk} }{ |C_k|}+   \frac{\beta_k^- s_r \mu_k N_k }{\sigma}\right)  \frac{\partial N_r}{\partial x_i}\right) 
-\nonumber\alb
-&= W_k
-+ \sum_{r=1}^\ns \sum_{i=1}^3  \frac{\partial}{\partial x_i} \left( \mu_r k_{\rm B} N_r   \left(\frac{\delta_{rk}}{|C_k|}+\frac{\beta_k^- s_r \mu_k N_k}{\sigma}\right)  \frac{\partial T_r}{\partial x_i} \right)
-\nonumber\alb
-&-\beta_k^+ \mu_{k} N_{k}\left(
-  \frac{\rho_{\rm c}}{\epsilon_0\epsilon_r}
-  -\sum_{i=1}^3 \frac{\vec{E}_i}{\epsilon_r} \frac{\partial \epsilon_r}{\partial x_i}  
-\right)  
++ \sum_{i=1}^3 \beta_k^{\rm g} \vec{E}_i \frac{\partial }{\partial x_i} \mu_{k} \rho_{k}
+- \sum_{i=1}^3 \sum_{r=1}^{\ns} \frac{\partial}{\partial x_i} \left(\mu_r k_{\rm B} T_r\frac{m_k}{m_r}\left(\frac{ \delta_{rk} }{ |C_k|}+   \frac{ \beta_k^{\rm a}\mu_k N_k s_r}{\sigma}\right)  \frac{\partial \rho_r}{\partial x_i}\right) 
+\nonumber \\
+&= m_k W_k
+-\beta_k^{\rm g} \mu_{k} \rho_{k}\frac{\rho_{\rm c}}{\epsilon_0 \epsilon_r}  
++\beta_k^{\rm g} \mu_{k} \rho_{k}\frac{1}{\epsilon_r} \sum_{i=1}^3 \vec{E}_i \frac{\partial \epsilon_r}{\partial x_i}  
++ \sum_{r=1}^\ns \sum_{i=1}^3  \frac{\partial}{\partial x_i} \left( \mu_r k_{\rm B} \rho_r  \frac{m_k}{m_r} \left(\frac{\delta_{rk}}{|C_k|}+\frac{s_r \mu_k N_k \beta_k^{\rm a}}{\sigma}\right)  \frac{\partial T_r}{\partial x_i} \right)
 \end{align}
 %
-with
-%
-\begin{equation}
-\beta_k^\pm = \max(0,~\pm s_k)
-\end{equation}
-%
+
+
 We can simplify further the latter by defining the ambipolar tensor $\alpha$ as:
 %
 \begin{equation}
 \alpha_{kr} \equiv
-  \frac{\delta_{rk}\sigma+ \beta_k^- C_r  \mu_k N_k}{\sigma} 
-=  |C_r| \left( \frac{\delta_{rk}}{|C_k|}+  \frac{ \beta_k^- s_r \mu_k N_k}{\sigma}\right)
-=  \frac{N_k}{N_r}\frac{\delta_{rk}\sigma+ \beta_k^- C_r  \mu_k N_r}{\sigma} 
+  \frac{m_k}{m_r}\frac{\delta_{rk}\sigma+ \beta_k^{\rm a} C_r  \mu_k N_k}{\sigma} 
+=  |C_r| \frac{m_k}{m_r}\left( \frac{\delta_{rk}}{|C_k|}+  \frac{ \beta_k^{\rm a} s_r \mu_k N_k}{\sigma}\right)
+=  \frac{\rho_k}{\rho_r}\frac{\delta_{rk}\sigma+ \beta_k^{\rm a} C_r  \mu_k N_r}{\sigma} 
 \end{equation}
 %
 and by noting that the following equality holds:
 %
 \begin{equation}
-1+\beta_k^- \frac{\mu_k\rho_{\rm c}}{\sigma} 
-= \sum_{r=1}^\ns \frac{\delta_{rk}\sigma+ \beta_k^- C_r  \mu_k N_r}{\sigma} 
+1+\beta_k^{\rm a} \frac{\mu_k\rho_{\rm c}}{\sigma} 
+= \sum_{r=1}^\ns \frac{\delta_{rk}\sigma+ \beta_k^{\rm a} C_r  \mu_k N_r}{\sigma} 
  \end{equation}
 %
 We thus obtain:
 %
 \begin{align}
-  \sum_{r=1}^{\ns}& \alpha_{kr} \frac{\partial N_r}{\partial t}  
-+ \sum_{i=1}^3 \sum_{r=1}^\ns  \frac{\partial}{\partial x_i}      \alpha_{kr} \left( \Delta \vec{V}_i^r + \vec{V}^{\rm n}_i \right)N_r\nonumber\alb
-&+  \sum_{i=1}^3 \left( \beta_k^+ \vec{E}_i- \beta_k^- \vec{J}_i   \right) \frac{\partial}{\partial x_i}  \mu_{k} N_{k} \left( \beta_k^+ + {\textstyle \frac{1}{\sigma}} \beta_k^-  
+  &  \sum_{r=1}^{\ns} \alpha_{kr} \frac{\partial \rho_r}{\partial t}  
++ \sum_{i=1}^3 \sum_{r=1}^\ns  \frac{\partial}{\partial x_i}      \alpha_{kr} \left( \Delta \vec{V}_i^r + \vec{V}^{\rm n}_i \right)\rho_r  
+  + \sum_{i=1}^3 \frac{\partial}{\partial x_i}  \rho_k  (s_k-\beta_k^{\rm g}+ \beta^{\rm a}_k) \mu_k  \vec{E}_i   
+\nonumber \\
+&- \sum_{i=1}^3 \beta_k^{\rm a}\vec{J}_i \frac{\partial}{\partial x_i}  \left( \frac{\mu_k \rho_k}{\sigma} 
 \right) 
-- \sum_{i=1}^3 \sum_{r=1}^{\ns} \frac{\partial}{\partial x_i} \left(\frac{\mu_r k_{\rm B} T_r \alpha_{kr}}{|C_r|}  \frac{\partial N_r}{\partial x_i}\right) \nonumber\alb
-&= W_k
--\beta_k^+ \mu_{k} N_{k}\left(
++ \sum_{i=1}^3 \beta_k^{\rm g} \vec{E}_i \frac{\partial }{\partial x_i} \mu_{k} \rho_{k}
+- \sum_{i=1}^3 \sum_{r=1}^{\ns} \frac{\partial}{\partial x_i} \left(\frac{\mu_r k_{\rm B} T_r \alpha_{kr}}{|C_r|}  \frac{\partial \rho_r}{\partial x_i}\right) 
+\nonumber \\
+&= m_k W_k
+-\beta_k^{\rm g} \mu_{k} \rho_{k}\left(
   \frac{\rho_{\rm c}}{\epsilon_0\epsilon_r}
   -\sum_{i=1}^3 \frac{\vec{E}_i}{\epsilon_r} \frac{\partial \epsilon_r}{\partial x_i}  
 \right)
-+ \sum_{r=1}^\ns \sum_{i=1}^3  \frac{\partial}{\partial x_i} \left( \frac{\mu_r k_{\rm B} N_r  \alpha_{kr}}{|C_r|}   \frac{\partial T_r}{\partial x_i} \right)
-\label{eqn:positivenegativespecies}
++ \sum_{r=1}^\ns \sum_{i=1}^3  \frac{\partial}{\partial x_i} \left( \frac{\mu_r k_{\rm B} \rho_r  \alpha_{kr}}{|C_r|}   \frac{\partial T_r}{\partial x_i} \right)
 \end{align}
 %
+
+\section{Matrix Form}
+
 The proposed charged species transport equations can also be written in general matrix form as follows:
 %
 \begin{equation}
-  R=Z\frac{\partial U}{\partial t} + \sum_{i=1}^3\frac{\partial}{\partial x_i} A_i U
-    + \sum_{i=1}^3 G_i \frac{\partial}{\partial x_i} B U - \sum_{i=1}^3  \frac{\partial}{\partial x_i} \left( K \frac{\partial U}{\partial x_i} \right)-S
+  R=Z\frac{\partial U}{\partial t} + \sum_{i=1}^3\frac{\partial}{\partial x_i} D_i U
+    + \sum_{i=1}^3 Y_i^1 \frac{\partial}{\partial x_i} H^1 
+    + \sum_{i=1}^3 Y_i^2 \frac{\partial}{\partial x_i} H^2 
+    - \sum_{i=1}^3  \frac{\partial}{\partial x_i} \left( K \frac{\partial U}{\partial x_i} \right)-S
 \label{eqn:Rproposed}
 \end{equation}
 %
 where $R$ is the residual which is driven to zero through the iterative process, and where the other matrices can be shown to correspond to:
 %
 \begin{align}
- \left[U\right]_k&=N_k \alb
- \left[A_i\right]_{k,k}&=\sum_{r=1}^\ns \frac{\delta_{rk}\sigma+\beta_k^- C_r  \mu_k N_r}{\sigma} \Delta \vec{V}_i^r + \left(1+\beta_k^- \frac{\mu_k\rho_{\rm c}}{\sigma}\right)\vec{V}^{\rm n}_i \alb
+ \left[U\right]_k&=\rho_k \alb
+  \left[D_i\right]_{k,k}&=\sum_{r=1}^\ns \frac{\delta_{rk}\sigma+\beta_k^{\rm a} C_r  \mu_k N_r}{\sigma} \left(\Delta \vec{V}_i^r +\vec{V}^{\rm n}_i\right)  +(s_k-\beta_k^{\rm g}+ \beta^{\rm a}_k) \mu_k  \vec{E}_i \alb
 % \left[A_i\right]_{k,k}&=&\sum_{r=1}^\ns \alpha_{kr}\frac{N_r}{N_k} \left(\Delta \vec{V}_i^r +\vec{V}^{\rm n}_i\right) \alb
- \left[B\right]_{k,k}&=\beta_k^+ \mu_k + \frac{1}{\sigma}\beta_k^- \mu_k \alb
- \left[G_i\right]_{k,k}&=\beta_k^+ \vec{E}_i - \beta_k^- \vec{J}_i \alb
+ \left[H^1\right]_{k,k}&= \mu_k \rho_k  \alb
+ \left[H^2\right]_{k,k}&= \frac{1}{\sigma} \mu_k \rho_k \alb
+ \left[Y_i^1\right]_{k,k}&=\beta_k^{\rm g} \vec{E}_i  \alb
+ \left[Y_i^2\right]_{k,k}&=- \beta_k^{\rm a} \vec{J}_i \alb
  \left[K\right]_{k,r} &= \frac{\mu_r k_{\rm B} T_r \alpha_{kr}}{|C_r|} \alb
  \left[Z\right]_{k,r} &= \alpha_{kr} \alb
- \left[S\right]_k &= W_k 
--\beta_k^+ \mu_{k} N_{k}\left(
+ \left[S\right]_k &= m_k W_k 
+-\beta_k^{\rm g} \mu_{k} \rho_{k}\left(
   \frac{\rho_{\rm c}}{\epsilon_0\epsilon_r}
   -\sum_{i=1}^3 \frac{\vec{E}_i}{\epsilon_r} \frac{\partial \epsilon_r}{\partial x_i}  
 \right)
-+ \sum_{r=1}^\ns \sum_{i=1}^3  \frac{\partial}{\partial x_i} \left( \frac{\mu_r k_{\rm B} N_r \alpha_{kr}}{|C_r|}  \frac{\partial T_r}{\partial x_i} \right)
++ \sum_{r=1}^\ns \sum_{i=1}^3  \frac{\partial}{\partial x_i} \left( \frac{\mu_r k_{\rm B} \rho_r \alpha_{kr}}{|C_r|}  \frac{\partial T_r}{\partial x_i} \right)
 \end{align}
+%
+Alternately, we can write the matrix $D$ as:
+%
+\begin{equation}
+ \left[D_i\right]_{k,r}=\alpha_{kr}(\Delta \vec{V}_i^r +\vec{V}_i^{\rm n})+\delta_{kr}(s_k-\beta_k^{\rm g}+ \beta^{\rm a}_k) \mu_k  \vec{E}_i 
+\end{equation}
 %
 In the latter, the velocity difference $\Delta \vec{V}$ can be obtained by substituting Eq.\ (\ref{eqn:V}) into Eq.\ (\ref{eqn:deltaV}):
 %

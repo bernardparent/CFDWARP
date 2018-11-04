@@ -136,8 +136,9 @@
    \item[$\alpha$] non-dimensional mass-based ambipolar tensor 
    \item[$\alpha^\prime$] non-dimensional ambipolar tensor 
    \item[$\beta_k^+$] equal to 1 if species $k$ is a positive ion, 0 otherwise 
-   \item[$\beta_k^-$] equal to 1 if species $k$ is a negative ion or electron, 0 otherwise 
+   \item[$\beta_k^{\rm a}$] constant multiplying the ambipolar terms within the charged species mass conservation equations 
    \item[$\beta_k^{\rm e}$] equal to 1 if species $k$ is an electron, 0 otherwise 
+   \item[$\beta_k^{\rm g}$] constant multiplying the terms added to the charged species mass conservation equations to ensure Gauss's law is satisfied 
    \item[$\beta_k^{\rm n}$] equal to 1 if species $k$ is a neutral, 0 otherwise 
    \item[$\beta_k^{\rm c}$] equal to 1 if species $k$ is a charged species, 0 otherwise 
    \item[$\gamma$] secondary emission coefficient
@@ -197,7 +198,7 @@ abstract
 
 \section{Introduction}
 
-This document gives an overview of the mass, momentum, and energy fluid transport equations (along with their derivations from basic principles) that are used in the model/fluid/_Favre-Reynolds* modules. Some -- but not all -- of the equations presented here were first published in Ref.\ \cite{aiaa:2016:parent}. The Reader is referred to  model/fluid/doc/Favre_Averaging for the derivation of the Favre-averaged equations for the neutrals as well as to model/metrics/doc for the transformation of the governing equations from Cartesian to curvilinear coordinates, and to model/fluid/doc/Plasma_Model for the derivation of the computationally-efficient charged species transport equations used herein.
+This document gives an overview of the mass, momentum, and energy fluid transport equations (along with their derivations from basic principles) that are used in the model/fluid/\textunderscore Favre-Reynolds* modules. Some -- but not all -- of the equations presented here were first published in Ref.\ \cite{aiaa:2016:parent}. The Reader is referred to  model/fluid/doc/Favre\textunderscore Averaging for the derivation of the Favre-averaged equations for the neutrals as well as to model/metrics/doc for the transformation of the governing equations from Cartesian to curvilinear coordinates, and to model/fluid/doc/Plasma\textunderscore Model for the derivation of the computationally-efficient charged species transport equations used herein.
 
 
 
@@ -329,27 +330,28 @@ where $\nu_k$ is the mass diffusion coefficient and $w_k$ the mass fraction and 
 
 \section{Charged Species Mass Conservation}
 
-As was shown in Ref.\ \cite{jcp:2015:parent}, and based on prior theory outlined in Refs. \cite{jcp:2014:parent,jcp:2011:parent:2, jcp:2013:parent}, it is more computationally efficient to rewrite the $k$th charged species transport equation in this form:
+As was shown in Ref.\ \cite{jcp:2015:parent}, and based on prior theory outlined in Refs. \cite{jcp:2014:parent,jcp:2011:parent:2, jcp:2013:parent}, it is more computationally efficient write the $k$th charged species transport equation in ambipolar form and to add some terms to enforce Gauss's law as follows:
 %
-\begin{equation}
-\begin{array}{l}\mfd
-  \sum_{r=1}^{\ns} \alpha^\prime_{kr} \frac{\partial N_r}{\partial t}  
-+ \sum_{i=1}^3 \sum_{r=1}^\ns  \frac{\partial}{\partial x_i}      \alpha^\prime_{kr} \left( \Delta \vec{V}_i^r + \vec{V}^{\rm n}_i \right)N_r
--  \sum_{i=1}^3 \beta_k^- \vec{J}_i \frac{\partial}{\partial x_i}  \left( \frac{\mu_k N_k}{\sigma} 
-\right) \alb\mfd
-+ \sum_{i=1}^3 \beta_k^+ \vec{E}_i \frac{\partial }{\partial x_i} \mu_{k} N_{k}
-- \sum_{i=1}^3 \sum_{r=1}^{\ns} \frac{\partial}{\partial x_i} \left(\frac{\mu_r k_{\rm B} T_r \alpha^\prime_{kr}}{|C_r|}  \frac{\partial N_r}{\partial x_i}\right)\alb\mfd 
-= \frac{1}{m_k}W_k
-+ \sum_{r=1}^\ns \sum_{i=1}^3  \frac{\partial}{\partial x_i} \left( \frac{\mu_r k_{\rm B} N_r  \alpha^\prime_{kr}}{|C_r|}   \frac{\partial T_r}{\partial x_i} \right)
--\beta_k^+ \mu_{k} N_{k}\left(
+\begin{align}
+  &  \sum_{r=1}^{\ns} \alpha_{kr} \frac{\partial \rho_r}{\partial t}  
++ \sum_{i=1}^3 \sum_{r=1}^\ns  \frac{\partial}{\partial x_i}      \alpha_{kr} \left( \Delta \vec{V}_i^r + \vec{V}^{\rm n}_i \right)\rho_r  
+  + \sum_{i=1}^3 \frac{\partial}{\partial x_i}  \rho_k  (s_k-\beta_k^{\rm g}+ \beta^{\rm a}_k) \mu_k  \vec{E}_i   
+\nonumber \\
+&- \sum_{i=1}^3 \beta_k^{\rm a}\vec{J}_i \frac{\partial}{\partial x_i}  \left( \frac{\mu_k \rho_k}{\sigma} 
+\right) 
++ \sum_{i=1}^3 \beta_k^{\rm g} \vec{E}_i \frac{\partial }{\partial x_i} \mu_{k} \rho_{k}
+- \sum_{i=1}^3 \sum_{r=1}^{\ns} \frac{\partial}{\partial x_i} \left(\frac{\mu_r k_{\rm B} T_r \alpha_{kr}}{|C_r|}  \frac{\partial \rho_r}{\partial x_i}\right) 
+\nonumber \\
+&= m_k W_k
+-\beta_k^{\rm g} \mu_{k} \rho_{k}\left(
   \frac{\rho_{\rm c}}{\epsilon_0\epsilon_r}
   -\sum_{i=1}^3 \frac{\vec{E}_i}{\epsilon_r} \frac{\partial \epsilon_r}{\partial x_i}  
 \right)
-\end{array}
-\label{eqn:chargedspeciestransport}
-\end{equation}
++ \sum_{r=1}^\ns \sum_{i=1}^3  \frac{\partial}{\partial x_i} \left( \frac{\mu_r k_{\rm B} \rho_r  \alpha_{kr}}{|C_r|}   \frac{\partial T_r}{\partial x_i} \right)
+\label{eqn:masscharged}
+\end{align}
 %
-where   $C_k$ is the charge of species $k$ (equal to $e$ for the singly-positively charged ions, to $-e$ for the electrons, to $-2e$ for the doubly-charged negative ions, etc), and $\rho_{\rm c}$ is the net charge density defined as:
+where $C_k$ is the charge of species $k$ (equal to $e$ for the singly-positively charged ions, to $-e$ for the electrons, to $-2e$ for the doubly-charged negative ions, etc), and $\rho_{\rm c}$ is the net charge density defined as:
 %
 \begin{equation}
  \rho_{\rm c} \equiv \sum_{r=1}^\ns  C_r N_r 
@@ -363,48 +365,17 @@ As well, $\vec{J}$ is the current density defined as:
 \label{eqn:J}
 \end{equation}
 %
-and the ambipolar tensor corresponds to:
+where the non-dimensional ambipolar tensor $\alpha$ is defined as:
 %
 \begin{equation}
-\alpha_{kr}^\prime \equiv
-  \frac{\delta_{rk}\sigma+ \beta_k^- C_r  \mu_k N_k}{\sigma} 
+\alpha_{kr} \equiv \frac{m_k}{m_r}\left(\frac{\delta_{rk}\sigma + \beta^{\rm a}_k C_r  \mu_k N_k}{\sigma}\right)
 \end{equation}
-%
 %
 with $\sigma$ the conductivity defined as:
 %
 \begin{equation}
  \sigma \equiv \sum_{k=1}^\ns |C_k| N_k \mu_k
 \label{eqn:sigma} 
-\end{equation}
-%
-We can multiply Eq.\ (\ref{eqn:chargedspeciestransport})  by $m_k$ to obtain the mass conservation equation of the charged species:
-%
-\begin{equation}
-\frameeqn{
-\begin{array}{l}\mfd
-  \sum_{r=1}^{\ns} \alpha_{kr} \frac{\partial \rho_r}{\partial t}  
-+ \sum_{i=1}^3 \sum_{r=1}^\ns  \frac{\partial}{\partial x_i}      \alpha_{kr} \left( \Delta \vec{V}_i^r + \vec{V}^{\rm n}_i \right)\rho_r
--  \sum_{i=1}^3 \beta_k^- \vec{J}_i \frac{\partial}{\partial x_i}  \left( \frac{\mu_k \rho_k}{\sigma} 
-\right) \alb\mfd
-+ \sum_{i=1}^3 \beta_k^+ \vec{E}_i \frac{\partial }{\partial x_i} \mu_{k} \rho_{k}
-- \sum_{i=1}^3 \sum_{r=1}^{\ns} \frac{\partial}{\partial x_i} \left(\frac{\mu_r k_{\rm B} T_r \alpha_{kr}}{|C_r|}  \frac{\partial \rho_r}{\partial x_i}\right) \alb\mfd
-- \sum_{i=1}^3 \sum_{r=1}^\ns \frac{\partial}{\partial x_i} \left( \frac{\mu_r k_{\rm B} \rho_r  \alpha_{kr}}{|C_r|}   \frac{\partial T_r}{\partial x_i} \right)
-= W_k
--\beta_k^+ \mu_{k} \rho_{k}\left(
-  \frac{\rho_{\rm c}}{\epsilon_0\epsilon_r}
-  -\sum_{i=1}^3 \frac{\vec{E}_i}{\epsilon_r} \frac{\partial \epsilon_r}{\partial x_i}  
-\right)
-\end{array}
-}
-\label{eqn:masscharged}
-\end{equation}
-%
-%
-where the non-dimensional mass-based ambipolar tensor $\alpha$ is defined as:
-%
-\begin{equation}
-\alpha_{kr} \equiv \frac{m_k}{m_r}\left(\frac{\delta_{rk}\sigma + \beta^-_k C_r  \mu_k N_k}{\sigma}\right)
 \end{equation}
 %
 In the latter $\Delta \vec{V}_i^k$ corresponds to:
@@ -2691,7 +2662,8 @@ Let's rewrite the neutrals mass conservation equation (\ref{eqn:massneutral_turb
    Z\frac{\partial U}{\partial t} + \sum_{i=1}^3  \frac{\partial }{\partial x_i} D_i U
    + \sum_{i=1}^3 \frac{\partial F_i}{\partial x_i} 
      - \sum_{i=1}^3 \sum_{j=1}^3 \frac{\partial }{\partial x_j}\left( K_{ij} \frac{\partial G}{\partial x_i} \right)
-     +\sum_{i=1}^3 Y_i \frac{\partial H}{\partial x_i}  
+     +\sum_{i=1}^3 Y_i^1 \frac{\partial H^1}{\partial x_i}  
+     +\sum_{i=1}^3 Y_i^2 \frac{\partial H^2}{\partial x_i}  
    =S
 \end{equation}
 %
@@ -2745,14 +2717,14 @@ F_i = \left[ \begin{array}{c}
 \begin{equation}
 S = \left[ \begin{array}{c}\mfd
 W_1 
--\beta_1^+ \mu_1 \rho_1 \left(
+-\beta_1^{\rm g} \mu_1 \rho_1 \left(
   \frac{\rho_{\rm c}}{\epsilon_0\epsilon_r}
   -\sum_{i=1}^3 \frac{\vec{E}_i}{\epsilon_r} \frac{\partial \epsilon_r}{\partial x_i}  
 \right)
 +\sum_{i=1}^3 \frac{\partial}{\partial x_i} \frac{\mu_{\rm e} k_{\rm B}\rho_{\rm e} \alpha_{1{\rm e}}}{|C_{\rm e}|}\frac{\partial T_{\rm e}}{\partial x_i} \\
 \vdots \\ \mfd
 W_\ns 
--\beta_\ns^+ \mu_\ns \rho_\ns \left(
+-\beta_\ns^{\rm g} \mu_\ns \rho_\ns \left(
   \frac{\rho_{\rm c}}{\epsilon_0\epsilon_r}
   -\sum_{i=1}^3 \frac{\vec{E}_i}{\epsilon_r} \frac{\partial \epsilon_r}{\partial x_i}  
 \right)
@@ -2773,20 +2745,40 @@ W_{\rm e} e_{\rm e} +   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  - Q_{
 \begin{equation}
 ~~~
 ~~~
-Y_i = \left[ \begin{array}{c}
-\beta_1^+\vec{E}_i - \beta_1^- \vec{J}_i \\
+Y_i^1 = \left[ \begin{array}{c}
+\beta_1^{\rm g}\vec{E}_i  \\
 \vdots \\
-\beta_\ns^+\vec{E}_i - \beta_\ns^- \vec{J}_i \alb
+\beta_\ns^{\rm g}\vec{E}_i  \alb
 0 \\
 \vdots \\
 0 \alb
 \end{array}
 \right]^{\rm D}
 ~~~
-H = \left[ \begin{array}{c}
-\rho_1 \mu_1( \beta^+_1   + \frac{1}{\sigma} \beta_1^-  ) \\
+Y_i^2 = \left[ \begin{array}{c}
+ - \beta_1^{\rm a} \vec{J}_i \\
 \vdots \\
-\rho_\ns \mu_\ns( \beta^+_\ns   + \frac{1}{\sigma} \beta_\ns^-  ) \alb
+ - \beta_\ns^{\rm a} \vec{J}_i \alb
+0 \\
+\vdots \\
+0 \alb
+\end{array}
+\right]^{\rm D}
+~~~
+H^1 = \left[ \begin{array}{c}
+\rho_1 \mu_1  \\
+\vdots \\
+\rho_\ns \mu_\ns  \alb
+0 \\
+\vdots \\
+0 \alb
+\end{array}
+\right]
+~~~
+H^2 = \left[ \begin{array}{c}
+\rho_1 \mu_1 \frac{1}{\sigma}    \\
+\vdots \\
+\rho_\ns \mu_\ns \frac{1}{\sigma}    \alb
 0 \\
 \vdots \\
 0 \alb
@@ -2798,9 +2790,20 @@ H = \left[ \begin{array}{c}
 %
 \begin{equation}
   [D_i]_{k,r}=\left\{\begin{array}{ll}
-        \beta_k^{\rm c}\beta_r^{\rm c} \left(\alpha_{kr}\Delta \vec{V}_i^r+ (\alpha_{kr}-\delta_{kr})\vec{V}_i^{\rm n}\right) &\textrm{if $k\le \ns$ and $r \le \ns$} \alb
-        \frac{1}{e_{\rm t}^\star} \sum_{k=1}^\ns \beta_k^{\rm c} w_k (h_k+h_k^\circ) \left(\vec{V}_i^{k}-\vec{V}_i^{\rm n}\right)  &\textrm{if $k=r=\ns+4$ } \alb
+        \beta_k^{\rm c}\beta_r^{\rm c} \left(
+\alpha_{kr}\Delta \vec{V}_i^r+ (\alpha_{kr}-\delta_{kr})\vec{V}_i^{\rm n}+\delta_{kr}(s_k-\beta_k^{\rm g}+ \beta^{\rm a}_k) \mu_k  \vec{E}_i\right) &\textrm{if $k\le \ns$ and $r \le \ns$} \alb
+        \frac{1}{e_{\rm t}^\star} \sum_{m=1}^\ns \beta_m^{\rm c} w_m (h_m+h_m^\circ) \left(\vec{V}_i^{m}-\vec{V}_i^{\rm n}\right)  &\textrm{if $k=r=\ns+4$ } \alb
         \frac{5}{3}(\vec{V}_i^{\rm e}-\vec{V}_i^{\rm n}) &\textrm{if $k=r=\ns+8$}
+             \end{array}  \right.
+\end{equation}
+%
+or we can write $D$ in diagonal form with no loss in generality:
+%
+\begin{equation}
+  [D_i]_{k,k}=\left\{\begin{array}{ll}
+        \beta_k^{\rm c} \left(\sum_{r=1}^\ns \frac{\delta_{rk}\sigma+\beta_k^{\rm a} C_r  \mu_k N_r}{\sigma} \left(\Delta \vec{V}_i^r +(1-\delta_{kr})\vec{V}^{\rm n}_i\right)  +(s_k-\beta_k^{\rm g}+ \beta^{\rm a}_k) \mu_k  \vec{E}_i\right) &\textrm{if $k\le \ns$ } \alb
+        \frac{1}{e_{\rm t}^\star} \sum_{m=1}^\ns \beta_m^{\rm c} w_m (h_m+h_m^\circ) \left(\vec{V}_i^{m}-\vec{V}_i^{\rm n}\right)  &\textrm{if $k=\ns+4$ } \alb
+        \frac{5}{3}(\vec{V}_i^{\rm e}-\vec{V}_i^{\rm n}) &\textrm{if $k=\ns+8$}
              \end{array}  \right.
 \end{equation}
 %
