@@ -80,12 +80,15 @@ else
 fi
 
 echo "Pulling latest public warp from github..";
+rm -rf "$warppublic"/* 
 cd $warppublic
-git pull
+git checkout master
+git reset --hard
+git pull --tags origin master
 if [ -n "$(git status --porcelain)" ]; then
-#  echo "ERROR: Changes or untracked files reported by git on $warppublic. Can not proceed. Exiting.";
-#  exit 1
-  echo "Changes or untracked files from previous attempt. This may not be a source of concern. "
+  echo "ERROR: Changes or untracked files reported by git on $warppublic. Can not proceed. Exiting.";
+  exit 1
+  #echo "Changes or untracked files on $warppublic. This may not be a source of concern."
 else
   echo "Checking that there is no changes or untracked files reported by git on $warppublic. [OK]";
 fi

@@ -7,6 +7,21 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 NOV 10c
+   * in tools/gitnewversion_public.sh
+     - fixed a bug with git pull: needed to remove all directories within $warppublic first
+
+
+2018 NOV 10b
+   * in tools/gitnewversion_public.sh
+     - fixed a bug with git pull: need to do a git checkout master and git reset --hard first
+
+
+2018 NOV 10a
+   * in bin/ns_SDBD.wrp
+     - made modifications
+
+
 2018 NOV 04a
    * moved model/fluid/doc/Plasma_Model2 to model/fluid/doc/Plasma_Model
    * in model/fluid/doc/Transport_Equations/report.tex
