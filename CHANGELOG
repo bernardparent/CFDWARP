@@ -7,6 +7,15 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 NOV 13a
+   * in bin
+     - renamed taylor_green_vortex.wrp to taylor_green_vortex_2.wrp
+     - added taylor_green_vortex from Prasanna
+     - added noh3D.wrp testcase
+   * in CONTRIB
+     - added taylor_green_vortex.wrp case by Prasanna
+ 
+
 2018 NOV 10c
    * in tools/gitnewversion_public.sh
      - fixed a bug with git pull: needed to remove all directories within $warppublic first
