@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 NOV 18b
+   * in bin/noh3D.wrp
+     - changed aref and zetaA2
+   * in bin
+     - added noh2D.wrp
+
+
 2018 NOV 18a
    * in bin
      - updated noh3D.wrp
