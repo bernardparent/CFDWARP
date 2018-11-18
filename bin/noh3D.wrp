@@ -6,11 +6,11 @@
                                A CFD Code for Plasma & Reactive Flow
   _______________________________________________________________________________________________
 
-  Version                          18nov10c
-  Compiler                         gcc 5.4.0 20160609 with OPENMP threads
-  Compiled on                      Nov 13 2018 at 23:10:53
+  Version                          18nov13a
+  Compiler                         gcc 4.9.2 with OPENMP threads
+  Compiled on                      Nov 18 2018 at 10:12:57 by parent on WAFL101
   Cycle Strategy                   Standard
-  Fluid Relaxation                 Block ADI [1,2]
+  Fluid Relaxation                 Block DDADI [2,1]
   EM Field Relaxation              None
   Convection Discretization        MUSCL+ with flux FVS+ [3], FDS+ [4], and primitive
                                    interpolation TVD [5], WENO [7], CWENO [9], AOWENO [8], and
@@ -26,10 +26,11 @@
   Number of Flux Components        5
   _______________________________________________________________________________________________
 
-  [1]  WR Briley and H McDonald. "On the Structure and Use of Linearized Block Implicit
-       Schemes", Journal of Computational Physics 34:54-73, 1980.
-  [2]  RM Beam and RF Warming. "An Implicit Finite-Difference Algorithm for Hyperbolic Systems
-       in Conservation-Law-Form", Journal of Computational Physics 22:87-110, 1976.
+  [1]  RW MacCormack. "A New Implicit Algorithm for Fluid Flow", 13th Computational Fluid
+       Dynamics Conference, AIAA Paper 97-2100, 1997.
+  [2]  J Bardina and CK Lombard. "Three Dimensional Hypersonic Flow Simulations with the CSCM
+       Implicit Upwind Navier-Stokes Method", Proceedings of the 8th Computational Fluid
+       Dynamics Conference, AIAA Paper 87-1114, 1987.
   [3]  B Parent. "Positivity-Preserving High-Resolution Schemes for Systems of Conservation
        Laws", Journal of Computational Physics 231:173-189, 2012.
   [4]  B Parent. "Positivity-Preserving Flux Difference Splitting Schemes", Journal of
@@ -53,7 +54,8 @@
 
 }
 
-mf=1;
+
+mf=2.0;
 
 is=1;
 ie=round(30*mf);
@@ -158,23 +160,26 @@ Init(
 
 Disc(
   NavierStokesPerfect(
-    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA1=0.5e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.5e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   MUSCLplus(
     FLUX=FLUX_FDSplus;
-    numiter=3;
+    numiter=5;
     AVERAGING=AVERAGING_ARITH;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
-    AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_TVD2_VANLEER;
-    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+    AOWENO_gammalo=0.85;
+    AOWENO_gammahi=0.85;
+    INTERPOL=INTERPOL_AOWENO5;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
   );
   CDFplus(
     xi1=0.5; {except for momentum and energy fluxes}
     xi2=0.5; {momentum fluxes}
     xi3=0.5; {total energy flux}
+  );
+  BDF(
+    STENCIL=STENCIL_BDF2;
   );
 );
 
@@ -192,11 +197,11 @@ Cycle(
   );
   DualTimeStepping(
     tmax=0.6;    {simulation time span in seconds}
-    dt=tmax/80/mf;   {physical time step in seconds}
+    dt=tmax/30/mf;   {physical time step in seconds}
     sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
-      CFL=0.2;
+      CFL=0.8;
       Init(NavierStokesPerfect(
         i=is;
         for_parallel(j,js,je,
@@ -262,12 +267,12 @@ Cycle(
       ););
 
     );
-    CFL=min(CFL*1.15,0.7);
+    if (iter>20,CFL=max(CFL*0.85,0.01););
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,k_ximax,clipinfo);
-    if (ximax<xiverge || iter>20,
+    if (ximax<xiverge || iter>40,
       IncreaseTimeLevel();
       WriteDataFile(outputfilename"."round(time/dt));
       printf("dt=%E time=%Es\n",dt,time);
