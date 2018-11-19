@@ -124,7 +124,7 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_PECLET;
   );
   MUSCLplus(
-    FLUX=FLUX_FDSplusgen;
+    FLUX=FLUX_FDSplusMultiD;
     numiter=6;
     AVERAGING=AVERAGING_ARITH;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
@@ -134,7 +134,9 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_PARENT;
   );
   CDFplus(
-    xi=0.5; {should be set to 0.5 or less when used with 2nd order or higher convective fluxes}
+    xi1=0.5; {should be set to 0.5 or less when used with 2nd order or higher convective fluxes}
+    xi2=0.5;
+    xi3=0.5;
   );
 
 );

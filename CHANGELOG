@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 NOV 19a
+   * in cycle/resconv/_MUSCL+/resconv.c
+     - renamed FLUX_FDSplusgen to FLUX_FDSplusMultiD
+   * in bin/*wrp
+     - renamed FLUX_FDSplusgen to FLUX_FDSplusMultiD
+   
+
 2018 NOV 18b
    * in bin/noh3D.wrp
      - changed aref and zetaA2

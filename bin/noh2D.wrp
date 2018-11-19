@@ -62,8 +62,6 @@ is=1;
 ie=round(30*mf);
 js=1;
 je=round(30*mf);
-ks=1;
-ke=round(30*mf);
 
 
 Grid(
@@ -163,7 +161,7 @@ Disc(
     zetaA2=0.03e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   MUSCLplus(
-    FLUX=FLUX_FDSplus;
+    FLUX=FLUX_FDSplusMultiD;
     numiter=5;
     AVERAGING=AVERAGING_ARITH;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
