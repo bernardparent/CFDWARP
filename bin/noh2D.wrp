@@ -62,6 +62,8 @@ is=1;
 ie=round(30*mf);
 js=1;
 je=round(30*mf);
+ks=1;
+ke=round(30*mf);
 
 
 Grid(
@@ -175,6 +177,9 @@ Disc(
     xi2=0.5; {momentum fluxes}
     xi3=0.5; {total energy flux}
   );
+  TVDRK(
+    METHOD=METHOD_TVDRK2;
+  );
 );
 
 
@@ -187,6 +192,57 @@ Cycle(
     Uref[1]=rhoref*aref;       
     Uref[2]=rhoref*aref;   
     Uref[3]=rhoref*aref*aref;  
+  );
+  PredictorCorrector(
+    tmax=0.6;    {simulation time span in seconds}
+    dt=tmax/50000/mf;   {physical time step in seconds}
+    if (mod(iter,5)==0,
+      Init(NavierStokesPerfect(
+        i=is;
+        for_parallel(j,js,je,
+            x=_x(i,j);
+            y=_y(i,j);
+            r=sqrt(x*x+y*y);
+
+            Region(i,j,  i,j,  INIT_TYPE3, -x/r,-y/r,1e-6,(1+time/r));
+        );
+        i=ie;
+        for_parallel(j,js,je,
+            x=_x(i,j);
+            y=_y(i,j);
+            r=sqrt(x*x+y*y);
+            Region(i,j,  i,j,  INIT_TYPE3, -x/r,-y/r,1e-6,(1+time/r));
+        );
+        j=js;
+        for_parallel(i,is,ie,
+            x=_x(i,j);
+            y=_y(i,j);
+            r=sqrt(x*x+y*y);
+            Region(i,j,  i,j,  INIT_TYPE3, -x/r,-y/r,1e-6,(1+time/r));
+        );
+        j=je;
+        for_parallel(i,is,ie,
+            x=_x(i,j);
+            y=_y(i,j);
+            r=sqrt(x*x+y*y);
+            Region(i,j,  i,j,  INIT_TYPE3, -x/r,-y/r,1e-6,(1+time/r));
+        );
+
+      ););
+
+    );
+
+    if (time>tmax-0.1*dt,
+      WriteDataFile(outputfilename"."round(time/dt));
+      exit(EXIT_SUCCESS);
+    );
+    if (mod(iter,500)==1,
+      WriteDataFile(outputfilename"."round(time/dt));
+    );
+    UpdateFluid(dt);
+    printf("%E %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
+           time,iter,effiter_U,ximax,i_ximax,
+           j_ximax,clipinfo);
   );
   DualTimeStepping(
     tmax=0.6;    {simulation time span in seconds}

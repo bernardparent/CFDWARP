@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 NOV 21a
+   * in bin/noh2D.wrp
+     - added PredictorCorrection module within Cycle
+
+
 2018 NOV 19a
    * in cycle/resconv/_MUSCL+/resconv.c
      - renamed FLUX_FDSplusgen to FLUX_FDSplusMultiD
