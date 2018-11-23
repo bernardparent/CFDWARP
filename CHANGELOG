@@ -7,9 +7,18 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
-2018 NOV 21a
-   * in bin/noh2D.wrp
-     - added PredictorCorrection module within Cycle
+2018 NOV 23a
+   * in bin
+     - updated noh2D.wrp
+   * renamed
+     - FLUX_FDSplusMultiD -> FLUX_FDSplusFilterMultiD
+     - convert_Fstar_interface -> filter_Fstar_interface
+   * in cycle/resconv/_MUSCL+/resconv.c
+     - added FLUX_FDSplusFilter
+   * in cycle/share/res_share.c
+     - renamed filter_Fstar_interface_positivity_preserving -> filter_Fstar_interface_positivity_preserving_MultiD
+     - added filter_Fstar_interface_positivity_preserving based on L matrix (instead of M) to filter
+       the flux
 
 
 2018 NOV 19a

@@ -56,7 +56,7 @@
 
  
 
-mf=2.0;
+mf=4.0;
 
 is=1;
 ie=round(30*mf);
@@ -163,13 +163,13 @@ Disc(
     zetaA2=0.03e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   MUSCLplus(
-    FLUX=FLUX_FDSplusMultiD;
+    FLUX=FLUX_FDSplusFilter;
     numiter=5;
     AVERAGING=AVERAGING_ARITH;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_AOWENO5;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
     EIGENVALCOND=EIGENVALCOND_PARENT;
   );
   CDFplus(
@@ -185,7 +185,7 @@ Disc(
 
 Cycle(
   NavierStokesPerfect(
-    xiverge=1e-3;          {residual convergence threshold}
+    xiverge=3e-2;          {residual convergence threshold}
     rhoref=1.0;            {reference density in kg/m3}
     aref=sqrt(1.4*286*1e-3);            {reference sound speed in m/s}
     Uref[0]=rhoref;            
@@ -195,7 +195,7 @@ Cycle(
   );
   PredictorCorrector(
     tmax=0.6;    {simulation time span in seconds}
-    dt=tmax/50000/mf;   {physical time step in seconds}
+    dt=tmax/400000/mf;   {physical time step in seconds}
     if (mod(iter,5)==0,
       Init(NavierStokesPerfect(
         i=is;
@@ -246,7 +246,7 @@ Cycle(
   );
   DualTimeStepping(
     tmax=0.6;    {simulation time span in seconds}
-    dt=tmax/30/mf;   {physical time step in seconds}
+    dt=tmax/40/mf;   {physical time step in seconds}
     sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
@@ -285,12 +285,12 @@ Cycle(
       ););
 
     );
-    if (iter>20,CFL=max(CFL*0.85,0.01););
+    if (iter>20,CFL=max(CFL*0.95,0.05););
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,clipinfo);
-    if (ximax<xiverge || iter>40,
+    if (ximax<xiverge || iter>50,
       IncreaseTimeLevel();
       WriteDataFile(outputfilename"."round(time/dt));
       printf("dt=%E time=%Es\n",dt,time);

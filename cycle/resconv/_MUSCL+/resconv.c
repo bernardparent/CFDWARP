@@ -11,7 +11,8 @@
 
 #define FLUX_FDSplus 1
 #define FLUX_FVSplus 2
-#define FLUX_FDSplusMultiD 3
+#define FLUX_FDSplusFilterMultiD 3
+#define FLUX_FDSplusFilter 4
 #define INTERPOL_AOWENO5 1
 #define INTERPOL_WENO5 2
 #define INTERPOL_WENO3 3
@@ -58,7 +59,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"AVERAGING_ROE",AVERAGING_ROE);
     SOAP_add_int_to_vars(codex,"AVERAGING_ARITH",AVERAGING_ARITH);
     SOAP_add_int_to_vars(codex,"FLUX_FDSplus",FLUX_FDSplus); 
-    SOAP_add_int_to_vars(codex,"FLUX_FDSplusMultiD",FLUX_FDSplusMultiD); 
+    SOAP_add_int_to_vars(codex,"FLUX_FDSplusFilterMultiD",FLUX_FDSplusFilterMultiD); 
+    SOAP_add_int_to_vars(codex,"FLUX_FDSplusFilter",FLUX_FDSplusFilter); 
     SOAP_add_int_to_vars(codex,"FLUX_FVSplus",FLUX_FVSplus); 
     SOAP_add_int_to_vars(codex,"INTERPOL_AOWENO5",INTERPOL_AOWENO5); 
     SOAP_add_int_to_vars(codex,"INTERPOL_WENO5",INTERPOL_WENO5); 
@@ -82,8 +84,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     if (gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PECLET && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PARENT && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_HARTEN && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_GNOFFO)
       SOAP_fatal_error(codex,"EIGENVALCOND must be set to either EIGENVALCOND_PECLET, EIGENVALCOND_PARENT, EIGENVALCOND_HARTEN, EIGENVALCOND_GNOFFO.");
     find_int_var_from_codex(codex,"FLUX",&gl->cycle.resconv.FLUX);
-    if (gl->cycle.resconv.FLUX!=FLUX_FDSplus && gl->cycle.resconv.FLUX!=FLUX_FVSplus && gl->cycle.resconv.FLUX!=FLUX_FDSplusMultiD)
-      SOAP_fatal_error(codex,"FLUX must be set to either FLUX_FDSplus or FLUX_FVSplus or FLUX_FDSplusMultiD.");
+    if (gl->cycle.resconv.FLUX!=FLUX_FDSplus && gl->cycle.resconv.FLUX!=FLUX_FVSplus && gl->cycle.resconv.FLUX!=FLUX_FDSplusFilterMultiD && gl->cycle.resconv.FLUX!=FLUX_FDSplusFilter)
+      SOAP_fatal_error(codex,"FLUX must be set to either FLUX_FDSplus or FLUX_FVSplus or FLUX_FDSplusFilterMultiD or FLUX_FDSplusFilter.");
     find_int_var_from_codex(codex,"numiter",&gl->cycle.resconv.numiter);
 
     find_int_var_from_codex(codex,"AVERAGING",&gl->cycle.resconv.AVERAGING);
@@ -179,16 +181,24 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t 
     case FLUX_FVSplus:
       find_Fstar_interface_FVSplus_muscl(np, gl,  l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics,   gl->cycle.resconv.numiter, EIGENVALUES_ENFORCED_POSITIVE,  gl->cycle.resconv.EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint, lambdaminusp1h,  lambdaplusm1h);
     break;
-    case FLUX_FDSplusMultiD:
+    case FLUX_FDSplusFilterMultiD:
 #ifdef _RESTIME_CDF  
       find_Fstar_interface_FDSplus_muscl(np, gl,  l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, 0, EIGENVALUES_NOT_ENFORCED_POSITIVE,  EIGENVALCOND_NONE, gl->cycle.resconv.AVERAGING, Finttmp, lambdaminusp1h, lambdaplusm1h);
 #else
       find_Fstar_interface_FDS_muscl(gl, theta, musclvarsL, musclvarsR, metrics, EIGENVALCOND_NONE, gl->cycle.resconv.AVERAGING, Finttmp);
 #endif
-      convert_Fstar_interface_positivity_preserving(np, gl, l, theta, metrics, gl->cycle.resconv.numiter, gl->cycle.resconv.EIGENVALCOND, Finttmp, Fint, lambdaminusp1h,  lambdaplusm1h);
+      filter_Fstar_interface_positivity_preserving_MultiD(np, gl, l, theta, metrics, gl->cycle.resconv.numiter, gl->cycle.resconv.EIGENVALCOND, Finttmp, Fint, lambdaminusp1h,  lambdaplusm1h);
+    break;
+    case FLUX_FDSplusFilter:
+#ifdef _RESTIME_CDF  
+      find_Fstar_interface_FDSplus_muscl(np, gl,  l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, 0, EIGENVALUES_NOT_ENFORCED_POSITIVE,  EIGENVALCOND_NONE, gl->cycle.resconv.AVERAGING, Finttmp, lambdaminusp1h, lambdaplusm1h);
+#else
+      find_Fstar_interface_FDS_muscl(gl, theta, musclvarsL, musclvarsR, metrics, EIGENVALCOND_NONE, gl->cycle.resconv.AVERAGING, Finttmp);
+#endif
+      filter_Fstar_interface_positivity_preserving(np, gl, l, theta, metrics, gl->cycle.resconv.numiter, gl->cycle.resconv.EIGENVALCOND, Finttmp, Fint, lambdaminusp1h,  lambdaplusm1h);
     break;
     default:
-      fatal_error("gl->cycle.resconv.FLUX must be set to either FLUX_FDSplus, FLUX_FVSplus, or FLUX_FDSplusMultiD in find_Fstar_interface().");
+      fatal_error("gl->cycle.resconv.FLUX must be set to either FLUX_FDSplus, FLUX_FVSplus, or FLUX_FDSplusFilter, or FLUX_FDSplusFilterMultiD in find_Fstar_interface().");
   }
 
 
