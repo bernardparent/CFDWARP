@@ -14,7 +14,8 @@ cleanall:
 	( cd _FDS_Cauchy ;  make cleanall )
 	( cd _FDS ; make cleanall )
 	( cd _FDS+ ; make cleanall )
-	( cd _FVS+ ; make cleanall )
+	( cd _FVSTVD+ ; make cleanall )
+	( cd _FVS+Filter ; make cleanall )
 	( cd _MUSCL+ ; make cleanall )
 	( cd _MUSCL ; make cleanall )
 

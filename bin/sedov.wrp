@@ -35,7 +35,7 @@ Pcenter=(gamma-1)*rhoinit*epsilon0/Vorigin;
 
 tmax=1.0;   {simulation time span in seconds}
 
-CFLref=1.0; {use CFLref=0.5 for BDF2}
+CFLref=0.5; {use CFLref=0.5 for BDF2}
 CFLref_firstiter=0.1;
 
 Grid(
@@ -128,6 +128,14 @@ Disc(
     zetaA1=0.1e0;   {conditions the convective waves of the A jacobian}
     zetaA2=0.1e0;
     zetaA3=0.1e0;   {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
+  );
+  FVSplusFilter(
+    numiter=4;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.85;
+    AOWENO_gammahi=0.85;
+    INTERPOL=INTERPOL_AOWENO5;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
   );
   MUSCLplus(
     FLUX=FLUX_FDSplusMultiD;

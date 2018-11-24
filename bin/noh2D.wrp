@@ -56,7 +56,22 @@
 
  
 
-mf=4.0;
+{
+gamma= 5/3
+initial density is 1
+the initial pressure is 0 (or 1e-6)
+velocities are directed toward the origin in the plane with magnitude 1.  
+
+Behind the shock the density is 16, the velocity is 0 and the pressure is 16/3.  
+The shock speed is 1/3.
+
+Ahead of the shock, velocity and pressure remain same as
+initially but density varies as 1+t/r with r the radius from the origin
+
+}
+
+
+mf=2.0;
 
 is=1;
 ie=round(30*mf);
@@ -162,6 +177,20 @@ Disc(
     zetaA1=0.5e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.03e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
+  FVSplusFilter(
+    numiter=4;
+    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
+    AOWENO_gammalo=0.85;
+    AOWENO_gammahi=0.85;
+    INTERPOL=INTERPOL_WENO5;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+  );
+  FVSTVDplus(
+    LIMITER=LIMITER_VANLEER;
+    ACCURACY=ACCURACY_SECONDORDER;
+    xi=1.99;
+    EIGENVALCOND=EIGENVALCOND_HARTEN;
+  );
   MUSCLplus(
     FLUX=FLUX_FDSplusFilter;
     numiter=5;
@@ -247,8 +276,8 @@ Cycle(
   DualTimeStepping(
     tmax=0.6;    {simulation time span in seconds}
     dt=tmax/40/mf;   {physical time step in seconds}
-    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
-    sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
+    sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
       CFL=0.9;
       Init(NavierStokesPerfect(

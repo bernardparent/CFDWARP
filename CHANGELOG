@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 NOV 24a
+   * in bin
+     - updated noh2D.wrp, sedov.wrp, riemann.wrp, wavywall.wrp
+   * renamed cycle/resconv/_FVS+ to cycle/resconv/_FVSTVD+
+   * added cycle/resconv/_FVS+Filter/
+
+
 2018 NOV 23a
    * in bin
      - updated noh2D.wrp
