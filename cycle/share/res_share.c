@@ -1130,9 +1130,11 @@ void filter_Fstar_interface_positivity_preserving_MultiD(np_t *np, gl_t *gl, lon
   find_MUstar_from_jacvars(jacvarsp1, metrics, MUp1);
 
   multiply_matrix_and_vector(Mp0,Fint,fluxtmp2);
-  for (flux=0; flux<nf; flux++) Vp0[flux]=fluxtmp2[flux]/MUp0[flux];
+  for (flux=0; flux<nf; flux++) Vp0[flux]=0.5*fluxtmp2[flux]/MUp0[flux];
 
-  for (flux=0; flux<nf; flux++) Vp1[flux]=0.0;
+  multiply_matrix_and_vector(Mp1,Fint,fluxtmp2);
+  for (flux=0; flux<nf; flux++) Vp1[flux]=0.5*fluxtmp2[flux]/MUp1[flux];
+
 
   set_matrix_to_zero(lambdaminus);
   set_matrix_to_zero(lambdaplus);
@@ -1193,6 +1195,7 @@ void filter_Fstar_interface_positivity_preserving_MultiD(np_t *np, gl_t *gl, lon
 
 
 
+
 void filter_Fstar_interface_positivity_preserving(np_t *np, gl_t *gl, long lp0, long theta, metrics_t metrics, long numiter, int EIGENVALCOND, flux_t Fint, flux_t Fpositive, sqmat_t lambdaminus, sqmat_t lambdaplus){
 
   flux_t LUp0,LUp1,Up0,Up1,Vp1,Vp0;
@@ -1218,9 +1221,12 @@ void filter_Fstar_interface_positivity_preserving(np_t *np, gl_t *gl, long lp0, 
   find_LUstar_from_jacvars(jacvarsp1, metrics, LUp1);
 
   multiply_matrix_and_vector(Lp0,Fint,fluxtmp2);
-  for (flux=0; flux<nf; flux++) Vp0[flux]=fluxtmp2[flux]/LUp0[flux];
+  for (flux=0; flux<nf; flux++) Vp0[flux]=0.5*fluxtmp2[flux]/LUp0[flux];
 
-  for (flux=0; flux<nf; flux++) Vp1[flux]=0.0;
+  multiply_matrix_and_vector(Lp1,Fint,fluxtmp2);
+  for (flux=0; flux<nf; flux++) Vp1[flux]=0.5*fluxtmp2[flux]/LUp1[flux];
+
+
 
   set_matrix_to_zero(lambdaminus);
   set_matrix_to_zero(lambdaplus);
@@ -1278,6 +1284,7 @@ void filter_Fstar_interface_positivity_preserving(np_t *np, gl_t *gl, long lp0, 
   for (flux=0; flux<nf; flux++) Fpositive[flux]=Fp0[flux]+Fp1[flux];
 
 }
+
 
 
 void find_Fstar_interface_FDSplus_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h, long theta, 

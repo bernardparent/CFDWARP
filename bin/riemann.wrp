@@ -109,7 +109,7 @@ Disc(
     zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
-  FVSplusFilter(
+  FVSplus(
     numiter=4;
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.85;

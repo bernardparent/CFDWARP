@@ -129,7 +129,7 @@ Disc(
     zetaA2=0.1e0;
     zetaA3=0.1e0;   {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
   );
-  FVSplusFilter(
+  FVSplus(
     numiter=4;
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.85;

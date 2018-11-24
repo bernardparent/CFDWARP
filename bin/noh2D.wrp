@@ -177,12 +177,12 @@ Disc(
     zetaA1=0.5e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.03e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
-  FVSplusFilter(
+  FVSplus(
     numiter=4;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
     AOWENO_gammalo=0.85;
     AOWENO_gammahi=0.85;
-    INTERPOL=INTERPOL_WENO5;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
     EIGENVALCOND=EIGENVALCOND_PARENT;
   );
   FVSTVDplus(
@@ -192,7 +192,7 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_HARTEN;
   );
   MUSCLplus(
-    FLUX=FLUX_FDSplusFilter;
+    FLUX=FLUX_FDSplusFilterMultiD;
     numiter=5;
     AVERAGING=AVERAGING_ARITH;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
