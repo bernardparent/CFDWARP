@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 NOV 27a
+   * in bin/noh2D.wrp
+     - made adjustments
+   * in cycle/resconv/_MUSCL+/resconv.c
+     - added option FVSplusFilter
+
+
 2018 NOV 24b
    * renamed cycle/resconv/_FVS+Filter to cycle/resconv/_FVS+
    * in cycle/share/res_share.c

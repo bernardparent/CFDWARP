@@ -71,7 +71,7 @@ initially but density varies as 1+t/r with r the radius from the origin
 }
 
 
-mf=2.0;
+mf=1.2;
 
 is=1;
 ie=round(30*mf);
@@ -174,8 +174,8 @@ Init(
 
 Disc(
   NavierStokesPerfect(
-    zetaA1=0.5e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.03e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=1e-5;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   FVSplus(
     numiter=4;
@@ -192,19 +192,19 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_HARTEN;
   );
   MUSCLplus(
-    FLUX=FLUX_FDSplusFilterMultiD;
+    FLUX=FLUX_FVSplusFilter;
     numiter=5;
     AVERAGING=AVERAGING_ARITH;
-    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
-    AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_TVD2_VANLEER;
-    EIGENVALCOND=EIGENVALCOND_PARENT;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.85;
+    AOWENO_gammahi=0.85;
+    INTERPOL=INTERPOL_WENO5;
+    EIGENVALCOND=EIGENVALCOND_HARTEN;
   );
   CDFplus(
     xi1=0.5; {except for momentum and energy fluxes}
-    xi2=0.5; {momentum fluxes}
-    xi3=0.5; {total energy flux}
+    xi2=xi1; {momentum fluxes}
+    xi3=xi1; {total energy flux}
   );
   TVDRK(
     METHOD=METHOD_TVDRK2;
