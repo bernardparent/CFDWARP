@@ -205,7 +205,7 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t 
       find_Fstar_interface_FVSplus_muscl(np, gl,  l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, 0, EIGENVALUES_NOT_ENFORCED_POSITIVE,  EIGENVALCOND_NONE, gl->cycle.resconv.AVERAGING, Finttmp, lambdaminusp1h, lambdaplusm1h);
       //find_Fstar_interface_FVSplus_muscl(np, gl,  l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, gl->cycle.resconv.numiter, EIGENVALUES_ENFORCED_POSITIVE,  gl->cycle.resconv.EIGENVALCOND, gl->cycle.resconv.AVERAGING, Finttmp, lambdaminusp1h, lambdaplusm1h);
 #else
-      find_Fstar_interface_FVS_muscl(gl, theta, musclvarsL, musclvarsR, metrics, EIGENVALCOND_NONE, gl->cycle.resconv.AVERAGING, Finttmp);
+      find_Fstar_interface_FVS_muscl(gl, theta, musclvarsL, musclvarsR, metrics, EIGENVALCOND_NONE, Finttmp);
 #endif 
 
       filter_Fstar_interface_positivity_preserving(np, gl, l, theta, metrics, gl->cycle.resconv.numiter, gl->cycle.resconv.EIGENVALCOND, Finttmp, Fint, lambdaminusp1h,  lambdaplusm1h);

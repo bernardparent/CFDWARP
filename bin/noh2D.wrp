@@ -54,7 +54,7 @@
 
 }
 
- 
+CONVERGENCEHISTORY=TRUE; 
 
 {
 gamma= 5/3
@@ -71,7 +71,7 @@ initially but density varies as 1+t/r with r the radius from the origin
 }
 
 
-mf=1.2;
+mf=2;
 
 is=1;
 ie=round(30*mf);
@@ -192,25 +192,23 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_HARTEN;
   );
   MUSCLplus(
-    FLUX=FLUX_FVSplusFilter;
+    FLUX=FLUX_FDSplusFilter;
     numiter=5;
     AVERAGING=AVERAGING_ARITH;
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.85;
     AOWENO_gammahi=0.85;
     INTERPOL=INTERPOL_WENO5;
-    EIGENVALCOND=EIGENVALCOND_HARTEN;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
   );
   CDFplus(
     xi1=0.5; {except for momentum and energy fluxes}
     xi2=xi1; {momentum fluxes}
     xi3=xi1; {total energy flux}
   );
-  TVDRK(
-    METHOD=METHOD_TVDRK2;
-  );
 );
 
+iterglob=0;
 
 Cycle(
   NavierStokesPerfect(
@@ -222,58 +220,8 @@ Cycle(
     Uref[2]=rhoref*aref;   
     Uref[3]=rhoref*aref*aref;  
   );
-  PredictorCorrector(
-    tmax=0.6;    {simulation time span in seconds}
-    dt=tmax/400000/mf;   {physical time step in seconds}
-    if (mod(iter,5)==0,
-      Init(NavierStokesPerfect(
-        i=is;
-        for_parallel(j,js,je,
-            x=_x(i,j);
-            y=_y(i,j);
-            r=sqrt(x*x+y*y);
-
-            Region(i,j,  i,j,  INIT_TYPE3, -x/r,-y/r,1e-6,(1+time/r));
-        );
-        i=ie;
-        for_parallel(j,js,je,
-            x=_x(i,j);
-            y=_y(i,j);
-            r=sqrt(x*x+y*y);
-            Region(i,j,  i,j,  INIT_TYPE3, -x/r,-y/r,1e-6,(1+time/r));
-        );
-        j=js;
-        for_parallel(i,is,ie,
-            x=_x(i,j);
-            y=_y(i,j);
-            r=sqrt(x*x+y*y);
-            Region(i,j,  i,j,  INIT_TYPE3, -x/r,-y/r,1e-6,(1+time/r));
-        );
-        j=je;
-        for_parallel(i,is,ie,
-            x=_x(i,j);
-            y=_y(i,j);
-            r=sqrt(x*x+y*y);
-            Region(i,j,  i,j,  INIT_TYPE3, -x/r,-y/r,1e-6,(1+time/r));
-        );
-
-      ););
-
-    );
-
-    if (time>tmax-0.1*dt,
-      WriteDataFile(outputfilename"."round(time/dt));
-      exit(EXIT_SUCCESS);
-    );
-    if (mod(iter,500)==1,
-      WriteDataFile(outputfilename"."round(time/dt));
-    );
-    UpdateFluid(dt);
-    printf("%E %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
-           time,iter,effiter_U,ximax,i_ximax,
-           j_ximax,clipinfo);
-  );
   DualTimeStepping(
+    iterglob=iterglob+1;
     tmax=0.6;    {simulation time span in seconds}
     dt=tmax/40/mf;   {physical time step in seconds}
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
@@ -316,13 +264,21 @@ Cycle(
     );
     if (iter>20,CFL=max(CFL*0.95,0.05););
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
-    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
+    if (CONVERGENCEHISTORY,
+      printf("%6ld %6ld  %E \n",
+           iterglob,iter,ximax);
+    ,{else}
+      printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,clipinfo);
+    );
     if (ximax<xiverge || iter>50,
       IncreaseTimeLevel();
-      WriteDataFile(outputfilename"."round(time/dt));
-      printf("dt=%E time=%Es\n",dt,time);
+      
+      if (!CONVERGENCEHISTORY,
+        WriteDataFile(outputfilename"."round(time/dt));
+        printf("dt=%E time=%Es\n",dt,time);
+      );
       if (time>tmax-0.1*dt,
         exit(EXIT_SUCCESS);
       );

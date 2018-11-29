@@ -1,0 +1,34 @@
+#!/usr/local/bin/soap
+
+N=1000;
+time=0.6;
+xstart=-0.25;
+xend=0.25;
+R=286.0;
+
+printf("VARIABLES= \x22X\x22, \x22Y\x22,
+\x22V[0]\x22,
+\x22V[1]\x22,
+\x22M[0]\x22,
+\x22M[1]\x22,
+\x22rho\x22,
+\x22P\x22,
+\x22T\x22,
+\x22\x61\x22,
+ZONE I=%ld, J=1 F=POINT\n",N);
+
+for (i,0,N-1,
+  x=xstart+i/(N-1)*(xend-xstart);
+  xshock=1/3*time;
+  r=abs(x);
+  if (x>=-xshock && x<=xshock,
+    P=16/3.0;
+    rho=16.0;
+  ,{else}
+    P=0.0;
+    rho=1.0+time/r;
+  );
+  T=P/rho/R;
+  a=sqrt(5.0/3.0*R*T);
+  printf("%E   %E   %E   %E   %E   %E   %E   %E   %E   %E \n",x,0.0{y},0.0{V[0]},0.0{V[1]},0.0{M[0]},0.0{M[1]},rho,P,T,a);
+);

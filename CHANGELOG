@@ -7,6 +7,15 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 NOV 29a
+   * in cycle/resconv/_MUSCL+/resconv.c
+     - in find_Fstar_interface(), fixed a bug related to the arguments passed to
+       function find_Fstar_interface_FVS_muscl() when CDF is not defined
+   * in bin
+     - added noh2D_exact.soap
+     - modified noh2D.wrp
+
+
 2018 NOV 27a
    * in bin/noh2D.wrp
      - made adjustments
