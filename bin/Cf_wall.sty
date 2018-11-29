@@ -8,16 +8,16 @@ $!FRAMELAYOUT
   HEADERCOLOR = RED
   XYPOS
     {
-    X = 1.3365
-    Y = 0.125
+    X = 1
+    Y = 0.25
     }
-  WIDTH = 9.0199
-  HEIGHT = 8.0177
+  WIDTH = 9
+  HEIGHT = 8
 $!THREEDAXIS 
   ASPECTRATIOLIMIT = 25
   BOXASPECTRATIOLIMIT = 25
 $!DELETELINEMAPS 
-$!ACTIVELINEMAPS  =  [1-4]
+$!ACTIVELINEMAPS  =  [1-2]
 $!GLOBALLINEPLOT 
   DATALABELS
     {
@@ -26,19 +26,15 @@ $!GLOBALLINEPLOT
   LEGEND
     {
     SHOW = YES
-    TEXTSHAPE
-      {
-      HEIGHT = 2
-      }
     BOX
       {
       BOXTYPE = NONE
       }
-    ROWSPACING = 3.6
+    ROWSPACING = 2
     XYPOS
       {
-      X = 34.182
-      Y = 90.369
+      X = 60.353
+      Y = 84.403
       }
     }
 $!LINEMAP  [1]
@@ -47,17 +43,15 @@ $!LINEMAP  [1]
     {
     ZONE = 1
     XAXISVAR = 1
-    YAXISVAR = 12
+    YAXISVAR = 11
     }
   LINES
     {
-    COLOR = BLACK
-    LINEPATTERN = DOTTED
-    PATTERNLENGTH = 6
-    LINETHICKNESS = 0.4
+    COLOR = RED
     }
   SYMBOLS
     {
+    SHOW = NO
     COLOR = RED
     FILLCOLOR = RED
     }
@@ -69,6 +63,13 @@ $!LINEMAP  [1]
   ERRORBARS
     {
     COLOR = RED
+    }
+  INDICES
+    {
+    JRANGE
+      {
+      MAX = 1
+      }
     }
 $!LINEMAP  [2]
   NAME = 'B'
@@ -76,13 +77,11 @@ $!LINEMAP  [2]
     {
     ZONE = 2
     XAXISVAR = 1
-    YAXISVAR = 12
+    YAXISVAR = 11
     }
   LINES
     {
-    COLOR = BLACK
-    LINEPATTERN = DASHED
-    LINETHICKNESS = 0.4
+    COLOR = GREEN
     }
   SYMBOLS
     {
@@ -97,63 +96,41 @@ $!LINEMAP  [2]
   ERRORBARS
     {
     COLOR = GREEN
+    }
+  INDICES
+    {
+    JRANGE
+      {
+      MAX = 1
+      }
     }
 $!LINEMAP  [3]
-  NAME = 'C'
+  NAME = '&DV&'
   ASSIGN
     {
-    ZONE = 3
+    ZONE = 1
     XAXISVAR = 1
-    YAXISVAR = 12
+    YAXISVAR = 5
     }
   LINES
     {
-    COLOR = BLACK
-    LINEPATTERN = DASHDOT
-    LINETHICKNESS = 0.4
+    COLOR = CYAN
     }
   SYMBOLS
     {
-    COLOR = BLUE
-    FILLCOLOR = BLUE
+    COLOR = CYAN
+    FILLCOLOR = CYAN
     }
   BARCHARTS
     {
-    COLOR = BLUE
-    FILLCOLOR = BLUE
+    COLOR = CYAN
+    FILLCOLOR = CYAN
     }
   ERRORBARS
     {
-    COLOR = BLUE
+    COLOR = CYAN
     }
 $!LINEMAP  [4]
-  NAME = 'D'
-  ASSIGN
-    {
-    ZONE = 4
-    XAXISVAR = 1
-    YAXISVAR = 12
-    }
-  LINES
-    {
-    COLOR = BLACK
-    LINETHICKNESS = 0.4
-    }
-  SYMBOLS
-    {
-    COLOR = CYAN
-    FILLCOLOR = CYAN
-    }
-  BARCHARTS
-    {
-    COLOR = CYAN
-    FILLCOLOR = CYAN
-    }
-  ERRORBARS
-    {
-    COLOR = CYAN
-    }
-$!LINEMAP  [5]
   NAME = '&DV&'
   ASSIGN
     {
@@ -179,7 +156,7 @@ $!LINEMAP  [5]
     {
     COLOR = YELLOW
     }
-$!LINEMAP  [6]
+$!LINEMAP  [5]
   NAME = '&DV&'
   ASSIGN
     {
@@ -205,7 +182,7 @@ $!LINEMAP  [6]
     {
     COLOR = PURPLE
     }
-$!LINEMAP  [7]
+$!LINEMAP  [6]
   NAME = '&DV&'
   ASSIGN
     {
@@ -231,7 +208,7 @@ $!LINEMAP  [7]
     {
     COLOR = RED
     }
-$!LINEMAP  [8]
+$!LINEMAP  [7]
   NAME = '&DV&'
   ASSIGN
     {
@@ -257,7 +234,7 @@ $!LINEMAP  [8]
     {
     COLOR = GREEN
     }
-$!LINEMAP  [9]
+$!LINEMAP  [8]
   NAME = '&DV&'
   ASSIGN
     {
@@ -283,76 +260,95 @@ $!LINEMAP  [9]
     {
     COLOR = BLUE
     }
+$!LINEMAP  [9]
+  NAME = '&DV&'
+  ASSIGN
+    {
+    ZONE = 1
+    XAXISVAR = 1
+    YAXISVAR = 11
+    }
+  LINES
+    {
+    COLOR = CYAN
+    }
+  SYMBOLS
+    {
+    COLOR = CYAN
+    FILLCOLOR = CYAN
+    }
+  BARCHARTS
+    {
+    COLOR = CYAN
+    FILLCOLOR = CYAN
+    }
+  ERRORBARS
+    {
+    COLOR = CYAN
+    }
+$!LINEMAP  [10]
+  NAME = '&DV&'
+  ASSIGN
+    {
+    ZONE = 1
+    XAXISVAR = 1
+    YAXISVAR = 12
+    }
+  LINES
+    {
+    COLOR = YELLOW
+    }
+  SYMBOLS
+    {
+    COLOR = YELLOW
+    FILLCOLOR = YELLOW
+    }
+  BARCHARTS
+    {
+    COLOR = YELLOW
+    FILLCOLOR = YELLOW
+    }
+  ERRORBARS
+    {
+    COLOR = YELLOW
+    }
 $!XYLINEAXIS 
   DEPXTOYRATIO = 1
-  GRIDAREA
-    {
-    DRAWBORDER = YES
-    }
   VIEWPORTPOSITION
     {
-    X1 = 17.472
-    Y1 = 14.409
-    X2 = 92.472
-    Y2 = 91.409
+    X1 = 18.69
+    Y1 = 11.284
+    X2 = 91.793
+    Y2 = 88.994
     }
-  VIEWPORTTOPSNAPTARGET = 91.4090909091
+  VIEWPORTTOPSNAPTARGET = 88.9943181818
 $!XYLINEAXIS 
   XDETAIL 1
     {
-    RANGEMIN = 0.025000000000000001388
-    RANGEMAX = 0.089999999999999996669
-    GRSPACING = 0.01
-    TICKS
-      {
-      SHOWONGRIDBORDERMAX = YES
-      }
-    TICKLABEL
-      {
-      TEXTSHAPE
-        {
-        FONT = TIMES
-        HEIGHT = 4.8
-        }
-      }
+    COORDSCALE = LOG
+    RANGEMIN = 0.0030882297262100214322
+    RANGEMAX = 1.3521466378777891038
+    GRSPACING = 0.2
     TITLE
       {
       TITLEMODE = USETEXT
       TEXT = 'X'
-      OFFSET = 7
+      OFFSET = 5
       }
     }
 $!XYLINEAXIS 
   YDETAIL 1
     {
-    RANGEMIN = -0.0020000000000000000416
-    RANGEMAX = 0.0070000000000000001457
+    COORDSCALE = LOG
+    RANGEMIN = 0.00025207482057717866099
+    RANGEMAX = 0.0080000000000000001665
     AUTOGRID = NO
     GRSPACING = 0.002
-    TICKS
-      {
-      SHOWONGRIDBORDERMAX = YES
-      }
-    TICKLABEL
-      {
-      TEXTSHAPE
-        {
-        FONT = TIMES
-        HEIGHT = 4.8
-        }
-      }
     TITLE
       {
       TITLEMODE = USETEXT
       TEXT = 'Y'
-      OFFSET = 15
+      OFFSET = 12
       }
     }
-$!ATTACHTEXT 
-  ANCHORPOS
-    {
-    X = 53.38584989922508
-    Y = 95.02840909090907
-    }
-  TEXT = 'T'
 $!SETSTYLEBASE CONFIG

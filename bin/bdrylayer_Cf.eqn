@@ -1,0 +1,6 @@
+#!MC 1200
+# Created by Tecplot 360 build 12.0.0.3454
+$!ALTERDATA 
+  EQUATION = '{Cf}=1.8e-5*ddy({v[0]})/(0.5*0.1166*693*693)'
+$!ALTERDATA  
+  EQUATION = '{Cf_analytical}=0.664/sqrt(max(1e-20,0.11655*693.2*{X}/1.8e-5)) '

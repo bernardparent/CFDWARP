@@ -5,7 +5,7 @@
 
 Mx=2.0;
 My=0.0;
-P=1000.0;
+P=10000.0;
 T=300.0;
 Rgas=286.0;
 rhoref=P/T/Rgas;
@@ -36,34 +36,38 @@ Grid(
 
 
 
-
-
 Bdry(
   NavierStokesPerfect(
     {
-    ******************************************************************
-    * Fluid Flow Boundary Conditions Types:                           
-    ******************************************************************
-    *  0 : Inflow, supersonic                                         
-    *  1 : Outflow, supersonic                                        
-    *  2 : Slip wall, 1st order                                       
-    *  3 : Slip wall, 2nd order                                       
-    *  4 : Wall, T specified                                          
-    *  5 : Wall, adiabatic                                            
-    ******************************************************************
+    _________________________________________________________________________________________
+
+    Boundary Condition Type    ID    Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC      0     Inflow, supersonic
+    BDRY_OUTFLOWSUPERSONIC1    1     Outflow, supersonic, 1o
+    BDRY_SYMMETRICAL1          2     Symmetrical, 1o
+    BDRY_SYMMETRICAL2          3     Symmetrical, 2o
+    BDRY_SYMMETRICAL3          8     Symmetrical, 3o
+    BDRY_WALLTFIXED1           4     Wall, T specified, 1o
+    BDRY_WALLTFIXED2           a     Wall, T specified, 2o
+    BDRY_WALLADIABATIC1        5     Wall, adiabatic, 1o
+    BDRY_WALLADIABATIC2        b     Wall, adiabatic, 2o
+    BDRY_INFLOWSUBSONIC1       6     Subsonic Inflow 1o (Constant Tstag, Pstag at inflow)
+    BDRY_OUTFLOWSUBSONIC1      7     Subsonic Outflow 1o (Constant P at outflow)
+    BDRY_FREESTREAM1           9     Freestream, 1o, params Vx,Vy, P, T
+    _________________________________________________________________________________________
     }
-    { first, create cuts in the computational domain; a cut is a region 
-     which is not computed by the solver }
-    { Cut(10{is},10{js},  17{ie},17{je});}
-    { second, apply a default boundary condition (BC) type to all boundary nodes }
-    All(3{BC type});
-    { impose BC type at faces i=is, i=ie, j=js, j=je}
-    Faces(0,1,  4,1);
-    { apply BC type only to the boundary nodes in a specific region of the computational domain}
-    { Region(10{is},10{js},  17{ie},17{je},  3{BC type});}
+    All(BDRY_OUTFLOWSUPERSONIC1);
+    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLTFIXED1,BDRY_OUTFLOWSUPERSONIC1);
+    {
+    Cut(is,js,  ie,je);
+    Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
+    Link(i1,j1,  i2,j2);
+    Param(is,js,  ie,je,  BDRY_FREESTREAM1, Vx,Vy,P,T);
+    }
   );
 );
- 
  
 Model(
  
@@ -74,13 +78,8 @@ Model(
     kappa=0.026;     {the thermal conductivity of the gas in W/mK }
     Pmin=1.0e2;    Pmax=9.9e99;   {min and max pressure allowed in the domain}
     Tmin=1.0e2;     Tmax=6.0e3;    {min and max temperature allowed in the domain}
-    zetaA1=0.0e0; {conditions the convective waves of the A jacobian; set it to 0.0 usually but make
-                   sure that the shock structure obtained is similar to when zetaA1 is set to 0.3}
-    zetaA2=0.2;
-    zetaA3=0.1e0; {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
     
     AXISYMMETRIC=FALSE;
-    EIGENVALCOND=EIGENVALCOND_PECLET;
   );
 );
  
@@ -106,6 +105,35 @@ Init(
       }
     );
 );
+
+
+Disc(
+  NavierStokesPerfect(
+    zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.0002e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.85;
+    AOWENO_gammahi=0.85;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
+  );
+  MUSCLplus(
+    FLUX=FLUX_FDSplusFilter;
+    numiter=6;
+    AVERAGING=AVERAGING_ARITH;
+    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.95;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
+  );
+);
+
+
 
 
 Cycle(
@@ -197,8 +225,8 @@ Cycle(
     if (mod(iter,50)==0,
       WriteDataFile();
     );
-    sigma1=0.2;      {exponent of largest pseudotime step in all dimensions}
-    sigma2=0.2;      {exponent of largest pseudotime step in all flux components}
+    sigma1=0.3;      {exponent of largest pseudotime step in all dimensions}
+    sigma2=0.3;      {exponent of largest pseudotime step in all flux components}
     PRECONDITIONER=PRECON_LOCALTIMESTEP;
     if (iter==1,
       CFL=0.001;
