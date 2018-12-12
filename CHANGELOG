@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 DEC 12a
+   * in bin
+     - updated sod.wrp
+     - updated sedov.wrp
+
+
 2018 NOV 29b
    * in bin
      - modified bdrylayer.wrp

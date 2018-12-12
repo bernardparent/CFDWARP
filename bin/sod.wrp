@@ -4,41 +4,40 @@
 }
 R=286.0;        {the gas constant in J/kgK }
 
-mf=2.0;
+mf=0.5;
 tf=2.0;
 
 
   PL=10000;
-  PR=100000;
-  rhoL=0.1;
-  rhoR=0.1;
-  uL=0;
-  uR=0; 
-  tmax=4e-4;   {simulation time span in seconds}
+  PR=10000;
+  rhoL=1;
+  rhoR=1;
+  uL=-1000;
+  uR=1000; 
+  tmax=2e-4;   {simulation time span in seconds}
   timelevels=round(20*mf*tf);  
-
 
 TL=PL/R/rhoL;
 TR=PR/R/rhoR;
 
 
-L=1.2;
+L=1.0;
 H=L/10; 
 
 
 is=1;  js=1; 
 im=round(mf*60)+1;
-ie=round(mf*120)+1; je=6;
+ie=round(mf*120); je=6;
 
 
 
 
 Grid(
   Size(is,js, ie,je);
-  Point(is,js, -L/2,0.0e0);
-  Point(ie,js, L/2,0.0e0);
-  Point(ie,je, L/2,H);
-  Point(is,je, -L/2,H);
+  Point(is,js, -L/2,-H/2);
+  Point(ie,js, L/2,-H/2);
+  Point(ie,je, L/2,H/2);
+  Point(is,je, -L/2,H/2);
   JoinCorners(is,js, ie,je,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
 );
 
@@ -80,16 +79,8 @@ Model(
     eta=0e-5;       {the viscosity of the gas in kg/ms }
     kappa=0.0;     {the thermal conductivity of the gas in W/mK }
     Pmin=1.0e-20;    Pmax=9.9e99;   {min and max pressure allowed in the domain in Pa}
-    Tmin=1.0e-20;     Tmax=6.0e4;    {min and max temperature allowed in the domain in K}
-    zetaA=0.0e0;   {conditions the convective waves of the A jacobian}
-    zetaA=0.0e0;   {conditions the acoustic waves of the A jacobian}
-    zetaAclip=3.0;
-    zetaA1=0.1;
-    zetaA2=1.0/zetaAclip;
-    zetaAden=0.2e0;   {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
-    
+    Tmin=1.0e-20;     Tmax=6.0e4;    {min and max temperature allowed in the domain in K}    
     AXISYMMETRIC=FALSE;
-    EIGENVALCOND=EIGENVALCOND_PECLET;
   );
 );
  
@@ -116,6 +107,24 @@ Init(
       }
     );
 );
+
+
+Disc(
+  NavierStokesPerfect(
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.00001e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  FVSTVDplus(
+    LIMITER=LIMITER_VANLEER;
+    ACCURACY=ACCURACY_SECONDORDER;
+    xi=1.99;
+    EIGENVALCOND=EIGENVALCOND_HARTEN;
+  );
+  TVDRK(
+    METHOD=METHOD_TVDRK2;
+  );
+);
+
 
 
 iterglob=0;
