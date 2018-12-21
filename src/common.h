@@ -127,6 +127,8 @@
 #define NODETYPE_BDRY 0 /* and more */
 #define LINK_NONE -3
 #define LINKDIM_NONE -3
+#define LINKDIMSGN_NONE -3
+#define LINKDIMSGN_BASE 10
 #define EOS 0
 
 #define maxlinewidth 97

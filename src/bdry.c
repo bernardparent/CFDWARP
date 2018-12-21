@@ -40,7 +40,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
   np_t **np;
   gl_t *gl;
   zone_t zone;
-  short linkdim;
+  short linkdim,linkdimsgn;
   long numparam,BCtype,i,j,k,is,ie,i1,i2,k1,k2,j1,j2,l1,l2;
 #ifdef _2DL 
   long js,je;
@@ -157,6 +157,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
     k1=1;
     k2=1;
     linkdim=LINKDIM_NONE;
+    linkdimsgn=LINKDIMSGN_NONE;
 #ifdef _2D
     if (sscanf(*argum,"%ld,%ld,%ld,%ld%n",&i1,&j1,&i2,&j2,&eos)!=4
 #endif
@@ -175,13 +176,31 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
         || (*argum)[eos]!=EOS){
 
 
-        SOAP_fatal_error(codex,"One or more argument(s) could not be read properly "
+#ifdef _2D
+        if (sscanf(*argum,"%ld,%ld,%ld,%ld,%hd,%hd%n",&i1,&j1,&i2,&j2,&linkdim,&linkdimsgn,&eos)!=6
+#endif
+#ifdef _3D
+        if (sscanf(*argum,"%ld,%ld,%ld,%ld,%ld,%ld,%hd,%hd%n",&i1,&j1,&k1,&i2,&j2,&k2,&linkdim,&linkdimsgn,&eos)!=8
+#endif
+          || (*argum)[eos]!=EOS){
+
+
+          SOAP_fatal_error(codex,"One or more argument(s) could not be read properly "
                                "in Link() part of Bdry(). Arguments: %s .",*argum);
+        }
       }
     }
     if (linkdim!=LINKDIM_NONE && (linkdim<1 || linkdim>nd)) SOAP_fatal_error(codex,"The link inner node dimension can not be set to %ld. It must lie within 1 and %ld.\n",linkdim,nd);
+    if (linkdimsgn!=LINKDIMSGN_NONE && linkdimsgn!=1 && linkdimsgn!=-1) SOAP_fatal_error(codex,"The link inner node dimension direction sign can not be set to %ld. It must be set to either +1 or -1.\n",linkdimsgn);
+
     /* reduce linkdim from 1,2,3 in control file to 0,1,2 in C code*/
-    if (linkdim!=LINKDIM_NONE) linkdim-=1;
+    if (linkdim!=LINKDIM_NONE) {
+      if (linkdimsgn==LINKDIMSGN_NONE) {
+        linkdim-=1;
+      } else {
+        linkdim=linkdim*linkdimsgn+LINKDIMSGN_BASE;
+      }
+    }
     l1=_ai(gl,i1,j1,k1);
     l2=_ai(gl,i2,j2,k2);
     if (!(   (is_node_bdry((*np)[l1],TYPELEVEL) && is_node_inner((*np)[l2],TYPELEVEL))
@@ -426,12 +445,19 @@ void find_link_direc(np_t *np, gl_t *gl, long llink, long lbdry, int TYPELEVEL, 
     fatal_error("Problem finding lbdry within np[llink] within find_link_direc. numlink=%hd. lbdry=%ld.",np[llink].numlink,lbdry);
   }
   if (*theta!=LINKDIM_NONE){
-    assert(*theta>=0);
-    assert(*theta<nd);
-    *thetasgn=0;
-    if (is_node_inner(np[_al(gl,llink,*theta,+1)],TYPELEVEL)) *thetasgn+=+1;
-    if (is_node_inner(np[_al(gl,llink,*theta,-1)],TYPELEVEL)) *thetasgn+=-1;
-    if (*thetasgn==0) fatal_error("Problem finding direction of extrapolation at link inner node (%ld,%ld,%ld). Make sure that, along the link dimension specified, the neighbor node is an inner node while another neighbor node is a bdry node.",_i_all(llink,gl,0),_i_all(llink,gl,1),_i_all(llink,gl,2));
+    if (*theta<nd){
+      assert(*theta>=0);
+      assert(*theta<nd);
+      *thetasgn=0;
+      if (is_node_inner(np[_al(gl,llink,*theta,+1)],TYPELEVEL)) *thetasgn+=+1;
+      if (is_node_inner(np[_al(gl,llink,*theta,-1)],TYPELEVEL)) *thetasgn+=-1;
+      if (*thetasgn==0) fatal_error("Problem finding direction of extrapolation at link inner node (%ld,%ld,%ld). Make sure that, along the link dimension specified, the neighbor node is an inner node while another neighbor node is a bdry node.",_i_all(llink,gl,0),_i_all(llink,gl,1),_i_all(llink,gl,2));
+    } else {
+      *theta=*theta-LINKDIMSGN_BASE;
+      *thetasgn=sign(*theta);
+      *theta=abs(*theta)-1;
+      if (!is_node_inner(np[_al(gl,llink,*theta,*thetasgn)],TYPELEVEL)) fatal_error("When linking a bdry node to an inner node and specifying a dimension and a direction sign, the node following the inner node along the direction sign must also be an inner node.");
+    }
   } else {
     /* check on which side there is a node that links to another */
     *theta=-1;

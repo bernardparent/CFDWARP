@@ -47,13 +47,13 @@
 }
 
 scale=1.0;
-M=1.5;
+M=0.5;
 T=300; {K}
 gamma=1.4;
 R=286.0;        {J/kgK }
 Re=1e5;
 eta=2e-5;       {kg/ms}
-tmax=8e-4;    {simulation time span in seconds}
+tmax=8e-2;    {simulation time span in seconds}
 D1=0.1*scale;
 D2=0.3*scale;
 if (M<0.05,
@@ -61,7 +61,7 @@ if (M<0.05,
 ,{else}
   D3=3.2*scale;
 );
-mf=0.5*1.41^4;   {1.935,1.64,1.53,1.70}
+mf=0.5*1.41^2;   {1.935,1.64,1.53,1.70}
 
 tf=1.0*(max(M,1)*2);
 
@@ -186,7 +186,7 @@ Init(
 Disc(
   NavierStokesPerfect(
     zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.5e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA2=0.0e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   MUSCL(
     FLUX=FLUX_FDS;
@@ -194,7 +194,7 @@ Disc(
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_WENO9;
+    INTERPOL=INTERPOL_WENO5;
     EIGENVALCOND=EIGENVALCOND_GNOFFO;
   );
   MUSCLplus(
@@ -285,10 +285,10 @@ Cycle(
     sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
-      CFL=0.1;
+      CFL=0.01;
     );
-    CFL=min(CFL*1.15,5.5);
-    UpdateFluid(CFL,PRECON_LOCALEIGENVALUE,sigma1,sigma2);
+    CFL=min(CFL*1.03,1.5);
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,clipinfo);

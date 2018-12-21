@@ -7,6 +7,17 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 DEC 21a
+   * in src/bdry.c
+     - in read_bdry_actions() and find_link_direc(), added an extra optional parameter to the Link() 
+       command (the direction of the stencil beyond the inner node) 
+       -> not needed generally, avoid to use this unless you know what you are doing
+   * in src/common.h
+     - added the constants LINKDIMSGN_NONE and LINKDIMSGN_BASE
+   * in bin
+     - updated noh2D.wrp and cylinder_in_freestream.wrp
+
+
 2018 DEC 12a
    * in bin
      - updated sod.wrp
