@@ -454,7 +454,7 @@ void write_control(char *filename){
 }
 
 
-double _x_DISTMPI_compatible(np_t *np, gl_t *gl, long i, long j, long k, long dim){
+double _x_DISTMPI_global(np_t *np, gl_t *gl, SOAP_codex_t *codex, long i, long j, long k, long dim){
   double x;
 #ifdef DISTMPI
   int rank;
@@ -471,7 +471,7 @@ double _x_DISTMPI_compatible(np_t *np, gl_t *gl, long i, long j, long k, long di
 #ifdef _3DL
         || k<gl->domain.ks || k>gl->domain.ke
 #endif
-       ) fatal_error("Function _%c() has been called with i,j,k that is out of bounds.",(int)'x'+dim);
+       ) SOAP_fatal_error(codex,"Function _%c() has been called with i=%ld,j=%ld,k=%ld that is out of bounds.",(int)'x'+dim,i,j,k);
     x=_x(np[_ai(gl,i,j,k)],dim);
 #ifdef DISTMPI
   }
@@ -483,7 +483,31 @@ double _x_DISTMPI_compatible(np_t *np, gl_t *gl, long i, long j, long k, long di
 }
 
 
-double _Omega_DISTMPI_compatible(np_t *np, gl_t *gl, long i, long j, long k){
+double _x_DISTMPI_local(np_t *np, gl_t *gl, SOAP_codex_t *codex, long i, long j, long k, long dim){
+  double x;
+  zone_t domain_local;
+  find_zone_intersection(gl->domain_lim,gl->domain_all,&domain_local);
+
+  if (i<domain_local.is || i>domain_local.ie
+#ifdef _2DL
+      || j<domain_local.js || j>domain_local.je
+#endif
+#ifdef _3DL
+      || k<domain_local.ks || k>domain_local.ke
+#endif
+     ) SOAP_fatal_error(codex,"Function _%c() has been called with i=%ld,j=%ld,k=%ld that is out of bounds. "
+                   "Make sure that domain.is<=i<=domain.ie, domain.js<=j<=domain.je, domain.ks<=k<=domain.ke "
+                   "where 'domain' refers to the zone accessible by one MPI process. "
+                   "Although seldom necessary, to access x,y,z outside of the domain, use the "
+                   "_x_global(), _y_global, _z_global() functions [DON'T USE THE *_global() FUNCTIONS UNLESS ABSOLUTELY "
+                   "NECESSARY AS THIS WILL SLOW DOWN THE CODE WHEN USING MPI]." ,(int)'x'+dim,i,j,k);
+  x=_x(np[_ai(gl,i,j,k)],dim);
+  
+  return(x);
+}
+
+
+double _Omega_DISTMPI_global(np_t *np, gl_t *gl, long i, long j, long k){
   double Omega;
 #ifdef DISTMPI
   int rank;
@@ -522,27 +546,34 @@ void read_control_functions(char *functionname, char **argum,
   gl=((readcontrolarg_t *)codex->action_args)->gl;
 #ifdef _2D
   k=0;
-  if (strcmp(functionname,"_x")==0 || strcmp(functionname,"_y")==0) {
+  if (strcmp(functionname,"_x")==0 || strcmp(functionname,"_y")==0 
+   || strcmp(functionname,"_x_global")==0 || strcmp(functionname,"_y_global")==0) {
     SOAP_substitute_all_argums(argum,codex);
     if (sscanf(*argum, "%ld,%ld%n",&i,&j,&eos)!=2 || (*argum)[eos]!=EOS){
       SOAP_fatal_error(codex,"Problem reading arguments in function %s().",functionname);
     }
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
   }
-  if (strcmp(functionname,"_x")==0) sprintf(*returnstr,"%E",_x_DISTMPI_compatible(*np,gl,i,j,k,0));
-  if (strcmp(functionname,"_y")==0) sprintf(*returnstr,"%E",_x_DISTMPI_compatible(*np,gl,i,j,k,1));
+  if (strcmp(functionname,"_x")==0) sprintf(*returnstr,"%E",_x_DISTMPI_local(*np,gl,codex,i,j,k,0));
+  if (strcmp(functionname,"_y")==0) sprintf(*returnstr,"%E",_x_DISTMPI_local(*np,gl,codex,i,j,k,1));
+  if (strcmp(functionname,"_x_global")==0) sprintf(*returnstr,"%E",_x_DISTMPI_global(*np,gl,codex,i,j,k,0));
+  if (strcmp(functionname,"_y_global")==0) sprintf(*returnstr,"%E",_x_DISTMPI_global(*np,gl,codex,i,j,k,1));
 #endif
 #ifdef _3D
-  if (strcmp(functionname,"_x")==0 || strcmp(functionname,"_y")==0 || strcmp(functionname,"_z")==0) {
+  if (strcmp(functionname,"_x")==0 || strcmp(functionname,"_y")==0 || strcmp(functionname,"_z")==0
+   || strcmp(functionname,"_x_global")==0 || strcmp(functionname,"_y_global")==0 || strcmp(functionname,"_z_global")==0) {
     SOAP_substitute_all_argums(argum,codex);
     if (sscanf(*argum, "%ld,%ld,%ld%n",&i,&j,&k,&eos)!=3 || (*argum)[eos]!=EOS){
       SOAP_fatal_error(codex,"Problem reading arguments in function %s().",functionname);
     }
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
   }
-  if (strcmp(functionname,"_x")==0) sprintf(*returnstr,"%E",_x_DISTMPI_compatible(*np,gl,i,j,k,0));
-  if (strcmp(functionname,"_y")==0) sprintf(*returnstr,"%E",_x_DISTMPI_compatible(*np,gl,i,j,k,1));
-  if (strcmp(functionname,"_z")==0) sprintf(*returnstr,"%E",_x_DISTMPI_compatible(*np,gl,i,j,k,2));
+  if (strcmp(functionname,"_x")==0) sprintf(*returnstr,"%E",_x_DISTMPI_local(*np,gl,codex,i,j,k,0));
+  if (strcmp(functionname,"_y")==0) sprintf(*returnstr,"%E",_x_DISTMPI_local(*np,gl,codex,i,j,k,1));
+  if (strcmp(functionname,"_z")==0) sprintf(*returnstr,"%E",_x_DISTMPI_local(*np,gl,codex,i,j,k,2));
+  if (strcmp(functionname,"_x_global")==0) sprintf(*returnstr,"%E",_x_DISTMPI_global(*np,gl,codex,i,j,k,0));
+  if (strcmp(functionname,"_y_global")==0) sprintf(*returnstr,"%E",_x_DISTMPI_global(*np,gl,codex,i,j,k,1));
+  if (strcmp(functionname,"_z_global")==0) sprintf(*returnstr,"%E",_x_DISTMPI_global(*np,gl,codex,i,j,k,2));
 #endif
 
   if (strcmp(functionname,"_Omega")==0) {
@@ -561,7 +592,7 @@ void read_control_functions(char *functionname, char **argum,
     }
 #endif
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
-    sprintf(*returnstr,"%E",_Omega_DISTMPI_compatible(*np,gl,i,j,k));
+    sprintf(*returnstr,"%E",_Omega_DISTMPI_global(*np,gl,i,j,k));
   }
 }
 
@@ -773,6 +804,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
   gl_t *gl;
   bool GRIDGENERATED;
   long cnt,cnt2,cnt_mem;
+  zone_t domain_local;
   SOAP_codex_t codex_mem;
   input_t *input;
   long i,j,k;
@@ -1018,6 +1050,19 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     gl->effiter_U_emfield=0.0e0;
     gl->effiter_R_emfield=0.0e0;
 #endif
+
+    find_zone_intersection(gl->domain_lim,gl->domain_all,&domain_local);
+    add_int_to_codex(codex,"domain.is",   domain_local.is);
+    add_int_to_codex(codex,"domain.ie",   domain_local.ie);
+#ifdef _2DL
+    add_int_to_codex(codex,"domain.js",   domain_local.js);
+    add_int_to_codex(codex,"domain.je",   domain_local.je);
+#endif
+#ifdef _3D
+    add_int_to_codex(codex,"domain.ks",   domain_local.ks);
+    add_int_to_codex(codex,"domain.ke",   domain_local.ke);
+#endif
+
   }
 
   if (strcmp(actionname,"Bdry")==0 && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
@@ -1256,6 +1301,16 @@ void read_control(char *control_filename, input_t input, bool CYCLEMODULE, bool 
   add_double_to_codex(&codex,"time",  gl->time);
 #else
   add_int_to_codex(&codex,"UNSTEADY",   FALSE);
+#endif
+  add_string_to_codex(&codex,"domain.is",   "UNDEFINED");
+  add_string_to_codex(&codex,"domain.ie",   "UNDEFINED");
+#ifdef _2DL
+  add_string_to_codex(&codex,"domain.js",   "UNDEFINED");
+  add_string_to_codex(&codex,"domain.je",   "UNDEFINED");
+#endif
+#ifdef _3D
+  add_string_to_codex(&codex,"domain.ks",   "UNDEFINED");
+  add_string_to_codex(&codex,"domain.ke",   "UNDEFINED");
 #endif
 
   thread_lock_init(&(gl->lock),THREADTYPE_ALL);

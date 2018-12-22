@@ -71,7 +71,7 @@ initially but density varies as 1+t/r with r the radius from the origin
 }
 
 
-mf=2;
+mf=1;
 
 is=1;
 ie=round(30*mf);
@@ -152,8 +152,8 @@ Init(
     INIT_TYPE3                   V[1]..V[nd],  P,  rho   
     _______________________________________________________________________________________
     }
-    for_parallel(i,is,ie,
-      for(j,js,je,
+    for_parallel(i,domain.is,domain.ie,
+      for(j,domain.js,domain.je,
         x=_x(i,j);
         y=_y(i,j);
         r=sqrt(x*x+y*y);
@@ -230,33 +230,40 @@ Cycle(
       CFL=0.9;
       Init(NavierStokesPerfect(
         i=is;
-        for_parallel(j,js,je,
+        if (i>=domain.is && i<=domain.ie,
+          for_parallel(j,domain.js,domain.je,
             x=_x(i,j);
             y=_y(i,j);
             r=sqrt(x*x+y*y);
-
             Region(i,j,  i,j,  INIT_TYPE3, -x/r,-y/r,1e-6,(1+time/r));
+          );
         );
         i=ie;
-        for_parallel(j,js,je,
+        if (i>=domain.is && i<=domain.ie,
+          for_parallel(j,domain.js,domain.je,
             x=_x(i,j);
             y=_y(i,j);
             r=sqrt(x*x+y*y);
             Region(i,j,  i,j,  INIT_TYPE3, -x/r,-y/r,1e-6,(1+time/r));
+          );
         );
         j=js;
-        for_parallel(i,is,ie,
+        if (j>=domain.js && j<=domain.je,
+          for_parallel(i,domain.is,domain.ie,
             x=_x(i,j);
             y=_y(i,j);
             r=sqrt(x*x+y*y);
             Region(i,j,  i,j,  INIT_TYPE3, -x/r,-y/r,1e-6,(1+time/r));
+          );
         );
         j=je;
-        for_parallel(i,is,ie,
+        if (j>=domain.js && j<=domain.je,
+          for_parallel(i,domain.is,domain.ie,
             x=_x(i,j);
             y=_y(i,j);
             r=sqrt(x*x+y*y);
             Region(i,j,  i,j,  INIT_TYPE3, -x/r,-y/r,1e-6,(1+time/r));
+          );
         );
 
       ););

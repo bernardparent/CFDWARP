@@ -68,7 +68,7 @@ Data points provided at: http://dept.ku.edu/~cfdku/hiocfd.html
 Case C3.5
 }
 
-mf=1; {mesh factor: 1,sqrt(2),2,2*sqrt(2),4}
+mf=0.25; {mesh factor: 1,sqrt(2),2,2*sqrt(2),4}
 
 is=1;
 ie=round(64*mf);
@@ -159,9 +159,9 @@ Init(
     _______________________________________________________________________________________
     }
 
-	for_parallel(i,is,ie,
-	  for_parallel(j,js,je,
-		for_parallel(k,ks,ke,
+	for_parallel(i,domain.is,domain.ie,
+	  for(j,domain.js,domain.je,
+		for(k,domain.ks,domain.ke,
 		  sin_x=sin(_x(i,j,k)/L_ref);
 		  cos_y=cos(_y(i,j,k)/L_ref);
 		  cos_z=cos(_z(i,j,k)/L_ref);

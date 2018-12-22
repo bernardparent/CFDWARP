@@ -7,6 +7,17 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2018 DEC 22a
+   * in src/control.c
+     - renamed _Omega_DISTMPI_compatible to _Omega_DISTMPI_global
+     - renamed _x_DISTMPI_compatible to _x_DISTMPI_global
+     - added _x_DISTMPI_local()
+     - in read_control_functions(), added calls to _x_DISTMPI_local
+     - in readcontrol_actions(), added variables domain.* to codex after grid is generated
+   * in bin/noh2D.wrp and bin/taylor_green_vortex.wrp and bin/taylor_green_vortex_2.wrp
+     - changed control file so that the loops use domain.is, domain.ie, etc
+
+
 2018 DEC 21a
    * in src/bdry.c
      - in read_bdry_actions() and find_link_direc(), added an extra optional parameter to the Link() 

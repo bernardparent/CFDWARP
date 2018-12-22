@@ -172,9 +172,9 @@ Init(
     INIT_TYPE3                   V[1]..V[nd],  P,  rho   
     _______________________________________________________________________________________
     }
-    for_parallel(i,is,ie,
-      for(j,js,je,
-        for(k,ks,ke,
+    for_parallel(i,domain.is,domain.ie,
+      for(j,domain.js,domain.je,
+        for(k,domain.ks,domain.ke,
           x=_x(i,j,k)/L;
           y=_y(i,j,k)/L;
           z=_z(i,j,k)/L;
