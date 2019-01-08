@@ -1,0 +1,313 @@
+{
+  _______________________________________________________________________________________________
+
+                                           C F D W A R P
+
+                               A CFD Code for Plasma & Reactive Flow
+  _______________________________________________________________________________________________
+
+  Version                          18dec22a
+  Compiler                         gcc 5.4.0 20160609 with OPENMP threads
+  Compiled on                      Dec 30 2018 at 14:53:57
+  Cycle Strategy                   Standard
+  Fluid Relaxation                 Block ADI [1,2]
+  EM Field Relaxation              None
+  Convection Discretization        MUSCL with flux FVS [3], FDS [5], and primitive interpolation
+                                   TVD [4], WENO [6], CWENO [8], AOWENO [7], and eigenvalue
+                                   conditioning HARTEN, GNOFFO [9], PECLET [10]
+  Temporal Discretization          Positivity-Preserving Cross-Difference Formula [11]
+  Fluid Model                      Favre-Reynolds Multispecies
+  Thermodynamic Model              NASA Glenn Polynomials [12]
+  Chemical Model                   Air 1 species 0 reaction
+  EM Field Model                   None
+  Beam Model                       None
+  Number of Dimensions             2
+  Number of Flux Components        6
+  Number of Species                1
+  Number of Charged Species        0
+  List of Species                  Air
+  _______________________________________________________________________________________________
+
+  [1]  WR Briley and H McDonald. "On the Structure and Use of Linearized Block Implicit
+       Schemes", Journal of Computational Physics 34:54-73, 1980.
+  [2]  RM Beam and RF Warming. "An Implicit Finite-Difference Algorithm for Hyperbolic Systems
+       in Conservation-Law-Form", Journal of Computational Physics 22:87-110, 1976.
+  [3]  JL Steger and RF Warming. "Flux Vector Splitting of the Inviscid Gasdynamic Equations
+       with Application to Finite-Difference Methods", Journal of Computational Physics 40:263-
+       293, 1981.
+  [4]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume Flux Vector
+       Splittings for the Euler Equations", AIAA Journal 24:1453-1460, 1986.
+  [5]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes", Journal
+       of Computational Physics 43:357-372, 1981.
+  [6]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes", Journal of
+       Computational Physics 126:202-228, 1996.
+  [7]  DS Balsara, S Garain, and CW Shu. "An Efficient Class of WENO schemes with Adaptive
+       Order", Journal of Computational Physics 326:780-804, 2016.
+  [8]  M Dumbser and M Kaser. "Arbitrary High Order Non-oscillatory Finite Volume Schemes on
+       Unstructured Meshes for Linear Hyperbolic Systems", Journal of Computational Physics,
+       221:693-723, 2007.
+  [9]  P Gnoffo and  JA White. "Computational Aerothermodynamic Simulation Issues on
+       Unstructured Grids", 37th AIAA Thermophysics Conference, AIAA Paper 2004-2371, 2004.
+  [10] B Parent. "Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows", AIAA
+       Journal, 55:141-152, 2017.
+  [11] B Parent. "Positivity-Preserving Dual Time Stepping Schemes for Gas Dynamics", Journal of
+       Computational Physics 361:391-411, 2018.
+  [12] BJ McBride, MJ Zehe, and S Gordon. "NASA Glenn Coefficients for Calculating Thermodynamic
+       Properties of Individual Species", NASA TP 2002-211556, 2002.
+
+
+}
+
+mf=1;
+
+is=1;
+ie=round(mf*80);
+js=1;
+je=round(mf*80);
+itermax=25;
+
+L=0.5e0;
+H=0.1;
+dwall=5e-6;
+
+Grid(
+  Size(is,js, ie,je);
+  Corners(is,js,ie,je, 0,0, L,H);
+  JoinCorners(is,js, ie,je,  FE,0.3e0,dwall*5,1.0e0,  FE,0.7e0,dwall,1.0e0);
+);
+
+
+Bdry(
+  FavreReynolds(
+    {
+    _________________________________________________________________________________________
+
+    Boundary Condition Type           ID  Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC             0   Inflow, supersonic
+    BDRY_INFLOWSUBSONIC1              7   Inflow, subsonic, Tstag, Pstag fixed
+    BDRY_INFLOWSUBSONICMASSFLOWFIXED1 g   Inflow, subsonic, Pstag, Massflow/Area fixed
+    BDRY_OUTFLOWSUPERSONIC1           1   Outflow, supersonic
+    BDRY_OUTFLOWSUBSONIC1             4   Outflow, subsonic, P fixed
+    BDRY_OUTFLOWSUBSONICMFIXED1       f   Outflow, subsonic, M fixed
+    BDRY_SYMMETRICAL2                 e   Symmetrical, 2nd order
+    BDRY_SYMMETRICAL1                 9   Symmetrical, 1st order
+    BDRY_WALLTFIXED1                  3   Wall, T specified
+    BDRY_WALLADIABATIC1               6   Wall, Adiabatic
+    BDRY_SLIPWALL1                    c   Slip wall, 1st order, Adiabatic
+    BDRY_FREESTREAM1                  2   Freestream, 1o, params Vx,Vy, P, T
+    _________________________________________________________________________________________
+    }
+    All(BDRY_WALLTFIXED1);
+    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLTFIXED1,BDRY_OUTFLOWSUPERSONIC1);
+    {
+    Cut(is,js,  ie,je);
+    Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
+    Link(i1,j1,  i2,j2);
+    Param(is,js,  ie,je,  BDRY_FREESTREAM1, Vx,Vy,P,T);
+    }
+  );
+);
+ 
+ 
+Model(
+  FavreReynolds(
+    TURBMODEL=TURBMODEL_KOMEGA1988;
+    DILATDISSIP=DILATDISSIP_WILCOX;
+    RAPCOMP=NO;
+    TURBSOURCE=YES;
+    REACTING=YES;
+    Prt=0.9e0;
+    Sct=1.0e0;
+    ADD_ETA_TO_ETAT_WITHIN_QK=YES;  {say NO for standard kinetic energy transport model}
+    kdiv=1.0e-3;    {m2/s2}
+    psidiv=0.1e-3;   {1/s}
+    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
+    Tmin=1.0e1;     Tmax=6.0e3;    {K}
+    Twmin=Tmin;     Twmax=Tmax;    {K}
+    kmin=1.0e-50;   kmax=9.9e99;   {m2/s2}
+    psimin=1e-10;   psimax=9.9e99; {1/s}
+    wmin=1.0e-50;                  {min mass fraction allowed in the domain}
+    AXISYMMETRIC=NO;
+  );
+);
+
+
+Init(
+  FavreReynolds(
+    {
+    _______________________________________________________________________________________
+
+    Initial Condition Type       Parameters
+    _______________________________________________________________________________________
+
+    INIT_TYPE1                   V[1]..V[nd],  T,  rho, w[1]..w[ns],     k, psi
+    INIT_TYPE2                   M[1]..M[nd],  P,  T,   w[1]..w[ns],     k, psi
+    INIT_TYPE3                   M[1]..M[nd],  Re, T,   w[1]..w[ns],     k, psi
+    INIT_TYPE4                   Mmag, angles, P,  T,   w[1]..w[ns],     k, psi
+    INIT_TYPE5                   V[1]..V[nd],  P,  T,   w[1]..w[ns],     k, psi
+    INIT_TYPE6                   V[1]..V[nd],  P,  T,   chi[1]..chi[ns], k, psi
+    _______________________________________________________________________________________
+
+    (a) In the freestream set psi to 110*q_infty for the k-omega models.
+    (b) In the freestream make sure that 1E-5*q_infty^2/ReL<k<0.1*q_infty^2/ReL.
+    }
+    Mx=2;
+    My=0;
+    P=10000; {Pa}
+    T=300; {K}
+    k=1e-2; {J/kg}
+    psi=110*sqrt(Mx^2+My^2)*sqrt(1.4*287*T); {1/s for TURBMODEL_KOMEGA*}
+    w_Air=1.000000;
+    All(INIT_TYPE2,Mx,My,P,T,w_Air,k,psi);
+    {
+    Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_Air,k,psi);
+    Region(is,js,  ie,je, INIT_TYPE2,Mx,My,P,T,w_Air,k,psi);
+    }
+  );
+);
+
+
+Disc(
+  FavreReynolds(
+    zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.85;
+    AOWENO_gammahi=0.85;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
+  );
+  MUSCLplus(
+    FLUX=FLUX_FDSplus;
+    numiter=3;
+    AVERAGING=AVERAGING_ARITH;
+    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.95;
+    INTERPOL=INTERPOL_WENO5;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+  );
+  CDFplus(
+    xi1=0.5; {except for momentum and energy fluxes}
+    xi2=0.5; {momentum fluxes}
+    xi3=0.5; {total energy flux}
+  );
+  BDF(
+    STENCIL=STENCIL_BDF2;
+  );
+
+);
+
+
+Cycle(
+  FavreReynolds(
+    xiverge=1e-3;{residual convergence threshold}
+    rhoref=1.0;  {reference density in kg/m3}
+    aref=300.0;  {reference sound speed in m/s}
+    kref=1e3;    {reference turbulence kinetic energy in m2/s2}
+    psiref=1e8;  {reference specific dissipation rate of the TKE in 1/s if for TURBMODEL_KOMEGA*
+                  reference dissipation rate of the TKE in m2/s3 for TURBMODEL_KEPSILON}
+    Uref[0]=rhoref*1e99;   
+    Uref[1]=rhoref*aref*1e99;   
+    Uref[2]=rhoref*aref*1e99;   
+    Uref[3]=rhoref*aref*aref*1e99;  
+    Uref[4]=rhoref*kref;  
+    Uref[5]=rhoref*psiref;  
+  );
+  SteadyState(
+    if (mod(iter,50)==0,
+      WriteDataFile(outputfilename);
+    );
+    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
+    if (iter==1,
+      CFL=0.1;
+    );
+    CFL=min(CFL*1.05,1.5);
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,clipinfo);
+  );
+  DualTimeStepping(
+    tmax=5e-5;    {simulation time span in seconds}
+    dt=tmax/(mf*50);   {physical time step in seconds}
+    sigma1=0.4;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.4;   {exponent of maximum pseudotime step in all fluxes}
+    if (iter==1,
+      CFL=0.01;
+    );
+    CFL=min(CFL*1.55,0.7);
+    UpdateFluid(CFL,PRECON_LOCALEIGENVALUE2,sigma1,sigma2,dt);
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,clipinfo);
+    if (ximax<xiverge || iter>itermax,
+      IncreaseTimeLevel();
+      WriteDataFile(outputfilename"."round(time/dt));
+      printf("dt=%E time=%Es\n",dt,time);
+      if (time>tmax-0.1*dt,
+        exit(EXIT_SUCCESS);
+      );
+    );
+  );
+);
+
+
+Post(
+  xstation[1]=0.1; {m}
+  xstation[2]=0.2; {m}
+  xstation[3]=0.3; {m}
+  numsteps=300;
+  qmin=1.0; {m/s, as small a value as possible}
+  Pback_min=400; {Pa}
+  Pback_max=40000; {Pa}
+  Aback=1.0; {m2/m}
+  for (cnt,1,3,
+    SetXstation(xstation[cnt]);
+    Pback=_Pback_xstation(Aback, Pback_min, Pback_max, numsteps, qmin);
+    Fpot=_Fpot_xstation(Pback, numsteps, qmin);
+    mdot=_mdot_xstation();
+    Tstag=_Tstag_xstation();
+    Pstag=_Pstag_xstation(numsteps);
+    Pstar=_Pstar_xstation();
+    T=_T_xstation();
+    q=_q_xstation();
+    rho=_rho_xstation();
+    htstar=_htstar_xstation();
+    printf("x      = %E m\n"
+           "Pback  = %E Pa\n"
+           "Fpot   = %E Ns/kg\n"
+           "mdot   = %E kg/ms\n"
+           "htstar = %E J/kg\n"
+           "Tstag  = %E K\n"
+           "Pstag  = %E Pa\n"
+           "Pstar  = %E Pa\n"
+           "T      = %E K\n"
+           "q      = %E m/s\n"
+           "rho    = %E kg/m3\n\n"
+           ,xstation[cnt],Pback,Fpot,mdot,htstar,Tstag,Pstag,Pstar,T,q,rho);
+  );
+  printf("\n");
+  for (dim,1,2,
+    Area[dim]=_Area(is,js, ie,je, dim,BDRY_WALLTFIXED1);
+    Fshear[dim]=_Fshear(is,js, ie,je, dim,BDRY_WALLTFIXED1);
+    Fpressure[dim]=_Fpressure(is,js, ie,je, dim,BDRY_WALLTFIXED1);
+  );
+  printf("Fshear    = (%+E,%+E) N/m\n",Fshear[1],Fshear[2]);
+  printf("Fpressure = (%+E,%+E) N/m\n",Fpressure[1],Fpressure[2]);
+  printf("Qheat     = %+E W/m\n",_Qheat(is,js, ie,je, BDRY_WALLTFIXED1));
+  printf("metotal   = %+E J/m\n",_metotal(is,js, ie,je));
+  printf("m         = %+E J/m\n",_m(is,js, ie,je));
+  printf("\n");
+  {
+  POSTGRIDONLY=FALSE;
+  WritePostFile(is,js, ie,je, "post.01", "tecplot", POSTGRIDONLY);
+  }
+);

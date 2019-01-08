@@ -7,6 +7,26 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 JAN 07a
+   * in LICENSE
+     - updated year of copyright
+   * in README
+     - updated year of copyright
+   * in src/control.c
+     - updated year of copyright
+   * in bin
+     - added flat_plate_turbulent_unsteady.wrp
+   * in cycle/share/cycle_share.h
+     - added PRECON_LOCALEIGENVALUE2 (new preconditioner that works better for 2-equation turbulence
+       models and nitrogen vibrational energy in non-equilibrium)
+   * in cycle/share/cycle_share.c
+     - in add_constants_to_codex(), added PRECON_LOCALEIGENVALUE2
+   * in cycle/*/cycle.c
+     - in runtime_actions_cycle_specific(), added PRECON_LOCALEIGENVALUE2
+   * in model/share/fluid_share.c
+     - in find_Gamma(), added PRECON_LOCALEIGENVALUE2
+
+
 2018 DEC 22a
    * in src/control.c
      - renamed _Omega_DISTMPI_compatible to _Omega_DISTMPI_global

@@ -165,9 +165,12 @@ Disc(
     AOWENO_gammahi=0.95;
     INTERPOL=INTERPOL_WENO5;
     EIGENVALCOND=EIGENVALCOND_PARENT;
+    AVERAGING=AVERAGING_ARITH;
   );
   CDFplus(
-    xi=0.5; {should be set to 0.5 or less when used with 2nd order or higher convective fluxes}
+    xi1=0.5; {should be set to 0.5 or less when used with 2nd order or higher convective fluxes}
+    xi2=xi1;
+    xi3=xi1;
   );
 );
 
@@ -224,7 +227,7 @@ Cycle(
       );
       CFL=max(CFL/1.14,0.5);
     );
-    UpdateFluid(CFL,PRECON_LOCALEIGENVALUE,sigma1,sigma2,dt);
+    UpdateFluid(CFL,PRECON_LOCALEIGENVALUE2,sigma1,sigma2,dt);
     if (CONVERGENCEHISTORY,
       printf("%ld %6.2f %6ld %9.3f   %E \n",
              globiter,CFL,iter,effiter_U,ximax);

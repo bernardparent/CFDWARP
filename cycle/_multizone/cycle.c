@@ -150,8 +150,8 @@ void runtime_actions_cycle_specific(char *actionname, char **argum, SOAP_codex_t
     if (gl->CFL<0.0) fatal_error("The CFL number can not be negative when calling UpdateFluid.");
     gl->PRECONDITIONER=SOAP_get_argum_long(codex,*argum,1);
     if (   gl->PRECONDITIONER!=PRECON_LOCALTIMESTEP && gl->PRECONDITIONER!=PRECON_CONSTANTTIMESTEP
-        && gl->PRECONDITIONER!=PRECON_LOCALEIGENVALUE)
-      fatal_error("Problem reading 2nd argument of UpdateFluid: The preconditioner must be set to either PRECON_LOCALTIMESTEP, PRECON_CONSTANTTIMESTEP, or PRECON_LOCALEIGENVALUE.");
+        && gl->PRECONDITIONER!=PRECON_LOCALEIGENVALUE && gl->PRECONDITIONER!=PRECON_LOCALEIGENVALUE2)
+      fatal_error("Problem reading 2nd argument of UpdateFluid: The preconditioner must be set to either PRECON_LOCALTIMESTEP, PRECON_CONSTANTTIMESTEP, or PRECON_LOCALEIGENVALUE, or PRECON_LOCALEIGENVALUE2.");
     gl->sigma1=SOAP_get_argum_double(codex,*argum,2);
     gl->sigma2=SOAP_get_argum_double(codex,*argum,3);
     if (gl->sigma1<0.0 || gl->sigma1>1.0) fatal_error("The constant sigma1 must be within 0 and 1 when calling UpdateFluid.");

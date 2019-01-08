@@ -283,7 +283,7 @@ void write_license ( FILE * outputfile ) {
   if (outputfile!=stdout) linewidth=maxlinewidth;
 
   wfprintf(outputfile,"\n");
-  sprintf(linestr,"  Copyright (c) 1998-2018, Bernard Parent\n  All rights reserved.\n\n  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:\n");
+  sprintf(linestr,"  Copyright (c) 1998-2019, Bernard Parent\n  All rights reserved.\n\n  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:\n");
   wfprintf(outputfile,"%s\n",strwrpind(linestr, linewidth, -2));
 
   sprintf(linestr,"  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.");
@@ -411,7 +411,7 @@ void write_modules(FILE *outputfile){
   wfprintf(outputfile,"\n");
 
   if (outputfile==stdout) {
-    sprintf(linestr,"  CFDWARP is a Copyright (c) 1998-2018 of Bernard Parent. Use 'warp -l' for licensing terms.");
+    sprintf(linestr,"  CFDWARP is a Copyright (c) 1998-2019 of Bernard Parent. Use 'warp -l' for licensing terms.");
     wfprintf(outputfile,"%s\n",strwrpind(linestr, linewidth, -2));
     wfprintf(outputfile,"\n");
     wfprintf(outputfile,"%s\n","  Use 'warp -h' to list command line options.");

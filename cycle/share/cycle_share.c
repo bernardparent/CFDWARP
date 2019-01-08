@@ -1326,6 +1326,8 @@ void add_constants_to_codex(gl_t *gl, SOAP_codex_t *codex){
   SOAP_add_to_vars(codex,"PRECON_LOCALTIMESTEP",str);
   sprintf(str, "%d", PRECON_LOCALEIGENVALUE);
   SOAP_add_to_vars(codex,"PRECON_LOCALEIGENVALUE",str);
+  sprintf(str, "%d", PRECON_LOCALEIGENVALUE2);
+  SOAP_add_to_vars(codex,"PRECON_LOCALEIGENVALUE2",str);
 
 }
 
