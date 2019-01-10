@@ -64,7 +64,7 @@ is=1;
 ie=round(mf*80);
 js=1;
 je=round(mf*80);
-itermax=25;
+itermax=50;
 
 L=0.5e0;
 H=0.1;
@@ -113,7 +113,7 @@ Bdry(
  
 Model(
   FavreReynolds(
-    TURBMODEL=TURBMODEL_KOMEGA1988;
+    TURBMODEL=TURBMODEL_KOMEGA2008;
     DILATDISSIP=DILATDISSIP_WILCOX;
     RAPCOMP=NO;
     TURBSOURCE=YES;
@@ -184,19 +184,22 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_PECLET;
   );
   MUSCLplus(
-    FLUX=FLUX_FDSplus;
+    FLUX=FLUX_FDSplusFilter;
     numiter=3;
     AVERAGING=AVERAGING_ARITH;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_WENO5;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
     EIGENVALCOND=EIGENVALCOND_PARENT;
   );
   CDFplus(
-    xi1=0.5; {except for momentum and energy fluxes}
-    xi2=0.5; {momentum fluxes}
-    xi3=0.5; {total energy flux}
+    xi[1]=0.5; 
+    xi[2]=0.5; 
+    xi[3]=0.5; 
+    xi[4]=0.5; 
+    xi[5]=0.25; 
+    xi[6]=0.25; 
   );
   BDF(
     STENCIL=STENCIL_BDF2;
@@ -230,13 +233,13 @@ Cycle(
       CFL=0.1;
     );
     CFL=min(CFL*1.05,1.5);
-    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
+    UpdateFluid(CFL,PRECON_LOCALEIGENVALUE2,sigma1,sigma2);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,clipinfo);
   );
   DualTimeStepping(
-    tmax=5e-5;    {simulation time span in seconds}
+    tmax=5e-4;    {simulation time span in seconds}
     dt=tmax/(mf*50);   {physical time step in seconds}
     sigma1=0.4;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.4;   {exponent of maximum pseudotime step in all fluxes}

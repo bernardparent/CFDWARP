@@ -7,6 +7,16 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 JAN 10a
+   * in cycle/restime/_CDF+/restime.c
+     - in write_disc_restime_template(), changed xi1,xi2,xi3 to xi[1..nf] and set all xi to 0.5
+       except for the tke and psi fluxes where xi is set to 0.25 
+     - in read_disc_restime_actions(), changed xi1,xi2,xi3 to xi[1..nf]
+     - in _psi(), xi is now set to gl->cycle.restime.xi[flux]
+   * in cycle/restime/_CDF+/restime.hh
+     - changed xi1,xi2,xi3 to xi[nf] within gl_cycle_restime_t
+
+
 2019 JAN 07a
    * in LICENSE
      - updated year of copyright

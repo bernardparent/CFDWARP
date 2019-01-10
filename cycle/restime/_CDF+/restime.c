@@ -7,21 +7,31 @@
 
 
 void write_disc_restime_template(FILE **controlfile){
+  long flux;
   wfprintf(*controlfile,
     "  %s(\n"
-    "    xi1=0.5; {except for momentum and energy fluxes}\n"
-    "    xi2=0.5; {momentum fluxes}\n"
-    "    xi3=0.5; {total energy flux}\n"
-    "  );\n"
   ,_RESTIME_ACTIONNAME);
-
+  for (flux=0; flux<nf; flux++){
+    if (flux>fluxet){
+      wfprintf(*controlfile,
+      "    xi[%ld]=0.25;\n",flux+1);
+    } else {
+      wfprintf(*controlfile,
+      "    xi[%ld]=0.5;\n",flux+1);
+    }
+  }
+  wfprintf(*controlfile,
+    "  );\n");
 }
+
 
 void read_disc_restime_actions_2(char *actionname, char **argum, SOAP_codex_t *codex){
 }
 
 
 void read_disc_restime_actions(char *actionname, char **argum, SOAP_codex_t *codex){
+  char str[100];
+  long flux;
 
   long numvarsinit;
   void (*action_original) (char *, char **, struct SOAP_codex_t *);
@@ -37,17 +47,12 @@ void read_disc_restime_actions(char *actionname, char **argum, SOAP_codex_t *cod
     codex->action=&read_disc_restime_actions_2;
     SOAP_process_code(*argum, codex, SOAP_VARS_KEEP_ALL);
     codex->action=action_original;
-
-    find_double_var_from_codex(codex,"xi1",&gl->cycle.restime.xi1);
-    find_double_var_from_codex(codex,"xi2",&gl->cycle.restime.xi2);
-    find_double_var_from_codex(codex,"xi3",&gl->cycle.restime.xi3);
-    if (gl->cycle.restime.xi1<0.0)
-      SOAP_fatal_error(codex,"xi1 must be set to a value equal or greater to 0.");
-    if (gl->cycle.restime.xi2<0.0)
-      SOAP_fatal_error(codex,"xi2 must be set to a value equal or greater to 0.");
-    if (gl->cycle.restime.xi3<0.0)
-      SOAP_fatal_error(codex,"xi3 must be set to a value equal or greater to 0.");
-
+    for (flux=0; flux<nf; flux++){
+      sprintf(str, "xi[%ld]", flux+1);
+      find_double_var_from_codex(codex,str,&gl->cycle.restime.xi[flux]);
+      if (gl->cycle.restime.xi[flux]<0.0)
+        SOAP_fatal_error(codex,"xi[%ld] must be set to a value equal or greater to 0.",flux+1);
+    }
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;
   }
@@ -95,13 +100,7 @@ void find_Lambdaxt_interface(np_t *np, gl_t *gl, long lp0, long lp1, long theta,
 
 static double _psi(gl_t *gl, double val0, double val1, long flux){
   double xi,ret;
-  xi=gl->cycle.restime.xi1;
-  if (flux>=fluxmom && flux<fluxmom+nd){
-    xi=gl->cycle.restime.xi2;
-  }
-  if (flux==fluxet){
-    xi=gl->cycle.restime.xi3;
-  }
+  xi=gl->cycle.restime.xi[flux];
   ret=minmod(val0,val1)*min(1.0,xi*max(fabs(val1),fabs(val0))/notzero(min(fabs(val0),fabs(val1)),1e-40));
   return(ret);
 }

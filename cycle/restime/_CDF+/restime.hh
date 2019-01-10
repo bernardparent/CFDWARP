@@ -9,6 +9,6 @@
 #define _RESTIME_ACTIONNAME "CDFplus"
 
 typedef struct {
-  double xi1,xi2,xi3;
+  flux_t xi;
 } gl_cycle_restime_t;
 
