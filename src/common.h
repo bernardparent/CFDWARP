@@ -282,6 +282,7 @@ typedef struct {
    flux_t Fp1h_diffusion[nd];
 #endif
 
+
 } npwk_t;
 
 
@@ -375,6 +376,9 @@ typedef struct {
 #endif
 #ifndef NDEBUG
   bool TSEMF_UPDATED;
+#endif
+#ifdef _RESCONV_STORAGE_FSTAR
+   flux_t Fp1h;
 #endif
 
 } npbs_t;

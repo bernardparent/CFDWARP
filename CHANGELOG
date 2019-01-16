@@ -7,6 +7,14 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 JAN 17a
+   * in cycle/res/_generic/res.c
+     - in find_residual(), added code specific to _RESCONV_STORAGE_FSTAR
+   * in cycle/resconv/_MUSCL2/resconv.c, changed many things
+   * in src/common.h
+     - in npbs_t, added Fp1h when _RESCONV_STORAGE_FSTAR is defined
+
+
 2019 JAN 16b
    * in cycle/resconv/_MUSCL2/doc/report.tex
      - made changes
