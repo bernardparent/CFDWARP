@@ -18,5 +18,6 @@ cleanall:
 	( cd _FVS+ ; make cleanall )
 	( cd _MUSCL+ ; make cleanall )
 	( cd _MUSCL ; make cleanall )
+	( cd _MUSCL2 ; make cleanall )
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.

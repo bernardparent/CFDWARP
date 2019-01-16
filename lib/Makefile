@@ -23,6 +23,7 @@ cleanall:
 	( cd gridg; make cleanall )
 	( cd exm; make cleanall )
 	( cd soap; make cleanall )
+	( cd latex/eg; make clean )
 	( rm -f *.a )
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.

@@ -471,14 +471,6 @@
     }
   }
 
-  \IfFileExists{mtpro2.sty}%
-  {
-   \AtEndOfClass{
-    \RequirePackage{mtpro2}       % mathtimes pro 2 package (commercial)
-    \enablesubscriptcorrection
-    \DeclareMathSymbol{0}{\mathalpha}{operators}{`0}\DeclareMathSymbol{1}{\mathalpha}{operators}{`1}\DeclareMathSymbol{2}{\mathalpha}{operators}{`2}\DeclareMathSymbol{3}{\mathalpha}{operators}{`3}\DeclareMathSymbol{4}{\mathalpha}{operators}{`4}\DeclareMathSymbol{5}{\mathalpha}{operators}{`5}\DeclareMathSymbol{6}{\mathalpha}{operators}{`6}\DeclareMathSymbol{7}{\mathalpha}{operators}{`7}\DeclareMathSymbol{8}{\mathalpha}{operators}{`8}\DeclareMathSymbol{9}{\mathalpha}{operators}{`9}}
-  }
-  {
     \AtEndOfClass{
       \RequirePackage{txfonts}
       \RequirePackage{amssymb}
@@ -490,7 +482,7 @@
       \let\overcbrace\overbrace
       \let\undercbrace\underbrace
     }
- }
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Page Layout (Margins and so on)

@@ -27,6 +27,10 @@ echo "Removing proprietary directory .././model/emfield/_Ohm_generalized"
 rm -rf .././model/emfield/_Ohm_generalized 
 cp -a _proprietary .././model/emfield/_Ohm_generalized 
 ( printf "current Ohm_generalized\nEND" ) > .././model/emfield/_Ohm_generalized/.config 
+echo "Removing proprietary directory .././cycle/resconv/_MUSCL2"
+rm -rf .././cycle/resconv/_MUSCL2 
+cp -a _proprietary .././cycle/resconv/_MUSCL2 
+( printf "current MUSCL2\nEND" ) > .././cycle/resconv/_MUSCL2/.config 
 echo "Removing proprietary directory .././cycle/ts/_block_DDADI"
 rm -rf .././cycle/ts/_block_DDADI 
 cp -a _proprietary .././cycle/ts/_block_DDADI 

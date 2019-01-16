@@ -7,6 +7,25 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 JAN 16b
+   * in cycle/resconv/_MUSCL2/doc/report.tex
+     - made changes
+
+
+2019 JAN 16a
+   * make config
+     - updated file config/removeproprietary.sh
+
+
+2019 JAN 15a
+   * in cycle/resconv/
+     - added _MUSCL2
+   * in lib/latex/warpdoc.cls
+     - got rid of mtpro2
+   * in lib/latex
+     - added eg
+
+
 2019 JAN 10a
    * in cycle/restime/_CDF+/restime.c
      - in write_disc_restime_template(), changed xi1,xi2,xi3 to xi[1..nf] and set all xi to 0.5
