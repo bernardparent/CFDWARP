@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 JAN 17b
+   * in cycle/resconv/_MUSCL2/resconv.c
+     - improved integrate_Fstar_interface()
+
+
 2019 JAN 17a
    * in cycle/res/_generic/res.c
      - in find_residual(), added code specific to _RESCONV_STORAGE_FSTAR
