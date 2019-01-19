@@ -1703,11 +1703,11 @@ void find_Gamma(np_t *np, gl_t *gl, long l, sqmat_t Gamma){
           case PRECON_CONSTANTTIMESTEP:
             Gamma[row][row]=1.0/gl->dtau;
           break;
-          case PRECON_LOCALEIGENVALUE:
+          case PRECON_LOCALEIGENVALUE2: /*old way as in Parent, Positivity-Preserving Dual-Time Stepping Schemes for Gas Dynamics, JCP 2018. */
             dtau_local=max(0.01*dtau_constant,min(100.0*dtau_constant,dtau_vector[row]));
             Gamma[row][row]=1.0e0/sqrt(dtau_constant*dtau_local);
           break;
-          case PRECON_LOCALEIGENVALUE2:
+          case PRECON_LOCALEIGENVALUE:
             if (row>=fluxet-nd && row<=fluxet) {
               dtau_local=dtau_constant;
             } else {

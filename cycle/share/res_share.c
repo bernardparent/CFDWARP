@@ -439,6 +439,23 @@ double _f_AOWENO5(double um2, double um1, double up0, double up1, double up2, do
 
 
 double _f_AOWENO7(double um3, double um2, double um1, double up0, double up1, double up2, double up3, double x, double gammalo, double gammahi, int AOWENO_TYPE){
+  double IS74,S74,ret;
+  find_central_polynomial_CWENO7(um3, um2, um1, up0, up1, up2, up3, x, &IS74, &S74);
+  ret=_f_AOWENO(um2, um1, up0, up1, up2, x, IS74, S74, gammalo, gammahi, AOWENO_TYPE);
+  return(ret);
+}
+
+
+double _f_AOWENO9(double um4, double um3, double um2, double um1, double up0, double up1, double up2, double up3, double up4, double x, double gammalo, double gammahi, int AOWENO_TYPE){
+  double IS95,S95,ret;
+  find_central_polynomial_CWENO9(um4, um3, um2, um1, up0, up1, up2, up3, up4, x, &IS95, &S95);
+  ret=_f_AOWENO(um2, um1, up0, up1, up2, x, IS95, S95, gammalo, gammahi, AOWENO_TYPE);
+  return(ret);
+}
+
+
+
+double _f_AOWENO7_old(double um3, double um2, double um1, double up0, double up1, double up2, double up3, double x, double gammalo, double gammahi, int AOWENO_TYPE){
   double IS74,S74,IS53,S53,sigma,eps,ret53,ret74,wtil74,wtil53,w74,w53,ret;
   find_central_polynomial_CWENO5(um2, um1, up0, up1, up2, x, &IS53, &S53);
   find_central_polynomial_CWENO7(um3, um2, um1, up0, up1, up2, up3, x, &IS74, &S74);
@@ -456,7 +473,7 @@ double _f_AOWENO7(double um3, double um2, double um1, double up0, double up1, do
 
 
 
-double _f_AOWENO9(double um4, double um3, double um2, double um1, double up0, double up1, double up2, double up3, double up4, double x, double gammalo, double gammahi, int AOWENO_TYPE){
+double _f_AOWENO9_old(double um4, double um3, double um2, double um1, double up0, double up1, double up2, double up3, double up4, double x, double gammalo, double gammahi, int AOWENO_TYPE){
   double IS74,S74,IS95,S95,sigma,eps,ret95,ret74,wtil74,wtil95,w74,w95,ret;
   find_central_polynomial_CWENO9(um4, um3, um2, um1, up0, up1, up2, up3, up4, x, &IS95, &S95);
   find_central_polynomial_CWENO7(um3, um2, um1, up0, up1, up2, up3, x, &IS74, &S74);

@@ -7,6 +7,20 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+
+2019 JAN 19a
+   * in cycle/resconv/_MUSCL/resconv.c and cycle/resconv/_MUSCL2/resconv.c 
+     - in find_Fstar_interface(), changed the algorithm for the boundary condition when using AOWENO9:
+       now, use AOWENO7, AOWENO5 instead of only AOWENO5.
+   * in cycle/share/res_share.c
+     - renamed _f_AOWENO7 to _f_AOWENO7_old
+     - renamed _f_AOWENO9 to _f_AOWENO9_old
+     - rewrote _f_AOWENO9 so that it switches only between CWENO9 and CWENO3
+     - rewrote _f_AOWENO7 so that it switches only between CWENO7 and CWENO3
+   * in model/share/fluid_share.c
+     - in find_Gamma(), renamed PRECON_LOCALEIGENVALUE2 to PRECON_LOCALEIGENVALUE and vice-versa
+
+
 2019 JAN 17b
    * in cycle/resconv/_MUSCL2/resconv.c
      - improved integrate_Fstar_interface()
