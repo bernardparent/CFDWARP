@@ -3,7 +3,7 @@
 
 }
 
-mf=2;
+mf=1;
 
 is=1;  js=1; 
 ie=round(mf*60); je=round(mf*60);
@@ -122,8 +122,8 @@ Disc(
     FLUX=FLUX_FDS;
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
-    AOWENO_gammalo=0.999;
-    AOWENO_gammahi=0.999;
+    AOWENO_gammalo=0.9999;
+    AOWENO_gammahi=0.9999;
     INTERPOL=INTERPOL_AOWENO7;
     EIGENVALCOND=EIGENVALCOND_GNOFFO;
   );

@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 JAN 21b
+   * in bin
+     - modified cylinder_in_freestream2.wrp, forward_step.wrp, impinge.wrp, titarev_toro.wrp
+
+
 2019 JAN 21a
    * in bin
      - modified bump.wrp, cylinder_in_freestream2.wrp, hyperbdry.wrp and impinge.wrp
