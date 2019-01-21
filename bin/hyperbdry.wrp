@@ -71,12 +71,6 @@ Model(
     kappa=0.03;       {the thermal conductivity of the gas in W/mK }
     Pmin=10;    Pmax=9.9e99;   {min and max pressure allowed in the domain}
     Tmin=10;     Tmax=26.0e3;    {min and max temperature allowed in the domain}
-    zetaA1=0.1e0; {conditions the convective waves of the A jacobian; set it to 0.0 usually but make
-                  sure that the shock structure obtained is similar to when zetaA1c is set to 0.3}
-    zetaA2=0.2;
-    zetaA3=0.1e0; {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
-    
-    EIGENVALCOND=EIGENVALCOND_PECLET;
     AXISYMMETRIC=FALSE;
  );
 );
@@ -103,6 +97,26 @@ Init(
       }
     );
 );
+
+    
+Disc(
+  NavierStokesPerfect(
+    zetaA1=0.1e0; {conditions the convective waves of the A jacobian; set it to 0.0 usually but make
+                  sure that the shock structure obtained is similar to when zetaA1c is set to 0.3}
+    zetaA2=0.2;
+    zetaA3=0.1e0; {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
+    AOWENO_gammalo=0.999;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_AOWENO7;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
+  );
+);
+
 
 
 
@@ -156,6 +170,21 @@ Cycle(
     printf("%6.2f %4ld %4ld %6ld %9.3f   %E (%4ld,%4ld) %3ld/%3ld    %s \n",
            CFL,window.is,window.ie,iter,effiter_U,ximax,i_ximax,
            j_ximax,numzones_updated,numzones_total,clipinfo);
+  );
+  SteadyState(
+    if (mod(iter,50)==0,
+      WriteDataFile(outputfilename);
+    );
+    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
+    if (iter==1,
+      CFL=0.1;
+    );
+    CFL=min(CFL*1.05,1.5);
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,clipinfo);
   );
 
 );

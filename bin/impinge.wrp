@@ -3,7 +3,7 @@
 
 }
 
-mf=1;
+mf=2;
 
 is=1;  js=1; 
 ie=round(mf*60); je=round(mf*60);
@@ -117,6 +117,15 @@ Disc(
   NavierStokesPerfect(
     zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
+    AOWENO_gammalo=0.999;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_AOWENO7;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
   );
   MUSCLplus(
     FLUX=FLUX_FDSplus;

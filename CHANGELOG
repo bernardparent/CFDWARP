@@ -7,6 +7,10 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 JAN 21a
+   * in bin
+     - modified bump.wrp, cylinder_in_freestream2.wrp, hyperbdry.wrp and impinge.wrp
+
 
 2019 JAN 19a
    * in cycle/resconv/_MUSCL/resconv.c and cycle/resconv/_MUSCL2/resconv.c 

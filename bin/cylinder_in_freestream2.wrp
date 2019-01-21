@@ -46,7 +46,7 @@
 
 }
 
-M=0.8;
+M=0.1;
 
 P=10000; {Pa}
 T=300; {K}
@@ -168,10 +168,10 @@ Disc(
   MUSCL(
     FLUX=FLUX_FDS;
     AVERAGING=AVERAGING_ROE;
-    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
-    AOWENO_gammalo=0.85;
-    AOWENO_gammahi=0.85;
-    INTERPOL=INTERPOL_AOWENO5;
+    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
+    AOWENO_gammalo=0.999;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_AOWENO7;
     EIGENVALCOND=EIGENVALCOND_GNOFFO;
   );
   MUSCLplus(
@@ -228,10 +228,10 @@ Cycle(
     sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
-      CFL=0.1;
+      CFL=0.01;
     );
-    CFL=min(CFL*1.15,5.5);
-    UpdateFluid(CFL,PRECON_LOCALEIGENVALUE,sigma1,sigma2);
+    CFL=min(CFL*1.05,2.0);
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,clipinfo);
