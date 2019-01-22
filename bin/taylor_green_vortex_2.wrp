@@ -58,7 +58,7 @@ Flux Reconstruction Schemes
 AIAA JOURNAL Vol. 53, No. 9, September 2015
 }
 
-mf=2; 
+mf=4; 
 
 Re=1600;
 M=0.1;
@@ -200,8 +200,8 @@ Disc(
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
     AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_AOWENO5;
+    AOWENO_gammahi=0.99999;
+    INTERPOL=INTERPOL_AOWENO7;
     EIGENVALCOND=EIGENVALCOND_GNOFFO;
   );
   TVDRK(
