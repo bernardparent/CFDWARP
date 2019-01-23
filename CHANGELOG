@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 JAN 23a
+   * in cycle/resconv/_MUSCL2/resconv.c
+     - in find_Fstar_interface(), made modifications to AOWENO7 and AOWENO9 fluxes when close to
+       boundary: now fix gammalo=gammahi=0.95 for AOWENO when close to bdry node
+ 
+
 2019 JAN 22a
    * in cycle/resconv/_MUSCL2/resconv.c
      - made modifications

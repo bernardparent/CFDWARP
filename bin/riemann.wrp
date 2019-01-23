@@ -4,7 +4,7 @@
 }
 
 meshfact=1.0;
-tf=1;
+tf=4;
 
 is=1;  js=1;
 im=round(25*meshfact)+1; jm=round(25*meshfact)+1; 
@@ -128,9 +128,9 @@ Disc(
     FLUX=FLUX_FDS;
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
-    AOWENO_gammalo=0.85;
-    AOWENO_gammahi=0.999;
-    INTERPOL=INTERPOL_AOWENO7;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.999999;
+    INTERPOL=INTERPOL_AOWENO9;
     EIGENVALCOND=EIGENVALCOND_GNOFFO; 
   );
   MUSCLplus(

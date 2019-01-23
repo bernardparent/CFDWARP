@@ -113,12 +113,22 @@ Disc(
     zetaA1=0.4e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
+  MUSCLplus(
+    FLUX=FLUX_FDSplus;
+    numiter=2;
+    AVERAGING=AVERAGING_ARITH;
+    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_AOWENO5;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+  );
   MUSCL(
     FLUX=FLUX_FDS;
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
     AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.999;
+    AOWENO_gammahi=0.9999;
     INTERPOL=INTERPOL_AOWENO9;
     EIGENVALCOND=EIGENVALCOND_PECLET; 
   );
