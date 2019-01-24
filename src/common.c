@@ -905,6 +905,10 @@ bool resume_node(np_t *np){
             mlock(np,sizeof(np_t))
          )) wfprintf(stderr,"problem locking memory.\n");
 #endif
+#ifdef _RESCONV_STORAGE_FSTAR
+    np->wk->Fp1h=NULL;
+#endif
+
     return(TRUE);
   } else {
     return(FALSE);

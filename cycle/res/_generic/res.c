@@ -321,15 +321,18 @@ void unlock_residual(np_t *np, gl_t *gl, long theta, long ls, long le){
 void find_residual(np_t *np, gl_t *gl, zone_t zone){
   sweep_with_1D_segments(np, gl, zone, &init_residual, SWEEPTYPE_I, TYPELEVEL_FLUID_WORK,&is_node_inner,SEGMENTWORK_LIGHT,GRIDLEVEL_ONE);
 #ifdef _RESCONV_STORAGE_FSTAR
+  init_Fstar_interfaces(np, gl, zone);
   sweep_with_1D_segments(np, gl, zone, &find_Fstar_interfaces, SWEEPTYPE_I, TYPELEVEL_FLUID_WORK,&is_node_inner,SEGMENTWORK_HEAVY,GRIDLEVEL_ONE);
-  sweep_with_1D_segments(np, gl, zone, &update_residual, SWEEPTYPE_I, TYPELEVEL_FLUID_WORK,&is_node_inner,SEGMENTWORK_HEAVY,GRIDLEVEL_ONE);
+  sweep_with_1D_segments(np, gl, zone, &update_residual, SWEEPTYPE_I, TYPELEVEL_FLUID_WORK,&is_node_inner,SEGMENTWORK_LIGHT,GRIDLEVEL_ONE);
 #ifdef _2DL
+  init_Fstar_interfaces(np, gl, zone);
   sweep_with_1D_segments(np, gl, zone, &find_Fstar_interfaces, SWEEPTYPE_J, TYPELEVEL_FLUID_WORK,&is_node_inner,SEGMENTWORK_HEAVY,GRIDLEVEL_ONE);
-  sweep_with_1D_segments(np, gl, zone, &update_residual, SWEEPTYPE_J, TYPELEVEL_FLUID_WORK,&is_node_inner,SEGMENTWORK_HEAVY,GRIDLEVEL_ONE);
+  sweep_with_1D_segments(np, gl, zone, &update_residual, SWEEPTYPE_J, TYPELEVEL_FLUID_WORK,&is_node_inner,SEGMENTWORK_LIGHT,GRIDLEVEL_ONE);
 #endif
 #ifdef _3DL
+  init_Fstar_interfaces(np, gl, zone);
   sweep_with_1D_segments(np, gl, zone, &find_Fstar_interfaces, SWEEPTYPE_K, TYPELEVEL_FLUID_WORK,&is_node_inner,SEGMENTWORK_HEAVY,GRIDLEVEL_ONE);
-  sweep_with_1D_segments(np, gl, zone, &update_residual, SWEEPTYPE_K, TYPELEVEL_FLUID_WORK,&is_node_inner,SEGMENTWORK_HEAVY,GRIDLEVEL_ONE);
+  sweep_with_1D_segments(np, gl, zone, &update_residual, SWEEPTYPE_K, TYPELEVEL_FLUID_WORK,&is_node_inner,SEGMENTWORK_LIGHT,GRIDLEVEL_ONE);
 #endif
 #else
   sweep_with_1D_segments(np, gl, zone, &update_residual, SWEEPTYPE_IJK, TYPELEVEL_FLUID_WORK,&is_node_inner,SEGMENTWORK_HEAVY,GRIDLEVEL_ONE);

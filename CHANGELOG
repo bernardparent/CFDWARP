@@ -7,6 +7,25 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 JAN 24a
+   * in cycle/res/_generic/res.c
+     - in find_residual(), added init_Fstar_interfaces()
+   * in cycle/resconv/_MUSCL/resconv.c
+     - in write_disc_resconv_template() and read_disc_resconv_actions(), added FACEINTEG
+     - in find_Fstar_interface(), changed the AOWENO7 and AOWENO9 boundary conditions (gammalo and gammahi
+       are now fixed to 0.95)
+     - added find_Fstar_interfaces()
+     - added init_Fstar_interfaces()
+     - added integrate_Fstar_interface()
+     - in add_dFstar_residual(), now call integrate_Fstar_interface() instead of find_Fstar_interface()
+   * in cycle/resconv/_MUSCL/
+     - added the directory doc
+   * in src/common.c
+     - in resume_node(), added np->wk->Fp1h=NULL;
+   * in src/common.h
+     - moved flux_t Fp1h; from npbs_t to npwk_t
+
+
 2019 JAN 23a
    * in cycle/resconv/_MUSCL2/resconv.c
      - in find_Fstar_interface(), made modifications to AOWENO7 and AOWENO9 fluxes when close to

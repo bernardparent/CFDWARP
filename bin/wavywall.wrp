@@ -27,7 +27,7 @@ x2=0.5; y2=0.0;
 x3=x2+(H1-H2)/tan(theta); 
 y3=H1-H2;
 
-meshfact=2.0;
+meshfact=1.0;
 
 is=1;  js=1; 
 ie=round(100*meshfact)+1; je=round(25*meshfact)+1;
@@ -129,9 +129,10 @@ Disc(
     
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.9999;
-    INTERPOL=INTERPOL_AOWENO9;
+    AOWENO_gammahi=0.99999;
+    INTERPOL=INTERPOL_AOWENO7;
     EIGENVALCOND=EIGENVALCOND_GNOFFO;
+    FACEINTEG=FACEINTEG_SECONDORDER;
   );
   FVS(
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;

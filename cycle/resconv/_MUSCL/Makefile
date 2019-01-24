@@ -21,5 +21,7 @@ arc:
 	( rm -f $(TARGETS) ; ar cqs $(TARGETS) *.o )
 
 cleanall: clean
+	( cd doc ; make clean )
+
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
