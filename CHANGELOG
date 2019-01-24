@@ -7,6 +7,17 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 JAN 24b
+   * in cycle/res/_generic/res.c
+     - in find_residual(), added zoneext 
+   * in cycle/resconv/_MUSCL/resconv.c
+     - in find_Fstar_interfaces(), only store Fstar at interfaces if FACEINTEG!=FACEINTEG_FIRSTORDER
+     - in integrate_Fstar_interface(), made code more efficient
+     - in add_dFstar_residual(), added old code for FACEINTEG=FACEINTEG_FIRSTORDER that doesn't use
+       the stored Fstar at the interfaces
+    
+
+
 2019 JAN 24a
    * in cycle/res/_generic/res.c
      - in find_residual(), added init_Fstar_interfaces()

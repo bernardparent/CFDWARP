@@ -58,7 +58,7 @@ Flux Reconstruction Schemes
 AIAA JOURNAL Vol. 53, No. 9, September 2015
 }
 
-mf=4; 
+mf=1; 
 
 Re=1600;
 M=0.1;

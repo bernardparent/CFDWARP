@@ -4,7 +4,7 @@
 }
 
 meshfact=1.0;
-tf=4;
+tf=2;
 
 is=1;  js=1;
 im=round(25*meshfact)+1; jm=round(25*meshfact)+1; 
@@ -132,7 +132,7 @@ Disc(
     AOWENO_gammahi=0.999999;
     INTERPOL=INTERPOL_AOWENO9;
     EIGENVALCOND=EIGENVALCOND_GNOFFO;
-    FACEINTEG=FACEINTEG_FIRSTORDER; 
+    FACEINTEG=FACEINTEG_SECONDORDER; 
   );
   MUSCLplus(
     FLUX=FLUX_FDSplus;
@@ -148,9 +148,10 @@ Disc(
     STENCIL=STENCIL_BDF3;
   );
   CDFplus(
-    xi1=1.0;
-    xi2=0.5;
-    xi3=0.5;
+    xi[1]=0.5;
+    xi[2]=0.5;
+    xi[3]=0.5;
+    xi[4]=0.5;
   );
   TVDRK(
     METHOD=METHOD_TVDRK2;
