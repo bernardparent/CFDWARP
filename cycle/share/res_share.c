@@ -5,6 +5,7 @@
 #define CWENO_CENTRAL_WEIGHT 100.0
 #define CWENO_IS_EXP 2
 #define AOWENO_IS_EXP 2
+#define WENO_EPSILON 1e-18
 
 
 void find_musclvars_offset(np_t *np, gl_t *gl, long l, long theta, long offset, flux_t musclvars){
@@ -115,7 +116,7 @@ double _f_CWENO3(double um2, double um1, double up0, double up1, double up2, dou
   gamma2=CWENO_CENTRAL_WEIGHT;
   gamma3=1.0;
 
-  eps=1e-49;
+  eps=WENO_EPSILON;
 
   wtil1=gamma1/powint(eps+IS1,CWENO_IS_EXP);
   wtil2=gamma2/powint(eps+IS2,CWENO_IS_EXP);
@@ -177,7 +178,7 @@ double _f_CWENO5(double um4, double um3, double um2, double um1, double up0, dou
   gamma4=1.0;
   gamma5=1.0;
 
-  eps=1e-49;
+  eps=WENO_EPSILON;
 
   wtil1=gamma1/powint(eps+IS1,CWENO_IS_EXP);
   wtil2=gamma2/powint(eps+IS2,CWENO_IS_EXP);
@@ -280,7 +281,7 @@ double _f_CWENO6(double um5, double um4, double um3, double um2, double um1, dou
   gamma5=1.0;
   gamma6=1.0;
 
-  eps=1e-49;
+  eps=WENO_EPSILON;
 
   wtil1=gamma1/powint(eps+IS1,CWENO_IS_EXP);
   wtil2=gamma2/powint(eps+IS2,CWENO_IS_EXP);
@@ -381,7 +382,7 @@ double _f_AOWENO(double um2, double um1, double up0, double up1, double up2, dou
 
   tau=1.0/3.0*(fabs(ISho-IS31)+fabs(ISho-IS32)+fabs(ISho-IS33));
 
-  eps=1e-49;
+  eps=WENO_EPSILON;
 
   gammaho=gammahi;
 
@@ -519,7 +520,7 @@ double _f_WENO3(double um1, double up0, double up1){
   gamma0=1.0/3.0;
   gamma1=2.0/3.0;
 
-  eps=1e-99;
+  eps=WENO_EPSILON;
   wtil0=gamma0/sqr(eps+IS0);
   wtil1=gamma1/sqr(eps+IS1);
   w0=wtil0/(wtil0+wtil1);
@@ -547,7 +548,7 @@ double _f_WENO5(double um2, double um1, double up0, double up1, double up2){
   gamma1=5.0/8.0;
   gamma2=5.0/16.0;
 
-  eps=1e-99;
+  eps=WENO_EPSILON;
   wtil0=gamma0/sqr(eps+IS0);
   wtil1=gamma1/sqr(eps+IS1);
   wtil2=gamma2/sqr(eps+IS2);
@@ -590,7 +591,7 @@ double _f_WENO7(double um3, double um2, double um1, double up0, double up1, doub
   gamma1=12.0/35.0;
   gamma2=18.0/35.0;
   gamma3=4.0/35.0;
-  eps=1e-99;
+  eps=WENO_EPSILON;
 
   wtil0=gamma0/sqr(eps+IS0);
   wtil1=gamma1/sqr(eps+IS1);
@@ -653,7 +654,7 @@ double _f_WENO9(double um4, double um3, double um2, double um1, double up0, doub
   gamma2=10.0/21.0;
   gamma3=20.0/63.0;
   gamma4=5.0/126.0;
-  eps=1e-99;
+  eps=WENO_EPSILON;
 
   wtil0=gamma0/sqr(eps+IS0);
   wtil1=gamma1/sqr(eps+IS1);

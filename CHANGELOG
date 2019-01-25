@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 JAN 25b
+   * in cycle/share/res_share.c
+     - substituted eps=1e-49 by eps=WENO_EPSILON in various locations 
+     - added definition of WENO_EPSILON at top of file and set it to 1e-18
+
+
 2019 JAN 25a
    * renamed 
      - FACEINTEG_SECONDORDER to FACEINTEG_CENTRAL3
