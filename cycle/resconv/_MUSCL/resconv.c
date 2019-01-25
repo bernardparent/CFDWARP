@@ -27,8 +27,8 @@
 #define INTERPOL_CWENO5 13
 #define INTERPOL_FIRSTORDER 14
 #define INTERPOL_SECONDORDER 15
-#define FACEINTEG_FIRSTORDER 21
-#define FACEINTEG_SECONDORDER 22
+#define FACEINTEG_CENTRAL1 21
+#define FACEINTEG_CENTRAL3 22
 
 
 
@@ -41,7 +41,7 @@ void write_disc_resconv_template(FILE **controlfile){
     "    AOWENO_gammalo=0.95;\n"
     "    AOWENO_gammahi=0.999;\n"
     "    INTERPOL=INTERPOL_AOWENO7;\n"
-    "    FACEINTEG=FACEINTEG_SECONDORDER;\n"
+    "    FACEINTEG=FACEINTEG_CENTRAL3;\n"
     "    EIGENVALCOND=EIGENVALCOND_GNOFFO;\n"
     "  );\n"
   ,_RESCONV_ACTIONNAME);
@@ -84,8 +84,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"INTERPOL_CWENO5",INTERPOL_CWENO5); 
     SOAP_add_int_to_vars(codex,"INTERPOL_FIRSTORDER",INTERPOL_FIRSTORDER); 
     SOAP_add_int_to_vars(codex,"INTERPOL_SECONDORDER",INTERPOL_SECONDORDER); 
-    SOAP_add_int_to_vars(codex,"FACEINTEG_FIRSTORDER",FACEINTEG_FIRSTORDER); 
-    SOAP_add_int_to_vars(codex,"FACEINTEG_SECONDORDER",FACEINTEG_SECONDORDER); 
+    SOAP_add_int_to_vars(codex,"FACEINTEG_CENTRAL1",FACEINTEG_CENTRAL1); 
+    SOAP_add_int_to_vars(codex,"FACEINTEG_CENTRAL3",FACEINTEG_CENTRAL3); 
 
     SOAP_add_int_to_vars(codex,"AOWENO_TYPE_COMPRESSIVE",AOWENO_TYPE_COMPRESSIVE); 
     SOAP_add_int_to_vars(codex,"AOWENO_TYPE_DIFFUSIVE",AOWENO_TYPE_DIFFUSIVE); 
@@ -106,8 +106,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
       SOAP_fatal_error(codex,"AVERAGING must be set to either AVERAGING_ROE or AVERAGING_ARITH.");
 
     find_int_var_from_codex(codex,"FACEINTEG",&gl->cycle.resconv.FACEINTEG);
-    if (gl->cycle.resconv.FACEINTEG!=FACEINTEG_FIRSTORDER  && gl->cycle.resconv.FACEINTEG!=FACEINTEG_SECONDORDER)
-      SOAP_fatal_error(codex,"FACEINTEG must be set to either FACEINTEG_FIRSTORDER or FACEINTEG_SECONDORDER.");
+    if (gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL1  && gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL3)
+      SOAP_fatal_error(codex,"FACEINTEG must be set to either FACEINTEG_CENTRAL1 or FACEINTEG_CENTRAL3.");
 
     find_int_var_from_codex(codex,"FLUX",&gl->cycle.resconv.FLUX);
     if (gl->cycle.resconv.FLUX!=FLUX_FDS && gl->cycle.resconv.FLUX!=FLUX_FVS)
@@ -347,7 +347,7 @@ void find_Fstar_interfaces(np_t *np, gl_t *gl, long theta, long ls, long le){
   flux_t musclvarsm5,musclvarsm4,musclvarsm3,musclvarsm2,musclvarsm1,musclvarsp0,musclvarsp1,
          musclvarsp2,musclvarsp3,musclvarsp4,musclvarsp5;
 
-  if (gl->cycle.resconv.FACEINTEG!=FACEINTEG_FIRSTORDER){
+  if (gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL1){
     for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
 
       if(l==ls){
@@ -443,10 +443,10 @@ static void integrate_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, fl
 #endif
   assert(is_node_valid(np[l],TYPELEVEL_FLUID));
   switch (gl->cycle.resconv.FACEINTEG){
-    case FACEINTEG_FIRSTORDER:
+    case FACEINTEG_CENTRAL1:
       for (flux=0; flux<nf; flux++) Fint[flux]=np[l].wk->Fp1h[flux];
     break;
-    case FACEINTEG_SECONDORDER:
+    case FACEINTEG_CENTRAL3:
 #ifdef _2D
       dim=mod(theta+1,nd);
       if (np[_al(gl,l,dim,+1)].wk->Fp1h!=NULL && np[_al(gl,l,dim,-1)].wk->Fp1h!=NULL){
@@ -539,7 +539,7 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
 
     switch (gl->cycle.resconv.FACEINTEG){
 
-      case FACEINTEG_SECONDORDER:
+      case FACEINTEG_CENTRAL3:
         if(l==ls){
           integrate_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, Fm1h);
         } else {
@@ -550,7 +550,7 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
         integrate_Fstar_interface(np, gl, l, theta, Fp1h);
       break;
 
-      case FACEINTEG_FIRSTORDER:
+      case FACEINTEG_CENTRAL1:
         if(l==ls){
           if (hbw_resconv_fluid>=5) find_musclvars_offset(np,gl,l,theta,-5,musclvarsm5);
           if (hbw_resconv_fluid>=4) find_musclvars_offset(np,gl,l,theta,-4,musclvarsm4);

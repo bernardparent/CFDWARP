@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 JAN 25a
+   * renamed 
+     - FACEINTEG_SECONDORDER to FACEINTEG_CENTRAL3
+     - FACEINTEG_FIRSTORDER to FACEINTEG_CENTRAL1
+
+
 2019 JAN 24b
    * in cycle/res/_generic/res.c
      - in find_residual(), added zoneext 
