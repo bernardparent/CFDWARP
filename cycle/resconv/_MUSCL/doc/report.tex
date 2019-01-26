@@ -92,7 +92,7 @@ abstract
 %%  \listoffigures
 
 
-\section{Second-Order Polynomial Fit}
+\section{Third Order Central}
 
 Let's say we wish to find the integral of the flux at the $i+1/2$ interface between two nodes. The integral should be performed from $\eta=-1/2$ to $\eta=1/2$. We know the fluxes $F_{i+1/2,j}$ at $\eta=0$, $F_{i+1/2,j+1}$ at $\eta=1$, and $F_{i+1/2,j-1}$ at $\eta=-1$, as determined through a standard WENO interpolation \cite{jcp:1994:liu}
  of the primitives reconstructed over a FDS \cite{jcp:1981:roe} or FVS flux. Now, let's fit a second-order polynomial through the fluxes:
@@ -178,6 +178,143 @@ Simplify:
 
 
 
+\section{Fifth Order Central}
+
+Let's fit a fourth-order polynomial through the fluxes:
+%
+\begin{equation}
+F_{i+1/2}=c_1 \eta^4 + c_2 \eta^3 + c_3 \eta^2 + c_4 \eta + c_5 
+\label{eqn:central5a}
+\end{equation}
+% 
+Find the coefficients $c_1$, $c_2$, $c_3$, $c_4$, and $c_5$ by making sure $F_{i+1/2}$ goes through the three $F$s. First, at $\eta=0$, $F_{i+1/2}=F_{i+1/2,j}$:
+%
+\begin{equation}
+c_5=F_{i+1/2,j}
+\label{eqn:central5_c5}
+\end{equation}
+%
+Second, at $\eta=1$, $F_{i+1/2}=F_{i+1/2,j+1}$:
+%
+\begin{equation}
+F_{i+1/2,j+1}=c_1  + c_2  + c_3  + c_4  + c_5 
+\label{eqn:central5c}
+\end{equation}
+% 
+Third, at $\eta=-1$, $F_{i+1/2}=F_{i+1/2,j-1}$:
+%
+\begin{equation}
+F_{i+1/2,j-1}=c_1  - c_2  + c_3  - c_4  + c_5 
+\label{eqn:central5d}
+\end{equation}
+% 
+Fourth, at $\eta=2$, $F_{i+1/2}=F_{i+1/2,j+2}$:
+%
+\begin{equation}
+F_{i+1/2,j+2}= 16 c_1 + 8 c_2 + 4 c_3 + 2 c_4 + c_5 
+\label{eqn:central5e}
+\end{equation}
+% 
+Fifth, at $\eta=-2$, $F_{i+1/2}=F_{i+1/2,j-2}$:
+%
+\begin{equation}
+F_{i+1/2,j-2}= 16 c_1 - 8 c_2 + 4 c_3 - 2 c_4 + c_5 
+\label{eqn:central5f}
+\end{equation}
+% 
+Add the former two equations and the latter two equations:
+%
+\begin{equation}
+F_{i+1/2,j-1}+F_{i+1/2,j+1} = 2 c_1    + 2 c_3   + 2 c_5 
+\label{eqn:central5g}
+\end{equation}
+% 
+%
+\begin{equation}
+F_{i+1/2,j-2}+F_{i+1/2,j+2} = 32 c_1  + 8 c_3  + 2 c_5 
+\label{eqn:central5h}
+\end{equation}
+% 
+Substitute $c_5=F_{i+1/2,j}$:
+%
+\begin{equation}
+F_{i+1/2,j-1}- 2 F_{i+1/2,j}+F_{i+1/2,j+1} = 2 c_1    + 2 c_3    
+\label{eqn:central5i}
+\end{equation}
+% 
+%
+\begin{equation}
+F_{i+1/2,j-2}- 2 F_{i+1/2,j}+F_{i+1/2,j+2} = 32 c_1  + 8 c_3   
+\label{eqn:central5j}
+\end{equation}
+% 
+
+
+
+Multiply Eq.\ (\ref{eqn:central5i}) by -4 and add to Eq.\ (\ref{eqn:central5j}):
+%
+\begin{equation}
+ c_1= \frac{+F_{i+1/2,j-2} -4 F_{i+1/2,j-1}+ 6 F_{i+1/2,j} -4 F_{i+1/2,j+1} +F_{i+1/2,j+2}}{24}   
+\label{eqn:central5_c1}
+\end{equation}
+% 
+Multiply Eq.\ (\ref{eqn:central5i}) by -16 and add to Eq.\ (\ref{eqn:central5j}):
+%
+\begin{equation}
+c_3=\frac{+ F_{i+1/2,j-2} -16 F_{i+1/2,j-1}+ 30 F_{i+1/2,j} -16 F_{i+1/2,j+1} 
++F_{i+1/2,j+2}}{24}   
+\label{eqn:central5_c3}
+\end{equation}
+% 
+
+Now that $c_1$, $c_3$, and $c_5$ are known, we can integrate the flux from $\eta=-1/2$ to $\eta=1/2$ to obtain the integrated flux $\overline{F}_{i+1/2}$:
+%
+\begin{equation}
+\overline{F}_{i+1/2}=\int_{\eta=-1/2}^{\eta=1/2} F_{i+1/2} d\eta
+\end{equation}
+%
+or
+%
+\begin{equation}
+\overline{F}_{i+1/2}=\int_{\eta=-1/2}^{\eta=1/2} \left( c_1 \eta^4 + c_2 \eta^3 + c_3 \eta^2 + c_4 \eta + c_5 \right) d\eta
+\end{equation}
+%
+Noting that $c_1$, $c_2$, $c_3$ do not depend on $\eta$:
+%
+\begin{equation}
+\overline{F}_{i+1/2}= \left[ \frac{c_1}{5} \eta^5 + \frac{c_2}{4} \eta^4 + \frac{c_3}{3} \eta^3 + \frac{c_4}{2} \eta^2 + c_5 \eta \right]_{\eta=-1/2}^{\eta=1/2}
+\end{equation}
+%
+or
+%
+\begin{equation}
+\overline{F}_{i+1/2}=  \frac{c_1}{80}  + \frac{c_3}{12}   + c_5  
+\end{equation}
+%
+Substitute $c_1$ and $c_3$ in the latter:
+%
+\begin{align}
+\overline{F}_{i+1/2}= & \frac{+F_{i+1/2,j-2} -4 F_{i+1/2,j-1}+ 6 F_{i+1/2,j} -4 F_{i+1/2,j+1} +F_{i+1/2,j+2}}{24\times 80}\nonumber\\
+ &+ \frac{+ F_{i+1/2,j-2} -16 F_{i+1/2,j-1}+ 30 F_{i+1/2,j} -16 F_{i+1/2,j+1} +F_{i+1/2,j+2}}{24\times 12}  
+ + F_{i+1/2,j} 
+\end{align}
+%
+Put all terms under a common denominator:
+%
+\begin{align}
+\overline{F}_{i+1/2}= & \frac{+3 F_{i+1/2,j-2} -12 F_{i+1/2,j-1}+ 18 F_{i+1/2,j} - 12 F_{i+1/2,j+1} +3F_{i+1/2,j+2}}{24\times 240}\nonumber\\
+ &+ \frac{+ 20 F_{i+1/2,j-2} -320 F_{i+1/2,j-1}+ 600 F_{i+1/2,j} -320 F_{i+1/2,j+1} +20 F_{i+1/2,j+2}}{24\times 240}  
+ + \frac{ 5760 F_{i+1/2,j}}{24\times 240} 
+\end{align}
+%
+Regroup:
+%
+\begin{equation}
+\frameeqn{
+\overline{F}_{i+1/2}=  \frac{+23 F_{i+1/2,j-2} -332 F_{i+1/2,j-1}+ 6378 F_{i+1/2,j} - 332 F_{i+1/2,j+1} + 23 F_{i+1/2,j+2}}{5760}
+}
+\end{equation}
+%
 
 
 

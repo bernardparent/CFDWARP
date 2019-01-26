@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 JAN 26a
+   * in cycle/resconv/_MUSCL/doc/report.tex
+     - added 5th order central integration scheme
+
+
 2019 JAN 25b
    * in cycle/share/res_share.c
      - substituted eps=1e-49 by eps=WENO_EPSILON in various locations 
