@@ -29,6 +29,7 @@
 #define INTERPOL_SECONDORDER 15
 #define FACEINTEG_CENTRAL1 21
 #define FACEINTEG_CENTRAL3 22
+#define FACEINTEG_CENTRAL5 23
 
 
 
@@ -86,6 +87,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"INTERPOL_SECONDORDER",INTERPOL_SECONDORDER); 
     SOAP_add_int_to_vars(codex,"FACEINTEG_CENTRAL1",FACEINTEG_CENTRAL1); 
     SOAP_add_int_to_vars(codex,"FACEINTEG_CENTRAL3",FACEINTEG_CENTRAL3); 
+    SOAP_add_int_to_vars(codex,"FACEINTEG_CENTRAL5",FACEINTEG_CENTRAL5); 
 
     SOAP_add_int_to_vars(codex,"AOWENO_TYPE_COMPRESSIVE",AOWENO_TYPE_COMPRESSIVE); 
     SOAP_add_int_to_vars(codex,"AOWENO_TYPE_DIFFUSIVE",AOWENO_TYPE_DIFFUSIVE); 
@@ -106,8 +108,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
       SOAP_fatal_error(codex,"AVERAGING must be set to either AVERAGING_ROE or AVERAGING_ARITH.");
 
     find_int_var_from_codex(codex,"FACEINTEG",&gl->cycle.resconv.FACEINTEG);
-    if (gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL1  && gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL3)
-      SOAP_fatal_error(codex,"FACEINTEG must be set to either FACEINTEG_CENTRAL1 or FACEINTEG_CENTRAL3.");
+    if (gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL1  && gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL3 && gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL5)
+      SOAP_fatal_error(codex,"FACEINTEG must be set to either FACEINTEG_CENTRAL1 or FACEINTEG_CENTRAL3 or FACEINTEG_CENTRAL5.");
 
     find_int_var_from_codex(codex,"FLUX",&gl->cycle.resconv.FLUX);
     if (gl->cycle.resconv.FLUX!=FLUX_FDS && gl->cycle.resconv.FLUX!=FLUX_FVS)
@@ -434,10 +436,46 @@ void init_Fstar_interfaces(np_t *np, gl_t *gl, zone_t zone){
 }
 
 
+int find_face_integrated_flux_CENTRAL5(np_t *np, gl_t *gl, long l, long dim, flux_t F){
+  int error;
+  long flux;
+  long lm2,lm1,lp0,lp1,lp2;
+  lm2=_al(gl,l,dim,-2);
+  lm1=_al(gl,l,dim,-1);
+  lp0=_al(gl,l,dim,+0);
+  lp1=_al(gl,l,dim,+1);
+  lp2=_al(gl,l,dim,+2);
+  error=4;
+  if (is_node_valid(np[lp0],TYPELEVEL_FLUID_WORK) && np[lp0].wk->Fp1h!=NULL){
+    if (is_node_valid(np[lm2],TYPELEVEL_FLUID_WORK) && is_node_valid(np[lp2],TYPELEVEL_FLUID_WORK) && np[lm2].wk->Fp1h!=NULL && np[lm1].wk->Fp1h!=NULL && np[lp0].wk->Fp1h!=NULL && np[lp1].wk->Fp1h!=NULL && np[lp2].wk->Fp1h!=NULL){
+      error=0;
+      for (flux=0; flux<nf; flux++) F[flux]=(23.0*np[lm2].wk->Fp1h[flux]-332.0*np[lm1].wk->Fp1h[flux]+6378.0*np[lp0].wk->Fp1h[flux]-332.0*np[lp1].wk->Fp1h[flux]+23.0*np[lp2].wk->Fp1h[flux])/5760.0;
+    } else {
+      if (is_node_valid(np[lm2],TYPELEVEL_FLUID_WORK) && is_node_valid(np[lp2],TYPELEVEL_FLUID_WORK) && np[lm1].wk->Fp1h!=NULL && np[lp0].wk->Fp1h!=NULL && np[lp1].wk->Fp1h!=NULL){
+        error=1;
+        for (flux=0; flux<nf; flux++) F[flux]=(np[lm1].wk->Fp1h[flux]+22.0*np[lp0].wk->Fp1h[flux]+np[lp1].wk->Fp1h[flux])/24.0;
+      } else {
+        if (np[lp0].wk->Fp1h!=NULL){
+          error=2;
+          for (flux=0; flux<nf; flux++) F[flux]=np[lp0].wk->Fp1h[flux];
+        } else {
+          error=3;
+        }
+      }
+    }
+  }
+  return(error);
+}
+
+
+
 static void integrate_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t Fint){
   long dim,flux;
-  double Fp0,Fm1,Fp1;
+  flux_t Fp0,Fm1,Fp1;
 #ifdef _3D
+  long i,j;
+  flux_t Fm2,Fp2;
+  int error_im1,error_im2,error_ip0,error_ip1,error_ip2;
   long dim2;
   long lp1p0,lm1p0,lp0p1,lp0m1,lp1p1,lp1m1,lm1p1,lm1m1;
 #endif
@@ -451,10 +489,10 @@ static void integrate_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, fl
       dim=mod(theta+1,nd);
       if (np[_al(gl,l,dim,+1)].wk->Fp1h!=NULL && np[_al(gl,l,dim,-1)].wk->Fp1h!=NULL){
         for (flux=0; flux<nf; flux++) {
-          Fp0=np[l].wk->Fp1h[flux];
-          Fp1=np[_al(gl,l,dim,+1)].wk->Fp1h[flux];
-          Fm1=np[_al(gl,l,dim,-1)].wk->Fp1h[flux];
-          Fint[flux]=(22.0*Fp0+Fp1+Fm1)/24.0;
+          Fp0[flux]=np[l].wk->Fp1h[flux];
+          Fp1[flux]=np[_al(gl,l,dim,+1)].wk->Fp1h[flux];
+          Fm1[flux]=np[_al(gl,l,dim,-1)].wk->Fp1h[flux];
+          Fint[flux]=(22.0*Fp0[flux]+Fp1[flux]+Fm1[flux])/24.0;
         }
       } else {
         for (flux=0; flux<nf; flux++) Fint[flux]=np[l].wk->Fp1h[flux];
@@ -475,26 +513,55 @@ static void integrate_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, fl
       if (np[lp1p0].wk->Fp1h!=NULL && np[lm1p0].wk->Fp1h!=NULL){
         for (flux=0; flux<nf; flux++) {
         if (np[lp0p1].wk->Fp1h!=NULL && np[lp0m1].wk->Fp1h!=NULL) {
-          Fp0=(22.0*np[l].wk->Fp1h[flux]+np[lp0p1].wk->Fp1h[flux]+np[lp0m1].wk->Fp1h[flux])/24.0;
+          Fp0[flux]=(22.0*np[l].wk->Fp1h[flux]+np[lp0p1].wk->Fp1h[flux]+np[lp0m1].wk->Fp1h[flux])/24.0;
         } else {
-          Fp0=np[l].wk->Fp1h[flux];
+          Fp0[flux]=np[l].wk->Fp1h[flux];
         }
         if (np[lp1p1].wk->Fp1h!=NULL && np[lp1m1].wk->Fp1h!=NULL) {
-          Fp1=(22.0*np[lp1p0].wk->Fp1h[flux]+np[lp1p1].wk->Fp1h[flux]+np[lp1m1].wk->Fp1h[flux])/24.0;
+          Fp1[flux]=(22.0*np[lp1p0].wk->Fp1h[flux]+np[lp1p1].wk->Fp1h[flux]+np[lp1m1].wk->Fp1h[flux])/24.0;
         } else {
-          Fp1=np[lp1p0].wk->Fp1h[flux];
+          Fp1[flux]=np[lp1p0].wk->Fp1h[flux];
         }
         if (np[lm1p1].wk->Fp1h!=NULL && np[lm1m1].wk->Fp1h!=NULL) {
-          Fm1=(22.0*np[lm1p0].wk->Fp1h[flux]+np[lm1p1].wk->Fp1h[flux]+np[lm1m1].wk->Fp1h[flux])/24.0;
+          Fm1[flux]=(22.0*np[lm1p0].wk->Fp1h[flux]+np[lm1p1].wk->Fp1h[flux]+np[lm1m1].wk->Fp1h[flux])/24.0;
         } else {
-          Fm1=np[lm1p0].wk->Fp1h[flux];
+          Fm1[flux]=np[lm1p0].wk->Fp1h[flux];
         }
-        Fint[flux]=(22.0*Fp0+Fp1+Fm1)/24.0;
+        Fint[flux]=(22.0*Fp0[flux]+Fp1[flux]+Fm1[flux])/24.0;
         }
       } else {
         for (flux=0; flux<nf; flux++) Fint[flux]=np[l].wk->Fp1h[flux];
       }
 #endif
+    break;
+    case FACEINTEG_CENTRAL5:
+#ifdef _2D
+      dim=mod(theta+1,nd);
+      find_face_integrated_flux_CENTRAL5(np,gl,l,dim,Fint);
+#endif
+#ifdef _3D
+      i=mod(theta+1,nd);
+      j=mod(theta+2,nd);
+      assert(np[l].wk->Fp1h!=NULL);
+       
+      error_im2=find_face_integrated_flux_CENTRAL5(np,gl,_al(gl,l,i,-2),j,Fm2);
+      error_ip2=find_face_integrated_flux_CENTRAL5(np,gl,_al(gl,l,i,+2),j,Fp2);  
+      error_im1=find_face_integrated_flux_CENTRAL5(np,gl,_al(gl,l,i,-1),j,Fm1);
+      error_ip1=find_face_integrated_flux_CENTRAL5(np,gl,_al(gl,l,i,+1),j,Fp1);
+      error_ip0=find_face_integrated_flux_CENTRAL5(np,gl,_al(gl,l,i,+0),j,Fp0);
+      
+      if (error_im2==0 && error_ip2==0 && error_im1==0 && error_ip1==0 && error_ip0==0){
+        for (flux=0; flux<nf; flux++) Fint[flux]=(23.0*Fm2[flux]-332.0*Fm1[flux]+6378.0*Fp0[flux]-332.0*Fp1[flux]+23.0*Fp2[flux])/5760.0;
+      } else {
+        if (error_im1==0 && error_ip1==0 && error_ip0==0){
+          for (flux=0; flux<nf; flux++) Fint[flux]=(22.0*Fp0[flux]+Fp1[flux]+Fm1[flux])/24.0;
+        } else {
+          for (flux=0; flux<nf; flux++) Fint[flux]=np[l].wk->Fp1h[flux];
+        }
+      }
+
+#endif
+
     break;
     default:
       fatal_error("FACEINTEG can not be set to %d.",gl->cycle.resconv.FACEINTEG);
@@ -539,16 +606,6 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
 
     switch (gl->cycle.resconv.FACEINTEG){
 
-      case FACEINTEG_CENTRAL3:
-        if(l==ls){
-          integrate_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, Fm1h);
-        } else {
-          for (flux=0; flux<nf; flux++) {
-            Fm1h[flux]=Fp1h[flux];
-          }
-        }
-        integrate_Fstar_interface(np, gl, l, theta, Fp1h);
-      break;
 
       case FACEINTEG_CENTRAL1:
         if(l==ls){
@@ -605,7 +662,14 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
       break;
 
       default:
-        fatal_error("FACEINTEG can not be set to %d.",gl->cycle.resconv.FACEINTEG);
+        if(l==ls){
+          integrate_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, Fm1h);
+        } else {
+          for (flux=0; flux<nf; flux++) {
+            Fm1h[flux]=Fp1h[flux];
+          }
+        }
+        integrate_Fstar_interface(np, gl, l, theta, Fp1h);
 
     }
 

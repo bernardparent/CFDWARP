@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 JAN 28a
+   * in cycle/resconv/_MUSCL/resconv.c
+     - added FACEINTEG_CENTRAL5
+
+
 2019 JAN 26a
    * in cycle/resconv/_MUSCL/doc/report.tex
      - added 5th order central integration scheme
