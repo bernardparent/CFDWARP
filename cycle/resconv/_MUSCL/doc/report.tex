@@ -349,16 +349,62 @@ c_4=\frac{-8F_{i+1/2,j+1}+8F_{i+1/2,j-1}+F_{i+1/2,j+2}-F_{i+1/2,j-2}}{-12}
 First find the indicator of smoothness for the 3rd order and 5th order central stencils. We define the indicator of smoothness $\beta$  as follows:
 %
 \begin{equation}
-\beta = \sum_m (\Delta \eta)^{2m-1} \int_{\eta=-0.5}^{\eta=0.5} \left( \frac{d^m F_{i+1/2}}{d\eta^m} \right)^2
+\beta = \sum_m (\Delta \eta)^{2m-1} \int_{\eta=-0.5}^{\eta=0.5} \left( \frac{d^m F_{i+1/2}}{d\eta^m} \right)^2 d\eta
 \end{equation}
 %
 But $\Delta \eta=1$:
 %
 \begin{equation}
-\beta = \sum_m  \int_{\eta=-0.5}^{\eta=0.5} \left( \frac{d^m F_{i+1/2}}{d\eta^m} \right)^2
+\beta = \sum_m  \int_{\eta=-0.5}^{\eta=0.5} \left( \frac{d^m F_{i+1/2}}{d\eta^m} \right)^2 d\eta
 \end{equation}
 %
-
+Now let us find the indicator of smoothness for the 3-point central stencil, $\beta_3$. 
+%
+\begin{equation}
+\beta_3 =   \int_{\eta=-0.5}^{\eta=0.5} \sum_{m=1}^2 \left(  \frac{d^m }{d\eta^m}\left(c_1 \eta^2 + c_2 \eta + c_3 
+\right) \right)^2 d\eta
+\end{equation}
+%
+%
+\begin{equation}
+\beta_3 =   \int_{\eta=-0.5}^{\eta=0.5}  \left(\left(  2 c_1 \eta + c_2  
+\right)^2 +  \left(  2 c_1   
+\right)^2 \right) d\eta
+\end{equation}
+%
+or
+%
+\begin{equation}
+\beta_3 =   \int_{\eta=-0.5}^{\eta=0.5}  \left(  4 c_1^2 \eta^2 + c_2^2 + 4 c_1 c_2 \eta  +   4 c_1^2   
+ \right) d\eta
+\end{equation}
+%
+integrate:
+%
+\begin{equation}
+\beta_3 =     \left[  \frac{4}{3} c_1^2 \eta^3 + c_2^2 \eta + 2 c_1 c_2 \eta^2  +   4 c_1^2 \eta   
+ \right]_{\eta=-0.5}^{\eta=0.5}
+\end{equation}
+%
+or
+%
+\begin{equation}
+\frameeqn{
+\beta_3 =     \frac{13}{3} c_1^2  + c_2^2     
+}
+\end{equation}
+%
+where
+%
+\begin{equation}
+c_1=\frac{F_{i+1/2,j+1}+F_{i+1/2,j-1}}{2}- F_{i+1/2,j} 
+\end{equation}
+% 
+%
+\begin{equation}
+c_2=\frac{F_{i+1/2,j+1}+F_{i+1/2,j-1}}{2} -F_{i+1/2,j-1}
+\end{equation}
+% 
 
 
 
