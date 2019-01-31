@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 JAN 31a
+   * in cycle/resconv/_MUSCL/doc/report.tex
+     - added WENO section
+
+
 2019 JAN 28a
    * in cycle/resconv/_MUSCL/resconv.c
      - added FACEINTEG_CENTRAL5

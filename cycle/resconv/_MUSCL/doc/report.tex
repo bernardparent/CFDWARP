@@ -57,7 +57,7 @@
 }
 
 \title{
-  Multidimensional Fluxes
+  Flux Integration on Interface
 }
 
 \date{
@@ -315,7 +315,49 @@ Regroup:
 }
 \end{equation}
 %
+Also, can find $c_2$ and $c_4$ by subtracting (\ref{eqn:central5d}) from (\ref{eqn:central5c}) and subtracting (\ref{eqn:central5f}) from (\ref{eqn:central5e}):
+%
+\begin{equation}
+F_{i+1/2,j+1}-F_{i+1/2,j-1}=2 c_2    + 2 c_4   
+\label{eqn:central5k}
+\end{equation}
+% 
+%
+\begin{equation}
+F_{i+1/2,j+2}-F_{i+1/2,j-2}=  16 c_2  + 4 c_4  
+\label{eqn:central5l}
+\end{equation}
+% 
+Multiply (\ref{eqn:central5k}) by $-2$ and add it to (\ref{eqn:central5l}):
+%
+\begin{equation}
+c_2=\frac{F_{i+1/2,j+2}-F_{i+1/2,j-2}-2F_{i+1/2,j+1}+2F_{i+1/2,j-1}}{12}    
+\label{eqn:central5_c2}
+\end{equation}
+% 
+Multiply (\ref{eqn:central5k}) by $-8$ and add it to (\ref{eqn:central5l}):
+%
+\begin{equation}
+c_4=\frac{-8F_{i+1/2,j+1}+8F_{i+1/2,j-1}+F_{i+1/2,j+2}-F_{i+1/2,j-2}}{-12}  
+\end{equation}
+% 
 
+
+
+\section{3rd-5th Adaptive Order WENO}
+
+First find the indicator of smoothness for the 3rd order and 5th order central stencils. We define the indicator of smoothness $\beta$  as follows:
+%
+\begin{equation}
+\beta = \sum_m (\Delta \eta)^{2m-1} \int_{\eta=-0.5}^{\eta=0.5} \left( \frac{d^m F_{i+1/2}}{d\eta^m} \right)^2
+\end{equation}
+%
+But $\Delta \eta=1$:
+%
+\begin{equation}
+\beta = \sum_m  \int_{\eta=-0.5}^{\eta=0.5} \left( \frac{d^m F_{i+1/2}}{d\eta^m} \right)^2
+\end{equation}
+%
 
 
 
