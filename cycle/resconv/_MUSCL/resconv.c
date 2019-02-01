@@ -30,6 +30,7 @@
 #define FACEINTEG_CENTRAL1 21
 #define FACEINTEG_CENTRAL3 22
 #define FACEINTEG_CENTRAL5 23
+#define FACEINTEG_AOWENO5 24
 
 
 
@@ -88,6 +89,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"FACEINTEG_CENTRAL1",FACEINTEG_CENTRAL1); 
     SOAP_add_int_to_vars(codex,"FACEINTEG_CENTRAL3",FACEINTEG_CENTRAL3); 
     SOAP_add_int_to_vars(codex,"FACEINTEG_CENTRAL5",FACEINTEG_CENTRAL5); 
+    SOAP_add_int_to_vars(codex,"FACEINTEG_AOWENO5",FACEINTEG_AOWENO5); 
 
     SOAP_add_int_to_vars(codex,"AOWENO_TYPE_COMPRESSIVE",AOWENO_TYPE_COMPRESSIVE); 
     SOAP_add_int_to_vars(codex,"AOWENO_TYPE_DIFFUSIVE",AOWENO_TYPE_DIFFUSIVE); 
@@ -108,8 +110,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
       SOAP_fatal_error(codex,"AVERAGING must be set to either AVERAGING_ROE or AVERAGING_ARITH.");
 
     find_int_var_from_codex(codex,"FACEINTEG",&gl->cycle.resconv.FACEINTEG);
-    if (gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL1  && gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL3 && gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL5)
-      SOAP_fatal_error(codex,"FACEINTEG must be set to either FACEINTEG_CENTRAL1 or FACEINTEG_CENTRAL3 or FACEINTEG_CENTRAL5.");
+    if (gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL1  && gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL3 && gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL5 && gl->cycle.resconv.FACEINTEG!=FACEINTEG_AOWENO5)
+      SOAP_fatal_error(codex,"FACEINTEG must be set to either FACEINTEG_CENTRAL1 or FACEINTEG_CENTRAL3 or FACEINTEG_CENTRAL5 or FACEINTEG_AOWENO5.");
 
     find_int_var_from_codex(codex,"FLUX",&gl->cycle.resconv.FLUX);
     if (gl->cycle.resconv.FLUX!=FLUX_FDS && gl->cycle.resconv.FLUX!=FLUX_FVS)
@@ -468,6 +470,73 @@ int find_face_integrated_flux_CENTRAL5(np_t *np, gl_t *gl, long l, long dim, flu
 }
 
 
+double integrated_flux_AOWENO5(double Fm2, double Fm1, double Fp0, double Fp1, double Fp2){
+  double ret;
+  double F3,F5,epsilon;
+  double gammahi,w3,w5,wtil3,wtil5,c31,c32,beta3,beta5,c51,c52,c53,c54;
+  gammahi=0.9;
+  epsilon=1e-12;
+  F3=(Fm1+22.0*Fp0+Fp1)/24.0;
+  F5=(23.0*Fm2-332.0*Fm1+6378.0*Fp0-332.0*Fp1+23.0*Fp2)/5760.0;  
+  c31=(Fp1+Fm1)/2.0-Fp0;
+  c32=(Fp1+Fm1)/2.0-Fm1;
+  beta3=13.0/3.0*sqr(c31)+sqr(c32);
+  c51=(Fm2-4.0*Fm1+6.0*Fp0-4.0*Fp1+Fp2)/24.0;
+  c52=(Fp2-Fm2-2.0*Fp1+2.0*Fm1)/12.0;
+  c53=(Fm2-16.0*Fm1+30.0*Fp0-16.0*Fp1+Fp2)/24.0;
+  c54=(-8.0*Fp1+8.0*Fm1+Fp2-Fm2)/(-12.0);
+  beta5=87617.0/140.0*sqr(c51)+3129.0/80.0*sqr(c52)+21.0/5.0*c51*c53+13.0/3.0*sqr(c53)+0.5*c52*c54+sqr(c54);
+  w3=(1.0-gammahi)/sqr(beta3+epsilon);
+  w5=gammahi/sqr(beta5+epsilon);
+  wtil3=w3/(w3+w5);
+  wtil5=w5/(w3+w5);
+  ret=wtil5/gammahi*(F5-(1.0-gammahi)*F3)+wtil3*F3;
+  
+  return(ret);
+}
+
+
+int find_face_integrated_flux_AOWENO5(np_t *np, gl_t *gl, long l, long dim, flux_t F){
+  int error;
+  long flux;
+  long lm2,lm1,lp0,lp1,lp2;
+  double Fm2,Fm1,Fp0,Fp1,Fp2;
+  lm2=_al(gl,l,dim,-2);
+  lm1=_al(gl,l,dim,-1);
+  lp0=_al(gl,l,dim,+0);
+  lp1=_al(gl,l,dim,+1);
+  lp2=_al(gl,l,dim,+2);
+  error=4;
+  if (is_node_valid(np[lp0],TYPELEVEL_FLUID_WORK) && np[lp0].wk->Fp1h!=NULL){
+    if (is_node_valid(np[lm2],TYPELEVEL_FLUID_WORK) && is_node_valid(np[lp2],TYPELEVEL_FLUID_WORK) && np[lm2].wk->Fp1h!=NULL && np[lm1].wk->Fp1h!=NULL && np[lp0].wk->Fp1h!=NULL && np[lp1].wk->Fp1h!=NULL && np[lp2].wk->Fp1h!=NULL){
+      error=0;
+      for (flux=0; flux<nf; flux++) {
+        Fm2=np[lm2].wk->Fp1h[flux];
+        Fm1=np[lm1].wk->Fp1h[flux];
+        Fp0=np[lp0].wk->Fp1h[flux];
+        Fp1=np[lp1].wk->Fp1h[flux];
+        Fp2=np[lp2].wk->Fp1h[flux];
+        F[flux]=integrated_flux_AOWENO5(Fm2, Fm1, Fp0, Fp1, Fp2);
+      }
+    } else {
+      if (is_node_valid(np[lm2],TYPELEVEL_FLUID_WORK) && is_node_valid(np[lp2],TYPELEVEL_FLUID_WORK) && np[lm1].wk->Fp1h!=NULL && np[lp0].wk->Fp1h!=NULL && np[lp1].wk->Fp1h!=NULL){
+        error=1;
+        for (flux=0; flux<nf; flux++) F[flux]=(np[lm1].wk->Fp1h[flux]+22.0*np[lp0].wk->Fp1h[flux]+np[lp1].wk->Fp1h[flux])/24.0;
+      } else {
+        if (np[lp0].wk->Fp1h!=NULL){
+          error=2;
+          for (flux=0; flux<nf; flux++) F[flux]=np[lp0].wk->Fp1h[flux];
+        } else {
+          error=3;
+        }
+      }
+    }
+  }
+  return(error);
+}
+
+
+
 
 static void integrate_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t Fint){
   long dim,flux;
@@ -552,6 +621,35 @@ static void integrate_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, fl
       
       if (error_im2==0 && error_ip2==0 && error_im1==0 && error_ip1==0 && error_ip0==0){
         for (flux=0; flux<nf; flux++) Fint[flux]=(23.0*Fm2[flux]-332.0*Fm1[flux]+6378.0*Fp0[flux]-332.0*Fp1[flux]+23.0*Fp2[flux])/5760.0;
+      } else {
+        if (error_im1==0 && error_ip1==0 && error_ip0==0){
+          for (flux=0; flux<nf; flux++) Fint[flux]=(22.0*Fp0[flux]+Fp1[flux]+Fm1[flux])/24.0;
+        } else {
+          for (flux=0; flux<nf; flux++) Fint[flux]=np[l].wk->Fp1h[flux];
+        }
+      }
+
+#endif
+
+    break;
+    case FACEINTEG_AOWENO5:
+#ifdef _2D
+      dim=mod(theta+1,nd);
+      find_face_integrated_flux_AOWENO5(np,gl,l,dim,Fint);
+#endif
+#ifdef _3D
+      i=mod(theta+1,nd);
+      j=mod(theta+2,nd);
+      assert(np[l].wk->Fp1h!=NULL);
+       
+      error_im2=find_face_integrated_flux_AOWENO5(np,gl,_al(gl,l,i,-2),j,Fm2);
+      error_ip2=find_face_integrated_flux_AOWENO5(np,gl,_al(gl,l,i,+2),j,Fp2);  
+      error_im1=find_face_integrated_flux_AOWENO5(np,gl,_al(gl,l,i,-1),j,Fm1);
+      error_ip1=find_face_integrated_flux_AOWENO5(np,gl,_al(gl,l,i,+1),j,Fp1);
+      error_ip0=find_face_integrated_flux_AOWENO5(np,gl,_al(gl,l,i,+0),j,Fp0);
+      
+      if (error_im2==0 && error_ip2==0 && error_im1==0 && error_ip1==0 && error_ip0==0){
+        for (flux=0; flux<nf; flux++) Fint[flux]=integrated_flux_AOWENO5(Fm2[flux], Fm1[flux], Fp0[flux], Fp1[flux], Fp2[flux]);
       } else {
         if (error_im1==0 && error_ip1==0 && error_ip0==0){
           for (flux=0; flux<nf; flux++) Fint[flux]=(22.0*Fp0[flux]+Fp1[flux]+Fm1[flux])/24.0;

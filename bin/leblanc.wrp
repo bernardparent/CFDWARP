@@ -86,9 +86,6 @@ Model(
     kappa=0.0;     {W/mK}
     Pmin=1.0e-20;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e-20;     Tmax=6.0e3;    {K}
-    zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.25;  {eigenvalue clipping factor: 2.0-20.0}
-    EIGENVALCOND=EIGENVALCOND_PARENT; 
     AXISYMMETRIC=FALSE;
     SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
     SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
@@ -128,6 +125,28 @@ Init(
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE2, Mx,My,P,T);
     Region(is,js,  ie,je,  INIT_TYPE2, Mx,My,P,T);
     }
+  );
+);
+
+
+
+Disc(
+  NavierStokesPerfect(
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_AOWENO7;
+    FACEINTEG=FACEINTEG_CENTRAL3;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+  );
+  TVDRK(
+    METHOD=METHOD_TVDRK2;
   );
 );
 

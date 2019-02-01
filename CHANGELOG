@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 02a
+   * in cycle/resconv/_MUSCL/resconv.c
+     - added FACEINTEG_AOWENO5
+
+
 2019 FEB 01b
    * in cycle/resconv/_MUSCL/doc/report.tex
      - improved WENO section
