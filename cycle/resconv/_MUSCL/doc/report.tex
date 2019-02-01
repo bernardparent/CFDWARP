@@ -173,6 +173,7 @@ Simplify:
 \frameeqn{
 \overline{F}_{i+1/2}=\frac{1}{24} F_{i+1/2,j+1}+ \frac{1}{24}F_{i+1/2,j-1}   + \frac{11}{12}F_{i+1/2,j} 
 }
+\label{eqn:Finteg_central3}
 \end{equation}
 %
 
@@ -313,6 +314,7 @@ Regroup:
 \frameeqn{
 \overline{F}_{i+1/2}=  \frac{+23 F_{i+1/2,j-2} -332 F_{i+1/2,j-1}+ 6378 F_{i+1/2,j} - 332 F_{i+1/2,j+1} + 23 F_{i+1/2,j+2}}{5760}
 }
+\label{eqn:Finteg_central5}
 \end{equation}
 %
 Also, can find $c_2$ and $c_4$ by subtracting (\ref{eqn:central5d}) from (\ref{eqn:central5c}) and subtracting (\ref{eqn:central5f}) from (\ref{eqn:central5e}):
@@ -339,8 +341,13 @@ Multiply (\ref{eqn:central5k}) by $-8$ and add it to (\ref{eqn:central5l}):
 %
 \begin{equation}
 c_4=\frac{-8F_{i+1/2,j+1}+8F_{i+1/2,j-1}+F_{i+1/2,j+2}-F_{i+1/2,j-2}}{-12}  
+\label{eqn:central5_c4}
 \end{equation}
 % 
+
+
+
+
 
 
 
@@ -361,28 +368,28 @@ But $\Delta \eta=1$:
 Now let us find the indicator of smoothness for the 3-point central stencil, $\beta_3$. 
 %
 \begin{equation}
-\beta_3 =   \int_{\eta=-0.5}^{\eta=0.5} \sum_{m=1}^2 \left(  \frac{d^m }{d\eta^m}\left(c_1 \eta^2 + c_2 \eta + c_3 
+\beta_3 =   \int_{\eta=-0.5}^{\eta=0.5} \sum_{m=1}^2 \left(  \frac{d^m }{d\eta^m}\left(c_{31} \eta^2 + c_{32} \eta + c_{33} 
 \right) \right)^2 d\eta
 \end{equation}
 %
 %
 \begin{equation}
-\beta_3 =   \int_{\eta=-0.5}^{\eta=0.5}  \left(\left(  2 c_1 \eta + c_2  
-\right)^2 +  \left(  2 c_1   
+\beta_3 =   \int_{\eta=-0.5}^{\eta=0.5}  \left(\left(  2 c_{31} \eta + c_{32}  
+\right)^2 +  \left(  2 c_{31}   
 \right)^2 \right) d\eta
 \end{equation}
 %
 or
 %
 \begin{equation}
-\beta_3 =   \int_{\eta=-0.5}^{\eta=0.5}  \left(  4 c_1^2 \eta^2 + c_2^2 + 4 c_1 c_2 \eta  +   4 c_1^2   
+\beta_3 =   \int_{\eta=-0.5}^{\eta=0.5}  \left(  4 c_{31}^2 \eta^2 + c_{32}^2 + 4 c_{31} c_{32} \eta  +   4 c_{31}^2   
  \right) d\eta
 \end{equation}
 %
 integrate:
 %
 \begin{equation}
-\beta_3 =     \left[  \frac{4}{3} c_1^2 \eta^3 + c_2^2 \eta + 2 c_1 c_2 \eta^2  +   4 c_1^2 \eta   
+\beta_3 =     \left[  \frac{4}{3} c_{31}^2 \eta^3 + c_{32}^2 \eta + 2 c_{31} c_{32} \eta^2  +   4 c_{31}^2 \eta   
  \right]_{\eta=-0.5}^{\eta=0.5}
 \end{equation}
 %
@@ -390,23 +397,104 @@ or
 %
 \begin{equation}
 \frameeqn{
-\beta_3 =     \frac{13}{3} c_1^2  + c_2^2     
+\beta_3 =     \frac{13}{3} c_{31}^2  + c_{32}^2     
 }
 \end{equation}
 %
 where
 %
 \begin{equation}
-c_1=\frac{F_{i+1/2,j+1}+F_{i+1/2,j-1}}{2}- F_{i+1/2,j} 
+c_{31}=\frac{F_{i+1/2,j+1}+F_{i+1/2,j-1}}{2}- F_{i+1/2,j} 
 \end{equation}
 % 
 %
 \begin{equation}
-c_2=\frac{F_{i+1/2,j+1}+F_{i+1/2,j-1}}{2} -F_{i+1/2,j-1}
+c_{32}=\frac{F_{i+1/2,j+1}+F_{i+1/2,j-1}}{2} -F_{i+1/2,j-1}
 \end{equation}
 % 
 
 
+Second, let us find the smoothness indicator for the 5th order stencil. 
+%
+\begin{equation}
+\beta_5 =   \int_{\eta=-0.5}^{\eta=0.5} \sum_{m=1}^4 \left(  \frac{d^m }{d\eta^m}\left(c_{51} \eta^4 + c_{52} \eta^3 + c_{53} \eta^2 + c_{54} \eta + c_{55} 
+\right) \right)^2 d\eta
+\end{equation}
+%
+Expand the sum:
+%
+\begin{equation}
+\beta_5 =   \int_{\eta=-0.5}^{\eta=0.5}  \left(  \left(4 c_{51} \eta^3 + 3 c_{52} \eta^2 + 2 c_{53} \eta + c_{54}  
+\right)^2 + \left(12 c_{51} \eta^2 + 6 c_{52} \eta + 2 c_{53}   
+\right)^2 + \left(24 c_{51} \eta + 6 c_{52} \right)^2 + \left(24 c_{51}  \right)^2 \right) d\eta
+\end{equation}
+%
+Integrate with mathematica:
+%f = (4 c1 eta^3 + 3 c2 eta^2 + 2 c3 eta + c4 )^2 + (12 c1 eta^2 + 
+%     6 c2 eta + 2 c3 )^2 + (24 c1 eta + 6 c2 )^2 + (24 c1 )^2
+%B = Simplify[Integrate[f, {eta, -1/2, 1/2}]]
+%
+\begin{equation}
+\frameeqn{
+\beta_5 =   \frac{87617}{140}c_{51}^2+ \frac{3129}{80}c_{52}^2 + \frac{21}{5}c_{51} c_{53} + \frac{13}{3} c_{53}^2 + \frac{1}{2}c_{52} c_{54} + c_{54}^2
+}
+\end{equation}
+%
+where the constants $c_{51}$, $c_{52}$, etc can be obtained from Eqs.\ (\ref{eqn:central5_c1}), (\ref{eqn:central5_c2}), (\ref{eqn:central5_c3}), (\ref{eqn:central5_c4}):
+%
+\begin{equation}
+ c_{51}= \frac{+F_{i+1/2,j-2} -4 F_{i+1/2,j-1}+ 6 F_{i+1/2,j} -4 F_{i+1/2,j+1} +F_{i+1/2,j+2}}{24}   
+\end{equation}
+% 
+%
+\begin{equation}
+c_{52}=\frac{F_{i+1/2,j+2}-F_{i+1/2,j-2}-2F_{i+1/2,j+1}+2F_{i+1/2,j-1}}{12}    
+\end{equation}
+% 
+%
+\begin{equation}
+c_{53}=\frac{+ F_{i+1/2,j-2} -16 F_{i+1/2,j-1}+ 30 F_{i+1/2,j} -16 F_{i+1/2,j+1} 
++F_{i+1/2,j+2}}{24}   
+\end{equation}
+% 
+%
+\begin{equation}
+c_{54}=\frac{-8F_{i+1/2,j+1}+8F_{i+1/2,j-1}+F_{i+1/2,j+2}-F_{i+1/2,j-2}}{-12}  
+\end{equation}
+% 
+Now, set the weights to:
+%
+\begin{align}
+w_3&=\frac{1-\gamma_{\rm hi}}{ \left( \beta_3 + \epsilon \right)^2} \\
+w_5&=\frac{\gamma_{\rm hi}}{ \left( \beta_5 + \epsilon \right)^2}
+\end{align}
+%
+and the normalized weights to:
+%
+\begin{align}
+\tilde{w}_3&=\frac{w_3}{w_3+w_5} \\
+\tilde{w}_5&=\frac{w_5}{w_3+w_5}
+\end{align}
+%
+Then, the flux at the interface becomes:
+%
+\begin{equation}
+\frameeqn{
+\bar{F}_{i+1/2}=\frac{\tilde{w}_5}{\gamma_{\rm hi}} \left( F_5 - (1-\gamma_{\rm hi}) F_3 \right)+ \tilde{w}_3 F_3
+}
+\end{equation}
+%
+with $F_3$ and $F_5$ from Eqs.\ (\ref{eqn:Finteg_central3}) and (\ref{eqn:Finteg_central5})
+%
+\begin{equation}
+F_3=\frac{1}{24} F_{i+1/2,j+1}+ \frac{1}{24}F_{i+1/2,j-1}   + \frac{11}{12}F_{i+1/2,j} 
+\end{equation}
+%
+%
+\begin{equation}
+F_5=  \frac{+23 F_{i+1/2,j-2} -332 F_{i+1/2,j-1}+ 6378 F_{i+1/2,j} - 332 F_{i+1/2,j+1} + 23 F_{i+1/2,j+2}}{5760}
+\end{equation}
+%
 
 \appendix
 
