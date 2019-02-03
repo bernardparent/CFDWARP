@@ -110,7 +110,7 @@ Init(
 
 Disc(
   NavierStokesPerfect(
-    zetaA1=0.4e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   MUSCLplus(
@@ -119,8 +119,8 @@ Disc(
     AVERAGING=AVERAGING_ARITH;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
     AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.999;
-    INTERPOL=INTERPOL_AOWENO5;
+    AOWENO_gammahi=0.9999;
+    INTERPOL=INTERPOL_AOWENO7;
     EIGENVALCOND=EIGENVALCOND_PARENT;
   );
   MUSCL(
@@ -141,7 +141,10 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_GNOFFO; 
   );
   CDFplus(
-    xi=0.5;
+    xi[1]=0.5;
+    xi[2]=0.5;
+    xi[3]=0.5;
+    xi[4]=0.5;
   );
   TVDRK(
     METHOD=METHOD_TVDRK2;
@@ -169,7 +172,7 @@ Cycle(
     if (iter<20, CFL=0.5;);
     
     phi1=20;      {maximum number of gridlines per zone in each dimension}
-    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,phi1,dt);
+    UpdateFluid(CFL,PRECON_LOCALEIGENVALUE,sigma1,sigma2,phi1,dt);
 
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld) %3ld/%3ld%s \n",
            CFL,iter,effiter_U,ximax,i_ximax,

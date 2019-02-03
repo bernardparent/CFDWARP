@@ -1506,7 +1506,8 @@ void condition_Lambda_plus_minus_Parent(np_t *np, gl_t *gl, long lp0, long theta
   Pstarmax=max(1e-40,Pstarmax);
 
   zetaA1=jacvarsp0.zetaA1;
-  factP=max(0.0,pow(fabs(Pstarmax-Pstarmin)/Pstarmin,1.0));
+//  factP=max(0.0,pow(fabs(Pstarmax-Pstarmin)/Pstarmin,1.0));
+  factP=max(0.0,pow(fabs(Pstarmax-Pstarmin)/Pstarmin,1.0)-0.3);
   for (flux=0; flux<nf; flux++){
     Lambdaplus[flux][flux]+=(aref+Vref)*zetaA1*factP;
     Lambdaminus[flux][flux]-=(aref+Vref)*zetaA1*factP;

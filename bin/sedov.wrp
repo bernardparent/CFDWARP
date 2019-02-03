@@ -35,8 +35,9 @@ Pcenter=(gamma-1)*rhoinit*epsilon0/Vorigin;
 
 tmax=1.0;   {simulation time span in seconds}
 
-CFLref=0.5; {use CFLref=0.5 for BDF2}
-CFLref_firstiter=0.1;
+CFLref=0.8; {use CFLref=0.5 for BDF2}
+CFLref_firstiter=0.3;
+itermax=30;
 
 Grid(
   Size(is,js, ie,je);
@@ -137,19 +138,20 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_PARENT;
   );
   MUSCLplus(
-    FLUX=FLUX_FDSplus;
-    numiter=6;
+    FLUX=FLUX_FDSplusFilter;
+    numiter=4;
     AVERAGING=AVERAGING_ARITH;
-    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
-    AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.95;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.9;
+    AOWENO_gammahi=0.9;
     INTERPOL=INTERPOL_AOWENO5;
     EIGENVALCOND=EIGENVALCOND_PARENT;
   );
   CDFplus(
-    xi1=0.5; {except for momentum and energy fluxes}
-    xi2=0.5; {momentum fluxes}
-    xi3=0.5; {total energy flux}
+    xi[1]=0.5; 
+    xi[2]=0.5; 
+    xi[3]=0.5; 
+    xi[4]=0.5; 
   );
 );
 
@@ -169,9 +171,9 @@ Cycle(
     Uref[3]=rhoref*aref*aref;  
   );
   DualTimeStepping(
-    sigma1=0.0;      {exponent of largest pseudotime step in all dimensions}
-    sigma2=0.0;      {exponent of largest pseudotime step in all flux components}
-    PRECONDITIONER=PRECON_LOCALTIMESTEP;
+    sigma1=0.3;      {exponent of largest pseudotime step in all dimensions}
+    sigma2=0.3;      {exponent of largest pseudotime step in all flux components}
+    PRECONDITIONER=PRECON_LOCALEIGENVALUE;
     if (iter==1,
      if (time==0,
         dt=1e-4/meshfact;
@@ -196,9 +198,9 @@ Cycle(
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,clipinfo);
-    if (ximax<xiverge || iter>80,
+    if (ximax<xiverge || iter>itermax,
       IncreaseTimeLevel();
-      {WriteDataFile(outputfilename"."round(time/dt));}
+      WriteDataFile(outputfilename"."round(time/dt));
       printf("dt=%E time=%Es\n",dt,time);
       if (time>tmax-0.1*dt,
         WriteDataFile(outputfilename);
@@ -241,7 +243,7 @@ Cycle(
     {printf("%6ld %6ld  %E \n",
            iter,iterglob,ximax);}
  
-    if (ximax<xiverge || iter>70,
+    if (ximax<xiverge || iter>itermax,
       IncreaseTimeLevel();
       WriteDataFile(outputfilename"."round(time/dt));
       printf("dt=%E time=%Es\n",dt,time);

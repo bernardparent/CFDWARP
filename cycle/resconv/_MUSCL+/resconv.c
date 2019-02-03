@@ -22,6 +22,7 @@
 #define INTERPOL_TVD2_SUPERBEE 6
 #define INTERPOL_TVD5 7
 #define INTERPOL_CWENO3 8
+#define INTERPOL_AOWENO7 9
 
 
 void write_disc_resconv_template(FILE **controlfile){
@@ -32,8 +33,8 @@ void write_disc_resconv_template(FILE **controlfile){
     "    AVERAGING=AVERAGING_ARITH;\n"
     "    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;\n"
     "    AOWENO_gammalo=0.95;\n"
-    "    AOWENO_gammahi=0.95;\n"
-    "    INTERPOL=INTERPOL_AOWENO5;\n"
+    "    AOWENO_gammahi=0.9999;\n"
+    "    INTERPOL=INTERPOL_AOWENO7;\n"
     "    EIGENVALCOND=EIGENVALCOND_PARENT;\n"
     "  );\n"
   ,_RESCONV_ACTIONNAME,numiter_FDSplus_default);
@@ -64,6 +65,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"FLUX_FDSplusFilter",FLUX_FDSplusFilter); 
     SOAP_add_int_to_vars(codex,"FLUX_FVSplusFilter",FLUX_FVSplusFilter); 
     SOAP_add_int_to_vars(codex,"FLUX_FVSplus",FLUX_FVSplus); 
+    SOAP_add_int_to_vars(codex,"INTERPOL_AOWENO7",INTERPOL_AOWENO7); 
     SOAP_add_int_to_vars(codex,"INTERPOL_AOWENO5",INTERPOL_AOWENO5); 
     SOAP_add_int_to_vars(codex,"INTERPOL_WENO5",INTERPOL_WENO5); 
     SOAP_add_int_to_vars(codex,"INTERPOL_WENO3",INTERPOL_WENO3); 
@@ -95,11 +97,11 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
       SOAP_fatal_error(codex,"AVERAGING must be set to either AVERAGING_ROE or AVERAGING_ARITH.");
 
     find_int_var_from_codex(codex,"INTERPOL",&gl->cycle.resconv.INTERPOL);
-    if (gl->cycle.resconv.INTERPOL!=INTERPOL_AOWENO5 && gl->cycle.resconv.INTERPOL!=INTERPOL_WENO3
+    if (gl->cycle.resconv.INTERPOL!=INTERPOL_AOWENO5 && gl->cycle.resconv.INTERPOL!=INTERPOL_AOWENO7 && gl->cycle.resconv.INTERPOL!=INTERPOL_WENO3
      && gl->cycle.resconv.INTERPOL!=INTERPOL_WENO5 && gl->cycle.resconv.INTERPOL!=INTERPOL_CWENO3
      && gl->cycle.resconv.INTERPOL!=INTERPOL_TVD2_MINMOD && gl->cycle.resconv.INTERPOL!=INTERPOL_TVD2_VANLEER 
      && gl->cycle.resconv.INTERPOL!=INTERPOL_TVD2_SUPERBEE && gl->cycle.resconv.INTERPOL!=INTERPOL_TVD5)
-      SOAP_fatal_error(codex,"INTERPOL must be set to either INTERPOL_AOWENO5, INTERPOL_WENO5, INTERPOL_WENO3, INTERPOL_CWENO3, INTERPOL_TVD2_MINMOD, INTERPOL_TVD2_VANLEER, INTERPOL_TVD2_SUPERBEE, or INTERPOL_TVD5.");
+      SOAP_fatal_error(codex,"INTERPOL must be set to either INTERPOL_AOWENO7, INTERPOL_AOWENO5, INTERPOL_WENO5, INTERPOL_WENO3, INTERPOL_CWENO3, INTERPOL_TVD2_MINMOD, INTERPOL_TVD2_VANLEER, INTERPOL_TVD2_SUPERBEE, or INTERPOL_TVD5.");
     find_int_var_from_codex(codex,"AOWENO_TYPE",&gl->cycle.resconv.AOWENO_TYPE);
     if (gl->cycle.resconv.AOWENO_TYPE!=AOWENO_TYPE_COMPRESSIVE && gl->cycle.resconv.AOWENO_TYPE!=AOWENO_TYPE_DIFFUSIVE)
       SOAP_fatal_error(codex,"AOWENO_TYPE must be set to either AOWENO_TYPE_COMPRESSIVE or AOWENO_TYPE_DIFFUSIVE.");
@@ -115,7 +117,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
 }
 
 
-static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t musclvarsm5h, flux_t musclvarsm3h, flux_t musclvarsm1h, flux_t musclvarsp1h, flux_t musclvarsp3h, flux_t musclvarsp5h, flux_t Fint, sqmat_t lambdaminusp1h, sqmat_t lambdaplusm1h){
+static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t musclvarsm7h, flux_t musclvarsm5h, flux_t musclvarsm3h, flux_t musclvarsm1h, flux_t musclvarsp1h, flux_t musclvarsp3h, flux_t musclvarsp5h, flux_t musclvarsp7h, flux_t Fint, sqmat_t lambdaminusp1h, sqmat_t lambdaplusm1h){
   metrics_t metrics;
   long flux,nodes_from_bdry;
   flux_t musclvarsL,musclvarsR,Finttmp;
@@ -129,6 +131,15 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t 
     gammalo=gl->cycle.resconv.AOWENO_gammalo;
     gammahi=gl->cycle.resconv.AOWENO_gammahi;
     switch (gl->cycle.resconv.INTERPOL){
+      case INTERPOL_AOWENO7:
+        if (nodes_from_bdry>=4){
+          musclvarsL[flux]=_f_AOWENO7(musclvarsm7h[flux],musclvarsm5h[flux],musclvarsm3h[flux],musclvarsm1h[flux],musclvarsp1h[flux],musclvarsp3h[flux],musclvarsp5h[flux],0.5,gammalo,gammahi,AOWENO_TYPE);
+          musclvarsR[flux]=_f_AOWENO7(musclvarsm5h[flux],musclvarsm3h[flux],musclvarsm1h[flux],musclvarsp1h[flux],musclvarsp3h[flux],musclvarsp5h[flux],musclvarsp7h[flux],-0.5,gammalo,gammahi,AOWENO_TYPE); 
+        } else {
+          musclvarsL[flux]=_f_TVD5(musclvarsm5h[flux],musclvarsm3h[flux],musclvarsm1h[flux],musclvarsp1h[flux],musclvarsp3h[flux]);
+          musclvarsR[flux]=_f_TVD5(musclvarsp5h[flux],musclvarsp3h[flux],musclvarsp1h[flux],musclvarsm1h[flux],musclvarsm3h[flux]);
+        }
+      break;
       case INTERPOL_AOWENO5:
         if (nodes_from_bdry>=3){
           musclvarsL[flux]=_f_AOWENO5(musclvarsm5h[flux],musclvarsm3h[flux],musclvarsm1h[flux],musclvarsp1h[flux],musclvarsp3h[flux],0.5,gammalo,gammahi,AOWENO_TYPE);
@@ -222,12 +233,13 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
   flux_t Fm1h,Fp1h;
   long flux,l;
   sqmat_t Lambdaminus_p0,Lambdaplus_p0,Lambdaminus_p1;
-  flux_t musclvarsm3,musclvarsm2,musclvarsm1,musclvarsp0,musclvarsp1,
-         musclvarsp2,musclvarsp3;
+  flux_t musclvarsm4,musclvarsm3,musclvarsm2,musclvarsm1,musclvarsp0,musclvarsp1,
+         musclvarsp2,musclvarsp3,musclvarsp4;
 
   for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
 
     if(l==ls){
+      if (hbw_resconv_fluid>=4) find_musclvars_offset(np,gl,l,theta,-4,musclvarsm4);
       find_musclvars_offset(np,gl,l,theta,-3,musclvarsm3);
       find_musclvars_offset(np,gl,l,theta,-2,musclvarsm2);
       find_musclvars_offset(np,gl,l,theta,-1,musclvarsm1);
@@ -235,17 +247,20 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
       find_musclvars_offset(np,gl,l,theta,+1,musclvarsp1);
       find_musclvars_offset(np,gl,l,theta,+2,musclvarsp2);
       find_musclvars_offset(np,gl,l,theta,+3,musclvarsp3);
+      if (hbw_resconv_fluid>=4) find_musclvars_offset(np,gl,l,theta,+4,musclvarsp4);
 
 
-      find_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, musclvarsm3, musclvarsm2, musclvarsm1, musclvarsp0, musclvarsp1, musclvarsp2, Fm1h,Lambdaminus_p1,Lambdaplus_p0);
+      find_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, musclvarsm4, musclvarsm3, musclvarsm2, musclvarsm1, musclvarsp0, musclvarsp1, musclvarsp2, musclvarsp3, Fm1h,Lambdaminus_p1,Lambdaplus_p0);
     } else {
       for (flux=0; flux<nf; flux++) {
         Fm1h[flux]=Fp1h[flux];
+        if (hbw_resconv_fluid>=4) musclvarsm3[flux]=musclvarsm2[flux];
         musclvarsm2[flux]=musclvarsm1[flux];
         musclvarsm1[flux]=musclvarsp0[flux];
         musclvarsp0[flux]=musclvarsp1[flux];
         musclvarsp1[flux]=musclvarsp2[flux];
         musclvarsp2[flux]=musclvarsp3[flux];
+        if (hbw_resconv_fluid>=4) musclvarsp3[flux]=musclvarsp4[flux];
       }
     }
 
@@ -257,7 +272,7 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
     find_musclvars_offset(np,gl,l,theta,+3,musclvarsp3);
 
 
-    find_Fstar_interface(np, gl, l, theta, musclvarsm2, musclvarsm1, musclvarsp0, musclvarsp1, musclvarsp2, musclvarsp3, Fp1h,Lambdaminus_p1,Lambdaplus_p0);
+    find_Fstar_interface(np, gl, l, theta, musclvarsm3, musclvarsm2, musclvarsm1, musclvarsp0, musclvarsp1, musclvarsp2, musclvarsp3, musclvarsp4, Fp1h,Lambdaminus_p1,Lambdaplus_p0);
     for (flux=0; flux<nf; flux++){
       np[l].wk->Res[flux]+=fact*(Fp1h[flux]-Fm1h[flux]);
 #ifdef _RESTIME_STORAGE_TRAPEZOIDAL

@@ -7,6 +7,17 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 03a
+   * in cycle/resconv/_MUSCL+/resconv.c
+     - added AOWENO7
+   * in cycle/resconv/_MUSCL+/resconv.hh
+     - changed hbw_resconv_fluid from 3 to 4
+   * in model/share/fluid_share.c
+     - in condition_Lambda_plus_minus_Parent(), changed factP=max(0.0,pow(fabs(Pstarmax-Pstarmin)/Pstarmin,1.0));
+       to factP=max(0.0,pow(fabs(Pstarmax-Pstarmin)/Pstarmin,1.0)-0.3); to turn off the eigenvalue
+       conditioning completely away from shocks (beneficial for ILES with high order schemes)
+
+
 2019 FEB 02a
    * in cycle/resconv/_MUSCL/resconv.c
      - added FACEINTEG_AOWENO5
