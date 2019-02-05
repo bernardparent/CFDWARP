@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 05a
+   * in cycle/resconv
+     - added experimental directory _MUSCL_EXP which is a fork of _MUSCL but with the option of
+       a positivity-preserving filter
+
+
 2019 FEB 04a
    * in cycle/resconv/_MUSCL+/resconv.c
      - in find_Fstar_interface(), changed the way the AOWENO7 scheme is discretized near the boundary nodes:
