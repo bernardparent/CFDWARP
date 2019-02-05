@@ -7,6 +7,14 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 04a
+   * in cycle/resconv/_MUSCL+/resconv.c
+     - in find_Fstar_interface(), changed the way the AOWENO7 scheme is discretized near the boundary nodes:
+       used to resort to TVD5 but now resort to AOWENO5 and TVD2 Van Leer 
+     - in find_Fstar_interface(), changed the way the AOWENO5 scheme is discretized near the boundary nodes:
+       used to resort to TVD5 but now resort to TVD2 Van Leer 
+
+
 2019 FEB 03a
    * in cycle/resconv/_MUSCL+/resconv.c
      - added AOWENO7

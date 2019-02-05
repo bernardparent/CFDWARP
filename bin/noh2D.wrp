@@ -71,14 +71,12 @@ initially but density varies as 1+t/r with r the radius from the origin
 }
 
 
-mf=1;
+mf=2;
 
 is=1;
 ie=round(30*mf);
 js=1;
 je=round(30*mf);
-ks=1;
-ke=round(30*mf);
 
 
 Grid(
@@ -202,9 +200,10 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_PARENT;
   );
   CDFplus(
-    xi1=0.5; {except for momentum and energy fluxes}
-    xi2=xi1; {momentum fluxes}
-    xi3=xi1; {total energy flux}
+    xi[1]=0.5; {except for momentum and energy fluxes}
+    xi[2]=0.5; {momentum fluxes}
+    xi[3]=0.5; {total energy flux}
+    xi[4]=0.5;
   );
 );
 
