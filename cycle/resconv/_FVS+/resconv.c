@@ -118,6 +118,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     find_double_var_from_codex(codex,"AOWENO_gammalo",&gl->cycle.resconv.AOWENO_gammalo);
     find_double_var_from_codex(codex,"AOWENO_gammahi",&gl->cycle.resconv.AOWENO_gammahi);
 
+    gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_FVSPLUS;
 
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;

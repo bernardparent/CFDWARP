@@ -4,12 +4,11 @@
 #define _RESCONV_POSITIVITY_PRESERVING
 #define hbw_resconv_fluid 2   //maximum half bandwidth of stencil (excluding center node)
 #define hbw_resconvplasma_fluid hbw_resconv_fluid  //half bandwidth of stencil that depends on emfield mem props
-#define CONVJACOBIAN CONVJACOBIAN_FDS
 #define _RESCONV_ACTIONNAME "FDSplus"
 
 typedef struct {
   int AVERAGING,numiter,ACCURACY;
   double xi;
-  int EIGENVALCOND;
+  int EIGENVALCOND,CONVJACOBIAN;
 } gl_cycle_resconv_t;
 

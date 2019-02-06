@@ -1077,12 +1077,6 @@ static void find_Lambda_minus_plus_FDSplus_muscl(np_t *np, gl_t *gl, long lp0, l
 
   condition_Lambda_plus_minus(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics, EIGENVALCOND, lambdaplus,lambdaminus);
 
-#if (CONVJACOBIAN==CONVJACOBIAN_FROMFLUXEIGENVALUES)
-  for (flux=0; flux<nf; flux++){  
-    np[lp0].bs->Lambdaplus[theta][flux]=lambdaplus[flux][flux];
-    np[lp1].bs->Lambdaminus[theta][flux]=lambdaminus[flux][flux];
-  }
-#endif
 
 }
 
@@ -1156,12 +1150,6 @@ void filter_Fstar_interface_positivity_preserving_MultiD(np_t *np, gl_t *gl, lon
 
   condition_Lambda_plus_minus(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics, EIGENVALCOND, lambdaplus,lambdaminus);
 
-#if (CONVJACOBIAN==CONVJACOBIAN_FROMFLUXEIGENVALUES)
-  for (flux=0; flux<nf; flux++){  
-    np[lp0].bs->Lambdaplus[theta][flux]=lambdaplus[flux][flux];
-    np[lp1].bs->Lambdaminus[theta][flux]=lambdaminus[flux][flux];
-  }
-#endif
 
   multiply_diagonal_matrix_and_vector(lambdaplus,MUp0,fluxtmp2);
   multiply_matrix_and_vector(Minvp0,fluxtmp2,Fp0);
@@ -1243,13 +1231,6 @@ void filter_Fstar_interface_positivity_preserving(np_t *np, gl_t *gl, long lp0, 
   }
 
   condition_Lambda_plus_minus(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics, EIGENVALCOND, lambdaplus,lambdaminus);
-
-#if (CONVJACOBIAN==CONVJACOBIAN_FROMFLUXEIGENVALUES)
-  for (flux=0; flux<nf; flux++){  
-    np[lp0].bs->Lambdaplus[theta][flux]=lambdaplus[flux][flux];
-    np[lp1].bs->Lambdaminus[theta][flux]=lambdaminus[flux][flux];
-  }
-#endif
 
   multiply_diagonal_matrix_and_vector(lambdaplus,LUp0,fluxtmp2);
   multiply_matrix_and_vector(Linvp0,fluxtmp2,Fp0);
@@ -1677,13 +1658,6 @@ static void find_Lambda_minus_plus_FVSplus_muscl(np_t *np, gl_t *gl, long lp0, l
   }
   
   condition_Lambda_plus_minus(np, gl, lp0, theta, jacvarsp0, jacvarsp1,metrics, EIGENVALCOND, lambdaplus,lambdaminus);
-
-#if (CONVJACOBIAN==CONVJACOBIAN_FROMFLUXEIGENVALUES)
-  for (flux=0; flux<nf; flux++){  
-    np[lp0].bs->Lambdaplus[theta][flux]=lambdaplus[flux][flux];
-    np[lp1].bs->Lambdaminus[theta][flux]=lambdaminus[flux][flux];
-  }
-#endif
 
 }
 

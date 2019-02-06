@@ -65,6 +65,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     if (gl->cycle.resconv.ACCURACY!=ACCURACY_FIRSTORDER && gl->cycle.resconv.ACCURACY!=ACCURACY_SECONDORDER)
       SOAP_fatal_error(codex,"ACCURACY must be set to either ACCURACY_FIRSTORDER or ACCURACY_SECONDORDER.");
 
+    gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_FDS;
+
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;
   }

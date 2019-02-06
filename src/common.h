@@ -364,10 +364,6 @@ typedef struct {
 #ifdef _RESCONV_DELTA_LAMBDA_STORAGE
    flux_t Delta_Lambda[nd];
 #endif
-#if (CONVJACOBIAN==CONVJACOBIAN_FROMFLUXEIGENVALUES)
-   flux_t Lambdaplus[nd];
-   flux_t Lambdaminus[nd];
-#endif
 #ifdef _RESSOURCE_LAMBDAMINUS_STORAGE
    flux_t Lambda_S_minus;
 #endif

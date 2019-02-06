@@ -129,6 +129,19 @@ Disc(
     zetaA1=0.1e0;   {conditions the convective waves of the A jacobian}
     zetaA2=0.1e0;
   );
+  FDSplus(
+    AVERAGING=AVERAGING_ROE;
+    ACCURACY=ACCURACY_SECONDORDER;
+    numiter=2;
+    xi=1.99;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+  );
+  FVSTVDplus(
+    LIMITER=LIMITER_VANLEER;
+    ACCURACY=ACCURACY_SECONDORDER;
+    xi=1.99;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+  );
   FVSplus(
     numiter=4;
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;

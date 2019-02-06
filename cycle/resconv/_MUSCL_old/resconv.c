@@ -156,6 +156,9 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     find_double_var_from_codex(codex,"AOWENO_gammalo",&gl->cycle.resconv.AOWENO_gammalo);
     find_double_var_from_codex(codex,"AOWENO_gammahi",&gl->cycle.resconv.AOWENO_gammahi);
 
+    gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_FDS;
+    if (gl->cycle.resconv.FLUX==FLUX_FVS) gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_FVS;
+
 
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;
@@ -320,10 +323,10 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t 
 
   switch (gl->cycle.resconv.FLUX){
     case FLUX_FDS:
-      find_Fstar_interface_FDS_muscl(gl, theta, musclvarsL, musclvarsR, metrics, gl->cycle.resconv.EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
+      find_Fstar_interface_FDS_muscl(np, gl, l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, gl->cycle.resconv.EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
     break;
     case FLUX_FVS:
-      find_Fstar_interface_FVS_muscl(gl, theta, musclvarsL, musclvarsR, metrics, gl->cycle.resconv.EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
+      find_Fstar_interface_FVS_muscl(np, gl, l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, gl->cycle.resconv.EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
     break;
     default:
       fatal_error("gl->cycle.resconv.FLUX must be set to either FLUX_FDS or FLUX_FVS in find_Fstar_interface().");

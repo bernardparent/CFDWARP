@@ -4,11 +4,10 @@
 #define hbw_resconvplasma_fluid hbw_resconv_fluid  //half bandwidth of stencil that depends on emfield mem props 
 #define _RESCONV_POSITIVITY_PRESERVING
 #define _RESCONV_DELTA_LAMBDA_STORAGE
-#define CONVJACOBIAN CONVJACOBIAN_FVSPLUS
 #define _RESCONV_ACTIONNAME "FVSplus"
 
 typedef struct {
-  int INTERPOL;
+  int INTERPOL,CONVJACOBIAN;
   int AOWENO_TYPE;
   double AOWENO_gammalo, AOWENO_gammahi;
   int EIGENVALCOND;

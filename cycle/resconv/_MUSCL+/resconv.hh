@@ -5,11 +5,10 @@
 //#define _RESCONV_INCLUDES_DIFFUSION
 #define hbw_resconv_fluid 4  //maximum half bandwidth of stencil (excluding center node)
 #define hbw_resconvplasma_fluid 1  //half bandwidth of stencil that depends on emfield mem props
-#define CONVJACOBIAN CONVJACOBIAN_FVSPLUS
 #define _RESCONV_ACTIONNAME "MUSCLplus"
 
 typedef struct {
-  int FLUX,INTERPOL;
+  int FLUX,INTERPOL,CONVJACOBIAN;
   int numiter;
   int AOWENO_TYPE;
   double AOWENO_gammalo, AOWENO_gammahi;

@@ -69,7 +69,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     if (gl->cycle.resconv.xi<0.0 || gl->cycle.resconv.xi>2.0)
       SOAP_fatal_error(codex,"xi must be set to a value between 0 and 2.");
 
-
+    gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_FVSPLUS;
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;
   }

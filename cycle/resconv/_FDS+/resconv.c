@@ -85,6 +85,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     if (gl->cycle.resconv.numiter<0)
       SOAP_fatal_error(codex,"numiter must be set to a positive integer.");
 
+    gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_FDS;
+
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;
   }

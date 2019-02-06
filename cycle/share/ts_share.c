@@ -387,15 +387,6 @@ void find_bdry_jacobian(np_t *np, gl_t *gl, long bdrytype, long lA, long lB,
 }
 
 
-
-
-
-
-
-
-
-
-
 static void find_Aabs_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t Aabs){
   sqmat_t mattmp,R,L,lambdap;
   long flux;
@@ -408,9 +399,6 @@ static void find_Aabs_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t
   multiply_diagonal_matrix_and_matrix(lambdap,L,mattmp);
   multiply_matrix_and_matrix(R,mattmp,Aabs);
 }
-
-
-
 
 
 void find_dFstar_dUstar_FDS_interface(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
@@ -439,14 +427,12 @@ void find_dFstar_dUstar_FDS_interface(np_t *np, gl_t *gl, long theta, long l, sq
   find_dFstar_dUstar(np[l], gl, theta, Ap0);
   find_dFstar_dUstar(np[lp1], gl, theta, Ap1);
 
-
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
       B[row][col]=0.5*(Ap0[row][col]+Omegap1h/Omegap0*Aabs[row][col]);
       C[row][col]=0.5*(Ap1[row][col]-Omegap1h/Omegap1*Aabs[row][col]);
     }
   }
-
 
 #if (defined(_RESTIME_CDF))
   sqmat_t B1,C1;
@@ -458,11 +444,7 @@ void find_dFstar_dUstar_FDS_interface(np_t *np, gl_t *gl, long theta, long l, sq
     }
   }
 #endif  
-
 }
-
-
-
 
 
 static void find_Aplus_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t Aplus){
@@ -493,7 +475,6 @@ static void find_Aminus_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat
 }
 
 
-
 void find_dFstar_dUstar_FVS_interface(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
   jacvars_t jacvarsp1,jacvarsp0;
   sqmat_t Aminusp1,Aplusp0;
@@ -509,7 +490,6 @@ void find_dFstar_dUstar_FVS_interface(np_t *np, gl_t *gl, long theta, long l, sq
 
   find_Aplus_from_jacvars(jacvarsp0,metricsp1h,Aplusp0);
   find_Aminus_from_jacvars(jacvarsp1,metricsp1h,Aminusp1);
-
 
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
@@ -532,7 +512,6 @@ void find_dFstar_dUstar_FVS_interface(np_t *np, gl_t *gl, long theta, long l, sq
 #endif  
 
 }
-
 
 
 static void find_A_plus_minus_from_jacvars_FVSplus(np_t *np, gl_t *gl, long theta, long l, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics, sqmat_t Aplusp0, sqmat_t Aminusp1){
@@ -584,7 +563,6 @@ static void find_A_plus_minus_from_jacvars_FVSplus(np_t *np, gl_t *gl, long thet
 }
 
 
-
 void find_dFstar_dUstar_FVSplus_interface(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
   jacvars_t jacvarsp1,jacvarsp0;
   sqmat_t Aminusp1,Aplusp0;
@@ -599,7 +577,6 @@ void find_dFstar_dUstar_FVSplus_interface(np_t *np, gl_t *gl, long theta, long l
   find_jacvars(np[lp0],gl,metricsp1h,theta,&jacvarsp0);
 
   find_A_plus_minus_from_jacvars_FVSplus(np,gl,theta,l,jacvarsp0, jacvarsp1, metricsp1h, Aplusp0, Aminusp1);
-
 
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
@@ -677,7 +654,6 @@ void find_dFstar_dUstar_FDSplus_interface(np_t *np, gl_t *gl, long theta, long l
 
   find_A_plus_minus_from_jacvars_FDSplus(np,gl,theta,l,jacvarsp0, jacvarsp1, metricsp1h, Aplusp0, Aminusp1);
 
-
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
       B[row][col]=metricsp1h.Omega/_Omega(np[lp0],gl)*Aplusp0[row][col];
@@ -685,58 +661,6 @@ void find_dFstar_dUstar_FDSplus_interface(np_t *np, gl_t *gl, long theta, long l
     }
   }
 }
-
-
-
-void find_dFstar_dUstar_FROMFLUXEIGENVALUES_interface(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
-  jacvars_t jacvarsp1,jacvarsp0,jacvarsp1h;
-  sqmat_t Aminusp1,Aplusp0,Lambda,Linv,L,mattmp;
-  long lp0,lp1,row,col;
-#if (CONVJACOBIAN==CONVJACOBIAN_FROMFLUXEIGENVALUES)
-  long flux;
-#endif
-
-  metrics_t metrics;
-
-  lp0=_al(gl,l,theta,+0);
-  lp1=_al(gl,l,theta,+1);
-
-  find_metrics_at_interface(np,gl,lp0,lp1,theta,&metrics);
-  find_jacvars(np[lp1],gl,metrics,theta,&jacvarsp1);
-  find_jacvars(np[lp0],gl,metrics,theta,&jacvarsp0);
-  find_jacvars_at_interface_arith_average(jacvarsp0,jacvarsp1,gl,theta,&jacvarsp1h);
-
-  set_matrix_to_zero(Lambda);
-
-#if (CONVJACOBIAN==CONVJACOBIAN_FROMFLUXEIGENVALUES)
-  for (flux=0; flux<nf; flux++) Lambda[flux][flux]=np[lp0].bs->Lambdaplus[theta][flux];
-#endif
-//  find_Lambda_from_jacvars(jacvarsp0, metrics, Lambda);
-//  for (flux=0; flux<nf; flux++) Lambda[flux][flux]=0.5*(fabs(Lambda[flux][flux])+Lambda[flux][flux]);
-  find_Linv_from_jacvars(jacvarsp0, metrics, Linv);
-  find_L_from_jacvars(jacvarsp0, metrics, L);
-  multiply_diagonal_matrix_and_matrix(Lambda,L,mattmp);
-  multiply_matrix_and_matrix(Linv,mattmp,Aplusp0);
-
-#if (CONVJACOBIAN==CONVJACOBIAN_FROMFLUXEIGENVALUES)
-  for (flux=0; flux<nf; flux++) Lambda[flux][flux]=np[lp1].bs->Lambdaminus[theta][flux];
-#endif
-//  find_Lambda_from_jacvars(jacvarsp1, metrics, Lambda);
-//  for (flux=0; flux<nf; flux++) Lambda[flux][flux]=0.5*(-fabs(Lambda[flux][flux])+Lambda[flux][flux]);
-  find_Linv_from_jacvars(jacvarsp1, metrics, Linv);
-  find_L_from_jacvars(jacvarsp1, metrics, L);
-  multiply_diagonal_matrix_and_matrix(Lambda,L,mattmp);
-  multiply_matrix_and_matrix(Linv,mattmp,Aminusp1);
-
-
-  for (row=0; row<nf; row++){
-    for (col=0; col<nf; col++){
-      B[row][col]=metrics.Omega/_Omega(np[lp0],gl)*Aplusp0[row][col];
-      C[row][col]=metrics.Omega/_Omega(np[lp1],gl)*Aminusp1[row][col];
-    }
-  }
-}
-
 
 
 static void condition_dFstar_dUstar_interface(sqmat_t A, sqmat_t B){
@@ -760,31 +684,28 @@ void add_dFstar_dUstar_to_TDMA(np_t *np, gl_t *gl, long theta, long l, double fa
   set_matrix_to_zero(Am1h);
   set_matrix_to_zero(Bm1h);
 
-  if (CONVJACOBIAN==CONVJACOBIAN_FVS){
-    find_dFstar_dUstar_FVS_interface(np, gl, theta, l, Bp1h, Cp1h);
-    find_dFstar_dUstar_FVS_interface(np, gl, theta, _al(gl,l,theta,-1), Am1h, Bm1h);
+  switch (gl->cycle.resconv.CONVJACOBIAN){ 
+    case CONVJACOBIAN_FVS:
+      find_dFstar_dUstar_FVS_interface(np, gl, theta, l, Bp1h, Cp1h);
+      find_dFstar_dUstar_FVS_interface(np, gl, theta, _al(gl,l,theta,-1), Am1h, Bm1h);
+    break;
+    case CONVJACOBIAN_FVSPLUS:
+      find_dFstar_dUstar_FVSplus_interface(np, gl, theta, l, Bp1h, Cp1h);
+      find_dFstar_dUstar_FVSplus_interface(np, gl, theta, _al(gl,l,theta,-1), Am1h, Bm1h);
+    break;
+    case CONVJACOBIAN_FDS:
+      find_dFstar_dUstar_FDS_interface(np, gl, theta, l, Bp1h, Cp1h);
+      find_dFstar_dUstar_FDS_interface(np, gl, theta, _al(gl,l,theta,-1), Am1h, Bm1h);
+    break;
+    case CONVJACOBIAN_FDSPLUS:
+      find_dFstar_dUstar_FDSplus_interface(np, gl, theta, l, Bp1h, Cp1h);
+      find_dFstar_dUstar_FDSplus_interface(np, gl, theta, _al(gl,l,theta,-1), Am1h, Bm1h);
+    break;
+    default:
+      fatal_error("gl->cycle.resconv.CONVJACOBIAN can not be set to %d.",gl->cycle.resconv.CONVJACOBIAN);
   }
-  if (CONVJACOBIAN==CONVJACOBIAN_FVSPLUS){
-    find_dFstar_dUstar_FVSplus_interface(np, gl, theta, l, Bp1h, Cp1h);
-    find_dFstar_dUstar_FVSplus_interface(np, gl, theta, _al(gl,l,theta,-1), Am1h, Bm1h);
-  }
-  if (CONVJACOBIAN==CONVJACOBIAN_FDS){
-    find_dFstar_dUstar_FDS_interface(np, gl, theta, l, Bp1h, Cp1h);
-    find_dFstar_dUstar_FDS_interface(np, gl, theta, _al(gl,l,theta,-1), Am1h, Bm1h);
-  }
-  if (CONVJACOBIAN==CONVJACOBIAN_FDSPLUS){
-    find_dFstar_dUstar_FDSplus_interface(np, gl, theta, l, Bp1h, Cp1h);
-    find_dFstar_dUstar_FDSplus_interface(np, gl, theta, _al(gl,l,theta,-1), Am1h, Bm1h);
-  }
-  
-  if (CONVJACOBIAN==CONVJACOBIAN_FROMFLUXEIGENVALUES){
-    find_dFstar_dUstar_FROMFLUXEIGENVALUES_interface(np, gl, theta, l, Bp1h, Cp1h);
-    find_dFstar_dUstar_FROMFLUXEIGENVALUES_interface(np, gl, theta, _al(gl,l,theta,-1), Am1h, Bm1h);
-  }
-
   condition_dFstar_dUstar_interface(Bp1h,Cp1h);
   condition_dFstar_dUstar_interface(Am1h,Bm1h);
-
 
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
@@ -795,9 +716,6 @@ void add_dFstar_dUstar_to_TDMA(np_t *np, gl_t *gl, long theta, long l, double fa
   }
 
 }
-
-
-
 
 
 void find_TDMA_jacobians_conservative(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
@@ -817,21 +735,23 @@ void find_TDMA_jacobians_conservative(np_t *np, gl_t *gl, long theta, long l, sq
     set_matrix_to_zero(B1);
     set_matrix_to_zero(C1);
 
-    if (CONVJACOBIAN==CONVJACOBIAN_FVS){
-      find_dFstar_dUstar_FVS_interface(np, gl, theta, l, B1, C1);
+    switch (gl->cycle.resconv.CONVJACOBIAN){ 
+      case CONVJACOBIAN_FVS:
+        find_dFstar_dUstar_FVS_interface(np, gl, theta, l, B1, C1);
+      break;
+      case CONVJACOBIAN_FVSPLUS:
+        find_dFstar_dUstar_FVSplus_interface(np, gl, theta, l, B1, C1);
+      break;
+      case CONVJACOBIAN_FDS:
+        find_dFstar_dUstar_FDS_interface(np, gl, theta, l, B1, C1);
+      break;
+      case CONVJACOBIAN_FDSPLUS:
+        find_dFstar_dUstar_FDSplus_interface(np, gl, theta, l, B1, C1);
+      break;
+      default:
+        fatal_error("gl->cycle.resconv.CONVJACOBIAN can not be set to %d.",gl->cycle.resconv.CONVJACOBIAN);
     }
-    if (CONVJACOBIAN==CONVJACOBIAN_FVSPLUS){
-      find_dFstar_dUstar_FVSplus_interface(np, gl, theta, l, B1, C1);
-    }
-    if (CONVJACOBIAN==CONVJACOBIAN_FDS){
-      find_dFstar_dUstar_FDS_interface(np, gl, theta, l, B1, C1);
-    }
-    if (CONVJACOBIAN==CONVJACOBIAN_FDSPLUS){
-      find_dFstar_dUstar_FDSplus_interface(np, gl, theta, l, B1, C1);
-    }
-    if (CONVJACOBIAN==CONVJACOBIAN_FROMFLUXEIGENVALUES){
-      find_dFstar_dUstar_FROMFLUXEIGENVALUES_interface(np, gl, theta, l, B1, C1);
-    }
+
     condition_dFstar_dUstar_interface(B1,C1);
 
     for (row=0; row<nf; row++){
@@ -859,8 +779,6 @@ void find_TDMA_jacobians_conservative(np_t *np, gl_t *gl, long theta, long l, sq
     }
   }
 
-
-
 #ifdef _FLUID_PLASMA
   find_Dstar_interface(np, gl, theta, l, B1, C1);
   for (row=0; row<nf; row++){
@@ -872,7 +790,6 @@ void find_TDMA_jacobians_conservative(np_t *np, gl_t *gl, long theta, long l, sq
 #endif
 
 }
-
 
 
 void add_TDMA_jacobians_non_conservative(np_t *np, gl_t *gl, long theta, long l, sqmat_t A, sqmat_t B, sqmat_t C, bool SOURCETERM){
@@ -899,7 +816,6 @@ void add_TDMA_jacobians_non_conservative(np_t *np, gl_t *gl, long theta, long l,
 // ?????
 //  for (flux=0; flux<nf; flux++) B[flux][flux]=max(0.0,B[flux][flux]);
 }
-
 
 
 void add_TDMA_jacobian_diagonally_dominant(np_t *np, gl_t *gl, long theta, long l, sqmat_t B){

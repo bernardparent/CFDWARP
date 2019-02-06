@@ -145,12 +145,9 @@ Model(
     DIFFUSION=YES;  {if set to NO, the diffusion matrix K will be set to zero}
     REACTING=YES;   {Chemical reactions?}
     Pmin=1.0e3;    Pmax=9.9e99;   {min and max pressure allowed in the domain in Pa}
-    Tmin=2.0e2;     Tmax=10.0e3;    {min and max temperature allowed in the domain in K}
+    Tmin=2.0e2;     Tmax=15.0e3;    {min and max temperature allowed in the domain in K}
     Twmin=Tmin;     Twmax=Tmax;    {min and max wall temperature allowed on any wall boundary node in K}
     wmin=1.0e-200;                  {min mass fraction allowed in the domain}
-    zetaA1=0.3e0;     {conditions the eigenvalues of the A jacobian}
-    zetaA2=0.3;
-    EIGENVALCOND=EIGENVALCOND_PARENT; {set the eigenvalue conditioning to EIGENVALCOND_PECLET, EIGENVALCOND_PARENT [RECOMMENDED], or EIGENVALCOND_HARTEN}
     AXISYMMETRIC=NO; {set to YES to solve axisymmetric problems in 2D}
   );
 );
@@ -189,6 +186,26 @@ Init(
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_eminus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
     Region(is,js,  ie,je, INIT_TYPE2,Mx,My,P,T,w_eminus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
     }
+  );
+);
+
+
+Disc(
+  NavierStokes(
+    zetaA1=0.3e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FVS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.95;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    FACEINTEG=FACEINTEG_CENTRAL3;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+    POSFILTER=POSFILTER_NONE;
+    POSFILTER_numiter=4;
   );
 );
 
