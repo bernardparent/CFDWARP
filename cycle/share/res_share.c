@@ -952,10 +952,8 @@ void find_Lambda_plus_minus_dtau_FDS(np_t *np, gl_t *gl, long l, long theta, int
 }
 
 
-
-
 /* Find Lambda minus and plus for a FDS flux discretization where F_i+F_{i+1} is NOT replaced by A_{i+1/2}*(U_i+U_{i+1}) */ 
-static void find_Lambda_minus_plus_FDSplus_muscl(np_t *np, gl_t *gl, long lp0, long lp1, jacvars_t jacvarsp0, jacvars_t jacvarsp1h, jacvars_t jacvarsp1, jacvars_t jacvarsp0_RE, jacvars_t jacvarsp1h_RE, jacvars_t jacvarsp1_RE, metrics_t metrics, sqmat_t lambdaminus, sqmat_t lambdaplus, long theta, long numiter, bool EIGENVALUES, int EIGENVALCOND){
+static void find_Lambda_minus_plus_FDSplus_muscl(np_t *np, gl_t *gl, long lp0, long lp1, jacvars_t jacvarsp0, jacvars_t jacvarsp1h, jacvars_t jacvarsp1, jacvars_t jacvarsp0_RE, jacvars_t jacvarsp1h_RE, jacvars_t jacvarsp1_RE, metrics_t metrics, sqmat_t lambdaminus, sqmat_t lambdaplus, long theta, long numiter, int EIGENVALCOND){
   sqmat_t Yminus,Yplus,Zplus,Zminus,Lp0,Linvp0,Linvp1,Lp1,Lp1h_RE,Linvp1h_RE,lambdapp1h_RE,lambdap1h_RE;
   long row,col,flux,cnt;
   flux_t Up0,fluxtmp,fluxtmp2,fluxtmp3,LUp0,LUp1,Up1,Up0_RE,Up1_RE,Fp0_RE,Fp1_RE,Vp0,Vp1;
@@ -971,11 +969,7 @@ static void find_Lambda_minus_plus_FDSplus_muscl(np_t *np, gl_t *gl, long lp0, l
   find_Lambda_from_jacvars(jacvarsp1h_RE, metrics, lambdap1h_RE);
   
   set_matrix_to_zero(lambdapp1h_RE);
-#ifdef _RESCONV_LAMBDA_ABSOLUTE_CONDITIONING
-  find_conditioned_Lambda_absolute_from_jacvars(jacvarsp1h_RE, metrics, EIGENVALCOND, lambdapp1h_RE);
-#else
   for (flux=0; flux<nf; flux++) lambdapp1h_RE[flux][flux]=fabs(lambdap1h_RE[flux][flux]);
-#endif
   find_Ustar_from_jacvars(jacvarsp0_RE,  metrics, Up0_RE);
   find_Ustar_from_jacvars(jacvarsp1_RE,  metrics, Up1_RE);
 
@@ -1006,21 +1000,17 @@ static void find_Lambda_minus_plus_FDSplus_muscl(np_t *np, gl_t *gl, long lp0, l
 
 #endif
 
-
-
   multiply_matrix_and_vector(Lp1h_RE,Up0_RE,fluxtmp);
   for (flux=0; flux<nf; flux++) fluxtmp2[flux]=(lambdapp1h_RE[flux][flux])*fluxtmp[flux];
   multiply_matrix_and_vector(Linvp1h_RE,fluxtmp2,fluxtmp);
   for (flux=0; flux<nf; flux++) fluxtmp[flux]+=Fp0_RE[flux];
   multiply_matrix_and_vector(Lp0,fluxtmp,fluxtmp2);
 
-
   multiply_matrix_and_vector(Lp1h_RE,Up1_RE,fluxtmp);
   for (flux=0; flux<nf; flux++) fluxtmp3[flux]=(-lambdapp1h_RE[flux][flux])*fluxtmp[flux];
   multiply_matrix_and_vector(Linvp1h_RE,fluxtmp3,fluxtmp);
   for (flux=0; flux<nf; flux++) fluxtmp[flux]+=Fp1_RE[flux];
   multiply_matrix_and_vector(Lp1,fluxtmp,fluxtmp3);
-
 
   for (flux=0; flux<nf; flux++) {
     Vp0[flux]=
@@ -1037,7 +1027,6 @@ static void find_Lambda_minus_plus_FDSplus_muscl(np_t *np, gl_t *gl, long lp0, l
        +0.5*fluxtmp3[flux]/notzero(LUp1[flux],1e-99);
   }
 
-
 #ifdef _RESCONV_INCLUDES_DIFFUSION
   for (flux=0; flux<nf; flux++) fluxtmp[flux]=np[lp0].wk->Fp1h_diffusion[theta][flux];
   multiply_matrix_and_vector(Lp0,fluxtmp,fluxtmp2);
@@ -1045,7 +1034,6 @@ static void find_Lambda_minus_plus_FDSplus_muscl(np_t *np, gl_t *gl, long lp0, l
 //  multiply_matrix_and_vector(Lp1,fluxtmp,fluxtmp2);
 //  for (flux=0; flux<nf; flux++) Vp1[flux]+=0.5*fluxtmp2[flux]/LUp1[flux];
 #endif
-
 
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
@@ -1064,52 +1052,30 @@ static void find_Lambda_minus_plus_FDSplus_muscl(np_t *np, gl_t *gl, long lp0, l
     Zminus[flux][flux]=min(0.0, Vp1[flux] );
     Zplus[flux][flux]=max(0.0, Vp1[flux] );
   }
-
-  switch (EIGENVALUES){
-   case EIGENVALUES_ENFORCED_POSITIVE:
   
-     for (cnt=0; cnt<numiter; cnt++){
-
-      multiply_matrix_and_vector(Zplus,LUp1,fluxtmp2);
-      multiply_matrix_and_vector(Linvp1,fluxtmp2,fluxtmp);
-      multiply_matrix_and_vector(Lp0,fluxtmp,fluxtmp2);
-
-      multiply_matrix_and_vector(Yminus,LUp0,fluxtmp3);
-      multiply_matrix_and_vector(Linvp0,fluxtmp3,fluxtmp);
-      multiply_matrix_and_vector(Lp1,fluxtmp,fluxtmp3);
-      for (flux=0; flux<nf; flux++) {
-        Yminus[flux][flux]=min(0.0, Yplus[flux][flux]+fluxtmp2[flux]/notzero(LUp0[flux],1e-99));
-        Zplus[flux][flux]=max(0.0, Zminus[flux][flux]+fluxtmp3[flux]/notzero(LUp1[flux],1e-99));
-      }
-      for (flux=0; flux<nf; flux++) {
-        Yplus[flux][flux]=max(0.0, Yplus[flux][flux]+fluxtmp2[flux]/notzero(LUp0[flux],1e-99));
-        Zminus[flux][flux]=min(0.0, Zminus[flux][flux]+fluxtmp3[flux]/notzero(LUp1[flux],1e-99));
-      }
-    
-     }
-
-     for (flux=0; flux<nf; flux++) {
-      lambdaplus[flux][flux]=Yplus[flux][flux]+Zplus[flux][flux];///LUp0[flux]*LUp1[flux];
-      lambdaminus[flux][flux]=Zminus[flux][flux]+Yminus[flux][flux];///LUp1[flux]*LUp0[flux];
-     }
-   break;
-
-
-
-   case EIGENVALUES_NOT_ENFORCED_POSITIVE: 
-     for (flux=0; flux<nf; flux++) {
-      lambdaplus[flux][flux]=Yplus[flux][flux]+Yminus[flux][flux];
-      lambdaminus[flux][flux]=Zplus[flux][flux]+Zminus[flux][flux];
-     }
-   break;
-
-   default:
-     fatal_error("EIGENVALUES can not be set to %d in find_Lambda_minus_plus_FDSplus_muscl.",EIGENVALUES);
+  for (cnt=0; cnt<numiter; cnt++){
+    multiply_matrix_and_vector(Zplus,LUp1,fluxtmp2);
+    multiply_matrix_and_vector(Linvp1,fluxtmp2,fluxtmp);
+    multiply_matrix_and_vector(Lp0,fluxtmp,fluxtmp2);
+    multiply_matrix_and_vector(Yminus,LUp0,fluxtmp3);
+    multiply_matrix_and_vector(Linvp0,fluxtmp3,fluxtmp);
+    multiply_matrix_and_vector(Lp1,fluxtmp,fluxtmp3);
+    for (flux=0; flux<nf; flux++) {
+      Yminus[flux][flux]=min(0.0, Yplus[flux][flux]+fluxtmp2[flux]/notzero(LUp0[flux],1e-99));
+      Zplus[flux][flux]=max(0.0, Zminus[flux][flux]+fluxtmp3[flux]/notzero(LUp1[flux],1e-99));
+    }
+    for (flux=0; flux<nf; flux++) {
+      Yplus[flux][flux]=max(0.0, Yplus[flux][flux]+fluxtmp2[flux]/notzero(LUp0[flux],1e-99));
+      Zminus[flux][flux]=min(0.0, Zminus[flux][flux]+fluxtmp3[flux]/notzero(LUp1[flux],1e-99));
+    }
   }
 
-#ifndef _RESCONV_LAMBDA_ABSOLUTE_CONDITIONING
+  for (flux=0; flux<nf; flux++) {
+    lambdaplus[flux][flux]=Yplus[flux][flux]+Zplus[flux][flux];///LUp0[flux]*LUp1[flux];
+    lambdaminus[flux][flux]=Zminus[flux][flux]+Yminus[flux][flux];///LUp1[flux]*LUp0[flux];
+  }
+
   condition_Lambda_plus_minus(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics, EIGENVALCOND, lambdaplus,lambdaminus);
-#endif
 
 #if (CONVJACOBIAN==CONVJACOBIAN_FROMFLUXEIGENVALUES)
   for (flux=0; flux<nf; flux++){  
@@ -1119,8 +1085,6 @@ static void find_Lambda_minus_plus_FDSplus_muscl(np_t *np, gl_t *gl, long lp0, l
 #endif
 
 }
-
-
 
 
 void filter_Fstar_interface_positivity_preserving_MultiD(np_t *np, gl_t *gl, long lp0, long theta, metrics_t metrics, long numiter, int EIGENVALCOND, flux_t Fint, flux_t Fpositive, sqmat_t lambdaminus, sqmat_t lambdaplus){
@@ -1190,9 +1154,7 @@ void filter_Fstar_interface_positivity_preserving_MultiD(np_t *np, gl_t *gl, lon
     lambdaminus[flux][flux]=Zminus[flux][flux]+Yminus[flux][flux];///MUp1[flux]*MUp0[flux];
   }
 
-#ifndef _RESCONV_LAMBDA_ABSOLUTE_CONDITIONING
   condition_Lambda_plus_minus(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics, EIGENVALCOND, lambdaplus,lambdaminus);
-#endif
 
 #if (CONVJACOBIAN==CONVJACOBIAN_FROMFLUXEIGENVALUES)
   for (flux=0; flux<nf; flux++){  
@@ -1244,8 +1206,6 @@ void filter_Fstar_interface_positivity_preserving(np_t *np, gl_t *gl, long lp0, 
   multiply_matrix_and_vector(Lp1,Fint,fluxtmp2);
   for (flux=0; flux<nf; flux++) Vp1[flux]=0.5*fluxtmp2[flux]/LUp1[flux];
 
-
-
   set_matrix_to_zero(lambdaminus);
   set_matrix_to_zero(lambdaplus);
   set_matrix_to_zero(Yminus);
@@ -1282,9 +1242,7 @@ void filter_Fstar_interface_positivity_preserving(np_t *np, gl_t *gl, long lp0, 
     lambdaminus[flux][flux]=Zminus[flux][flux]+Yminus[flux][flux];///LUp1[flux]*LUp0[flux];
   }
 
-#ifndef _RESCONV_LAMBDA_ABSOLUTE_CONDITIONING
   condition_Lambda_plus_minus(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics, EIGENVALCOND, lambdaplus,lambdaminus);
-#endif
 
 #if (CONVJACOBIAN==CONVJACOBIAN_FROMFLUXEIGENVALUES)
   for (flux=0; flux<nf; flux++){  
@@ -1300,14 +1258,12 @@ void filter_Fstar_interface_positivity_preserving(np_t *np, gl_t *gl, long lp0, 
   multiply_matrix_and_vector(Linvp1,fluxtmp2,Fp1);
 
   for (flux=0; flux<nf; flux++) Fpositive[flux]=Fp0[flux]+Fp1[flux];
-
 }
-
 
 
 void find_Fstar_interface_FDSplus_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h, long theta, 
                      flux_t musclvarsm1h, flux_t musclvarsp1h, metrics_t metrics,  long numiter, 
-                     int EIGENVALUES, int EIGENVALCOND, int AVERAGING, flux_t Fint, sqmat_t lambdaminusp1h, sqmat_t lambdaplusm1h){
+                     int EIGENVALCOND, int AVERAGING, flux_t Fint, sqmat_t lambdaminusp1h, sqmat_t lambdaplusm1h){
   flux_t Fm1h,Fp1h,fluxtmp,fluxtmp2;
   /* flux_t Ustar; */
   sqmat_t R;
@@ -1324,39 +1280,123 @@ void find_Fstar_interface_FDSplus_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h
   find_jacvars(np[lp1h],gl,metrics,theta,&jacvarsp1h);
   find_jacvars_at_interface_from_jacvars(jacvarsm1h, jacvarsp1h, gl, theta, metrics, AVERAGING, &jacvarsp0);
 
-  find_Lambda_minus_plus_FDSplus_muscl(np,gl,lm1h,lp1h,jacvarsm1h,jacvarsp0,jacvarsp1h, jacvarsm1h_RE,jacvarsp0_RE,jacvarsp1h_RE,metrics, lambdaminusp1h, lambdaplusm1h, theta, numiter, EIGENVALUES, EIGENVALCOND);
+  find_Lambda_minus_plus_FDSplus_muscl(np,gl,lm1h,lp1h,jacvarsm1h,jacvarsp0,jacvarsp1h, jacvarsm1h_RE,jacvarsp0_RE,jacvarsp1h_RE,metrics, lambdaminusp1h, lambdaplusm1h, theta, numiter, EIGENVALCOND);
 
   find_Linv_from_jacvars(jacvarsm1h, metrics, R);
   find_LUstar_from_jacvars(jacvarsm1h, metrics, fluxtmp);
   multiply_diagonal_matrix_and_vector(lambdaplusm1h,fluxtmp,fluxtmp2);
   multiply_matrix_and_vector(R,fluxtmp2,Fm1h);
 
+  find_Linv_from_jacvars(jacvarsp1h, metrics, R);
+  find_LUstar_from_jacvars(jacvarsp1h, metrics, fluxtmp);
+  multiply_diagonal_matrix_and_vector(lambdaminusp1h,fluxtmp,fluxtmp2);
+  multiply_matrix_and_vector(R,fluxtmp2,Fp1h);
+
+  for (flux=0; flux<nf; flux++) Fint[flux]=Fm1h[flux]+Fp1h[flux];
+}
+
+
+void find_Fstar_interface_FDS_muscl_with_CDF(np_t *np, gl_t *gl, long lm1h, long lp1h,  long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
+                     metrics_t metrics, int EIGENVALCOND, int AVERAGING, flux_t Fint){
+
+  sqmat_t Lm1h,Linvm1h,Linvp1h,Lp1h,Lp0_RE,Linvp0_RE,lambdapp0_RE,lambdap0_RE;
+  long flux;
+  flux_t Um1h,fluxtmp,fluxtmp2,fluxtmp3,LUm1h,LUp1h,Up1h,Um1h_RE,Up1h_RE,Fm1h_RE,Fp1h_RE;
+#ifdef _RESTIME_CDF
+  sqmat_t lambdaxt_p0,lambdaxt_p1h,lambdaxt_m1h;
+  flux_t deltaxt_p0;
+  flux_t LUm1h_RE,LUp1h_RE;
+#endif
+  flux_t Fm1h,Fp1h;
+  sqmat_t R;
+  jacvars_t jacvarsm1h,jacvarsp1h,jacvarsp0;
+  jacvars_t jacvarsm1h_RE,jacvarsp1h_RE,jacvarsp0_RE;
+  sqmat_t lambdaminusp1h, lambdaplusm1h;
+
+  find_jacvars_from_musclvars(musclvarsm1h, metrics, gl, theta, &jacvarsm1h_RE);
+  find_jacvars_from_musclvars(musclvarsp1h, metrics, gl, theta, &jacvarsp1h_RE);
+  
+  find_jacvars_at_interface_from_jacvars(jacvarsm1h_RE, jacvarsp1h_RE, gl, theta, metrics, AVERAGING, &jacvarsp0_RE);
+  find_jacvars(np[lm1h],gl,metrics,theta,&jacvarsm1h);
+  find_jacvars(np[lp1h],gl,metrics,theta,&jacvarsp1h);
+  find_jacvars_at_interface_from_jacvars(jacvarsm1h, jacvarsp1h, gl, theta, metrics, AVERAGING, &jacvarsp0);
+
+  find_L_from_jacvars(jacvarsp0_RE, metrics, Lp0_RE);
+  find_Linv_from_jacvars(jacvarsp0_RE, metrics, Linvp0_RE);
+  find_Lambda_from_jacvars(jacvarsp0_RE, metrics, lambdap0_RE);
+  
+  set_matrix_to_zero(lambdapp0_RE);
+  find_conditioned_Lambda_absolute_from_jacvars(jacvarsp0_RE, metrics, EIGENVALCOND, lambdapp0_RE);
+  find_Ustar_from_jacvars(jacvarsm1h_RE,  metrics, Um1h_RE);
+  find_Ustar_from_jacvars(jacvarsp1h_RE,  metrics, Up1h_RE);
+
+  find_L_from_jacvars(jacvarsm1h, metrics, Lm1h);
+  find_Ustar_from_jacvars(jacvarsm1h,  metrics, Um1h);
+  find_LUstar_from_jacvars(jacvarsm1h, metrics, LUm1h);
+
+  find_L_from_jacvars(jacvarsp1h, metrics, Lp1h);
+  find_Linv_from_jacvars(jacvarsm1h, metrics, Linvm1h);
+  find_Linv_from_jacvars(jacvarsp1h, metrics, Linvp1h);
+  find_Ustar_from_jacvars(jacvarsp1h,  metrics, Up1h);
+  find_LUstar_from_jacvars(jacvarsp1h, metrics, LUp1h);
+
+  find_Fstar_from_jacvars(jacvarsm1h_RE,  metrics, Fm1h_RE);
+  find_Fstar_from_jacvars(jacvarsp1h_RE,  metrics, Fp1h_RE);
+#ifdef _RESTIME_CDF
+  find_LUstar_from_jacvars(jacvarsm1h_RE, metrics, LUm1h_RE);
+  find_LUstar_from_jacvars(jacvarsp1h_RE, metrics, LUp1h_RE);
+  find_Lambdaxt_interface(np, gl, lm1h, lp1h, theta, jacvarsp0_RE, metrics, lambdaxt_p0);
+  find_Lambdaxt(np, gl, lm1h, jacvarsm1h_RE, metrics, lambdaxt_m1h);
+  find_Lambdaxt(np, gl, lp1h, jacvarsp1h_RE, metrics, lambdaxt_p1h);
+  find_Deltaxt_interface(np, gl, lm1h, lp1h, theta, jacvarsm1h, jacvarsp1h, metrics, deltaxt_p0);
+  for (flux=0; flux<nf; flux++) lambdapp0_RE[flux][flux]+=-fabs(lambdaxt_p0[flux][flux])*deltaxt_p0[flux];
+#endif
+
+  multiply_matrix_and_vector(Lp0_RE,Um1h_RE,fluxtmp);
+  for (flux=0; flux<nf; flux++) fluxtmp2[flux]=(lambdapp0_RE[flux][flux])*fluxtmp[flux];
+  multiply_matrix_and_vector(Linvp0_RE,fluxtmp2,fluxtmp);
+  for (flux=0; flux<nf; flux++) fluxtmp[flux]+=Fm1h_RE[flux];
+  multiply_matrix_and_vector(Lm1h,fluxtmp,fluxtmp2);
+
+  multiply_matrix_and_vector(Lp0_RE,Up1h_RE,fluxtmp);
+  for (flux=0; flux<nf; flux++) fluxtmp3[flux]=(-lambdapp0_RE[flux][flux])*fluxtmp[flux];
+  multiply_matrix_and_vector(Linvp0_RE,fluxtmp3,fluxtmp);
+  for (flux=0; flux<nf; flux++) fluxtmp[flux]+=Fp1h_RE[flux];
+  multiply_matrix_and_vector(Lp1h,fluxtmp,fluxtmp3);
+
+  for (flux=0; flux<nf; flux++) {
+    lambdaplusm1h[flux][flux]=
+#ifdef _RESTIME_CDF
+       -0.5*lambdaxt_m1h[flux][flux]*deltaxt_p0[flux]
+#endif
+       +0.5*fluxtmp2[flux]/notzero(LUm1h[flux],1e-99);
+    lambdaminusp1h[flux][flux]=
+#ifdef _RESTIME_CDF
+       -0.5*lambdaxt_p1h[flux][flux]*deltaxt_p0[flux]
+#endif
+       +0.5*fluxtmp3[flux]/notzero(LUp1h[flux],1e-99);
+  }
+
+  find_Linv_from_jacvars(jacvarsm1h, metrics, R);
+  find_LUstar_from_jacvars(jacvarsm1h, metrics, fluxtmp);
+  multiply_diagonal_matrix_and_vector(lambdaplusm1h,fluxtmp,fluxtmp2);
+  multiply_matrix_and_vector(R,fluxtmp2,Fm1h);
 
   find_Linv_from_jacvars(jacvarsp1h, metrics, R);
   find_LUstar_from_jacvars(jacvarsp1h, metrics, fluxtmp);
   multiply_diagonal_matrix_and_vector(lambdaminusp1h,fluxtmp,fluxtmp2);
   multiply_matrix_and_vector(R,fluxtmp2,Fp1h);
 
-
   for (flux=0; flux<nf; flux++) Fint[flux]=Fm1h[flux]+Fp1h[flux];
-
-
 }
 
 
-
-
-
-
-
-
-void find_Fstar_interface_FDS_muscl(gl_t *gl, long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
+void find_Fstar_interface_FDS_muscl_without_CDF(gl_t *gl, long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
                      metrics_t metrics, int EIGENVALCOND, int AVERAGING, flux_t Fint){
   flux_t Fm1h,Fp1h,mattmp,Um1h,Up1h,fluxtmp,alphap0;
   jacvars_t jacvarsm1h,jacvarsp1h,jacvarsp0;
   sqmat_t Linv,lambdap,L;
   long flux;
-
 
   find_jacvars_from_musclvars(musclvarsm1h, metrics, gl, theta, &jacvarsm1h);
   find_jacvars_from_musclvars(musclvarsp1h, metrics, gl, theta, &jacvarsp1h);
@@ -1367,7 +1407,6 @@ void find_Fstar_interface_FDS_muscl(gl_t *gl, long theta, flux_t musclvarsm1h, f
   find_Ustar_from_musclvars(musclvarsp1h, metrics, gl, Up1h);
   for (flux=0; flux<nf; flux++) mattmp[flux]=Up1h[flux]-Um1h[flux];
   multiply_matrix_and_vector(L,mattmp,alphap0);
-
 
   find_conditioned_Lambda_absolute_from_jacvars(jacvarsp0, metrics, EIGENVALCOND, lambdap);
   find_Linv_from_jacvars(jacvarsp0, metrics, Linv);
@@ -1380,27 +1419,30 @@ void find_Fstar_interface_FDS_muscl(gl_t *gl, long theta, flux_t musclvarsm1h, f
   for (flux=0; flux<nf; flux++){
     Fint[flux]=0.5*(Fint[flux]+Fm1h[flux]+Fp1h[flux]);
   }
-
 }
 
 
+void find_Fstar_interface_FDS_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h,  long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
+                     metrics_t metrics, int EIGENVALCOND, int AVERAGING, flux_t Fint){
+#ifdef _RESTIME_CDF
+  find_Fstar_interface_FDS_muscl_with_CDF(np, gl, lm1h, lp1h,  theta, musclvarsm1h, musclvarsp1h,
+                                          metrics, EIGENVALCOND, AVERAGING, Fint);
+#else
+  find_Fstar_interface_FDS_muscl_without_CDF(gl, theta, musclvarsm1h, musclvarsp1h,
+                                             metrics, EIGENVALCOND, AVERAGING, Fint);
+#endif
+}
 
 
-
-
-void find_Fstar_interface_FVS_muscl(gl_t *gl, long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
+void find_Fstar_interface_FVS_muscl_without_CDF(gl_t *gl, long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
                      metrics_t metrics, int EIGENVALCOND, flux_t Fint){
   flux_t Fplusm1h,Fminusp1h,Um1h,Up1h,fluxtmp1,fluxtmp2;
   jacvars_t jacvarsp1h,jacvarsm1h;
   sqmat_t Linvp1h,Linvm1h,Lambdap1h,Lambdam1h,Lambdaabsm1h,Lambdaabsp1h,Lp1h,Lm1h,Lambdaplusm1h,Lambdaminusp1h;
   long flux;
 
-
-
   find_jacvars_from_musclvars(musclvarsm1h, metrics, gl, theta, &jacvarsm1h);
   find_jacvars_from_musclvars(musclvarsp1h, metrics, gl, theta, &jacvarsp1h);
-
-
   
   find_L_from_jacvars(jacvarsm1h, metrics, Lm1h);
   find_L_from_jacvars(jacvarsp1h, metrics, Lp1h);
@@ -1426,17 +1468,113 @@ void find_Fstar_interface_FVS_muscl(gl_t *gl, long theta, flux_t musclvarsm1h, f
   multiply_matrix_and_vector(Lambdaminusp1h,fluxtmp1,fluxtmp2);
   multiply_matrix_and_vector(Linvp1h,fluxtmp2,Fminusp1h);
 
-
   for (flux=0; flux<nf; flux++){
     Fint[flux]=Fplusm1h[flux]+Fminusp1h[flux];
   }
+}
+
+
+void find_Fstar_interface_FVS_muscl_with_CDF(np_t *np, gl_t *gl, long lm1h, long lp1h, long theta, 
+                     flux_t musclvarsm1h, flux_t musclvarsp1h, metrics_t metrics,  
+                     int EIGENVALCOND, int AVERAGING, flux_t Fint){
+  flux_t Fm1h,Fp1h,fluxtmp,fluxtmp2;
+  sqmat_t R;
+  long flux;
+  sqmat_t lambdaminusp1h, lambdaplusm1h;
+  jacvars_t jacvarsm1h,jacvarsp1h,jacvarsp0;
+  jacvars_t jacvarsm1h_RE,jacvarsp1h_RE,jacvarsp0_RE;
+  sqmat_t Lm1h,Linvm1h,Linvp1h,Lp1h,Linvp1h_RE,Linvm1h_RE,
+          Lambdaabsp1h_RE,Lambdaabsm1h_RE,Lambdap1h_RE,Lambdam1h_RE;
+  flux_t Um1h,fluxtmp3,LUm1h,LUp1h,Up1h,LUm1h_RE,LUp1h_RE;
+#ifdef _RESTIME_CDF
+  sqmat_t lambdaxt_m1h,lambdaxt_p1h;
+  flux_t Deltaxt_p0;
+#endif
+
+  find_jacvars_from_musclvars(musclvarsm1h, metrics, gl, theta, &jacvarsm1h_RE);
+  find_jacvars_from_musclvars(musclvarsp1h, metrics, gl, theta, &jacvarsp1h_RE);
+  find_jacvars_at_interface_from_jacvars(jacvarsm1h_RE, jacvarsp1h_RE, gl, theta, metrics, AVERAGING, &jacvarsp0_RE);
+  find_jacvars(np[lm1h],gl,metrics,theta,&jacvarsm1h);
+  find_jacvars(np[lp1h],gl,metrics,theta,&jacvarsp1h);
+  find_jacvars_at_interface_from_jacvars(jacvarsm1h, jacvarsp1h, gl, theta, metrics, AVERAGING, &jacvarsp0);
+
+#ifdef _RESTIME_CDF
+  find_Lambdaxt(np, gl, lm1h, jacvarsm1h_RE, metrics, lambdaxt_m1h);
+  find_Lambdaxt(np, gl, lp1h, jacvarsp1h_RE, metrics, lambdaxt_p1h);
+  find_Deltaxt_interface(np, gl, lm1h, lp1h, theta, jacvarsm1h, jacvarsp1h,  metrics, Deltaxt_p0);
+#endif
+
+  find_Linv_from_jacvars(jacvarsm1h_RE, metrics, Linvm1h_RE);
+  find_Linv_from_jacvars(jacvarsp1h_RE, metrics, Linvp1h_RE);
+  find_Lambda_from_jacvars(jacvarsm1h_RE, metrics, Lambdam1h_RE);
+  find_Lambda_from_jacvars(jacvarsp1h_RE, metrics, Lambdap1h_RE);
+  set_matrix_to_zero(Lambdaabsm1h_RE);
+  set_matrix_to_zero(Lambdaabsp1h_RE);
+  find_conditioned_Lambda_absolute_from_jacvars(jacvarsm1h_RE, metrics, EIGENVALCOND, Lambdaabsm1h_RE);
+  find_conditioned_Lambda_absolute_from_jacvars(jacvarsp1h_RE, metrics, EIGENVALCOND, Lambdaabsp1h_RE);
+  find_LUstar_from_jacvars(jacvarsm1h_RE,  metrics, LUm1h_RE);
+  find_LUstar_from_jacvars(jacvarsp1h_RE,  metrics, LUp1h_RE);
+
+  find_L_from_jacvars(jacvarsm1h, metrics, Lm1h);
+  find_Ustar_from_jacvars(jacvarsm1h,  metrics, Um1h);
+  find_LUstar_from_jacvars(jacvarsm1h, metrics, LUm1h);
+
+  find_L_from_jacvars(jacvarsp1h, metrics, Lp1h);
+  find_Linv_from_jacvars(jacvarsm1h, metrics, Linvm1h);
+  find_Linv_from_jacvars(jacvarsp1h, metrics, Linvp1h);
+  find_Ustar_from_jacvars(jacvarsp1h,  metrics, Up1h);
+  find_LUstar_from_jacvars(jacvarsp1h, metrics, LUp1h);
+
+  for (flux=0; flux<nf; flux++) fluxtmp2[flux]=(Lambdam1h_RE[flux][flux]+Lambdaabsm1h_RE[flux][flux])*LUm1h_RE[flux];
+#ifdef _RESTIME_CDF
+  for (flux=0; flux<nf; flux++) fluxtmp2[flux]+=-(lambdaxt_m1h[flux][flux]+fabs(lambdaxt_m1h[flux][flux]))*Deltaxt_p0[flux]*LUm1h_RE[flux];
+#endif
+
+  multiply_matrix_and_vector(Linvm1h_RE,fluxtmp2,fluxtmp);
+  multiply_matrix_and_vector(Lm1h,fluxtmp,fluxtmp2);
+
+  for (flux=0; flux<nf; flux++) fluxtmp3[flux]=(Lambdap1h_RE[flux][flux]-Lambdaabsp1h_RE[flux][flux])*LUp1h_RE[flux];
+#ifdef _RESTIME_CDF
+  for (flux=0; flux<nf; flux++) fluxtmp3[flux]+=-(lambdaxt_p1h[flux][flux]-fabs(lambdaxt_p1h[flux][flux]))*Deltaxt_p0[flux]*LUp1h_RE[flux];
+#endif
+
+  multiply_matrix_and_vector(Linvp1h_RE,fluxtmp3,fluxtmp);
+  multiply_matrix_and_vector(Lp1h,fluxtmp,fluxtmp3);
+
+  for (flux=0; flux<nf; flux++){
+    lambdaplusm1h[flux][flux]=0.5*fluxtmp2[flux]/notzero(LUm1h[flux],1e-99);
+    lambdaminusp1h[flux][flux]=0.5*fluxtmp3[flux]/notzero(LUp1h[flux],1e-99);
+  }
+ 
+  find_Linv_from_jacvars(jacvarsm1h, metrics, R);
+  find_LUstar_from_jacvars(jacvarsm1h, metrics, fluxtmp);
+  multiply_diagonal_matrix_and_vector(lambdaplusm1h,fluxtmp,fluxtmp2);
+  multiply_matrix_and_vector(R,fluxtmp2,Fm1h);
+
+  find_Linv_from_jacvars(jacvarsp1h, metrics, R);
+  find_LUstar_from_jacvars(jacvarsp1h, metrics, fluxtmp);
+  multiply_diagonal_matrix_and_vector(lambdaminusp1h,fluxtmp,fluxtmp2);
+  multiply_matrix_and_vector(R,fluxtmp2,Fp1h);
+
+  for (flux=0; flux<nf; flux++) Fint[flux]=Fm1h[flux]+Fp1h[flux];
 
 }
 
 
+void find_Fstar_interface_FVS_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h,  long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
+                     metrics_t metrics, int EIGENVALCOND, int AVERAGING, flux_t Fint){
+#ifdef _RESTIME_CDF
+  find_Fstar_interface_FVS_muscl_with_CDF(np, gl, lm1h, lp1h,  theta, musclvarsm1h, musclvarsp1h,
+                                          metrics, EIGENVALCOND, AVERAGING, Fint);
+#else
+  find_Fstar_interface_FVS_muscl_without_CDF(gl, theta, musclvarsm1h, musclvarsp1h,
+                                             metrics, EIGENVALCOND, Fint);
+#endif
+
+}
 
 
-static void find_Lambda_minus_plus_FVSplus_muscl(np_t *np, gl_t *gl, long lp0, long lp1, jacvars_t jacvarsp0, jacvars_t jacvarsp1h, jacvars_t jacvarsp1, jacvars_t jacvarsp0_RE, jacvars_t jacvarsp1h_RE, jacvars_t jacvarsp1_RE, metrics_t metrics, long theta, long numiter, int EIGENVALUES, int EIGENVALCOND, sqmat_t lambdaminus, sqmat_t lambdaplus){
+static void find_Lambda_minus_plus_FVSplus_muscl(np_t *np, gl_t *gl, long lp0, long lp1, jacvars_t jacvarsp0, jacvars_t jacvarsp1h, jacvars_t jacvarsp1, jacvars_t jacvarsp0_RE, jacvars_t jacvarsp1h_RE, jacvars_t jacvarsp1_RE, metrics_t metrics, long theta, long numiter, int EIGENVALCOND, sqmat_t lambdaminus, sqmat_t lambdaplus){
   sqmat_t Yminus,Yplus,Zplus,Zminus,Lp0,Linvp0,Linvp1,Lp1,Linvp1_RE,Linvp0_RE,
           Lambdaabsp1_RE,Lambdaabsp0_RE,Lambdap1_RE,Lambdap0_RE;
   long row,col,flux,cnt;
@@ -1450,7 +1588,6 @@ static void find_Lambda_minus_plus_FVSplus_muscl(np_t *np, gl_t *gl, long lp0, l
   find_Lambdaxt(np, gl, lp0, jacvarsp0_RE, metrics, lambdaxt_p0);
   find_Lambdaxt(np, gl, lp1, jacvarsp1_RE, metrics, lambdaxt_p1);
   find_Deltaxt_interface(np, gl, lp0, lp1, theta, jacvarsp0, jacvarsp1,  metrics, Deltaxt_p1h);
-
 #endif
 
   find_Linv_from_jacvars(jacvarsp0_RE, metrics, Linvp0_RE);
@@ -1459,15 +1596,10 @@ static void find_Lambda_minus_plus_FVSplus_muscl(np_t *np, gl_t *gl, long lp0, l
   find_Lambda_from_jacvars(jacvarsp1_RE, metrics, Lambdap1_RE);
   set_matrix_to_zero(Lambdaabsp0_RE);
   set_matrix_to_zero(Lambdaabsp1_RE);
-#ifdef _RESCONV_LAMBDA_ABSOLUTE_CONDITIONING
-  find_conditioned_Lambda_absolute_from_jacvars(jacvarsp0_RE, metrics, EIGENVALCOND, Lambdaabsp0_RE);
-  find_conditioned_Lambda_absolute_from_jacvars(jacvarsp1_RE, metrics, EIGENVALCOND, Lambdaabsp1_RE);
-#else
   for (flux=0; flux<nf; flux++) {
     Lambdaabsp0_RE[flux][flux]=fabs(Lambdap0_RE[flux][flux]);
     Lambdaabsp1_RE[flux][flux]=fabs(Lambdap1_RE[flux][flux]);
   }
-#endif
   find_LUstar_from_jacvars(jacvarsp0_RE,  metrics, LUp0_RE);
   find_LUstar_from_jacvars(jacvarsp1_RE,  metrics, LUp1_RE);
 
@@ -1481,7 +1613,6 @@ static void find_Lambda_minus_plus_FVSplus_muscl(np_t *np, gl_t *gl, long lp0, l
   find_Ustar_from_jacvars(jacvarsp1,  metrics, Up1);
   find_LUstar_from_jacvars(jacvarsp1, metrics, LUp1);
 
-
   for (flux=0; flux<nf; flux++) fluxtmp2[flux]=(Lambdap0_RE[flux][flux]+Lambdaabsp0_RE[flux][flux])*LUp0_RE[flux];
 #ifdef _RESTIME_CDF
   for (flux=0; flux<nf; flux++) fluxtmp2[flux]+=-(lambdaxt_p0[flux][flux]+fabs(lambdaxt_p0[flux][flux]))*Deltaxt_p1h[flux]*LUp0_RE[flux];
@@ -1489,7 +1620,6 @@ static void find_Lambda_minus_plus_FVSplus_muscl(np_t *np, gl_t *gl, long lp0, l
 
   multiply_matrix_and_vector(Linvp0_RE,fluxtmp2,fluxtmp);
   multiply_matrix_and_vector(Lp0,fluxtmp,fluxtmp2);
-
 
   for (flux=0; flux<nf; flux++) fluxtmp3[flux]=(Lambdap1_RE[flux][flux]-Lambdaabsp1_RE[flux][flux])*LUp1_RE[flux];
 #ifdef _RESTIME_CDF
@@ -1510,65 +1640,43 @@ static void find_Lambda_minus_plus_FVSplus_muscl(np_t *np, gl_t *gl, long lp0, l
     }
   }
 
-
-
-    for (flux=0; flux<nf; flux++) {
-      Yminus[flux][flux]=min(0.0,
+  for (flux=0; flux<nf; flux++) {
+    Yminus[flux][flux]=min(0.0,
        +0.5*fluxtmp2[flux]/notzero(LUp0[flux],1e-99) );
-      Yplus[flux][flux]=max(0.0,
+    Yplus[flux][flux]=max(0.0,
        +0.5*fluxtmp2[flux]/notzero(LUp0[flux],1e-99) );
-      Zplus[flux][flux]=max(0.0,
+    Zplus[flux][flux]=max(0.0,
        +0.5*fluxtmp3[flux]/notzero(LUp1[flux],1e-99) );
-      Zminus[flux][flux]=min(0.0,
+    Zminus[flux][flux]=min(0.0,
        +0.5*fluxtmp3[flux]/notzero(LUp1[flux],1e-99) );
-    }
-
-  switch (EIGENVALUES){
-   case EIGENVALUES_ENFORCED_POSITIVE:
-
-     for (cnt=0; cnt<numiter; cnt++){
-
-      multiply_matrix_and_vector(Zplus,LUp1,fluxtmp2);
-      multiply_matrix_and_vector(Linvp1,fluxtmp2,fluxtmp);
-      multiply_matrix_and_vector(Lp0,fluxtmp,fluxtmp2);
-
-      multiply_matrix_and_vector(Yminus,LUp0,fluxtmp3);
-      multiply_matrix_and_vector(Linvp0,fluxtmp3,fluxtmp);
-      multiply_matrix_and_vector(Lp1,fluxtmp,fluxtmp3);
-      for (flux=0; flux<nf; flux++) {
-        Yminus[flux][flux]=min(0.0, Yplus[flux][flux]+fluxtmp2[flux]/notzero(LUp0[flux],1e-99));
-        Zplus[flux][flux]=max(0.0, Zminus[flux][flux]+fluxtmp3[flux]/notzero(LUp1[flux],1e-99));
-      }
-      for (flux=0; flux<nf; flux++) {
-        Yplus[flux][flux]=max(0.0, Yplus[flux][flux]+fluxtmp2[flux]/notzero(LUp0[flux],1e-99));
-        Zminus[flux][flux]=min(0.0, Zminus[flux][flux]+fluxtmp3[flux]/notzero(LUp1[flux],1e-99));
-      }
-    
-     }
-
-     for (flux=0; flux<nf; flux++) {
-      lambdaplus[flux][flux]=Yplus[flux][flux]+Zplus[flux][flux];
-      lambdaminus[flux][flux]=Zminus[flux][flux]+Yminus[flux][flux];
-     }
-   break;
-
-
-
-   case EIGENVALUES_NOT_ENFORCED_POSITIVE: 
-     for (flux=0; flux<nf; flux++) {
-      lambdaplus[flux][flux]=Yplus[flux][flux]+Yminus[flux][flux];
-      lambdaminus[flux][flux]=Zplus[flux][flux]+Zminus[flux][flux];
-     }
-   break;
-
-   default:
-     fatal_error("EIGENVALUES can not be set to %d in find_Lambda_minus_plus_FVSplus_muscl.",EIGENVALUES);
   }
 
+  for (cnt=0; cnt<numiter; cnt++){
+
+    multiply_matrix_and_vector(Zplus,LUp1,fluxtmp2);
+    multiply_matrix_and_vector(Linvp1,fluxtmp2,fluxtmp);
+    multiply_matrix_and_vector(Lp0,fluxtmp,fluxtmp2);
+
+    multiply_matrix_and_vector(Yminus,LUp0,fluxtmp3);
+    multiply_matrix_and_vector(Linvp0,fluxtmp3,fluxtmp);
+    multiply_matrix_and_vector(Lp1,fluxtmp,fluxtmp3);
+    for (flux=0; flux<nf; flux++) {
+      Yminus[flux][flux]=min(0.0, Yplus[flux][flux]+fluxtmp2[flux]/notzero(LUp0[flux],1e-99));
+      Zplus[flux][flux]=max(0.0, Zminus[flux][flux]+fluxtmp3[flux]/notzero(LUp1[flux],1e-99));
+    }
+    for (flux=0; flux<nf; flux++) {
+      Yplus[flux][flux]=max(0.0, Yplus[flux][flux]+fluxtmp2[flux]/notzero(LUp0[flux],1e-99));
+      Zminus[flux][flux]=min(0.0, Zminus[flux][flux]+fluxtmp3[flux]/notzero(LUp1[flux],1e-99));
+    }
   
-#ifndef _RESCONV_LAMBDA_ABSOLUTE_CONDITIONING
+  }
+
+  for (flux=0; flux<nf; flux++) {
+    lambdaplus[flux][flux]=Yplus[flux][flux]+Zplus[flux][flux];
+    lambdaminus[flux][flux]=Zminus[flux][flux]+Yminus[flux][flux];
+  }
+  
   condition_Lambda_plus_minus(np, gl, lp0, theta, jacvarsp0, jacvarsp1,metrics, EIGENVALCOND, lambdaplus,lambdaminus);
-#endif
 
 #if (CONVJACOBIAN==CONVJACOBIAN_FROMFLUXEIGENVALUES)
   for (flux=0; flux<nf; flux++){  
@@ -1580,15 +1688,11 @@ static void find_Lambda_minus_plus_FVSplus_muscl(np_t *np, gl_t *gl, long lp0, l
 }
 
 
-
-
 void find_Fstar_interface_FVSplus_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h, long theta, 
                      flux_t musclvarsm1h, flux_t musclvarsp1h, metrics_t metrics,  long numiter, 
-                     int EIGENVALUES, int EIGENVALCOND, int AVERAGING, flux_t Fint, sqmat_t lambdaminusp1h, sqmat_t lambdaplusm1h){
+                     int EIGENVALCOND, int AVERAGING, flux_t Fint, sqmat_t lambdaminusp1h, sqmat_t lambdaplusm1h){
   flux_t Fm1h,Fp1h,fluxtmp,fluxtmp2;
-  /* flux_t Ustar; */
   sqmat_t R;
-  /* sqmat_t L; */
   long flux;
   jacvars_t jacvarsm1h,jacvarsp1h,jacvarsp0;
   jacvars_t jacvarsm1h_RE,jacvarsp1h_RE,jacvarsp0_RE;
@@ -1600,23 +1704,19 @@ void find_Fstar_interface_FVSplus_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h
   find_jacvars(np[lp1h],gl,metrics,theta,&jacvarsp1h);
   find_jacvars_at_interface_from_jacvars(jacvarsm1h, jacvarsp1h, gl, theta, metrics, AVERAGING, &jacvarsp0);
 
-  find_Lambda_minus_plus_FVSplus_muscl(np,gl,lm1h,lp1h,jacvarsm1h,jacvarsp0,jacvarsp1h, jacvarsm1h_RE,jacvarsp0_RE,jacvarsp1h_RE,metrics, theta, numiter, EIGENVALUES, EIGENVALCOND, lambdaminusp1h, lambdaplusm1h);
-
+  find_Lambda_minus_plus_FVSplus_muscl(np,gl,lm1h,lp1h,jacvarsm1h,jacvarsp0,jacvarsp1h, jacvarsm1h_RE,jacvarsp0_RE,jacvarsp1h_RE,metrics, theta, numiter, EIGENVALCOND, lambdaminusp1h, lambdaplusm1h);
 
   find_Linv_from_jacvars(jacvarsm1h, metrics, R);
   find_LUstar_from_jacvars(jacvarsm1h, metrics, fluxtmp);
   multiply_diagonal_matrix_and_vector(lambdaplusm1h,fluxtmp,fluxtmp2);
   multiply_matrix_and_vector(R,fluxtmp2,Fm1h);
 
-
   find_Linv_from_jacvars(jacvarsp1h, metrics, R);
   find_LUstar_from_jacvars(jacvarsp1h, metrics, fluxtmp);
   multiply_diagonal_matrix_and_vector(lambdaminusp1h,fluxtmp,fluxtmp2);
   multiply_matrix_and_vector(R,fluxtmp2,Fp1h);
 
-
   for (flux=0; flux<nf; flux++) Fint[flux]=Fm1h[flux]+Fp1h[flux];
-
 
 }
 

@@ -19,7 +19,7 @@
   typedef GRIDG_gl3d_t glgrid_t;
 #endif
 
-#define numbib 39
+#define numbib 40
 #define maxstrlen 4096
 
 typedef char longstr_t[maxstrlen];
@@ -64,7 +64,8 @@ const static longstr_t bibname[numbib]=
    "young1950a",
    "frankel1950a",
    "gnoffo2004a",
-   "parent2017a"
+   "parent2017a",
+   "parent2019a"
   };
 
 const static longstr_t bib[numbib]=
@@ -184,6 +185,9 @@ const static longstr_t bib[numbib]=
 
    //parent2017a
    "B Parent. \"Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows\", AIAA Journal, 55:141-152, 2017.",
+
+   //parent2019a
+   "B Parent. \"Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler Equatons\", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019."
 
   };
 

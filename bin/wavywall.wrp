@@ -108,7 +108,7 @@ Init(
 
 Disc(
   NavierStokesPerfect(
-    zetaA1=0.1e0; {conditions the convective waves of the A jacobian; set it to 0.0 usually but make
+    zetaA1=0.1; {conditions the convective waves of the A jacobian; set it to 0.0 usually but make
                    sure that the shock structure obtained is similar to when zetaA1 is set to 0.3}
     zetaA2=0.2;
     zetaA3=0.1e0; {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
@@ -124,16 +124,16 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_PARENT;
   );
   MUSCL(
-    FLUX=FLUX_FDS;
+    FLUX=FLUX_FVS;
     AVERAGING=AVERAGING_ROE;
     
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.9999;
     INTERPOL=INTERPOL_AOWENO7;
-    EIGENVALCOND=EIGENVALCOND_PARENT;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
     FACEINTEG=FACEINTEG_CENTRAL3;
-    POSFILTER=POSFILTER_PARENT;
+    POSFILTER=POSFILTER_NONE;
     POSFILTER_numiter=4;
   );
   FVS(

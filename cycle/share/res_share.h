@@ -23,9 +23,6 @@
 #define AOWENO_TYPE_DIFFUSIVE 0
 #define AOWENO_TYPE_COMPRESSIVE 1
 
-#define EIGENVALUES_NOT_ENFORCED_POSITIVE 0
-#define EIGENVALUES_ENFORCED_POSITIVE 1
-
 #ifdef _FLUID_NEUTRALSTRANSPORT
   #define EIGENVALCOND_HARTEN 0
   #define EIGENVALCOND_GNOFFO 1
@@ -97,18 +94,17 @@ void find_Lambda_plus_minus_dtau_FDS(np_t *np, gl_t *gl, long l, long theta, int
 
 void find_Fstar_interface_FDSplus_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h, long theta, 
                      flux_t musclvarsm1h, flux_t musclvarsp1h, metrics_t metrics,  long numiter, 
-                     int EIGENVALUES, int EIGENVALCOND, int AVERAGING, flux_t Fint, sqmat_t lambdaminusp1h, sqmat_t lambdaplusm1h);
+                     int EIGENVALCOND, int AVERAGING, flux_t Fint, sqmat_t lambdaminusp1h, sqmat_t lambdaplusm1h);
 
-void find_Fstar_interface_FDS_muscl(gl_t *gl, long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
+void find_Fstar_interface_FDS_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h,  long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
                      metrics_t metrics, int EIGENVALCOND, int AVERAGING, flux_t Fint);
 
 void find_Fstar_interface_FVSplus_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h, long theta, 
                      flux_t musclvarsm1h, flux_t musclvarsp1h, metrics_t metrics,  long numiter, 
-                     int EIGENVALUES, int EIGENVALCOND, int AVERAGING, flux_t Fint, sqmat_t lambdaminusp1h, sqmat_t lambdaplusm1h);
+                     int EIGENVALCOND, int AVERAGING, flux_t Fint, sqmat_t lambdaminusp1h, sqmat_t lambdaplusm1h);
 
-
-void find_Fstar_interface_FVS_muscl(gl_t *gl, long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
-                     metrics_t metrics, int EIGENVALCOND, flux_t Fint);
+void find_Fstar_interface_FVS_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h,  long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
+                     metrics_t metrics, int EIGENVALCOND, int AVERAGING, flux_t Fint);
 
 void find_jacvars_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, int AVERAGING, jacvars_t *jacvars);
 

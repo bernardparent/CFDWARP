@@ -7,6 +7,45 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 06a
+   * in cycle/resconv/_FDS+/*.hh
+     - removed #define _RESCONV_LAMBDA_ABSOLUTE_CONDITIONING
+   * moved
+     - cycle/resconv/_MUSCL to cycle/resconv/_MUSCL_old
+     - cycle/resconv/_MUSCL_EXP to cycle/resconv/_MUSCL
+   * in cycle/resconv/_MUSCL+/resconv.c
+     - got rid of EIGENVALUES_ENFORCED_POSITIVE in calls to find_Fstar_interface_FDSplus_muscl()
+       and find_Fstar_interface_FVSplus_muscl()
+     - got rid of calls to find_Fstar_interface_FDSplus_muscl() with EIGENVALUES_NOT_ENFORCED_POSITIVE
+       (replaced by call to find_Fstar_interface_FDS_muscl() 
+     - got rid of calls to find_Fstar_interface_FVSplus_muscl() with EIGENVALUES_NOT_ENFORCED_POSITIVE
+       (replaced by call to find_Fstar_interface_FVS_muscl() 
+   * in cycle/resconv/_MUSCL/resconv.c
+     - added POSFILTER and POSFILTER_numiter
+     - got rid of calls to find_Fstar_interface_FDSplus_muscl() with EIGENVALUES_NOT_ENFORCED_POSITIVE
+       (replaced by call to find_Fstar_interface_FDS_muscl() 
+     - got rid of calls to find_Fstar_interface_FVSplus_muscl() with EIGENVALUES_NOT_ENFORCED_POSITIVE
+       (replaced by call to find_Fstar_interface_FVS_muscl() 
+     - in integrate_Fstar_interface(), added Parent Positivity-preserving filter
+     - in add_dFstar_residual(), added Parent Positivity-preserving filter for FACEINTEG_CENTRAL1
+     - in find_Delta_Lambda_for_dtau(), Delta_Lambda[flux]=np[l].bs->Delta_Lambda[theta][flux]; for
+       POSFILTER_PARENT
+   * in cycle/resconv/_MUSCL/resconv.hh
+     - added _RESCONV_MUSCLPLUS, _RESCONV_DELTA_LAMBDA_STORAGE, _RESCONV_POSITIVITY_PRESERVING
+     - changed CONVJACOBIAN CONVJACOBIAN_FDS to CONVJACOBIAN CONVJACOBIAN_FVSPLUS
+   * in cycle/share/res_share.c
+     - in find_Lambda_minus_plus_F*Splus_muscl(), took away EIGENVALUES parameter
+     - removed code related to _RESCONV_LAMBDA_ABSOLUTE_CONDITIONING
+     - in find_Lambda_minus_plus_F*Splus_muscl(), removed code related to EIGENVALUES_NOT_ENFORCED_POSITIVE
+     - in find_Fstar_interface_F*Splus_muscl(),  took away EIGENVALUES parameter
+     - added function find_Fstar_interface_FDS_muscl_with_CDF()
+     - added function find_Fstar_interface_FVS_muscl_with_CDF()
+   * in cycle/share/res_share.h
+     - removed EIGENVALUES_NOT_ENFORCED_POSITIVE and EIGENVALUES_ENFORCED_POSITIVE
+   * in src/control.c
+     - in bib[], added parent2019a conference paper
+ 
+
 2019 FEB 05a
    * in cycle/resconv
      - added experimental directory _MUSCL_EXP which is a fork of _MUSCL but with the option of

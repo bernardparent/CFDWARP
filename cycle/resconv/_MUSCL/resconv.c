@@ -31,6 +31,8 @@
 #define FACEINTEG_CENTRAL3 22
 #define FACEINTEG_CENTRAL5 23
 #define FACEINTEG_AOWENO5 24
+#define POSFILTER_NONE 1
+#define POSFILTER_PARENT 2
 
 
 
@@ -45,6 +47,8 @@ void write_disc_resconv_template(FILE **controlfile){
     "    INTERPOL=INTERPOL_AOWENO7;\n"
     "    FACEINTEG=FACEINTEG_CENTRAL3;\n"
     "    EIGENVALCOND=EIGENVALCOND_GNOFFO;\n"
+    "    POSFILTER=POSFILTER_NONE;\n"
+    "    POSFILTER_numiter=4;\n"
     "  );\n"
   ,_RESCONV_ACTIONNAME);
 
@@ -66,6 +70,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"EIGENVALCOND_HARTEN",EIGENVALCOND_HARTEN); 
     SOAP_add_int_to_vars(codex,"EIGENVALCOND_PECLET",EIGENVALCOND_PECLET);
     SOAP_add_int_to_vars(codex,"EIGENVALCOND_GNOFFO",EIGENVALCOND_GNOFFO);
+    SOAP_add_int_to_vars(codex,"EIGENVALCOND_PARENT",EIGENVALCOND_PARENT);
     SOAP_add_int_to_vars(codex,"AVERAGING_ROE",AVERAGING_ROE);
     SOAP_add_int_to_vars(codex,"AVERAGING_ARITH",AVERAGING_ARITH);
     SOAP_add_int_to_vars(codex,"FLUX_FDS",FLUX_FDS); 
@@ -90,6 +95,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"FACEINTEG_CENTRAL3",FACEINTEG_CENTRAL3); 
     SOAP_add_int_to_vars(codex,"FACEINTEG_CENTRAL5",FACEINTEG_CENTRAL5); 
     SOAP_add_int_to_vars(codex,"FACEINTEG_AOWENO5",FACEINTEG_AOWENO5); 
+    SOAP_add_int_to_vars(codex,"POSFILTER_PARENT",POSFILTER_PARENT); 
+    SOAP_add_int_to_vars(codex,"POSFILTER_NONE",POSFILTER_NONE); 
 
     SOAP_add_int_to_vars(codex,"AOWENO_TYPE_COMPRESSIVE",AOWENO_TYPE_COMPRESSIVE); 
     SOAP_add_int_to_vars(codex,"AOWENO_TYPE_DIFFUSIVE",AOWENO_TYPE_DIFFUSIVE); 
@@ -102,12 +109,20 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     codex->action=action_original;
 
     find_int_var_from_codex(codex,"EIGENVALCOND",&gl->cycle.resconv.EIGENVALCOND);
-    if (gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PECLET && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_HARTEN && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_GNOFFO)
-      SOAP_fatal_error(codex,"EIGENVALCOND must be set to either EIGENVALCOND_PECLET, EIGENVALCOND_HARTEN, EIGENVALCOND_GNOFFO.");
+    if (gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PECLET && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_HARTEN && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_GNOFFO && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PARENT)
+      SOAP_fatal_error(codex,"EIGENVALCOND must be set to either EIGENVALCOND_PECLET, EIGENVALCOND_HARTEN, EIGENVALCOND_GNOFFO, EIGENVALCOND_PARENT.");
 
     find_int_var_from_codex(codex,"AVERAGING",&gl->cycle.resconv.AVERAGING);
     if (gl->cycle.resconv.AVERAGING!=AVERAGING_ROE  && gl->cycle.resconv.AVERAGING!=AVERAGING_ARITH)
       SOAP_fatal_error(codex,"AVERAGING must be set to either AVERAGING_ROE or AVERAGING_ARITH.");
+
+
+    find_int_var_from_codex(codex,"POSFILTER",&gl->cycle.resconv.POSFILTER);
+    if (gl->cycle.resconv.POSFILTER!=POSFILTER_NONE  && gl->cycle.resconv.POSFILTER!=POSFILTER_PARENT)
+      SOAP_fatal_error(codex,"POSFILTER must be set to either POSFILTER_NONE or POSFILTER_PARENT.");
+    find_int_var_from_codex(codex,"POSFILTER_numiter",&gl->cycle.resconv.POSFILTER_numiter);
+    if (gl->cycle.resconv.POSFILTER_numiter<1) SOAP_fatal_error(codex,"POSFILTER_numiter must be set to an integer greater or equal to 1.");
+
 
     find_int_var_from_codex(codex,"FACEINTEG",&gl->cycle.resconv.FACEINTEG);
     if (gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL1  && gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL3 && gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL5 && gl->cycle.resconv.FACEINTEG!=FACEINTEG_AOWENO5)
@@ -168,11 +183,8 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t 
   metrics_t metrics;
   long flux,nodes_from_bdry;
   flux_t musclvarsL,musclvarsR;
-  int AOWENO_TYPE;
+  int AOWENO_TYPE,EIGENVALCOND;
   double gammalo,gammahi;
-#ifdef _RESTIME_CDF  
-  sqmat_t lambdaminusp1h, lambdaplusm1h;
-#endif
 
   find_metrics_at_interface(np, gl, l, _al(gl,l,theta,+1), theta, &metrics);
   nodes_from_bdry=_nodes_from_bdry_through_links_limited(np,gl,l,theta,TYPELEVEL_FLUID_WORK,hbw_resconv_fluid);
@@ -318,22 +330,19 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t 
   }
 
 
+  if (gl->cycle.resconv.POSFILTER==POSFILTER_NONE){
+    EIGENVALCOND=gl->cycle.resconv.EIGENVALCOND;
+  } else {
+    EIGENVALCOND=EIGENVALCOND_NONE;
+  }
   switch (gl->cycle.resconv.FLUX){
     case FLUX_FDS:
-#ifdef _RESTIME_CDF  
-      find_Fstar_interface_FDSplus_muscl(np, gl,  l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, 0, EIGENVALUES_NOT_ENFORCED_POSITIVE,  gl->cycle.resconv.EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint, lambdaminusp1h, lambdaplusm1h);
-#else
-      find_Fstar_interface_FDS_muscl(gl, theta, musclvarsL, musclvarsR, metrics, gl->cycle.resconv.EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
-#endif
+      find_Fstar_interface_FDS_muscl(np, gl, l, _al(gl,l,theta,+1),  theta, musclvarsL, musclvarsR,
+                     metrics, EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
     break;
     case FLUX_FVS:
-#ifdef _RESTIME_CDF  
-      find_Fstar_interface_FVSplus_muscl(np, gl,  l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, 0, EIGENVALUES_NOT_ENFORCED_POSITIVE, gl->cycle.resconv.EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint, lambdaminusp1h, lambdaplusm1h);
-#else
-
-      find_Fstar_interface_FVS_muscl(gl, theta, musclvarsL, musclvarsR, metrics, gl->cycle.resconv.EIGENVALCOND, Fint);
-#endif
-
+      find_Fstar_interface_FVS_muscl(np, gl, l, _al(gl,l,theta,+1),  theta, musclvarsL,  musclvarsR,
+                     metrics, EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
     break;
     default:
       fatal_error("gl->cycle.resconv.FLUX must be set to either FLUX_FDS or FLUX_FVS in find_Fstar_interface().");
@@ -350,7 +359,6 @@ void find_Fstar_interfaces(np_t *np, gl_t *gl, long theta, long ls, long le){
   long flux,l;
   flux_t musclvarsm5,musclvarsm4,musclvarsm3,musclvarsm2,musclvarsm1,musclvarsp0,musclvarsp1,
          musclvarsp2,musclvarsp3,musclvarsp4,musclvarsp5;
-
   if (gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL1){
     for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
 
@@ -538,9 +546,11 @@ int find_face_integrated_flux_AOWENO5(np_t *np, gl_t *gl, long l, long dim, flux
 
 
 
-static void integrate_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t Fint){
+static void integrate_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t Fint, sqmat_t lambdaminusp1h, sqmat_t lambdaplusm1h){
   long dim,flux;
   flux_t Fp0,Fm1,Fp1;
+  flux_t Finttmp;
+  metrics_t metrics;
 #ifdef _3D
   long i,j;
   flux_t Fm2,Fp2;
@@ -664,23 +674,35 @@ static void integrate_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, fl
     default:
       fatal_error("FACEINTEG can not be set to %d.",gl->cycle.resconv.FACEINTEG);
   }
+
+
+  if (gl->cycle.resconv.POSFILTER==POSFILTER_PARENT){
+    // apply positivity-preserving filter
+    find_metrics_at_interface(np, gl, l, _al(gl,l,theta,+1), theta, &metrics);
+    for (flux=0; flux<nf; flux++){
+      Finttmp[flux]=Fint[flux];
+    }
+    filter_Fstar_interface_positivity_preserving(np, gl, l, theta, metrics, gl->cycle.resconv.POSFILTER_numiter, gl->cycle.resconv.EIGENVALCOND, Finttmp, Fint, lambdaminusp1h,  lambdaplusm1h);
+  }
+
 }
 
 
 void add_dFstar_residual_new(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
   flux_t Fm1h,Fp1h;
   long flux,l;
+  sqmat_t lambdaminusp1h, lambdaplusm1h;
 
   for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
 
     if(l==ls){
-      integrate_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, Fm1h);
+      integrate_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, Fm1h, lambdaminusp1h, lambdaplusm1h);
     } else {
       for (flux=0; flux<nf; flux++) {
         Fm1h[flux]=Fp1h[flux];
       }
     }
-    integrate_Fstar_interface(np, gl, l, theta, Fp1h);
+    integrate_Fstar_interface(np, gl, l, theta, Fp1h, lambdaminusp1h, lambdaplusm1h);
 
     for (flux=0; flux<nf; flux++) {
       np[l].wk->Res[flux]+=fact*(Fp1h[flux]-Fm1h[flux]);
@@ -695,8 +717,10 @@ void add_dFstar_residual_new(long theta, long ls, long le, np_t *np, gl_t *gl, d
 
 
 void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
-  flux_t Fm1h,Fp1h;
+  flux_t Fm1h,Fp1h,Ftmp;
   long flux,l;
+  metrics_t metrics;
+  sqmat_t Lambdaminus_p0,Lambdaplus_p0,Lambdaminus_p1;
   flux_t musclvarsm5,musclvarsm4,musclvarsm3,musclvarsm2,musclvarsm1,musclvarsp0,musclvarsp1,
          musclvarsp2,musclvarsp3,musclvarsp4,musclvarsp5;
 
@@ -705,7 +729,7 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
     switch (gl->cycle.resconv.FACEINTEG){
 
 
-      case FACEINTEG_CENTRAL1:
+      case (FACEINTEG_CENTRAL1):
         if(l==ls){
           if (hbw_resconv_fluid>=5) find_musclvars_offset(np,gl,l,theta,-5,musclvarsm5);
           if (hbw_resconv_fluid>=4) find_musclvars_offset(np,gl,l,theta,-4,musclvarsm4);
@@ -719,6 +743,14 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
           if (hbw_resconv_fluid>=4) find_musclvars_offset(np,gl,l,theta,+4,musclvarsp4);
           if (hbw_resconv_fluid>=5) find_musclvars_offset(np,gl,l,theta,+5,musclvarsp5);
           find_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, musclvarsm5, musclvarsm4, musclvarsm3, musclvarsm2, musclvarsm1, musclvarsp0, musclvarsp1, musclvarsp2, musclvarsp3, musclvarsp4, Fm1h);
+          if (gl->cycle.resconv.POSFILTER==POSFILTER_PARENT){
+            // apply positivity-preserving filter
+            find_metrics_at_interface(np, gl, _al(gl,l,theta,-1), l, theta, &metrics);
+            for (flux=0; flux<nf; flux++){
+              Ftmp[flux]=Fm1h[flux];
+            }
+            filter_Fstar_interface_positivity_preserving(np, gl, _al(gl,l,theta,-1), theta, metrics, gl->cycle.resconv.POSFILTER_numiter, gl->cycle.resconv.EIGENVALCOND, Ftmp, Fm1h, Lambdaminus_p1, Lambdaplus_p0);
+          }
 
         } else {
 
@@ -737,6 +769,9 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
 
         }
 
+        for (flux=0; flux<nf; flux++) {
+          Lambdaminus_p0[flux][flux]=Lambdaminus_p1[flux][flux];
+        }
         switch (hbw_resconv_fluid){
           case 1:
             find_musclvars_offset(np,gl,l,theta,+1,musclvarsp1);
@@ -757,17 +792,32 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
             fatal_error("hbw_resconv_fluid can not be set to %ld",hbw_resconv_fluid);
         }
         find_Fstar_interface(np, gl, l, theta, musclvarsm4, musclvarsm3, musclvarsm2, musclvarsm1, musclvarsp0, musclvarsp1, musclvarsp2, musclvarsp3, musclvarsp4, musclvarsp5, Fp1h);
+        if (gl->cycle.resconv.POSFILTER==POSFILTER_PARENT){
+          for (flux=0; flux<nf; flux++) {
+            Lambdaminus_p0[flux][flux]=Lambdaminus_p1[flux][flux];
+          }
+          // apply positivity-preserving filter
+          find_metrics_at_interface(np, gl, l, _al(gl,l,theta,+1), theta, &metrics);
+          for (flux=0; flux<nf; flux++){
+            Ftmp[flux]=Fp1h[flux];
+          }
+          filter_Fstar_interface_positivity_preserving(np, gl, l, theta, metrics, gl->cycle.resconv.POSFILTER_numiter, gl->cycle.resconv.EIGENVALCOND, Ftmp, Fp1h, Lambdaminus_p1, Lambdaplus_p0);
+        }
+
       break;
 
       default:
         if(l==ls){
-          integrate_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, Fm1h);
+          integrate_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, Fm1h, Lambdaminus_p1,Lambdaplus_p0);
         } else {
           for (flux=0; flux<nf; flux++) {
             Fm1h[flux]=Fp1h[flux];
           }
         }
-        integrate_Fstar_interface(np, gl, l, theta, Fp1h);
+        for (flux=0; flux<nf; flux++) {
+          Lambdaminus_p0[flux][flux]=Lambdaminus_p1[flux][flux];
+        }
+        integrate_Fstar_interface(np, gl, l, theta, Fp1h, Lambdaminus_p1,Lambdaplus_p0);
 
     }
 
@@ -776,6 +826,7 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
 #ifdef _RESTIME_STORAGE_TRAPEZOIDAL
       np[l].bs->Res_trapezoidal[flux]+=fact_trapezoidal*(Fp1h[flux]-Fm1h[flux]); 
 #endif
+      np[l].bs->Delta_Lambda[theta][flux]=-Lambdaminus_p0[flux][flux]    +Lambdaplus_p0[flux][flux];
     }
   }
 
@@ -790,8 +841,19 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
 void find_Delta_Lambda_for_dtau(np_t *np, gl_t *gl, long l, long theta, flux_t Delta_Lambda){
   sqmat_t Lambda_minus,Lambda_plus;
   long flux;
-  find_Lambda_minus_dtau_FDS(np,gl,l,theta,gl->cycle.resconv.EIGENVALCOND,gl->cycle.resconv.AVERAGING,Lambda_minus);
-  find_Lambda_plus_dtau_FDS(np,gl,l,theta,gl->cycle.resconv.EIGENVALCOND,gl->cycle.resconv.AVERAGING,Lambda_plus);
-  for (flux=0; flux<nf; flux++) Delta_Lambda[flux]=Lambda_plus[flux][flux]-Lambda_minus[flux][flux];
+  switch (gl->cycle.resconv.POSFILTER){
+    case POSFILTER_NONE:
+      find_Lambda_minus_dtau_FDS(np,gl,l,theta,gl->cycle.resconv.EIGENVALCOND,gl->cycle.resconv.AVERAGING,Lambda_minus);
+      find_Lambda_plus_dtau_FDS(np,gl,l,theta,gl->cycle.resconv.EIGENVALCOND,gl->cycle.resconv.AVERAGING,Lambda_plus);
+      for (flux=0; flux<nf; flux++) Delta_Lambda[flux]=Lambda_plus[flux][flux]-Lambda_minus[flux][flux];
+    break;
+    case POSFILTER_PARENT:
+      for (flux=0; flux<nf; flux++) Delta_Lambda[flux]=np[l].bs->Delta_Lambda[theta][flux];
+    break;
+    default:
+      fatal_error("POSFILTER must be set to either POSFILTER_NONE or POSFILTER_PARENT, not to %d",gl->cycle.resconv.POSFILTER);
+  }
 }
+
+
 

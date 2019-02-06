@@ -116,16 +116,19 @@ Init(
 Disc(
   NavierStokesPerfect(
     zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   MUSCL(
     FLUX=FLUX_FDS;
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
-    AOWENO_gammalo=0.9999;
+    AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.9999;
     INTERPOL=INTERPOL_AOWENO7;
-    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+    POSFILTER=POSFILTER_NONE;
+    POSFILTER_numiter=4;
+    FACEINTEG=FACEINTEG_CENTRAL3;
   );
   MUSCLplus(
     FLUX=FLUX_FDSplus;

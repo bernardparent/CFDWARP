@@ -2,7 +2,6 @@
 #define _RESCONV_FVS
 #define hbw_resconv_fluid 4 //maximum half bandwidth of stencil (excluding center node)
 #define hbw_resconvplasma_fluid hbw_resconv_fluid  //half bandwidth of stencil that depends on emfield mem props 
-#define _RESCONV_LAMBDA_ABSOLUTE_CONDITIONING
 #define CONVJACOBIAN CONVJACOBIAN_FVS
 #define _RESCONV_ACTIONNAME "FVS"
 

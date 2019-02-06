@@ -198,36 +198,21 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t 
 
   switch (gl->cycle.resconv.FLUX){
     case FLUX_FDSplus:
-      find_Fstar_interface_FDSplus_muscl(np, gl,  l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics,   gl->cycle.resconv.numiter, EIGENVALUES_ENFORCED_POSITIVE,  gl->cycle.resconv.EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint, lambdaminusp1h,  lambdaplusm1h);
+      find_Fstar_interface_FDSplus_muscl(np, gl,  l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics,   gl->cycle.resconv.numiter, gl->cycle.resconv.EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint, lambdaminusp1h,  lambdaplusm1h);
     break;
     case FLUX_FVSplus:
-      find_Fstar_interface_FVSplus_muscl(np, gl,  l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics,   gl->cycle.resconv.numiter, EIGENVALUES_ENFORCED_POSITIVE,  gl->cycle.resconv.EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint, lambdaminusp1h,  lambdaplusm1h);
+      find_Fstar_interface_FVSplus_muscl(np, gl,  l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics,   gl->cycle.resconv.numiter, gl->cycle.resconv.EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint, lambdaminusp1h,  lambdaplusm1h);
     break;
     case FLUX_FDSplusFilterMultiD:
-#ifdef _RESTIME_CDF  
-      find_Fstar_interface_FDSplus_muscl(np, gl,  l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, 0, EIGENVALUES_NOT_ENFORCED_POSITIVE,  EIGENVALCOND_NONE, gl->cycle.resconv.AVERAGING, Finttmp, lambdaminusp1h, lambdaplusm1h);
-#else
-      find_Fstar_interface_FDS_muscl(gl, theta, musclvarsL, musclvarsR, metrics, EIGENVALCOND_NONE, gl->cycle.resconv.AVERAGING, Finttmp);
-#endif
+      find_Fstar_interface_FDS_muscl(np, gl, l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, EIGENVALCOND_NONE, gl->cycle.resconv.AVERAGING, Finttmp);
       filter_Fstar_interface_positivity_preserving_MultiD(np, gl, l, theta, metrics, gl->cycle.resconv.numiter, gl->cycle.resconv.EIGENVALCOND, Finttmp, Fint, lambdaminusp1h,  lambdaplusm1h);
     break;
     case FLUX_FDSplusFilter:
-#ifdef _RESTIME_CDF  
-      find_Fstar_interface_FDSplus_muscl(np, gl,  l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, 0, EIGENVALUES_NOT_ENFORCED_POSITIVE,  EIGENVALCOND_NONE, gl->cycle.resconv.AVERAGING, Finttmp, lambdaminusp1h, lambdaplusm1h);
-#else
-      find_Fstar_interface_FDS_muscl(gl, theta, musclvarsL, musclvarsR, metrics, EIGENVALCOND_NONE, gl->cycle.resconv.AVERAGING, Finttmp);
-#endif
+      find_Fstar_interface_FDS_muscl(np, gl, l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, EIGENVALCOND_NONE, gl->cycle.resconv.AVERAGING, Finttmp);
       filter_Fstar_interface_positivity_preserving(np, gl, l, theta, metrics, gl->cycle.resconv.numiter, gl->cycle.resconv.EIGENVALCOND, Finttmp, Fint, lambdaminusp1h,  lambdaplusm1h);
     break;
     case FLUX_FVSplusFilter:
-
-#ifdef _RESTIME_CDF  
-      find_Fstar_interface_FVSplus_muscl(np, gl,  l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, 0, EIGENVALUES_NOT_ENFORCED_POSITIVE,  EIGENVALCOND_NONE, gl->cycle.resconv.AVERAGING, Finttmp, lambdaminusp1h, lambdaplusm1h);
-      //find_Fstar_interface_FVSplus_muscl(np, gl,  l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, gl->cycle.resconv.numiter, EIGENVALUES_ENFORCED_POSITIVE,  gl->cycle.resconv.EIGENVALCOND, gl->cycle.resconv.AVERAGING, Finttmp, lambdaminusp1h, lambdaplusm1h);
-#else
-      find_Fstar_interface_FVS_muscl(gl, theta, musclvarsL, musclvarsR, metrics, EIGENVALCOND_NONE, Finttmp);
-#endif 
-
+      find_Fstar_interface_FVS_muscl(np, gl, l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, EIGENVALCOND_NONE, gl->cycle.resconv.AVERAGING, Finttmp);
       filter_Fstar_interface_positivity_preserving(np, gl, l, theta, metrics, gl->cycle.resconv.numiter, gl->cycle.resconv.EIGENVALCOND, Finttmp, Fint, lambdaminusp1h,  lambdaplusm1h);
     break;
     default:
