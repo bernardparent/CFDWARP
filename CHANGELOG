@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 08a
+   * in model/thermo/_generic/thermo.c
+     - in _dsk_dT_from_T(), now do not output an error if _CHEM_SET_TE_TO_T_FOR_ARRHENIUS_REACTIONS is defined
+
+
 2019 FEB 07b
    * in lib/gridg/2Dbase.c and lib/gridg/3Dbase.c
      - renamed JoinPlanes to JoinFaces

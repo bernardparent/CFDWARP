@@ -178,11 +178,11 @@ Model(
     TEMODEL=TEMODEL_LOCAL;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=YES;
-    REACTING=NO;
+    REACTING=YES;
     sigmadiv=1e-10; {S/m}
     etdiv=1e-1;     {J/kg}
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
-    Tmin=1.0e1;     Tmax=6.0e3;    {K}
+    Tmin=1.0e1;     Tmax=15.0e3;    {K}
     Tvmin=Tmin;     Tvmax=10.0e3;  {K}
     Temin=Tmin;     Temax=60.0e3;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
@@ -282,8 +282,8 @@ Disc(
     AOWENO_gammahi=0.95;
     INTERPOL=INTERPOL_TVD2_VANLEER;
     FACEINTEG=FACEINTEG_CENTRAL1;
-    EIGENVALCOND=EIGENVALCOND_GNOFFO;
-    POSFILTER=POSFILTER_NONE;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+    POSFILTER=POSFILTER_PARENT;
     POSFILTER_numiter=4;
   );
 );
@@ -292,8 +292,8 @@ Disc(
 Cycle(
   NavierStokesPlasma(
     xiverge=1e-3;         {residual convergence threshold}
-    zetaGammai=1.0;       {factor multiplying the pseudotime step of the ion species transport equations} 
-    zetaGammae=1.0;       {factor multiplying the pseudotime step of the electron species transport equations
+    zetaGammai=1;       {factor multiplying the pseudotime step of the ion species transport equations} 
+    zetaGammae=1;       {factor multiplying the pseudotime step of the electron species transport equations
                            near cathode}
     relaxNi_bdry=1.0;     {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.2;     {the electron density relaxation factor at the boundary }
@@ -331,16 +331,16 @@ Cycle(
     if (mod(iter,50)==0,
       WriteDataFile(outputfilename);
     );
-    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
+    sigma1=0.5;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
-      CFL=0.01;
+      CFL=0.05;
     );
-    CFL=min(CFL*1.02,0.5);
+    CFL=min(CFL*1.05,0.14);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
-    Lc=3e-3;      {characteristic length scale in meters used to solve the emfield equation}
-    relaxEMF=0.3; {relaxation factor forced on the update of the emfield variables}
-    UpdateEMField(Lc,relaxEMF); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+    Lc=0.05;      {characteristic length scale in meters used to solve the emfield equation}
+    relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
+    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,600); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);

@@ -2646,7 +2646,7 @@ double _dsk_dT_from_T(long spec, double T){
     } 
   }
 #endif
-#ifdef speceminus
+#if (defined(speceminus) && !defined(_CHEM_SET_TE_TO_T_FOR_ARRHENIUS_REACTIONS))
   if (_FLUID_EENERGY && spec==speceminus){
     fatal_error("In _dsk_dT_from_T part of thermo.c, spec can't be set to speceminus when the electron temperature is not equal to the gas temperature. Probably, you are trying to solve a chemical reaction in Arrhenius form that involves the electron species. You should rewrite it as 2 distinct reactions that don't involve the equilibrium constant.");
   }
