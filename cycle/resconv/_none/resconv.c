@@ -22,6 +22,7 @@ void read_disc_resconv_actions_2(char *actionname, char **argum, SOAP_codex_t *c
 void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *codex){
   gl_t *gl=((readcontrolarg_t *)codex->action_args)->gl;
   gl->DISC_RESCONV_READ=TRUE;
+  gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_NONE;
 }
 
 

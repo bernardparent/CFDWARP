@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 07a
+   * in cycle/resconv/_none/resconv.c
+     - in read_disc_resconv_actions(), added gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_NONE
+   * in cycle/resconv/_none/resconv.hh
+     - in gl_cycle_resconv_t added CONVJACOBIAN
+   
+
 2019 FEB 06b
    * in cycle/resconv/*/resconv.c
      - in read_disc_resconv_actions(), added initialization of gl->cycle.resconv.CONVJACOBIAN

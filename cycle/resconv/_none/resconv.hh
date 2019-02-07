@@ -6,5 +6,6 @@
 #define _RESCONV_ACTIONNAME "None"
 
 typedef struct {
+  int CONVJACOBIAN;
 } gl_cycle_resconv_t;
 
