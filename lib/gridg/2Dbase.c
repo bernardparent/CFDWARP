@@ -245,7 +245,7 @@ static void JoinCorners_argum(char **argum, SOAP_codex_t *codex, GRIDG_gl2d_t gl
 
 
 /* Algorithm by Derrick Alexander */
-void JoinPlanes2D(GRIDG_gl2d_t gl2d, GRIDG_xygrid_t *xygrid, SOAP_codex_t *codex,
+void JoinFaces2D(GRIDG_gl2d_t gl2d, GRIDG_xygrid_t *xygrid, SOAP_codex_t *codex,
                long i1, long j1, long i2, long j2){
   long i,j;
   double fy_start,fy_end,fx_top,fx_bot,y1,y2;
@@ -256,16 +256,16 @@ void JoinPlanes2D(GRIDG_gl2d_t gl2d, GRIDG_xygrid_t *xygrid, SOAP_codex_t *codex
     for (j=j1+1; j<j2; j++){
       VALID=TRUE;
       if (!xygrid[GRIDG_ai2(gl2d,i1,j)].INIT){
-        SOAP_fatal_error(codex,"Node (%ld,%ld) not yet initialized. JoinPlanes command failed.",i1,j);
+        SOAP_fatal_error(codex,"Node (%ld,%ld) not yet initialized. JoinFaces command failed.",i1,j);
       }
       if (!xygrid[GRIDG_ai2(gl2d,i2,j)].INIT){
-        SOAP_fatal_error(codex,"Node (%ld,%ld) not yet initialized. JoinPlanes command failed.",i2,j);
+        SOAP_fatal_error(codex,"Node (%ld,%ld) not yet initialized. JoinFaces command failed.",i2,j);
       }
       if (!xygrid[GRIDG_ai2(gl2d,i,j1)].INIT){
-        SOAP_fatal_error(codex,"Node (%ld,%ld) not yet initialized. JoinPlanes command failed.",i,j1);
+        SOAP_fatal_error(codex,"Node (%ld,%ld) not yet initialized. JoinFaces command failed.",i,j1);
       }
       if (!xygrid[GRIDG_ai2(gl2d,i,j2)].INIT){
-        SOAP_fatal_error(codex,"Node (%ld,%ld) not yet initialized. JoinPlanes command failed.",i,j2);
+        SOAP_fatal_error(codex,"Node (%ld,%ld) not yet initialized. JoinFaces command failed.",i,j2);
       }
 
       fy_start=(xygrid[GRIDG_ai2(gl2d,i1,j)].y-xygrid[GRIDG_ai2(gl2d,i1,j1)].y)
@@ -292,7 +292,7 @@ void JoinPlanes2D(GRIDG_gl2d_t gl2d, GRIDG_xygrid_t *xygrid, SOAP_codex_t *codex
   }
 
   if (!VALID){
-    SOAP_fatal_error(codex,"When using the JoinPlanes() command, set i2>i1+1 and j2>j1+1.");
+    SOAP_fatal_error(codex,"When using the JoinFaces() command, set i2>i1+1 and j2>j1+1.");
   }
 }
 
@@ -349,16 +349,16 @@ static void Join_argum(char **argum, SOAP_codex_t *codex, GRIDG_gl2d_t gl2d, GRI
 }
 
 
-static void JoinPlanes_argum(char **argum, SOAP_codex_t *codex, GRIDG_gl2d_t gl2d, GRIDG_xygrid_t *xygrid){
+static void JoinFaces_argum(char **argum, SOAP_codex_t *codex, GRIDG_gl2d_t gl2d, GRIDG_xygrid_t *xygrid){
   long i1,j1,i2,j2;
   int eos=EOS;
 
   SOAP_substitute_all_argums(argum, codex);
   if (sscanf(*argum,"%ld,%ld,%ld,%ld%n",&i1,&j1,&i2,&j2,&eos)!=4 || (*argum)[eos]!=EOS){
-    SOAP_fatal_error(codex,"One or more argument(s) could not be read properly in JoinPlanes().");
+    SOAP_fatal_error(codex,"One or more argument(s) could not be read properly in JoinFaces().");
   }
   verify_zone_validity(i1, j1, i2, j2, gl2d, codex);
-  JoinPlanes2D(gl2d, xygrid, codex, i1, j1, i2, j2);
+  JoinFaces2D(gl2d, xygrid, codex, i1, j1, i2, j2);
 }
 
 
@@ -808,8 +808,8 @@ static void actions(char *actionname, char **argum, SOAP_codex_t *codex){
     Join_argum(argum,codex,*gl2d,*xygrid);
     codex->ACTIONPROCESSED=TRUE;
   }
-  if (strcmp(actionname,"JoinPlanes")==0) {
-    JoinPlanes_argum(argum,codex,*gl2d,*xygrid);
+  if (strcmp(actionname,"JoinFaces")==0) {
+    JoinFaces_argum(argum,codex,*gl2d,*xygrid);
     codex->ACTIONPROCESSED=TRUE;
   }
   if (strcmp(actionname,"Translate")==0) {

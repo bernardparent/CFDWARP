@@ -7,6 +7,18 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 07b
+   * in lib/gridg/2Dbase.c and lib/gridg/3Dbase.c
+     - renamed JoinPlanes to JoinFaces
+   * in model/chem
+     - added _Air_Plasma_12s_59r_Dunn-Kang-Macheret
+   * in model/thermo/_generic/thermo.c
+     - in _sk_from_T(), now do not output an error if _CHEM_SET_TE_TO_T_FOR_ARRHENIUS_REACTIONS is defined
+     - in _muk_from_N_Tk_Ek(), added mobilities for NO+, N+, O+
+   * in model/chem/doc/report.tex
+     - fixed a mistake in one reaction for the Dunn-Kang model: NO- should be NO+
+
+
 2019 FEB 07a
    * in cycle/resconv/_none/resconv.c
      - in read_disc_resconv_actions(), added gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_NONE

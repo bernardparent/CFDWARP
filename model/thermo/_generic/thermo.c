@@ -2591,7 +2591,7 @@ double _sk_from_T(long spec, double T){
   }
 #endif
 
-#ifdef speceminus
+#if (defined(speceminus) && !defined(_CHEM_SET_TE_TO_T_FOR_ARRHENIUS_REACTIONS))
   if (_FLUID_EENERGY && spec==speceminus){
     fatal_error("In _sk_from_T() part of thermo.c, spec can't be set to speceminus when the electron temperature is not equal to the gas temperature. Probably, you are trying to solve a chemical reaction in Arrhenius form that involves the electron species. You should rewrite it as 2 distinct reactions that don't involve the equilibrium constant.");
   }
@@ -2717,7 +2717,10 @@ double _dmukN_dTk_from_Tk_EkoverN(double Tk, double Ekstar, long k){
 
 }
 
-/* find the mobility of species k [m2/Vs] using the species temperature Tk [K] and electric field in the species reference frame Ek [V/m] */ 
+/* find the mobility of species k [m2/Vs] using the species temperature Tk [K] and electric field in the species reference frame Ek [V/m] 
+  O2+, N2+, and NO+ are found from Sinnott, G., Golden, D. E., & Varney, R. N. (1968). Positive-Ion Mobilities in Dry Air. Physical Review, 170(1), 272–275. doi:10.1103/physrev.170.272 
+  O2- is found from GOSHO, Y. AND HARADA, A., “A New Technique for Measuring Negative Ion Mobilities at Atmospheric Pressure,” Journal of Physics D, Vol. 16, 1983, pp. 1159–1166.
+*/ 
 double _muk_from_N_Tk_Ek(double N, double Tk, double Ek, long k){
   double mu,Estar;
   mu=0.0;
@@ -2728,21 +2731,30 @@ double _muk_from_N_Tk_Ek(double N, double Tk, double Ek, long k){
     mu=_mueN_from_Te(Tk)/N;
   } else {
 #endif
-    /* electrons */
-    if (smap[k]==0){
-      mu=_mueN_from_Te(Tk)/N;
-    }
-    /* O2+ ion */
-    if (smap[k]==5){
-      mu=1.0/N*min(1.18E23/sqrt(Tk),3.61E12/sqrt(Estar));
-    }
-    /* N2+ ion */
-    if (smap[k]==6){
-      mu=1.0/N*min(0.75E23/sqrt(Tk),2.03E12/sqrt(Estar));
-    }
-    /* O2- ion */
-    if (smap[k]==9){
-      mu=1.0/N*min(0.97E23/sqrt(Tk),3.56E19*pow(Estar,-0.1));
+    switch (smap[k]){
+      case SMAP_eminus:
+        mu=_mueN_from_Te(Tk)/N;
+      break;
+      case SMAP_O2plus:
+        mu=1.0/N*min(1.18E23/sqrt(Tk),3.61E12/sqrt(Estar));
+      break;
+      case SMAP_N2plus:
+        mu=1.0/N*min(0.75E23/sqrt(Tk),2.03E12/sqrt(Estar));
+      break;
+      case SMAP_NOplus:
+        mu=1.0/N*min(1.62E23/sqrt(Tk),4.47E12/sqrt(Estar));
+      break;
+      case SMAP_O2minus:
+        mu=1.0/N*min(0.97E23/sqrt(Tk),3.56E19*pow(Estar,-0.1));
+      break;
+      case SMAP_Nplus:
+        mu=1.0/N*min(1.00E23/sqrt(Tk),1.00E12/sqrt(Estar)); //approximate: need to find it in litterature
+      break;
+      case SMAP_Oplus:
+        mu=1.0/N*min(1.00E23/sqrt(Tk),1.00E12/sqrt(Estar)); //approximate: need to find it in litterature
+      break;
+      default:
+        fatal_error("Mobility can't be found for species %ld",k);
     }
 #ifdef speceminus
   }

@@ -14,7 +14,7 @@ Grid2D(
   Equation(is,js,is,je, x, x=-sin(y*20)/40);
   Block( ie,js, ie,je, NO,0.5, 1,1, EE,0.5, 1.2,1 );
   Block( is,je, ie,je, EE,0.5, 1,1, NO,0.5, 1,1 );
-  JoinPlanes(is,js, ie,je);
+  JoinFaces(is,js, ie,je);
   Rotate(is,js,ie,je, 0.3,0.3, rad(20));
 );
 

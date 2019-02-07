@@ -15,7 +15,7 @@ Grid3D(
   {top}    JoinCorners( is,je,ks, ie,je,ke, FE,0.5,dx1,1, NO,0.5,1,1, EE, 0.5,1,1 );
   {front}  JoinCorners( is,js,ks, ie,je,ks, FE,0.5,dx1,1, EE,0.5,1,1, NO, 0.5,1,1 );
   {back}   JoinCorners( is,js,ke, ie,je,ke, FE,0.5,dx1,1, EE,0.5,1,1, NO, 0.5,1,1 );
-  JoinPlanes(is,js,ks,ie,je,ke);
+  JoinFaces(is,js,ks,ie,je,ke);
 );
 }
 

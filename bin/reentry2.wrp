@@ -8,7 +8,7 @@
 
   Version                          19feb07a
   Compiler                         gcc 4.9.2 with OPENMP threads
-  Compiled on                      Feb  7 2019 at 14:21:05 by parent on CLEO
+  Compiled on                      Feb  7 2019 at 13:05:49 by parent on CLEO
   Cycle Strategy                   Standard
   Fluid Relaxation                 Block ADI [1,2]
   EM Field Relaxation              None
@@ -20,14 +20,14 @@
   Temporal Discretization          Steady-State
   Fluid Model                      Navier-Stokes Multispecies
   Thermodynamic Model              NASA Glenn Polynomials [13]
-  Chemical Model                   Air Plasma 11s 31r Dunn-Kang [14]
+  Chemical Model                   Air Plasma 12 species 59 reactions Dung-Kang-Macheret [15,14]
   EM Field Model                   None
   Beam Model                       None
   Number of Dimensions             2
-  Number of Flux Components        14
-  Number of Species                11
-  Number of Charged Species        6
-  List of Species                  e-, O+, N+, O2+, N2+, NO+, O, N, NO, O2, N2
+  Number of Flux Components        15
+  Number of Species                12
+  Number of Charged Species        7
+  List of Species                  e-, O2-, O+, N+, O2+, N2+, NO+, O, N, NO, O2, N2
   _______________________________________________________________________________________________
 
   [1]  WR Briley and H McDonald. "On the Structure and Use of Linearized Block Implicit
@@ -58,13 +58,15 @@
        Equatons", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.
   [13] BJ McBride, MJ Zehe, and S Gordon. "NASA Glenn Coefficients for Calculating Thermodynamic
        Properties of Individual Species", NASA TP 2002-211556, 2002.
-  [14] MG Dunn and SW Kang. "Theoretical and Experimental Studies of Reentry Plasmas", NASA CR-
+  [14] B Parent, MN Shneider, and SO Macheret. "Detailed Modeling of Plasmas for Computational
+       Aerodynamics", AIAA Journal, 54:898-911, 2016.
+  [15] MG Dunn and SW Kang. "Theoretical and Experimental Studies of Reentry Plasmas", NASA CR-
        2232, 1973.
 
 
 }
 
- 
+
 
 Mx=15.0;
 My=0.0;
@@ -102,7 +104,6 @@ Grid(
   {JoinCorners(is,js,is,je, NO,1,1,1, EE,0.5,1,1);}
   Join(is,js,is1,je, i, EG,0.5,1.0,1.0);
 );
-
 
 Bdry(
   NavierStokes(
@@ -144,7 +145,7 @@ Model(
     DIFFUSION=YES;
     REACTING=YES;
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
-    Tmin=1.0e1;     Tmax=15.0e3;    {K}
+    Tmin=1.0e1;     Tmax=12.0e3;    {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-50;
     AXISYMMETRIC=NO;
@@ -170,6 +171,7 @@ Init(
 
     }
     w_eminus=1.0e-30;
+    w_O2minus=1.0e-30;
     w_Oplus=1.0e-30;
     w_Nplus=1.0e-30;
     w_O2plus=1.0e-30;
@@ -180,11 +182,11 @@ Init(
     w_NO=1.0e-30;
     w_O2=0.235;
     w_N2=0.765;
-    All(INIT_TYPE2,Mx,My,P,T,w_eminus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
-    Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,Twall,w_eminus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
+    All(INIT_TYPE2,Mx,My,P,T,w_eminus,w_O2minus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
+    Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,Twall,w_eminus,w_O2minus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
     {
-    Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_eminus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
-    Region(is,js,  ie,je, INIT_TYPE2,Mx,My,P,T,w_eminus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
+    Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_eminus,w_O2minus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
+    Region(is,js,  ie,je, INIT_TYPE2,Mx,My,P,T,w_eminus,w_O2minus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
     }
   );
 );
@@ -200,7 +202,7 @@ Disc(
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.95;
+    AOWENO_gammahi=0.999;
     INTERPOL=INTERPOL_TVD2_VANLEER;
     FACEINTEG=FACEINTEG_CENTRAL1;
     EIGENVALCOND=EIGENVALCOND_PARENT;
@@ -226,9 +228,10 @@ Cycle(
     Uref[8]=rhoref;   
     Uref[9]=rhoref;   
     Uref[10]=rhoref;   
-    Uref[11]=rhoref*aref;   
+    Uref[11]=rhoref;   
     Uref[12]=rhoref*aref;   
-    Uref[13]=rhoref*aref*aref;  
+    Uref[13]=rhoref*aref;   
+    Uref[14]=rhoref*aref*aref;  
   );
   SteadyState(
     if (mod(iter,50)==0,

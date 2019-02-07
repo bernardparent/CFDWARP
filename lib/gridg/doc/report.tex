@@ -321,25 +321,25 @@ When used on a 2D grid, \verb|Join| is to be used as follows:
 
 
 
-\subsection{\emph{JoinPlanes}}
+\subsection{\emph{JoinFaces}}
 
-\verb|JoinPlanes| joins all nodes on the outside shell (or perimeter in 2D) of the
+\verb|JoinFaces| joins all nodes on the outside shell (or perimeter in 2D) of the
 grid region (\verb|i1|$\leq$\verb|i|$\leq$\verb|i2|,
   \verb|j1|$\leq$\verb|j|$\leq$\verb|j2|,
   \verb|k1|$\leq$\verb|k|$\leq$\verb|k2|). In 3D the syntax takes on the form:
 %
 \begin{verbatim}
-  JoinPlanes(i1,j1,k1, i2,j2,k2);
+  JoinFaces(i1,j1,k1, i2,j2,k2);
 \end{verbatim}
 %
 while in 2D, one would write:
 %
 \begin{verbatim}
-  JoinPlanes(i1,j1, i2,j2);
+  JoinFaces(i1,j1, i2,j2);
 \end{verbatim}
 %
 Of course, the node positions must already have been given a value prior
-to the call to the \verb|JoinPlanes| command on
+to the call to the \verb|JoinFaces| command on
 \verb|i=i1|, \verb|i=i2|, \verb|j=j1|, \verb|j=j2|, \verb|k=k1| and
 \verb|k=k2|. The algorithm was implemented by Dr.\ Derrick Alexander.
 

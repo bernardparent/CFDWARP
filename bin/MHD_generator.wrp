@@ -277,6 +277,9 @@ Disc(
     AOWENO_gammahi=0.85;
     INTERPOL=INTERPOL_AOWENO5;
     EIGENVALCOND=EIGENVALCOND_PECLET;
+    POSFILTER=POSFILTER_NONE;
+    POSFILTER_numiter=4;
+    FACEINTEG=FACEINTEG_CENTRAL1;
   );
 );
 
@@ -373,7 +376,7 @@ Cycle(
     subiter_tsemf=4;
     for (cnt,0,2,
       {UpdateEMField(Lc,relaxEMF,TSEMF_ADI);}
-      UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,subiter_tsemf);
+      UpdateEMField(Lc,relaxEMF,TSEMF_SOR,subiter_tsemf);
       {UpdateEMField(Lc,relaxEMF,TSEMF_DDADI);}
     );
     system("date");

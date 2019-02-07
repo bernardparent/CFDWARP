@@ -25,7 +25,7 @@ int Join3D(GRIDG_gl3d_t gl3d, GRIDG_xyzgrid_t *xyzgrid, SOAP_codex_t *codex,
            long k2, char index, char modeL, char modeH,
            double NLoverN, double valL, double valH);
 
-void JoinPlanes3D(GRIDG_gl3d_t gl, GRIDG_xyzgrid_t *xyz, SOAP_codex_t *codex,
+void JoinFaces3D(GRIDG_gl3d_t gl, GRIDG_xyzgrid_t *xyz, SOAP_codex_t *codex,
                long i1, long j1, long k1, long i2, long j2, long k2);
 
 void Plane(GRIDG_gl3d_t gl, GRIDG_xyzgrid_t *xyz, SOAP_codex_t *codex,
