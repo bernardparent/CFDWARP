@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 08c
+   * in bin 
+     - added Pstag.eqn
+     - improved cylinder_in_freestream.wrp
+
+
 2019 FEB 08b
    * in bin
      - modified eigenvalue conditioning parameters in carbuncle.wrp, forward_step.wrp, impinge.wrp

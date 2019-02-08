@@ -47,7 +47,7 @@
 }
 
 scale=1.0;
-M=0.5;
+M=2.0;
 T=300; {K}
 gamma=1.4;
 R=286.0;        {J/kgK }
@@ -61,7 +61,7 @@ if (M<0.05,
 ,{else}
   D3=3.2*scale;
 );
-mf=0.5*1.41^2;   {1.935,1.64,1.53,1.70}
+mf=0.5*1.41^4;   {1.935,1.64,1.53,1.70}
 
 tf=1.0*(max(M,1)*2);
 
@@ -185,7 +185,7 @@ Init(
 
 Disc(
   NavierStokesPerfect(
-    zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA1=0.02e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.0e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   MUSCL(
@@ -195,7 +195,10 @@ Disc(
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.95;
     INTERPOL=INTERPOL_WENO5;
-    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+    FACEINTEG=FACEINTEG_CENTRAL1;
+    POSFILTER=POSFILTER_PARENT;
+    POSFILTER_numiter=4;
   );
   MUSCLplus(
     FLUX=FLUX_FDSplus;
