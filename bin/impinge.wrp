@@ -115,8 +115,8 @@ Init(
 
 Disc(
   NavierStokesPerfect(
-    zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA1=0.01e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.01e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   MUSCL(
     FLUX=FLUX_FDS;
@@ -126,9 +126,9 @@ Disc(
     AOWENO_gammahi=0.9999;
     INTERPOL=INTERPOL_AOWENO7;
     EIGENVALCOND=EIGENVALCOND_PARENT;
-    POSFILTER=POSFILTER_NONE;
+    POSFILTER=POSFILTER_PARENT;
     POSFILTER_numiter=4;
-    FACEINTEG=FACEINTEG_CENTRAL3;
+    FACEINTEG=FACEINTEG_CENTRAL1;
   );
   MUSCLplus(
     FLUX=FLUX_FDSplus;
