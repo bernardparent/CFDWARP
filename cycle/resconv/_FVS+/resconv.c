@@ -32,7 +32,7 @@ void write_disc_resconv_template(FILE **controlfile){
     "    AOWENO_gammalo=0.85;\n"
     "    AOWENO_gammahi=0.85;\n"
     "    INTERPOL=INTERPOL_AOWENO5;\n"
-    "    EIGENVALCOND=EIGENVALCOND_PARENT;\n"
+    "    EIGENVALCOND=EIGENVALCOND_PASCAL;\n"
     "  );\n"
   ,_RESCONV_ACTIONNAME);
 
@@ -54,7 +54,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"EIGENVALCOND_HARTEN",EIGENVALCOND_HARTEN); 
     SOAP_add_int_to_vars(codex,"EIGENVALCOND_PECLET",EIGENVALCOND_PECLET);
     SOAP_add_int_to_vars(codex,"EIGENVALCOND_GNOFFO",EIGENVALCOND_GNOFFO);
-    SOAP_add_int_to_vars(codex,"EIGENVALCOND_PARENT",EIGENVALCOND_PARENT);
+    SOAP_add_int_to_vars(codex,"EIGENVALCOND_PASCAL",EIGENVALCOND_PASCAL);
     SOAP_add_int_to_vars(codex,"INTERPOL_FIRSTORDER",INTERPOL_FIRSTORDER);
     SOAP_add_int_to_vars(codex,"INTERPOL_BDF2",INTERPOL_BDF2);
     SOAP_add_int_to_vars(codex,"INTERPOL_TVD2_MINMOD",INTERPOL_TVD2_MINMOD); 
@@ -79,8 +79,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     codex->action=action_original;
 
     find_int_var_from_codex(codex,"EIGENVALCOND",&gl->cycle.resconv.EIGENVALCOND);
-    if (gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PECLET && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_HARTEN && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_GNOFFO && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PARENT)
-      SOAP_fatal_error(codex,"EIGENVALCOND must be set to either EIGENVALCOND_PECLET, EIGENVALCOND_HARTEN, EIGENVALCOND_GNOFFO, EIGENVALCOND_PARENT.");
+    if (gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PECLET && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_HARTEN && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_GNOFFO && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PASCAL)
+      SOAP_fatal_error(codex,"EIGENVALCOND must be set to either EIGENVALCOND_PECLET, EIGENVALCOND_HARTEN, EIGENVALCOND_GNOFFO, EIGENVALCOND_PASCAL.");
 
     find_int_var_from_codex(codex,"numiter",&gl->cycle.resconv.numiter);
     find_int_var_from_codex(codex,"INTERPOL",&gl->cycle.resconv.INTERPOL);

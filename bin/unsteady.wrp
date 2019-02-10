@@ -77,7 +77,7 @@ Model(
     zetaA3=0.2e0;   {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
     
     AXISYMMETRIC=FALSE;
-    EIGENVALCOND=EIGENVALCOND_PARENT;
+    EIGENVALCOND=EIGENVALCOND_PASCAL;
   );
 );
  

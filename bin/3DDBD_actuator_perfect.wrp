@@ -223,7 +223,7 @@ Model(
     Tmin=1.0e1;     Tmax=6.0e3;    {K}
     zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.25;  {eigenvalue clipping factor: 2.0-20.0}
-    EIGENVALCOND=EIGENVALCOND_PARENT; 
+    EIGENVALCOND=EIGENVALCOND_PASCAL; 
     SetBodyForce(is,js,ks, ie,je,ke, 0.0{N/m3},0.0{N/m3},0.0{N/m3});
     SetHeatDeposited(is,js,ks, ie,je,ke, 0.0 {W/m3});
     {

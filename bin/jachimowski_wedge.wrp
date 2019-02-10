@@ -126,7 +126,7 @@ Model(
     zetaA2=0.2;
     zetaA3=0.2e0;  {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
     
-    EIGENVALCOND=EIGENVALCOND_PARENT; {set the Lambda conditioning to EIGENVALCOND_PECLET or EIGENVALCOND_HARTEN}
+    EIGENVALCOND=EIGENVALCOND_PASCAL; {set the Lambda conditioning to EIGENVALCOND_PECLET or EIGENVALCOND_HARTEN}
     AXISYMMETRIC=NO; {set to YES to solve axisymmetric problems in 2D}
   );
 );

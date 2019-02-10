@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 10a
+   * renamed
+     - EIGENVALCOND_PARENT -> EIGENVALCOND_PASCAL
+
+
 2019 FEB 08c
    * in bin 
      - added Pstag.eqn

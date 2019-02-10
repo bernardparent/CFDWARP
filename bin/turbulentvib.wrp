@@ -81,7 +81,7 @@ Model(
     wmin=1.0e-50;                  {min mass fraction allowed in the domain}
     zetaA1=0.1e0;    {conditions the eigenvalues of the A jacobian}
     zetaA2=0.25;  {eigenvalue clipping factor: 2.0-20.0}
-    EIGENVALCOND=EIGENVALCOND_PARENT; {recommended: EIGENVALCOND_PARENT}
+    EIGENVALCOND=EIGENVALCOND_PASCAL; {recommended: EIGENVALCOND_PASCAL}
     AXISYMMETRIC=NO;
   );
 );

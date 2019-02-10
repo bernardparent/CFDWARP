@@ -131,7 +131,7 @@ Disc(
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.95;
     INTERPOL=INTERPOL_TVD2_VANLEER;
-    EIGENVALCOND=EIGENVALCOND_PARENT;
+    EIGENVALCOND=EIGENVALCOND_PASCAL;
   );
   CDFplus(
     xi1=0.5; {should be set to 0.5 or less when used with 2nd order or higher convective fluxes}

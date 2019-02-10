@@ -97,7 +97,7 @@ Model(
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-50;
     zetaA1=0.1e0;     {conditions the eigenvalues of the A jacobian}
-    EIGENVALCOND=EIGENVALCOND_PECLET; {Recommended: EIGENVALCOND_PARENT}
+    EIGENVALCOND=EIGENVALCOND_PECLET; {Recommended: EIGENVALCOND_PASCAL}
     AXISYMMETRIC=NO;
   );
 );

@@ -100,7 +100,7 @@ Model(
     wmin=1.0e-50;                  {min mass fraction allowed in the domain}
     zetaA1=0.1e0;     {conditions the eigenvalues of the A jacobian}
     zetaA2=0.3;
-    EIGENVALCOND=EIGENVALCOND_PARENT; {set the eigenvalue conditioning to EIGENVALCOND_PECLET, EIGENVALCOND_PARENT [RECOMMENDED], or EIGENVALCOND_HARTEN}
+    EIGENVALCOND=EIGENVALCOND_PASCAL; {set the eigenvalue conditioning to EIGENVALCOND_PECLET, EIGENVALCOND_PASCAL [RECOMMENDED], or EIGENVALCOND_HARTEN}
     AXISYMMETRIC=NO; {set to YES to solve axisymmetric problems in 2D}
   );
 );

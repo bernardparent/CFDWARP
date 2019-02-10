@@ -251,7 +251,7 @@ Model(
     
     SetHeatDeposited(is,js,ks, ie,je,ke, 0.0 {W/m3});
     SetBodyForce(is,js,ks, ie,je,ke, 0.0{N/m3},0.0{N/m3},0.0{N/m3});
-    EIGENVALCOND=EIGENVALCOND_PARENT;
+    EIGENVALCOND=EIGENVALCOND_PASCAL;
   );
 
 

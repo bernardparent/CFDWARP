@@ -243,7 +243,7 @@ Model(
     zetaA1=0.5e0;    {conditions the eigenvalues of the A jacobian}
     zetaA2=0.2;
     zetaA3=0.2;
-    EIGENVALCOND=EIGENVALCOND_PARENT; {set the eigenvalue conditioning to EIGENVALCOND_PECLET, EIGENVALCOND_PARENT [RECOMMENDED], or EIGENVALCOND_HARTEN}
+    EIGENVALCOND=EIGENVALCOND_PASCAL; {set the eigenvalue conditioning to EIGENVALCOND_PECLET, EIGENVALCOND_PASCAL [RECOMMENDED], or EIGENVALCOND_HARTEN}
     zetaD=1.0;     {conditions the Dstar eigenvalues for the charged species}
     AXISYMMETRIC=NO;
   );

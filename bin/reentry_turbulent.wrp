@@ -155,7 +155,7 @@ Model(
     psimin=1e-10;   psimax=9.9e99; {min and max omega/epsilon allowed in the domain}
     wmin=1.0e-200;                  {min mass fraction allowed in the domain}
     zetaA1=0.1e0;     {conditions the eigenvalues of the A jacobian}
-    EIGENVALCOND=EIGENVALCOND_PARENT; {set the eigenvalue conditioning to EIGENVALCOND_PECLET, EIGENVALCOND_PARENT [RECOMMENDED], or EIGENVALCOND_HARTEN}
+    EIGENVALCOND=EIGENVALCOND_PASCAL; {set the eigenvalue conditioning to EIGENVALCOND_PECLET, EIGENVALCOND_PASCAL [RECOMMENDED], or EIGENVALCOND_HARTEN}
     AXISYMMETRIC=NO;
   );
 );

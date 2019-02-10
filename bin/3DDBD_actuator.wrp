@@ -293,7 +293,7 @@ Model(
     ,{else}
       zetaA2=0.1;
     );
-    EIGENVALCOND=EIGENVALCOND_PARENT; {set the eigenvalue conditioning to EIGENVALCOND_PECLET, EIGENVALCOND_PARENT [RECOMMENDED], or EIGENVALCOND_HARTEN}
+    EIGENVALCOND=EIGENVALCOND_PASCAL; {set the eigenvalue conditioning to EIGENVALCOND_PECLET, EIGENVALCOND_PASCAL [RECOMMENDED], or EIGENVALCOND_HARTEN}
     zetaD=0.3;     {conditions the Dstar eigenvalues for the charged species}
     AXISYMMETRIC=NO;
   );

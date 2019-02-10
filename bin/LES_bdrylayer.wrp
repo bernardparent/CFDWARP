@@ -183,7 +183,7 @@ Disc(
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.95;
     INTERPOL=INTERPOL_AOWENO5;
-    EIGENVALCOND=EIGENVALCOND_PARENT;
+    EIGENVALCOND=EIGENVALCOND_PASCAL;
   );
   CDFplus(
     xi1=0.5; {except for momentum and energy fluxes}

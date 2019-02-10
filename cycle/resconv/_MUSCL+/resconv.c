@@ -35,7 +35,7 @@ void write_disc_resconv_template(FILE **controlfile){
     "    AOWENO_gammalo=0.95;\n"
     "    AOWENO_gammahi=0.9999;\n"
     "    INTERPOL=INTERPOL_AOWENO7;\n"
-    "    EIGENVALCOND=EIGENVALCOND_PARENT;\n"
+    "    EIGENVALCOND=EIGENVALCOND_PASCAL;\n"
     "  );\n"
   ,_RESCONV_ACTIONNAME,numiter_FDSplus_default);
 
@@ -56,7 +56,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
 
     SOAP_add_int_to_vars(codex,"EIGENVALCOND_HARTEN",EIGENVALCOND_HARTEN); 
     SOAP_add_int_to_vars(codex,"EIGENVALCOND_PECLET",EIGENVALCOND_PECLET);
-    SOAP_add_int_to_vars(codex,"EIGENVALCOND_PARENT",EIGENVALCOND_PARENT);
+    SOAP_add_int_to_vars(codex,"EIGENVALCOND_PASCAL",EIGENVALCOND_PASCAL);
     SOAP_add_int_to_vars(codex,"EIGENVALCOND_GNOFFO",EIGENVALCOND_GNOFFO);
     SOAP_add_int_to_vars(codex,"AVERAGING_ROE",AVERAGING_ROE);
     SOAP_add_int_to_vars(codex,"AVERAGING_ARITH",AVERAGING_ARITH);
@@ -85,8 +85,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     codex->action=action_original;
 
     find_int_var_from_codex(codex,"EIGENVALCOND",&gl->cycle.resconv.EIGENVALCOND);
-    if (gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PECLET && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PARENT && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_HARTEN && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_GNOFFO)
-      SOAP_fatal_error(codex,"EIGENVALCOND must be set to either EIGENVALCOND_PECLET, EIGENVALCOND_PARENT, EIGENVALCOND_HARTEN, EIGENVALCOND_GNOFFO.");
+    if (gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PECLET && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PASCAL && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_HARTEN && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_GNOFFO)
+      SOAP_fatal_error(codex,"EIGENVALCOND must be set to either EIGENVALCOND_PECLET, EIGENVALCOND_PASCAL, EIGENVALCOND_HARTEN, EIGENVALCOND_GNOFFO.");
     find_int_var_from_codex(codex,"FLUX",&gl->cycle.resconv.FLUX);
     if (gl->cycle.resconv.FLUX!=FLUX_FDSplus && gl->cycle.resconv.FLUX!=FLUX_FVSplus && gl->cycle.resconv.FLUX!=FLUX_FDSplusFilterMultiD && gl->cycle.resconv.FLUX!=FLUX_FDSplusFilter && gl->cycle.resconv.FLUX!=FLUX_FVSplusFilter)
       SOAP_fatal_error(codex,"FLUX must be set to either FLUX_FDSplus or FLUX_FVSplus or FLUX_FDSplusFilterMultiD or FLUX_FDSplusFilter or FLUX_FVSplusFilter.");

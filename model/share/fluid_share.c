@@ -1598,8 +1598,8 @@ void find_conditioned_Lambda_absolute_from_jacvars(jacvars_t jacvars, metrics_t 
     case EIGENVALCOND_PECLET:
       condition_Lambda_absolute_Peclet(jacvars, metrics, Lambdaabs);
     break;
-    case EIGENVALCOND_PARENT:
-      fatal_error("Eigenvalue conditioning can not be set to EIGENVALCOND_PARENT with this flux discretization scheme.");
+    case EIGENVALCOND_PASCAL:
+      fatal_error("Eigenvalue conditioning can not be set to EIGENVALCOND_PASCAL with this flux discretization scheme.");
     break;
     case EIGENVALCOND_GNOFFO:
       condition_Lambda_absolute_Gnoffo(jacvars, metrics, Lambdaabs);
@@ -1625,7 +1625,7 @@ void condition_Lambda_plus_minus(np_t *np, gl_t *gl, long lp0, long theta, jacva
     case EIGENVALCOND_PECLET:
       condition_Lambda_plus_minus_Peclet(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics,  Lambdaplus, Lambdaminus);
     break;
-    case EIGENVALCOND_PARENT:
+    case EIGENVALCOND_PASCAL:
       condition_Lambda_plus_minus_Parent(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics,  Lambdaplus, Lambdaminus);
     break;
     case EIGENVALCOND_GNOFFO:
