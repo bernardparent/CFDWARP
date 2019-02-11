@@ -130,7 +130,7 @@ Disc(
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.9999;
     INTERPOL=INTERPOL_AOWENO7;
-    EIGENVALCOND=EIGENVALCOND_PASCAL; 
+    EIGENVALCOND=EIGENVALCOND_PARENT; 
     FACEINTEG=FACEINTEG_CENTRAL1;
     POSFILTER=POSFILTER_PARENT;
     POSFILTER_numiter=4;
@@ -172,7 +172,7 @@ Cycle(
     CFL=(15-min(iter,15))/15*5+1.0;
     
     if (iter<20, CFL=0.5;);
-    
+    if (time<dt*2, CFL=0.1;);
     phi1=20;      {maximum number of gridlines per zone in each dimension}
     UpdateFluid(CFL,PRECON_LOCALEIGENVALUE,sigma1,sigma2,phi1,dt);
 

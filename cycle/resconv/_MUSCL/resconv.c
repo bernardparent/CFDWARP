@@ -71,6 +71,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"EIGENVALCOND_PECLET",EIGENVALCOND_PECLET);
     SOAP_add_int_to_vars(codex,"EIGENVALCOND_GNOFFO",EIGENVALCOND_GNOFFO);
     SOAP_add_int_to_vars(codex,"EIGENVALCOND_PASCAL",EIGENVALCOND_PASCAL);
+    SOAP_add_int_to_vars(codex,"EIGENVALCOND_PARENT",EIGENVALCOND_PARENT);
     SOAP_add_int_to_vars(codex,"AVERAGING_ROE",AVERAGING_ROE);
     SOAP_add_int_to_vars(codex,"AVERAGING_ARITH",AVERAGING_ARITH);
     SOAP_add_int_to_vars(codex,"FLUX_FDS",FLUX_FDS); 
@@ -109,8 +110,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     codex->action=action_original;
 
     find_int_var_from_codex(codex,"EIGENVALCOND",&gl->cycle.resconv.EIGENVALCOND);
-    if (gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PECLET && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_HARTEN && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_GNOFFO && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PASCAL)
-      SOAP_fatal_error(codex,"EIGENVALCOND must be set to either EIGENVALCOND_PECLET, EIGENVALCOND_HARTEN, EIGENVALCOND_GNOFFO, EIGENVALCOND_PASCAL.");
+    if (gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PECLET && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_HARTEN && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_GNOFFO && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PASCAL && gl->cycle.resconv.EIGENVALCOND!=EIGENVALCOND_PARENT)
+      SOAP_fatal_error(codex,"EIGENVALCOND must be set to either EIGENVALCOND_PECLET, EIGENVALCOND_HARTEN, EIGENVALCOND_GNOFFO, EIGENVALCOND_PASCAL, EIGENVALCOND_PARENT.");
 
     find_int_var_from_codex(codex,"AVERAGING",&gl->cycle.resconv.AVERAGING);
     if (gl->cycle.resconv.AVERAGING!=AVERAGING_ROE  && gl->cycle.resconv.AVERAGING!=AVERAGING_ARITH)

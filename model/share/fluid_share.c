@@ -1463,7 +1463,7 @@ void condition_Lambda_plus_minus_Peclet(np_t *np, gl_t *gl, long lp0, long theta
 
 
 
-void condition_Lambda_plus_minus_Parent(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
+void condition_Lambda_plus_minus_Pascal(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
   long flux,dim,lp1;
   double zetaA1;
   double ap0,ap1,Vp0,Vp1,Vref,aref,factP,Pstarmax,Pstarmin;
@@ -1513,6 +1513,48 @@ void condition_Lambda_plus_minus_Parent(np_t *np, gl_t *gl, long lp0, long theta
     Lambdaminus[flux][flux]-=(aref+Vref)*zetaA1*factP;
   }
 }
+
+
+void condition_Lambda_plus_minus_Parent(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
+  long flux;
+  double zetaA1;
+  double valmin,valmax,sump0,diffp0,sump1,diffp1,Lambdaadd;
+  flux_t LUstarp0,LUstarp1;
+  
+  find_LUstar_from_jacvars(jacvarsp0, metrics, LUstarp1);
+  find_LUstar_from_jacvars(jacvarsp1, metrics, LUstarp0);
+  zetaA1=jacvarsp0.zetaA1;
+  sump0=Lambdaplus[fluxet][fluxet]*LUstarp0[fluxet]+Lambdaplus[fluxet-1][fluxet-1]*LUstarp0[fluxet-1];
+  sump1=fabs(Lambdaminus[fluxet][fluxet]*LUstarp1[fluxet]+Lambdaminus[fluxet-1][fluxet-1]*LUstarp1[fluxet-1]);
+  valmin=1.0e99;
+  valmax=-1.0e99;
+  for (flux=0; flux<nf; flux++){
+    if (flux!=fluxet && flux!=fluxet-1) {
+      valmin=min(valmin,Lambdaplus[flux][flux]*LUstarp0[flux]);
+      valmax=max(valmax,Lambdaplus[flux][flux]*LUstarp0[flux]);
+    }
+  }
+  diffp0=valmax-valmin;
+  valmin=1.0e99;
+  valmax=-1.0e99;
+  for (flux=0; flux<nf; flux++){
+    if (flux!=fluxet && flux!=fluxet-1) {
+      valmin=min(valmin,fabs(Lambdaminus[flux][flux]*LUstarp1[flux]));
+      valmax=max(valmax,fabs(Lambdaminus[flux][flux]*LUstarp1[flux]));
+    }
+  }
+  diffp1=valmax-valmin;
+
+  // this line needs some fine tuning 
+  Lambdaadd=max(max(0.0,(diffp1-sump1)/LUstarp1[0]),max(0.0,(diffp0-sump0)/LUstarp0[0]));
+
+  for (flux=0; flux<nf; flux++){
+    Lambdaplus[flux][flux]+=Lambdaadd;
+    Lambdaminus[flux][flux]-=Lambdaadd;
+  }
+}
+
+
 
 
 // as defined in "Computational Aerothermodynamic Simulation Issues on Unstructured Grids" by Gnoffo and White, AIAA 2004-2371
@@ -1601,6 +1643,9 @@ void find_conditioned_Lambda_absolute_from_jacvars(jacvars_t jacvars, metrics_t 
     case EIGENVALCOND_PASCAL:
       fatal_error("Eigenvalue conditioning can not be set to EIGENVALCOND_PASCAL with this flux discretization scheme.");
     break;
+    case EIGENVALCOND_PARENT:
+      fatal_error("Eigenvalue conditioning can not be set to EIGENVALCOND_PARENT with this flux discretization scheme.");
+    break;
     case EIGENVALCOND_GNOFFO:
       condition_Lambda_absolute_Gnoffo(jacvars, metrics, Lambdaabs);
     break;
@@ -1626,6 +1671,9 @@ void condition_Lambda_plus_minus(np_t *np, gl_t *gl, long lp0, long theta, jacva
       condition_Lambda_plus_minus_Peclet(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics,  Lambdaplus, Lambdaminus);
     break;
     case EIGENVALCOND_PASCAL:
+      condition_Lambda_plus_minus_Pascal(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics,  Lambdaplus, Lambdaminus);
+    break;
+    case EIGENVALCOND_PARENT:
       condition_Lambda_plus_minus_Parent(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics,  Lambdaplus, Lambdaminus);
     break;
     case EIGENVALCOND_GNOFFO:

@@ -1,4 +1,4 @@
-#define _RESCONV_METHOD "Multidimensional MUSCL with flux FVS [steger1981a], FDS [roe1981a], and primitive interpolation TVD [anderson1986a], WENO [jiang1996a], CWENO [dumbser2007a], AOWENO [balsara2016a], and eigenvalue conditioning HARTEN, GNOFFO [gnoffo2004a], PECLET [parent2017a], PARENT [parent2018a], and PARENT positivity-preserving filter [parent2019a]"
+#define _RESCONV_METHOD "Multidimensional MUSCL with flux FVS [steger1981a], FDS [roe1981a], and primitive interpolation TVD [anderson1986a], WENO [jiang1996a], CWENO [dumbser2007a], AOWENO [balsara2016a], and eigenvalue conditioning HARTEN, GNOFFO [gnoffo2004a], PECLET [parent2017a], PASCAL [parent2018a], and PARENT positivity-preserving filter [parent2019a]"
 #define _RESCONV_MUSCL
 #define _RESCONV_MUSCLPLUS
 #define _RESCONV_DELTA_LAMBDA_STORAGE

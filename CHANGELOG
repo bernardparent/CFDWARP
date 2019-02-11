@@ -7,6 +7,18 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 11a
+   * in cycle/resconv/_MUSCL+/resconv.hh and cycle/resconv/_MUSCL/resconv.hh
+     - changed PARENT [parent2018a] to PASCAL [parent2018a]
+   * in cycle/resconv/_MUSCL/resconv.c
+     - added EIGENVALCOND_PARENT
+   * in cycle/share/res_share.h
+     - added EIGENVALCOND_PARENT
+   * in model/share/fluid_share.c
+     - renamed condition_Lambda_plus_minus_Parent() to condition_Lambda_plus_minus_Pascal() 
+     - added new condition_Lambda_plus_minus_Parent()
+
+
 2019 FEB 10a
    * renamed
      - EIGENVALCOND_PARENT -> EIGENVALCOND_PASCAL
