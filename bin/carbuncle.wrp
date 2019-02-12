@@ -7,7 +7,7 @@ Rgas=286.0;
 rhoref=1;
 aref=300;
 
-Mx=5;
+Mx=4.0;
 My=0.0;
 P=10200;
 T=300;
@@ -17,7 +17,7 @@ CFLref=1.0;
 
 
 
-meshtype=1; {set to 1 for gridline on axis of symmetry ; 
+meshtype=2; {set to 1 for gridline on axis of symmetry ; 
              set to 2 for no gridline on axis of symmetry ;}
 meshfact=1.0;
 sizefact=1.0;
@@ -220,12 +220,12 @@ Disc(
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
     AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_AOWENO5;
+    AOWENO_gammahi=0.9999;
+    INTERPOL=INTERPOL_AOWENO7;
     EIGENVALCOND=EIGENVALCOND_PARENT; 
     POSFILTER=POSFILTER_PARENT;
     POSFILTER_numiter=4;
-    FACEINTEG=FACEINTEG_CENTRAL1;
+    FACEINTEG=FACEINTEG_CENTRAL3;
   );
   MUSCLplus(
     FLUX=FLUX_FDSplusFilter;
