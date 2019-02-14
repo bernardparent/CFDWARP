@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 14a
+   * in model/share/fluid_share.c
+     - added condition_Lambda_plus_minus_Parent3()
+
+
 2019 FEB 12a
    * in model/share/fluid_share.c
      - added condition_Lambda_plus_minus_Parent2()

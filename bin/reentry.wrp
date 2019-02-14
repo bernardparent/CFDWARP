@@ -1,107 +1,112 @@
 {
-  _______________________________________________________________________________________________
+  ____________________________________________________________________________
 
-                                           C F D W A R P
+  WARP: a CFD Code for Plasma Aerodynamics [a]
+  ____________________________________________________________________________
 
-                               A CFD Code for Plasma & Reactive Flow
-  _______________________________________________________________________________________________
+  Cycle Strategy                          Multizone [1]
+  Fluid Transport Integration             Block ADI [2,3]
+  EM Field Integration                    none
+  Convection Derivative Discretization    Positivity-Preserving FDS [4] Total
+                                          Variation Diminishing 2nd Order [5]
+  Time Derivative Discretization          Steady-State
+  Fluid Transport Model                   Navier-Stokes Multispecies
+  Chemical Model                          Air Plasma 11s 31r Dunn-Kang
+  Beam Model                              None
+  EM Field Model                          None
+  Thermodynamic Model                     NASA Glenn Polynomials [6]
+  Number of Dimensions                    2
+  Number of Flux Components               14
+  Number of Species                       11
+  Number of Charged Species               6
+  List of Species                         e-, O+, N+, O2+, N2+, NO+, O, N, NO,
+                                          O2, N2
+  ____________________________________________________________________________
 
-  Version                          19feb07a
-  Compiler                         gcc 4.9.2 with OPENMP threads
-  Compiled on                      Feb  7 2019 at 14:21:05 by parent on CLEO
-  Cycle Strategy                   Standard
-  Fluid Relaxation                 Block ADI [1,2]
-  EM Field Relaxation              None
-  Convection Discretization        Multidimensional MUSCL with flux FVS [3], FDS [5], and
-                                   primitive interpolation TVD [4], WENO [7], CWENO [9], AOWENO
-                                   [8], and eigenvalue conditioning HARTEN, GNOFFO [10], PECLET
-                                   [11], PARENT [6], and PARENT positivity-preserving filter
-                                   [12]
-  Temporal Discretization          Steady-State
-  Fluid Model                      Navier-Stokes Multispecies
-  Thermodynamic Model              NASA Glenn Polynomials [13]
-  Chemical Model                   Air Plasma 11s 31r Dunn-Kang [14]
-  EM Field Model                   None
-  Beam Model                       None
-  Number of Dimensions             2
-  Number of Flux Components        14
-  Number of Species                11
-  Number of Charged Species        6
-  List of Species                  e-, O+, N+, O2+, N2+, NO+, O, N, NO, O2, N2
-  _______________________________________________________________________________________________
-
-  [1]  WR Briley and H McDonald. "On the Structure and Use of Linearized Block Implicit
-       Schemes", Journal of Computational Physics 34:54-73, 1980.
-  [2]  RM Beam and RF Warming. "An Implicit Finite-Difference Algorithm for Hyperbolic Systems
-       in Conservation-Law-Form", Journal of Computational Physics 22:87-110, 1976.
-  [3]  JL Steger and RF Warming. "Flux Vector Splitting of the Inviscid Gasdynamic Equations
-       with Application to Finite-Difference Methods", Journal of Computational Physics 40:263-
-       293, 1981.
-  [4]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume Flux Vector
-       Splittings for the Euler Equations", AIAA Journal 24:1453-1460, 1986.
-  [5]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes", Journal
-       of Computational Physics 43:357-372, 1981.
-  [6]  B Parent. "Positivity-Preserving Dual Time Stepping Schemes for Gas Dynamics", Journal of
-       Computational Physics 361:391-411, 2018.
-  [7]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes", Journal of
-       Computational Physics 126:202-228, 1996.
-  [8]  DS Balsara, S Garain, and CW Shu. "An Efficient Class of WENO schemes with Adaptive
-       Order", Journal of Computational Physics 326:780-804, 2016.
-  [9]  M Dumbser and M Kaser. "Arbitrary High Order Non-oscillatory Finite Volume Schemes on
-       Unstructured Meshes for Linear Hyperbolic Systems", Journal of Computational Physics,
-       221:693-723, 2007.
-  [10] P Gnoffo and  JA White. "Computational Aerothermodynamic Simulation Issues on
-       Unstructured Grids", 37th AIAA Thermophysics Conference, AIAA Paper 2004-2371, 2004.
-  [11] B Parent. "Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows", AIAA
-       Journal, 55:141-152, 2017.
-  [12] B Parent. "Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler
-       Equatons", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.
-  [13] BJ McBride, MJ Zehe, and S Gordon. "NASA Glenn Coefficients for Calculating Thermodynamic
-       Properties of Individual Species", NASA TP 2002-211556, 2002.
-  [14] MG Dunn and SW Kang. "Theoretical and Experimental Studies of Reentry Plasmas", NASA CR-
-       2232, 1973.
-
+  [a]  B Parent. "Weakly-ionized Airflow Resolver and Post-processor: a CFD
+       Code for Plasma Aerodynamics", WARP version 17jan18a compiled on Jan
+       18 2017 at 18:59:23 using gcc 4.8.4 with OPENMP threads. WARP is a
+       Copyright (c) 1998-2017 of Bernard Parent. Copying and distribution of
+       WARP is prohibited.
+  [1]  B Parent and JP Sislian. "The Use of Domain Decomposition in
+       Accelerating the Convergence of Quasihyperbolic Systems", Journal of
+       Computational Physics 179:140-169, 2002.
+  [2]  WR Briley and H McDonald. "On the Structure and Use of Linearized Block
+       Implicit Schemes", Journal of Computational Physics 34:54-73, 1980.
+  [3]  RM Beam and RF Warming. "An Implicit Finite-Difference Algorithm for
+       Hyperbolic Systems in Conservation-Law-Form", Journal of Computational
+       Physics 22:87-110, 1976.
+  [4]  B Parent. "Positivity-Preserving Flux Difference Splitting Schemes",
+       Journal of Computational Physics 243:194-209, 2013.
+  [5]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume
+       Flux Vector Splittings for the Euler Equations", AIAA Journal
+       24:1453-1460, 1986.
+  [6]  BJ McBride, MJ Zehe, and S Gordon. "NASA Glenn Coefficients for
+       Calculating Thermodynamic Properties of Individual Species", NASA TP
+       2002-211556, 2002.
 
 }
 
- 
-
-Mx=15.0;
+ Mx=16;
 My=0.0;
-P=10000.0;
-T=300.0;
-Twall=1000.0;
-Rgas=286.0;
-rhoref=P/T/Rgas;
-aref=sqrt(1.4*Rgas*T);
-meshfact=0.8;
-Hlayer=0.0007/(P/Rgas/T)/2;
-H=0.1;
-L=1.0;
-Lbow=0.04;
+P=10200;
+T=250;
 
-  is=1;  js=1; jm=round(60*meshfact);
-  is1=round(20*meshfact);
-  ie=round(101*meshfact); je=round(101*meshfact);
+
+CFLref=1.0;
+
+
+
+meshtype=1; {set to 1 for gridline on axis of symmetry ; 
+             set to 2 for no gridline on axis of symmetry ;}
+meshfact=1.0;
+sizefact=1.0;
+
+
+is=1;  js=1; 
+if (meshtype==1,
+  ie=round(64*meshfact)+1; 
+);
+if (meshtype==2,
+  ie=round(64*meshfact); 
+);
+
+je=round(32*meshfact)+1;
+Rin_x=0.6*sizefact;
+Rin_y=Rin_x/2.4;
+Rout_x=Rin_x*1.38;
+Rout_y=Rin_y*4.6;
 
 Grid(
-  dwall=Hlayer/jm;
-  printf("Hlayer=%Em dwall=%Em\n",Hlayer,dwall);
   Size(is,js, ie,je);
-  
-  Point(is1,js, 0.0e0,0.0e0);
-  Point(ie,js, L,0.0e0);
-  Point(ie,je, L,H);
-  Point(is1,je, 0.0e0,H);
-  Point(ie,jm, L,Hlayer);
-  Point(is1,jm, 0.0e0,Hlayer);
-  JoinCorners(is1,js, ie,jm,  FE,0.28e0,dwall*Mx*3,1.0e0,  EE,0.5e0,1.0e0,1.0e0);  
-  JoinCorners(is1,jm, ie,je,  FE,0.28e0,dwall*Mx*3,1.0e0,  GE,0.5e0,dwall,1.0e0);
-  Copy(is1,js,is1,je, is,js);
-  Translate(is,js,is,je, -Lbow,0.0);
-  {JoinCorners(is,js,is,je, NO,1,1,1, EE,0.5,1,1);}
-  Join(is,js,is1,je, i, EG,0.5,1.0,1.0);
+
+  if (meshtype==1 || meshtype==2,
+    theta=-pi/2;
+    dtheta=pi/(ie-is);
+    im=(ie+is)/2;
+    for (i,is,ie,
+      theta=((abs(i-im)/(ie-im))^1.3)*pi/2;
+      x_in=-sqrt(1/(1/sqr(Rin_x)+sqr(tan(theta)/Rin_y)));
+      y_in=Rin_y*sqrt(1-sqr(x_in/Rin_x));
+      if (i-im<0, y_in=-y_in;);
+      Point(i,js, x_in,y_in);  
+    );
+
+    theta=-pi/2;
+    dtheta=pi/(ie-is);
+    im=(ie+is)/2;
+    for (i,is,ie,
+      theta=((abs(i-im)/(ie-im))^1.1)*pi/2;
+      x_in=-sqrt(1/(1/sqr(Rout_x)+sqr(tan(theta)/Rout_y)));
+      y_in=Rout_y*sqrt(1-sqr(x_in/Rout_x));
+      if (i-im<0, y_in=-y_in;);
+      Point(i,je, x_in,y_in);  
+    );
+
+    Join(is,js,ie,je,j,FE,0.8,Rin_x/300/meshfact,1);
+  );
 );
+
 
 
 Bdry(
@@ -109,31 +114,27 @@ Bdry(
     {
     _________________________________________________________________________________________
 
-    Boundary Condition Type           ID  Description
+    Boundary Condition Type           Number  Description
     _________________________________________________________________________________________
 
-    BDRY_INFLOWSUPERSONIC             0   Inflow, supersonic
-    BDRY_INFLOWSUBSONIC1              7   Inflow, subsonic, Tstag, Pstag fixed, 1o
-    BDRY_INFLOWSUBSONICMASSFLOWFIXED1 g   Inflow, subsonic, Pstag, Massflow/Area fixed, 1o
-    BDRY_OUTFLOWSUPERSONIC1           1   Outflow, supersonic, 1o
-    BDRY_OUTFLOWSUBSONIC1             4   Outflow, subsonic, P fixed, 1o
-    BDRY_OUTFLOWSUBSONICMFIXED1       f   Outflow, subsonic, M fixed, 1o
-    BDRY_SYMMETRICAL2                 e   Symmetrical, 2o
-    BDRY_SYMMETRICAL1                 9   Symmetrical, 1o
-    BDRY_WALLTFIXED1                  3   Wall, T specified
-    BDRY_WALLADIABATIC1               6   Wall, Adiabatic
-    BDRY_SLIPWALL1                    c   Slip wall, Adiabatic, 1o
-    BDRY_FREESTREAM1                  2   Freestream, 1o, params Vx,Vy, P, T
+    BDRY_INFLOWSUPERSONIC             0       Inflow, supersonic
+    BDRY_INFLOWSUBSONIC1              7       Inflow, subsonic, Tstag, Pstag fixed, 1o
+    BDRY_INFLOWSUBSONICMASSFLOWFIXED1 16      Inflow, subsonic, Pstag, Massflow/Area fixed, 1o
+    BDRY_OUTFLOWSUPERSONIC1           1       Outflow, supersonic, 1o
+    BDRY_OUTFLOWSUBSONIC1             4       Outflow, subsonic, P fixed, 1o
+    BDRY_OUTFLOWSUBSONICMFIXED1       15      Outflow, subsonic, M fixed, 1o
+    BDRY_SYMMETRICAL2                 14      Symmetrical, 2o
+    BDRY_SYMMETRICAL1                 9       Symmetrical, 1o
+    BDRY_WALLTFIXED1                   3       Wall, T specified
+    BDRY_WALLADIABATIC1                6       Wall, Adiabatic
+    BDRY_SLIPWALL1                    12      Slip wall, Adiabatic, 1o
     _________________________________________________________________________________________
     }
     All(BDRY_WALLTFIXED1);
-    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_SYMMETRICAL1,BDRY_OUTFLOWSUPERSONIC1);
-    Region(is1,js,  ie,js,  BDRY_WALLADIABATIC1);
+    Faces(BDRY_OUTFLOWSUPERSONIC1,BDRY_OUTFLOWSUPERSONIC1,  BDRY_SLIPWALL1,BDRY_INFLOWSUPERSONIC);
     {
     Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
-    Link(i1,j1,  i2,j2);
-    Param(is,js,  ie,je,  BDRY_FREESTREAM1, Vx,Vy,P,T);
     }
   );
 );
@@ -141,13 +142,13 @@ Bdry(
  
 Model(
   NavierStokes(
-    DIFFUSION=YES;
-    REACTING=YES;
-    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
-    Tmin=1.0e1;     Tmax=15.0e3;    {K}
-    Twmin=Tmin;     Twmax=Tmax;    {K}
-    wmin=1.0e-50;
-    AXISYMMETRIC=NO;
+    DIFFUSION=YES;  {if set to NO, the diffusion matrix K will be set to zero}
+    REACTING=YES;   {Chemical reactions?}
+    Pmin=1.0e3;    Pmax=9.9e99;   {min and max pressure allowed in the domain in Pa}
+    Tmin=2.0e2;     Tmax=10.0e3;    {min and max temperature allowed in the domain in K}
+    Twmin=Tmin;     Twmax=Tmax;    {min and max wall temperature allowed on any wall boundary node in K}
+    wmin=1.0e-200;                  {min mass fraction allowed in the domain}
+    AXISYMMETRIC=NO; {set to YES to solve axisymmetric problems in 2D}
   );
 );
 
@@ -169,9 +170,9 @@ Init(
     _______________________________________________________________________________________
 
     }
-    w_eminus=1.0e-30;
-    w_Oplus=1.0e-30;
-    w_Nplus=1.0e-30;
+    w_eminus=1e-30;
+    w_Oplus=1e-30;
+    w_Nplus=1e-30;
     w_O2plus=1.0e-30;
     w_N2plus=1.0e-30;
     w_NOplus=1.0e-30;
@@ -181,7 +182,6 @@ Init(
     w_O2=0.235;
     w_N2=0.765;
     All(INIT_TYPE2,Mx,My,P,T,w_eminus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
-    Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,Twall,w_eminus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
     {
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_eminus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
     Region(is,js,  ie,je, INIT_TYPE2,Mx,My,P,T,w_eminus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
@@ -192,8 +192,8 @@ Init(
 
 Disc(
   NavierStokes(
-    zetaA1=0.3e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.003e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA1=0.02e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.02e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   MUSCL(
     FLUX=FLUX_FDS;
@@ -201,9 +201,9 @@ Disc(
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_TVD2_VANLEER;
+    INTERPOL=INTERPOL_AOWENO5;
     FACEINTEG=FACEINTEG_CENTRAL1;
-    EIGENVALCOND=EIGENVALCOND_PASCAL;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
     POSFILTER=POSFILTER_PARENT;
     POSFILTER_numiter=4;
   );
@@ -212,7 +212,7 @@ Disc(
 
 Cycle(
   NavierStokes(
-    xiverge=1e-3;  {residual convergence threshold}
+    xiverge=1e-20;  {residual convergence threshold}
     rhoref=1.0;  {reference density in kg/m3}
     aref=300.0;  {reference sound speed in m/s}
     Uref[0]=rhoref;   
@@ -230,17 +230,36 @@ Cycle(
     Uref[12]=rhoref*aref;   
     Uref[13]=rhoref*aref*aref;  
   );
-  SteadyState(
+  MultizoneSteady(
     if (mod(iter,50)==0,
       WriteDataFile(outputfilename);
     );
     sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
+    PRECONDITIONER=PRECON_LOCALTIMESTEP;
     if (iter==1,
-      CFL=0.01;
+      CFL=0.1;
     );
-    CFL=min(CFL*1.05,1.3);
-    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
+    CFL=min(CFL*1.05,CFLref);
+    phi1=20;      {maximum number of gridlines per zone in each dimension}
+    UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,phi1);
+
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld) %3ld/%3ld%s \n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,numzones_updated,numzones_total,clipinfo);
+  );
+  SteadyState(
+    if (mod(iter,50)==0,
+      WriteDataFile(outputfilename);
+    );
+    sigma1=0.4;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.4;   {exponent of maximum pseudotime step in all fluxes}
+    PRECONDITIONER=PRECON_LOCALTIMESTEP;
+    if (iter==1,
+      CFL=0.1;
+    );
+    CFL=min(CFL*1.01,0.5);
+    UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,clipinfo);
@@ -249,53 +268,49 @@ Cycle(
 
 
 Post(
-  xstation[1]=0.1; {m}
-  xstation[2]=0.2; {m}
-  xstation[3]=0.3; {m}
-  numsteps=300;
-  qmin=1.0; {m/s, as small a value as possible}
-  Pback_min=400; {Pa}
-  Pback_max=40000; {Pa}
-  Aback=1.0; {m2/m}
+  xstation[1]=0.1;{m}
+  xstation[2]=0.2;{m}
+  xstation[3]=0.3;{m}
   for (cnt,1,3,
-    SetXstation(xstation[cnt]);
-    Pback=_Pback_xstation(Aback, Pback_min, Pback_max, numsteps, qmin);
-    Fpot=_Fpot_xstation(Pback, numsteps, qmin);
+    SetPostDomainToXstation(xstation[cnt]);
+    printf("    Processing x-station..");
+    Pback=_Pback_xstation({Aback,m2/m}1.0, {Pback_min,Pa}400, {Pback_max,Pa}4000, {numsteps}300,
+                 {q_min,m (as small a positive value as possible)}1.0);
+    Fpot=_Fpot_xstation(Pback,{numsteps}300, {q_min,m}1.0);
     mdot=_mdot_xstation();
     Tstag=_Tstag_xstation();
-    Pstag=_Pstag_xstation(numsteps);
+    Pstag=_Pstag_xstation({numsteps} 300);
     Pstar=_Pstar_xstation();
     T=_T_xstation();
     q=_q_xstation();
     rho=_rho_xstation();
     htstar=_htstar_xstation();
-    printf("x      = %E m\n"
-           "Pback  = %E Pa\n"
-           "Fpot   = %E Ns/kg\n"
-           "mdot   = %E kg/ms\n"
-           "htstar = %E J/kg\n"
-           "Tstag  = %E K\n"
-           "Pstag  = %E Pa\n"
-           "Pstar  = %E Pa\n"
-           "T      = %E K\n"
-           "q      = %E m/s\n"
-           "rho    = %E kg/m3\n\n"
+    printf("\n"
+           "    x      = %E m\n"
+           "    Pback  = %E Pa\n"
+           "    Fpot   = %E Ns/kg\n"
+           "    mdot   = %E kg/ms\n"
+           "    htstar = %E J/kg\n"
+           "    Tstag  = %E K\n"
+           "    Pstag  = %E Pa\n"
+           "    Pstar  = %E Pa\n"
+           "    T      = %E K\n"
+           "    q      = %E m/s\n"
+           "    rho    = %E kg/m3\n\n"
            ,xstation[cnt],Pback,Fpot,mdot,htstar,Tstag,Pstag,Pstar,T,q,rho);
   );
+  ResetPostDomain();
+  RestrictPostDomainToRegion(is,js, ie,je);
   printf("\n");
   for (dim,1,2,
-    Area[dim]=_Area(is,js, ie,je, dim,BDRY_WALLTFIXED1);
-    Fshear[dim]=_Fshear(is,js, ie,je, dim,BDRY_WALLTFIXED1);
-    Fpressure[dim]=_Fpressure(is,js, ie,je, dim,BDRY_WALLTFIXED1);
+    Fshear[dim]=_Fshear(dim,BDRY_WALLTFIXED1);
+    Fpressure[dim]=_Fpressure(dim,BDRY_WALLTFIXED1);
   );
-  printf("Fshear    = (%+E,%+E) N/m\n",Fshear[1],Fshear[2]);
-  printf("Fpressure = (%+E,%+E) N/m\n",Fpressure[1],Fpressure[2]);
-  printf("Qheat     = %+E W/m\n",_Qheat(is,js, ie,je, BDRY_WALLTFIXED1));
-  printf("metotal   = %+E J/m\n",_metotal(is,js, ie,je));
-  printf("m         = %+E J/m\n",_m(is,js, ie,je));
+  printf("    Fshear    = (%+E,%+E) N/m\n",Fshear[1],Fshear[2]);
+  printf("    Fpressure = (%+E,%+E) N/m\n",Fpressure[1],Fpressure[2]);
   printf("\n");
   {
-  POSTGRIDONLY=FALSE;
-  WritePostFile(is,js, ie,je, "post.01", "tecplot", POSTGRIDONLY);
+  WritePostFile("post.01", "tecplot",POSTFILE_ALL);
+  WritePostFile("grid.01", "tecplot",POSTFILE_GRID);
   }
 );

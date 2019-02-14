@@ -22,7 +22,7 @@ rho1=P1/(R*T1);
 Re=1e5;
 L=2*eta*Re/rho1/q1;
 
-CFLmax=0.4;
+CFLmax=1.0;
 
 H=L*0.23;
 Hbdry=L*0.3/40;
