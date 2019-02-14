@@ -7,6 +7,15 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 14b
+   * in bin
+     - modified taylor_green_vortex.wrp to latest version
+     - renamed taylor_green_vortex.mcr to taylor_green_vortex_2.mcr 
+     - renamed taylor_green_vortex.eqn to taylor_green_vortex_2.eqn 
+     - added taylor_green_vortex.mcr which is to be used with taylor_green_vortex.wrp
+     - added taylor_green_vortex.eqn which is to be used with taylor_green_vortex.wrp
+
+
 2019 FEB 14a
    * in model/share/fluid_share.c
      - added condition_Lambda_plus_minus_Parent3()

@@ -1,20 +1,21 @@
-{  _______________________________________________________________________________________________
+{ _______________________________________________________________________________________________
 
                                            C F D W A R P
 
                                A CFD Code for Plasma & Reactive Flow
   _______________________________________________________________________________________________
 
-  Version                          18nov04a
-  Compiler                         gcc 4.9.2 with OPENMP threads
-  Compiled on                      Nov  9 2018 at 19:50:28 by prasanna on WAFL101
+  Version                          19feb08b
+  Compiler                         gcc 4.9.2 with OPENMP threads with distributed memory MPI
+  Compiled on                      Feb  8 2019 at 16:25:22 by prasanna on WAFL101
   Cycle Strategy                   Predictor-Corrector
   Fluid Relaxation                 None
   EM Field Relaxation              None
-  Convection Discretization        MUSCL with flux FVS [1], FDS [3], and primitive interpolation
-                                   TVD [2], WENO [4], CWENO [6], AOWENO [5], and eigenvalue
-                                   conditioning HARTEN, GNOFFO [7], PECLET [8]
-  Temporal Discretization          Total Variation Diminishing Runge Kutta [9]
+  Convection Discretization        Multidimensional MUSCL with flux FVS [1], FDS [3], and
+                                   primitive interpolation TVD [2], WENO [5], CWENO [7], AOWENO
+                                   [6], and eigenvalue conditioning HARTEN, GNOFFO [8], PECLET
+                                   [9], PARENT [4], and PARENT positivity-preserving filter [10]
+  Temporal Discretization          Total Variation Diminishing Runge Kutta [11]
   Fluid Model                      Navier-Stokes Perfect Gas
   Thermodynamic Model              Perfect Gas
   Chemical Model                   Air 1 species 0 reaction
@@ -31,29 +32,33 @@
        Splittings for the Euler Equations", AIAA Journal 24:1453-1460, 1986.
   [3]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes", Journal
        of Computational Physics 43:357-372, 1981.
-  [4]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes", Journal of
+  [4]  B Parent. "Positivity-Preserving Dual Time Stepping Schemes for Gas Dynamics", Journal of
+       Computational Physics 361:391-411, 2018.
+  [5]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes", Journal of
        Computational Physics 126:202-228, 1996.
-  [5]  DS Balsara, S Garain, and CW Shu. "An Efficient Class of WENO schemes with Adaptive
+  [6]  DS Balsara, S Garain, and CW Shu. "An Efficient Class of WENO schemes with Adaptive
        Order", Journal of Computational Physics 326:780-804, 2016.
-  [6]  M Dumbser and M Kaser. "Arbitrary High Order Non-oscillatory Finite Volume Schemes on
+  [7]  M Dumbser and M Kaser. "Arbitrary High Order Non-oscillatory Finite Volume Schemes on
        Unstructured Meshes for Linear Hyperbolic Systems", Journal of Computational Physics,
        221:693-723, 2007.
-  [7]  P Gnoffo and  JA White. "Computational Aerothermodynamic Simulation Issues on
+  [8]  P Gnoffo and  JA White. "Computational Aerothermodynamic Simulation Issues on
        Unstructured Grids", 37th AIAA Thermophysics Conference, AIAA Paper 2004-2371, 2004.
-  [8]  B Parent. "Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows", AIAA
+  [9]  B Parent. "Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows", AIAA
        Journal, 55:141-152, 2017.
-  [9]  S Gottlieb and CW Shu. "Total Variation Diminishing Runge Kutta Schemes", Mathematics of
+  [10] B Parent. "Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler
+       Equatons", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.
+  [11] S Gottlieb and CW Shu. "Total Variation Diminishing Runge Kutta Schemes", Mathematics of
        Computation, 67:73-85, 1998.
 }
 
 {
-Reference for initial conditions :
+Initial conditions from :
 James DeBonis. "Solutions of the Taylor-Green Vortex Problem Using High-Resolution Explicit 
 Finite Difference Methods", 51st AIAA Aerospace Sciences Meeting including the New Horizons 
 Forum and Aerospace Exposition, Aerospace Sciences Meetings
 }
 {
-Reference data (attached at end of wrp control file):
+Reference data (attached at end of warp file):
 
 DRP-512 data (extracted manually using enguage digitizer):
 J. R. Bull and A. Jameson.  "Simulation of the Taylor–Green Vortex Using High-Order Flux 
@@ -68,43 +73,33 @@ Data points provided at: http://dept.ku.edu/~cfdku/hiocfd.html
 Case C3.5
 }
 
-mf=0.25; {mesh factor: 1,sqrt(2),2,2*sqrt(2),4}
+mf=2; 
+
+L= 0.005*0.3048{0.005*0.3048}; {not the length of the domain}
 
 is=1;
-ie=round(64*mf);
+ie=round(64*mf)+2;
 js=1;
-je=round(64*mf);
+je=round(64*mf)+2;
 ks=1;
-ke=round(64*mf);
-
-L_ref= 0.005*0.3048; {domain spans -pi*L_ref<=x,y,z<=pi*L_ref}
-
-L=pi*L_ref;
-D=pi*L_ref;
-H=pi*L_ref;
-
-dx=2*L/(ie-1);
-dy=2*D/(je-1);
-dz=2*H/(ke-1);
-
-ie=ie+1;
-je=je+1;
-ke=ke+1;
+ke=round(64*mf)+2;
 
 iterdiv=round(7*mf);
 
 Ma=0.1;
-T_0=530*5/9; {K}
+T0=530*5/9;
 gamma=1.4;
-R=287; {J/kgK}
-U_0=Ma*sqrt(gamma*R*T_0); {m/s}
-rho_0=1; {kg/m^3}
-p_0=rho_0*R*T_0; {Pa}
-mu_0=rho_0*U_0*L_ref/1600; {kg/ms}
+R=287;
+V0=Ma*sqrt(gamma*R*T0);
+rho0=1;
+P0=rho0*R*T0;
+mu_0=rho0*V0*L/1600;
 
+
+Ldom=L*2*pi/(ie-is-1)*(ie-is);
 Grid(
   Size(is,js,ks, ie,je,ke);
-  Corners(is,js,ks, ie,je,ke, -pi*L_ref,-pi*L_ref,-pi*L_ref, pi*L_ref+dx,pi*L_ref+dy,pi*L_ref+dz);
+  Corners(is,js,ks, ie,je,ke, 0,0,0, Ldom,Ldom,Ldom);
   JoinCorners(is,js,ks, ie,je,ke,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
 );
 
@@ -136,7 +131,7 @@ Bdry(
 Model(
   NavierStokesPerfect(
     gamma=1.4;
-    R=287; {J/kgK}
+    R=287;
     eta=mu_0;       {kg/ms}
     kappa=eta*1004.5/0.71;     {W/mK}
     Pmin=1.0e-5;    Pmax=9.9e99;   {Pa}
@@ -158,23 +153,20 @@ Init(
     INIT_TYPE3                   V[1]..V[nd],  P,  rho   
     _______________________________________________________________________________________
     }
-
-	for_parallel(i,domain.is,domain.ie,
-	  for(j,domain.js,domain.je,
-		for(k,domain.ks,domain.ke,
-		  sin_x=sin(_x(i,j,k)/L_ref);
-		  cos_y=cos(_y(i,j,k)/L_ref);
-		  cos_z=cos(_z(i,j,k)/L_ref);
-		  cos_x=cos(_x(i,j,k)/L_ref);
-		  sin_y=sin(_y(i,j,k)/L_ref);
-		  cos_2z=cos(2 * _z(i,j,k)/L_ref);
-		  cos_2x=cos(2 * _x(i,j,k)/L_ref);
-		  cos_2y=cos(2 * _y(i,j,k)/L_ref);
-		  
-    	  Region(i,j,k,  i,j,k,  INIT_TYPE1, U_0 * sin_x * cos_y * cos_z,-U_0 * cos_x * sin_y * cos_z,0.0,p_0 + ( (rho_0*U_0^2/ 16) * ( 2 + cos_2z ) * (cos_2x + cos_2y) ), T_0);
-		);
-	  );
-	);
+    for_parallel(i,domain.is,domain.ie,
+      for(j,domain.js,domain.je,
+        for(k,domain.ks,domain.ke,
+          x=_x(i,j,k)/L;
+          y=_y(i,j,k)/L;
+          z=_z(i,j,k)/L;
+          Region(i,j,k,  i,j,k,  INIT_TYPE1, V0*sin(x)*cos(y)*cos(z),-V0*cos(x)*sin(y)*cos(z),0,P0+rho0*V0*V0/16.0*(cos(2*x)+cos(2*y))*(cos(2*z)+2),T0);
+        );
+      );
+    );
+    {
+    Bdry(BDRY_WALLTFIXED1, INIT_TYPE2, Mx,My,Mz,P,T);
+    Region(is,js,ks,  ie,je,ke,  INIT_TYPE2, Mx,My,Mz,P,T);
+    }
   );
 );
 
@@ -191,17 +183,20 @@ Disc(
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
     AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_AOWENO5;
-    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+    AOWENO_gammahi=0.9999;
+    INTERPOL=INTERPOL_AOWENO7;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO; 
+    FACEINTEG=FACEINTEG_CENTRAL3;
+    POSFILTER=POSFILTER_NONE;
+    POSFILTER_numiter=4;
   );
 );
 
 Cycle(
   NavierStokesPerfect(
     xiverge=1e-3;          {residual convergence threshold}
-    rhoref=rho_0;            {reference density in kg/m3}
-    aref=sqrt(gamma*R*T_0);            {reference sound speed in m/s}
+    rhoref=rho0;            {reference density in kg/m3}
+    aref=sqrt(gamma*R*T0);            {reference sound speed in m/s}
     Uref[0]=rhoref;            
     Uref[1]=rhoref*aref;       
     Uref[2]=rhoref*aref;   
@@ -210,8 +205,8 @@ Cycle(
   );
 
   PredictorCorrector(
-    tmax=20*L_ref/U_0; {time in seconds after which simulation is stopped}
-	dt=1.25E-7/mf; {corresponding to CFL~0.91}
+    tmax=20*L/V0; {time in seconds after which simulation is stopped}
+	dt=1.25E-7/mf;
     if (time>tmax-0.1*dt,
       WriteDataFile(outputfilename"."round(time/dt));
       exit(EXIT_SUCCESS);
@@ -228,7 +223,6 @@ Cycle(
   );
 
 );
-
 
 {
 DRP512 data:
@@ -2297,3 +2291,4 @@ PS-512 data:
 19.98 0.0215861094784 0.001876556645 1.5012434382
 19.99 0.0215673592481 0.001873496392 1.49879524842
 }
+
