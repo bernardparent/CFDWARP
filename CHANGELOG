@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 16a
+   * in bin
+     - renamed standard test cases to standard names
+
+
 2019 FEB 14b
    * in bin
      - modified taylor_green_vortex.wrp to latest version
