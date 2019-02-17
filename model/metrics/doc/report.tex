@@ -732,19 +732,118 @@ becomes:
 %
 
 
-\section{Possible Issues with Freestream Conservation}
+
+
+
+\section{Freestream-Preserving Metrics at Interface}
 
 When using a non-control-volume scheme, as is done in this document, there is always
 a possibility of not conserving the free stream properly on a highly stretched mesh.
 To minimize such an error, the metrics are here determined at the cell interface each
 time the flux at the interface is computed. In two dimensions, the free stream is preserved
 exactly, although some small errors can originate in the free stream for a three dimensional
-distorted mesh. Recently, an approach has been proposed by Visbal and Gaitonde
+distorted mesh. One approach that has been proposed by Visbal and Gaitonde
 \cite{jcp:2002:visbal} to maintain free stream in generalized coordinate for three dimensional
-flow. This is not yet implemented in the current algorithm.
+flow. We here follow a different, simpler, path.
+
+%
+\begin{figure}
+   \fontsizefigure\center
+   \psfrag{a}[c][c][1][0]{$\vec{a}$}
+   \psfrag{b}[c][c][1][0]{$\vec{b}$}
+   \psfrag{c}[c][c][1][0]{$\vec{c}$}
+   \psfrag{d}[c][c][1][0]{$\vec{d}$}
+   \includegraphics[width=1.0\lengthfigure]{interface.eps}
+\caption{Face at the interface defined by the points $\vec{a}$, $\vec{b}$, $\vec{c}$, and $\vec{d}$.}
+\label{fig:interface}
+\end{figure}
 
 
+As shown in Fig.\ \ref{fig:interface}, consider a face between two nodes defined by the 4 coordinates $(a_x,~a_y,~a_z)$, $(b_x,~b_y,~b_z)$, $(c_x,~c_y,~c_z)$, and $(d_x,~d_y,~d_z)$.  Define the vectors $\vec{ca}$ and $\vec{ba}$ as:
+%
+\begin{equation}
+\vec{ba}=\vec{b}-\vec{a}
+\end{equation}
+%
+%
+\begin{equation}
+\vec{ca}=\vec{c}-\vec{a}
+\end{equation}
+%
+Then the cross product between these two vectors is:
+%
+\begin{equation}
+\vec{g}=\vec{ba} \times \vec{ca}
+\end{equation}
+%
+or
+%
+\begin{equation}
+\vec{g}=\left|\begin{array}{ccc} 
+\vec{i} & \vec{j} & \vec{k} \\
+\vec{ba}_x & \vec{ba}_y & \vec{ba}_z \\
+\vec{ca}_x & \vec{ca}_y & \vec{ca}_z 
+\end{array}   \right|
+\end{equation}
+%
+or
+%
+\begin{equation}
+\vec{g}=
+   (\vec{ba}_y \vec{ca}_z-  \vec{ba}_z \vec{ca}_y)\vec{i}
+ + (\vec{ba}_z \vec{ca}_x - \vec{ca}_z \vec{ba}_x)\vec{j}
+ + (\vec{ba}_x \vec{ca}_y - \vec{ba}_y \vec{ca}_x)\vec{k}
+\end{equation}
+%
+From the cross product, we can find find the area of the triangle
+%
+\begin{equation}
+A=\frac{1}{2}\sqrt{
+   \vec{g}_x^2
+ + \vec{g}_y^2
+ + \vec{g}_z^2
+  }
+\end{equation}
+%
+and we can find the unit normal vector as (i.e.\ vector normal to the triangle):
+%
+\begin{equation}
+\vec{n}=\frac{1}{2A}\left(\vec{g}_x\vec{i}+\vec{g}_y\vec{j} + \vec{g}_z\vec{k}\right)
+\end{equation}
+%
+But what we need is the multiplication between $\vec{n}$ and $A$ which we will denote as $\vec{abc}$:
+%
+\begin{equation}
+\vec{abc}=A\vec{n}=\frac{1}{2}\left(\vec{g}_x\vec{i}+\vec{g}_y\vec{j} + \vec{g}_z\vec{k}\right)
+\end{equation}
+%
+or
+%
+\begin{equation}
+\vec{abc}=\frac{\vec{ba}_y \vec{ca}_z-  \vec{ba}_z \vec{ca}_y}{2}\vec{i}+\frac{\vec{ba}_z \vec{ca}_x - \vec{ca}_z \vec{ba}_x}{2}\vec{j} + \frac{\vec{ba}_x \vec{ca}_y - \vec{ba}_y \vec{ca}_x}{2}\vec{k}
+\end{equation}
+%
 
+The vector $\vec{abc}$ is not unique as it can point in two directions. To verify that it points in the right direction, calculate the dot product between $\vec{abc}$ and a vector linking the two nodes adjacent to the interface. If the dot product is positive then $\vec{abc}$ points in the right direction. If not, then change the sign of each component of $\vec{abc}$.  
+
+Following similar steps, we can find the vector associated with the second triangle part of the face with the corners located at $\vec{a}$, $\vec{d}$ and $\vec{c}$:
+%
+\begin{equation}
+\vec{adc}=\frac{\vec{da}_y \vec{ca}_z-  \vec{da}_z \vec{ca}_y}{2}\vec{i}+\frac{\vec{da}_z \vec{ca}_x - \vec{ca}_z \vec{da}_x}{2}\vec{j} + \frac{\vec{da}_x \vec{ca}_y - \vec{da}_y \vec{ca}_x}{2}\vec{k}
+\end{equation}
+%
+Now, at the interface perpendicular to the dimension $\theta$, 
+%
+\begin{equation}
+\Omega X_{\theta,j}= \vec{abc}_j + \vec{adc}_j
+\end{equation}
+%
+Or
+%
+\begin{equation}
+X_{\theta,j}= \frac{\vec{abc}_j + \vec{adc}_j}{\Omega }
+\end{equation}
+%
 
 
 

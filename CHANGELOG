@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 17a
+   * in model/metrics/doc/report.tex
+     - added section related to new metrics that ensure freestream preservation in 3D
+
+
 2019 FEB 16a
    * in bin
      - renamed standard test cases to standard names
