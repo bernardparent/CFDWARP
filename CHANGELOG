@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 18a
+   * in bin
+     - deleted reentry2.wrp
+     - deleted reentry3.wrp
+     - added reentry_sheath.wrp
+
+
 2019 FEB 17a
    * in model/metrics/doc/report.tex
      - added section related to new metrics that ensure freestream preservation in 3D
