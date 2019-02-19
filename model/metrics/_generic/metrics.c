@@ -1,5 +1,5 @@
 #include <model/metrics/_metrics.h>
-
+#include <lib/exm/exm.h>
 
 
 double _Omega(np_t np, gl_t *gl){
@@ -88,7 +88,97 @@ static double _dx_dX_int(np_t *np, gl_t *gl, long lL, long lR, long theta,
 }
 
 
+#ifdef _3D
+void find_point_in_between_8_nodes(np_t *np, gl_t *gl, long l, long dim1, long dim1sgn, long dim2, long dim2sgn, long dim3, long dim3sgn, EXM_vec3D_t a){
+  long dim; 
+
+  for (dim=0; dim<nd; dim++){
+    a[dim]=0.125*(
+             _x(np[l],dim)
+            +_x(np[_al(gl,l,dim1,dim1sgn)],dim)
+            +_x(np[_al(gl,l,dim2,dim2sgn)],dim)
+            +_x(np[_all(gl,l,dim1,dim1sgn,dim2,dim2sgn)],dim)
+            +_x(np[_al(gl,l,dim3,dim3sgn)],dim)
+            +_x(np[_all(gl,l,dim1,dim1sgn,dim3,dim3sgn)],dim)
+            +_x(np[_all(gl,l,dim2,dim2sgn,dim3,dim3sgn)],dim)
+            +_x(np[_al(gl,_all(gl,l,dim1,dim1sgn,dim2,dim2sgn),dim3,dim3sgn)],dim)
+           );
+  }
+}
+#endif
+
+
 void find_Omega_and_X_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta,
+                          double *Omega, dim2_t X) {
+#ifdef _2D
+  long i,j;
+  *Omega=_dx_dX_int(np,gl,lL,lR,theta,0,0)
+               *_dx_dX_int(np,gl,lL,lR,theta,1,1)
+               -_dx_dX_int(np,gl,lL,lR,theta,0,1)
+               *_dx_dX_int(np,gl,lL,lR,theta,1,0);
+  for (i=0; i<nd; i++){
+    for (j=0; j<nd; j++){
+      X[i][j]=(2.0e0*krodelta(i,j)-1.0e0)/notzero(*Omega,1e-99)*
+         _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+1,nd));
+    }
+  }
+#endif
+#ifdef _3D
+  long i,j;
+  EXM_vec3D_t a,b,c,d,ba,ca,da,abc,adc;
+
+  *Omega=0.0e0;
+  for (i=0; i<nd; i++){
+    *Omega+=_dx_dX_int(np,gl,lL,lR,theta,0,i)
+                  *_dx_dX_int(np,gl,lL,lR,theta,1,mod(i+1,nd))
+                  *_dx_dX_int(np,gl,lL,lR,theta,2,mod(i+2,nd))
+                  -_dx_dX_int(np,gl,lL,lR,theta,0,i)
+                  *_dx_dX_int(np,gl,lL,lR,theta,1,mod(i+2,nd))
+                  *_dx_dX_int(np,gl,lL,lR,theta,2,mod(i+1,nd));
+  }
+  find_point_in_between_8_nodes(np,gl,lL,theta,+1,mod(theta+1,nd),+1,mod(theta+2,nd),-1,a);
+  find_point_in_between_8_nodes(np,gl,lL,theta,+1,mod(theta+1,nd),+1,mod(theta+2,nd),+1,b);
+  find_point_in_between_8_nodes(np,gl,lL,theta,+1,mod(theta+1,nd),-1,mod(theta+2,nd),+1,c);
+  find_point_in_between_8_nodes(np,gl,lL,theta,+1,mod(theta+1,nd),-1,mod(theta+2,nd),-1,d);
+
+  for (i=0; i<nd; i++){
+    ba[i]=b[i]-a[i];
+    ca[i]=c[i]-a[i];
+    da[i]=d[i]-a[i];
+  }
+
+  abc[0]=0.5*(ba[1]*ca[2]-ba[2]*ca[1]);
+  abc[1]=0.5*(ba[2]*ca[0]-ba[0]*ca[2]);
+  abc[2]=0.5*(ba[0]*ca[1]-ba[1]*ca[0]);
+
+  adc[0]=-0.5*(da[1]*ca[2]-da[2]*ca[1]);
+  adc[1]=-0.5*(da[2]*ca[0]-da[0]*ca[2]);
+  adc[2]=-0.5*(da[0]*ca[1]-da[1]*ca[0]);
+
+  for (i=0; i<nd; i++){
+    if (i==theta){
+      for (j=0; j<nd; j++){  
+        X[i][j]=(abc[j]+adc[j])/notzero(*Omega,1e-99);
+      }
+//      if (i==theta) printf("%E  %E  %E\n",X[i][0],X[i][1],X[i][2]);
+    } else {
+      for (j=0; j<nd; j++){
+        X[i][j]=1.0e0/notzero(*Omega,1e-99)*(
+           _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+1,nd))*
+                        _dx_dX_int(np,gl,lL,lR,theta,mod(j+2,nd),mod(i+2,nd))
+          -_dx_dX_int(np,gl,lL,lR,theta,mod(j+2,nd),mod(i+1,nd))*
+                        _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+2,nd))
+        );
+      }
+    }
+     // if (i==theta) printf("%E  %E  %E\n\n",X[i][0],X[i][1],X[i][2]);
+
+  }
+#endif
+}
+
+
+void find_Omega_and_X_at_interface_old(np_t *np, gl_t *gl, long lL, long lR, long theta,
                           double *Omega, dim2_t X) {
 #ifdef _2D
   long i,j;

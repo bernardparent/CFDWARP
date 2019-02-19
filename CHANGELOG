@@ -7,6 +7,14 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 19a
+   * in model/metrics/_generic/metrics.c
+     - added find_point_in_between_8_nodes()
+     - renamed find_Omega_and_X_at_interface() to find_Omega_and_X_at_interface_old()
+     - in find_Omega_and_X_at_interface(), changed the 3D metrics so that they preserve freestream
+       perfectly independently of the skewness of the mesh (needs more testing)
+
+
 2019 FEB 18a
    * in bin
      - deleted reentry2.wrp
