@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 19b
+   * in cycle/resconv/_MUSCL/resconv.c
+     - in write_disc_resconv_template(), changed the default for FACEINTEG to FACEINTEG_CENTRAL1
+   * in model/metrics/_generic/metrics.c
+     - added some comments
+
+
 2019 FEB 19a
    * in model/metrics/_generic/metrics.c
      - added find_point_in_between_8_nodes()

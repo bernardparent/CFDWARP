@@ -89,7 +89,7 @@ static double _dx_dX_int(np_t *np, gl_t *gl, long lL, long lR, long theta,
 
 
 #ifdef _3D
-void find_point_in_between_8_nodes(np_t *np, gl_t *gl, long l, long dim1, long dim1sgn, long dim2, long dim2sgn, long dim3, long dim3sgn, EXM_vec3D_t a){
+static void find_point_in_between_8_nodes(np_t *np, gl_t *gl, long l, long dim1, long dim1sgn, long dim2, long dim2sgn, long dim3, long dim3sgn, EXM_vec3D_t a){
   long dim; 
 
   for (dim=0; dim<nd; dim++){
@@ -108,6 +108,7 @@ void find_point_in_between_8_nodes(np_t *np, gl_t *gl, long l, long dim1, long d
 #endif
 
 
+// these metrics at the interface preserve freestream
 void find_Omega_and_X_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta,
                           double *Omega, dim2_t X) {
 #ifdef _2D
@@ -178,6 +179,7 @@ void find_Omega_and_X_at_interface(np_t *np, gl_t *gl, long lL, long lR, long th
 }
 
 
+// these metrics at the interface do not preserve freestream in 3D
 void find_Omega_and_X_at_interface_old(np_t *np, gl_t *gl, long lL, long lR, long theta,
                           double *Omega, dim2_t X) {
 #ifdef _2D

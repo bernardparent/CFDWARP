@@ -45,7 +45,7 @@ void write_disc_resconv_template(FILE **controlfile){
     "    AOWENO_gammalo=0.95;\n"
     "    AOWENO_gammahi=0.999;\n"
     "    INTERPOL=INTERPOL_AOWENO7;\n"
-    "    FACEINTEG=FACEINTEG_CENTRAL3;\n"
+    "    FACEINTEG=FACEINTEG_CENTRAL1;\n"
     "    EIGENVALCOND=EIGENVALCOND_GNOFFO;\n"
     "    POSFILTER=POSFILTER_NONE;\n"
     "    POSFILTER_numiter=4;\n"
