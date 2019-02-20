@@ -71,7 +71,7 @@ initially but density varies as 1+t/r with r the radius from the origin
 }
 
 
-mf=4;
+mf=2;
 
 is=1;
 ie=round(30*mf);
@@ -194,10 +194,10 @@ Disc(
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.999;
+    AOWENO_gammahi=0.9999;
     INTERPOL=INTERPOL_AOWENO7;
-    FACEINTEG=FACEINTEG_CENTRAL3;
-    EIGENVALCOND=EIGENVALCOND_PASCAL;
+    FACEINTEG=FACEINTEG_CENTRAL1;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
     POSFILTER=POSFILTER_PARENT;
     POSFILTER_numiter=4;
   );
