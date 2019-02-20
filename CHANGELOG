@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 20a
+   * in model/share/fluid_share.c
+     - added condition_Lambda_plus_minus_Parent4() -> significantly better than previous attempts
+
+
 2019 FEB 19b
    * in cycle/resconv/_MUSCL/resconv.c
      - in write_disc_resconv_template(), changed the default for FACEINTEG to FACEINTEG_CENTRAL1
