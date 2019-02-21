@@ -337,6 +337,7 @@ void update_bdry_nodes(np_t *np, gl_t *gl, zone_t zone){
 #ifdef DISTMPI
 
 #define numfluidvars (nf+1+max(0,hbw_resconv_fluid-1)*nf)
+#define numlinkvars (nf+(hbw_resconv_fluid-1-1)*nf)
 #define DOUBLE_INT_MAX 100000000000000
 
 typedef double sendvars_t[max(nfe,numfluidvars)];
@@ -346,6 +347,56 @@ typedef struct {
   long l;
   bool SENT;
 } sendnode_t;
+
+
+void update_linked_nodes_2(np_t *np, gl_t *gl, int TYPELEVEL){
+
+  int rankrecv,numproc,ranksend,thisrank;
+  long i,j,k;
+  zone_t zonesend,zonerecv,zone;
+  MPI_Status MPI_Status1;
+
+  MPI_Comm_rank(MPI_COMM_WORLD, &thisrank);
+  MPI_Comm_size(MPI_COMM_WORLD, &numproc);
+
+  /* here we need to mpi the linkmusclvars */
+  for (ranksend=0; ranksend<numproc; ranksend++){
+    zonesend=_domain_from_rank(ranksend,gl);
+    for (rankrecv=0; rankrecv<numproc; rankrecv++){
+      if (rankrecv!=ranksend && (ranksend==thisrank || rankrecv==thisrank)){
+        zonerecv=_domain_lim_from_rank(rankrecv,gl);
+        if (is_zone_intersecting_zone(zonesend,zonerecv)){
+          zone=_zone_intersection(zonesend,zonerecv);
+          for1DL(i,zone.is,zone.ie)
+            for2DL(j,zone.js,zone.je)
+              for3DL(k,zone.ks,zone.ke)
+                if (ranksend==thisrank) {
+//                  if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)) printf("x");
+                  if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK) && is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)){
+                    assert(np[_ai(gl,i,j,k)].numlinkmusclvars!=0);
+                    assert(np[_ai(gl,i,j,k)].linkmusclvars!=NULL);
+                    MPI_Send(&np[_ai(gl,i,j,k)].numlinkmusclvars,1,MPI_INT,rankrecv,0,MPI_COMM_WORLD);
+                    MPI_Send(np[_ai(gl,i,j,k)].linkmusclvars,numlinkvars,MPI_DOUBLE,rankrecv,0,MPI_COMM_WORLD);
+                    
+                  }
+                }
+                if (rankrecv==thisrank) {
+                  if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK) && is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)){
+                    MPI_Recv(&np[_ai(gl,i,j,k)].numlinkmusclvars,1,MPI_INT,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
+                    assert(np[_ai(gl,i,j,k)].linkmusclvars!=NULL);
+                    MPI_Recv(np[_ai(gl,i,j,k)].linkmusclvars,numlinkvars,MPI_DOUBLE,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
+                  }
+                }
+              end3DL
+            end2DL
+          end1DL
+        }
+      }
+    }
+  } 
+   
+  MPI_Barrier(MPI_COMM_WORLD);
+}
 
 
 void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
@@ -361,7 +412,9 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   double *sendvars;
   int *recvproc;
   int cntproc;
+  zone_t zone;
 
+  zone=gl->domain;
   switch (TYPELEVEL){
     case TYPELEVEL_FLUID:
       numvars=numfluidvars;
@@ -388,15 +441,15 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   MPI_Pack_size( 1, MPI_DOUBLE, MPI_COMM_WORLD, &packsize );
   
   recvproc=(int *)malloc((numproc+2)*sizeof(int));
-  buffersize = min(INT_MAX,nf*(gl->domain.ie-gl->domain.is)*(gl->domain.je-gl->domain.js)if3DL(*(gl->domain.ke-gl->domain.ks)) * (MPI_BSEND_OVERHEAD + packsize));
+  buffersize = min(INT_MAX,nf*(zone.ie-zone.is)*(zone.je-zone.js)if3DL(*(zone.ke-zone.ks)) * (MPI_BSEND_OVERHEAD + packsize));
   buffer = (double *)malloc( buffersize );
 
   MPI_Buffer_attach( buffer, buffersize );
 
 
-  for1DL(i,gl->domain.is,gl->domain.ie)
-    for2DL(j,gl->domain.js,gl->domain.je)
-      for3DL(k,gl->domain.ks,gl->domain.ke)
+  for1DL(i,zone.is,zone.ie)
+    for2DL(j,zone.js,zone.je)
+      for3DL(k,zone.ks,zone.ke)
         np[_al(gl,i,j,k)].numlinkmusclvars=0;
       end3DL
     end2DL
@@ -405,9 +458,9 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
 
   /* first send the packets */
   cntsend=0;
-  for1DL(i,gl->domain.is,gl->domain.ie)
-    for2DL(j,gl->domain.js,gl->domain.je)
-      for3DL(k,gl->domain.ks,gl->domain.ke)
+  for1DL(i,zone.is,zone.ie)
+    for2DL(j,zone.js,zone.je)
+      for3DL(k,zone.ks,zone.ke)
         if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL)){
 #ifdef _CYCLE_MULTIZONE
           fatal_error("Linked nodes can not be used with Multizone cycle yet. Need to update update_linked_nodes() function.");
@@ -440,6 +493,8 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
                     sendnode=(sendnode_t *)realloc(sendnode,(cntsend+1)*sizeof(sendnode_t));
                   } else {
                     /* no need to send with MPI*/
+                    //printf("\n --(%ld,%ld,%ld) %d",i,j,k,thisrank);
+
                     l=_l_from_l_all(gl,l2);
                     for (flux=0; flux<nf; flux++) np[l].bs->U[flux]=mpivars[flux];
                     assert(np[l].linkmusclvars!=NULL);
@@ -512,9 +567,9 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   }
 
 
-  for1DL(i,gl->domain.is,gl->domain.ie)
-    for2DL(j,gl->domain.js,gl->domain.je)
-      for3DL(k,gl->domain.ks,gl->domain.ke)
+  for1DL(i,zone.is,zone.ie)
+    for2DL(j,zone.js,zone.je)
+      for3DL(k,zone.ks,zone.ke)
         if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL) && is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL)){
           l1=_node_link(np[_ai(gl,i,j,k)],0,TYPELEVEL);
           rank2=_node_rank(gl, i, j, k);
@@ -542,9 +597,9 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
     MPI_Recv(sendvars,numsendvars,MPI_DOUBLE,thisproc,0,MPI_COMM_WORLD,&MPI_Status1);
 
     cntsend=0;
-    for1DL(i,gl->domain.is,gl->domain.ie)
-      for2DL(j,gl->domain.js,gl->domain.je)
-        for3DL(k,gl->domain.ks,gl->domain.ke)
+    for1DL(i,zone.is,zone.ie)
+      for2DL(j,zone.js,zone.je)
+        for3DL(k,zone.ks,zone.ke)
           if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL) && is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL)){
             l2=_ai_all(gl,i,j,k);
             assert(is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL));
@@ -591,6 +646,8 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   free(sendnode);
   free(recvproc);
   free(sendvars);
+
+  update_linked_nodes_2(np, gl, TYPELEVEL);
 }
 
 
@@ -1649,6 +1706,7 @@ long _numthread_optimized(long numzone){
 
 #ifdef DISTMPI
 
+
 void exchange_U(np_t *np, gl_t *gl){
   int rankrecv,numproc,ranksend,thisrank;
   long i,j,k,flux;
@@ -1658,7 +1716,6 @@ void exchange_U(np_t *np, gl_t *gl){
 
   MPI_Comm_rank(MPI_COMM_WORLD, &thisrank);
   MPI_Comm_size(MPI_COMM_WORLD, &numproc);
-  
   for (ranksend=0; ranksend<numproc; ranksend++){
     zonesend=_domain_from_rank(ranksend,gl);
     for (rankrecv=0; rankrecv<numproc; rankrecv++){
