@@ -29,6 +29,8 @@
 #define INTERPOL_SECONDORDER 15
 #define FACEINTEG_CENTRAL1 21
 #define FACEINTEG_CENTRAL3 22
+#define FACEINTEG_CENTRAL5 23
+#define FACEINTEG_AOWENO5 24
 #define POSFILTER_NONE 1
 #define POSFILTER_PARENT 2
 
@@ -92,6 +94,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"INTERPOL_SECONDORDER",INTERPOL_SECONDORDER); 
     SOAP_add_int_to_vars(codex,"FACEINTEG_CENTRAL1",FACEINTEG_CENTRAL1); 
     SOAP_add_int_to_vars(codex,"FACEINTEG_CENTRAL3",FACEINTEG_CENTRAL3); 
+    SOAP_add_int_to_vars(codex,"FACEINTEG_CENTRAL5",FACEINTEG_CENTRAL5); 
+    SOAP_add_int_to_vars(codex,"FACEINTEG_AOWENO5",FACEINTEG_AOWENO5); 
     SOAP_add_int_to_vars(codex,"POSFILTER_PARENT",POSFILTER_PARENT); 
     SOAP_add_int_to_vars(codex,"POSFILTER_NONE",POSFILTER_NONE); 
 
@@ -122,8 +126,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
 
 
     find_int_var_from_codex(codex,"FACEINTEG",&gl->cycle.resconv.FACEINTEG);
-    if (gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL1  && gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL3)
-      SOAP_fatal_error(codex,"FACEINTEG must be set to either FACEINTEG_CENTRAL1 or FACEINTEG_CENTRAL3.");
+    if (gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL1  && gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL3 && gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL5 && gl->cycle.resconv.FACEINTEG!=FACEINTEG_AOWENO5)
+      SOAP_fatal_error(codex,"FACEINTEG must be set to either FACEINTEG_CENTRAL1 or FACEINTEG_CENTRAL3 or FACEINTEG_CENTRAL5 or FACEINTEG_AOWENO5.");
 
     find_int_var_from_codex(codex,"FLUX",&gl->cycle.resconv.FLUX);
     if (gl->cycle.resconv.FLUX!=FLUX_FDS && gl->cycle.resconv.FLUX!=FLUX_FVS)
@@ -354,39 +358,234 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t 
 
 
 
-static void find_musclvars_offset_local(np_t *np, gl_t *gl, long l, long theta, long offset, flux_t musclvars){
-  flux_t musclvarsp0,musclvarsp1,musclvarsm1;
+
+void find_Fstar_interfaces(np_t *np, gl_t *gl, long theta, long ls, long le){
+  flux_t Fm1h,Fp1h;
+  long flux,l;
+  flux_t musclvarsm5,musclvarsm4,musclvarsm3,musclvarsm2,musclvarsm1,musclvarsp0,musclvarsp1,
+         musclvarsp2,musclvarsp3,musclvarsp4,musclvarsp5;
+  if (gl->cycle.resconv.FACEINTEG!=FACEINTEG_CENTRAL1){
+    for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
+
+      if(l==ls){
+
+        if (hbw_resconv_fluid>=5) find_musclvars_offset(np,gl,l,theta,-5,musclvarsm5);
+        if (hbw_resconv_fluid>=4) find_musclvars_offset(np,gl,l,theta,-4,musclvarsm4);
+        if (hbw_resconv_fluid>=3) find_musclvars_offset(np,gl,l,theta,-3,musclvarsm3);
+        if (hbw_resconv_fluid>=2) find_musclvars_offset(np,gl,l,theta,-2,musclvarsm2);
+        find_musclvars_offset(np,gl,l,theta,-1,musclvarsm1);
+        find_musclvars_offset(np,gl,l,theta,+0,musclvarsp0);
+        find_musclvars_offset(np,gl,l,theta,+1,musclvarsp1);
+        if (hbw_resconv_fluid>=2) find_musclvars_offset(np,gl,l,theta,+2,musclvarsp2);
+        if (hbw_resconv_fluid>=3) find_musclvars_offset(np,gl,l,theta,+3,musclvarsp3);
+        if (hbw_resconv_fluid>=4) find_musclvars_offset(np,gl,l,theta,+4,musclvarsp4);
+        if (hbw_resconv_fluid>=5) find_musclvars_offset(np,gl,l,theta,+5,musclvarsp5);
+        find_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, musclvarsm5, musclvarsm4, musclvarsm3, musclvarsm2, musclvarsm1, musclvarsp0, musclvarsp1, musclvarsp2, musclvarsp3, musclvarsp4, Fm1h);
+
+      } else {
+
+        for (flux=0; flux<nf; flux++) {
+          Fm1h[flux]=Fp1h[flux];
+          if (hbw_resconv_fluid>=5) musclvarsm4[flux]=musclvarsm3[flux];
+          if (hbw_resconv_fluid>=4) musclvarsm3[flux]=musclvarsm2[flux];
+          if (hbw_resconv_fluid>=3) musclvarsm2[flux]=musclvarsm1[flux];
+          if (hbw_resconv_fluid>=2) musclvarsm1[flux]=musclvarsp0[flux];
+          musclvarsp0[flux]=musclvarsp1[flux];
+          if (hbw_resconv_fluid>=2) musclvarsp1[flux]=musclvarsp2[flux];
+          if (hbw_resconv_fluid>=3) musclvarsp2[flux]=musclvarsp3[flux];
+          if (hbw_resconv_fluid>=4) musclvarsp3[flux]=musclvarsp4[flux];
+          if (hbw_resconv_fluid>=5) musclvarsp4[flux]=musclvarsp5[flux];
+        }
+
+      }
+
+      switch (hbw_resconv_fluid){
+        case 1:
+          find_musclvars_offset(np,gl,l,theta,+1,musclvarsp1);
+        break;
+        case 2:
+          find_musclvars_offset(np,gl,l,theta,+2,musclvarsp2);
+        break;
+        case 3:
+          find_musclvars_offset(np,gl,l,theta,+3,musclvarsp3);
+        break;
+        case 4:
+          find_musclvars_offset(np,gl,l,theta,+4,musclvarsp4);
+        break;
+        case 5:
+          find_musclvars_offset(np,gl,l,theta,+5,musclvarsp5);
+        break;
+        default:
+          fatal_error("hbw_resconv_fluid can not be set to %ld",hbw_resconv_fluid);
+      }
+      find_Fstar_interface(np, gl, l, theta, musclvarsm4, musclvarsm3, musclvarsm2, musclvarsm1, musclvarsp0, musclvarsp1, musclvarsp2, musclvarsp3, musclvarsp4, musclvarsp5, Fp1h);
+      np[l].wk->Fp1h=(double *)realloc(np[l].wk->Fp1h,nf*sizeof(double));
+      np[_al(gl,l,theta,-1)].wk->Fp1h=(double *)realloc(np[_al(gl,l,theta,-1)].wk->Fp1h,nf*sizeof(double));
+      for (flux=0; flux<nf; flux++) {
+        assert(is_node_valid(np[l],TYPELEVEL_FLUID));
+        np[l].wk->Fp1h[flux]=Fp1h[flux];
+        assert(is_node_valid(np[_al(gl,l,theta,-1)],TYPELEVEL_FLUID));
+        np[_al(gl,l,theta,-1)].wk->Fp1h[flux]=Fm1h[flux];
+
+      }
+    }
+  }
+
+}
+
+
+void init_Fstar_interfaces(np_t *np, gl_t *gl, zone_t zone){
+  long i,j,k;
+  zone_t newzone;
+  newzone=_zone_intersection(gl->domain_all,_zone_expansion(zone,+1));
+  for1DL(i,newzone.is,newzone.ie)
+    for2DL(j,newzone.js,newzone.je)
+      for3DL(k,newzone.ks,newzone.ke)
+        if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)){
+          free(np[_ai(gl,i,j,k)].wk->Fp1h);
+          np[_ai(gl,i,j,k)].wk->Fp1h=NULL;
+        }
+      end3DL
+    end2DL
+  end1DL
+}
+
+
+int find_face_integrated_flux_CENTRAL5(np_t *np, gl_t *gl, long l, long dim, flux_t F){
+  int error;
+  long flux;
+  long lm2,lm1,lp0,lp1,lp2;
+  lm2=_al(gl,l,dim,-2);
+  lm1=_al(gl,l,dim,-1);
+  lp0=_al(gl,l,dim,+0);
+  lp1=_al(gl,l,dim,+1);
+  lp2=_al(gl,l,dim,+2);
+  error=4;
+  if (is_node_valid(np[lp0],TYPELEVEL_FLUID_WORK) && np[lp0].wk->Fp1h!=NULL){
+    if (is_node_valid(np[lm2],TYPELEVEL_FLUID_WORK) && is_node_valid(np[lp2],TYPELEVEL_FLUID_WORK) && np[lm2].wk->Fp1h!=NULL && np[lm1].wk->Fp1h!=NULL && np[lp0].wk->Fp1h!=NULL && np[lp1].wk->Fp1h!=NULL && np[lp2].wk->Fp1h!=NULL){
+      error=0;
+      for (flux=0; flux<nf; flux++) F[flux]=(23.0*np[lm2].wk->Fp1h[flux]-332.0*np[lm1].wk->Fp1h[flux]+6378.0*np[lp0].wk->Fp1h[flux]-332.0*np[lp1].wk->Fp1h[flux]+23.0*np[lp2].wk->Fp1h[flux])/5760.0;
+    } else {
+      if (is_node_valid(np[lm2],TYPELEVEL_FLUID_WORK) && is_node_valid(np[lp2],TYPELEVEL_FLUID_WORK) && np[lm1].wk->Fp1h!=NULL && np[lp0].wk->Fp1h!=NULL && np[lp1].wk->Fp1h!=NULL){
+        error=1;
+        for (flux=0; flux<nf; flux++) F[flux]=(np[lm1].wk->Fp1h[flux]+22.0*np[lp0].wk->Fp1h[flux]+np[lp1].wk->Fp1h[flux])/24.0;
+      } else {
+        if (np[lp0].wk->Fp1h!=NULL){
+          error=2;
+          for (flux=0; flux<nf; flux++) F[flux]=np[lp0].wk->Fp1h[flux];
+        } else {
+          error=3;
+        }
+      }
+    }
+  }
+  return(error);
+}
+
+
+double integrated_flux_AOWENO5(double Fm2, double Fm1, double Fp0, double Fp1, double Fp2){
+  double ret;
+  double F3,F5,epsilon;
+  double gammahi,w3,w5,wtil3,wtil5,c31,c32,beta3,beta5,c51,c52,c53,c54;
+  gammahi=0.9;
+  epsilon=1e-12;
+  F3=(Fm1+22.0*Fp0+Fp1)/24.0;
+  F5=(23.0*Fm2-332.0*Fm1+6378.0*Fp0-332.0*Fp1+23.0*Fp2)/5760.0;  
+  c31=(Fp1+Fm1)/2.0-Fp0;
+  c32=(Fp1+Fm1)/2.0-Fm1;
+  beta3=13.0/3.0*sqr(c31)+sqr(c32);
+  c51=(Fm2-4.0*Fm1+6.0*Fp0-4.0*Fp1+Fp2)/24.0;
+  c52=(Fp2-Fm2-2.0*Fp1+2.0*Fm1)/12.0;
+  c53=(Fm2-16.0*Fm1+30.0*Fp0-16.0*Fp1+Fp2)/24.0;
+  c54=(-8.0*Fp1+8.0*Fm1+Fp2-Fm2)/(-12.0);
+  beta5=87617.0/140.0*sqr(c51)+3129.0/80.0*sqr(c52)+21.0/5.0*c51*c53+13.0/3.0*sqr(c53)+0.5*c52*c54+sqr(c54);
+  w3=(1.0-gammahi)/sqr(beta3+epsilon);
+  w5=gammahi/sqr(beta5+epsilon);
+  wtil3=w3/(w3+w5);
+  wtil5=w5/(w3+w5);
+  ret=wtil5/gammahi*(F5-(1.0-gammahi)*F3)+wtil3*F3;
+  
+  return(ret);
+}
+
+
+int find_face_integrated_flux_AOWENO5(np_t *np, gl_t *gl, long l, long dim, flux_t F){
+  int error;
+  long flux;
+  long lm2,lm1,lp0,lp1,lp2;
+  double Fm2,Fm1,Fp0,Fp1,Fp2;
+  lm2=_al(gl,l,dim,-2);
+  lm1=_al(gl,l,dim,-1);
+  lp0=_al(gl,l,dim,+0);
+  lp1=_al(gl,l,dim,+1);
+  lp2=_al(gl,l,dim,+2);
+  error=4;
+  if (is_node_valid(np[lp0],TYPELEVEL_FLUID_WORK) && np[lp0].wk->Fp1h!=NULL){
+    if (is_node_valid(np[lm2],TYPELEVEL_FLUID_WORK) && is_node_valid(np[lp2],TYPELEVEL_FLUID_WORK) && np[lm2].wk->Fp1h!=NULL && np[lm1].wk->Fp1h!=NULL && np[lp0].wk->Fp1h!=NULL && np[lp1].wk->Fp1h!=NULL && np[lp2].wk->Fp1h!=NULL){
+      error=0;
+      for (flux=0; flux<nf; flux++) {
+        Fm2=np[lm2].wk->Fp1h[flux];
+        Fm1=np[lm1].wk->Fp1h[flux];
+        Fp0=np[lp0].wk->Fp1h[flux];
+        Fp1=np[lp1].wk->Fp1h[flux];
+        Fp2=np[lp2].wk->Fp1h[flux];
+        F[flux]=integrated_flux_AOWENO5(Fm2, Fm1, Fp0, Fp1, Fp2);
+      }
+    } else {
+      if (is_node_valid(np[lm2],TYPELEVEL_FLUID_WORK) && is_node_valid(np[lp2],TYPELEVEL_FLUID_WORK) && np[lm1].wk->Fp1h!=NULL && np[lp0].wk->Fp1h!=NULL && np[lp1].wk->Fp1h!=NULL){
+        error=1;
+        for (flux=0; flux<nf; flux++) F[flux]=(np[lm1].wk->Fp1h[flux]+22.0*np[lp0].wk->Fp1h[flux]+np[lp1].wk->Fp1h[flux])/24.0;
+      } else {
+        if (np[lp0].wk->Fp1h!=NULL){
+          error=2;
+          for (flux=0; flux<nf; flux++) F[flux]=np[lp0].wk->Fp1h[flux];
+        } else {
+          error=3;
+        }
+      }
+    }
+  }
+  return(error);
+}
+
+
+
+
+static void integrate_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t Fint, sqmat_t lambdaminusp1h, sqmat_t lambdaplusm1h){
   long dim,flux;
-  int TYPELEVEL;
+  flux_t Fp0,Fm1,Fp1;
+  flux_t Finttmp;
+  metrics_t metrics;
 #ifdef _3D
-  flux_t musclvars1,musclvars2,musclvars3;
+  long i,j;
+  flux_t Fm2,Fp2;
+  int error_im1,error_im2,error_ip0,error_ip1,error_ip2;
   long dim2;
   long lp1p0,lm1p0,lp0p1,lp0m1,lp1p1,lp1m1,lm1p1,lm1m1;
 #endif
-
-  TYPELEVEL=TYPELEVEL_FLUID_WORK;
-  assert(is_node_valid(np[l],TYPELEVEL));
+  assert(is_node_valid(np[l],TYPELEVEL_FLUID));
   switch (gl->cycle.resconv.FACEINTEG){
     case FACEINTEG_CENTRAL1:
-      find_musclvars_offset(np,gl,l,theta,offset,musclvars);
+      for (flux=0; flux<nf; flux++) Fint[flux]=np[l].wk->Fp1h[flux];
     break;
     case FACEINTEG_CENTRAL3:
 #ifdef _2D
       dim=mod(theta+1,nd);
-      if (is_node_valid(np[_al(gl,l,dim,+1)],TYPELEVEL) && is_node_valid(np[_al(gl,l,dim,-1)],TYPELEVEL)){
-        find_musclvars_offset(np,gl,l,theta,offset,musclvarsp0);
-        find_musclvars_offset(np,gl,_al(gl,l,dim,+1),theta,offset,musclvarsp1);
-        find_musclvars_offset(np,gl,_al(gl,l,dim,-1),theta,offset,musclvarsm1);
+      if (np[_al(gl,l,dim,+1)].wk->Fp1h!=NULL && np[_al(gl,l,dim,-1)].wk->Fp1h!=NULL){
         for (flux=0; flux<nf; flux++) {
-          musclvars[flux]=(22.0*musclvarsp0[flux]+musclvarsp1[flux]+musclvarsm1[flux])/24.0;
+          Fp0[flux]=np[l].wk->Fp1h[flux];
+          Fp1[flux]=np[_al(gl,l,dim,+1)].wk->Fp1h[flux];
+          Fm1[flux]=np[_al(gl,l,dim,-1)].wk->Fp1h[flux];
+          Fint[flux]=(22.0*Fp0[flux]+Fp1[flux]+Fm1[flux])/24.0;
         }
       } else {
-        find_musclvars_offset(np,gl,l,theta,offset,musclvars);
+        for (flux=0; flux<nf; flux++) Fint[flux]=np[l].wk->Fp1h[flux];
       }
 #endif
 #ifdef _3D
       dim=mod(theta+1,nd);
       dim2=mod(theta+2,nd);
+      assert(np[l].wk->Fp1h!=NULL);
       lp1p0=_al(gl,l,dim,+1);
       lm1p0=_al(gl,l,dim,-1);
       lp0p1=_al(gl,l,dim2,+1);
@@ -395,55 +594,131 @@ static void find_musclvars_offset_local(np_t *np, gl_t *gl, long l, long theta, 
       lp1m1=_all(gl,l,dim2,-1,dim,+1);
       lm1p1=_all(gl,l,dim2,+1,dim,-1);
       lm1m1=_all(gl,l,dim2,-1,dim,-1);
-      if (is_node_valid(np[lp1p0],TYPELEVEL) && is_node_valid(np[lm1p0],TYPELEVEL)){
-        
-        if (is_node_valid(np[lp0p1],TYPELEVEL) && is_node_valid(np[lp0m1],TYPELEVEL)) {
-          find_musclvars_offset(np,gl,l,theta,offset,musclvars1);
-          find_musclvars_offset(np,gl,lp0p1,theta,offset,musclvars2);
-          find_musclvars_offset(np,gl,lp0m1,theta,offset,musclvars3);
-          for (flux=0; flux<nf; flux++) musclvarsp0[flux]=(22.0*musclvars1[flux]+musclvars2[flux]+musclvars3[flux])/24.0;
+      if (np[lp1p0].wk->Fp1h!=NULL && np[lm1p0].wk->Fp1h!=NULL){
+        for (flux=0; flux<nf; flux++) {
+        if (np[lp0p1].wk->Fp1h!=NULL && np[lp0m1].wk->Fp1h!=NULL) {
+          Fp0[flux]=(22.0*np[l].wk->Fp1h[flux]+np[lp0p1].wk->Fp1h[flux]+np[lp0m1].wk->Fp1h[flux])/24.0;
         } else {
-          find_musclvars_offset(np,gl,l,theta,offset,musclvarsp0);
+          Fp0[flux]=np[l].wk->Fp1h[flux];
         }
-        if (is_node_valid(np[lp1p1],TYPELEVEL) && is_node_valid(np[lp1m1],TYPELEVEL) && is_node_valid(np[lp1p0],TYPELEVEL)) {
-          find_musclvars_offset(np,gl,lp1p0,theta,offset,musclvars1);
-          find_musclvars_offset(np,gl,lp1p1,theta,offset,musclvars2);
-          find_musclvars_offset(np,gl,lp1m1,theta,offset,musclvars3);
-          for (flux=0; flux<nf; flux++) musclvarsp1[flux]=(22.0*musclvars1[flux]+musclvars2[flux]+musclvars3[flux])/24.0;
+        if (np[lp1p1].wk->Fp1h!=NULL && np[lp1m1].wk->Fp1h!=NULL) {
+          Fp1[flux]=(22.0*np[lp1p0].wk->Fp1h[flux]+np[lp1p1].wk->Fp1h[flux]+np[lp1m1].wk->Fp1h[flux])/24.0;
         } else {
-          if (is_node_valid(np[lp1p0],TYPELEVEL)){
-            find_musclvars_offset(np,gl,lp1p0,theta,offset,musclvarsp1);
-          } else {
-            find_musclvars_offset(np,gl,l,theta,offset,musclvarsp1);
-          }
+          Fp1[flux]=np[lp1p0].wk->Fp1h[flux];
         }
-
-        if (is_node_valid(np[lm1p1],TYPELEVEL) && is_node_valid(np[lm1m1],TYPELEVEL) && is_node_valid(np[lm1p0],TYPELEVEL)) {
-          find_musclvars_offset(np,gl,lm1p0,theta,offset,musclvars1);
-          find_musclvars_offset(np,gl,lm1p1,theta,offset,musclvars2);
-          find_musclvars_offset(np,gl,lm1m1,theta,offset,musclvars3);
-          for (flux=0; flux<nf; flux++) musclvarsm1[flux]=(22.0*musclvars1[flux]+musclvars2[flux]+musclvars3[flux])/24.0;
+        if (np[lm1p1].wk->Fp1h!=NULL && np[lm1m1].wk->Fp1h!=NULL) {
+          Fm1[flux]=(22.0*np[lm1p0].wk->Fp1h[flux]+np[lm1p1].wk->Fp1h[flux]+np[lm1m1].wk->Fp1h[flux])/24.0;
         } else {
-          if (is_node_valid(np[lm1p0],TYPELEVEL)){
-            find_musclvars_offset(np,gl,lm1p0,theta,offset,musclvarsm1);
-          } else {
-            find_musclvars_offset(np,gl,l,theta,offset,musclvarsm1);
-          }
+          Fm1[flux]=np[lm1p0].wk->Fp1h[flux];
         }
-
-
-        for (flux=0; flux<nf; flux++) musclvars[flux]=(22.0*musclvarsp0[flux]+musclvarsp1[flux]+musclvarsm1[flux])/24.0;
-
-        
+        Fint[flux]=(22.0*Fp0[flux]+Fp1[flux]+Fm1[flux])/24.0;
+        }
       } else {
-        find_musclvars_offset(np,gl,l,theta,offset,musclvars);
+        for (flux=0; flux<nf; flux++) Fint[flux]=np[l].wk->Fp1h[flux];
       }
 #endif
     break;
+    case FACEINTEG_CENTRAL5:
+#ifdef _2D
+      dim=mod(theta+1,nd);
+      find_face_integrated_flux_CENTRAL5(np,gl,l,dim,Fint);
+#endif
+#ifdef _3D
+      i=mod(theta+1,nd);
+      j=mod(theta+2,nd);
+      assert(np[l].wk->Fp1h!=NULL);
+       
+      error_im2=find_face_integrated_flux_CENTRAL5(np,gl,_al(gl,l,i,-2),j,Fm2);
+      error_ip2=find_face_integrated_flux_CENTRAL5(np,gl,_al(gl,l,i,+2),j,Fp2);  
+      error_im1=find_face_integrated_flux_CENTRAL5(np,gl,_al(gl,l,i,-1),j,Fm1);
+      error_ip1=find_face_integrated_flux_CENTRAL5(np,gl,_al(gl,l,i,+1),j,Fp1);
+      error_ip0=find_face_integrated_flux_CENTRAL5(np,gl,_al(gl,l,i,+0),j,Fp0);
+      
+      if (error_im2==0 && error_ip2==0 && error_im1==0 && error_ip1==0 && error_ip0==0){
+        for (flux=0; flux<nf; flux++) Fint[flux]=(23.0*Fm2[flux]-332.0*Fm1[flux]+6378.0*Fp0[flux]-332.0*Fp1[flux]+23.0*Fp2[flux])/5760.0;
+      } else {
+        if (error_im1==0 && error_ip1==0 && error_ip0==0){
+          for (flux=0; flux<nf; flux++) Fint[flux]=(22.0*Fp0[flux]+Fp1[flux]+Fm1[flux])/24.0;
+        } else {
+          for (flux=0; flux<nf; flux++) Fint[flux]=np[l].wk->Fp1h[flux];
+        }
+      }
+
+#endif
+
+    break;
+    case FACEINTEG_AOWENO5:
+#ifdef _2D
+      dim=mod(theta+1,nd);
+      find_face_integrated_flux_AOWENO5(np,gl,l,dim,Fint);
+#endif
+#ifdef _3D
+      i=mod(theta+1,nd);
+      j=mod(theta+2,nd);
+      assert(np[l].wk->Fp1h!=NULL);
+       
+      error_im2=find_face_integrated_flux_AOWENO5(np,gl,_al(gl,l,i,-2),j,Fm2);
+      error_ip2=find_face_integrated_flux_AOWENO5(np,gl,_al(gl,l,i,+2),j,Fp2);  
+      error_im1=find_face_integrated_flux_AOWENO5(np,gl,_al(gl,l,i,-1),j,Fm1);
+      error_ip1=find_face_integrated_flux_AOWENO5(np,gl,_al(gl,l,i,+1),j,Fp1);
+      error_ip0=find_face_integrated_flux_AOWENO5(np,gl,_al(gl,l,i,+0),j,Fp0);
+      
+      if (error_im2==0 && error_ip2==0 && error_im1==0 && error_ip1==0 && error_ip0==0){
+        for (flux=0; flux<nf; flux++) Fint[flux]=integrated_flux_AOWENO5(Fm2[flux], Fm1[flux], Fp0[flux], Fp1[flux], Fp2[flux]);
+      } else {
+        if (error_im1==0 && error_ip1==0 && error_ip0==0){
+          for (flux=0; flux<nf; flux++) Fint[flux]=(22.0*Fp0[flux]+Fp1[flux]+Fm1[flux])/24.0;
+        } else {
+          for (flux=0; flux<nf; flux++) Fint[flux]=np[l].wk->Fp1h[flux];
+        }
+      }
+
+#endif
+
+    break;
     default:
-      fatal_error("FACEINTEG can not be set to %ld.",gl->cycle.resconv.FACEINTEG);
+      fatal_error("FACEINTEG can not be set to %d.",gl->cycle.resconv.FACEINTEG);
   }
+
+
+  if (gl->cycle.resconv.POSFILTER==POSFILTER_PARENT){
+    // apply positivity-preserving filter
+    find_metrics_at_interface(np, gl, l, _al(gl,l,theta,+1), theta, &metrics);
+    for (flux=0; flux<nf; flux++){
+      Finttmp[flux]=Fint[flux];
+    }
+    filter_Fstar_interface_positivity_preserving(np, gl, l, theta, metrics, gl->cycle.resconv.POSFILTER_numiter, gl->cycle.resconv.EIGENVALCOND, Finttmp, Fint, lambdaminusp1h,  lambdaplusm1h);
+  }
+
 }
+
+
+void add_dFstar_residual_new(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
+  flux_t Fm1h,Fp1h;
+  long flux,l;
+  sqmat_t lambdaminusp1h, lambdaplusm1h;
+
+  for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
+
+    if(l==ls){
+      integrate_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, Fm1h, lambdaminusp1h, lambdaplusm1h);
+    } else {
+      for (flux=0; flux<nf; flux++) {
+        Fm1h[flux]=Fp1h[flux];
+      }
+    }
+    integrate_Fstar_interface(np, gl, l, theta, Fp1h, lambdaminusp1h, lambdaplusm1h);
+
+    for (flux=0; flux<nf; flux++) {
+      np[l].wk->Res[flux]+=fact*(Fp1h[flux]-Fm1h[flux]);
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL
+      np[l].bs->Res_trapezoidal[flux]+=fact_trapezoidal*(Fp1h[flux]-Fm1h[flux]); 
+#endif
+    }
+  }
+
+}
+
 
 
 void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
@@ -456,18 +731,22 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
 
   for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
 
+    switch (gl->cycle.resconv.FACEINTEG){
+
+
+      case (FACEINTEG_CENTRAL1):
         if(l==ls){
-          if (hbw_resconv_fluid>=5) find_musclvars_offset_local(np,gl,l,theta,-5,musclvarsm5);
-          if (hbw_resconv_fluid>=4) find_musclvars_offset_local(np,gl,l,theta,-4,musclvarsm4);
-          if (hbw_resconv_fluid>=3) find_musclvars_offset_local(np,gl,l,theta,-3,musclvarsm3);
-          if (hbw_resconv_fluid>=2) find_musclvars_offset_local(np,gl,l,theta,-2,musclvarsm2);
-          find_musclvars_offset_local(np,gl,l,theta,-1,musclvarsm1);
-          find_musclvars_offset_local(np,gl,l,theta,+0,musclvarsp0);
-          find_musclvars_offset_local(np,gl,l,theta,+1,musclvarsp1);
-          if (hbw_resconv_fluid>=2) find_musclvars_offset_local(np,gl,l,theta,+2,musclvarsp2);
-          if (hbw_resconv_fluid>=3) find_musclvars_offset_local(np,gl,l,theta,+3,musclvarsp3);
-          if (hbw_resconv_fluid>=4) find_musclvars_offset_local(np,gl,l,theta,+4,musclvarsp4);
-          if (hbw_resconv_fluid>=5) find_musclvars_offset_local(np,gl,l,theta,+5,musclvarsp5);
+          if (hbw_resconv_fluid>=5) find_musclvars_offset(np,gl,l,theta,-5,musclvarsm5);
+          if (hbw_resconv_fluid>=4) find_musclvars_offset(np,gl,l,theta,-4,musclvarsm4);
+          if (hbw_resconv_fluid>=3) find_musclvars_offset(np,gl,l,theta,-3,musclvarsm3);
+          if (hbw_resconv_fluid>=2) find_musclvars_offset(np,gl,l,theta,-2,musclvarsm2);
+          find_musclvars_offset(np,gl,l,theta,-1,musclvarsm1);
+          find_musclvars_offset(np,gl,l,theta,+0,musclvarsp0);
+          find_musclvars_offset(np,gl,l,theta,+1,musclvarsp1);
+          if (hbw_resconv_fluid>=2) find_musclvars_offset(np,gl,l,theta,+2,musclvarsp2);
+          if (hbw_resconv_fluid>=3) find_musclvars_offset(np,gl,l,theta,+3,musclvarsp3);
+          if (hbw_resconv_fluid>=4) find_musclvars_offset(np,gl,l,theta,+4,musclvarsp4);
+          if (hbw_resconv_fluid>=5) find_musclvars_offset(np,gl,l,theta,+5,musclvarsp5);
           find_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, musclvarsm5, musclvarsm4, musclvarsm3, musclvarsm2, musclvarsm1, musclvarsp0, musclvarsp1, musclvarsp2, musclvarsp3, musclvarsp4, Fm1h);
           if (gl->cycle.resconv.POSFILTER==POSFILTER_PARENT){
             // apply positivity-preserving filter
@@ -500,19 +779,19 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
         }
         switch (hbw_resconv_fluid){
           case 1:
-            find_musclvars_offset_local(np,gl,l,theta,+1,musclvarsp1);
+            find_musclvars_offset(np,gl,l,theta,+1,musclvarsp1);
           break;
           case 2:
-            find_musclvars_offset_local(np,gl,l,theta,+2,musclvarsp2);
+            find_musclvars_offset(np,gl,l,theta,+2,musclvarsp2);
           break;
           case 3:
-            find_musclvars_offset_local(np,gl,l,theta,+3,musclvarsp3);
+            find_musclvars_offset(np,gl,l,theta,+3,musclvarsp3);
           break;
           case 4:
-            find_musclvars_offset_local(np,gl,l,theta,+4,musclvarsp4);
+            find_musclvars_offset(np,gl,l,theta,+4,musclvarsp4);
           break;
           case 5:
-            find_musclvars_offset_local(np,gl,l,theta,+5,musclvarsp5);
+            find_musclvars_offset(np,gl,l,theta,+5,musclvarsp5);
           break;
           default:
             fatal_error("hbw_resconv_fluid can not be set to %ld",hbw_resconv_fluid);
@@ -530,6 +809,22 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
           filter_Fstar_interface_positivity_preserving(np, gl, l, theta, metrics, gl->cycle.resconv.POSFILTER_numiter, gl->cycle.resconv.EIGENVALCOND, Ftmp, Fp1h, Lambdaminus_p1, Lambdaplus_p0);
         }
 
+      break;
+
+      default:
+        if(l==ls){
+          integrate_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, Fm1h, Lambdaminus_p1,Lambdaplus_p0);
+        } else {
+          for (flux=0; flux<nf; flux++) {
+            Fm1h[flux]=Fp1h[flux];
+          }
+        }
+        for (flux=0; flux<nf; flux++) {
+          Lambdaminus_p0[flux][flux]=Lambdaminus_p1[flux][flux];
+        }
+        integrate_Fstar_interface(np, gl, l, theta, Fp1h, Lambdaminus_p1,Lambdaplus_p0);
+
+    }
 
     for (flux=0; flux<nf; flux++) {
       np[l].wk->Res[flux]+=fact*(Fp1h[flux]-Fm1h[flux]);

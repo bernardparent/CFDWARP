@@ -17,6 +17,7 @@ cleanall:
 	( cd _FVSTVD+ ; make cleanall )
 	( cd _FVS+ ; make cleanall )
 	( cd _MUSCL+ ; make cleanall )
+	( cd _MUSCL_test ; make cleanall )
 	( cd _MUSCL_old ; make cleanall )
 	( cd _MUSCL ; make cleanall )
 

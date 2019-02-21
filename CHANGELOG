@@ -7,6 +7,15 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 21a
+   * in cycle/resconv/
+     - copied _MUSCL to _MUSCL_test
+   * in cycle/resconv/_MUSCL/resconv.c
+     - got rid of face integration of F and replaced it with face integration of musclvars
+       (face integration of F was problematic because it didn't preserve freestream on non-uniform
+        meshes)
+
+
 2019 FEB 20b
    * in bin
      - updated Noh3D.wrp

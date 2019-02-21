@@ -7,6 +7,7 @@
 #define hbw_resconv_fluid 5 //maximum half bandwidth of stencil (excluding center node)
 #define hbw_resconvplasma_fluid 1  //half bandwidth of stencil that depends on emfield mem props
 #define _RESCONV_ACTIONNAME "MUSCL"
+#define _RESCONV_STORAGE_FSTAR
 
 typedef struct {
   int FLUX,INTERPOL,CONVJACOBIAN;
