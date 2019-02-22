@@ -144,8 +144,8 @@ Init(
 
 Disc(
   NavierStokesPerfect(
-    zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.01;  {eigenvalue clipping factor: 2.0-20.0}
+    zetaA1=0.02e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.001;  {eigenvalue clipping factor: 2.0-20.0}
   );
   MUSCLplus(
     FLUX=FLUX_FDSplus;
@@ -162,11 +162,11 @@ Disc(
     AVERAGING=AVERAGING_ARITH;
     AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
     AOWENO_gammalo=0.95;
-    AOWENO_gammahi=1-1e-4;
-    INTERPOL=INTERPOL_AOWENO7;
-    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+    AOWENO_gammahi=1-1e-7;
+    INTERPOL=INTERPOL_AOWENO9;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
     FACEINTEG=FACEINTEG_CENTRAL1; 
-    POSFILTER=POSFILTER_NONE;
+    POSFILTER=POSFILTER_PARENT;
     POSFILTER_numiter=4;
   );
   FVS(
@@ -180,9 +180,10 @@ Disc(
     METHOD=METHOD_TVDRK3;
   );
   CDFplus(
-    xi1=1.0;
-    xi2=0.5;
-    xi3=0.5;
+    xi[1]=0.5;
+    xi[2]=0.5;
+    xi[3]=0.5;
+    xi[4]=0.5;
   );
   BDF(
     STENCIL=STENCIL_BDF2;

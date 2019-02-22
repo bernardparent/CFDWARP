@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 22a
+   * in bin
+     - made changes to Titarev-Toro.wrp and to Woodward-Colella_forward_step.wrp
+
+
 2019 FEB 21b
    * in cycle/share/cycle_share.c
      - added function update_linked_nodes_2() necessary to update the musclvars that are not
