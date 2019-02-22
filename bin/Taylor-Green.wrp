@@ -73,7 +73,7 @@ Data points provided at: http://dept.ku.edu/~cfdku/hiocfd.html
 Case C3.5
 }
 
-mf=0.25; 
+mf=0.5; 
 
 L= 0.005*0.3048{0.005*0.3048}; {not the length of the domain}
 

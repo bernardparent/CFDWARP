@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 22b
+   * in bin
+     - added Taylor-Green.ref
+   * in lib/soap/doc/report.tex
+     - fixed a LaTeX bug: for_parallel should be for\_parallel
+
+
 2019 FEB 22a
    * in bin
      - made changes to Titarev-Toro.wrp and to Woodward-Colella_forward_step.wrp
