@@ -120,6 +120,9 @@
   /* Makes a perfect copy of  *orig to *copy */
   void SOAP_copy_codex(SOAP_codex_t *orig, SOAP_codex_t *copy);
 
+  /* to be called after copied codex is not used anymore */
+  void SOAP_free_codex_copy(SOAP_codex_t *codex);
+
   /* to be called after SOAP_process_code */
   void SOAP_free_codex(SOAP_codex_t *codex);
 

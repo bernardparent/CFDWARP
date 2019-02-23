@@ -214,15 +214,18 @@ int main ( int argc, char **argv ) {
     WRITECONTROL = TRUE;
   if ( process_flag ( argc, argv, "-h" ) ) {
     write_options ( stdout );
+    free ( postprocessor ); 
     exit(EXIT_SUCCESS);
   }
   if ( process_flag ( argc, argv, "-l" ) ) {
     write_license ( stdout );
+    free ( postprocessor ); 
     exit(EXIT_SUCCESS);
   }
   if (READCONTROL && WRITECONTROL) fatal_error("CFDWARP can not be called with both the '-r' and the '-w' flags.");
   if ( process_flag ( argc, argv, "-v" ) || argc==1) {
     write_modules ( stdout );
+    free ( postprocessor ); 
     exit(EXIT_SUCCESS);
   }
   if (!READCONTROL && !WRITECONTROL) fatal_error("CFDWARP must be called with either the '-r' or the '-w' flag.");
@@ -506,10 +509,14 @@ int main ( int argc, char **argv ) {
 
   if ( WRITECONTROL ) {
     write_control ( control_filename );
+  } else if ( !GRIDONLY ) { 
+    free_clipped_variables( &gl );
+    free( gl.cycle.code_runtime );
+    SOAP_free_all_vars ( gl.cycle.codex.vars );
+    SOAP_free_codex ( &gl.cycle.codex );
   }
 
-
-
+  free ( postprocessor );
 
   free ( control_filename );
   free ( post_filename );

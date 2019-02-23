@@ -1782,6 +1782,12 @@ void SOAP_free_all_vars(SOAP_vars_t *vars){
 }
 
 
+void SOAP_free_codex_copy(SOAP_codex_t *codex){
+  free(codex->filename);
+  if (codex->action_being_processed!=NULL) free(codex->action_being_processed);
+}
+
+
 void SOAP_free_codex(SOAP_codex_t *codex){
   long varnum;
   varnum=0;
@@ -1905,7 +1911,7 @@ void SOAP_process_code(char *code, SOAP_codex_t *codex, int SOAP_VARS){
       }
       if (!ASSIGN){
         codex->ACTIONPROCESSED=FALSE;
-        codex->action_being_processed=malloc(sizeof(char) * (2+strlen(action))); 
+        codex->action_being_processed=realloc(codex->action_being_processed,sizeof(char) * (2+strlen(action))); 
         strcpy(codex->action_being_processed,action);
       }
       if (parentheses>0) {
@@ -1928,7 +1934,6 @@ void SOAP_process_code(char *code, SOAP_codex_t *codex, int SOAP_VARS){
         if (!codex->ACTIONPROCESSED && codex->SCREENOUTPUT) fprintf(stdout,"%s ignored..",action);
         free(codex->action_being_processed);
         codex->action_being_processed=NULL;
-
       }
     } while (cnt<codelength);
     free(action);

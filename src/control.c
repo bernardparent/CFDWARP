@@ -1253,6 +1253,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     free((codex->vars)[cnt2].value);
   }
   (codex->vars)[cnt_mem].name=NULL;
+  SOAP_free_codex_copy(&codex_mem);
 }
 
 
@@ -1352,5 +1353,10 @@ void read_control(char *control_filename, input_t input, bool CYCLEMODULE, bool 
 #endif
   gl->CONTROL_READ=TRUE;
 
+  if ( GRIDONLY ) {
+    SOAP_free_codex ( &codex );   
+  } else {
+    SOAP_free_codex_copy ( &codex ); 
+  }
 }
 

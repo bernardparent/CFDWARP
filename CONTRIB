@@ -1,6 +1,7 @@
 
-Contributions
-_______________________________________________________________________
+CFDWARP CONTRIBUTIONS
+__________________________________________________________________________________________
+
 
 Alexander, Derrick
   - implementation of the JoinAll2D subroutine in lib/gridgen/2Dbase.c
@@ -38,8 +39,10 @@ Schwartzentruber, Tom
     although this has been taken away since.
   - implementation of the subsonic outflow boundary condition based
     on constant Mach number in prim/_FANS_kpsi/prim_bdry.c
-
 	
-Thoguluva, Prasanna
-  - addition of bin/taylor_green_vortex.wrp
+Thoguluva Rajendran, Prasanna
+  - addition of bin/taylor_green_vortex.*
  
+Weerakoon, Minindu
+  - Fixes to memory leaks problems (see CHANGELOG 19feb23a) 
+

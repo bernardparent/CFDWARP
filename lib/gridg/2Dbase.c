@@ -655,6 +655,8 @@ static void Equation_argum(char **argum, SOAP_codex_t *codex, GRIDG_gl2d_t gl2d,
 
   free(expr);
   codex->vars=argequation2D.codex.vars;
+  free( argequation2D.expr );
+  SOAP_free_codex_copy(&(argequation2D.codex));
 }
 
 

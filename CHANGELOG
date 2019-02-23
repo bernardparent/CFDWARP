@@ -7,6 +7,25 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 23a
+   * in lib/gridg/2Dbase.c and lib/gridg/3Dbase.c
+     - at end of Equation_argum(), added call to SOAP_free_codex_copy() and free(argequation2D.expr)
+       to prevent memory leak
+   * in lib/soap/soap.c
+     - added SOAP_free_codex_copy()
+     - in SOAP_process_code(), codex->action_being_processed is now realloced instead of malloced
+       to prevent memory leak
+   * in src/control.c
+     - in readcontrol_actions(), added SOAP_free_codex_copy(&codex_mem); to get rid of memory leaks
+     - in read_control(), added calls to SOAP_free_codex and SOAP_free_codex_copy to get rid of 
+       memory leaks
+   * in src/main.c
+     - in main(), added free ( postprocessor ); in various locations prior to exit() to get rid of
+       memory leaks
+     - in main(), added calls to free_clipped_variables(), SOAP_free_all_vars(), SOAP_free_codex()
+       and free( gl.cycle.code_runtime ) prior to exiting to get rid of memory leaks reports
+
+
 2019 FEB 22b
    * in bin
      - added Taylor-Green.ref

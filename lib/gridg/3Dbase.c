@@ -1084,6 +1084,8 @@ static void Equation_argum(char **argum, SOAP_codex_t *codex, GRIDG_gl3d_t gl3d,
   }
   free(expr);
   codex->vars=argequation3D.codex.vars;
+  free( argequation3D.expr ); 
+  SOAP_free_codex_copy(&(argequation3D.codex));
 }
 
 
