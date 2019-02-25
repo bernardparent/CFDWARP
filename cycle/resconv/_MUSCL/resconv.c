@@ -358,11 +358,15 @@ static void find_musclvars_offset_local(np_t *np, gl_t *gl, long l, long theta, 
   flux_t musclvarsp0,musclvarsp1,musclvarsm1;
   long dim,flux;
   int TYPELEVEL;
+  double wcen;
 #ifdef _3D
   flux_t musclvars1,musclvars2,musclvars3;
   long dim2;
   long lp1p0,lm1p0,lp0p1,lp0m1,lp1p1,lp1m1,lm1p1,lm1m1;
 #endif
+
+  wcen=22.0;
+  //wcen=8.0;
 
   TYPELEVEL=TYPELEVEL_FLUID_WORK;
   assert(is_node_valid(np[l],TYPELEVEL));
@@ -378,7 +382,7 @@ static void find_musclvars_offset_local(np_t *np, gl_t *gl, long l, long theta, 
         find_musclvars_offset(np,gl,_al(gl,l,dim,+1),theta,offset,musclvarsp1);
         find_musclvars_offset(np,gl,_al(gl,l,dim,-1),theta,offset,musclvarsm1);
         for (flux=0; flux<nf; flux++) {
-          musclvars[flux]=(22.0*musclvarsp0[flux]+musclvarsp1[flux]+musclvarsm1[flux])/24.0;
+          musclvars[flux]=(wcen*musclvarsp0[flux]+musclvarsp1[flux]+musclvarsm1[flux])/(2.0+wcen);
         }
       } else {
         find_musclvars_offset(np,gl,l,theta,offset,musclvars);
@@ -401,7 +405,7 @@ static void find_musclvars_offset_local(np_t *np, gl_t *gl, long l, long theta, 
           find_musclvars_offset(np,gl,l,theta,offset,musclvars1);
           find_musclvars_offset(np,gl,lp0p1,theta,offset,musclvars2);
           find_musclvars_offset(np,gl,lp0m1,theta,offset,musclvars3);
-          for (flux=0; flux<nf; flux++) musclvarsp0[flux]=(22.0*musclvars1[flux]+musclvars2[flux]+musclvars3[flux])/24.0;
+          for (flux=0; flux<nf; flux++) musclvarsp0[flux]=(wcen*musclvars1[flux]+musclvars2[flux]+musclvars3[flux])/(wcen+2.0);
         } else {
           find_musclvars_offset(np,gl,l,theta,offset,musclvarsp0);
         }
@@ -409,7 +413,7 @@ static void find_musclvars_offset_local(np_t *np, gl_t *gl, long l, long theta, 
           find_musclvars_offset(np,gl,lp1p0,theta,offset,musclvars1);
           find_musclvars_offset(np,gl,lp1p1,theta,offset,musclvars2);
           find_musclvars_offset(np,gl,lp1m1,theta,offset,musclvars3);
-          for (flux=0; flux<nf; flux++) musclvarsp1[flux]=(22.0*musclvars1[flux]+musclvars2[flux]+musclvars3[flux])/24.0;
+          for (flux=0; flux<nf; flux++) musclvarsp1[flux]=(wcen*musclvars1[flux]+musclvars2[flux]+musclvars3[flux])/(wcen+2.0);
         } else {
           if (is_node_valid(np[lp1p0],TYPELEVEL)){
             find_musclvars_offset(np,gl,lp1p0,theta,offset,musclvarsp1);
@@ -422,7 +426,7 @@ static void find_musclvars_offset_local(np_t *np, gl_t *gl, long l, long theta, 
           find_musclvars_offset(np,gl,lm1p0,theta,offset,musclvars1);
           find_musclvars_offset(np,gl,lm1p1,theta,offset,musclvars2);
           find_musclvars_offset(np,gl,lm1m1,theta,offset,musclvars3);
-          for (flux=0; flux<nf; flux++) musclvarsm1[flux]=(22.0*musclvars1[flux]+musclvars2[flux]+musclvars3[flux])/24.0;
+          for (flux=0; flux<nf; flux++) musclvarsm1[flux]=(wcen*musclvars1[flux]+musclvars2[flux]+musclvars3[flux])/(wcen+2.0);
         } else {
           if (is_node_valid(np[lm1p0],TYPELEVEL)){
             find_musclvars_offset(np,gl,lm1p0,theta,offset,musclvarsm1);
@@ -432,7 +436,7 @@ static void find_musclvars_offset_local(np_t *np, gl_t *gl, long l, long theta, 
         }
 
 
-        for (flux=0; flux<nf; flux++) musclvars[flux]=(22.0*musclvarsp0[flux]+musclvarsp1[flux]+musclvarsm1[flux])/24.0;
+        for (flux=0; flux<nf; flux++) musclvars[flux]=(wcen*musclvarsp0[flux]+musclvarsp1[flux]+musclvarsm1[flux])/(wcen+2.0);
 
         
       } else {

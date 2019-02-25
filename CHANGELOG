@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 25a
+   * in cycle/resconv/_MUSCL/resconv.c
+     - in find_musclvars_offset_local(), make code clearer but didn't change functionality
+
+
 2019 FEB 23a
    * in lib/gridg/2Dbase.c and lib/gridg/3Dbase.c
      - at end of Equation_argum(), added call to SOAP_free_codex_copy() and free(argequation2D.expr)

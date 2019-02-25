@@ -27,7 +27,7 @@ x2=0.5; y2=0.0;
 x3=x2+(H1-H2)/tan(theta); 
 y3=H1-H2;
 
-meshfact=1.0;
+meshfact=2.0;
 
 is=1;  js=1; 
 ie=round(100*meshfact)+1; je=round(25*meshfact)+1;
@@ -108,7 +108,7 @@ Init(
 
 Disc(
   NavierStokesPerfect(
-    zetaA1=0.01; {conditions the convective waves of the A jacobian; set it to 0.0 usually but make
+    zetaA1=0.03; {conditions the convective waves of the A jacobian; set it to 0.0 usually but make
                    sure that the shock structure obtained is similar to when zetaA1 is set to 0.3}
     zetaA2=0.2;
     zetaA3=0.1e0; {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
