@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 26a
+   * in src/main.c
+     - changed the type of SIGUSR1_CAUGHT from bool to int: a bool type couldn't be passed to MPI_Reduce
+       correctly
+
+
 2019 FEB 25a
    * in cycle/resconv/_MUSCL/resconv.c
      - in find_musclvars_offset_local(), make code clearer but didn't change functionality

@@ -9,7 +9,7 @@
 #include <model/_model.h>
 #include <src/version.hh>
 
-static bool SIGUSR1_CAUGHT;
+static int SIGUSR1_CAUGHT;
 
 #define maxstrlen 4096
 #define lengthcol1 9
