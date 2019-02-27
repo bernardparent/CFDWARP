@@ -7,6 +7,18 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 27b
+   * in src/post.c
+     - commented changes to read_post() done on 19feb27a because such could give a core dump when
+       no xcut were performed in the Post() module
+   * in src/common.c
+     - deleted invert_matrix_new()
+     - added invert_matrix_partial_pivoting() by Jaehyuk Lee
+     - renamed invert_matrix() to invert_matrix_gaussian_elimination()
+     - created invert_matrix() which can call either invert_matrix_partial_pivoting() or 
+       invert_matrix_gaussian_elimination()
+
+
 2019 FEB 27a
    * in src/main.c
      - changed the type of SIGUSR1_CAUGHT from bool to int: a bool type couldn't be passed to MPI_Reduce

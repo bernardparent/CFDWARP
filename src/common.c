@@ -729,44 +729,7 @@ void multiply_diagonal_matrix_and_vector(sqmat_t sqmat, flux_t mat1, flux_t mat2
 }
 
 
-
-void invert_matrix_new(sqmat_t matgiven, sqmat_t mat2){
-  long row,col,col2;
-  double fact;
-  sqmat_t mat1;
-  for (row=0; row<nf; row++){
-    for (col=0; col<nf; col++){
-      mat1[row][col]=matgiven[row][col];
-    }
-  }
-  set_matrix_to_identity(mat2);
-  /* the idea is to transform mat1 into an identity matrix through row additions
-     while performing the same row additions on mat2 */
-  for (col=0; col<nf; col++){
-    /* make column "col" of mat1 all zeros except for mat1[col][col] */ 
-    for (row=0; row<nf; row++){
-      if (row!=col){
-        assert(mat1[col][col]!=0.0);
-        fact=-mat1[row][col]/mat1[col][col];
-        for (col2=0; col2<nf; col2++){
-          mat1[row][col2]+=mat1[col][col2]*fact;
-          mat2[row][col2]+=mat2[col][col2]*fact;
-        }
-      }
-    }
-    /* set mat1[col][col] to 1*/
-    assert(mat1[col][col]!=0.0);
-    fact=1.0/mat1[col][col];
-    for (col2=0; col2<nf; col2++){
-      mat2[col][col2]*=fact;
-    }
-  }
-
-}
-
-
-
-void invert_matrix(sqmat_t mattmp, sqmat_t mat2){
+void invert_matrix_gaussian_elimination(sqmat_t mattmp, sqmat_t mat2){
   long row,row2,col;
   double multfact;
   sqmat_t mat1;
@@ -798,6 +761,70 @@ void invert_matrix(sqmat_t mattmp, sqmat_t mat2){
     }
 }
 
+
+// function by Jaehyuk Lee -> needs further testing
+void invert_matrix_partial_pivoting(sqmat_t mattmp, sqmat_t mat2){
+  long p, row,row2,col;
+  double temp,m,multfact;
+  sqmat_t mat1;
+  for(row=0;row<nf;row++){
+    for(col=0;col<nf;col++){
+      mat1[row][col]=mattmp[row][col];
+    }
+  }
+  set_matrix_to_identity(mat2);
+  for(row=0;row<nf-1;row++){
+    p=row;
+    m=mat1[row][row];
+    for(row2=row+1;row2<nf;row2++){
+      if(fabs(m)<fabs(mat1[row2][row])){
+        p=row2;
+        m=mat1[row2][row];
+      }
+    }
+    if(p!=row){
+      for(col=0;col<nf;col++){
+      temp=mat1[p][col];
+      mat1[p][col]=mat1[row][col];
+      mat1[row][col]=temp;
+      temp=mat2[p][col];
+      mat2[p][col]=mat2[row][col];
+      mat2[row][col]=temp;
+      }
+    }
+    for(row2=row+1;row2<nf;row2++){
+      assert(mat1[row][row]!=0.0e0);
+      multfact=-(mat1[row2][row])/(mat1[row][row]);
+      for(col=0;col<nf;col++){
+        mat2[row2][col]=mat2[row2][col]+mat2[row][col]*multfact;
+      }
+      for(col=row;col<nf;col++){
+        mat1[row2][col]=mat1[row2][col]+mat1[row][col]*multfact;
+      }mat1[row2][row]=0.0e0;
+    }
+  }
+  for(row=nf-1;row>=1;row--){
+    for(row2=row-1;row2>=0;row2--){
+      assert(mat1[row][row]!=0.0e0);
+      multfact=-mat1[row2][row]/mat1[row][row];
+      for(col=0;col<nf;col++){
+        mat2[row2][col]=mat2[row2][col]+multfact*mat2[row][col];
+      }
+    }
+  }
+  for(row=0;row<nf;row++){
+    for(col=0;col<nf;col++){
+      assert(mat1[row][row]!=0.0e0);
+      mat2[row][col]=mat2[row][col]/mat1[row][row];
+    }
+  }
+}
+
+
+void invert_matrix(sqmat_t mattmp, sqmat_t mat2){
+  invert_matrix_gaussian_elimination(mattmp,mat2);
+  //invert_matrix_partial_pivoting(mattmp,mat2);
+}
 
 
 void invert_diagonal_matrix(sqmat_t mat1, sqmat_t mat2){
