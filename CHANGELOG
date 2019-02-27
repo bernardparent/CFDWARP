@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 27c
+   * in lib/soap/soap.c
+     - in BA_printf(), added a fatal_error if numargum<1
+     - in BA_fprintf(), added a fatal_error if numargum<2
+
+
 2019 FEB 27b
    * in src/post.c
      - commented changes to read_post() done on 19feb27a because such could give a core dump when

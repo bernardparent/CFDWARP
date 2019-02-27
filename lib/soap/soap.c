@@ -5,6 +5,7 @@
 #include <math.h>
 #include <time.h>
 #include <string.h>
+#include <assert.h>
 #include <stdarg.h>
 #ifdef DISTMPI
   #include "mpi.h"
@@ -1343,6 +1344,8 @@ static void BA_printf(char **argum, SOAP_codex_t *codex){
   long cnt,numargum,cnt2;
   char **argv;
   numargum=SOAP_number_argums(*argum);
+  if (numargum<1) SOAP_fatal_error(codex,"Number of arguments given to printf must be at least 1.");
+  assert(numargum>0);
   for (cnt=0; cnt<numargum; cnt++) SOAP_substitute_argum(argum,cnt,codex);
   argv=(char **)malloc(numargum*sizeof(char *));
   for (cnt=0; cnt<numargum; cnt++){
@@ -1370,14 +1373,16 @@ static void BA_printf(char **argum, SOAP_codex_t *codex){
 
 
 static void BA_fprintf(char **argum, SOAP_codex_t *codex){
-  long cnt,numargum,cnt2;
+  long numargum,cnt,cnt2;
   FILE *stream;
   char **argv;
   char *filename;
 
   numargum=SOAP_number_argums(*argum);
+  if (numargum<2) SOAP_fatal_error(codex,"Number of arguments given to fprintf must be at least 2: the filename and the string to print.");
+  assert(numargum>1);
   for (cnt=0; cnt<numargum; cnt++) SOAP_substitute_argum(argum,cnt,codex);
-  argv=(char **)malloc((numargum-1)*sizeof(char *));
+  argv=(char **)malloc(numargum*sizeof(char *));
   for (cnt=1; cnt<numargum; cnt++){
     argv[cnt-1]=(char *)malloc(sizeof(char));
     SOAP_get_argum_straight(codex,&(argv[cnt-1]), *argum, cnt);
