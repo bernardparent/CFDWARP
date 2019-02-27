@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 28a
+   * in model/share/fluid_share.c
+     - rewrote condition_Lambda_plus_minus_Parent() in accordance with the latest positivity-preserving
+       theory in multiple dimensions
+     - added condition_Lambda_plus_minus_Parent5()
+
+
 2019 FEB 27c
    * in lib/soap/soap.c
      - in BA_printf(), added a fatal_error if numargum<1
