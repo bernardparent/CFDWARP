@@ -7,11 +7,21 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
-2019 FEB 26a
+2019 FEB 27a
    * in src/main.c
      - changed the type of SIGUSR1_CAUGHT from bool to int: a bool type couldn't be passed to MPI_Reduce
        correctly
-
+     - in main(), added code to free nppost and its data structure 
+     - in main(), added SOAP_free_codex_copy() for OUTPOSTMODULE 
+   * in src/post.c 
+     - in read_post(), added code to free np_post and its data structure 
+     - in read_post_actions(), added code to free the data structure of np_post 
+   * in src/control.c 
+     - in *replace_cites, strcpy(newstr,strrep(newstr,orig,repl)) separated into two to avoid buffer overlapping
+     - in read_control(), calls SOAP_free_codex() if POSTMODULE is TRUE
+   * in USAGE
+     - improved instructions for CPU PROFILING
+ 
 
 2019 FEB 25a
    * in cycle/resconv/_MUSCL/resconv.c

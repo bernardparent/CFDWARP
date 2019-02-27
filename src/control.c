@@ -199,6 +199,7 @@ char *replace_cites(char *str, int *cite){
   static char  newstr[maxstrlen];
   static char  repl[maxstrlen];
   static char  orig[maxstrlen];
+  static char  temp[maxstrlen];
   long cntbib,cntcite,numcite;
 
   strcpy(newstr,str);
@@ -217,7 +218,8 @@ char *replace_cites(char *str, int *cite){
         cite[cntbib]=numcite;
       }
       sprintf(repl,"%ld",numcite);
-      strcpy(newstr,strrep(newstr,orig,repl));
+      strcpy(temp,strrep(newstr,orig,repl)); 
+      strcpy(newstr,temp);
     }
   }
   return(newstr);
@@ -1353,10 +1355,9 @@ void read_control(char *control_filename, input_t input, bool CYCLEMODULE, bool 
 #endif
   gl->CONTROL_READ=TRUE;
 
-  if ( GRIDONLY ) {
-    SOAP_free_codex ( &codex );   
-  } else {
-    SOAP_free_codex_copy ( &codex ); 
-  }
+  if ( POSTMODULE || GRIDONLY )
+    SOAP_free_codex ( &codex );
+  else
+    SOAP_free_codex_copy ( &codex );
 }
 

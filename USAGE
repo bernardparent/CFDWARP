@@ -216,8 +216,6 @@ CPU PROFILING
 If CFDWARP was compiled with the CPU profiling option (-pg flag), then run
 it as usual and wait for it to finish the job normally (don't kill it
 prematurely). This will output the file gmon.out in the local directory.
-Then run the following
-
 When warp finishes, it will output a file called "gmon.out". This can be analyzed
 using gprof with the analysis outputted to an ascii file as follows:
 

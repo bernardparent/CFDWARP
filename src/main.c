@@ -492,6 +492,16 @@ int main ( int argc, char **argv ) {
         }
         fatal_error_if_options_remaining ( argc, argv );
         write_post_file ( nppost, &glpost, postzone, post_filename, postprocessor, GRIDONLY );
+        if( FOUNDCUT ){
+          for1DL ( i, glpost.domain_lim.is, glpost.domain_lim.ie )
+            for2DL ( j, glpost.domain_lim.js, glpost.domain_lim.je )
+              for3DL ( k, glpost.domain_lim.ks, glpost.domain_lim.ke )
+                dispose_node ( &( nppost[_ai ( &glpost, i, j, k )] ) );
+              end3DL 
+            end2DL 
+          end1DL 
+          free ( nppost );
+        }
       }
     }
 
@@ -503,6 +513,7 @@ int main ( int argc, char **argv ) {
       end2DL 
     end1DL 
     free ( np );
+
   }
 
   fatal_error_if_options_remaining ( argc, argv );
@@ -512,8 +523,10 @@ int main ( int argc, char **argv ) {
   } else if ( !GRIDONLY ) { 
     free_clipped_variables( &gl );
     free( gl.cycle.code_runtime );
-    SOAP_free_all_vars ( gl.cycle.codex.vars );
-    SOAP_free_codex ( &gl.cycle.codex );
+    if( OUTPUTPOSTMODULE )
+      SOAP_free_codex_copy ( &gl.cycle.codex );
+    else
+      SOAP_free_codex ( &gl.cycle.codex );
   }
 
   free ( postprocessor );
