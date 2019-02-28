@@ -7,6 +7,18 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 FEB 28b
+  * in src/test.c
+     - in main(), added code to free npArray and its data structure
+     - in main(), added calls to free_clipped_variables(), SOAP_free_codex(), free ( npArray ), 
+       free ( control_filename ), free ( input.name ), free ( argint ) and free( gl.cycle.code_runtime ) 
+       prior to exiting to get rid of memory leaks reports
+     - in main(), added calls to dispose_node() for npL and npR to free allocated memory in their old 
+       addresses before assigning new addresses
+  * in src/post.c  
+     - in read_post(), added conditional statement to properly free np_post
+
+
 2019 FEB 28a
    * in model/share/fluid_share.c
      - rewrote condition_Lambda_plus_minus_Parent() in accordance with the latest positivity-preserving

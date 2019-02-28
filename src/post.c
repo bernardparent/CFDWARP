@@ -2267,11 +2267,10 @@ static void read_post_actions(char *action, char **argum, SOAP_codex_t *codex){
 
 
 void read_post(char *argum, SOAP_codex_t *codex){
-/*
   long i,j,k;
-  np_t *np_post;
-  gl_t gl_post;
-*/
+  np_t **np;
+  np_t **np_post;
+  gl_t *gl_post;
 #ifdef DISTMPI
   int rank;
   MPI_Barrier(MPI_COMM_WORLD);
@@ -2287,18 +2286,19 @@ void read_post(char *argum, SOAP_codex_t *codex){
   add_bdry_types_fluid_to_codex(codex);
 
   SOAP_process_code(argum, codex, SOAP_VARS_KEEP_ALL);
-/*
-  np_post = ((readcontrolarg_t *)codex->action_args)->np_post;
-  gl_post = ((readcontrolarg_t *)codex->action_args)->gl_post;
-  for1DL ( i, gl_post.domain_lim.is, gl_post.domain_lim.ie )
-    for2DL ( j, gl_post.domain_lim.js, gl_post.domain_lim.je )
-      for3DL ( k, gl_post.domain_lim.ks, gl_post.domain_lim.ke )
-        dispose_node ( &( np_post[_ai ( &gl_post, i, j, k )] ) );
-      end3DL
-    end2DL
-  end1DL
-  free ( np_post );
-*/
+  np = ((readcontrolarg_t *)codex->action_args)->np;
+  np_post = &(((readcontrolarg_t *)codex->action_args)->np_post);
+  gl_post = &(((readcontrolarg_t *)codex->action_args)->gl_post);
+  if ( *np_post != *np ){
+    for1DL ( i, gl_post->domain_lim.is, gl_post->domain_lim.ie )
+      for2DL ( j, gl_post->domain_lim.js, gl_post->domain_lim.je )
+        for3DL ( k, gl_post->domain_lim.ks, gl_post->domain_lim.ke )
+          dispose_node ( &( (*np_post)[_ai ( gl_post, i, j, k )] ) );
+        end3DL
+      end2DL
+    end1DL
+    free ( *np_post );
+  }
 }
 
 

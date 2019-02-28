@@ -846,6 +846,7 @@ int main ( int argc, char **argv ) {
   input_t input;
   int *argint, argoneint;
   char tmpstr[1000];
+  long i,j,k;
 
 #ifdef _FLUID_MULTISPECIES
   double Tmin, Tmax, dT;
@@ -934,6 +935,8 @@ int main ( int argc, char **argv ) {
 
     lL = _ai ( &gl, node_i, node_j, node_k );
     lR = _al(&gl, lL, theta, +1);
+    dispose_node ( &npL );
+    dispose_node ( &npR );
     npL = npArray[lL];
     npR = npArray[lR];
 
@@ -1098,7 +1101,21 @@ int main ( int argc, char **argv ) {
     }
 #endif
   }
-  dispose_node ( &npL );
-  dispose_node ( &npR );
+  //dispose_node ( &npL );
+  //dispose_node ( &npR );
+  for1DL ( i, gl.domain_lim.is, gl.domain_lim.ie )
+    for2DL ( j, gl.domain_lim.js, gl.domain_lim.je )
+      for3DL ( k, gl.domain_lim.ks, gl.domain_lim.ke )
+        dispose_node ( &( npArray[_ai ( &gl, i, j, k )] ) );
+      end3DL 
+    end2DL 
+  end1DL 
+  free_clipped_variables( &gl );
+  free( gl.cycle.code_runtime );
+  SOAP_free_codex ( &gl.cycle.codex );
+  free ( npArray ); 
+  free ( control_filename );
+  free ( input.name );
+  free ( argint );
   return ( EXIT_SUCCESS );
 }
