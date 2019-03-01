@@ -7,6 +7,19 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 01a
+  * in model/share/fluid_share.c
+    - in condition_Lambda_plus_minus_Parent(), improved the algorithm so that only V for fluxes below fluxet-1
+      is used to determine Vmin and Vmax
+    - deleted functions that are not used anymore:
+      o condition_Lambda_plus_minus_Parent_firstpass()
+      o condition_Lambda_plus_minus_Parent5()
+      o condition_Lambda_plus_minus_Parent4()
+      o condition_Lambda_plus_minus_Parent3()
+      o condition_Lambda_plus_minus_Parent2()
+      o condition_Lambda_plus_minus_Parent1()
+
+
 2019 FEB 28b
   * in src/test.c
      - in main(), added code to free npArray and its data structure

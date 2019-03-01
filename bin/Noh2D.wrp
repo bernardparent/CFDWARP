@@ -172,7 +172,7 @@ Init(
 
 Disc(
   NavierStokesPerfect(
-    zetaA1=0.01e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA1=0.02e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=1e-7;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   FVSplus(
@@ -196,7 +196,7 @@ Disc(
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.9999;
     INTERPOL=INTERPOL_AOWENO7;
-    FACEINTEG=FACEINTEG_CENTRAL1;
+    FACEINTEG=FACEINTEG_CENTRAL3;
     EIGENVALCOND=EIGENVALCOND_PARENT;
     POSFILTER=POSFILTER_PARENT;
     POSFILTER_numiter=4;

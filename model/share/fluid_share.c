@@ -1515,58 +1515,6 @@ void condition_Lambda_plus_minus_Pascal(np_t *np, gl_t *gl, long lp0, long theta
 }
 
 
-
-void condition_Lambda_plus_minus_Parent_firstpass(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
-  long flux,dim,lp1;
-  double zetaA1;
-  double ap0,ap1,Vp0,Vp1,Vref,aref,factP,Pstarmax,Pstarmin;
-
-  zetaA1=jacvarsp0.zetaA1;
-  ap0=_astar_from_jacvars(jacvarsp0,metrics);
-  ap1=_astar_from_jacvars(jacvarsp1,metrics);
-  Vp0=_Vstar_from_jacvars(jacvarsp0, metrics);
-  Vp1=_Vstar_from_jacvars(jacvarsp1, metrics);
-
-  /* first, make sure the eigenvalues are within physically-realistic bounds and clip them if necessary */
-  aref=max(ap0,ap1);
-  Vref=max(fabs(Vp0),fabs(Vp1));
-  for (flux=0; flux<nf; flux++){
-    Lambdaplus[flux][flux]=min(Lambdaplus[flux][flux],Vref+aref/notzero(jacvarsp0.zetaA2,1e-99));
-    Lambdaminus[flux][flux]=max(Lambdaminus[flux][flux],-Vref-aref/notzero(jacvarsp0.zetaA2,1e-99));
-  }
-
-  /* second, add entropy correction to prevent carbuncle */
-  lp1=_al(gl,lp0,theta,+1);
-  Pstarmax=max(_Pstar(np[lp0],gl),_Pstar(np[lp1],gl));
-  for (dim=0; dim<nd; dim++){
-    if (dim!=theta){
-      Pstarmax=max(Pstarmax,_Pstar(np[_al(gl,lp0,dim,+1)],gl));
-      Pstarmax=max(Pstarmax,_Pstar(np[_al(gl,lp0,dim,-1)],gl));
-      Pstarmax=max(Pstarmax,_Pstar(np[_al(gl,lp1,dim,+1)],gl));
-      Pstarmax=max(Pstarmax,_Pstar(np[_al(gl,lp1,dim,-1)],gl));
-    }
-  }  
-  Pstarmin=min(_Pstar(np[lp0],gl),_Pstar(np[lp1],gl));
-  for (dim=0; dim<nd; dim++){
-    if (dim!=theta){
-      Pstarmin=min(Pstarmin,_Pstar(np[_al(gl,lp0,dim,+1)],gl));
-      Pstarmin=min(Pstarmin,_Pstar(np[_al(gl,lp0,dim,-1)],gl));
-      Pstarmin=min(Pstarmin,_Pstar(np[_al(gl,lp1,dim,+1)],gl));
-      Pstarmin=min(Pstarmin,_Pstar(np[_al(gl,lp1,dim,-1)],gl));
-    }
-  }  
-  Pstarmin=max(1e-40,Pstarmin);
-  Pstarmax=max(1e-40,Pstarmax);
-
-  zetaA1=jacvarsp0.zetaA1;
-//  factP=max(0.0,pow(fabs(Pstarmax-Pstarmin)/Pstarmin,1.0));
-  factP=max(0.0,pow(fabs(Pstarmax-Pstarmin)/Pstarmin,1.0)-0.3);
-  for (flux=fluxet-1; flux<=fluxet; flux++){
-    Lambdaplus[flux][flux]+=(aref+Vref)*zetaA1*factP;
-    Lambdaminus[flux][flux]-=(aref+Vref)*zetaA1*factP;
-  }
-}
-
 void condition_Lambda_plus_minus_Parent(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
   long flux;
   double Vadd1,Vadd2,Vadd,Vmin,Vmax;
@@ -1580,225 +1528,23 @@ void condition_Lambda_plus_minus_Parent(np_t *np, gl_t *gl, long lp0, long theta
 
   Vmin=1e99;
   Vmax=-1e99;
-  for (flux=0; flux<nf; flux++) {
-    if (flux!=fluxet && flux!=fluxet-1) Vmin=min(Vmin,Lambdaplus[flux][flux]*LUstarp0[flux]);
-  }
-  for (flux=0; flux<nf; flux++) {
-    if (flux!=fluxet && flux!=fluxet-1) Vmax=max(Vmax,Lambdaplus[flux][flux]*LUstarp0[flux]);
-  }
+  for (flux=0; flux<fluxet-1; flux++) Vmin=min(Vmin,Lambdaplus[flux][flux]*LUstarp0[flux]);
+  for (flux=0; flux<fluxet-1; flux++) Vmax=max(Vmax,Lambdaplus[flux][flux]*LUstarp0[flux]);
   Vadd1=max(0.0,fabs(Vmax-Vmin)-(Lambdaplus[fluxet][fluxet]*LUstarp0[fluxet]+Lambdaplus[fluxet-1][fluxet-1]*LUstarp0[fluxet-1]))/LUstarp0[fluxet];
 
   Vmin=1e99;
   Vmax=-1e99;
-  for (flux=0; flux<nf; flux++) {
-    if (flux!=fluxet && flux!=fluxet-1) Vmin=min(Vmin,-Lambdaminus[flux][flux]*LUstarp1[flux]);
-  }
-  for (flux=0; flux<nf; flux++) {
-    if (flux!=fluxet && flux!=fluxet-1) Vmax=max(Vmax,-Lambdaminus[flux][flux]*LUstarp1[flux]);
-  }
+  for (flux=0; flux<fluxet-1; flux++) Vmin=min(Vmin,-Lambdaminus[flux][flux]*LUstarp1[flux]);
+  for (flux=0; flux<fluxet-1; flux++) Vmax=max(Vmax,-Lambdaminus[flux][flux]*LUstarp1[flux]);
   Vadd2=max(0.0,fabs(Vmax-Vmin)-fabs(Lambdaminus[fluxet][fluxet]*LUstarp1[fluxet]+Lambdaminus[fluxet-1][fluxet-1]*LUstarp1[fluxet-1]))/LUstarp1[fluxet];
 
   Vadd=max(Vadd1,Vadd2);
 
-
-
   for (flux=fluxet-1; flux<=fluxet; flux++){
     Lambdaplus[flux][flux]+=0.5*Vadd;
     Lambdaminus[flux][flux]-=0.5*Vadd;
   }
-
 }
-
-
-
-void condition_Lambda_plus_minus_Parent5(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
-  long flux;
-  double Vadd1,Vadd2,Vadd,Vmin,Vmax;
-  flux_t LUstarp0,LUstarp1;
-
-  condition_Lambda_plus_minus_Pascal(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics,  Lambdaplus, Lambdaminus);
-
-  /* make sure the flux is positivity-preserving in multiple dimensions by conditioning the eigenvalues */
-  find_LUstar_from_jacvars(jacvarsp1, metrics, LUstarp1);
-  find_LUstar_from_jacvars(jacvarsp0, metrics, LUstarp0);
-
-  Vmin=1e99;
-  Vmax=-1e99;
-  for (flux=0; flux<nf; flux++) {
-    if (flux!=fluxet && flux!=fluxet-1) Vmin=min(Vmin,Lambdaplus[flux][flux]*LUstarp0[flux]);
-  }
-  for (flux=0; flux<nf; flux++) {
-    if (flux!=fluxet && flux!=fluxet-1) Vmax=max(Vmax,Lambdaplus[flux][flux]*LUstarp0[flux]);
-  }
-  Vadd1=max(0.0,fabs(Vmax-Vmin)-(Lambdaplus[fluxet][fluxet]*LUstarp0[fluxet]+Lambdaplus[fluxet-1][fluxet-1]*LUstarp0[fluxet-1]))/LUstarp0[fluxet];
-
-  Vmin=1e99;
-  Vmax=-1e99;
-  for (flux=0; flux<nf; flux++) {
-    if (flux!=fluxet && flux!=fluxet-1) Vmin=min(Vmin,-Lambdaminus[flux][flux]*LUstarp1[flux]);
-  }
-  for (flux=0; flux<nf; flux++) {
-    if (flux!=fluxet && flux!=fluxet-1) Vmax=max(Vmax,-Lambdaminus[flux][flux]*LUstarp1[flux]);
-  }
-  Vadd2=max(0.0,fabs(Vmax-Vmin)-fabs(Lambdaminus[fluxet][fluxet]*LUstarp1[fluxet]+Lambdaminus[fluxet-1][fluxet-1]*LUstarp1[fluxet-1]))/LUstarp1[fluxet];
-
-  Vadd=max(Vadd1,Vadd2);
-
-
-
-  for (flux=fluxet-1; flux<=fluxet; flux++){
-    Lambdaplus[flux][flux]+=0.5*Vadd;
-    Lambdaminus[flux][flux]-=0.5*Vadd;
-  }
-
-}
-
-
-
-void condition_Lambda_plus_minus_Parent4(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
-  long flux;
-  double Vadd1,Vadd2,Vadd,sum;
-  flux_t LUstarp0,LUstarp1;
-
-  condition_Lambda_plus_minus_Pascal(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics,  Lambdaplus, Lambdaminus);
-
-  /* make sure the flux is positivity-preserving in multiple dimensions by conditioning the eigenvalues */
-  find_LUstar_from_jacvars(jacvarsp1, metrics, LUstarp1);
-  find_LUstar_from_jacvars(jacvarsp0, metrics, LUstarp0);
-
-  sum=0.0;
-  for (flux=0; flux<fluxet-2; flux++) sum+=Lambdaplus[flux][flux]*LUstarp0[flux];
-  Vadd1=max(0.0,fabs(sum-Lambdaplus[fluxet-2][fluxet-2]*LUstarp0[fluxet-2])-(Lambdaplus[fluxet][fluxet]*LUstarp0[fluxet]+Lambdaplus[fluxet-1][fluxet-1]*LUstarp0[fluxet-1]))/LUstarp0[fluxet];
-
-  sum=0.0;
-  for (flux=0; flux<fluxet-2; flux++) sum+=Lambdaminus[flux][flux]*LUstarp1[flux];
-  Vadd2=max(0.0,fabs(sum-Lambdaminus[fluxet-2][fluxet-2]*LUstarp1[fluxet-2])-fabs(Lambdaminus[fluxet][fluxet]*LUstarp1[fluxet]+Lambdaminus[fluxet-1][fluxet-1]*LUstarp1[fluxet-1]))/LUstarp1[fluxet];
-
-  Vadd=max(Vadd1,Vadd2);
-
-  for (flux=fluxet-1; flux<=fluxet; flux++){
-    Lambdaplus[flux][flux]+=0.5*Vadd;
-    Lambdaminus[flux][flux]-=0.5*Vadd;
-  }
-
-
-}
-
-
-void condition_Lambda_plus_minus_Parent3(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
-  long flux;
-  double zetaA1,zetaA2,Vmin,Vmax,Vadd;
-  flux_t Vp0,Vp1,LUstarp0,LUstarp1;
-
-  condition_Lambda_plus_minus_Parent_firstpass(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics,  Lambdaplus, Lambdaminus);
-
-
-  zetaA1=0.0; //set zetaA1=0 for minimum dissipation to yield positivity-preserving scheme
-              //set zetaA1=0.5 for best results
-  zetaA2=0.0;
-  find_LUstar_from_jacvars(jacvarsp1, metrics, LUstarp1);
-  find_LUstar_from_jacvars(jacvarsp0, metrics, LUstarp0);
-  for (flux=0; flux<nf; flux++){
-    Vp0[flux]=fabs(LUstarp0[flux]*Lambdaplus[flux][flux]);
-    Vp1[flux]=fabs(LUstarp1[flux]*Lambdaminus[flux][flux]);
-  }
-  Vmin=1.0e99;
-  Vmax=-1.0e99;
-  for (flux=0; flux<nf; flux++){
-    if (flux!=fluxet && flux!=fluxet-1) {
-      Vmin=min(Vmin,min(Vp1[flux],Vp0[flux]));
-      Vmax=max(Vmax,max(Vp1[flux],Vp0[flux]));
-    }
-  }
-
-  Vadd=max(0.0,(Vmax-Vmin)-(1.0-zetaA1)*min(Vp0[fluxet]+Vp0[fluxet-1],Vp1[fluxet]+Vp1[fluxet-1]));
-
-  Vadd=Vadd/min(min(LUstarp0[fluxet],LUstarp1[fluxet]),min(LUstarp0[fluxet-1],LUstarp1[fluxet-1]));
-  for (flux=fluxet-1; flux<=fluxet; flux++){
-    Lambdaplus[flux][flux]+=Vadd*0.5/(1.0-zetaA2);
-    Lambdaminus[flux][flux]-=Vadd*0.5/(1.0-zetaA2);
-  }
-
-
-  
-
-}
-
-
-
-
-
-void condition_Lambda_plus_minus_Parent2(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
-  long flux;
-  double zetaA1,zetaA2,Vmin,Vmax,Vadd;
-  flux_t Vp0,Vp1,LUstarp0,LUstarp1;
-  
-  zetaA1=0.4; //set zetaA1=0 for minimum dissipation to yield positivity-preserving scheme
-              //set zetaA1=0.5 for best results
-  zetaA2=0.5;
-  find_LUstar_from_jacvars(jacvarsp1, metrics, LUstarp0);
-  find_LUstar_from_jacvars(jacvarsp0, metrics, LUstarp1);
-  for (flux=0; flux<nf; flux++){
-    Vp0[flux]=fabs(LUstarp0[flux]*Lambdaplus[flux][flux]);
-    Vp1[flux]=fabs(LUstarp1[flux]*Lambdaminus[flux][flux]);
-  }
-  Vmin=1.0e99;
-  Vmax=-1.0e99;
-  for (flux=0; flux<nf; flux++){
-    if (flux!=fluxet && flux!=fluxet-1) {
-      Vmin=min(Vmin,min(Vp1[flux],Vp0[flux]));
-      Vmax=max(Vmax,max(Vp1[flux],Vp0[flux]));
-    }
-  }
-
-  Vadd=max(0.0,(Vmax-Vmin)-(1.0-zetaA1)*min(Vp0[fluxet]+Vp0[fluxet-1],Vp1[fluxet]+Vp1[fluxet-1]));
-
-  Vadd=Vadd/min(min(LUstarp0[fluxet],LUstarp1[fluxet]),min(LUstarp0[fluxet-1],LUstarp1[fluxet-1]));
-  for (flux=fluxet-1; flux<=fluxet; flux++){
-    Lambdaplus[flux][flux]+=Vadd*0.5/(1.0-zetaA2);
-    Lambdaminus[flux][flux]-=Vadd*0.5/(1.0-zetaA2);
-  }
-}
-
-
-
-void condition_Lambda_plus_minus_Parent1(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
-  long flux;
-  double valmin,valmax,sump0,diffp0,sump1,diffp1,Lambdaadd;
-  flux_t LUstarp0,LUstarp1;
-  
-  find_LUstar_from_jacvars(jacvarsp0, metrics, LUstarp1);
-  find_LUstar_from_jacvars(jacvarsp1, metrics, LUstarp0);
-  sump0=Lambdaplus[fluxet][fluxet]*LUstarp0[fluxet]+Lambdaplus[fluxet-1][fluxet-1]*LUstarp0[fluxet-1];
-  sump1=fabs(Lambdaminus[fluxet][fluxet]*LUstarp1[fluxet]+Lambdaminus[fluxet-1][fluxet-1]*LUstarp1[fluxet-1]);
-  valmin=1.0e99;
-  valmax=-1.0e99;
-  for (flux=0; flux<nf; flux++){
-    if (flux!=fluxet && flux!=fluxet-1) {
-      valmin=min(valmin,Lambdaplus[flux][flux]*LUstarp0[flux]);
-      valmax=max(valmax,Lambdaplus[flux][flux]*LUstarp0[flux]);
-    }
-  }
-  diffp0=valmax-valmin;
-  valmin=1.0e99;
-  valmax=-1.0e99;
-  for (flux=0; flux<nf; flux++){
-    if (flux!=fluxet && flux!=fluxet-1) {
-      valmin=min(valmin,fabs(Lambdaminus[flux][flux]*LUstarp1[flux]));
-      valmax=max(valmax,fabs(Lambdaminus[flux][flux]*LUstarp1[flux]));
-    }
-  }
-  diffp1=valmax-valmin;
-
-  // this line needs some fine tuning 
-  Lambdaadd=max(max(0.0,(diffp1-sump1)/LUstarp1[0]),max(0.0,(diffp0-sump0)/LUstarp0[0]));
-
-  for (flux=0; flux<nf; flux++){
-    Lambdaplus[flux][flux]+=Lambdaadd;
-    Lambdaminus[flux][flux]-=Lambdaadd;
-  }
-}
-
 
 
 // as defined in "Computational Aerothermodynamic Simulation Issues on Unstructured Grids" by Gnoffo and White, AIAA 2004-2371

@@ -5,7 +5,7 @@
 }
 
  
-Mx=2.0;
+Mx=12.0;
 My=0.0;
 P=100000;
 T=300;
@@ -13,8 +13,10 @@ L=1.0;
 H=0.2;
 dwall=1e-6/(P/286/T);
 
+mf=0.7;
+
 is=1;  js=1; 
-ie=100; je=100;
+ie=round(mf*100); je=round(mf*100);
 
 Grid(
   Size(is,js, ie,je);
@@ -79,9 +81,6 @@ Model(
     kmin=1.0e-10;   kmax=9.9e99;   {m2/s2}
     psimin=1e-10;   psimax=9.9e99; {1/s}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain}
-    zetaA1=0.1e0;    {conditions the eigenvalues of the A jacobian}
-    zetaA2=0.25;  {eigenvalue clipping factor: 2.0-20.0}
-    EIGENVALCOND=EIGENVALCOND_PASCAL; {recommended: EIGENVALCOND_PASCAL}
     AXISYMMETRIC=NO;
   );
 );
@@ -119,6 +118,24 @@ Init(
 );
 
 
+Disc(
+  FavreReynoldsTv(
+    zetaA1=0.02e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.03e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_AOWENO7;
+    FACEINTEG=FACEINTEG_CENTRAL3;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+    POSFILTER=POSFILTER_NONE;
+    POSFILTER_numiter=4;
+  );
+);
 
 
 Cycle(
@@ -183,23 +200,21 @@ Cycle(
   );
 
   SteadyState(
-    sigma1=0.3;      {exponent of largest pseudotime step in all dimensions}
-    sigma2=0.3;      {exponent of largest pseudotime step in all flux components}
-    PRECONDITIONER=PRECON_LOCALTIMESTEP;
+    if (mod(iter,50)==0,
+      WriteDataFile(outputfilename);
+    );
+    sigma1=0.5;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
       CFL=0.01;
     );
     CFL=min(CFL*1.03,0.5);
-    UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2);
-    { dtau=1e-7; {pseudotime step in seconds}
-      UpdateFluidConstantPseudotimeStep(dtau); }
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,clipinfo);
-    if (mod(iter,50)==0,
-      WriteDataFile();
-    );
   );
+
 
 );
 
