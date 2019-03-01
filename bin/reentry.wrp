@@ -131,7 +131,7 @@ Bdry(
     _________________________________________________________________________________________
     }
     All(BDRY_WALLTFIXED1);
-    Faces(BDRY_OUTFLOWSUPERSONIC1,BDRY_OUTFLOWSUPERSONIC1,  BDRY_SLIPWALL1,BDRY_INFLOWSUPERSONIC);
+    Faces(BDRY_OUTFLOWSUPERSONIC1,BDRY_OUTFLOWSUPERSONIC1,  BDRY_SYMMETRICAL1,BDRY_INFLOWSUPERSONIC);
     {
     Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
@@ -192,8 +192,8 @@ Init(
 
 Disc(
   NavierStokes(
-    zetaA1=0.08e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.02e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA1=0.3e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.002e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   MUSCL(
     FLUX=FLUX_FDS;

@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 01b
+  * in model/share/fluid_share.c
+    - in condition_Lambda_plus_minus_Parent(), made changes so that the Vs for the mass density
+      fluxes are regrouped together before being compared to the Vs for fluxes fluxet-2 and fluxet-3
+  
+
 2019 MAR 01a
   * in model/share/fluid_share.c
     - in condition_Lambda_plus_minus_Parent(), improved the algorithm so that only V for fluxes below fluxet-1
