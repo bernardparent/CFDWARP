@@ -3,7 +3,7 @@
 
 }
 
-Mx=2.0;
+Mx=6.0;
 My=0.0;
 P=10000.0;
 T=300.0;
@@ -14,7 +14,7 @@ meshfact=0.5;
 Hlayer=0.0007/(P/Rgas/T)/2;
 H=0.1;
 L=1.0;
-CFLmax=2.0;
+CFLmax=1.0;
 
   is=1;  js=1; jm=round(60*meshfact);
   ie=round(81*meshfact); je=round(101*meshfact);
@@ -121,10 +121,10 @@ Disc(
     AOWENO_gammalo=0.85;
     AOWENO_gammahi=0.85;
     INTERPOL=INTERPOL_TVD2_VANLEER;
-    EIGENVALCOND=EIGENVALCOND_PECLET;
-    POSFILTER=POSFILTER_NONE;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+    POSFILTER=POSFILTER_PARENT;
     POSFILTER_numiter=4;
-    FACEINTEG=FACEINTEG_CENTRAL3;
+    FACEINTEG=FACEINTEG_CENTRAL1;
   );
   MUSCLplus(
     FLUX=FLUX_FDSplusMultiD;

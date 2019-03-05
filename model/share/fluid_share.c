@@ -1517,6 +1517,50 @@ void condition_Lambda_plus_minus_Pascal(np_t *np, gl_t *gl, long lp0, long theta
 
 void condition_Lambda_plus_minus_Parent(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
   long flux,spec;
+  double lambdaadd1,lambdaadd2,lambdaadd,alphamin,alphamax,alphamass;
+  flux_t LUstarp0,LUstarp1,alpha;
+
+  condition_Lambda_plus_minus_Pascal(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics,  Lambdaplus, Lambdaminus);
+
+  /* make sure the flux is positivity-preserving in multiple dimensions by conditioning the eigenvalues */
+  find_LUstar_from_jacvars(jacvarsp1, metrics, LUstarp1);
+  find_LUstar_from_jacvars(jacvarsp0, metrics, LUstarp0);
+
+  for (flux=0; flux<nf; flux++) alpha[flux]=Lambdaplus[flux][flux]*LUstarp0[flux]/min(LUstarp0[fluxet],LUstarp0[fluxet-1]);
+  alphamass=0.0;
+  for (spec=0; spec<ns; spec++) alphamass+=alpha[spec];
+  alphamax=alphamass;
+  alphamin=alphamass;
+  for (flux=fluxmom; flux<fluxet-1; flux++) {
+    alphamax=max(alphamax,alpha[flux]);
+    alphamin=min(alphamin,alpha[flux]);
+  }
+  lambdaadd1=max(0.0,alphamax-alphamin-(alpha[fluxet]+alpha[fluxet-1]));
+
+  for (flux=0; flux<nf; flux++) alpha[flux]=-Lambdaminus[flux][flux]*LUstarp1[flux]/min(LUstarp1[fluxet],LUstarp1[fluxet-1]);
+  alphamass=0.0;
+  for (spec=0; spec<ns; spec++) alphamass+=alpha[spec];
+  alphamax=alphamass;
+  alphamin=alphamass;
+  for (flux=fluxmom; flux<fluxet-1; flux++) {
+    alphamax=max(alphamax,alpha[flux]);
+    alphamin=min(alphamin,alpha[flux]);
+  }
+  lambdaadd2=max(0.0,alphamax-alphamin-(alpha[fluxet]+alpha[fluxet-1]));
+
+
+  lambdaadd=0.5*max(lambdaadd1,lambdaadd2);
+
+  for (flux=fluxet-1; flux<=fluxet; flux++){
+    Lambdaplus[flux][flux]+=lambdaadd;
+    Lambdaminus[flux][flux]-=lambdaadd;
+  }
+}
+
+
+
+void condition_Lambda_plus_minus_Parent_old(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
+  long flux,spec;
   double lambdaadd1,lambdaadd2,lambdaadd,Vmin,Vmax,Vmass;
   flux_t LUstarp0,LUstarp1;
 
@@ -1555,7 +1599,7 @@ void condition_Lambda_plus_minus_Parent(np_t *np, gl_t *gl, long lp0, long theta
 }
 
 
-void condition_Lambda_plus_minus_Parent_old(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
+void condition_Lambda_plus_minus_Parent_veryold(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
   long flux;
   double Vadd1,Vadd2,Vadd,Vmin,Vmax;
   flux_t LUstarp0,LUstarp1;

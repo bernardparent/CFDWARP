@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 05a
+  * in model/share/fluid_share.c
+    - rewrote condition_Lambda_plus_minus_Parent() as specified in latest COEFF document
+      (should give the same results as the previous condition_Lambda_plus_minus_Parent() albeit written
+      differently)
+
+
 2019 MAR 01b
   * in model/share/fluid_share.c
     - in condition_Lambda_plus_minus_Parent(), made changes so that the Vs for the mass density
