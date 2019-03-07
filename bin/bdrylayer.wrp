@@ -140,10 +140,10 @@ Cycle(
   NavierStokesPerfect(
     xiverge=1e2;          {residual convergence threshold}
     aref=300.0;            {reference sound speed in m/s}
-    Uref[0]=rhoref;            
-    Uref[1]=rhoref*aref;       
-    Uref[2]=rhoref*aref;   
-    Uref[3]=rhoref*aref*aref;  
+    Uref[1]=rhoref;            
+    Uref[2]=rhoref*aref;       
+    Uref[3]=rhoref*aref;   
+    Uref[4]=rhoref*aref*aref;  
   );
   Multizone(
     tmax=5e-5;   {simulation time span in seconds}

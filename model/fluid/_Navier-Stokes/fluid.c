@@ -47,15 +47,15 @@ void write_cycle_fluid_template(FILE **controlfile){
   ,_FLUID_ACTIONNAME);
   for (spec=0; spec<ns; spec++){
     wfprintf(*controlfile,
-    "    Uref[%d]=rhoref;   \n",spec);
+    "    Uref[%d]=rhoref;   \n",spec+1);
   }
   for (dim=0; dim<nd; dim++){
     wfprintf(*controlfile,
-    "    Uref[%d]=rhoref*aref;   \n",ns+dim);
+    "    Uref[%d]=rhoref*aref;   \n",ns+dim+1);
   }
   wfprintf(*controlfile,
     "    Uref[%d]=rhoref*aref*aref;  \n"
-    "  );\n",nd+ns);
+    "  );\n",nd+ns+1);
   
 }
 
@@ -124,7 +124,7 @@ void read_cycle_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
     find_double_var_from_codex(codex,"xiverge",&gl->cycle.fluid.xiverge);
 
     for (flux=0; flux<nf; flux++){
-      sprintf(tmpstr,"Uref[%ld]",flux);
+      sprintf(tmpstr,"Uref[%ld]",flux+1);
       find_double_var_from_codex(codex,tmpstr,&gl->cycle.fluid.Uref[flux]);
     }
 

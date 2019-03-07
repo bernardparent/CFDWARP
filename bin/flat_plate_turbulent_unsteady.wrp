@@ -171,8 +171,8 @@ Init(
 
 Disc(
   FavreReynolds(
-    zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.01e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   MUSCL(
     FLUX=FLUX_FDS;
@@ -181,7 +181,10 @@ Disc(
     AOWENO_gammalo=0.85;
     AOWENO_gammahi=0.85;
     INTERPOL=INTERPOL_TVD2_VANLEER;
-    EIGENVALCOND=EIGENVALCOND_PECLET;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+    POSFILTER=POSFILTER_PARENT;
+    POSFILTER_numiter=4;
+    FACEINTEG=FACEINTEG_CENTRAL1;
   );
   MUSCLplus(
     FLUX=FLUX_FDSplusFilter;
@@ -216,12 +219,12 @@ Cycle(
     kref=1e3;    {reference turbulence kinetic energy in m2/s2}
     psiref=1e8;  {reference specific dissipation rate of the TKE in 1/s if for TURBMODEL_KOMEGA*
                   reference dissipation rate of the TKE in m2/s3 for TURBMODEL_KEPSILON}
-    Uref[0]=rhoref*1e99;   
-    Uref[1]=rhoref*aref*1e99;   
+    Uref[1]=rhoref*1e99;   
     Uref[2]=rhoref*aref*1e99;   
-    Uref[3]=rhoref*aref*aref*1e99;  
-    Uref[4]=rhoref*kref;  
-    Uref[5]=rhoref*psiref;  
+    Uref[3]=rhoref*aref*1e99;   
+    Uref[4]=rhoref*aref*aref*1e99;  
+    Uref[5]=rhoref*kref;  
+    Uref[6]=rhoref*psiref;  
   );
   SteadyState(
     if (mod(iter,50)==0,
@@ -246,7 +249,7 @@ Cycle(
     if (iter==1,
       CFL=0.01;
     );
-    CFL=min(CFL*1.55,0.7);
+    CFL=min(CFL*1.55,1.7);
     UpdateFluid(CFL,PRECON_LOCALEIGENVALUE2,sigma1,sigma2,dt);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,

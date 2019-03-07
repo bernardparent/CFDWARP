@@ -341,11 +341,10 @@ Cycle(
     Tvref=5000.0;         {reference vibrational temperature in K}
     aref=sqrt(1.4*287*Tref);  {reference sound speed in m/s}
     wion=1e-7;            {average ion mass fraction}
-    Uref[0]=wion*1.8e-5*rhoref;   
-    Uref[1]=wion*rhoref;   
+    Uref[1]=wion*1.8e-5*rhoref;   
     Uref[2]=wion*rhoref;   
     Uref[3]=wion*rhoref;   
-    Uref[4]=rhoref;   
+    Uref[4]=wion*rhoref;   
     Uref[5]=rhoref;   
     Uref[6]=rhoref;   
     Uref[7]=rhoref;   
@@ -355,16 +354,17 @@ Cycle(
     Uref[11]=rhoref;   
     Uref[12]=rhoref;   
     Uref[13]=rhoref;   
-    Uref[14]=rhoref*aref;   
+    Uref[14]=rhoref;   
     Uref[15]=rhoref*aref;   
-    Uref[16]=rhoref*aref*aref;  
-    Uref[17]=rhoref*700.0*Tvref;  
-    Uref[18]=rhoref*wion*414*Teref;  
+    Uref[16]=rhoref*aref;   
+    Uref[17]=rhoref*aref*aref;  
+    Uref[18]=rhoref*700.0*Tvref;  
+    Uref[19]=rhoref*wion*414*Teref;  
   );
   Ohm(
     xiverge_emfield=1e2; {residual convergence threshold for the potential equation}
     sigmaref=0.0000001; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
-    Uref_emfield[0]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
+    Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
   DualTimeStepping(
     sigma1=0.4;      {exponent of largest pseudotime step in all dimensions}

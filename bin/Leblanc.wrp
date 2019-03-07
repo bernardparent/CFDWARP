@@ -156,10 +156,10 @@ Cycle(
     xiverge=1e-2;          {residual convergence threshold}
     rhoref=0.01;            {reference density in kg/m3}
     aref=sqrt(5/3*286*0.001);            {reference sound speed in m/s}
-    Uref[0]=rhoref;            
-    Uref[1]=rhoref*aref;       
-    Uref[2]=rhoref*aref;   
-    Uref[3]=rhoref*aref*aref;  
+    Uref[1]=rhoref;            
+    Uref[2]=rhoref*aref;       
+    Uref[3]=rhoref*aref;   
+    Uref[4]=rhoref*aref*aref;  
   );
   PredictorCorrector(
     tmax=6;    {simulation time span in seconds}

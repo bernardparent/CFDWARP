@@ -151,13 +151,13 @@ Cycle(
     xiverge=1e0;  {residual convergence threshold}
     rhoref=1.0;  {reference density in kg/m3}
     aref=300.0;  {reference sound speed in m/s}
-    Uref[0]=rhoref;   
     Uref[1]=rhoref;   
     Uref[2]=rhoref;   
     Uref[3]=rhoref;   
-    Uref[4]=rhoref*aref;   
+    Uref[4]=rhoref;   
     Uref[5]=rhoref*aref;   
-    Uref[6]=rhoref*aref*aref;  
+    Uref[6]=rhoref*aref;   
+    Uref[7]=rhoref*aref*aref;  
   );
   SteadyState(
     tmax=6e-4;    {simulation time span in seconds}

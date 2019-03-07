@@ -7,6 +7,26 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 07a
+  * in model/emfield/_*/emfield.c
+    - in write_cycle_emfield_template(), rewrote Uref_emfield[0] to Uref_emfield[1]
+    - in read_cycle_emfield_actions(), changed sprintf(tmpstr,"Uref_emfield[%ld]",flux); to 
+      sprintf(tmpstr,"Uref_emfield[%ld]",flux+1);
+  * in model/fluid/_*/fluid.c
+    - in write_cycle_fluid_template(), rewrote Uref[i] to Uref[i+1]
+    - in read_cycle_fluid_actions(), changed sprintf(tmpstr,"Uref[%ld]",flux); to 
+      sprintf(tmpstr,"Uref[%ld]",flux+1);
+  * in model/share/fluid_share.c
+    - in find_Gamma(), changed PRECON_LOCALEIGENVALUE2 for PRECON_LOCALEIGENVALUE so that the original
+      approach at local eigenvalue conditioning (Parent JCP 2018) is named PRECON_LOCALEIGENVALUE and not 
+      PRECON_LOCALEIGENVALUE2
+  * in cycle/resconv/_MUSCL/resconv.hh
+    - improved the description for _RESCONV_METHOD
+  * in bin/*wrp
+    - renamed Uref[0] to Uref[1], Uref[1] to Uref[2], etc 
+    - renamed Uref_emfield[0] to Uref_emfield[1] 
+
+
 2019 MAR 05a
   * in model/share/fluid_share.c
     - rewrote condition_Lambda_plus_minus_Parent() as specified in latest COEFF document

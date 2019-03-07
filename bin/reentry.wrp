@@ -215,7 +215,6 @@ Cycle(
     xiverge=1e-20;  {residual convergence threshold}
     rhoref=1.0;  {reference density in kg/m3}
     aref=300.0;  {reference sound speed in m/s}
-    Uref[0]=rhoref;   
     Uref[1]=rhoref;   
     Uref[2]=rhoref;   
     Uref[3]=rhoref;   
@@ -226,9 +225,10 @@ Cycle(
     Uref[8]=rhoref;   
     Uref[9]=rhoref;   
     Uref[10]=rhoref;   
-    Uref[11]=rhoref*aref;   
+    Uref[11]=rhoref;   
     Uref[12]=rhoref*aref;   
-    Uref[13]=rhoref*aref*aref;  
+    Uref[13]=rhoref*aref;   
+    Uref[14]=rhoref*aref*aref;  
   );
   MultizoneSteady(
     if (mod(iter,50)==0,

@@ -199,10 +199,10 @@ Cycle(
     xiverge=1e-2;          {residual convergence threshold}
     rhoref=3.8;           {reference density in kg/m3}
     aref=sqrt(1.4*10/rhoref);            {reference sound speed in m/s}
-    Uref[0]=rhoref;            
-    Uref[1]=rhoref*aref;       
-    Uref[2]=rhoref*aref;   
-    Uref[3]=rhoref*aref*aref;  
+    Uref[1]=rhoref;            
+    Uref[2]=rhoref*aref;       
+    Uref[3]=rhoref*aref;   
+    Uref[4]=rhoref*aref*aref;  
   );
   DualTimeStepping(
     dt=7/(mf*800*tf);   {physical time step in seconds}

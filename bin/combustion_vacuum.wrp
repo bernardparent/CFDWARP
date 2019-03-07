@@ -103,7 +103,7 @@ Model(
   NavierStokes(
     DIFFUSION=YES;
     Pmin=0.001;    Pmax=9.9e99;   {Pa}
-    Tmin=20;     Tmax=12.0e3;    {K}
+    Tmin=20;     Tmax=30.0e3;    {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=-1e-99;
     AXISYMMETRIC=NO;
@@ -128,7 +128,7 @@ Init(
     _______________________________________________________________________________________
 
     }
-    Mx=4;
+    Mx=10;
     My=0;
     P=10000; {Pa}
     T=1700; {K}
@@ -152,10 +152,8 @@ Init(
 
 Disc(
   NavierStokes(
-    zetaA=0.1e0;     {conditions the eigenvalues of the A jacobian}
-    zetaAclip=2.0;  {eigenvalue clipping factor: 2.0-20.0}
-    zetaA1=zetaA;     {conditions the eigenvalues of the A jacobian}
-    zetaA2=1.0/zetaAclip;  {eigenvalue clipping factor: 2.0-20.0}
+    zetaA1=0.2;     {conditions the eigenvalues of the A jacobian}
+    zetaA2=0.001;  {eigenvalue clipping factor: 2.0-20.0}
   );
   MUSCLplus(
     FLUX=FLUX_FDSplus;
@@ -167,11 +165,32 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_PASCAL;
     AVERAGING=AVERAGING_ARITH;
   );
-  CDFplus(
-    xi1=0.5; {should be set to 0.5 or less when used with 2nd order or higher convective fluxes}
-    xi2=xi1;
-    xi3=xi1;
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.95;
+    INTERPOL=INTERPOL_AOWENO7;
+    FACEINTEG=FACEINTEG_CENTRAL1;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+    POSFILTER=POSFILTER_PARENT;
+    POSFILTER_numiter=4;
   );
+  CDFplus(
+    xi[1]=0.5; {should be set to 0.5 or less when used with 2nd order or higher convective fluxes}
+    xi[2]=0.5;
+    xi[3]=0.5;
+    xi[4]=0.5;
+    xi[5]=0.5;
+    xi[6]=0.5;
+    xi[7]=0.5;
+    xi[8]=0.5;
+    xi[9]=0.5;
+    xi[10]=0.5;
+    xi[11]=0.5;
+    xi[12]=0.5;
+);
 );
 
 
@@ -183,7 +202,6 @@ Cycle(
     xiverge=1e3;  {residual convergence threshold}
     rhoref=1.0;  {reference density in kg/m3}
     aref=300.0;  {reference sound speed in m/s}
-    Uref[0]=rhoref;   
     Uref[1]=rhoref;   
     Uref[2]=rhoref;   
     Uref[3]=rhoref;   
@@ -192,9 +210,10 @@ Cycle(
     Uref[6]=rhoref;   
     Uref[7]=rhoref;   
     Uref[8]=rhoref;   
-    Uref[9]=rhoref*aref;   
+    Uref[9]=rhoref;   
     Uref[10]=rhoref*aref;   
-    Uref[11]=rhoref*aref*aref;  
+    Uref[11]=rhoref*aref;   
+    Uref[12]=rhoref*aref*aref;  
   );
   SteadyState(
     if (mod(iter,50)==0,
@@ -216,11 +235,11 @@ Cycle(
     sigma1=0.4;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.4;   {exponent of maximum pseudotime step in all fluxes}
     dt=tmax/(10*mf*8*tf);   {physical time step in seconds}
-    if (time<3*dt,
+    if (time<30*dt,
       if (iter==1,
-        CFL=0.1;
+        CFL=0.01;
       );
-      CFL=min(CFL*1.1,1.0);
+      CFL=min(CFL*1.3,0.5);
     ,{else}
       if (iter==1,
         CFL=5.0;

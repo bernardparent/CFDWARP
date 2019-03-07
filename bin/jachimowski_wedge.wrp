@@ -185,7 +185,6 @@ Cycle(
     kref=1e4;  {reference turbulence kinetic energy in m2/s2}
     psiref=1e8;  {reference specific dissipation rate of the TKE in 1/s if TURBMODEL=TURBMODEL_KOMEGA*
                   reference dissipation rate of the TKE in m2/s3 if TURBMODEL=TURBMODEL_KEPSILON}
-    Uref[0]=rhoref;   
     Uref[1]=rhoref;   
     Uref[2]=rhoref;   
     Uref[3]=rhoref;   
@@ -194,11 +193,12 @@ Cycle(
     Uref[6]=rhoref;   
     Uref[7]=rhoref;   
     Uref[8]=rhoref;   
-    Uref[9]=rhoref*aref;   
+    Uref[9]=rhoref;   
     Uref[10]=rhoref*aref;   
-    Uref[11]=rhoref*aref*aref;  
-    Uref[12]=rhoref*kref;  
-    Uref[13]=rhoref*psiref;  
+    Uref[11]=rhoref*aref;   
+    Uref[12]=rhoref*aref*aref;  
+    Uref[13]=rhoref*kref;  
+    Uref[14]=rhoref*psiref;  
   );
   SteadyState(
     if (mod(iter,50)==0,

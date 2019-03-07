@@ -117,10 +117,10 @@ Cycle(
   NavierStokesPerfect(
     xiverge=1e0;          {residual convergence threshold}
     aref=300.0;            {reference sound speed in m/s}
-    Uref[0]=rhoref;            
-    Uref[1]=rhoref*aref;       
-    Uref[2]=rhoref*aref;   
-    Uref[3]=rhoref*aref*aref;  
+    Uref[1]=rhoref;            
+    Uref[2]=rhoref*aref;       
+    Uref[3]=rhoref*aref;   
+    Uref[4]=rhoref*aref*aref;  
   );
   SteadyState(
     if (mod(iter,50)==0,

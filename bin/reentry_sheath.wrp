@@ -333,28 +333,28 @@ Cycle(
     Tvref=5000.0;         {reference vibrational temperature in K}
     aref=sqrt(1.4*287*Tref);  {reference sound speed in m/s}
     wion=1e-7;            {average ion mass fraction}
-    Uref[0]=wion*1.8e-5*rhoref;   
-    Uref[1]=wion*rhoref;   
+    Uref[1]=wion*1.8e-5*rhoref;   
     Uref[2]=wion*rhoref;   
     Uref[3]=wion*rhoref;   
     Uref[4]=wion*rhoref;   
     Uref[5]=wion*rhoref;   
     Uref[6]=wion*rhoref;   
-    Uref[7]=rhoref;   
+    Uref[7]=wion*rhoref;   
     Uref[8]=rhoref;   
     Uref[9]=rhoref;   
     Uref[10]=rhoref;   
     Uref[11]=rhoref;   
-    Uref[12]=rhoref*aref;   
+    Uref[12]=rhoref;   
     Uref[13]=rhoref*aref;   
-    Uref[14]=rhoref*aref*aref;  
-    Uref[15]=rhoref*700.0*Tvref;  
-    Uref[16]=rhoref*wion*414*Teref;  
+    Uref[14]=rhoref*aref;   
+    Uref[15]=rhoref*aref*aref;  
+    Uref[16]=rhoref*700.0*Tvref;  
+    Uref[17]=rhoref*wion*414*Teref;  
   );
   Ohm(
     xiverge_emfield=1e-2; {residual convergence threshold for the potential equation}
     sigmaref=3e-6; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
-    Uref_emfield[0]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
+    Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
   SteadyState(
     if (mod(iter,50)==0,

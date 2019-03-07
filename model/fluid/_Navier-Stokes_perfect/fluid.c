@@ -50,16 +50,16 @@ void write_cycle_fluid_template(FILE **controlfile){
     "    xiverge=1e-3;          {residual convergence threshold}\n"
     "    rhoref=1.0;            {reference density in kg/m3}\n"
     "    aref=300.0;            {reference sound speed in m/s}\n" 
-    "    Uref[0]=rhoref;            \n"
-    "    Uref[1]=rhoref*aref;       \n"
+    "    Uref[1]=rhoref;            \n"
+    "    Uref[2]=rhoref*aref;       \n"
   ,_FLUID_ACTIONNAME);
   for (dim=1; dim<nd; dim++){
     wfprintf(*controlfile,
-    "    Uref[%d]=rhoref*aref;   \n",dim+1);
+    "    Uref[%d]=rhoref*aref;   \n",dim+2);
   }
   wfprintf(*controlfile,
     "    Uref[%d]=rhoref*aref*aref;  \n"
-    "  );\n",nd+1);
+    "  );\n",nd+2);
   
 }
 
@@ -240,7 +240,7 @@ void read_cycle_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
     find_double_var_from_codex(codex,"xiverge",&gl->cycle.fluid.xiverge);
 
     for (flux=0; flux<nf; flux++){
-      sprintf(tmpstr,"Uref[%ld]",flux);
+      sprintf(tmpstr,"Uref[%ld]",flux+1);
       find_double_var_from_codex(codex,tmpstr,&gl->cycle.fluid.Uref[flux]);   
     }
 

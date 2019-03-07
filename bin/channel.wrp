@@ -160,14 +160,14 @@ Cycle(
     psiref=1e8;  {reference specific dissipation rate of the TKE in 1/s if TURBMODEL=TURBMODEL_KOMEGA*
                   reference dissipation rate of the TKE in m2/s3 if TURBMODEL=TURBMODEL_KEPSILON}
     aref=sqrt(1.4*287*Tref);  {reference sound speed in m/s}
-    Uref[0]=rhoref;   
     Uref[1]=rhoref;   
-    Uref[2]=rhoref*aref;   
+    Uref[2]=rhoref;   
     Uref[3]=rhoref*aref;   
-    Uref[4]=rhoref*aref*aref;  
-    Uref[5]=rhoref*kref;  
-    Uref[6]=rhoref*psiref;  
-    Uref[7]=rhoref*700.0*Tvref;  
+    Uref[4]=rhoref*aref;   
+    Uref[5]=rhoref*aref*aref;  
+    Uref[6]=rhoref*kref;  
+    Uref[7]=rhoref*psiref;  
+    Uref[8]=rhoref*700.0*Tvref;  
   );
   MultizoneMarching(
     if (mod(iter,50)==0,

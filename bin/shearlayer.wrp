@@ -187,12 +187,12 @@ Cycle(
     kref=1e4;    {reference turbulence kinetic energy in m2/s2}
     psiref=1e8;  {reference specific dissipation rate of the TKE in 1/s if for TURBMODEL_KOMEGA*
                   reference dissipation rate of the TKE in m2/s3 for TURBMODEL_KEPSILON}
-    Uref[0]=rhoref;   
-    Uref[1]=rhoref*aref;   
+    Uref[1]=rhoref;   
     Uref[2]=rhoref*aref;   
-    Uref[3]=rhoref*aref*aref;  
-    Uref[4]=rhoref*kref;  
-    Uref[5]=rhoref*psiref;  
+    Uref[3]=rhoref*aref;   
+    Uref[4]=rhoref*aref*aref;  
+    Uref[5]=rhoref*kref;  
+    Uref[6]=rhoref*psiref;  
   );
   MultizoneSteady(
     if (mod(iter,50)==0,

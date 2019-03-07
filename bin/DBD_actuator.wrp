@@ -354,10 +354,32 @@ Disc(
     INTERPOL=INTERPOL_AOWENO5;
     EIGENVALCOND=EIGENVALCOND_GNOFFO;
   );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.95;
+    INTERPOL=INTERPOL_AOWENO5;
+    FACEINTEG=FACEINTEG_CENTRAL1;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+    POSFILTER=POSFILTER_PARENT;
+    POSFILTER_numiter=4;
+  );
   CDFplus(
-    xi1=0.5; {should be set to 0.5 or less when used with 2nd order or higher convective fluxes}
-    xi2=xi1;
-    xi3=xi1;
+    xi[1]=0.5;
+    xi[2]=0.5;
+    xi[3]=0.5;
+    xi[4]=0.5;
+    xi[5]=0.5;
+    xi[6]=0.5;
+    xi[7]=0.5;
+    xi[8]=0.5;
+    xi[9]=0.5;
+    xi[10]=0.5;
+    xi[11]=0.5;
+    xi[12]=0.25;
+    xi[13]=0.25;
   );
 );
 
@@ -378,24 +400,24 @@ Cycle(
     Tvref=5000.0;         {reference vibrational temperature in K}
     aref=sqrt(1.4*287*Tref);  {reference sound speed in m/s}
     wion=1e-7;            {average ion mass fraction}
-    Uref[0]=wion*1.8e-5*rhoref;   
-    Uref[1]=wion*rhoref;   
+    Uref[1]=wion*1.8e-5*rhoref;   
     Uref[2]=wion*rhoref;   
     Uref[3]=wion*rhoref;   
-    Uref[4]=rhoref;   
+    Uref[4]=wion*rhoref;   
     Uref[5]=rhoref;   
     Uref[6]=rhoref;   
     Uref[7]=rhoref;   
-    Uref[8]=rhoref*aref;   
+    Uref[8]=rhoref;   
     Uref[9]=rhoref*aref;   
-    Uref[10]=rhoref*aref*aref;  
-    Uref[11]=rhoref*700.0*Tvref;  
-    Uref[12]=rhoref*wion*414*Teref;  
+    Uref[10]=rhoref*aref;   
+    Uref[11]=rhoref*aref*aref;  
+    Uref[12]=rhoref*700.0*Tvref;  
+    Uref[13]=rhoref*wion*414*Teref;  
   );
   Ohm(
     xiverge_emfield=1e2; {residual convergence threshold for the potential equation}
     sigmaref=0.0000001; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
-    Uref_emfield[0]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
+    Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
 
   DualTimeStepping(
@@ -484,7 +506,7 @@ Cycle(
         relaxEMF=1.0;
         Lc=10000;  
         UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,1000);
-        UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,50);
+        {UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,50);}
      ,{ else}
         relaxEMF=1.0;
         Lc=10000;  

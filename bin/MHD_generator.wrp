@@ -305,28 +305,28 @@ Cycle(
     wion=1e-4; {average ion mass fraction}
     
     Teref=5000.0;
-    Uref[0]=wion*1.8e-5*rhoref*1e99;   
-    Uref[1]=wion*rhoref*1e99;   
+    Uref[1]=wion*1.8e-5*rhoref*1e99;   
     Uref[2]=wion*rhoref*1e99;   
     Uref[3]=wion*rhoref*1e99;   
-    Uref[4]=rhoref;   
+    Uref[4]=wion*rhoref*1e99;   
     Uref[5]=rhoref;   
     Uref[6]=rhoref;   
     Uref[7]=rhoref;   
-    Uref[8]=rhoref*aref*1e99;   
+    Uref[8]=rhoref;   
     Uref[9]=rhoref*aref*1e99;   
-    Uref[10]=rhoref*aref*aref;  
-    Uref[11]=rhoref*kref*1e99;  
-    Uref[12]=rhoref*psiref*1e99;  
-    Uref[13]=rhoref*700.0*Tvref*1e99;  
-    Uref[14]=rhoref*wion*414*Teref*1e99;  
+    Uref[10]=rhoref*aref*1e99;   
+    Uref[11]=rhoref*aref*aref;  
+    Uref[12]=rhoref*kref*1e99;  
+    Uref[13]=rhoref*psiref*1e99;  
+    Uref[14]=rhoref*700.0*Tvref*1e99;  
+    Uref[15]=rhoref*wion*414*Teref*1e99;  
   );
   OhmGeneralized(
     xiverge_emfield=1e-2; {residual convergence threshold for the potential equation}
     relaxEk=0.5; {relaxation factor for E in species frame}
     relaxphi_bdry=1.0; {relaxation factor for phi at the dielectric boundaries}
     sigmaref=0.001; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
-    Uref_emfield[0]=dphi; {reference value for the electric field potential in Volts -> used to determine xi}
+    Uref_emfield[1]=dphi; {reference value for the electric field potential in Volts -> used to determine xi}
   );
 
   DualTimeStepping(

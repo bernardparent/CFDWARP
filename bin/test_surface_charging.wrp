@@ -203,15 +203,15 @@ Cycle(
     aref=300.0;           {reference speed of sound in m/s when determining the pseudotime step  }
     Nref=1e18;            {reference number density in 1/m3}
     Teref=5000;           {reference electron temperature in K}
-    Uref[0]=Nref;   
     Uref[1]=Nref;   
-    Uref[2]=Nref*1e99;   
-    Uref[3]=Teref*1e99;   
+    Uref[2]=Nref;   
+    Uref[3]=Nref*1e99;   
+    Uref[4]=Teref*1e99;   
   );
   Ohm(
     xiverge_emfield=1e0; {residual convergence threshold for the potential equation}
     sigmaref=3e-10; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
-    Uref_emfield[0]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
+    Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
    DualTimeStepping(
     dt=tmax/(60*mf*numcycle);  {physical time step in seconds}

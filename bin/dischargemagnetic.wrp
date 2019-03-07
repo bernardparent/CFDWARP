@@ -188,10 +188,10 @@ Cycle(
     relaxNe_bdry=0.7;    {the electron density relaxation factor at the boundary }
     relaxTe=0.5;    {the electron temperature relaxation factor }
     aref=300.0;    {reference speed of sound when determining the pseudotime step  }
-    Uref[0]=N_eminus;   
-    Uref[1]=N_N2plus;
-    Uref[2]=N_N2*1e99;
-    Uref[3]=Te_init*1e99;
+    Uref[1]=N_eminus;   
+    Uref[2]=N_N2plus;
+    Uref[3]=N_N2*1e99;
+    Uref[4]=Te_init*1e99;
     {[e-  O2-  O2+  N2+  O2  N2  O  N  ]}
   );
   OhmGeneralized(
@@ -199,7 +199,7 @@ Cycle(
     relaxphi_bdry=1.0; {relaxation factor for phi at the dielectric boundaries}
     relaxEk=0.7;
     sigmaref=0.003; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
-    Uref_emfield[0]=dphi+10.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
+    Uref_emfield[1]=dphi+10.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
    DualTimeStepping(
     dt=tmax/(50*meshfact);  {physical time step in seconds}

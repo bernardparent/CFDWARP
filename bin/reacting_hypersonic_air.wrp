@@ -219,6 +219,18 @@ Disc(
     ACCURACY=ACCURACY_SECONDORDER;
     EIGENVALCOND=EIGENVALCOND_GNOFFO;
   );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_AOWENO7;
+    FACEINTEG=FACEINTEG_CENTRAL1;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+    POSFILTER=POSFILTER_PARENT;
+    POSFILTER_numiter=4;
+  );
   MUSCLplus(
     FLUX=FLUX_FDSplus;
     AVERAGING=AVERAGING_ARITH;
@@ -230,9 +242,15 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_PASCAL;
   );
   CDFplus(
-    xi1=0.5;
-    xi2=0.5;
-    xi3=0.5;
+    xi[1]=0.5;
+    xi[2]=0.5;
+    xi[3]=0.5;
+    xi[4]=0.5;
+    xi[5]=0.5;
+    xi[6]=0.5;
+    xi[7]=0.5;
+    xi[8]=0.25;
+    xi[9]=0.25;
   );
 );
 
@@ -246,15 +264,15 @@ Cycle(
     kref=1e4;  {reference turbulence kinetic energy in m2/s2}
     psiref=1e8;  {reference specific dissipation rate of the TKE in 1/s if TURBMODEL=TURBMODEL_KOMEGA*
                   reference dissipation rate of the TKE in m2/s3 if TURBMODEL=TURBMODEL_KEPSILON}
-    Uref[0]=rhoref;   
     Uref[1]=rhoref;   
     Uref[2]=rhoref;   
     Uref[3]=rhoref;   
-    Uref[4]=rhoref*aref;   
+    Uref[4]=rhoref;   
     Uref[5]=rhoref*aref;   
-    Uref[6]=rhoref*aref*aref;  
-    Uref[7]=rhoref*kref;  
-    Uref[8]=rhoref*psiref;  
+    Uref[6]=rhoref*aref;   
+    Uref[7]=rhoref*aref*aref;  
+    Uref[8]=rhoref*kref;  
+    Uref[9]=rhoref*psiref;  
   );
    Multizone(
     tmax=1e-4;   {simulation time span in seconds}
@@ -270,12 +288,12 @@ Cycle(
       );
       PRECONDITIONER=PRECON_LOCALTIMESTEP;
     ,{else}
-      PRECONDITIONER=PRECON_LOCALEIGENVALUE2;
+      PRECONDITIONER=PRECON_LOCALEIGENVALUE;
     );
     if (time==0,
       CFL=min(1.5,CFL*1.2);
     ,
-      CFL=max(0.8,CFL/1.03);
+      CFL=max(0.4,CFL/1.03);
     );
     phi1=20;     {maximum number of gridlines per zone in each dimension}
     UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,phi1,dt);
