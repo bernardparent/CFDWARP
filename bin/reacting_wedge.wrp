@@ -216,17 +216,17 @@ Post(
   for (cnt,1,3,
     SetPostDomainToXstation(xstation[cnt]);
     printf("    Processing x-station..");
-    Pback=_Pback_xstation({Aback,m2/m}1.0, {Pback_min,Pa}400, {Pback_max,Pa}4000, {numsteps}300,
+    Pback=XSTATION_Pback({Aback,m2/m}1.0, {Pback_min,Pa}400, {Pback_max,Pa}4000, {numsteps}300,
                  {q_min,m (as small a positive value as possible)}1.0);
-    Fpot=_Fpot_xstation(Pback,{numsteps}300, {q_min,m}1.0);
-    mdot=_mdot_xstation();
-    Tstag=_Tstag_xstation();
-    Pstag=_Pstag_xstation({numsteps} 300);
-    Pstar=_Pstar_xstation();
-    T=_T_xstation();
-    q=_q_xstation();
-    rho=_rho_xstation();
-    htstar=_htstar_xstation();
+    Fpot=XSTATION_Fpot(Pback,{numsteps}300, {q_min,m}1.0);
+    mdot=XSTATION_mdot();
+    Tstag=XSTATION_Tstag();
+    Pstag=XSTATION_Pstag({numsteps} 300);
+    Pstar=XSTATION_Pstar();
+    T=XSTATION_T();
+    q=XSTATION_q();
+    rho=XSTATION_rho();
+    htstar=XSTATION_htstar();
     printf("\n"
            "    x      = %E m\n"
            "    Pback  = %E Pa\n"

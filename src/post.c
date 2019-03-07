@@ -1499,17 +1499,17 @@ void write_post_template(FILE **controlfile){
   "  Pback_max=40000; {Pa}\n"
   "  Aback=1.0; {m2"if2D("/m")"}\n"
   "  for (cnt,1,3,\n"
-  "    SetXstation(xstation[cnt]);\n"
-  "    Pback=_Pback_xstation(Aback, Pback_min, Pback_max, numsteps, qmin);\n"
-  "    Fpot=_Fpot_xstation(Pback, numsteps, qmin);\n"
-  "    mdot=_mdot_xstation();\n"
-  "    Tstag=_Tstag_xstation();\n"
-  "    Pstag=_Pstag_xstation(numsteps);\n"
-  "    Pstar=_Pstar_xstation();\n"
-  "    T=_T_xstation();\n"
-  "    q=_q_xstation();\n"
-  "    rho=_rho_xstation();\n"
-  "    htstar=_htstar_xstation();\n"
+  "    XSTATION_Set(xstation[cnt]);\n"
+  "    Pback=XSTATION_Pback(Aback, Pback_min, Pback_max, numsteps, qmin);\n"
+  "    Fpot=XSTATION_Fpot(Pback, numsteps, qmin);\n"
+  "    mdot=XSTATION_mdot();\n"
+  "    Tstag=XSTATION_Tstag();\n"
+  "    Pstag=XSTATION_Pstag(numsteps);\n"
+  "    Pstar=XSTATION_Pstar();\n"
+  "    T=XSTATION_T();\n"
+  "    q=XSTATION_q();\n"
+  "    rho=XSTATION_rho();\n"
+  "    htstar=XSTATION_htstar();\n"
   "    printf(\"x      = %%E m\\n\"\n"
   "           \"Pback  = %%E Pa\\n\"\n"
   "           \"Fpot   = %%E Ns/kg\\n\"\n"
@@ -1662,7 +1662,7 @@ static void verify_post_domain_is_single_x_plane(np_t *np, gl_t gl, zone_t zone,
 
 
 
-static double _mdot_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *codex 
+static double XSTATION_mdot (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *codex 
                     ){
   double mdot;
   long k,j,l;
@@ -1678,7 +1678,7 @@ static double _mdot_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *code
 #ifdef DISTMPI
   if (rank==0) {
 #endif
-    verify_post_domain_is_single_x_plane(np,gl,zone,codex,"_mdot_xstation");
+    verify_post_domain_is_single_x_plane(np,gl,zone,codex,"XSTATION_mdot");
     mdot=0.0;
     for3DL(k,zone.ks,zone.ke)
       for2DL(j,zone.js,zone.je)
@@ -1700,7 +1700,7 @@ static double _mdot_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *code
 
 
 /* expand the flow to the engine back pressure */
-static double _Fpot_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *codex, 
+static double XSTATION_Fpot (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *codex, 
                               long numsteps, double q_min, double Pback ){
   double qc,rhoc,ThrustPotential;
   long k,j,l,i;
@@ -1717,7 +1717,7 @@ static double _Fpot_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *code
   if (rank==0) {
 #endif
     i=zone.is;
-    verify_post_domain_is_single_x_plane(np,gl,zone,codex,"_Fpot_xstation");
+    verify_post_domain_is_single_x_plane(np,gl,zone,codex,"XSTATION_Fpot");
     ThrustPotential=0.0;
     for3DL(k,zone.ks,zone.ke)
       for2DL(j,zone.js,zone.je)
@@ -1733,7 +1733,7 @@ static double _Fpot_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *code
   }
   MPI_Bcast(&ThrustPotential,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
 #endif
-  ThrustPotential/=_mdot_xstation(np, gl, zone, codex);
+  ThrustPotential/=XSTATION_mdot(np, gl, zone, codex);
   return(ThrustPotential);
 }
 
@@ -1771,7 +1771,7 @@ static double _Fx_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *codex)
   }
   MPI_Bcast(&Fx,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
 #endif
-  Fx/=_mdot_xstation(np, gl, zone, codex);
+  Fx/=XSTATION_mdot(np, gl, zone, codex);
   return(Fx);
 }
 
@@ -1780,7 +1780,7 @@ static double _Fx_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *codex)
 
 
 /* find iteratively the engine back pressure */
-static double _Pback_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *codex,
+static double XSTATION_Pback (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *codex,
                                double Aback, long numsteps, double q_min,
                                double Pback_min, double Pback_max){
   double Pback;
@@ -1800,7 +1800,7 @@ static double _Pback_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *cod
   if (rank==0) {
 #endif
     i=zone.is;
-    verify_post_domain_is_single_x_plane(np,gl,zone,codex,"_Pback_xstation");
+    verify_post_domain_is_single_x_plane(np,gl,zone,codex,"XSTATION_Pback");
     argfP.i=i;
     argfP.Aback=Aback;
     argfP.np=np;
@@ -1867,7 +1867,7 @@ static double _mdotreacting_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_codex
 
 
 
-static double _Pstag_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *codex,
+static double XSTATION_Pstag (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *codex,
                                long numsteps){
   double Pstagave;
   long k,j,l;
@@ -1884,7 +1884,7 @@ static double _Pstag_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *cod
   if (rank==0) {
 #endif
 
-    verify_post_domain_is_single_x_plane(np,gl,zone,codex,"_Pstag_xstation");
+    verify_post_domain_is_single_x_plane(np,gl,zone,codex,"XSTATION_Pstag");
     Pstagave=0.0;
     for3DL(k,zone.ks,zone.ke)
       for2DL(j,zone.js,zone.je)
@@ -1898,7 +1898,7 @@ static double _Pstag_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *cod
   }
   MPI_Bcast(&Pstagave,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
 #endif
-  Pstagave/=_mdot_xstation(np,gl,zone,codex);
+  Pstagave/=XSTATION_mdot(np,gl,zone,codex);
   return(Pstagave);
 }
 
@@ -1932,7 +1932,7 @@ static double _massavgproperty_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_co
   }
   MPI_Bcast(&Qave,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
 #endif
-  Qave/=_mdot_xstation(np,gl,zone,codex);
+  Qave/=XSTATION_mdot(np,gl,zone,codex);
 
   return(Qave);
 }
@@ -1986,30 +1986,30 @@ static void read_post_functions(char *functionname, char **argum,
 
   read_control_functions(functionname, argum, returnstr, codex);
 
-  if (strcmp(functionname,"_Pback_xstation")==0) {
-    if (SOAP_number_argums(*argum)!=5) SOAP_fatal_error(codex,"Wrong number of arguments to _Pback_xstation.");
+  if (strcmp(functionname,"XSTATION_Pback")==0) {
+    if (SOAP_number_argums(*argum)!=5) SOAP_fatal_error(codex,"Wrong number of arguments to XSTATION_Pback.");
     SOAP_substitute_all_argums(argum,codex);
     if (sscanf(*argum, "%lg,%lg,%lg,%ld,%lg%n",&Aback,&Pback_min,&Pback_max,&numsteps,&q_min,&eos)!=5 || (*argum)[eos]!=EOS){
-      SOAP_fatal_error(codex,"Problem reading arguments given to function _Pback_xstation.");
+      SOAP_fatal_error(codex,"Problem reading arguments given to function XSTATION_Pback.");
     }
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
-    sprintf(*returnstr,"%E",_Pback_xstation (np, gl, *domain_post, codex, Aback, numsteps, q_min, Pback_min, Pback_max));
+    sprintf(*returnstr,"%E",XSTATION_Pback (np, gl, *domain_post, codex, Aback, numsteps, q_min, Pback_min, Pback_max));
   }
 
-  if (strcmp(functionname,"_Fpot_xstation")==0) {
-    if (SOAP_number_argums(*argum)!=3) SOAP_fatal_error(codex,"Wrong number of arguments to _Fpot_xstation.");
+  if (strcmp(functionname,"XSTATION_Fpot")==0) {
+    if (SOAP_number_argums(*argum)!=3) SOAP_fatal_error(codex,"Wrong number of arguments to XSTATION_Fpot.");
     SOAP_substitute_all_argums(argum,codex);
     if (sscanf(*argum, "%lg,%ld,%lg%n",&Pback,&numsteps,&q_min,&eos)!=3 || (*argum)[eos]!=EOS){
-      SOAP_fatal_error(codex,"Problem reading arguments given to function _Fpot_xstation.");
+      SOAP_fatal_error(codex,"Problem reading arguments given to function XSTATION_Fpot.");
     }
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
-    sprintf(*returnstr,"%E",_Fpot_xstation (np, gl, *domain_post, codex,
+    sprintf(*returnstr,"%E",XSTATION_Fpot (np, gl, *domain_post, codex,
             numsteps, q_min, Pback));
   }
 
-  if (strcmp(functionname,"_mdot_xstation")==0) {
+  if (strcmp(functionname,"XSTATION_mdot")==0) {
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
-    sprintf(*returnstr,"%E",_mdot_xstation (np, gl, *domain_post, codex ));
+    sprintf(*returnstr,"%E",XSTATION_mdot (np, gl, *domain_post, codex ));
   }
 
   if (strcmp(functionname,"_Fx_xstation")==0) {
@@ -2027,50 +2027,50 @@ static void read_post_functions(char *functionname, char **argum,
     sprintf(*returnstr,"%E",_mdotreacting_xstation (np, gl, *domain_post, codex, rank1, wstoichio1, rank2, wstoichio2));
   }
 
-  if (strcmp(functionname,"_Pstag_xstation")==0) {
-    if (SOAP_number_argums(*argum)!=1) SOAP_fatal_error(codex,"Wrong number of arguments to _Pstag_xstation.");
+  if (strcmp(functionname,"XSTATION_Pstag")==0) {
+    if (SOAP_number_argums(*argum)!=1) SOAP_fatal_error(codex,"Wrong number of arguments to XSTATION_Pstag.");
     SOAP_substitute_all_argums(argum,codex);
     if (sscanf(*argum, "%ld%n",&numsteps,&eos)!=1 || (*argum)[eos]!=EOS){
-      SOAP_fatal_error(codex,"Problem reading argument given to _Pstag_xstation().");
+      SOAP_fatal_error(codex,"Problem reading argument given to XSTATION_Pstag().");
     }
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
-    sprintf(*returnstr,"%E",_Pstag_xstation (np, gl, *domain_post, codex,  numsteps));
+    sprintf(*returnstr,"%E",XSTATION_Pstag (np, gl, *domain_post, codex,  numsteps));
   }
 
-  if (strcmp(functionname,"_Tstag_xstation")==0) {
+  if (strcmp(functionname,"XSTATION_Tstag")==0) {
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
     sprintf(*returnstr,"%E",_massavgproperty_xstation(np, gl, *domain_post, codex, &(_Tstag),
-               "_Tstag_xstation"));
+               "XSTATION_Tstag"));
   }
 
-  if (strcmp(functionname,"_Pstar_xstation")==0) {
+  if (strcmp(functionname,"XSTATION_Pstar")==0) {
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
     sprintf(*returnstr,"%E",_massavgproperty_xstation(np, gl, *domain_post, codex, &(_Pstar),
-               "_Pstar_xstation"));
+               "XSTATION_Pstar"));
   }
 
-  if (strcmp(functionname,"_T_xstation")==0) {
+  if (strcmp(functionname,"XSTATION_T")==0) {
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
     sprintf(*returnstr,"%E",_massavgproperty_xstation(np, gl, *domain_post, codex, &(_T),
-               "_T_xstation"));
+               "XSTATION_T"));
   }
 
-  if (strcmp(functionname,"_rho_xstation")==0) {
+  if (strcmp(functionname,"XSTATION_rho")==0) {
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
     sprintf(*returnstr,"%E",_massavgproperty_xstation(np, gl, *domain_post, codex, &(_rho_post),
-               "_rho_xstation"));
+               "XSTATION_rho"));
   }
 
-  if (strcmp(functionname,"_htstar_xstation")==0) {
+  if (strcmp(functionname,"XSTATION_htstar")==0) {
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
     sprintf(*returnstr,"%E",_massavgproperty_xstation(np, gl, *domain_post, codex, &(_htstar),
-               "_htstar_xstation"));
+               "XSTATION_htstar"));
   }
 
-  if (strcmp(functionname,"_q_xstation")==0) {
+  if (strcmp(functionname,"XSTATION_q")==0) {
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
     sprintf(*returnstr,"%E",_massavgproperty_xstation(np, gl, *domain_post, codex, &(_q),
-               "_q_xstation"));
+               "XSTATION_q"));
   }
 
 
@@ -2216,7 +2216,7 @@ static void read_post_actions(char *action, char **argum, SOAP_codex_t *codex){
   filename=(char *)malloc(sizeof(char));
   postprocessor=(char *)malloc(sizeof(char));
 
-  if (strcmp(action,"SetXstation")==0) {
+  if (strcmp(action,"XSTATION_Set")==0) {
 #ifdef DISTMPI
     MPI_Barrier(MPI_COMM_WORLD);
 #endif

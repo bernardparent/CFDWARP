@@ -74,12 +74,12 @@ openmptest.sh                tests OPENMP threads (used in conjunction with
 renamebatch.sh               renames a batch of files that share the same prefix or 
                              suffix (with a number in between) [USE WITH CARE] 
 
-search.sh                    a script that lists the files (recursively in all 
-                             subdirectories) that contain a certain string  
-
-substr.sh                    substitutes a string by another string 
+replace.sh                   replaces a string by another string 
                              in all files with a specified extension recursively 
                              using either perl or rpl [USE WITH CARE]
+
+search.sh                    a script that lists the files (recursively in all 
+                             subdirectories) that contain a certain string  
 
 tarwarp.sh                   creates a tarball of the warp directory
             

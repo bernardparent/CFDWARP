@@ -7,6 +7,27 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 07b
+  * renamed
+    - SetXstation to XSTATION_Set
+    - _Pback_xstation to XSTATION_Pback
+    - _Fpot_xstation to XSTATION_Fpot
+    - _mdot_xstation to XSTATION_mdot
+    - _Pstag_xstation to XSTATION_Pstag
+    - _Tstag_xstation to XSTATION_Tstag
+    - _Pstar_xstation to XSTATION_Pstar
+    - _Pstar_xstation to XSTATION_Pstar
+    - _T_xstation to XSTATION_T
+    - _q_xstation to XSTATION_q
+    - _rho_xstation to XSTATION_rho
+    - _htstar_xstation to XSTATION_htstar
+  * in tools
+    - moved substr.sh to replace.sh
+  * in tools/replace.sh
+    - changed the flag -sub for -replace
+    - renamed stringsub to stringreplace
+
+
 2019 MAR 07a
   * in model/emfield/_*/emfield.c
     - in write_cycle_emfield_template(), rewrote Uref_emfield[0] to Uref_emfield[1]

@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Description: Substitutes a string in certain files (.tex, Makefiles, .c) in all directories recursively 
+# Description: Finds and replaces a string in certain files (.tex, Makefiles, .c) in all directories recursively 
 # Author: Bernard Parent
 # Date: July 2018
 
 stringfind="";
-stringsub="";
+stringreplace="";
 mode="rpl";
 filename="";
 dryrun="";
@@ -19,7 +19,7 @@ do
     -filename) filename="$2";  shift;;
     -mode) mode="$2";  shift;;
     -find) stringfind="$2"; shift;;
-    -sub) stringsub="$2"; shift;;
+    -replace) stringreplace="$2"; shift;;
     -git) nogit="";;
     -w) strtype="word";;
     -dryrun) dryrun="TEST";;
@@ -48,8 +48,8 @@ if [ -z "$stringfind" ]; then
   argerror="1"; 
 fi
 
-if [ -z "$stringsub" ]; then 
-  echo "-sub flag not found."
+if [ -z "$stringreplace" ]; then 
+  echo "-replace flag not found."
   argerror="1"; 
 fi
 
@@ -59,8 +59,8 @@ if [ -n "$argerror" ]; then
 FLAG           ARGUMENT                                      Required?
 ------------------------------------------------------------------------
 -filename      '*.c' or '*Makefile' or '*.wrp' or '.config'  Y 
--find          string that should be found                   Y
--sub           string that will replace what was found       Y
+-find          string that will be replaced                  Y
+-replace       string that will replace what was found       Y
 -mode          rpl or perl (default is rpl)                  N
 -git           No argument. If set, will include files       N
                within .git directories.
@@ -73,10 +73,10 @@ FLAG           ARGUMENT                                      Required?
 
 EXAMPLES
 
-$0 -find 'John' -sub 'Mikey' -filename '*.txt' 
+$0 -find 'John' -replace 'Mikey' -filename '*.txt' 
 will search within all *.txt files recursively for the string John and replace it by Mikey using rpl.
 
-$0 -git -w -find 'John' -sub 'Mikey' -filename '*Makefile' -mode perl 
+$0 -git -w -find 'John' -replace 'Mikey' -filename '*Makefile' -mode perl 
 will search within all Makefiles recursively for the word John and replace it by Mikey using perl.
 
 
@@ -104,27 +104,27 @@ else
 fi
 
 stringfind_orig=$stringfind
-stringsub_orig=$stringsub
+stringreplace_orig=$stringreplace
 
 if [[ "$mode" = "perl" ]]; then
   #escape the \
   stringfind=${stringfind//\\/\\\\}
-  stringsub=${stringsub//\\/\\\\}
+  stringreplace=${stringreplace//\\/\\\\}
   #escape the $ 
   stringfind=${stringfind//$/\\$}
-  stringsub=${stringsub//$/\\$}
+  stringreplace=${stringreplace//$/\\$}
   #escape the / 
   stringfind=${stringfind//\//\\\/}
-  stringsub=${stringsub//\//\\\/}
+  stringreplace=${stringreplace//\//\\\/}
 fi
 
 
 if [ -n "$dryrun" ]; then
   
   echo 'Only the above listed files will be subject to the find & replace.'
-  echo 'Will search for '$stringfind_orig' and replace with '$stringsub_orig
+  echo 'Will search for '$stringfind_orig' and replace with '$stringreplace_orig
   echo $stringfind_orig' is escaped as '$stringfind
-  echo $stringsub_orig' is escaped as '$stringsub
+  echo $stringreplace_orig' is escaped as '$stringreplace
   exit 1
 fi
 
@@ -133,13 +133,13 @@ case "$mode" in
     case "$strtype" in
       any)
         echo "Within files named $filename, replacing string.."
-        perl -i.substrperlold -pe 's/'"$stringfind"'/'"$stringsub"'/g;' \
+        perl -i.substrperlold -pe 's/'"$stringfind"'/'"$stringreplace"'/g;' \
            `find . $nogit -type f -name "$filename" -print` 
         rm -f `find . $nogit -type f -name '*.substrperlold' -print`
       ;;
       word)
         echo "Within files named $filename, replacing word.."
-        perl -i.substrperlold -pe 's/\b'"$stringfind"'\b/'"$stringsub"'/g;' \
+        perl -i.substrperlold -pe 's/\b'"$stringfind"'\b/'"$stringreplace"'/g;' \
            `find . $nogit -type f -name "$filename" -print` 
         rm -f `find . $nogit -type f -name '*.substrperlold' -print`
       ;;
@@ -152,12 +152,12 @@ case "$mode" in
     case "$strtype" in
       any)
         echo "Within files named $filename,"
-        rpl -b "$stringfind" "$stringsub" \
+        rpl -b "$stringfind" "$stringreplace" \
           `find . $nogit -type f -name "$filename" -print`
       ;;
       word)
         echo "Within files named $filename,"
-        rpl -w -b "$stringfind" "$stringsub" \
+        rpl -w -b "$stringfind" "$stringreplace" \
           `find . $nogit -type f -name "$filename" -print`
       ;;
       *) 
