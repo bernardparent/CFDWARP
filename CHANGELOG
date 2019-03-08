@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 08b
+  * in bin
+    - modified carbuncle.wrp and ns_SDBD.wrp
+
+
 2019 MAR 08a
   * in cycle/resconv/_MUSCL+/resconv.c
     - removed FLUX_FDSplusFilterMultiD in read_disc_resconv_actions(), find_Fstar_interface() 
