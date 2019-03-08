@@ -433,38 +433,6 @@ void test_LUstar ( np_t * np, gl_t * gl, long lL, long lR, long theta ) {
 }
 
 
-void test_MUstar ( np_t * np, gl_t * gl, long lL, long lR, long theta ) {
-  sqmat_t M;
-  flux_t Ustar, MtimesUstar, MUstar;
-  metrics_t metrics;
-  jacvars_t jacvarsL, jacvarsR, jacvars;
-  long flux;
-
-  printf ( "\n" );
-  printf ( "M*Ustar should be equal to the MUstar vector.\n" );
-  printf ( "The terms are determined at the interface between node " );
-  printf_ijk_position_of_node_l ( gl, lL );
-  printf ( " and node " );
-  printf_ijk_position_of_node_l ( gl, lR );
-  printf ( ".\n\n" );
-
-  find_metrics_at_interface ( np, gl, lL, lR, theta, &metrics );
-  find_jacvars ( np[lL], gl, metrics, theta, &jacvarsL );
-  find_jacvars ( np[lR], gl, metrics, theta, &jacvarsR );
-  find_jacvars_at_interface_from_jacvars ( jacvarsL, jacvarsR, gl, theta, metrics, AVERAGING_ROE, &jacvars );
-
-  find_M_from_jacvars ( jacvars, metrics, M );
-  find_Ustar_from_jacvars ( jacvars, metrics, Ustar );
-  multiply_matrix_and_vector ( M, Ustar, MtimesUstar );
-  find_MUstar_from_jacvars ( jacvars, metrics, MUstar );
-
-  for ( flux = 0; flux < nf; flux++ ) {
-    printf ( "M_times_Ustar[%ld]=%+14.7E    MUstar[%ld]=%+14.7E\n", flux, MtimesUstar[flux], flux,
-             MUstar[flux] );
-
-  }
-}
-
 
 void test_Linv ( np_t * np, gl_t * gl, long lL, long lR, long theta ) {
   sqmat_t R, A, lambdak, Z1, Z2;
@@ -494,43 +462,6 @@ void test_Linv ( np_t * np, gl_t * gl, long lL, long lR, long theta ) {
   display_matrix ( Z1 );
   printf ( "A * Linv \n" );
   display_matrix ( Z2 );
-}
-
-
-void test_Minv ( np_t * np, gl_t * gl, long lL, long lR, long theta ) {
-  sqmat_t Minv, M, Lambda, Z1, Z2;
-  metrics_t metrics;
-  jacvars_t jacvarsL, jacvarsR, jacvars;
-  flux_t Fstar1,Fstar2,Ustar;
-  long flux;
-
-  printf ( "\n" );
-  printf ( "Minv*Lambda*M*Ustar should be equal to Fstar.\n" );
-  printf ( "The terms are determined at the interface between node " );
-  printf_ijk_position_of_node_l ( gl, lL );
-  printf ( " and node " );
-  printf_ijk_position_of_node_l ( gl, lR );
-  printf ( ".\n\n" );
-
-  find_metrics_at_interface ( np, gl, lL, lR, theta, &metrics );
-  find_jacvars ( np[lL], gl, metrics, theta, &jacvarsL );
-  find_jacvars ( np[lR], gl, metrics, theta, &jacvarsR );
-  find_jacvars_at_interface_from_jacvars ( jacvarsL, jacvarsR, gl, theta, metrics, AVERAGING_ROE, &jacvars );
-
-  find_Minv_from_jacvars ( jacvars, metrics, Minv );
-  find_Lambda_from_jacvars ( jacvars, metrics, Lambda );
-  find_M_from_jacvars ( jacvars, metrics, M );
-  find_Ustar_from_jacvars( jacvars,  metrics, Ustar );
-  
-
-  multiply_matrix_and_matrix ( Lambda, M, Z1 );
-  multiply_matrix_and_matrix ( Minv, Z1, Z2 );
-  multiply_matrix_and_vector ( Z2, Ustar, Fstar1 );
-  find_Fstar_from_jacvars(jacvars, metrics, Fstar2);
-
-  
-  for (flux=0; flux<nf; flux++) 
-    printf ( "(Minv*Lambda*M*Ustar)[%ld]=%12.12E  Fstar[%ld]=%12.12E\n",flux,Fstar1[flux],flux,Fstar2[flux]);
 }
 
 
@@ -567,47 +498,6 @@ void test_L ( np_t * np, gl_t * gl, long lL, long lR, long theta ) {
    printf("L Numerical (found from the Linv subroutine - inverted) \n");
    display_matrix(Lnum);
 */
-}
-
-
-void test_M ( np_t * np, gl_t * gl, long lL, long lR, long theta ) {
-  sqmat_t Minv, M, Mult, Mgauss;
-// sqmar_t Lnum;
-  jacvars_t jacvarsL, jacvarsR, jacvars;
-  metrics_t metrics;
-
-  printf ( "\n" );
-  printf ( "Minv*M should give the identity matrix.\n" );
-  printf ( "The terms are determined at the interface between node " );
-  printf_ijk_position_of_node_l ( gl, lL );
-  printf ( " and node " );
-  printf_ijk_position_of_node_l ( gl, lR );
-  printf ( ".\n\n" );
-
-  find_metrics_at_interface ( np, gl, lL, lR, theta, &metrics );
-  find_jacvars ( np[lL], gl, metrics, theta, &jacvarsL );
-  find_jacvars ( np[lR], gl, metrics, theta, &jacvarsR );
-  find_jacvars_at_interface_from_jacvars ( jacvarsL, jacvarsR, gl, theta, metrics, AVERAGING_ROE, &jacvars );
-
-  find_Minv_from_jacvars ( jacvars, metrics, Minv );
-  find_M_from_jacvars ( jacvars, metrics, M );
-  invert_matrix ( Minv, Mgauss );
-  multiply_matrix_and_matrix ( Minv, M, Mult );
-
-  printf ( "Minv*M Analytical \n" );
-  display_matrix ( Mult );
-
-
-
-  printf ( "\n" );
-  printf ( "\n" );
-  printf ( "M (analytical):\n" );
-
-  display_matrix ( M );
-  printf ( "M (from Minv using Gaussian elimination):\n" );
-  display_matrix ( Mgauss );
-
-
 }
 
 
@@ -977,12 +867,6 @@ int main ( int argc, char **argv ) {
         test_L ( npArray, &gl, lL, lR, theta );
       if ( strcmp ( "LUstar", argv[cnt] ) == 0 )
         test_LUstar ( npArray, &gl, lL, lR, theta );
-      if ( strcmp ( "M", argv[cnt] ) == 0 )
-        test_M ( npArray, &gl, lL, lR, theta );
-      if ( strcmp ( "Minv", argv[cnt] ) == 0 )
-        test_Minv ( npArray, &gl, lL, lR, theta );
-      if ( strcmp ( "MUstar", argv[cnt] ) == 0 )
-        test_MUstar ( npArray, &gl, lL, lR, theta );
       if ( strcmp ( "dUstardUprime", argv[cnt] ) == 0 )
         test_dUstar_dUprime ( npArray, lL, &gl );
       if ( strcmp ( "jacvars", argv[cnt] ) == 0 )
@@ -1063,15 +947,6 @@ int main ( int argc, char **argv ) {
                           lengthcol1, lengthcol2 );
       write_options_row ( stderr, "LUstar", "none", 
                           "characteristic variables  ./test -r test.wrp -node 10 10"if3D(" 10")" LUstar", linewidth,
-                          lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "M", "none", 
-                          "Left eigenvectors of B matrix  ./test -r test.wrp -node 10 10"if3D(" 10")" M", linewidth, lengthcol1,
-                          lengthcol2 );
-      write_options_row ( stderr, "Minv", "none", 
-                          "Right eigenvectors of B matrix  ./test -r test.wrp -node 10 10"if3D(" 10")" Minv", linewidth, lengthcol1,
-                          lengthcol2 );
-      write_options_row ( stderr, "MUstar", "none", 
-                          "characteristic variables of B matrix ./test -r test.wrp -node 10 10"if3D(" 10")" MUstar", linewidth,
                           lengthcol1, lengthcol2 );
       write_options_row ( stderr, "dUstardUprime", "none", 
                           "dUstar/dUprime Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" dUstardUprime", linewidth,

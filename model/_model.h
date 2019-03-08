@@ -134,15 +134,9 @@ void find_L_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t L);
 
 void find_LUstar_from_jacvars(jacvars_t jacvars,  metrics_t metrics, flux_t LUstar);
 
-void find_MUstar_from_jacvars(jacvars_t jacvars,  metrics_t metrics, flux_t MUstar);
-
 void find_Ustar_from_jacvars(jacvars_t jacvars,  metrics_t metrics, flux_t Ustar);
 
 void find_Lambda_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t lambda);
-
-void find_M_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t M);
-
-void find_Minv_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t Minv);
 
 void find_jacvars_at_interface_Roe_average(jacvars_t jacvarsL, jacvars_t jacvarsR, gl_t *gl, long theta, jacvars_t *jacvars);
 

@@ -565,15 +565,6 @@ void find_Linv_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
 }
 
 
-void find_M_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t M){
-  fatal_error("find_M_from_jacvars not yet implemented");  
-}
-
-void find_Minv_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t M){
-  fatal_error("find_M_from_jacvars not yet implemented");  
-}
-
-
 void find_Ustar_from_jacvars(jacvars_t jacvars,  metrics_t metrics, flux_t Ustar){
   long dim,flux,spec;
 
@@ -642,43 +633,6 @@ void find_LUstar_from_jacvars(jacvars_t jacvars,  metrics_t metrics, flux_t LUst
     multiply_matrix_and_vector(L,Ustar,LUstar);
   }
 }
-
-
-void find_MUstar_from_jacvars(jacvars_t jacvars,  metrics_t metrics, flux_t MUstar){
-  double a,a2,dPdrhoetstar,Pstar;
-  long spec,flux;
-
-#ifdef _2D
-  a=_a_from_jacvars(jacvars);
-  a2=sqr(a);
-  Pstar=jacvars.P+(2.0/3.0)*jacvars.rho*jacvars.k;
-  dPdrhoetstar=jacvars.dPdrhoetstar;
-  for (spec=0; spec<ns; spec++) MUstar[spec]=jacvars.w[spec]*Pstar*dPdrhoetstar/(2.0*a2);
-  MUstar[ns]=Pstar*dPdrhoetstar/(2.0*a2);
-  MUstar[ns+1]=(jacvars.rho*a2 - Pstar*dPdrhoetstar)/(2.0*a2);
-  MUstar[fluxet]=(jacvars.rho*a2 - Pstar*dPdrhoetstar)/(2.0*a2);
-  MUstar[fluxtke]=jacvars.k*Pstar*dPdrhoetstar/(2.0*a2*a2);
-  MUstar[fluxpsi]=jacvars.psi*Pstar*dPdrhoetstar/(2.0*a2*a2);
-#endif
-
-#ifdef _3D
-  a=_a_from_jacvars(jacvars);
-  a2=sqr(a);
-  Pstar=jacvars.P+(2.0/3.0)*jacvars.rho*jacvars.k;
-  dPdrhoetstar=jacvars.dPdrhoetstar;
-  for (spec=0; spec<ns; spec++) LUstar[spec]=jacvars.w[spec]*Pstar*dPdrhoetstar/3.0/a2;
-  MUstar[ns]=Pstar*dPdrhoetstar/(3.0*a2);
-  MUstar[ns+1]=Pstar*dPdrhoetstar/(3.0*a2);
-  MUstar[ns+2]=(jacvars.rho - (Pstar*dPdrhoetstar)/a2)/2.0;
-  MUstar[fluxet]=(jacvars.rho - (Pstar*dPdrhoetstar)/a2)/2.0;
-  MUstar[fluxtke]=jacvars.k*Pstar*dPdrhoetstar/(3.0*a2*a2);
-  MUstar[fluxpsi]=Pstar*dPdrhoetstar*jacvars.psi/(3.0*a2*a2);
-#endif 
-
-  for (flux=0; flux<nf; flux++) MUstar[flux]=MUstar[flux]*metrics.Omega;
-}
-
-
 
 
 void find_L_from_jacvars_eigenset1(jacvars_t jacvars, metrics_t metrics, sqmat_t L){

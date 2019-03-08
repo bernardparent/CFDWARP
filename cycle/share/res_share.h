@@ -111,8 +111,6 @@ void find_jacvars_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta,
 
 void find_jacvars_at_interface_from_jacvars(jacvars_t jacvarsL, jacvars_t jacvarsR, gl_t *gl, long theta, metrics_t metrics, int AVERAGING, jacvars_t *jacvars);
 
-void filter_Fstar_interface_positivity_preserving_MultiD(np_t *np, gl_t *gl, long lp0, long theta, metrics_t metrics, long numiter, int EIGENVALCOND, flux_t Fint, flux_t Fpositive, sqmat_t lambdaminus, sqmat_t lambdaplus);
-
 void filter_Fstar_interface_positivity_preserving(np_t *np, gl_t *gl, long lp0, long theta, metrics_t metrics, long numiter, int EIGENVALCOND, flux_t Fint, flux_t Fpositive, sqmat_t lambdaminus, sqmat_t lambdaplus);
 
 

@@ -7,6 +7,23 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 08a
+  * in cycle/resconv/_MUSCL+/resconv.c
+    - removed FLUX_FDSplusFilterMultiD in read_disc_resconv_actions(), find_Fstar_interface() 
+      (not used anymore; replaced by multidimensonal positivity-preserving eigenvalue conditioning)
+  * in cycle/share/res_share.c
+    - removed filter_Fstar_interface_positivity_preserving_MultiD()
+      (not used anymore; replaced by multidimensonal positivity-preserving eigenvalue conditioning)
+  * in model/fluid/_*/fluid_conv.c and model/fluid/_drift-diffusion/fluid.c
+    - deleted find_M_from_jacvars(), find_Minv_from_jacvars(), find_MUstar_from_jacvars()
+      (not used anymore; replaced by multidimensonal positivity-preserving eigenvalue conditioning)
+  * in model/share/fluid_share.c
+    - deleted condition_Lambda_plus_minus_Parent_old()
+    - deleted condition_Lambda_plus_minus_Parent_veryold()
+  * in src/test.c
+    - deleted test_MUstar(), test_Minv(), test_M()
+
+
 2019 MAR 07b
   * renamed
     - SetXstation to XSTATION_Set
