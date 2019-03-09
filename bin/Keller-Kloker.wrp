@@ -109,8 +109,8 @@ HEAT_xs=0.05*Lx;
 HEAT_xe=0.12*Lx;
 HEAT_ys=0.0;
 HEAT_ye=deltalam/4;
-HEAT_zs=Lz*0.25;
-HEAT_ze=Lz*0.75;
+HEAT_zs=Lz*(HEAT_ks-ks)/(ke-ks);
+HEAT_ze=Lz*(HEAT_ke-ks)/(ke-ks);
 
 Grid(
   Size(is,js,ks, ie,je,ke);
