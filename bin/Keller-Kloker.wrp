@@ -80,10 +80,10 @@ Lz=2*pi/21*Lref;
 deltalam=0.025*Lref;
 deltaturb=0.175*Lref;
 
-mf=0.5;
+mf=1;
 
 is=1;
-ie=round(550*mf);
+ie=round(800*mf);
 js=1;
 je=round(60*mf);
 ks=1;
@@ -94,10 +94,10 @@ TURB_je=round(40*mf);
 TURB_is=round(100*mf);
 TURB_ie=ie;
 TURB_ys=0;
-TURB_ye=deltaturb*1.2;
+TURB_ye=deltaturb;
 TURB_xs=0.25*Lx;
 TURB_xe=Lx;
-TURB_dwall=5e-6/mf;
+TURB_dwall=20e-6/mf;
 
 HEAT_is=round(30*mf);
 HEAT_ie=round(50*mf);
@@ -109,8 +109,8 @@ HEAT_xs=0.05*Lx;
 HEAT_xe=0.12*Lx;
 HEAT_ys=0.0;
 HEAT_ye=deltalam/4;
-HEAT_zs=Lz*(HEAT_ks-ks)/(ke-ks);
-HEAT_ze=Lz*(HEAT_ke-ks)/(ke-ks);
+HEAT_zs=Lz*0.2;
+HEAT_ze=Lz*0.7;
 
 Grid(
   Size(is,js,ks, ie,je,ke);
@@ -145,7 +145,7 @@ Grid(
 
   {Region between TURB_is and TURB_ie}
   Corners(TURB_is,TURB_js,ks,TURB_ie,TURB_je,ke, TURB_xs,TURB_ys,0,TURB_xe,TURB_ye,Lz);
-  JoinCorners(TURB_is,TURB_js,ks,TURB_ie,TURB_je,ke,  EE,0.5,1,1, FE,0.2,TURB_dwall,1, EE,0.5,1,1);
+  JoinCorners(TURB_is,TURB_js,ks,TURB_ie,TURB_je,ke,  EE,0.5,1,1, FE,0.4,TURB_dwall,1, EE,0.5,1,1);
   Corners(TURB_is,TURB_je,ks,TURB_ie,je,ke, TURB_xs,TURB_ye,0,TURB_xe,Ly,Lz);
   JoinCorners(TURB_is,TURB_je,ks,TURB_ie,je,ke,  EE,0.5,1,1, GE,0.8,1,1, EE,0.5,1,1);
 
@@ -247,18 +247,22 @@ Init(
 
 Disc(
   NavierStokesPerfect(
-    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.0e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   MUSCL(
     FLUX=FLUX_FDS;
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.9999;
+    if (UNSTEADY,
+      AOWENO_gammahi=0.9999;
+    ,{else}
+      AOWENO_gammahi=0.99;
+    );
     INTERPOL=INTERPOL_AOWENO7;
     FACEINTEG=FACEINTEG_CENTRAL1;
-    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
     POSFILTER=POSFILTER_NONE;
     POSFILTER_numiter=4;
   );
@@ -292,14 +296,14 @@ Cycle(
     if (iter==1,
       CFL=0.1;
     );
-    CFL=min(CFL*1.05,1.5);
+    CFL=min(CFL*1.05,0.8);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,k_ximax,clipinfo);
   );
   DualTimeStepping(
-    tmax=1e-4;    {simulation time span in seconds}
+    tmax=1e-2;    {simulation time span in seconds}
     dt=0.5*(1.5e-4/mf)/sqrt(1.4*286*Tinf);   {physical time step in seconds}
     sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
@@ -321,7 +325,7 @@ Cycle(
       maxiter=15;
     );
 
-    CFL=min(CFL*1.25,1.5);
+    CFL=min(CFL*1.25,1.0);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld,%4ld)  %s  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
@@ -339,51 +343,15 @@ Cycle(
 
 
 Post(
-  xstation[1]=0.1; {m}
-  xstation[2]=0.2; {m}
-  xstation[3]=0.3; {m}
-  numsteps=300;
-  qmin=1.0; {m/s, as small a value as possible}
-  Pback_min=400; {Pa}
-  Pback_max=40000; {Pa}
-  Aback=1.0; {m2}
-  for (cnt,1,3,
-    XSTATION_Set(xstation[cnt]);
-    Pback=XSTATION_Pback(Aback, Pback_min, Pback_max, numsteps, qmin);
-    Fpot=XSTATION_Fpot(Pback, numsteps, qmin);
-    mdot=XSTATION_mdot();
-    Tstag=XSTATION_Tstag();
-    Pstag=XSTATION_Pstag(numsteps);
-    Pstar=XSTATION_Pstar();
-    T=XSTATION_T();
-    q=XSTATION_q();
-    rho=XSTATION_rho();
-    htstar=XSTATION_htstar();
-    printf("x      = %E m\n"
-           "Pback  = %E Pa\n"
-           "Fpot   = %E Ns/kg\n"
-           "mdot   = %E kg/s\n"
-           "htstar = %E J/kg\n"
-           "Tstag  = %E K\n"
-           "Pstag  = %E Pa\n"
-           "Pstar  = %E Pa\n"
-           "T      = %E K\n"
-           "q      = %E m/s\n"
-           "rho    = %E kg/m3\n\n"
-           ,xstation[cnt],Pback,Fpot,mdot,htstar,Tstag,Pstag,Pstar,T,q,rho);
-  );
-  printf("\n");
+  im=round((ie-is)*0.8+is);
+  rhoinf=Pinf/Tinf/286;
+  qinf=Minf*sqrt(1.4*286*Tinf);
   for (dim,1,3,
-    Area[dim]=_Area(is,js,ks, ie,je,ke, dim,BDRY_WALLTFIXED1);
-    Fshear[dim]=_Fshear(is,js,ks, ie,je,ke, dim,BDRY_WALLTFIXED1);
-    Fpressure[dim]=_Fpressure(is,js,ks, ie,je,ke, dim,BDRY_WALLTFIXED1);
+    Area[dim]=_Area(im,js,ks, ie,je,ke, dim,BDRY_WALLTFIXED1);
+    Fshear[dim]=_Fshear(im,js,ks, ie,je,ke, dim,BDRY_WALLTFIXED1);
+    Fpressure[dim]=_Fpressure(im,js,ks, ie,je,ke, dim,BDRY_WALLTFIXED1);
   );
-  printf("Fshear    = (%+E,%+E,%+E) N\n",Fshear[1],Fshear[2],Fshear[3]);
-  printf("Fpressure = (%+E,%+E,%+E) N\n",Fpressure[1],Fpressure[2],Fpressure[3]);
-  printf("Qheat     = %+E W\n",_Qheat(is,js,ks, ie,je,ke, BDRY_WALLTFIXED1));
-  printf("metotal   = %+E J\n",_metotal(is,js,ks, ie,je,ke));
-  printf("m         = %+E J\n",_m(is,js,ks, ie,je,ke));
-  printf("\n");
+  printf("Cf=%E\n",Fshear[1]/Area[2]/(0.5*rhoinf*qinf^2));
   {
   POSTGRIDONLY=FALSE;
   WritePostFile(is,js,ks, ie,je,ke, "post.01", "tecplot", POSTGRIDONLY);
