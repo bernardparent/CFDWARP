@@ -762,7 +762,7 @@ void invert_matrix_gaussian_elimination(sqmat_t mattmp, sqmat_t mat2){
 }
 
 
-// function by Jaehyuk Lee -> needs further testing
+// function by Jaehyuk Lee 
 void invert_matrix_partial_pivoting(sqmat_t mattmp, sqmat_t mat2){
   long p, row,row2,col;
   double temp,m,multfact;

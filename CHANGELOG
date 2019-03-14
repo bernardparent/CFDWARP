@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 14a
+  * in lib/exm/exm.c
+    - added EXM_invert_matrix_partial_pivoting()
+  * in CONTRIB
+    - added contributions by Jaehyuk Lee
+
+
 2019 MAR 11a
   * in bin
     - improved Keller-Kloker.wrp

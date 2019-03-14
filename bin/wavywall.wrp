@@ -253,7 +253,7 @@ Cycle(
     if (iter==1,
       CFL=0.1;
     );
-    {if (iter==1 || iter==25,
+    {if (iter==1 || iter==100,
       system("date");
     );}
     CFL=min(CFL*1.1,CFLref);

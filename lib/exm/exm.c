@@ -1066,7 +1066,7 @@ void EXM_multiply_matrices(EXM_mat_t mat1, EXM_mat_t mat2, EXM_mat_t *matr){
 
 
 
-void EXM_invert_matrix(EXM_mat_t mat, EXM_mat_t *matinv){
+void EXM_invert_matrix_gaussian_elimination(EXM_mat_t mat, EXM_mat_t *matinv){
   long row,col,row2;
   double fact;
   EXM_mat_t mattmp;
@@ -1112,6 +1112,91 @@ void EXM_invert_matrix(EXM_mat_t mat, EXM_mat_t *matinv){
     printf("number of rows not equal to number of columns \n");
   }
   EXM_free_matrix(&mattmp);
+}
+
+
+// function by Jaehyuk Lee 
+void EXM_invert_matrix_partial_pivoting(EXM_mat_t mat, EXM_mat_t *matinv){
+  long pivot,row,row2,col;
+  double temp,pivotval,fact;
+  EXM_mat_t mattmp;
+  EXM_init_matrix(&mattmp,mat.glm.numrow,mat.glm.numcol);
+  if ((mat.glm.numrow==mat.glm.numcol)) {
+    EXM_reinit_matrix(matinv,mat.glm.numrow,mat.glm.numcol);
+    for (row=0; row<mat.glm.numrow; row++){
+      for (col=0; col<mat.glm.numcol; col++){
+        mattmp.cont[EXM_aim(mat.glm,row,col)]=mat.cont[EXM_aim(mat.glm,row,col)];
+        matinv->cont[EXM_aim(mat.glm,row,col)]=0.0;
+      }
+      matinv->cont[EXM_aim(mat.glm,row,row)]=1.0;
+    }
+    //process starts from here
+    for(row=0;row<mat.glm.numrow-1;row++){
+      //partial pivoting start
+      pivot=row;
+      pivotval=mattmp.cont[EXM_aim(mat.glm,row,row)];
+      for(row2=row+1;row2<mat.glm.numrow;row2++){
+        if(fabs(pivotval)<fabs(mattmp.cont[EXM_aim(mat.glm,row2,row)])){
+          pivot=row2;
+          pivotval=mattmp.cont[EXM_aim(mat.glm,row2,row)];
+        }
+      }
+      if(pivot!=row){
+        for(col=0;col<mat.glm.numrow;col++){
+          //partial pivoting of mattmp
+          temp=mattmp.cont[EXM_aim(mat.glm,pivot,col)];
+          mattmp.cont[EXM_aim(mat.glm,pivot,col)]=mattmp.cont[EXM_aim(mat.glm,row,col)];
+          mattmp.cont[EXM_aim(mat.glm,row,col)]=temp;
+          //partial pivoting of matinv
+          temp=matinv->cont[EXM_aim(mat.glm,pivot,col)];
+          matinv->cont[EXM_aim(mat.glm,pivot,col)]=matinv->cont[EXM_aim(mat.glm,row,col)];
+          matinv->cont[EXM_aim(mat.glm,row,col)]=temp;
+        }
+      }//partial pivoting complete
+      //forward substitution start
+      for(row2=row+1;row2<mat.glm.numrow;row2++){
+        assert(mattmp.cont[EXM_aim(mat.glm,row,row)]!=0.0e0);
+        fact=-(mattmp.cont[EXM_aim(mat.glm,row2,row)])/(mattmp.cont[EXM_aim(mat.glm,row,row)]);
+        for(col=0;col<mat.glm.numrow;col++){
+          matinv->cont[EXM_aim(mat.glm,row2,col)]=matinv->cont[EXM_aim(mat.glm,row2,col)]+matinv->cont[EXM_aim(mat.glm,row,col)]*fact;
+        }
+        for(col=row;col<mat.glm.numrow;col++){
+          mattmp.cont[EXM_aim(mat.glm,row2,col)]=mattmp.cont[EXM_aim(mat.glm,row2,col)]+mattmp.cont[EXM_aim(mat.glm,row,col)]*fact;
+        }
+        mattmp.cont[EXM_aim(mat.glm,row2,row)]=0.0e0;
+      }//forward substitution complete
+    }
+    //backward substitution start
+    for(row=mat.glm.numrow-1;row>=1;row--){
+      //multiply fact over matinv
+      for(row2=row-1;row2>=0;row2--){
+        assert(mattmp.cont[EXM_aim(mat.glm,row,row)]!=0.0e0);
+        fact=-mattmp.cont[EXM_aim(mat.glm,row2,row)]/mattmp.cont[EXM_aim(mat.glm,row,row)];
+        for(col=0;col<mat.glm.numrow;col++){
+          matinv->cont[EXM_aim(mat.glm,row2,col)]=matinv->cont[EXM_aim(mat.glm,row2,col)]+matinv->cont[EXM_aim(mat.glm,row,col)]*fact;
+        }
+      }
+    }
+    //devide matinv by diagonal of mattmp
+    for(row=0;row<mat.glm.numrow;row++){
+      for(col=0;col<mat.glm.numrow;col++){
+        assert(mattmp.cont[EXM_aim(mat.glm,row,row)]!=0.0e0);
+        matinv->cont[EXM_aim(mat.glm,row,col)]=matinv->cont[EXM_aim(mat.glm,row,col)]/mattmp.cont[EXM_aim(mat.glm,row,row)];
+      }
+    }//backward substitution complete
+    //EXM_display_matrix(mattmp);
+  }
+  else{
+    printf("matrix cannot be inverted\n");
+    printf("number of rows not equal to number of columns \n");
+  }
+  EXM_free_matrix(&mattmp);
+}
+
+
+void EXM_invert_matrix(EXM_mat_t mat, EXM_mat_t *matinv){
+  //EXM_invert_matrix_gaussian_elimination(mat,matinv);
+  EXM_invert_matrix_partial_pivoting(mat,matinv);
 }
 
 

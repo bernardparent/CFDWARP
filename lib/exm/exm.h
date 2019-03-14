@@ -131,6 +131,10 @@ void EXM_init_identity_matrix(EXM_mat_t *mat, long numrow, long numcol);
 
 void EXM_invert_matrix(EXM_mat_t mat, EXM_mat_t *matinv);
 
+void EXM_invert_matrix_partial_pivoting(EXM_mat_t mat, EXM_mat_t *matinv);
+
+void EXM_invert_matrix_gaussian_elimination(EXM_mat_t mat, EXM_mat_t *matinv);
+
 void EXM_invert_matrix_analytical(EXM_mat_t mat, EXM_mat_t *matinv);
 
 /* find orthogonal vector to the three points pa,

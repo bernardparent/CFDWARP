@@ -31,6 +31,10 @@ Hui, Tim
     prim/chem/_jachimowsky/chem.c
   - all files in prim/chem/_lutz
 
+Lee, Jaehyuk
+  - addition of EXM_invert_matrix_partial_pivoting() in lib/exm.c
+  - addition of invert_matrix_partial_pivoting() in src/common.c
+
 Padmanabhan, Sathyan 
   - tools/tauvt.c
 
