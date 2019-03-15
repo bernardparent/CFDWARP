@@ -47,45 +47,55 @@
 
 }
 
- Mx=16;
+
+ Mx=20;
 My=0.0;
-P=10200;
-T=250;
+P=300/Mx^2*16^2;
+T=238;
+Twall=2000;
+
 
 
 CFLref=1.0;
 
 
 
+
+
 meshtype=1; {set to 1 for gridline on axis of symmetry ; 
              set to 2 for no gridline on axis of symmetry ;}
 meshfact=1.0;
-sizefact=1.0;
+sizefact=0.02;
 
+dwall=30e-6/meshfact;
 
 is=1;  js=1; 
+is1=round(8*meshfact);
 if (meshtype==1,
-  ie=round(64*meshfact)+1; 
+  ie1=is1+round(64*meshfact)+1; 
 );
 if (meshtype==2,
-  ie=round(64*meshfact); 
+  ie1=is1+round(64*meshfact); 
 );
+ie=ie1+is1;
 
-je=round(32*meshfact)+1;
+je=round(90*meshfact)+1;
 Rin_x=0.6*sizefact;
-Rin_y=Rin_x/2.4;
-Rout_x=Rin_x*1.38;
-Rout_y=Rin_y*4.6;
+Rin_y=Rin_x/0.3;
+Rout_x=Rin_x*3.38;
+Rout_y=Rin_y*2.8;
+
+
 
 Grid(
   Size(is,js, ie,je);
 
   if (meshtype==1 || meshtype==2,
     theta=-pi/2;
-    dtheta=pi/(ie-is);
-    im=(ie+is)/2;
-    for (i,is,ie,
-      theta=((abs(i-im)/(ie-im))^1.3)*pi/2;
+    dtheta=pi/(ie1-is1);
+    im=(ie1+is1)/2;
+    for (i,is1,ie1,
+      theta=((abs(i-im)/(ie1-im))^1.3)*pi/2;
       x_in=-sqrt(1/(1/sqr(Rin_x)+sqr(tan(theta)/Rin_y)));
       y_in=Rin_y*sqrt(1-sqr(x_in/Rin_x));
       if (i-im<0, y_in=-y_in;);
@@ -93,18 +103,24 @@ Grid(
     );
 
     theta=-pi/2;
-    dtheta=pi/(ie-is);
-    im=(ie+is)/2;
-    for (i,is,ie,
-      theta=((abs(i-im)/(ie-im))^1.1)*pi/2;
+    dtheta=pi/(ie1-is1);
+    im=(ie1+is1)/2;
+    for (i,is1,ie1,
+      theta=((abs(i-im)/(ie1-im))^1.1)*pi/2;
       x_in=-sqrt(1/(1/sqr(Rout_x)+sqr(tan(theta)/Rout_y)));
       y_in=Rout_y*sqrt(1-sqr(x_in/Rout_x));
       if (i-im<0, y_in=-y_in;);
       Point(i,je, x_in,y_in);  
     );
 
-    Join(is,js,ie,je,j,FE,0.8,Rin_x/300/meshfact,1);
+    Join(is1,js,ie1,je,j,FE,0.8,dwall,1);
   );
+
+  Corners(is,js,is,je,sizefact,-Rin_y,sizefact,-Rout_y*1.15);
+  JoinCorners(is,js,is1,je,EG,0.5,1.0,1.0,FE,0.8,dwall,1.0);
+
+  Corners(ie,js,ie,je,sizefact,Rin_y,sizefact,Rout_y*1.15);
+  JoinCorners(ie1,js,ie,je,GE,0.5,1.0,1.0,FE,0.8,dwall,1.0);
 );
 
 
@@ -131,7 +147,7 @@ Bdry(
     _________________________________________________________________________________________
     }
     All(BDRY_WALLTFIXED1);
-    Faces(BDRY_OUTFLOWSUPERSONIC1,BDRY_OUTFLOWSUPERSONIC1,  BDRY_SYMMETRICAL1,BDRY_INFLOWSUPERSONIC);
+    Faces(BDRY_OUTFLOWSUPERSONIC1,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLADIABATIC1,BDRY_INFLOWSUPERSONIC);
     {
     Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
@@ -144,8 +160,8 @@ Model(
   NavierStokes(
     DIFFUSION=YES;  {if set to NO, the diffusion matrix K will be set to zero}
     REACTING=YES;   {Chemical reactions?}
-    Pmin=1.0e3;    Pmax=9.9e99;   {min and max pressure allowed in the domain in Pa}
-    Tmin=2.0e2;     Tmax=10.0e3;    {min and max temperature allowed in the domain in K}
+    Pmin=1.0e1;    Pmax=9.9e99;   {min and max pressure allowed in the domain in Pa}
+    Tmin=2.0e1;     Tmax=30.0e3;    {min and max temperature allowed in the domain in K}
     Twmin=Tmin;     Twmax=Tmax;    {min and max wall temperature allowed on any wall boundary node in K}
     wmin=1.0e-200;                  {min mass fraction allowed in the domain}
     AXISYMMETRIC=NO; {set to YES to solve axisymmetric problems in 2D}
@@ -193,7 +209,7 @@ Init(
 Disc(
   NavierStokes(
     zetaA1=0.3e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.002e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   MUSCL(
     FLUX=FLUX_FDS;
@@ -201,7 +217,7 @@ Disc(
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_AOWENO5;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
     FACEINTEG=FACEINTEG_CENTRAL1;
     EIGENVALCOND=EIGENVALCOND_PARENT;
     POSFILTER=POSFILTER_PARENT;
@@ -252,13 +268,13 @@ Cycle(
     if (mod(iter,50)==0,
       WriteDataFile(outputfilename);
     );
-    sigma1=0.4;   {exponent of maximum pseudotime step in all dimensions}
-    sigma2=0.4;   {exponent of maximum pseudotime step in all fluxes}
+    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
     PRECONDITIONER=PRECON_LOCALTIMESTEP;
     if (iter==1,
-      CFL=0.1;
+      CFL=0.06;
     );
-    CFL=min(CFL*1.01,0.5);
+    CFL=min(CFL*1.03,0.5);
     UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,

@@ -75,9 +75,9 @@
 
 }
 
- Mx=16;
+ Mx=12;
 My=0.0;
-P=300;
+P=300/Mx^2*16^2;
 T=238;
 Twall=2000;
 
@@ -94,31 +94,35 @@ meshtype=1; {set to 1 for gridline on axis of symmetry ;
 meshfact=1.0;
 sizefact=0.02;
 
-dwall=10e-6;
+dwall=1e-6;
 
 is=1;  js=1; 
+is1=round(8*meshfact);
 if (meshtype==1,
-  ie=round(64*meshfact)+1; 
+  ie1=is1+round(64*meshfact)+1; 
 );
 if (meshtype==2,
-  ie=round(64*meshfact); 
+  ie1=is1+round(64*meshfact); 
 );
+ie=ie1+is1;
 
-je=round(64*meshfact)+1;
+je=round(90*meshfact)+1;
 Rin_x=0.6*sizefact;
-Rin_y=Rin_x/2.4;
-Rout_x=Rin_x*1.38;
-Rout_y=Rin_y*4.6;
+Rin_y=Rin_x/0.3;
+Rout_x=Rin_x*3.38;
+Rout_y=Rin_y*2.8;
+
+
 
 Grid(
   Size(is,js, ie,je);
 
   if (meshtype==1 || meshtype==2,
     theta=-pi/2;
-    dtheta=pi/(ie-is);
-    im=(ie+is)/2;
-    for (i,is,ie,
-      theta=((abs(i-im)/(ie-im))^1.3)*pi/2;
+    dtheta=pi/(ie1-is1);
+    im=(ie1+is1)/2;
+    for (i,is1,ie1,
+      theta=((abs(i-im)/(ie1-im))^1.3)*pi/2;
       x_in=-sqrt(1/(1/sqr(Rin_x)+sqr(tan(theta)/Rin_y)));
       y_in=Rin_y*sqrt(1-sqr(x_in/Rin_x));
       if (i-im<0, y_in=-y_in;);
@@ -126,18 +130,24 @@ Grid(
     );
 
     theta=-pi/2;
-    dtheta=pi/(ie-is);
-    im=(ie+is)/2;
-    for (i,is,ie,
-      theta=((abs(i-im)/(ie-im))^1.1)*pi/2;
+    dtheta=pi/(ie1-is1);
+    im=(ie1+is1)/2;
+    for (i,is1,ie1,
+      theta=((abs(i-im)/(ie1-im))^1.1)*pi/2;
       x_in=-sqrt(1/(1/sqr(Rout_x)+sqr(tan(theta)/Rout_y)));
       y_in=Rout_y*sqrt(1-sqr(x_in/Rout_x));
       if (i-im<0, y_in=-y_in;);
       Point(i,je, x_in,y_in);  
     );
 
-    Join(is,js,ie,je,j,FE,0.8,dwall,1);
+    Join(is1,js,ie1,je,j,FE,0.8,dwall,1);
   );
+
+  Corners(is,js,is,je,sizefact,-Rin_y,sizefact,-Rout_y*1.15);
+  JoinCorners(is,js,is1,je,EG,0.5,1.0,1.0,FE,0.8,dwall,1.0);
+
+  Corners(ie,js,ie,je,sizefact,Rin_y,sizefact,Rout_y*1.15);
+  JoinCorners(ie1,js,ie,je,GE,0.5,1.0,1.0,FE,0.8,dwall,1.0);
 );
 
 
@@ -165,7 +175,7 @@ Bdry(
     _________________________________________________________________________________________
     }
     All(BDRY_WALLTFIXED1);
-    Faces(BDRY_OUTFLOWSUPERSONIC1,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLTFIXED1,BDRY_INFLOWSUPERSONIC);
+    Faces(BDRY_OUTFLOWSUPERSONIC1,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLADIABATIC1,BDRY_INFLOWSUPERSONIC);
 
     {
     Cut(is,js,  ie,je);
@@ -215,14 +225,14 @@ Model(
     wimin=1e-15;    wimax=1e-2;    {min and max ion mass fraction}
     wemin=1e-20;    wemax=1e-7;    {min and max electron mass fraction}
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
-    gamma=0.1e0;    {secondary emission coefficient}
+    gamma=0.05e0;    {secondary emission coefficient}
     AXISYMMETRIC=NO;
   );
   Ohm(
     Te_buffer=300.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,T+Te_buffer);  
                        needed to prevent convergence hangs where |E| becomes close to 0;
                        set to as little a value as possible}
-    Jmax=2000000.0;     {the maximum current density in A/m2 expected in the domain; this will affect only
+    Jmax=200000000.0;     {the maximum current density in A/m2 expected in the domain; this will affect only
                        the Townsend ionization rates; make sure Jmax > sigma*Emag in the converged solution.}
     SetRelativePermittivity(is,js, ie,je, 1.0 );
     SetSolidConductivity(is,js, ie,je, 0.0 {S/m});
@@ -296,7 +306,7 @@ Init(
 Disc(
   NavierStokesPlasma(
     zetaA1=0.3e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.003e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA2=0.001e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
     zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
   );
   Ohm(
@@ -311,7 +321,7 @@ Disc(
     AOWENO_gammahi=0.95;
     INTERPOL=INTERPOL_TVD2_VANLEER;
     FACEINTEG=FACEINTEG_CENTRAL1;
-    EIGENVALCOND=EIGENVALCOND_PASCAL;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
     POSFILTER=POSFILTER_PARENT;
     POSFILTER_numiter=4;
   );
@@ -325,7 +335,7 @@ Cycle(
     zetaGammae=1;       {factor multiplying the pseudotime step of the electron species transport equations
                            near cathode}
     relaxNi_bdry=1.0;     {the ion density relaxation factor at the boundary }
-    relaxNe_bdry=0.2;     {the electron density relaxation factor at the boundary }
+    relaxNe_bdry=0.5;     {the electron density relaxation factor at the boundary }
     relaxTe=0.3;          {the electron temperature relaxation factor }
     rhoref=0.1;           {reference density in kg/m3}
     Tref=300.0;           {reference temperature in K}
@@ -365,11 +375,16 @@ Cycle(
     if (iter==1,
       CFL=0.01;
     );
-    CFL=min(CFL*1.05,0.07);
+    if (iter>10000,
+      CFLmax=0.15;
+    ,
+      CFLmax=0.08;
+    );
+    CFL=min(CFL*1.05,CFLmax);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     Lc=0.05;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
-    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,600); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,400); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
