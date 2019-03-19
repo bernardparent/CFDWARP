@@ -7,6 +7,16 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 19a
+  * in model/fluid/_*_plasma/fluid.c
+    - in write_model_fluid_template(), added emfieldfact=1.0;
+    - in read_model_fluid_actions(), added read of emfieldfact
+  * in model/fluid/_*_plasma/fluid.hh
+    - in gl_model_fluid_t, added emfieldfact
+  * in model/fluid/_*_plasma/fluid_source.c
+    - in find_Semfield(), multiplied Femfield, E_dot_J and _zetav_from_Te by emfieldfact
+
+
 2019 MAR 15a
   * in bin
     - updated reentry.wrp and reentry_sheath.wrp
