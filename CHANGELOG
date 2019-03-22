@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 22a
+  * in model/chem/*/chem.c
+    - changed #define TOWNSEND_IMPLICIT TRUE to #define TOWNSEND_IMPLICIT FALSE
+
+
 2019 MAR 19a
   * in model/fluid/_*_plasma/fluid.c
     - in write_model_fluid_template(), added emfieldfact=1.0;

@@ -8,7 +8,7 @@
 
 #define ATTACHMENT TRUE
 #define TOWNSEND TRUE
-#define TOWNSEND_IMPLICIT TRUE
+#define TOWNSEND_IMPLICIT FALSE
 
 #define Estarmin 1e-40
 

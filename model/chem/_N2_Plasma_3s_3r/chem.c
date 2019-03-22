@@ -8,7 +8,7 @@
 #define ATTACHMENT TRUE
 #define TOWNSEND TRUE
 #define TOWNSEND_SEMI_IMPLICIT FALSE    //jacobian found through "constant current" approach
-#define TOWNSEND_IMPLICIT TRUE  //jacobian found through exact linearization
+#define TOWNSEND_IMPLICIT FALSE  //jacobian found through exact linearization
 
 #define Estarmin 1e-40
 
