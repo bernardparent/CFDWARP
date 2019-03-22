@@ -38,6 +38,9 @@ tecgrid2D.c                  reads a 2D GRIDG script and creates a TECPLOT post 
 tecgrid3D.c                  reads a 3D GRIDG script and creates a TECPLOT post file 
 
 
+average.sh                   reads the data from various input files and outputs the 
+                             averaged values to an output file
+
 countlines.sh                counts the number of lines of code in all files with a 
                              given extension in all subdirectories recursively
 
