@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 23a
+  * in model/emfield/_Ohm/emfield.c
+    - added  _Qjoulek_new()
+    - added _Qjoulek_interface()
+
+
 2019 MAR 22b
   * in tools
     - added average.sh from Prasanna
