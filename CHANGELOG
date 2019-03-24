@@ -7,6 +7,19 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 24a
+  * in model/emfield/_Ohm/emfield.c
+    - renamed _Qjoulek to _Qjoulek_old
+    - renamed _Qjoulek_new to _Qjoulek
+    - renamed find_Vk_from_mu_old() to find_Vk_from_mu_veryold()
+    - renamed find_Vk_from_mu() to find_Vk_from_mu_old()
+    - coded new find_Vk_from_mu() 
+  * renamed
+    - emfieldfact to emfieldworkheatfact
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Semfield(), now calls _E_dot_J() instead of _E_dot_J_recast()
+
+
 2019 MAR 23a
   * in model/emfield/_Ohm/emfield.c
     - added  _Qjoulek_new()
