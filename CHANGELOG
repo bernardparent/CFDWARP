@@ -7,6 +7,16 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 26b
+  * in bin
+    - added reentry_cube_sheath.wrp
+    - modified reentry_sheath.wrp
+  * in lib/soap/doc/report.tex
+    - fixed typo "for\_parallel" in verbatim should be "for_parallel" 
+  * in src/control.c
+    - in longstr_t bib, fixed a spelling mistake in one of the citations
+ 
+
 2019 MAR 26a
   * in model/emfield/_Ohm/emfield.c
     - deleted  _Qjoulek_interface()

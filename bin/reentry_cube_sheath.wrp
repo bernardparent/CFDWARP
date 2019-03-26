@@ -6,17 +6,17 @@
                                A CFD Code for Plasma & Reactive Flow
   _______________________________________________________________________________________________
 
-  Version                          19feb07a
+  Version                          19mar19a
   Compiler                         gcc 4.9.2 with OPENMP threads
-  Compiled on                      Feb  7 2019 at 17:03:55 by parent on CLEO
+  Compiled on                      Mar 21 2019 at 15:01:47 by parent on CLEO
   Cycle Strategy                   Standard
   Fluid Relaxation                 Block DDADI [2,1]
-  EM Field Relaxation              Implicit schemes based on Gauss-Seidel sweeps including SOR
-                                   [3,4] and SOR2
-  Convection Discretization        Multidimensional MUSCL with flux FVS [5], FDS [7], and
-                                   primitive interpolation TVD [6], WENO [9], CWENO [11],
+  EM Field Relaxation              Implicit schemes based on approximate factorization including
+                                   ADI [4], DDADI [2,1], and IMAF [3]
+  Convection Discretization        Reconstruction-Evolution MUSCL with flux FVS [5], FDS [7],
+                                   and primitive interpolation TVD [6], WENO [9], CWENO [11],
                                    AOWENO [10], and eigenvalue conditioning HARTEN, GNOFFO
-                                   [12], PECLET [13], PARENT [8], and PARENT positivity-
+                                   [12], PECLET [13], PASCAL [8], and PARENT positivity-
                                    preserving filter [14]
   Temporal Discretization          Steady-State
   Fluid Model                      Navier-Stokes with drift-diffusion plasma model [15]
@@ -36,10 +36,10 @@
   [2]  J Bardina and CK Lombard. "Three Dimensional Hypersonic Flow Simulations with the CSCM
        Implicit Upwind Navier-Stokes Method", Proceedings of the 8th Computational Fluid
        Dynamics Conference, AIAA Paper 87-1114, 1987.
-  [3]  DM Young. "Iterative Methods for Solving Partial Difference Equations of Elliptic Type",
-       PhD thesis, Harvard University, May 1950.
-  [4]  S Frankel, "Convergence Rates of Iterative Treatments of Partial Differential Equations",
-       Mathematics of Computation 4:56-75, 1950.
+  [3]  RW MacCormack. "Iterative Modified Approximate Factorization", Computers and Fluids
+       30:917-925, 2001.
+  [4]  DW Peaceman and HH Rachford. "The Numerical Solution of Parabolic and Elliptic
+       Differential Equations", J. Soc. Ind. Appl. Math. 3:28-41, 1955.
   [5]  JL Steger and RF Warming. "Flux Vector Splitting of the Inviscid Gasdynamic Equations
        with Application to Finite-Difference Methods", Journal of Computational Physics 40:263-
        293, 1981.
@@ -75,79 +75,45 @@
 
 }
 
- Mx=16;
-My=0.0;
-P=300/Mx^2*16^2;
-T=238;
-Twall=2000;
-Tmax_barrier=25000;
+mf=1.5; 
 
+is=1;
+im=round(mf*35);
+ie=round(mf*50);
+js=1;
+jm1=round(mf*20);
+jm2=round(mf*60);
+je=round(mf*80);
 
-CFLref=1.0;
-
-
-
-
-
-meshtype=1; {set to 1 for gridline on axis of symmetry ; 
-             set to 2 for no gridline on axis of symmetry ;}
-meshfact=1.0;
-sizefact=0.02;
-
+L=0.04;
+H=0.1;
 dwall=15e-6;
-
-is=1;  js=1; 
-is1=round(8*meshfact);
-if (meshtype==1,
-  ie1=is1+round(64*meshfact)+1; 
-);
-if (meshtype==2,
-  ie1=is1+round(64*meshfact); 
-);
-ie=ie1+is1;
-
-je=round(90*meshfact)+1;
-Rin_x=0.6*sizefact;
-Rin_y=Rin_x/0.3;
-Rout_x=Rin_x*3.38;
-Rout_y=Rin_y*2.8;
-
-
 
 Grid(
   Size(is,js, ie,je);
+  Corners(im,jm1,ie,jm2,0,-H/2,L,H/2);
+  JoinCorners(im,jm1, ie,jm2,  FE,0.5e0,dwall,1.0e0,  ff,0.5e0,dwall,dwall);
 
-  if (meshtype==1 || meshtype==2,
-    theta=-pi/2;
-    dtheta=pi/(ie1-is1);
-    im=(ie1+is1)/2;
-    for (i,is1,ie1,
-      theta=((abs(i-im)/(ie1-im))^1.3)*pi/2;
-      x_in=-sqrt(1/(1/sqr(Rin_x)+sqr(tan(theta)/Rin_y)));
-      y_in=Rin_y*sqrt(1-sqr(x_in/Rin_x));
-      if (i-im<0, y_in=-y_in;);
-      Point(i,js, x_in,y_in);  
-    );
+  Copy(im,jm1,im,jm2,is,jm1);
+  Translate(is,jm1,is,jm2,-2.5*L,0);
+  Join(is,jm1,im,jm2,i,EG,0.5,1,1);
+ 
+  Copy(is,jm1,ie,jm1,is,js);
+  Translate(is,js,ie,js,0,-H);
+  Join(is,js,ie,jm1,j,EG,0.5,1,1);
 
-    theta=-pi/2;
-    dtheta=pi/(ie1-is1);
-    im=(ie1+is1)/2;
-    for (i,is1,ie1,
-      theta=((abs(i-im)/(ie1-im))^1.1)*pi/2;
-      x_in=-sqrt(1/(1/sqr(Rout_x)+sqr(tan(theta)/Rout_y)));
-      y_in=Rout_y*sqrt(1-sqr(x_in/Rout_x));
-      if (i-im<0, y_in=-y_in;);
-      Point(i,je, x_in,y_in);  
-    );
+  Copy(is,jm2,ie,jm2,is,je);
+  Translate(is,je,ie,je,0,H);
+  Join(is,jm2,ie,je,j,GE,0.5,1,1);
+  
+  Join(is,js,ie,js, i, EE,0.5,1,1);
+  Join(is,je,ie,je, i, EE,0.5,1,1);
 
-    Join(is1,js,ie1,je,j,FE,0.8,dwall,1);
-  );
+  JoinFaces(is,js,ie,jm1);
+  JoinFaces(is,jm2,ie,je);
 
-  Corners(is,js,is,je,sizefact,-Rin_y,sizefact,-Rout_y*1.15);
-  JoinCorners(is,js,is1,je,EG,0.5,1.0,1.0,FE,0.8,dwall,1.0);
-
-  Corners(ie,js,ie,je,sizefact,Rin_y,sizefact,Rout_y*1.15);
-  JoinCorners(ie1,js,ie,je,GE,0.5,1.0,1.0,FE,0.8,dwall,1.0);
+  Join(is,js,is,je, j, EE,0.5,1,1);
+  Join(is,js,im,je, i, EG,0.5,1,1);
 );
 
 
@@ -174,11 +140,10 @@ Bdry(
     BDRY_FREESTREAM1                   5    Freestream, 1o, params Vx,Vy, P, T
     _________________________________________________________________________________________
     }
-    All(BDRY_WALLTFIXED1);
-    Faces(BDRY_OUTFLOWSUPERSONIC1,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLADIABATIC1,BDRY_INFLOWSUPERSONIC);
-
+    Cut(im,jm1,  ie,jm2);
+    All(BDRY_WALLADIABATIC1);
+    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_OUTFLOWSUPERSONIC1,BDRY_OUTFLOWSUPERSONIC1);
     {
-    Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
     Link(i1,j1,  i2,j2);
     Param(is,js,  ie,je,  BDRY_FREESTREAM1, Vx,Vy,P,T);
@@ -214,19 +179,19 @@ Model(
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=YES;
     REACTING=YES;
-    emfieldworkheatfact=1;
+    emfieldworkheatfact=1;   {factor multiplying the emfield work and heat source terms}
     sigmadiv=1e-4; {S/m}
-    etdiv=1e2;     {J/kg}
-    Pmin=1.0e2;    Pmax=9.9e99;   {Pa}
-    Tmin=1.0e2;     Tmax=Tmax_barrier;    {K}
-    Tvmin=Tmin;     Tvmax=30000;  {K}
+    etdiv=1e3;     {J/kg}
+    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
+    Tmin=1.0e2;     Tmax=10e3;    {K}
+    Tvmin=Tmin;     Tvmax=20.0e3;  {K}
     Temin=Tmin;     Temax=60.0e3;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain for neutrals}
     wimin=1e-15;    wimax=0.5;    {min and max ion mass fraction}
     wemin=1e-20;    wemax=1e-4;    {min and max electron mass fraction}
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
-    gamma=0.05e0;    {secondary emission coefficient}
+    gamma=0.1e0;    {secondary emission coefficient}
     AXISYMMETRIC=NO;
   );
   Ohm(
@@ -259,25 +224,27 @@ Init(
     _______________________________________________________________________________________
 
     }
+    Mx=26;
+    My=0.0;
+    P=300/Mx^2*16^2;
+    T=238;
     Vx=Mx*sqrt(1.4*286*T);
     Vy=My*sqrt(1.4*286*T);
     Tv=T; {K}
-    Te=T; {K}
-    chi_eminus=1e-10;
+    Te=3000; {K}
+    chi_eminus=1e-12;
     chi_O2minus=1.0e-30;
-    chi_Oplus=1e-30;
+    chi_Oplus=1e-12;
     chi_Nplus=1.0e-30;
     chi_O2plus=1.0e-30;
     chi_N2plus=1.0e-30;
-    chi_NOplus=1.0e-10;
+    chi_NOplus=1.0e-30;
     chi_O=1.0e-30;
     chi_N=1.0e-30;
     chi_NO=1.0e-30;
     chi_O2=0.25;
     chi_N2=0.75;
     All(INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_Oplus,chi_Nplus,chi_O2plus,chi_N2plus,chi_NOplus,chi_O,chi_N,chi_NO,chi_O2,chi_N2,Tv,Te);
-    Bdry(BDRY_WALLTFIXED1, INIT_TYPE6,Vx,Vy,P,Twall,chi_eminus,chi_O2minus,chi_Oplus,chi_Nplus,chi_O2plus,chi_N2plus,chi_NOplus,chi_O,chi_N,chi_NO,chi_O2,chi_N2,Tv,Te);
-
     {
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_Oplus,chi_Nplus,chi_O2plus,chi_N2plus,chi_NOplus,chi_O,chi_N,chi_NO,chi_O2,chi_N2,Tv,Te);
     Region(is,js,  ie,je, INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_Oplus,chi_Nplus,chi_O2plus,chi_N2plus,chi_NOplus,chi_O,chi_N,chi_NO,chi_O2,chi_N2,Tv,Te);
@@ -319,7 +286,7 @@ Disc(
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.95;
+    AOWENO_gammahi=0.999;
     INTERPOL=INTERPOL_TVD2_VANLEER;
     FACEINTEG=FACEINTEG_CENTRAL1;
     EIGENVALCOND=EIGENVALCOND_PARENT;
@@ -332,11 +299,11 @@ Disc(
 Cycle(
   NavierStokesPlasma(
     xiverge=1e-3;         {residual convergence threshold}
-    zetaGammai=0.1;       {factor multiplying the pseudotime step of the ion species transport equations} 
-    zetaGammae=0.001;       {factor multiplying the pseudotime step of the electron species transport equations
+    zetaGammai=1;       {factor multiplying the pseudotime step of the ion species transport equations} 
+    zetaGammae=1;       {factor multiplying the pseudotime step of the electron species transport equations
                            near cathode}
     relaxNi_bdry=1.0;     {the ion density relaxation factor at the boundary }
-    relaxNe_bdry=0.5;     {the electron density relaxation factor at the boundary }
+    relaxNe_bdry=0.2;     {the electron density relaxation factor at the boundary }
     relaxTe=0.3;          {the electron temperature relaxation factor }
     rhoref=0.1;           {reference density in kg/m3}
     Tref=300.0;           {reference temperature in K}
@@ -394,7 +361,6 @@ Cycle(
     Lc=1;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.2; {relaxation factor forced on the update of the emfield variables}
     UpdateEMField(Lc,relaxEMF,TSEMF_SOR,1500); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
-    UpdateEMField(Lc,1.0,TSEMF_IMAF,30);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);

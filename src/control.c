@@ -187,7 +187,7 @@ const static longstr_t bib[numbib]=
    "B Parent. \"Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows\", AIAA Journal, 55:141-152, 2017.",
 
    //parent2019a
-   "B Parent. \"Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler Equatons\", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019."
+   "B Parent. \"Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler Equations\", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019."
 
   };
 
