@@ -162,6 +162,7 @@ Model(
     TEMODEL=TEMODEL_TRANSPORT;
     N2VIBJOULEHEATING=YES; {solve the nitrogen vibration energy joule heating source terms? YES or NO } 
     REACTING=YES;
+    emfieldworkheatfact=1.0;
     Prt=0.9e0;      {the turbulent Prandtl number;
                       - recommended value of 0.9 in boundary layers
                       - recommended value of 0.5 in shear layers}

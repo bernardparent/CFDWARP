@@ -7,6 +7,19 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 26a
+  * in model/emfield/_Ohm/emfield.c
+    - deleted  _Qjoulek_interface()
+    - added _Nk_max()
+    - in find_Vk_from_mu(), now calls _Nk_max()
+  * in model/emfield/_Ohm_generalized/emfield.c
+    - renamed _Qjoulek to _Qjoulek_old
+    - recoded _Qjoulek() 
+    - added _Nk_max()
+    - in find_Vk_from_mu(), now calls _Nk_max() instead of _Nk_smoothed()
+    - in find_DeltaVk_from_mu() now calls _Nk_max() instead of _Nk_smoothed()
+
+
 2019 MAR 24a
   * in model/emfield/_Ohm/emfield.c
     - renamed _Qjoulek to _Qjoulek_old
@@ -16,7 +29,7 @@ ________________________________________________________________________________
     - coded new find_Vk_from_mu() 
   * renamed
     - emfieldfact to emfieldworkheatfact
-  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+  * in model/fluid/_*_plasma/fluid_source.c
     - in find_Semfield(), now calls _E_dot_J() instead of _E_dot_J_recast()
 
 
