@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 28a
+  * in tools/average.sh
+    - added error handling of files with different number of columns and rows (Prasanna T.R.)
+  * in bin
+    - added heatbdry2D.wrp
+   
+
 2019 MAR 26b
   * in bin
     - added reentry_cube_sheath.wrp
