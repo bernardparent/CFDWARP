@@ -214,8 +214,6 @@ void add_Ystar_dH_dUstar_to_TDMA(np_t *np, gl_t *gl, long theta, long l, double 
 #endif
 
 
-
-
 void add_dSstar_dUstar_to_TDMA(np_t *np, gl_t *gl, long l,  double fact, sqmat_t B){
   sqmat_t dSstar_dUstar;
   long row,col;
@@ -241,8 +239,6 @@ void add_dSstar_dUstar_to_TDMA(np_t *np, gl_t *gl, long l,  double fact, sqmat_t
   multiply_matrix_and_matrix(Linv,mattmp,dSstar_dUstar);
 #else
   find_dSstar_dUstar(np,gl,l,dSstar_dUstar);
-// ?????
-  for (row=0; row<nf; row++) dSstar_dUstar[row][row]=min(0.0e0,dSstar_dUstar[row][row]);
 #endif
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
@@ -250,116 +246,6 @@ void add_dSstar_dUstar_to_TDMA(np_t *np, gl_t *gl, long l,  double fact, sqmat_t
     }
   }
 }
-
-
-
-
-
-void add_dSstar_dUstar_to_TDMA_test(np_t *np, gl_t *gl, long l,  double fact, sqmat_t B){
-  sqmat_t dSstar_dUstar;
-  long row,col;
-
-#ifdef _RESSOURCE_LAMBDAMINUS_STORAGE
-  sqmat_t Lambdaminus,Linv,L,mattmp;
-  long theta;
-  jacvars_t jacvars;
-  metrics_t metrics;
-  theta=0;
-  find_metrics_at_node(np, gl, l, theta, &metrics);
-  find_jacvars(np[l], gl, metrics, theta, &jacvars);
-  find_Linv_from_jacvars(jacvars, metrics, Linv);
-  find_L_from_jacvars(jacvars, metrics, L);
-
-  for (row=0; row<nf; row++){
-    for (col=0; col<nf; col++){
-      Lambdaminus[row][col]=0.0;
-    }
-    Lambdaminus[row][row]=np[l].bs->Lambda_S_minus[row];
-  }
-  multiply_diagonal_matrix_and_matrix(Lambdaminus,L,mattmp);
-  multiply_matrix_and_matrix(Linv,mattmp,dSstar_dUstar);
-#else
-  /* here the idea is 
-     dSdU*U=Linv*Lambda*L*U
-     L*dSdU*U=Lambda*LU
-     Lambda[r][r]=(L*dSdU*U)[r]/LU[r]
-*/
-/*  jacvars_t jacvars;
-  metrics_t metrics;
-  flux_t Ustar,fluxtmp1,fluxtmp2,LUstar;
-  sqmat_t L,mattmp,Lambda,Linv;
-  long theta;
-
-  theta=0;
-
-  find_metrics_at_node(np, gl, l, theta, &metrics);
-  find_jacvars(np[l], gl, metrics, theta, &jacvars);
-
-  find_dSstar_dUstar(np,gl,l,dSstar_dUstar);
-
-  find_Ustar(np[l], gl, Ustar);
-  find_L_from_jacvars(jacvars, metrics, L);
-  find_Linv_from_jacvars(jacvars, metrics, Linv);
-  find_LUstar_from_jacvars(jacvars,  metrics, LUstar);
-
-
-  multiply_matrix_and_vector(dSstar_dUstar,Ustar,fluxtmp1);
-  multiply_matrix_and_vector(L,fluxtmp1,fluxtmp2);
-  for (row=0; row<nf; row++){
-    for (col=0; col<nf; col++){
-      Lambda[row][col]=0.0;
-    }
-    Lambda[row][row]=fluxtmp2[row]/notzero(LUstar[row],1e-99);
-  } 
-  multiply_diagonal_matrix_and_matrix(Lambda,L,mattmp);
-  multiply_matrix_and_matrix(Linv,mattmp,dSstar_dUstar);
-*/
-
-/* here the idea is
-     dSdU=Linv*Lambda*L
-     L*dSdU=Lambda*L
-     L*dSdU*Linv=Lambda
-
-  */
-
-  jacvars_t jacvars;
-  metrics_t metrics;
-  sqmat_t L,mattmp,Lambda,Linv;
-  long theta;
-
-  theta=0;
-
-  find_metrics_at_node(np, gl, l, theta, &metrics);
-  find_jacvars(np[l], gl, metrics, theta, &jacvars);
-
-  find_dSstar_dUstar(np,gl,l,dSstar_dUstar);
-//  display_matrix(dSstar_dUstar);
-
-  find_L_from_jacvars(jacvars, metrics, L);
-  find_Linv_from_jacvars(jacvars, metrics, Linv);
-
-
-  multiply_matrix_and_matrix(dSstar_dUstar,Linv,mattmp);
-  multiply_matrix_and_matrix(L,mattmp,Lambda);
-  for (row=0; row<nf; row++) {
-    for (col=0; col<nf; col++){
-    }
-      Lambda[row][row]=min(0.0,Lambda[row][row]);
-  }
-//  display_matrix(Lambda);
-
-  multiply_matrix_and_matrix(Lambda,L,mattmp);
-  multiply_matrix_and_matrix(Linv,mattmp,dSstar_dUstar);
-//  display_matrix(dSstar_dUstar);
-
-#endif
-  for (row=0; row<nf; row++){
-    for (col=0; col<nf; col++){
-      B[row][col]+=-fact*dSstar_dUstar[row][col];
-    }
-  }
-}
-
 
 
 #ifdef UNSTEADY

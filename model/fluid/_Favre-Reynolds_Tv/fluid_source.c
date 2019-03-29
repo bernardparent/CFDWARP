@@ -232,5 +232,10 @@ void find_dSstar_dUstar(np_t *np, gl_t *gl, long l, sqmat_t dSstar_dUstar){
                  +dSvibdU[row][col];
     }
   }
+
+#ifndef TEST
+  for (row=0; row<nf; row++) dSstar_dUstar[row][row]=min(0.0e0,dSstar_dUstar[row][row]);
+#endif
+
 }
 

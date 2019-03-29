@@ -7,6 +7,16 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 29a
+  * in cycle/share/ts_share.c
+    - in add_dSstar_dUstar_to_TDMA(), removed the code that prevented dStardUstar[row][row] 
+      from being positive
+    - deleted add_dSstar_dUstar_to_TDMA_test()
+  * in model/fluid/*/fluid_source.c and model/fluid/_drift-diffusion/fluid.c
+    - in find_dSstar_dUstar(), added code that prevents dStardUstar[row][row] 
+      from being positive
+
+
 2019 MAR 28a
   * in tools/average.sh
     - added error handling of files with different number of columns and rows (Prasanna T.R.)
