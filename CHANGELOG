@@ -7,6 +7,15 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 30a
+  * in model/share/fluid_share.c
+    - in condition_Lambda_plus_minus_Parent(), implemented new eigenvalue conditioning (function of 
+      zetaA2) that blends the Steger-Warming eigenvalues with those of the positivity-preserving 
+      filter such that the resulting eigenvalues remain within the 1/zetaA2 of the spectral radius 
+      (works much better than previous approach of simply clipping the wave speeds for shocks of 
+      infinite strength)
+     
+
 2019 MAR 29a
   * in cycle/share/ts_share.c
     - in add_dSstar_dUstar_to_TDMA(), removed the code that prevented dStardUstar[row][row] 

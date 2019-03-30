@@ -3,7 +3,7 @@
 
 }
 
-Mx=6.0;
+Mx=2.5;
 My=0.0;
 P=10000.0;
 T=300.0;
@@ -104,8 +104,8 @@ Init(
 
 Disc(
   NavierStokesPerfect(
-    zetaA1=0.02e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.02e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   FDSplus(
     AVERAGING=AVERAGING_ARITH;

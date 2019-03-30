@@ -71,7 +71,7 @@ initially but density varies as 1+t/r with r the radius from the origin
 }
 
 
-mf=2;
+mf=1.8;
 
 is=1;
 ie=round(30*mf);
@@ -173,7 +173,7 @@ Init(
 Disc(
   NavierStokesPerfect(
     zetaA1=0.02e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=1e-7;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA2=0.3;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   FVSplus(
     numiter=4;
@@ -194,8 +194,8 @@ Disc(
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.9999;
-    INTERPOL=INTERPOL_AOWENO7;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
     FACEINTEG=FACEINTEG_CENTRAL1;
     EIGENVALCOND=EIGENVALCOND_PARENT;
     POSFILTER=POSFILTER_PARENT;
