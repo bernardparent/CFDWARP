@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAR 31b
+  * in bin
+    - updated reentry_sheath.wrp
+
+
 2019 MAR 31a
   * in model/share/fluid_share.c
     - in condition_Lambda_plus_minus_Parent(), made an alteration to the Steger-Warming blending: 

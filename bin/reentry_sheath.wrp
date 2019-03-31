@@ -75,7 +75,7 @@
 
 }
 
- Mx=16;
+ Mx=17;
 My=0.0;
 P=300/Mx^2*16^2;
 T=238;
@@ -223,7 +223,7 @@ Model(
     Temin=Tmin;     Temax=60.0e3;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain for neutrals}
-    wimin=1e-15;    wimax=0.5;    {min and max ion mass fraction}
+    wimin=1e-40;    wimax=0.5;    {min and max ion mass fraction}
     wemin=1e-20;    wemax=1e-4;    {min and max electron mass fraction}
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
     gamma=0.05e0;    {secondary emission coefficient}
@@ -332,8 +332,8 @@ Disc(
 Cycle(
   NavierStokesPlasma(
     xiverge=1e-3;         {residual convergence threshold}
-    zetaGammai=0.1;       {factor multiplying the pseudotime step of the ion species transport equations} 
-    zetaGammae=0.001;       {factor multiplying the pseudotime step of the electron species transport equations
+    zetaGammai=1;       {factor multiplying the pseudotime step of the ion species transport equations} 
+    zetaGammae=1;       {factor multiplying the pseudotime step of the electron species transport equations
                            near cathode}
     relaxNi_bdry=1.0;     {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.5;     {the electron density relaxation factor at the boundary }
@@ -376,7 +376,7 @@ Cycle(
     if (iter==1,
       CFL=0.01;
     );
-    if (iter<3000,
+    if (iter<5000,
       CFLmax=0.6;
       Model(
         NavierStokesPlasma(Tmax=8000; emfieldworkheatfact=0.0;);
@@ -393,8 +393,8 @@ Cycle(
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     Lc=1;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.2; {relaxation factor forced on the update of the emfield variables}
-    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,1500); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
-    UpdateEMField(Lc,1.0,TSEMF_IMAF,30);
+    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,500); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+    {UpdateEMField(Lc,1.0,TSEMF_IMAF,30);}
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
