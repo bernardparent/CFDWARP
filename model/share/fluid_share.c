@@ -1517,10 +1517,11 @@ void condition_Lambda_plus_minus_Pascal(np_t *np, gl_t *gl, long lp0, long theta
 
 void condition_Lambda_plus_minus_Parent(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
   long flux,spec,dim,lp1;
-  double ap0,ap1,Vp0,Vp1,Vref,aref,factP,Pstarmax,Pstarmin,fact;
+  double ap0,ap1,Vp0,Vp1,Vref,aref,factP,Pstarmax,Pstarmin,factcommon;
   double lambdaadd1,lambdaadd2,lambdaadd,alphamin,alphamax,alphamass;
-  flux_t LUstarp0,LUstarp1,alpha;
+  flux_t LUstarp0,LUstarp1,alpha,fact;
   sqmat_t Lambdap0,Lambdap1;
+  bool FACTCOMMON[nf];
 
 
   /* FIRST, make sure the eigenvalues of the waves are within same order of magnitude as the spectral radius and, 
@@ -1533,15 +1534,24 @@ void condition_Lambda_plus_minus_Parent(np_t *np, gl_t *gl, long lp0, long theta
   find_Lambda_from_jacvars(jacvarsp1, metrics, Lambdap1);
   aref=max(ap0,ap1);
   Vref=max(fabs(Vp0),fabs(Vp1));
-  fact=1.0;
+  for (flux=0; flux<nf; flux++) FACTCOMMON[flux]=TRUE;
+#ifdef _FLUID_PLASMA
+  for (flux=0; flux<nf; flux++) {
+    if (flux<ncs) FACTCOMMON[flux]=FALSE;
+  }
+#endif
+  factcommon=1.0;
   for (flux=0; flux<nf; flux++){
-    fact=min(fact,(Vref+aref/notzero(jacvarsp0.zetaA2,1e-99))/notzero(max(Lambdaplus[flux][flux],-Lambdaminus[flux][flux]),1e-99));
+    fact[flux]=min(1.0,(Vref+aref/notzero(jacvarsp0.zetaA2,1e-99))/notzero(max(Lambdaplus[flux][flux],-Lambdaminus[flux][flux]),1e-99));
+    if (FACTCOMMON[flux]) factcommon=min(factcommon,fact[flux]);
   }
   for (flux=0; flux<nf; flux++){
-    Lambdaplus[flux][flux]=(1.0-fact)*max(0.0,Lambdap0[flux][flux])+fact*Lambdaplus[flux][flux];
-    Lambdaminus[flux][flux]=(1.0-fact)*min(0.0,Lambdap1[flux][flux])+fact*Lambdaminus[flux][flux];
+    if (FACTCOMMON[flux]) fact[flux]=factcommon;
   }
-
+  for (flux=0; flux<nf; flux++){
+    Lambdaplus[flux][flux]=(1.0-fact[flux])*max(0.0,Lambdap0[flux][flux])+fact[flux]*Lambdaplus[flux][flux];
+    Lambdaminus[flux][flux]=(1.0-fact[flux])*min(0.0,Lambdap1[flux][flux])+fact[flux]*Lambdaminus[flux][flux];
+  }
 
   /* SECOND, add eigenvalue conditioning in vicinity of pressure gradients to prevent carbuncle */
   lp1=_al(gl,lp0,theta,+1);
