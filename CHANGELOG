@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 APR 02b
+  * in model/share/fluid_share.c
+    - in condition_Lambda_plus_minus_Pascal(), reverted the conditioning to exactly how it is 
+      specified in Parent JCP 2018 paper. I.e., some small amount of conditioning takes place
+      when (Pmax-Pmin)/Pmin<0.3
+ 
+
 2019 APR 02a
   * in bin
     - added eps0_divE.eqn
