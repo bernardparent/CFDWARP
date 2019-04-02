@@ -7,6 +7,14 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 APR 02a
+  * in bin
+    - added eps0_divE.eqn
+    - updated ns_SDBD.wrp
+  * in model/fluid/_drift-diffusion/fluid.c and model/fluid/*plasma/fluid_source.c
+    - in find_dSstar_dUstar(), got rid of the variable declaration spec (not needed anymore)
+
+
 2019 MAR 31b
   * in bin
     - updated reentry_sheath.wrp

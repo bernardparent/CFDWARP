@@ -160,6 +160,7 @@ Model(
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=YES;
     REACTING=YES;
+    emfieldworkheatfact=1.0;
     sigmadiv=1e-18; {S/m}
     etdiv=1e-1;     {J/kg}
     Pmin=1.0e3;    Pmax=9.9e99;   {Pa}
@@ -274,7 +275,7 @@ Disc(
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.95;
     INTERPOL=INTERPOL_AOWENO7;
-    EIGENVALCOND=EIGENVALCOND_PARENT;
+    EIGENVALCOND=EIGENVALCOND_PARENT; 
     POSFILTER_numiter=4;
     POSFILTER=POSFILTER_PARENT;
     FACEINTEG=FACEINTEG_CENTRAL1;
