@@ -1,3 +1,6 @@
+average.c                    reads the data from various input files and outputs the 
+                             averaged values to an output file
+
 bdrylayer.c                  finds the thickness and skin friction coefficient of laminar 
                              and turbulent compressible and incompressible boundary layers
 

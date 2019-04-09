@@ -7,6 +7,14 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 APR 09b
+  * in tools
+    - added average.c (from Prasanna)
+    - updated README
+  * in CONTRIB
+    - added average.c to Prasanna's contributions
+
+
 2019 APR 09a
   * in cycle/res/_generic/res.c and cycle/resconv/*/resconv.c and cycle/resssource/*/ressource.c  
     - replaced _RESTIME_STORAGE_TRAPEZOIDAL by _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL in various

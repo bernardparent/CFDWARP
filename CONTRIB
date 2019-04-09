@@ -47,6 +47,7 @@ Schwartzentruber, Tom
 Thoguluva Rajendran, Prasanna
   - addition of bin/taylor_green_vortex.*
   - tools/average.sh
+  - tools/average.c
  
 Weerakoon, Minindu
   - Fixes to memory leaks problems (see CHANGELOG 19feb23a and 19feb27a and 19feb28b) 
