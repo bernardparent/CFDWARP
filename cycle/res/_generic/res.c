@@ -63,7 +63,7 @@ void add_dKstar_dG_residual(long theta, long ls, long le, np_t *np, gl_t *gl, do
       for (flux=0; flux<nf; flux++){
         if (l!=_l_plus_one(le,gl,theta)) np[l].wk->Res[flux]+=fact*tmpm1h[flux];
         if (l!=ls) np[_al(gl,l,theta,-1)].wk->Res[flux]-=fact*tmpm1h[flux];
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
         if (l!=_l_plus_one(le,gl,theta)) np[l].bs->Res_trapezoidal[flux]+=fact_trapezoidal*tmpm1h[flux];
         if (l!=ls) np[_al(gl,l,theta,-1)].bs->Res_trapezoidal[flux]-=fact_trapezoidal*tmpm1h[flux];
 #endif
@@ -120,7 +120,7 @@ void add_dDstarU_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doub
     for (flux=0; flux<nf; flux++){
       if (l!=_l_plus_one(le,gl,theta)) np[l].wk->Res[flux]-=fact*tmpm1h[flux];
       if (l!=ls) np[_al(gl,l,theta,-1)].wk->Res[flux]+=fact*tmpm1h[flux];
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
       if (l!=_l_plus_one(le,gl,theta)) np[l].bs->Res_trapezoidal[flux]-=fact_trapezoidal*tmpm1h[flux];
       if (l!=ls) np[_al(gl,l,theta,-1)].bs->Res_trapezoidal[flux]+=fact_trapezoidal*tmpm1h[flux];
 #endif
@@ -204,7 +204,7 @@ void add_Ystar_dH_residual(long theta, long ls, long le, np_t *np, gl_t *gl, dou
 
     for (flux=0; flux<nf; flux++){
       np[l].wk->Res[flux]+=fact*(+tmpm1h[flux]+tmpp1h[flux]);
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
       np[l].bs->Res_trapezoidal[flux]+=fact_trapezoidal*(+tmpm1h[flux]+tmpp1h[flux]);
 #endif
       
@@ -296,7 +296,7 @@ void init_residual(np_t *np, gl_t *gl, long theta, long ls, long le){
   for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
     thread_lock_node_set(np,l,THREADTYPE_ZONE);
     for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]=0.0e0;
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
     for (flux=0; flux<nf; flux++) np[l].bs->Res_trapezoidal[flux]=0.0e0;
 #endif
 #ifdef _RESCONV_DELTA_LAMBDA_STORAGE    

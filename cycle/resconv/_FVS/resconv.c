@@ -364,7 +364,7 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
 
     for (flux=0; flux<nf; flux++) {
       np[l].wk->Res[flux]+=fact*(Fp1h[flux]-Fm1h[flux]);
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
       np[l].bs->Res_trapezoidal[flux]+=fact_trapezoidal*(Fp1h[flux]-Fm1h[flux]); 
 #endif
     }

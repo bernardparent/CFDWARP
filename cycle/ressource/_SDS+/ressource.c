@@ -103,7 +103,7 @@ void add_Sstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double
       for (flux=0; flux<nf; flux++) np[l].bs->Lambda_S_minus[flux]=Lambdaminus[flux][flux];
 #endif
       for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]-=fact*(Splus[flux]+Sminus[flux]);
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
       for (flux=0; flux<nf; flux++) np[l].bs->Res_trapezoidal[flux]-=fact_trapezoidal*S[flux];
 #endif
     }

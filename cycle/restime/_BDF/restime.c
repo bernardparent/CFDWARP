@@ -92,9 +92,6 @@ void add_Z_dUstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, dou
       find_Z(np,gl,l,Z);
       multiply_matrix_and_vector(Z, tmp, dRes);
       for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]+=fact*dRes[flux];
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL
-      for (flux=0; flux<nf; flux++) np[l].bs->Res_trapezoidal[flux]+=fact_trapezoidal*dRes[flux];
-#endif
     }
 }
 

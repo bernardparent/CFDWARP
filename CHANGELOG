@@ -7,6 +7,47 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 APR 09a
+  * in cycle/res/_generic/res.c and cycle/resconv/*/resconv.c and cycle/resssource/*/ressource.c  
+    - replaced _RESTIME_STORAGE_TRAPEZOIDAL by _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL in various
+      locations
+  * in cycle/resconv/_MUSCL/resconv.c
+    - added find_Fstar_interface_trapezoidal()
+    - changed flux_t musclvars* to musclvarscycle_t musclvars*
+    - in find_musclvars_offset_local(), changed nf to nmc in some loops related to musclvars
+    - in add_dFstar_residual(), changed nf to nmc in some loops related to musclvars
+    - in add_dFstar_residual() now calls find_Fstar_interface_trapezoidal
+  * in cycle/resconv/_MUSCL/resconv.c
+    - changed flux_t musclvars* to musclvarscycle_t musclvars*
+  * renamed
+    - find_musclvars_offset() to find_musclvarscycle_offset()
+    - find_musclvars_offset_local() to find_musclvarscycle_offset_local()
+  * in cycle/restime/_BDF/restime.c and cycle/restime/_CDF+/restime.c
+    - deleted code related to TRAPEZOIDAL method
+  * in cycle/restime/_Trapezoidal/restime.hh
+    - added #define _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
+  * in cycle/share/cycle_share.c
+    - added find_musclvarscycle()
+    - made numfluidvars and numlinkvars function of nmc
+    - in update_linked_nodes(), changed flux_t musclvars to musclvarscycle_t musclvars
+    - in update_linked_nodes(), calls find_musclvarscycle() instead of find_musclvars()
+    - in update_linked_nodes(), changed nf to nmc where appropriate
+    - in increase_time_level(), added call to find_musclvars() when _RESTIME_STORAGE_TRAPEZOIDAL_MUSCLVARS 
+      is defined
+  * in cycle/share/cycle_share.h
+    - added definitions of nmc and of musclvarscycle_t
+  * in cycle/share/res_share.c
+    - in find_musclvarscycle_offset(), changed nf to nmc where appropriate
+    - now calls find_musclvarscycle() instead of find_musclvars()
+  * in src/bdry.c
+    - in read_bdry_actions(), changed nf to nmc where appropriate
+  * in src/init.c
+    - in read_init_actions(), added call to find_musclvars() when _RESTIME_STORAGE_TRAPEZOIDAL_MUSCLVARS
+      is defined 
+  * in cycle/restime/
+    - added _Trapezoidal+
+
+
 2019 APR 02b
   * in model/share/fluid_share.c
     - in condition_Lambda_plus_minus_Pascal(), reverted the conditioning to exactly how it is 

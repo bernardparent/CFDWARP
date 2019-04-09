@@ -36,6 +36,14 @@
 #define PRECON_LOCALEIGENVALUE 12
 #define PRECON_LOCALEIGENVALUE2 13
 
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_MUSCLVARS
+#define nmc (2*nf)
+#else
+#define nmc nf
+#endif
+
+typedef double musclvarscycle_t[nmc];
+
 
 typedef struct{
   zone_t *res;
@@ -46,6 +54,8 @@ typedef struct{
   zone_t domain;
 #endif
 } multizone_t;
+
+void find_musclvarscycle(np_t np, gl_t *gl, musclvarscycle_t musclvars);
 
 void sweep_with_1D_segments(np_t *np, gl_t *gl, zone_t zone,
                    void funct(np_t *, gl_t *, long, long, long), int sweeptype,

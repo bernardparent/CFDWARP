@@ -179,6 +179,15 @@ Disc(
     AOWENO_gammahi=0.95;
     INTERPOL=INTERPOL_AOWENO5;
     EIGENVALCOND=EIGENVALCOND_GNOFFO; 
+    POSFILTER=POSFILTER_NONE;
+    POSFILTER_numiter=4;
+    FACEINTEG=FACEINTEG_CENTRAL1;
+  );
+  CDFplus(
+    xi[1]=0.5;
+    xi[2]=0.5;
+    xi[3]=0.5;
+    xi[4]=0.5;
   );
   MUSCLplus(
     FLUX=FLUX_FDSplus;

@@ -59,6 +59,16 @@ void *segmentfunct(void *segmentarg){
 }
 
 
+void find_musclvarscycle(np_t np, gl_t *gl, musclvarscycle_t musclvars){
+  find_musclvars(np,gl,musclvars);
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_MUSCLVARS
+  long flux;
+//  for (flux=0; flux<nf; flux++) musclvars[nf+flux]=musclvars[flux];
+  for (flux=0; flux<nf; flux++) musclvars[nf+flux]=np.bs->Res_trapezoidal_m1[flux];
+#endif
+}
+
+
 static void execute_function_on_all_segments(segmentarg_t *segmentarg, long numsegment,  int SEGMENTWORK){
   if (
 #if !defined(POSIXTHREADS) && !defined(OPENMPTHREADS)
@@ -336,8 +346,8 @@ void update_bdry_nodes(np_t *np, gl_t *gl, zone_t zone){
 
 #ifdef DISTMPI
 
-#define numfluidvars (nf+1+max(0,hbw_resconv_fluid-1)*nf)
-#define numlinkvars (nf+(hbw_resconv_fluid-1-1)*nf)
+#define numfluidvars (nf+1+max(0,hbw_resconv_fluid-1)*nmc)
+#define numlinkvars ((hbw_resconv_fluid-1)*nmc)
 #define DOUBLE_INT_MAX 100000000000000
 
 typedef double sendvars_t[max(nfe,numfluidvars)];
@@ -402,7 +412,7 @@ void update_linked_nodes_2(np_t *np, gl_t *gl, int TYPELEVEL){
 void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   long i,j,k,l1,l2,flux,offset,l,cntlink;
   MPI_Status MPI_Status1;
-  flux_t musclvars;
+  musclvarscycle_t musclvars;
   sendvars_t mpivars;
   int thisrank,numproc,rank2,rank1,thisproc;
   int packsize,buffersize,bbuffersize;
@@ -441,7 +451,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   MPI_Pack_size( 1, MPI_DOUBLE, MPI_COMM_WORLD, &packsize );
   
   recvproc=(int *)malloc((numproc+2)*sizeof(int));
-  buffersize = min(INT_MAX,nf*(zone.ie-zone.is)*(zone.je-zone.js)if3DL(*(zone.ke-zone.ks)) * (MPI_BSEND_OVERHEAD + packsize));
+  buffersize = min(INT_MAX,nmc*(zone.ie-zone.is)*(zone.je-zone.js)if3DL(*(zone.ke-zone.ks)) * (MPI_BSEND_OVERHEAD + packsize));
   buffer = (double *)malloc( buffersize );
 
   MPI_Buffer_attach( buffer, buffersize );
@@ -481,8 +491,8 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
                   mpivars[nf]=(double)_nodes_between_link_and_bdry_limited(np, gl, _l_from_l_all(gl,l1), l2, TYPELEVEL, max(0,hbw_resconv_fluid-1));
                   for (offset=1; offset<hbw_resconv_fluid; offset++) {
 //                  find_prim_fluid(np, _al_link(np, gl, _l_from_l_all(gl,l1), offset, TYPELEVEL), gl);
-                    find_musclvars(np[_al_link(np, gl, _l_from_l_all(gl,l1), l2, offset, TYPELEVEL)], gl, musclvars);
-                    for (flux=0; flux<nf; flux++) mpivars[1+flux+offset*nf]=musclvars[flux];
+                    find_musclvarscycle(np[_al_link(np, gl, _l_from_l_all(gl,l1), l2, offset, TYPELEVEL)], gl, musclvars);
+                    for (flux=0; flux<nmc; flux++) mpivars[1+flux+nf+(offset-1)*nmc]=musclvars[flux];
                   }
                   if (rank1!=rank2){
                     for (flux=0; flux<numvars; flux++) sendnode[cntsend].vars[flux]=mpivars[flux];
@@ -502,7 +512,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
                     assert(is_node_link(np[l],TYPELEVEL));
                     np[l].numlinkmusclvars=(short)round(mpivars[nf]);
                     for (offset=1; offset<hbw_resconv_fluid; offset++) {
-                      for (flux=0; flux<nf; flux++) np[l].linkmusclvars[flux+(offset-1)*nf]=mpivars[1+flux+offset*nf];
+                      for (flux=0; flux<nmc; flux++) np[l].linkmusclvars[flux+(offset-1)*nmc]=mpivars[1+flux+nf+(offset-1)*nmc];
                     }
                    
                   } 
@@ -622,8 +632,8 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
                   assert(np[l].linkmusclvars!=NULL);
                   np[l].numlinkmusclvars=(short)round(mpivars[nf]);
                   for (offset=1; offset<hbw_resconv_fluid; offset++) {
-                    for (flux=0; flux<nf; flux++)
-                      np[l].linkmusclvars[flux+(offset-1)*nf]=mpivars[1+flux+offset*nf];
+                    for (flux=0; flux<nmc; flux++)
+                      np[l].linkmusclvars[flux+(offset-1)*nmc]=mpivars[1+flux+nf+(offset-1)*nmc];
                   }
                 }
 #ifdef EMFIELD
@@ -953,10 +963,13 @@ void increase_time_level(np_t *np, gl_t *gl){
             np[l].bs->Um2[flux]=np[l].bs->Um1[flux];
 #endif
             np[l].bs->Um1[flux]=np[l].bs->U[flux];
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
             np[l].bs->Res_trapezoidal_m1[flux]=np[l].bs->Res_trapezoidal[flux];
 #endif
           }
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_MUSCLVARS
+          find_musclvars(np[l],gl,np[l].bs->Res_trapezoidal_m1);
+#endif
         }
 #ifdef EMFIELD
         if ((is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD))){

@@ -779,7 +779,7 @@ void add_dFstar_residual_old(long theta, long ls, long le, np_t *np, gl_t *gl, d
     find_Fstar_interface(np, gl, metrics, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, *jacvarsp1h, Fp1h);
 
     for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]+=fact*(Fp1h[flux]-Fm1h[flux]);
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
     for (flux=0; flux<nf; flux++) np[l].bs->Res_trapezoidal[flux]+=fact_trapezoidal*(Fp1h[flux]-Fm1h[flux]);
 #endif
 #ifdef _RESCONV_DELTA_LAMBDA_STORAGE
@@ -836,7 +836,7 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
                theta, *jacvarsm1h,*jacvarsp1h,*jacvarsp3h,Fp1h);
 
     for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]+=fact*(Fp1h[flux]-Fm1h[flux]);
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
     for (flux=0; flux<nf; flux++) np[l].bs->Res_trapezoidal[flux]+=fact_trapezoidal*(Fp1h[flux]-Fm1h[flux]);
 #endif
 #ifdef _RESCONV_DELTA_LAMBDA_STORAGE

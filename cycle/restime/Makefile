@@ -12,6 +12,7 @@ cleanall:
 	( cd _RK4 ; make cleanall )
 	( cd _TVDRK ; make cleanall )
 	( cd _Trapezoidal ; make cleanall )
+	( cd _Trapezoidal+ ; make cleanall )
 	( cd _BDF ; make cleanall )
 	( cd _CDF+ ; make cleanall )
 

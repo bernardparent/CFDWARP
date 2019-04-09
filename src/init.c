@@ -297,10 +297,15 @@ void read_init_actions(char *actionname, char **argum, SOAP_codex_t *codex){
        for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
         for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
          for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
-          for (flux=0; flux<nf; flux++){
+          #ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
+           for (flux=0; flux<nf; flux++){
             (*np)[_ai(gl,i,j,k)].bs->Res_trapezoidal_m1[flux]=0.0;
             (*np)[_ai(gl,i,j,k)].bs->Res_trapezoidal[flux]=0.0;
-          }
+           }
+          #endif
+          #ifdef _RESTIME_STORAGE_TRAPEZOIDAL_MUSCLVARS
+           find_musclvars((*np)[_ai(gl,i,j,k)],gl,(*np)[_ai(gl,i,j,k)].bs->Res_trapezoidal_m1);
+          #endif
          end3DL
         end2DL
        end1DL

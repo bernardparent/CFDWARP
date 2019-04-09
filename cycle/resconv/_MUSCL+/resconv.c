@@ -118,7 +118,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
 }
 
 
-static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t musclvarsm7h, flux_t musclvarsm5h, flux_t musclvarsm3h, flux_t musclvarsm1h, flux_t musclvarsp1h, flux_t musclvarsp3h, flux_t musclvarsp5h, flux_t musclvarsp7h, flux_t Fint, sqmat_t lambdaminusp1h, sqmat_t lambdaplusm1h){
+static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, musclvarscycle_t musclvarsm7h, musclvarscycle_t musclvarsm5h, musclvarscycle_t musclvarsm3h, musclvarscycle_t musclvarsm1h, musclvarscycle_t musclvarsp1h, musclvarscycle_t musclvarsp3h, musclvarscycle_t musclvarsp5h, musclvarscycle_t musclvarsp7h, flux_t Fint, sqmat_t lambdaminusp1h, sqmat_t lambdaplusm1h){
   metrics_t metrics;
   long flux,nodes_from_bdry;
   flux_t musclvarsL,musclvarsR,Finttmp;
@@ -224,21 +224,21 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
   flux_t Fm1h,Fp1h;
   long flux,l;
   sqmat_t Lambdaminus_p0,Lambdaplus_p0,Lambdaminus_p1;
-  flux_t musclvarsm4,musclvarsm3,musclvarsm2,musclvarsm1,musclvarsp0,musclvarsp1,
+  musclvarscycle_t musclvarsm4,musclvarsm3,musclvarsm2,musclvarsm1,musclvarsp0,musclvarsp1,
          musclvarsp2,musclvarsp3,musclvarsp4;
 
   for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
 
     if(l==ls){
-      if (hbw_resconv_fluid>=4) find_musclvars_offset(np,gl,l,theta,-4,musclvarsm4);
-      find_musclvars_offset(np,gl,l,theta,-3,musclvarsm3);
-      find_musclvars_offset(np,gl,l,theta,-2,musclvarsm2);
-      find_musclvars_offset(np,gl,l,theta,-1,musclvarsm1);
-      find_musclvars_offset(np,gl,l,theta,+0,musclvarsp0);
-      find_musclvars_offset(np,gl,l,theta,+1,musclvarsp1);
-      find_musclvars_offset(np,gl,l,theta,+2,musclvarsp2);
-      find_musclvars_offset(np,gl,l,theta,+3,musclvarsp3);
-      if (hbw_resconv_fluid>=4) find_musclvars_offset(np,gl,l,theta,+4,musclvarsp4);
+      if (hbw_resconv_fluid>=4) find_musclvarscycle_offset(np,gl,l,theta,-4,musclvarsm4);
+      find_musclvarscycle_offset(np,gl,l,theta,-3,musclvarsm3);
+      find_musclvarscycle_offset(np,gl,l,theta,-2,musclvarsm2);
+      find_musclvarscycle_offset(np,gl,l,theta,-1,musclvarsm1);
+      find_musclvarscycle_offset(np,gl,l,theta,+0,musclvarsp0);
+      find_musclvarscycle_offset(np,gl,l,theta,+1,musclvarsp1);
+      find_musclvarscycle_offset(np,gl,l,theta,+2,musclvarsp2);
+      find_musclvarscycle_offset(np,gl,l,theta,+3,musclvarsp3);
+      if (hbw_resconv_fluid>=4) find_musclvarscycle_offset(np,gl,l,theta,+4,musclvarsp4);
 
 
       find_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, musclvarsm4, musclvarsm3, musclvarsm2, musclvarsm1, musclvarsp0, musclvarsp1, musclvarsp2, musclvarsp3, Fm1h,Lambdaminus_p1,Lambdaplus_p0);
@@ -260,13 +260,13 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
       Lambdaminus_p0[flux][flux]=Lambdaminus_p1[flux][flux];
     }
 
-    find_musclvars_offset(np,gl,l,theta,+3,musclvarsp3);
+    find_musclvarscycle_offset(np,gl,l,theta,+3,musclvarsp3);
 
 
     find_Fstar_interface(np, gl, l, theta, musclvarsm3, musclvarsm2, musclvarsm1, musclvarsp0, musclvarsp1, musclvarsp2, musclvarsp3, musclvarsp4, Fp1h,Lambdaminus_p1,Lambdaplus_p0);
     for (flux=0; flux<nf; flux++){
       np[l].wk->Res[flux]+=fact*(Fp1h[flux]-Fm1h[flux]);
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
       np[l].bs->Res_trapezoidal[flux]+=fact_trapezoidal*(Fp1h[flux]-Fm1h[flux]);
 #endif
       np[l].bs->Delta_Lambda[theta][flux]=-Lambdaminus_p0[flux][flux]    +Lambdaplus_p0[flux][flux];

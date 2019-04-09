@@ -1,6 +1,7 @@
 #include <src/bdry.h>
 #include <model/metrics/_metrics.h>
 #include <src/control.h>
+#include <cycle/share/cycle_share.h>
 #define minadjnode 2
 
 
@@ -231,10 +232,10 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
 
 #ifdef DISTMPI
         if (is_node_bdry((*np)[l1],TYPELEVEL)){
-          (*np)[l1].linkmusclvars=(double *)realloc((*np)[l1].linkmusclvars,(max(0,hbw_resconv_fluid-1)*nf)*sizeof(double));
+          (*np)[l1].linkmusclvars=(double *)realloc((*np)[l1].linkmusclvars,(max(0,hbw_resconv_fluid-1)*nmc)*sizeof(double));
         } else {
           assert(is_node_bdry((*np)[l2],TYPELEVEL));
-          (*np)[l2].linkmusclvars=(double *)realloc((*np)[l2].linkmusclvars,(max(0,hbw_resconv_fluid-1)*nf)*sizeof(double));
+          (*np)[l2].linkmusclvars=(double *)realloc((*np)[l2].linkmusclvars,(max(0,hbw_resconv_fluid-1)*nmc)*sizeof(double));
         }
 #endif
       break;

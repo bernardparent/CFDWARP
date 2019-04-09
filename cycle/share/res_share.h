@@ -3,6 +3,7 @@
 
 #include <model/_model.h>
 #include <src/common.h>
+#include <cycle/share/cycle_share.h>
 
 #define LIMITER_FIRSTORDER 0
 #define LIMITER_MINMOD 1
@@ -38,7 +39,8 @@
 #define AVERAGING_ROE 1
 
 
-void find_musclvars_offset(np_t *np, gl_t *gl, long l, long theta, long offset, flux_t musclvars);
+
+void find_musclvarscycle_offset(np_t *np, gl_t *gl, long l, long theta, long offset, musclvarscycle_t musclvars);
 
 double _f_AOWENO5(double um2, double um1, double up0, double up1, 
                    double up2, double x, double gammalo, double gammahi, int AOWENO_TYPE);

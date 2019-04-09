@@ -17,7 +17,7 @@ J.R. Kamm, F.X. Timmes, On efficient generation of numerically robust Sedov Solu
 }
 
 
- meshfact=1;
+ meshfact=0.25*1.8;
 tf=2;
 
   is=1;  js=1;  ks=1;
@@ -201,17 +201,15 @@ Cycle(
     PRECONDITIONER=PRECON_LOCALEIGENVALUE;
     if (iter==1,
      if (time==0,
-        dt=1e-4/meshfact;
+        dt=1e-4/meshfact/tf/2;
+        CFL=0.01;
       ,{else}
-          dt=min(dt*1.4,tmax/round(50*meshfact));
+        dt=min(dt*1.4,tmax/round(50*meshfact)/tf);
+        CFL=CFLref;            
      );
     );
-    CFL=CFLref;            
+
     
-    if (iter==1,
-      CFL=0.0001;
-    );
-    CFL=CFLref;
     if (time==0,
       CFLmax=CFLref_firstiter;
     ,{else}
