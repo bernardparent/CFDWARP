@@ -660,7 +660,7 @@ static void integrate_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, fl
 }
 
 
-void add_dFstar_residual_new(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
+void add_dFstar_residual_new(long theta, long ls, long le, np_t *np, gl_t *gl){
   flux_t Fm1h,Fp1h;
   long flux,l;
 
@@ -675,23 +675,27 @@ void add_dFstar_residual_new(long theta, long ls, long le, np_t *np, gl_t *gl, d
     }
     integrate_Fstar_interface(np, gl, l, theta, Fp1h);
 
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
     for (flux=0; flux<nf; flux++) {
-      np[l].wk->Res[flux]+=fact*(Fp1h[flux]-Fm1h[flux]);
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
-      np[l].bs->Res_trapezoidal[flux]+=fact_trapezoidal*(Fp1h[flux]-Fm1h[flux]); 
-#endif
+      np[l].bs->Res_trapezoidal[flux]+=gl->cycle.restime.weightm1_trapezoidal_convection*(Fp1h[flux]-Fm1h[flux]);
+      np[l].wk->Res[flux]+=(1.0-gl->cycle.restime.weightm1_trapezoidal_convection)*(Fp1h[flux]-Fm1h[flux]);
     }
+#else
+    for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]+=(Fp1h[flux]-Fm1h[flux]);
+#endif
+
   }
 
 }
 
 
 
-void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
+void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
   flux_t Fm1h,Fp1h;
   long flux,l;
   flux_t musclvarsm5,musclvarsm4,musclvarsm3,musclvarsm2,musclvarsm1,musclvarsp0,musclvarsp1,
          musclvarsp2,musclvarsp3,musclvarsp4,musclvarsp5;
+
 
   for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
 
@@ -764,12 +768,16 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
 
     }
 
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
     for (flux=0; flux<nf; flux++) {
-      np[l].wk->Res[flux]+=fact*(Fp1h[flux]-Fm1h[flux]);
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
-      np[l].bs->Res_trapezoidal[flux]+=fact_trapezoidal*(Fp1h[flux]-Fm1h[flux]); 
-#endif
+      np[l].bs->Res_trapezoidal[flux]+=gl->cycle.restime.weightm1_trapezoidal_convection*(Fp1h[flux]-Fm1h[flux]);
+      np[l].wk->Res[flux]+=(1.0-gl->cycle.restime.weightm1_trapezoidal_convection)*(Fp1h[flux]-Fm1h[flux]);
     }
+#else
+    for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]+=(Fp1h[flux]-Fm1h[flux]);
+#endif
+
+
   }
 
 }

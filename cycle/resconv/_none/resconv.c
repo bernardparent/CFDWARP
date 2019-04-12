@@ -26,7 +26,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
 }
 
 
-void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
+void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
 }
 
 

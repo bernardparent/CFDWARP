@@ -178,6 +178,10 @@ Disc(
     xi[3]=0.5; 
     xi[4]=0.5; 
   );
+  Trapezoidal(
+    weightm1_convection=0.5;
+    weightm1_default=0.0;
+  );
 );
 
 

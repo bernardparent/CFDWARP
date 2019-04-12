@@ -189,20 +189,20 @@ void find_Lambdaxt_minus_dtau(np_t *np, gl_t *gl, long l, long theta, sqmat_t La
 }
 
 
-void add_Z_dUstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
+void add_Z_dUstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
   long l;
   long flux;
   flux_t tmp,dRes;
   sqmat_t Z;
 
-    for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
-      for (flux=0; flux<nf; flux++){
-        tmp[flux]=_Omega(np[l],gl)*(np[l].bs->U[flux]-np[l].bs->Um1[flux])/gl->dt;
-      }      
-      find_Z(np,gl,l,Z);
-      multiply_matrix_and_vector(Z, tmp, dRes);
-      for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]+=fact*dRes[flux];
-    }
+  for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
+    for (flux=0; flux<nf; flux++){
+      tmp[flux]=_Omega(np[l],gl)*(np[l].bs->U[flux]-np[l].bs->Um1[flux])/gl->dt;
+    }      
+    find_Z(np,gl,l,Z);
+    multiply_matrix_and_vector(Z, tmp, dRes);
+    for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]+=dRes[flux];
+  }
 }
 
 
@@ -274,7 +274,6 @@ void find_dFstarxt_dUstar_interface(np_t *np, gl_t *gl, long theta, long l, jacv
       C[row][col]=Omegap1h/Omegap1*(-Aminus[row][col]);
     }
   }
-
 
 }
 

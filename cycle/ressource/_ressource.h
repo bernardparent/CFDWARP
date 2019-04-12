@@ -5,7 +5,7 @@
 #include <model/_model.h>
 
 
-void add_Sstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal);
+void add_Sstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl);
 
 
 

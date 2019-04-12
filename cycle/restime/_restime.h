@@ -34,7 +34,7 @@ void write_disc_restime_template(FILE **controlfile);
 
 void read_disc_restime_actions(char *actionname, char **argum, SOAP_codex_t *codex);
 
-void add_Z_dUstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal);
+void add_Z_dUstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl);
 
 void update_U_predictor_corrector(np_t *np, gl_t *gl, zone_t zone);
 

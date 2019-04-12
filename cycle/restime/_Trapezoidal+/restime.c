@@ -22,29 +22,25 @@ void read_disc_restime_actions(char *actionname, char **argum, SOAP_codex_t *cod
 
 
 
-void add_Z_dUstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
+
+
+void add_Z_dUstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
   long l;
   long flux;
-  flux_t tmp,dRes,Up1h,Um1h;
+  flux_t tmp,dRes;
   sqmat_t Z;
 
-    for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
-      for (flux=0; flux<nf; flux++) {
-        Up1h[flux]= 
-              +1.0*np[l].bs->U[flux]; 
-        Um1h[flux]= 
-              +1.0*np[l].bs->Um1[flux]; 
-      }
-        
-      for (flux=0; flux<nf; flux++){
-        tmp[flux]=_Omega(np[l],gl)*(Up1h[flux]-Um1h[flux])/gl->dt;
-      }
-      
-      find_Z(np,gl,l,Z);
-      multiply_matrix_and_vector(Z, tmp, dRes);
-      for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]+=fact*dRes[flux];
-    }
+  for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
+    for (flux=0; flux<nf; flux++){
+      tmp[flux]=_Omega(np[l],gl)*(np[l].bs->U[flux]-np[l].bs->Um1[flux])/gl->dt;
+    }      
+    find_Z(np,gl,l,Z);
+    multiply_matrix_and_vector(Z, tmp, dRes);
+    for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]+=dRes[flux];
+  }
 }
+
+
 
 
 

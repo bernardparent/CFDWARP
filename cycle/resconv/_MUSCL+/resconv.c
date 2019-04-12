@@ -220,7 +220,7 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, musclva
 }
 
 
-void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
+void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
   flux_t Fm1h,Fp1h;
   long flux,l;
   sqmat_t Lambdaminus_p0,Lambdaplus_p0,Lambdaminus_p1;
@@ -262,13 +262,20 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
 
     find_musclvarscycle_offset(np,gl,l,theta,+3,musclvarsp3);
 
-
     find_Fstar_interface(np, gl, l, theta, musclvarsm3, musclvarsm2, musclvarsm1, musclvarsp0, musclvarsp1, musclvarsp2, musclvarsp3, musclvarsp4, Fp1h,Lambdaminus_p1,Lambdaplus_p0);
-    for (flux=0; flux<nf; flux++){
-      np[l].wk->Res[flux]+=fact*(Fp1h[flux]-Fm1h[flux]);
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
-      np[l].bs->Res_trapezoidal[flux]+=fact_trapezoidal*(Fp1h[flux]-Fm1h[flux]);
+
+
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
+    for (flux=0; flux<nf; flux++) {
+      np[l].bs->Res_trapezoidal[flux]+=gl->cycle.restime.weightm1_trapezoidal_convection*(Fp1h[flux]-Fm1h[flux]);
+      np[l].wk->Res[flux]+=(1.0-gl->cycle.restime.weightm1_trapezoidal_convection)*(Fp1h[flux]-Fm1h[flux]);
+    }
+#else
+    for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]+=(Fp1h[flux]-Fm1h[flux]);
 #endif
+
+
+    for (flux=0; flux<nf; flux++){
       np[l].bs->Delta_Lambda[theta][flux]=-Lambdaminus_p0[flux][flux]    +Lambdaplus_p0[flux][flux];
     }
   }

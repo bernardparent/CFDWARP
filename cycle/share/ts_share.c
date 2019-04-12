@@ -249,19 +249,23 @@ void add_dSstar_dUstar_to_TDMA(np_t *np, gl_t *gl, long l,  double fact, sqmat_t
 
 
 #ifdef UNSTEADY
-void add_Z_dUstardt_dUstar_to_TDMA(np_t *np, gl_t *gl, long l,  double fact, sqmat_t B){
+void add_Z_dUstardt_dUstar_to_TDMA(np_t *np, gl_t *gl, long l,  double weightp0, sqmat_t B){
   long row,col;
   sqmat_t dZU_dU;
 
   find_dZU_dU(np, gl, l, dZU_dU);
   /* make sure the jacobian has no negative diagonal element */
   for (row=0; row<nf; row++) dZU_dU[row][row]=max(0.0,dZU_dU[row][row]);
+  /* get rid of standard time derivative */
+  for (row=0; row<nf; row++) dZU_dU[row][row]-=1.0e0;
   /* the linearization is done assuming frozen Z */
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
-      B[row][col]+=fact*1.0e0/gl->dt*dZU_dU[row][col];
+      B[row][col]+=weightp0*1.0e0/gl->dt*dZU_dU[row][col];
     }
   }
+  /* add standard time derivative */
+  for (row=0; row<nf; row++) B[row][row]+=1.0e0/gl->dt;
 }
 #endif
 
@@ -607,14 +611,20 @@ void add_dFstar_dUstar_to_TDMA(np_t *np, gl_t *gl, long theta, long l, double fa
 void find_TDMA_jacobians_conservative(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
   sqmat_t B1,C1;
   long row,col;
-  double fact;
+  double weightp0_default,weightp0_convection;
+  weightp0_default=1.0;
+  weightp0_convection=1.0;
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
+  weightp0_default=1.0-gl->cycle.restime.weightm1_trapezoidal_default;
+  weightp0_convection=1.0-gl->cycle.restime.weightm1_trapezoidal_convection;
+#endif
+#ifdef _RESTIME_TRAPEZOIDAL_MUSCL
+  weightp0_default=1.0;
+  weightp0_convection=0.5;
+#endif
 
   set_matrix_to_zero(B);
   set_matrix_to_zero(C);
-  fact=1.0;
-#if (defined(_RESTIME_TRAPEZOIDAL))
-  fact=0.5;
-#endif
 
   if (_FLUID_CONVECTION) {
     
@@ -642,25 +652,21 @@ void find_TDMA_jacobians_conservative(np_t *np, gl_t *gl, long theta, long l, sq
 
     for (row=0; row<nf; row++){
       for (col=0; col<nf; col++){
-        B[row][col]=fact*B1[row][col];
-        C[row][col]=fact*C1[row][col];
+        B[row][col]=weightp0_convection*B1[row][col];
+        C[row][col]=weightp0_convection*C1[row][col];
       }
     }
 
   }
 
 
-#if (defined(_RESTIME_CDF_TRAPEZOIDAL))
-  fact=0.5;
-#endif
-
 
   if (_FLUID_DIFFUSION){
     find_Kstar_dG_dUstar_interface(np, gl, theta, l, B1, C1);
     for (row=0; row<nf; row++){
       for (col=0; col<nf; col++){
-        B[row][col]+=fact*B1[row][col];
-        C[row][col]+=fact*C1[row][col];
+        B[row][col]+=weightp0_default*B1[row][col];
+        C[row][col]+=weightp0_default*C1[row][col];
       }
     }
   }
@@ -669,8 +675,8 @@ void find_TDMA_jacobians_conservative(np_t *np, gl_t *gl, long theta, long l, sq
   find_Dstar_interface(np, gl, theta, l, B1, C1);
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
-      B[row][col]+=fact*B1[row][col];
-      C[row][col]+=fact*C1[row][col];
+      B[row][col]+=weightp0_default*B1[row][col];
+      C[row][col]+=weightp0_default*C1[row][col];
     }
   }
 #endif
@@ -679,23 +685,23 @@ void find_TDMA_jacobians_conservative(np_t *np, gl_t *gl, long theta, long l, sq
 
 
 void add_TDMA_jacobians_non_conservative(np_t *np, gl_t *gl, long theta, long l, sqmat_t A, sqmat_t B, sqmat_t C, bool SOURCETERM){
-  double fact;
-//  long flux;
-
-  fact=1.0;
-
-#ifdef UNSTEADY
-  if (SOURCETERM) add_Z_dUstardt_dUstar_to_TDMA(np, gl, l, fact, B);
-#endif   
-
-#if (defined(_RESTIME_TRAPEZOIDAL) || defined(_RESTIME_CDF_TRAPEZOIDAL))
-  fact=0.5;
+  double weightp0_default;
+  weightp0_default=1.0;
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
+  weightp0_default=1.0-gl->cycle.restime.weightm1_trapezoidal_default;
+#endif
+#ifdef _RESTIME_TRAPEZOIDAL_MUSCL
+  weightp0_default=1.0;
 #endif
 
-  if (SOURCETERM && _FLUID_SOURCE) add_dSstar_dUstar_to_TDMA(np, gl, l, fact, B);
+#ifdef UNSTEADY
+  if (SOURCETERM) add_Z_dUstardt_dUstar_to_TDMA(np, gl, l, weightp0_default, B);
+#endif   
+
+  if (SOURCETERM && _FLUID_SOURCE) add_dSstar_dUstar_to_TDMA(np, gl, l, weightp0_default, B);
 
 #ifdef _FLUID_PLASMA
-  add_Ystar_dH_dUstar_to_TDMA(np, gl, theta, l, fact, A, B, C);
+  add_Ystar_dH_dUstar_to_TDMA(np, gl, theta, l, weightp0_default, A, B, C);
 #endif
 
 // need to make sure that the diagonal elements of B are positive for stability purposes
@@ -706,26 +712,27 @@ void add_TDMA_jacobians_non_conservative(np_t *np, gl_t *gl, long theta, long l,
 
 void add_TDMA_jacobian_diagonally_dominant(np_t *np, gl_t *gl, long theta, long l, sqmat_t B){
   long dim;
-  double fact;
   sqmat_t garb;
+  double weightp0_default,weightp0_convection;
+  weightp0_default=1.0;
+  weightp0_convection=1.0;
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
+  weightp0_default=1.0-gl->cycle.restime.weightm1_trapezoidal_default;
+  weightp0_convection=1.0-gl->cycle.restime.weightm1_trapezoidal_convection;
+#endif
+#ifdef _RESTIME_TRAPEZOIDAL_MUSCL
+  weightp0_default=1.0;
+  weightp0_convection=0.5;
+#endif
   set_matrix_to_zero(garb);
+
   for (dim=0; dim<nd; dim++){
     if (dim!=theta){
-#if (defined(_RESTIME_TRAPEZOIDAL))
-      fact=0.5;
-#else
-      fact=1.0;
-#endif
-      if (_FLUID_CONVECTION) add_dFstar_dUstar_to_TDMA(np, gl, dim, l, fact, garb, B, garb);
-#if (defined(_RESTIME_TRAPEZOIDAL) || defined(_RESTIME_CDF_TRAPEZOIDAL))
-      fact=0.5;
-#else
-      fact=1.0;
-#endif
-      if (_FLUID_DIFFUSION) add_Kstar_dG_dUstar_to_TDMA(np, gl, dim, l, fact, garb, B, garb);
+      if (_FLUID_CONVECTION) add_dFstar_dUstar_to_TDMA(np, gl, dim, l, weightp0_convection, garb, B, garb);
+      if (_FLUID_DIFFUSION) add_Kstar_dG_dUstar_to_TDMA(np, gl, dim, l, weightp0_default, garb, B, garb);
 #ifdef _FLUID_PLASMA
-      add_Ystar_dH_dUstar_to_TDMA(np, gl, dim, l, fact, garb, B, garb);
-      add_Dstar_to_TDMA(np, gl, dim, l, fact, garb, B, garb);
+      add_Ystar_dH_dUstar_to_TDMA(np, gl, dim, l, weightp0_default, garb, B, garb);
+      add_Dstar_to_TDMA(np, gl, dim, l, weightp0_default, garb, B, garb);
 #endif
     }
   }

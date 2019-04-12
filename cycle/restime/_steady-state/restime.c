@@ -26,6 +26,6 @@ void find_Fstarxt_interface(np_t *np, gl_t *gl, long theta, long l, jacvars_t ja
 }
 
 
-void add_Z_dUstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
+void add_Z_dUstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
 }
 

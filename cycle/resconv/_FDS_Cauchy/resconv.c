@@ -752,49 +752,9 @@ static void find_Delta_Lambda_for_dtau_local(np_t *np, gl_t *gl, long l, long th
 }
 
 
-/*
-void add_dFstar_residual_old(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
-  jacvars_t *jacvarstmp,*jacvarsm1h,*jacvarsp1h;
-  flux_t Fm1h,Fp1h;
-  long flux,l;
-  metrics_t metrics;
-
-  jacvarsm1h= (jacvars_t *) malloc(sizeof(jacvars_t));
-  jacvarsp1h= (jacvars_t *) malloc(sizeof(jacvars_t));
-
-  l=_l_minus_one(ls,gl,theta);
-  find_metrics_at_interface(np, gl, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, &metrics);
-  find_jacvars_at_interface_normal(np,gl,metrics,_al(gl,l,theta,+0),_al(gl,l,theta,+1),theta,jacvarsp1h);
-  find_Fstar_interface(np, gl, metrics, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, *jacvarsp1h, Fp1h);
-
-  for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
-    jacvarstmp=jacvarsm1h;
-    jacvarsm1h=jacvarsp1h;
-    jacvarsp1h=jacvarstmp;
-  
-    for (flux=0; flux<nf; flux++) Fm1h[flux]=Fp1h[flux];
-
-    find_metrics_at_interface(np, gl, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, &metrics);
-    find_jacvars_at_interface_normal(np,gl,metrics,_al(gl,l,theta,+0),_al(gl,l,theta,+1),theta,jacvarsp1h);
-    find_Fstar_interface(np, gl, metrics, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, *jacvarsp1h, Fp1h);
-
-    for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]+=fact*(Fp1h[flux]-Fm1h[flux]);
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
-    for (flux=0; flux<nf; flux++) np[l].bs->Res_trapezoidal[flux]+=fact_trapezoidal*(Fp1h[flux]-Fm1h[flux]);
-#endif
-#ifdef _RESCONV_DELTA_LAMBDA_STORAGE
-    find_Delta_Lambda_for_dtau_local(np, gl, l, theta, np[l].bs->Delta_Lambda[theta]); 
-#endif
-  }
-
-  free(jacvarsm1h);
-  free(jacvarsp1h);
-}
-
-*/
 
 
-void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
+void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
   jacvars_t *jacvarstmp,*jacvarsm3h,*jacvarsm1h,*jacvarsp1h,*jacvarsp3h;
   flux_t Fm1h,Fp1h;
   long flux,l;
@@ -835,10 +795,16 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doubl
     find_Fstar_interface(np, gl, metricsp1h,_al(gl,l,theta,+0),_al(gl,l,theta,+1),
                theta, *jacvarsm1h,*jacvarsp1h,*jacvarsp3h,Fp1h);
 
-    for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]+=fact*(Fp1h[flux]-Fm1h[flux]);
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
-    for (flux=0; flux<nf; flux++) np[l].bs->Res_trapezoidal[flux]+=fact_trapezoidal*(Fp1h[flux]-Fm1h[flux]);
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
+    for (flux=0; flux<nf; flux++) {
+      np[l].bs->Res_trapezoidal[flux]+=gl->cycle.restime.weightm1_trapezoidal_convection*(Fp1h[flux]-Fm1h[flux]);
+      np[l].wk->Res[flux]+=(1.0-gl->cycle.restime.weightm1_trapezoidal_convection)*(Fp1h[flux]-Fm1h[flux]);
+    }
+#else
+    for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]+=(Fp1h[flux]-Fm1h[flux]);
 #endif
+
+
 #ifdef _RESCONV_DELTA_LAMBDA_STORAGE
     find_Delta_Lambda_for_dtau_local(np, gl, l, theta, *jacvarsm1h, *jacvarsp1h, metricsm1h, metricsp1h,  np[l].bs->Delta_Lambda[theta]); 
 #endif

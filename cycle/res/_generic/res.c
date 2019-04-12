@@ -20,12 +20,13 @@
 
 
       
-void add_dKstar_dG_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
+void add_dKstar_dG_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
   long l,vartheta,flux;
   flux_t Gp0[nd],Gm1[nd],dGm1h,tmpm1h;
   flux_t Gp0m1[nd],Gp0p1[nd],Gm1p1[nd],Gm1m1[nd];
   sqmat_t Km1h;
   metrics_t metricsm1h;
+  double weightp0;
 
   for (l=ls; l!=_l_plus_one(_l_plus_one(le,gl,theta),gl,theta); l=_l_plus_one(l,gl,theta)){
     find_metrics_at_interface(np, gl, _al(gl,l,theta,-1), _al(gl,l,theta,+0),
@@ -56,16 +57,20 @@ void add_dKstar_dG_residual(long theta, long ls, long le, np_t *np, gl_t *gl, do
         }
       }
       multiply_matrix_and_vector(Km1h,dGm1h,tmpm1h);
-
 #ifdef _RESCONV_INCLUDES_DIFFUSION
       for (flux=0; flux<nf; flux++) np[_al(gl,l,theta,-1)].wk->Fp1h_diffusion[theta][flux]=-tmpm1h[flux];
 #else
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
+      weightp0=(1.0-gl->cycle.restime.weightm1_trapezoidal_default);
+#else
+      weightp0=1.0;
+#endif
       for (flux=0; flux<nf; flux++){
-        if (l!=_l_plus_one(le,gl,theta)) np[l].wk->Res[flux]+=fact*tmpm1h[flux];
-        if (l!=ls) np[_al(gl,l,theta,-1)].wk->Res[flux]-=fact*tmpm1h[flux];
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
-        if (l!=_l_plus_one(le,gl,theta)) np[l].bs->Res_trapezoidal[flux]+=fact_trapezoidal*tmpm1h[flux];
-        if (l!=ls) np[_al(gl,l,theta,-1)].bs->Res_trapezoidal[flux]-=fact_trapezoidal*tmpm1h[flux];
+        if (l!=_l_plus_one(le,gl,theta)) np[l].wk->Res[flux]+=weightp0*tmpm1h[flux];
+        if (l!=ls) np[_al(gl,l,theta,-1)].wk->Res[flux]-=weightp0*tmpm1h[flux];
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
+        if (l!=_l_plus_one(le,gl,theta)) np[l].bs->Res_trapezoidal[flux]+=(1.0-weightp0)*tmpm1h[flux];
+        if (l!=ls) np[_al(gl,l,theta,-1)].bs->Res_trapezoidal[flux]-=(1.0-weightp0)*tmpm1h[flux];
 #endif
       }
 #endif
@@ -80,11 +85,12 @@ void add_dKstar_dG_residual(long theta, long ls, long le, np_t *np, gl_t *gl, do
 
 #ifdef _FLUID_PLASMA
 
-void add_dDstarU_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
+void add_dDstarU_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
   long l,flux;
   flux_t tmpm1h,DUstarplusm1,DUstarminusp0,DUstarplusp0,DUstarplusm2,DUstarminusm1,DUstarminusp1;
   flux_t Ustarm1,Ustarp0,Ustarm2,Ustarp1;
   sqmat_t Dstarplusm1,Dstarminusp0,Dstarplusp0,Dstarplusm2,Dstarminusm1,Dstarminusp1;
+  double weightm1;
 
     /*  FVS-TVD discretization of d(Dstar*Ustar)/dX */
   for (l=ls; l!=_l_plus_one(_l_plus_one(le,gl,theta),gl,theta); l=_l_plus_one(l,gl,theta)){
@@ -117,12 +123,17 @@ void add_dDstarU_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doub
 
     }
 
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
+    weightp0=1.0-gl->cycle.restime.weightm1_trapezoidal_default;
+#else
+    weightp0=1.0;
+#endif
     for (flux=0; flux<nf; flux++){
-      if (l!=_l_plus_one(le,gl,theta)) np[l].wk->Res[flux]-=fact*tmpm1h[flux];
-      if (l!=ls) np[_al(gl,l,theta,-1)].wk->Res[flux]+=fact*tmpm1h[flux];
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
-      if (l!=_l_plus_one(le,gl,theta)) np[l].bs->Res_trapezoidal[flux]-=fact_trapezoidal*tmpm1h[flux];
-      if (l!=ls) np[_al(gl,l,theta,-1)].bs->Res_trapezoidal[flux]+=fact_trapezoidal*tmpm1h[flux];
+      if (l!=_l_plus_one(le,gl,theta)) np[l].wk->Res[flux]-=weightp0*tmpm1h[flux];
+      if (l!=ls) np[_al(gl,l,theta,-1)].wk->Res[flux]+=weightp0*tmpm1h[flux];
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
+      if (l!=_l_plus_one(le,gl,theta)) np[l].bs->Res_trapezoidal[flux]-=(1.0-weightp0)*tmpm1h[flux];
+      if (l!=ls) np[_al(gl,l,theta,-1)].bs->Res_trapezoidal[flux]+=(1.0-weightp0)*tmpm1h[flux];
 #endif
     }
 
@@ -133,11 +144,12 @@ void add_dDstarU_residual(long theta, long ls, long le, np_t *np, gl_t *gl, doub
 
 
 
-void add_Ystar_dH_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
+void add_Ystar_dH_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
   long l,flux;
   flux_t tmpm1h,tmpp1h;
   flux_t Ystarm1h,Ystarp1h,Hp0,Hm1,Hp1,Hm2,Hp2;
   int cnt;
+  double weightp0;
 
 
     /* first-order discretization of Ystar*dH/dX 
@@ -202,10 +214,15 @@ void add_Ystar_dH_residual(long theta, long ls, long le, np_t *np, gl_t *gl, dou
       }
     }
 
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
+    weightp0=1.0-gl->cycle.restime.weightm1_trapezoidal_default;
+#else
+    weightp0=1.0;
+#endif
     for (flux=0; flux<nf; flux++){
-      np[l].wk->Res[flux]+=fact*(+tmpm1h[flux]+tmpp1h[flux]);
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
-      np[l].bs->Res_trapezoidal[flux]+=fact_trapezoidal*(+tmpm1h[flux]+tmpp1h[flux]);
+      np[l].wk->Res[flux]+=weightp0*(+tmpm1h[flux]+tmpp1h[flux]);
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
+      np[l].bs->Res_trapezoidal[flux]+=(1.0-weightp0)*(+tmpm1h[flux]+tmpp1h[flux]);
 #endif
       
     }
@@ -222,51 +239,34 @@ void add_Ystar_dH_residual(long theta, long ls, long le, np_t *np, gl_t *gl, dou
 
 
 
-
-
-
 void update_residual(np_t *np, gl_t *gl, long theta, long ls, long le){
   long l;
-#if (defined(_RESTIME_CDF_TRAPEZOIDAL) || defined(_RESTIME_TRAPEZOIDAL))
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
   long flux;
 #endif
-  double fact,fact_trapezoidal;
 //   wfprintf(stderr,"residual updated from i=%ld j=%ld to i=%ld j=%ld\n",np[ls].i,np[ls].j,np[le].i,np[le].j); 
 
-#if (defined(_RESTIME_CDF_TRAPEZOIDAL) || defined(_RESTIME_TRAPEZOIDAL))
-  fact=0.5;
-  fact_trapezoidal=0.5;
-#else
-  fact=1.0;
-  fact_trapezoidal=0.0;
-#endif
 
-  if (_FLUID_SOURCE) add_Sstar_residual(theta,ls,le,np,gl,fact,fact_trapezoidal);
+  if (_FLUID_SOURCE) add_Sstar_residual(theta,ls,le,np,gl);
 
-  if (_FLUID_DIFFUSION) add_dKstar_dG_residual(theta,ls,le,np,gl,fact,fact_trapezoidal);
+  if (_FLUID_DIFFUSION) add_dKstar_dG_residual(theta,ls,le,np,gl);
 
 #ifdef _FLUID_PLASMA
-  add_Ystar_dH_residual(theta,ls,le,np,gl,fact,fact_trapezoidal);
-  add_dDstarU_residual(theta,ls,le,np,gl,fact,fact_trapezoidal);
+  add_Ystar_dH_residual(theta,ls,le,np,gl);
+  add_dDstarU_residual(theta,ls,le,np,gl);
 #endif
 
-#ifdef _RESTIME_CDF
-  fact=1.0;
-  fact_trapezoidal=0.0;
-#endif
-  if (_FLUID_CONVECTION) add_dFstar_residual(theta,ls,le,np,gl,fact,fact_trapezoidal);
+  if (_FLUID_CONVECTION) add_dFstar_residual(theta,ls,le,np,gl);
 
 
 #ifdef UNSTEADY 
   if (theta==nd-1) {
-    fact=1.0;
-    fact_trapezoidal=0.0;
-    add_Z_dUstar_residual(theta, ls, le, np, gl,fact,fact_trapezoidal);
+    add_Z_dUstar_residual(theta, ls, le, np, gl);
   }
 #endif
 
 
-#if (defined(_RESTIME_CDF_TRAPEZOIDAL) || defined(_RESTIME_TRAPEZOIDAL))
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
   if (theta==nd-1) {
     for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)) {
       for (flux=0; flux<nf; flux++){
@@ -296,7 +296,7 @@ void init_residual(np_t *np, gl_t *gl, long theta, long ls, long le){
   for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
     thread_lock_node_set(np,l,THREADTYPE_ZONE);
     for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]=0.0e0;
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
     for (flux=0; flux<nf; flux++) np[l].bs->Res_trapezoidal[flux]=0.0e0;
 #endif
 #ifdef _RESCONV_DELTA_LAMBDA_STORAGE    

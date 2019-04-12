@@ -53,7 +53,7 @@ void read_disc_restime_actions(char *actionname, char **argum, SOAP_codex_t *cod
 
 
 
-void add_Z_dUstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
+void add_Z_dUstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
   long l;
   long flux;
   flux_t tmp,dRes,Up1h,Um1h;
@@ -91,7 +91,7 @@ void add_Z_dUstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, dou
       
       find_Z(np,gl,l,Z);
       multiply_matrix_and_vector(Z, tmp, dRes);
-      for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]+=fact*dRes[flux];
+      for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]+=dRes[flux];
     }
 }
 

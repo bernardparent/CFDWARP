@@ -294,6 +294,7 @@ void read_init_actions(char *actionname, char **argum, SOAP_codex_t *codex){
       #endif
 
       #ifdef _RESTIME_STORAGE_TRAPEZOIDAL
+//       resume_nodes_only_in_zone_and_update_bdry_nodes(*np, gl, _zone_intersection(gl->domain_all,_zone_expansion(gl->domain,+hbw_res_fluid)));
        for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
         for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
          for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
@@ -304,7 +305,7 @@ void read_init_actions(char *actionname, char **argum, SOAP_codex_t *codex){
            }
           #endif
           #ifdef _RESTIME_STORAGE_TRAPEZOIDAL_MUSCLVARS
-           find_musclvars((*np)[_ai(gl,i,j,k)],gl,(*np)[_ai(gl,i,j,k)].bs->Res_trapezoidal_m1);
+           if (is_node_valid((*np)[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) find_musclvars((*np)[_ai(gl,i,j,k)],gl,(*np)[_ai(gl,i,j,k)].bs->Res_trapezoidal_m1);
           #endif
          end3DL
         end2DL
@@ -313,7 +314,6 @@ void read_init_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     }
     codex->ACTIONPROCESSED=TRUE;
   }
-  
 #ifdef EMFIELD
   if (strcmp(actionname,_EMFIELD_ACTIONNAME)==0){
     if (!gl->INIT_FLUID_READ) SOAP_fatal_error(codex,"The fluid module %s must come before the emfield module %s within Init().",_FLUID_ACTIONNAME,_EMFIELD_ACTIONNAME);

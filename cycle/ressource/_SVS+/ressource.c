@@ -2,7 +2,7 @@
 #include <cycle/share/cycle_share.h>
 
 
-void add_Sstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double fact, double fact_trapezoidal){
+void add_Sstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
   long l;
   long flux,row,col;
   metrics_t metrics;
@@ -56,10 +56,13 @@ void add_Sstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl, double
 #ifdef _RESSOURCE_LAMBDAMINUS_STORAGE
       for (flux=0; flux<nf; flux++) np[l].bs->Lambda_S_minus[flux]=Lambdaminus[flux][flux];
 #endif
-      for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]-=fact*(Splus[flux]+Sminus[flux]);
-#ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
-      for (flux=0; flux<nf; flux++) np[l].bs->Res_trapezoidal[flux]-=fact_trapezoidal*S[flux];
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
+      for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]-=(1.0-gl->cycle.restime.weightm1_trapezoidal_default)*(Splus[flux]+Sminus[flux]);
+      for (flux=0; flux<nf; flux++) np[l].bs->Res_trapezoidal[flux]-=gl->cycle.restime.weightm1_trapezoidal_default*(Splus[flux]+Sminus[flux]);
+#else
+      for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]-=(Splus[flux]+Sminus[flux]);
 #endif
+
     }
   }
 }
