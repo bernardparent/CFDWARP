@@ -280,6 +280,10 @@ Disc(
     POSFILTER=POSFILTER_PARENT;
     FACEINTEG=FACEINTEG_CENTRAL1;
   );
+  Trapezoidal(
+    weightm1_convection=0.5;
+    weightm1_default=0.0;
+  );
   CDFplus(
     xi[1]=0.5;
     xi[2]=0.5;

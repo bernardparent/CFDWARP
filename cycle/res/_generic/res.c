@@ -90,7 +90,7 @@ void add_dDstarU_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
   flux_t tmpm1h,DUstarplusm1,DUstarminusp0,DUstarplusp0,DUstarplusm2,DUstarminusm1,DUstarminusp1;
   flux_t Ustarm1,Ustarp0,Ustarm2,Ustarp1;
   sqmat_t Dstarplusm1,Dstarminusp0,Dstarplusp0,Dstarplusm2,Dstarminusm1,Dstarminusp1;
-  double weightm1;
+  double weightp0;
 
     /*  FVS-TVD discretization of d(Dstar*Ustar)/dX */
   for (l=ls; l!=_l_plus_one(_l_plus_one(le,gl,theta),gl,theta); l=_l_plus_one(l,gl,theta)){

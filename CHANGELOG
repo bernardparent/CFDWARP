@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 APR 13b
+  * in cycle/res/_generic/res.c
+    - in add_dDstarU_residual(), fixed typo: double weightm1 should be double weightp0
+  * in bin
+    - updated ns_SDBD.wrp 
+
+
 2019 APR 13a
   * in tools/average.c
     - implemented error messages if filenames given on the command line are too long (Prasanna)
