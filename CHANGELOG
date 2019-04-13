@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 APR 13a
+  * in tools/average.c
+    - implemented error messages if filenames given on the command line are too long (Prasanna)
+  * in bin
+    - updated Noh2D.wrp
+
+
 2019 APR 12a
   * in cycle/res/_generic/res.c
     - in add_dKstar_dG_residual(), add_dDstarU_residual(), add_Ystar_dH_residual(), got rid
@@ -39,7 +46,7 @@ ________________________________________________________________________________
 
 2019 APR 09b
   * in tools
-    - added average.c (from Prasanna)
+    - added average.c (Prasanna)
     - updated README
   * in CONTRIB
     - added average.c to Prasanna's contributions

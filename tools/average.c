@@ -19,8 +19,8 @@ void detectRowCols ( FILE * filepointer, int *numrows, int *numcols );
 void CleanFile ( char *fileName );
 
 int main ( int argc, char **argv ) {
-  char output[256], inputfileprefix[256];
-  char fileName[256], ichar[256], firstfileName[256], newfileName[256];
+  char output[255], inputfileprefix[255];
+  char fileName[255], ichar[255], firstfileName[255], newfileName[255];
   int start, end, increm, expected_numfiles, num_files, i, j, numrows, numcols, numrows_infile,
     numcols_infile, i_element, j_element;
   bool validOptions = TRUE;
@@ -61,7 +61,7 @@ int main ( int argc, char **argv ) {
               "-increm            \tcounter increments      \tinteger      \tN\n"
               "                   \t(i=start, start+increm, ..)\n"
               "Eg: \n"
-              "average -inputfileprefix Cf_x. -start 10 -end 30 -output avg_out.txt will average the values in all columns in the specified files (Cf_x.10,Cf_x.11...Cf_x.30) and output the average to the file avg_out.txt .\n" );
+              "average -inputfileprefix Cf_x. -start 10 -end 30 -output avg_out.txt\nwill average the values in all columns in the specified files (Cf_x.10,Cf_x.11...Cf_x.30) and output the average to the file avg_out.txt .\n" );
     exit ( 1 );
   }
 
@@ -71,6 +71,22 @@ int main ( int argc, char **argv ) {
   sscanf ( argv[chkarg ( argc, argv, "-end" ) + 1], "%d", &end );
   if ( start == end ) {
     printf ( "\nTrying to average using 1 file. Please input more than 1 file.\n" );
+    exit ( 1 );
+  }
+
+  int suffix_max_length, prefix_max_length;
+  char suffix[256];
+  sprintf ( suffix, "%d", end );
+  suffix_max_length = strlen ( suffix );
+  prefix_max_length = strlen ( inputfileprefix );
+  if ( suffix_max_length + prefix_max_length > 250 ) {
+    printf
+      ( "Filenames are too long. Please ensure that the length of the filenames does not exceed 250 characters. Aborting.\n" );
+    exit ( 1 );
+  }
+
+  if ( strlen ( output ) > 254 ) {
+    printf ( "Output file name is too long. Please choose a shorter name. Aborting\n" );
     exit ( 1 );
   }
 
@@ -115,7 +131,8 @@ int main ( int argc, char **argv ) {
     filepointer = fopen ( fileName, "r" );
     detectRowCols ( filepointer, &numrows, &numcols );
     //printf("\nNumber of rows=%d,Number of columns=%d\n",numrows,numcols);
-    fclose ( filepointer );
+    if ( filepointer != NULL )
+      fclose ( filepointer );
   }
 
   for ( i = start + increm; i <= end; i = i + increm ) {        //check if number of rows and cols are same in all files which exist.
@@ -128,7 +145,8 @@ int main ( int argc, char **argv ) {
       strcat ( newfileName, fileName );
       filepointer = fopen ( newfileName, "r" );
       detectRowCols ( filepointer, &numrows_infile, &numcols_infile );
-      fclose ( filepointer );
+      if ( filepointer != NULL )
+        fclose ( filepointer );
       if ( ( numrows_infile != numrows ) || ( numcols_infile != numcols ) ) {
         printf
           ( "\n\nDifferent number of rows and columns in file %s compared to the first file %s. Aborting.\n\n",
@@ -175,6 +193,8 @@ int main ( int argc, char **argv ) {
               strcat ( fileName, ichar );
               remove ( fileName );
             }
+            if ( filepointer != NULL )
+              fclose ( filepointer );
             exit ( 1 );
           }
           if ( scanned != 1 ) {
@@ -187,13 +207,16 @@ int main ( int argc, char **argv ) {
               strcat ( fileName, ichar );
               remove ( fileName );
             }
+            if ( filepointer != NULL )
+              fclose ( filepointer );
             exit ( 1 );
           }
           avg_matrix[i_element][j_element] =
             avg_matrix[i_element][j_element] + current_matrix[i_element][j_element];
         }
       }
-      fclose ( filepointer );
+      if ( filepointer != NULL )
+        fclose ( filepointer );
     }
   }
 
@@ -222,13 +245,14 @@ int main ( int argc, char **argv ) {
       fprintf ( filepointer, "\n" );
     }
   }
-  fclose ( filepointer );
+  if ( filepointer != NULL )
+    fclose ( filepointer );
   printf ( "Averaged over %d files. Results outputted to %s. Done.\n", num_files, output );
   return ( 0 );
 }
 
 void CleanFile ( char *fileName ) {
-  char newFileName[256] = "____";
+  char newFileName[255] = "____";
   char ch;
   int lastchardelim = 0;
   int new_line = 1;
@@ -281,17 +305,22 @@ void CleanFile ( char *fileName ) {
       }
     } else {
       printf ( "Aborting. Could not write file %s. Check write permission in directory.\n\n", newFileName );
-      fclose ( tempfilepointer );
-      fclose ( filepointer );
+      if ( tempfilepointer != NULL )
+        fclose ( tempfilepointer );
+      if ( filepointer != NULL )
+        fclose ( filepointer );
       exit ( 1 );
     }
   } else {
     printf ( "Aborting. Could not read file %s\n\n", fileName );
-    fclose ( filepointer );
+    if ( filepointer != NULL )
+      fclose ( filepointer );
     exit ( 1 );
   }
-  fclose ( filepointer );
-  fclose ( tempfilepointer );
+  if ( filepointer != NULL )
+    fclose ( filepointer );
+  if ( tempfilepointer != NULL )
+    fclose ( tempfilepointer );
 }
 
 void detectRowCols ( FILE * filepointer, int *numrows, int *numcols ) {
