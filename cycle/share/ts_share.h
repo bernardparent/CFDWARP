@@ -23,7 +23,7 @@ void add_Ystar_dH_dUstar_to_TDMA(np_t *np, gl_t *gl, long theta, long l, double 
 
 void add_dSstar_dUstar_to_TDMA(np_t *np, gl_t *gl, long l,  double fact, sqmat_t B);
 
-void add_Z_dUstardt_dUstar_to_TDMA(np_t *np, gl_t *gl, long l,  double fact, sqmat_t B);
+void add_Z_dUstardt_dUstar_to_TDMA(np_t *np, gl_t *gl, long l,  sqmat_t B);
 
 void add_dFstar_dUstar_to_TDMA(np_t *np, gl_t *gl, long theta, long l, double fact, sqmat_t A, sqmat_t B, sqmat_t C);
 

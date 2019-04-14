@@ -249,23 +249,19 @@ void add_dSstar_dUstar_to_TDMA(np_t *np, gl_t *gl, long l,  double fact, sqmat_t
 
 
 #ifdef UNSTEADY
-void add_Z_dUstardt_dUstar_to_TDMA(np_t *np, gl_t *gl, long l,  double weightp0, sqmat_t B){
+void add_Z_dUstardt_dUstar_to_TDMA(np_t *np, gl_t *gl, long l,  sqmat_t B){
   long row,col;
   sqmat_t dZU_dU;
 
   find_dZU_dU(np, gl, l, dZU_dU);
   /* make sure the jacobian has no negative diagonal element */
   for (row=0; row<nf; row++) dZU_dU[row][row]=max(0.0,dZU_dU[row][row]);
-  /* get rid of standard time derivative */
-  for (row=0; row<nf; row++) dZU_dU[row][row]-=1.0e0;
   /* the linearization is done assuming frozen Z */
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
-      B[row][col]+=weightp0*1.0e0/gl->dt*dZU_dU[row][col];
+      B[row][col]+=1.0e0/gl->dt*dZU_dU[row][col];
     }
   }
-  /* add standard time derivative */
-  for (row=0; row<nf; row++) B[row][row]+=1.0e0/gl->dt;
 }
 #endif
 
@@ -695,7 +691,7 @@ void add_TDMA_jacobians_non_conservative(np_t *np, gl_t *gl, long theta, long l,
 #endif
 
 #ifdef UNSTEADY
-  if (SOURCETERM) add_Z_dUstardt_dUstar_to_TDMA(np, gl, l, weightp0_default, B);
+  if (SOURCETERM) add_Z_dUstardt_dUstar_to_TDMA(np, gl, l, B);
 #endif   
 
   if (SOURCETERM && _FLUID_SOURCE) add_dSstar_dUstar_to_TDMA(np, gl, l, weightp0_default, B);

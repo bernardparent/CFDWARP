@@ -20,6 +20,8 @@ tmax=1e-6;   {simulation time span in seconds}
 
 
 meshfact=1.0;
+tf=2;
+itermax=100;
 
 is=1;  js=1; 
 ie=round(meshfact*44)+1; 
@@ -118,7 +120,7 @@ Model(
     Nemin=1e6;
     Nimin=1e6;    {the minimum allowed number density for the charged species }
     Nkmax=1e20;    {the maximum allowed number density for the charged species }
-    sigmadiv=1e-20;    {minimum value for conductivity when it appears on denominator  }
+    sigmadiv=1e-8;    {minimum value for conductivity when it appears on denominator  }
     Temin=200;
     Temax=60000;
   );
@@ -187,13 +189,18 @@ Disc(
     zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
   );
   Ohm(
-    Ediv=100.0;        {a small positive number in V/m, needed to prevent a division by zero when
+    Ediv=1000.0;        {a small positive number in V/m, needed to prevent a division by zero when
                        discretizing the electron pressure gradients within the potential equation}
   );
   CDFplus(
-    xi1=0.5;
-    xi2=0.5;
-    xi3=0.5;
+    xi[1]=0.5;
+    xi[2]=0.5;
+    xi[3]=0.5;
+    xi[4]=0.5;
+  );
+  Trapezoidal(
+    weightm1_convection=0.5;
+    weightm1_default=0.5;
   );
 );
 
@@ -201,8 +208,8 @@ Disc(
 Cycle(
   DriftDiffusion(
     xiverge=4e3;  {residual convergence threshold}
-    zetaGammae=0.008;{0.008;}
-    zetaGammai=0.2;
+    zetaGammae=1.0;{0.008;}
+    zetaGammai=1.0;
     relaxNi_bdry=1.0;    {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.7;    {the electron density relaxation factor at the boundary }
     relaxTe=0.5;    {the electron temperature relaxation factor }
@@ -216,29 +223,29 @@ Cycle(
   Ohm(
     xiverge_emfield=1e1; {residual convergence threshold for the potential equation}
     relaxphi_bdry=1.0; {relaxation factor for phi at the dielectric boundaries}
-    sigmaref=0.0001; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
+    sigmaref=0.000001; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
     Uref_emfield[1]=dphi+10.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
-   DualTimeStepping(
-    dt=tmax/(50*meshfact);  {physical time step in seconds}
-    sigma1=0.5;      {exponent of largest pseudotime step in all dimensions}
-    sigma2=0.5;      {exponent of largest pseudotime step in all flux components}
-    PRECONDITIONER=PRECON_LOCALEIGENVALUE;
+  DualTimeStepping(
+    dt=tmax/(250*meshfact*tf);  {physical time step in seconds}
+    sigma1=0.3;      {exponent of largest pseudotime step in all dimensions}
+    sigma2=0.3;      {exponent of largest pseudotime step in all flux components}
+    PRECONDITIONER=PRECON_LOCALTIMESTEP;
     if (iter==1,
       Init(Ohm(Region(is,js1,is,js2,1,max(0.0,dphi-8*time/tmax*dphi)););); 
       CFL=1;
     );
-    CFL=min(CFL*1.1,3.0);
-    Lc=0.3e-3*100000;  {characteristic length scale used to solve the emfield equation}
-    relaxEMF=0.8;  {relaxation factor forced on the update of the emfield variables}
+    CFL=min(CFL*1.1,0.8);
+    Lc=0.3e0;  {characteristic length scale used to solve the emfield equation}
+    relaxEMF=0.5;  {relaxation factor forced on the update of the emfield variables}
     UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,dt);
     UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,100);
-    {UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,10);}
+    {UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,100);}
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %6.0f %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,Lc,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
     if (iter==-1, exit(EXIT_SUCCESS); );
-    if (iter>20 && (iter>100 || (ximax<xiverge && ximax_emfield<xiverge_emfield)),
+    if (iter>20 && (iter>itermax || (FALSE && ximax<xiverge && ximax_emfield<xiverge_emfield)),
       IncreaseTimeLevel();
       WriteDataFile(outputfilename"."round(time/dt));
       printf("dt=%E time=%Es\n",dt,time);

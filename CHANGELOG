@@ -7,6 +7,19 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 APR 14a
+  * in cycle/restime/_Trapezoidal/restime.c
+    - in add_Z_dUstar_residual(), took away dependence of the residual on 
+      gl->cycle.restime.weightm1_trapezoidal_default
+  * in cycle/share/ts_share.c
+    - in add_Z_dUstardt_dUstar_to_TDMA(), took away dependence of the residual on 
+      gl->cycle.restime.weightm1_trapezoidal_default
+  * in cycle/resconv/_none/resconv.hh
+    - took away definition of CONVJACOBIAN (not needed anymore)
+  * in bin
+    - updated discharge.wrp
+
+
 2019 APR 13b
   * in cycle/res/_generic/res.c
     - in add_dDstarU_residual(), fixed typo: double weightm1 should be double weightp0

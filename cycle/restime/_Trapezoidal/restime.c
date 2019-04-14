@@ -50,7 +50,6 @@ void read_disc_restime_actions(char *actionname, char **argum, SOAP_codex_t *cod
 }
 
 
-
 void add_Z_dUstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
   long l;
   long flux;
@@ -63,18 +62,8 @@ void add_Z_dUstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
     }      
     find_Z(np,gl,l,Z);
     multiply_matrix_and_vector(Z, tmp, dRes);
-    for (flux=0; flux<nf; flux++){
-      dRes[flux]-=_Omega(np[l],gl)*(np[l].bs->U[flux]-np[l].bs->Um1[flux])/gl->dt;
-    }      
-    for (flux=0; flux<nf; flux++) {
-      np[l].wk->Res[flux]+=(1.0-gl->cycle.restime.weightm1_trapezoidal_default)*dRes[flux];
-      np[l].bs->Res_trapezoidal[flux]+=gl->cycle.restime.weightm1_trapezoidal_default*dRes[flux];
-    }
-    for (flux=0; flux<nf; flux++) {
-      np[l].wk->Res[flux]+=_Omega(np[l],gl)*(np[l].bs->U[flux]-np[l].bs->Um1[flux])/gl->dt;
-    }
+    for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]+=dRes[flux];
   }
 }
-
 
 
