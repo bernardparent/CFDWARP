@@ -128,7 +128,7 @@ Init(
     _______________________________________________________________________________________
 
     }
-    Mx=10;
+    Mx=4;
     My=0;
     P=10000; {Pa}
     T=1700; {K}
@@ -152,8 +152,8 @@ Init(
 
 Disc(
   NavierStokes(
-    zetaA1=0.2;     {conditions the eigenvalues of the A jacobian}
-    zetaA2=0.001;  {eigenvalue clipping factor: 2.0-20.0}
+    zetaA1=0.1;     {conditions the eigenvalues of the A jacobian}
+    zetaA2=0.5;  {eigenvalue clipping factor: 2.0-20.0}
   );
   MUSCLplus(
     FLUX=FLUX_FDSplus;
@@ -171,7 +171,7 @@ Disc(
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_AOWENO7;
+    INTERPOL=INTERPOL_WENO5;
     FACEINTEG=FACEINTEG_CENTRAL1;
     EIGENVALCOND=EIGENVALCOND_PARENT;
     POSFILTER=POSFILTER_PARENT;
@@ -235,18 +235,18 @@ Cycle(
     sigma1=0.4;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.4;   {exponent of maximum pseudotime step in all fluxes}
     dt=tmax/(10*mf*8*tf);   {physical time step in seconds}
-    if (time<30*dt,
+    if (time<3*dt,
       if (iter==1,
-        CFL=0.01;
+        CFL=0.1;
       );
-      CFL=min(CFL*1.3,0.5);
+      CFL=min(CFL*1.1,1.0);
     ,{else}
       if (iter==1,
         CFL=5.0;
       );
       CFL=max(CFL/1.14,0.5);
     );
-    UpdateFluid(CFL,PRECON_LOCALEIGENVALUE2,sigma1,sigma2,dt);
+    UpdateFluid(CFL,PRECON_LOCALEIGENVALUE,sigma1,sigma2,dt);
     if (CONVERGENCEHISTORY,
       printf("%ld %6.2f %6ld %9.3f   %E \n",
              globiter,CFL,iter,effiter_U,ximax);

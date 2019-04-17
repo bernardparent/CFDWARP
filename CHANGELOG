@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 APR 17a
+  * in bin
+    - reverted combustion_vacuum.wrp setup to how it was before 19feb16a (setup was changed since
+      then erroneously)
+
+
 2019 APR 14a
   * in cycle/restime/_Trapezoidal/restime.c
     - in add_Z_dUstar_residual(), took away dependence of the residual on 
