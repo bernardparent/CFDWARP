@@ -64,7 +64,7 @@ void find_musclvarscycle(np_t np, gl_t *gl, musclvarscycle_t musclvars){
 #ifdef _RESTIME_STORAGE_TRAPEZOIDAL_MUSCLVARS
   long flux;
 //  for (flux=0; flux<nf; flux++) musclvars[nf+flux]=musclvars[flux];
-  for (flux=0; flux<nf; flux++) musclvars[nf+flux]=np.bs->Res_trapezoidal_m1[flux];
+  for (flux=0; flux<nf; flux++) musclvars[nf+flux]=np.bs->trapezoidalm1[flux];
 #endif
 }
 
@@ -964,11 +964,11 @@ void increase_time_level(np_t *np, gl_t *gl){
 #endif
             np[l].bs->Um1[flux]=np[l].bs->U[flux];
 #ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
-            np[l].bs->Res_trapezoidal_m1[flux]=np[l].bs->Res_trapezoidal[flux];
+            np[l].bs->trapezoidalm1[flux]=np[l].bs->trapezoidalm1_next[flux];
 #endif
           }
 #ifdef _RESTIME_STORAGE_TRAPEZOIDAL_MUSCLVARS
-          find_musclvars(np[l],gl,np[l].bs->Res_trapezoidal_m1);
+          find_musclvars(np[l],gl,np[l].bs->trapezoidalm1);
 #endif
         }
 #ifdef EMFIELD

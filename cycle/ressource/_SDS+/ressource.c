@@ -104,7 +104,7 @@ void add_Sstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
 #endif
 #ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
       for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]-=(1.0-gl->cycle.restime.weightm1_trapezoidal_default)*(Splus[flux]+Sminus[flux]);
-      for (flux=0; flux<nf; flux++) np[l].bs->Res_trapezoidal[flux]-=gl->cycle.restime.weightm1_trapezoidal_default*(Splus[flux]+Sminus[flux]);
+      for (flux=0; flux<nf; flux++) np[l].bs->trapezoidalm1_next[flux]-=gl->cycle.restime.weightm1_trapezoidal_default*(Splus[flux]+Sminus[flux]);
 #else
       for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]-=(Splus[flux]+Sminus[flux]);
 #endif

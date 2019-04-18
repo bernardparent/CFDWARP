@@ -305,7 +305,7 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
 #endif
         if (is_node_in_zone(i,j,k,gl->domain_lim)) {
           for (flux=0; flux<nf; flux++){
-            np[_ai(gl,i,j,k)].bs->Res_trapezoidal_m1[flux]=Res[flux];
+            np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux]=Res[flux];
           }
         }
       end3DL
@@ -560,7 +560,7 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
       for2DL(j,domain.js,domain.je)
         for3DL(k,domain.ks,domain.ke)
           if (proc==rank){
-            for (flux=0; flux<nf; flux++) U[flux]=np[_ai(gl,i,j,k)].bs->Res_trapezoidal_m1[flux];
+            for (flux=0; flux<nf; flux++) U[flux]=np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux];
             if (proc!=0) {
               MPI_Send(U,nf,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
             }
@@ -580,7 +580,7 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
   for1DL(i,gl->domain_all.is,gl->domain_all.ie)
     for2DL(j,gl->domain_all.js,gl->domain_all.je)
       for3DL(k,gl->domain_all.ks,gl->domain_all.ke)
-        for (flux=0; flux<nf; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->Res_trapezoidal_m1[flux];
+        for (flux=0; flux<nf; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux];
       end3DL
     end2DL
   end1DL

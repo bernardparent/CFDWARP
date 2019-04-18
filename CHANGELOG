@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 APR 18a
+  * renamed
+    - Res_trapezoidal_m1 -> trapezoidalm1
+    - Res_trapezoidal -> trapezoidalm1_next
+
+
 2019 APR 17a
   * in bin
     - reverted combustion_vacuum.wrp setup to how it was before 19feb16a (setup was changed since

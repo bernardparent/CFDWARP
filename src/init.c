@@ -300,12 +300,12 @@ void read_init_actions(char *actionname, char **argum, SOAP_codex_t *codex){
          for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
           #ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
            for (flux=0; flux<nf; flux++){
-            (*np)[_ai(gl,i,j,k)].bs->Res_trapezoidal_m1[flux]=0.0;
-            (*np)[_ai(gl,i,j,k)].bs->Res_trapezoidal[flux]=0.0;
+            (*np)[_ai(gl,i,j,k)].bs->trapezoidalm1[flux]=0.0;
+            (*np)[_ai(gl,i,j,k)].bs->trapezoidalm1_next[flux]=0.0;
            }
           #endif
           #ifdef _RESTIME_STORAGE_TRAPEZOIDAL_MUSCLVARS
-           if (is_node_valid((*np)[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) find_musclvars((*np)[_ai(gl,i,j,k)],gl,(*np)[_ai(gl,i,j,k)].bs->Res_trapezoidal_m1);
+           if (is_node_valid((*np)[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) find_musclvars((*np)[_ai(gl,i,j,k)],gl,(*np)[_ai(gl,i,j,k)].bs->trapezoidalm1);
           #endif
          end3DL
         end2DL

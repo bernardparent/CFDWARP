@@ -69,8 +69,8 @@ void add_dKstar_dG_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
         if (l!=_l_plus_one(le,gl,theta)) np[l].wk->Res[flux]+=weightp0*tmpm1h[flux];
         if (l!=ls) np[_al(gl,l,theta,-1)].wk->Res[flux]-=weightp0*tmpm1h[flux];
 #ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
-        if (l!=_l_plus_one(le,gl,theta)) np[l].bs->Res_trapezoidal[flux]+=(1.0-weightp0)*tmpm1h[flux];
-        if (l!=ls) np[_al(gl,l,theta,-1)].bs->Res_trapezoidal[flux]-=(1.0-weightp0)*tmpm1h[flux];
+        if (l!=_l_plus_one(le,gl,theta)) np[l].bs->trapezoidalm1_next[flux]+=(1.0-weightp0)*tmpm1h[flux];
+        if (l!=ls) np[_al(gl,l,theta,-1)].bs->trapezoidalm1_next[flux]-=(1.0-weightp0)*tmpm1h[flux];
 #endif
       }
 #endif
@@ -132,8 +132,8 @@ void add_dDstarU_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
       if (l!=_l_plus_one(le,gl,theta)) np[l].wk->Res[flux]-=weightp0*tmpm1h[flux];
       if (l!=ls) np[_al(gl,l,theta,-1)].wk->Res[flux]+=weightp0*tmpm1h[flux];
 #ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
-      if (l!=_l_plus_one(le,gl,theta)) np[l].bs->Res_trapezoidal[flux]-=(1.0-weightp0)*tmpm1h[flux];
-      if (l!=ls) np[_al(gl,l,theta,-1)].bs->Res_trapezoidal[flux]+=(1.0-weightp0)*tmpm1h[flux];
+      if (l!=_l_plus_one(le,gl,theta)) np[l].bs->trapezoidalm1_next[flux]-=(1.0-weightp0)*tmpm1h[flux];
+      if (l!=ls) np[_al(gl,l,theta,-1)].bs->trapezoidalm1_next[flux]+=(1.0-weightp0)*tmpm1h[flux];
 #endif
     }
 
@@ -222,7 +222,7 @@ void add_Ystar_dH_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
     for (flux=0; flux<nf; flux++){
       np[l].wk->Res[flux]+=weightp0*(+tmpm1h[flux]+tmpp1h[flux]);
 #ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
-      np[l].bs->Res_trapezoidal[flux]+=(1.0-weightp0)*(+tmpm1h[flux]+tmpp1h[flux]);
+      np[l].bs->trapezoidalm1_next[flux]+=(1.0-weightp0)*(+tmpm1h[flux]+tmpp1h[flux]);
 #endif
       
     }
@@ -270,7 +270,7 @@ void update_residual(np_t *np, gl_t *gl, long theta, long ls, long le){
   if (theta==nd-1) {
     for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)) {
       for (flux=0; flux<nf; flux++){
-        np[l].wk->Res[flux]+=np[l].bs->Res_trapezoidal_m1[flux];
+        np[l].wk->Res[flux]+=np[l].bs->trapezoidalm1[flux];
       }
     }
   }
@@ -297,7 +297,7 @@ void init_residual(np_t *np, gl_t *gl, long theta, long ls, long le){
     thread_lock_node_set(np,l,THREADTYPE_ZONE);
     for (flux=0; flux<nf; flux++) np[l].wk->Res[flux]=0.0e0;
 #ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
-    for (flux=0; flux<nf; flux++) np[l].bs->Res_trapezoidal[flux]=0.0e0;
+    for (flux=0; flux<nf; flux++) np[l].bs->trapezoidalm1_next[flux]=0.0e0;
 #endif
 #ifdef _RESCONV_DELTA_LAMBDA_STORAGE    
     for (dim=0; dim<nd; dim++){

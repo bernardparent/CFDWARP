@@ -361,10 +361,10 @@ typedef struct {
    flux_t dUstar1,dUstar2,dUstar3,dUstar4;
 #endif
 #ifdef _RESTIME_STORAGE_TRAPEZOIDAL 
-   flux_t Res_trapezoidal_m1;
+   flux_t trapezoidalm1;
 #endif
 #ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL 
-   flux_t Res_trapezoidal;
+   flux_t trapezoidalm1_next;
 #endif
 #ifdef _RESCONV_DELTA_LAMBDA_STORAGE
    flux_t Delta_Lambda[nd];

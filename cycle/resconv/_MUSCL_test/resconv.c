@@ -712,7 +712,7 @@ void add_dFstar_residual_new(long theta, long ls, long le, np_t *np, gl_t *gl){
 
 #ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
     for (flux=0; flux<nf; flux++) {
-      np[l].bs->Res_trapezoidal[flux]+=gl->cycle.restime.weightm1_trapezoidal_convection*(Fp1h[flux]-Fm1h[flux]);
+      np[l].bs->trapezoidalm1_next[flux]+=gl->cycle.restime.weightm1_trapezoidal_convection*(Fp1h[flux]-Fm1h[flux]);
       np[l].wk->Res[flux]+=(1.0-gl->cycle.restime.weightm1_trapezoidal_convection)*(Fp1h[flux]-Fm1h[flux]);
     }
 #else
@@ -837,7 +837,7 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
 
 #ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
     for (flux=0; flux<nf; flux++) {
-      np[l].bs->Res_trapezoidal[flux]+=gl->cycle.restime.weightm1_trapezoidal_convection*(Fp1h[flux]-Fm1h[flux]);
+      np[l].bs->trapezoidalm1_next[flux]+=gl->cycle.restime.weightm1_trapezoidal_convection*(Fp1h[flux]-Fm1h[flux]);
       np[l].wk->Res[flux]+=(1.0-gl->cycle.restime.weightm1_trapezoidal_convection)*(Fp1h[flux]-Fm1h[flux]);
     }
 #else
