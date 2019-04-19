@@ -113,6 +113,16 @@ Disc(
     zetaA2=0.2;
     zetaA3=0.1e0; {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
   );
+  MUSCLX(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_AOWENO7;
+    FACEINTEG=FACEINTEG_CENTRAL3;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+  );
   MUSCLplus(
     FLUX=FLUX_FDSplus;
     AVERAGING=AVERAGING_ROE;

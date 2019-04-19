@@ -173,9 +173,6 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t 
   flux_t musclvarsL,musclvarsR;
   int AOWENO_TYPE;
   double gammalo,gammahi;
-#ifdef _RESTIME_CDF  
-  sqmat_t lambdaminusp1h, lambdaplusm1h;
-#endif
 
   find_metrics_at_interface(np, gl, l, _al(gl,l,theta,+1), theta, &metrics);
   nodes_from_bdry=_nodes_from_bdry_through_links_limited(np,gl,l,theta,TYPELEVEL_FLUID_WORK,hbw_resconv_fluid);
@@ -349,17 +346,17 @@ void find_Fstar_interfaces(np_t *np, gl_t *gl, long theta, long ls, long le){
 
       if(l==ls){
 
-        if (hbw_resconv_fluid>=5) find_musclvars_offset(np,gl,l,theta,-5,musclvarsm5);
-        if (hbw_resconv_fluid>=4) find_musclvars_offset(np,gl,l,theta,-4,musclvarsm4);
-        if (hbw_resconv_fluid>=3) find_musclvars_offset(np,gl,l,theta,-3,musclvarsm3);
-        if (hbw_resconv_fluid>=2) find_musclvars_offset(np,gl,l,theta,-2,musclvarsm2);
-        find_musclvars_offset(np,gl,l,theta,-1,musclvarsm1);
-        find_musclvars_offset(np,gl,l,theta,+0,musclvarsp0);
-        find_musclvars_offset(np,gl,l,theta,+1,musclvarsp1);
-        if (hbw_resconv_fluid>=2) find_musclvars_offset(np,gl,l,theta,+2,musclvarsp2);
-        if (hbw_resconv_fluid>=3) find_musclvars_offset(np,gl,l,theta,+3,musclvarsp3);
-        if (hbw_resconv_fluid>=4) find_musclvars_offset(np,gl,l,theta,+4,musclvarsp4);
-        if (hbw_resconv_fluid>=5) find_musclvars_offset(np,gl,l,theta,+5,musclvarsp5);
+        if (hbw_resconv_fluid>=5) find_musclvarscycle_offset(np,gl,l,theta,-5,musclvarsm5);
+        if (hbw_resconv_fluid>=4) find_musclvarscycle_offset(np,gl,l,theta,-4,musclvarsm4);
+        if (hbw_resconv_fluid>=3) find_musclvarscycle_offset(np,gl,l,theta,-3,musclvarsm3);
+        if (hbw_resconv_fluid>=2) find_musclvarscycle_offset(np,gl,l,theta,-2,musclvarsm2);
+        find_musclvarscycle_offset(np,gl,l,theta,-1,musclvarsm1);
+        find_musclvarscycle_offset(np,gl,l,theta,+0,musclvarsp0);
+        find_musclvarscycle_offset(np,gl,l,theta,+1,musclvarsp1);
+        if (hbw_resconv_fluid>=2) find_musclvarscycle_offset(np,gl,l,theta,+2,musclvarsp2);
+        if (hbw_resconv_fluid>=3) find_musclvarscycle_offset(np,gl,l,theta,+3,musclvarsp3);
+        if (hbw_resconv_fluid>=4) find_musclvarscycle_offset(np,gl,l,theta,+4,musclvarsp4);
+        if (hbw_resconv_fluid>=5) find_musclvarscycle_offset(np,gl,l,theta,+5,musclvarsp5);
         find_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, musclvarsm5, musclvarsm4, musclvarsm3, musclvarsm2, musclvarsm1, musclvarsp0, musclvarsp1, musclvarsp2, musclvarsp3, musclvarsp4, Fm1h);
 
       } else {
@@ -381,19 +378,19 @@ void find_Fstar_interfaces(np_t *np, gl_t *gl, long theta, long ls, long le){
 
       switch (hbw_resconv_fluid){
         case 1:
-          find_musclvars_offset(np,gl,l,theta,+1,musclvarsp1);
+          find_musclvarscycle_offset(np,gl,l,theta,+1,musclvarsp1);
         break;
         case 2:
-          find_musclvars_offset(np,gl,l,theta,+2,musclvarsp2);
+          find_musclvarscycle_offset(np,gl,l,theta,+2,musclvarsp2);
         break;
         case 3:
-          find_musclvars_offset(np,gl,l,theta,+3,musclvarsp3);
+          find_musclvarscycle_offset(np,gl,l,theta,+3,musclvarsp3);
         break;
         case 4:
-          find_musclvars_offset(np,gl,l,theta,+4,musclvarsp4);
+          find_musclvarscycle_offset(np,gl,l,theta,+4,musclvarsp4);
         break;
         case 5:
-          find_musclvars_offset(np,gl,l,theta,+5,musclvarsp5);
+          find_musclvarscycle_offset(np,gl,l,theta,+5,musclvarsp5);
         break;
         default:
           fatal_error("hbw_resconv_fluid can not be set to %ld",hbw_resconv_fluid);
@@ -704,17 +701,17 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
 
       case FACEINTEG_CENTRAL1:
         if(l==ls){
-          if (hbw_resconv_fluid>=5) find_musclvars_offset(np,gl,l,theta,-5,musclvarsm5);
-          if (hbw_resconv_fluid>=4) find_musclvars_offset(np,gl,l,theta,-4,musclvarsm4);
-          if (hbw_resconv_fluid>=3) find_musclvars_offset(np,gl,l,theta,-3,musclvarsm3);
-          if (hbw_resconv_fluid>=2) find_musclvars_offset(np,gl,l,theta,-2,musclvarsm2);
-          find_musclvars_offset(np,gl,l,theta,-1,musclvarsm1);
-          find_musclvars_offset(np,gl,l,theta,+0,musclvarsp0);
-          find_musclvars_offset(np,gl,l,theta,+1,musclvarsp1);
-          if (hbw_resconv_fluid>=2) find_musclvars_offset(np,gl,l,theta,+2,musclvarsp2);
-          if (hbw_resconv_fluid>=3) find_musclvars_offset(np,gl,l,theta,+3,musclvarsp3);
-          if (hbw_resconv_fluid>=4) find_musclvars_offset(np,gl,l,theta,+4,musclvarsp4);
-          if (hbw_resconv_fluid>=5) find_musclvars_offset(np,gl,l,theta,+5,musclvarsp5);
+          if (hbw_resconv_fluid>=5) find_musclvarscycle_offset(np,gl,l,theta,-5,musclvarsm5);
+          if (hbw_resconv_fluid>=4) find_musclvarscycle_offset(np,gl,l,theta,-4,musclvarsm4);
+          if (hbw_resconv_fluid>=3) find_musclvarscycle_offset(np,gl,l,theta,-3,musclvarsm3);
+          if (hbw_resconv_fluid>=2) find_musclvarscycle_offset(np,gl,l,theta,-2,musclvarsm2);
+          find_musclvarscycle_offset(np,gl,l,theta,-1,musclvarsm1);
+          find_musclvarscycle_offset(np,gl,l,theta,+0,musclvarsp0);
+          find_musclvarscycle_offset(np,gl,l,theta,+1,musclvarsp1);
+          if (hbw_resconv_fluid>=2) find_musclvarscycle_offset(np,gl,l,theta,+2,musclvarsp2);
+          if (hbw_resconv_fluid>=3) find_musclvarscycle_offset(np,gl,l,theta,+3,musclvarsp3);
+          if (hbw_resconv_fluid>=4) find_musclvarscycle_offset(np,gl,l,theta,+4,musclvarsp4);
+          if (hbw_resconv_fluid>=5) find_musclvarscycle_offset(np,gl,l,theta,+5,musclvarsp5);
           find_Fstar_interface(np, gl, _al(gl,l,theta,-1), theta, musclvarsm5, musclvarsm4, musclvarsm3, musclvarsm2, musclvarsm1, musclvarsp0, musclvarsp1, musclvarsp2, musclvarsp3, musclvarsp4, Fm1h);
 
         } else {
@@ -736,19 +733,19 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
 
         switch (hbw_resconv_fluid){
           case 1:
-            find_musclvars_offset(np,gl,l,theta,+1,musclvarsp1);
+            find_musclvarscycle_offset(np,gl,l,theta,+1,musclvarsp1);
           break;
           case 2:
-            find_musclvars_offset(np,gl,l,theta,+2,musclvarsp2);
+            find_musclvarscycle_offset(np,gl,l,theta,+2,musclvarsp2);
           break;
           case 3:
-            find_musclvars_offset(np,gl,l,theta,+3,musclvarsp3);
+            find_musclvarscycle_offset(np,gl,l,theta,+3,musclvarsp3);
           break;
           case 4:
-            find_musclvars_offset(np,gl,l,theta,+4,musclvarsp4);
+            find_musclvarscycle_offset(np,gl,l,theta,+4,musclvarsp4);
           break;
           case 5:
-            find_musclvars_offset(np,gl,l,theta,+5,musclvarsp5);
+            find_musclvarscycle_offset(np,gl,l,theta,+5,musclvarsp5);
           break;
           default:
             fatal_error("hbw_resconv_fluid can not be set to %ld",hbw_resconv_fluid);
