@@ -28,6 +28,7 @@ int main ( int argc, char **argv ) {
   FILE *filepointer;
   expected_numfiles = 0;
   num_files = 0;
+  numrows=numcols=numrows_infile=numcols_infile=0;
   if ( chkarg ( argc, argv, "-inputfileprefix" ) == 0 )
     validOptions = FALSE;       //check if argument flags exist
   if ( chkarg ( argc, argv, "-output" ) == 0 )

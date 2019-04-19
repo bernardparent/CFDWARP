@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 APR 19b
+  * in tools/average.c
+    - fixed memory read bug (Prasanna)
+
+
 2019 APR 19a
   * in cycle/resconv/
     - moved _MUSCL_old to _MUSCLX
