@@ -7,6 +7,19 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 APR 20a
+​  * in src/common.h
+​    - in struct() gl_t, declared char *post_filename (VanTien)
+​  * in src/main.c
+​    - in write_options_row(), for the "-opm" flag, changed "none" to "string" (VanTien)
+​    - in main(), added gl.post_filename = NULL; in if() statement for the "-opm" flag: changed to 
+      process_flag_string and added &gl.post_filename; added free(gl.post_filename) (VanTien)
+​  * in src/post.c
+​    - in read_post_actions(), added add_string_to_codex() to read the string postfilename in the Post 
+      module as the variable gl.post_filename (VanTien)
+    - in write_post_template(), replaced printf by fprintf with postfilename (VanTien)
+
+
 2019 APR 19b
   * in tools/average.c
     - fixed memory read bug (Prasanna)

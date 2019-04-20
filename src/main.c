@@ -77,7 +77,7 @@ void write_options ( FILE * outputfile ) {
                       linewidth, lengthcol1, lengthcol2 );
   write_options_row ( outputfile, "-op", "string", "Output post file", linewidth, lengthcol1, lengthcol2 );
   write_options_row ( outputfile, "-opg", "string", "Output grid-only post file", linewidth, lengthcol1, lengthcol2 );
-  write_options_row ( outputfile, "-opm", "none", "Execute the post module in control file",
+  write_options_row ( outputfile, "-opm", "string", "Execute the post module in control file",
                       linewidth, lengthcol1, lengthcol2 );
   write_options_row ( outputfile, "-or", "none", "Output maximum residual", linewidth, lengthcol1, lengthcol2 );
   sprintf(tmpstr,"%d int",nd*2);
@@ -187,6 +187,7 @@ int main ( int argc, char **argv ) {
   post_filename = NULL;
   input.name = NULL;
   gl.output_filename = NULL;
+  gl.post_filename = NULL;
   postprocessor = ( char * ) malloc ( 10 * sizeof ( char ) );
   strcpy ( postprocessor, "tecplot" );
   if ( process_flag ( argc, argv, "-nic" ) )
@@ -278,7 +279,7 @@ int main ( int argc, char **argv ) {
     OUTPUTRESIDUAL = TRUE;
   else
     OUTPUTRESIDUAL = FALSE;
-  if ( process_flag ( argc, argv, "-opm" ) )
+  if ( process_flag_string ( argc, argv, "-opm", &gl.post_filename ) )
     OUTPUTPOSTMODULE = TRUE;
   else
     OUTPUTPOSTMODULE = FALSE;
@@ -535,6 +536,7 @@ int main ( int argc, char **argv ) {
   free ( post_filename );
   free ( input.name );
   free ( gl.output_filename );
+  free ( gl.post_filename );
   free ( argint );
 #ifdef UNSTEADY
   free ( input.name_m1 );

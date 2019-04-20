@@ -181,7 +181,7 @@ typedef struct {
 #ifdef _CYCLE_PREDICTOR_CORRECTOR
   long numsubiter_pc,subiter_pc;
 #endif
-  char *output_filename;
+  char *output_filename, *post_filename;
   bool CONVERGED,OUTPUTASCII,OUTPUTINTERPOLATION;
   int PRECONDITIONER;
   double effiter_U,effiter_R,ximax,xiave,CFL,sigma1,sigma2,dtau;

@@ -1510,7 +1510,7 @@ void write_post_template(FILE **controlfile){
   "    q=XSTATION_q();\n"
   "    rho=XSTATION_rho();\n"
   "    htstar=XSTATION_htstar();\n"
-  "    printf(\"x      = %%E m\\n\"\n"
+  "    fprintf(postfilename,\"x      = %%E m\\n\"\n"
   "           \"Pback  = %%E Pa\\n\"\n"
   "           \"Fpot   = %%E Ns/kg\\n\"\n"
   "           \"mdot   = %%E kg/"if2D("m")"s\\n\"\n"
@@ -1523,7 +1523,7 @@ void write_post_template(FILE **controlfile){
   "           \"rho    = %%E kg/m3\\n\\n\"\n"
   "           ,xstation[cnt],Pback,Fpot,mdot,htstar,Tstag,Pstag,Pstar,T,q,rho);\n"
   "  );\n"
-  "  printf(\"\\n\");\n"
+  "  fprintf(postfilename,\"\\n\");\n"
   "  for (dim,1,%ld,\n"
   "    Area[dim]=_Area(is,js,"if3D("ks,")" ie,je,"if3D("ke,")" dim,BDRY_WALLTFIXED1);\n"
 #if (fluxmom>=0)
@@ -1535,21 +1535,21 @@ void write_post_template(FILE **controlfile){
 #endif
   "  );\n"  
 #if (fluxmom>=0)
-  "  printf(\"Fshear    = (%%+E"if2DL(",%%+E")if3DL(",%%+E")") N"if2D("/m")"\\n\",Fshear[1]"if2DL(",Fshear[2]")if3DL(",Fshear[3]")");\n"
-  "  printf(\"Fpressure = (%%+E"if2DL(",%%+E")if3DL(",%%+E")") N"if2D("/m")"\\n\",Fpressure[1]"if2DL(",Fpressure[2]")if3DL(",Fpressure[3]")");\n"
+  "  fprintf(postfilename,\"Fshear    = (%%+E"if2DL(",%%+E")if3DL(",%%+E")") N"if2D("/m")"\\n\",Fshear[1]"if2DL(",Fshear[2]")if3DL(",Fshear[3]")");\n"
+  "  fprintf(postfilename,\"Fpressure = (%%+E"if2DL(",%%+E")if3DL(",%%+E")") N"if2D("/m")"\\n\",Fpressure[1]"if2DL(",Fpressure[2]")if3DL(",Fpressure[3]")");\n"
 #endif
 #if (fluxet>=0)
-  "  printf(\"Qheat     = %%+E W"if2D("/m")"\\n\",_Qheat(is,js,"if3D("ks,")" ie,je,"if3D("ke,")" BDRY_WALLTFIXED1));\n"
-  "  printf(\"metotal   = %%+E J"if2D("/m")"\\n\",_metotal(is,js,"if3D("ks,")" ie,je"if3D(",ke")"));\n"
+  "  fprintf(postfilename,\"Qheat     = %%+E W"if2D("/m")"\\n\",_Qheat(is,js,"if3D("ks,")" ie,je,"if3D("ke,")" BDRY_WALLTFIXED1));\n"
+  "  fprintf(postfilename,\"metotal   = %%+E J"if2D("/m")"\\n\",_metotal(is,js,"if3D("ks,")" ie,je"if3D(",ke")"));\n"
 #endif
-  "  printf(\"m         = %%+E J"if2D("/m")"\\n\",_m(is,js,"if3D("ks,")" ie,je"if3D(",ke")"));\n"
+  "  fprintf(postfilename,\"m         = %%+E J"if2D("/m")"\\n\",_m(is,js,"if3D("ks,")" ie,je"if3D(",ke")"));\n"
 #ifdef EMFIELD
-  "  printf(\"Femfield  = (%%+E"if2DL(",%%+E")if3DL(",%%+E")") N"if2D("/m")"\\n\",Femfield[1]"if2DL(",Femfield[2]")if3DL(",Femfield[3]")");\n"
-  "  printf(\"Qbeam     = %%+E W"if2D("/m")"\\n\",_Qbeam(is,js,"if3D("ks,")" ie,je"if3D(",ke")"));\n"
-  "  printf(\"EdotJ     = %%+E W"if2D("/m")"\\n\",_EdotJ(is,js,"if3D("ks,")" ie,je"if3D(",ke")"));\n"
-  "  printf(\"Wemfield  = %%+E W"if2D("/m")"\\n\",_Wemfield(is,js,"if3D("ks,")" ie,je"if3D(",ke")")); {Wemfield=Femfield dot Vn}\n"
+  "  fprintf(postfilename,\"Femfield  = (%%+E"if2DL(",%%+E")if3DL(",%%+E")") N"if2D("/m")"\\n\",Femfield[1]"if2DL(",Femfield[2]")if3DL(",Femfield[3]")");\n"
+  "  fprintf(postfilename,\"Qbeam     = %%+E W"if2D("/m")"\\n\",_Qbeam(is,js,"if3D("ks,")" ie,je"if3D(",ke")"));\n"
+  "  fprintf(postfilename,\"EdotJ     = %%+E W"if2D("/m")"\\n\",_EdotJ(is,js,"if3D("ks,")" ie,je"if3D(",ke")"));\n"
+  "  fprintf(postfilename,\"Wemfield  = %%+E W"if2D("/m")"\\n\",_Wemfield(is,js,"if3D("ks,")" ie,je"if3D(",ke")")); {Wemfield=Femfield dot Vn}\n"
 #endif
-  "  printf(\"\\n\");\n"
+  "  fprintf(postfilename,\"\\n\");\n"
   "  {\n"
   "  POSTGRIDONLY=FALSE;\n"
   "  WritePostFile(is,js,"if3D("ks,")" ie,je,"if3D("ke,")" \"post.01\", \"tecplot\", POSTGRIDONLY);\n"
@@ -2216,6 +2216,7 @@ static void read_post_actions(char *action, char **argum, SOAP_codex_t *codex){
   filename=(char *)malloc(sizeof(char));
   postprocessor=(char *)malloc(sizeof(char));
 
+  add_string_to_codex(codex, "postfilename", gl->post_filename);
   if (strcmp(action,"XSTATION_Set")==0) {
 #ifdef DISTMPI
     MPI_Barrier(MPI_COMM_WORLD);
