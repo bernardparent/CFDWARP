@@ -14,8 +14,8 @@ tf=2.0;
   rhoR=1;
   uL=-1000;
   uR=1000; 
-  tmax=2e-4;   {simulation time span in seconds}
-  timelevels=round(20*mf*tf);  
+  tmax=3e-4;   {simulation time span in seconds}
+  timelevels=round(100*mf*tf);  
 
 TL=PL/R/rhoL;
 TR=PR/R/rhoR;

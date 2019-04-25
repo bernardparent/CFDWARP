@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 APR 25a
+  * in bin
+    - got rid of FACEINTEG=FACEINTEG_CENTRAL1; within MUSCL() module
+  * in USAGE
+    - added post.02 after -opm flag 
+
+
 2019 APR 20a
 ​  * in src/common.h
 ​    - in struct() gl_t, declared char *post_filename (VanTien)

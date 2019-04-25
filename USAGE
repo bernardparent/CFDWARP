@@ -128,7 +128,7 @@ be tedious to obtain using TECPLOT or other post-processing software).
 To run post-processing commands using the Post() module, type the 
 following at the shell prompt:
 
-./warp -r control.wrp -i data.02 -opm
+./warp -r control.wrp -i data.02 -opm post.02
 
 
 

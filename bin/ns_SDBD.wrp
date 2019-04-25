@@ -278,7 +278,7 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_PARENT; 
     POSFILTER_numiter=4;
     POSFILTER=POSFILTER_PARENT;
-    FACEINTEG=FACEINTEG_CENTRAL1;
+     
   );
   Trapezoidal(
     weightm1_convection=0.5;
