@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 APR 29a
+  * in bin
+    - updated ns_SDBD.wrp
+
+
 2019 APR 25a
   * in bin
     - got rid of FACEINTEG=FACEINTEG_CENTRAL1; within MUSCL() module

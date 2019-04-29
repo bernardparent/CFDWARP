@@ -1,20 +1,21 @@
 
  
-meshlevel=2;
+meshlevel=3;
 
 mf=(1.41)^(-4+meshlevel); {1.0/1.41, 1.0, 1.41, 2.0, 2.82}
 
 tf=1.0; {tf=1 works great}
-CFLfact=0.8;
+CFLfact=1.6;
+
 
 dphimax=14000;
-itermax=150;
-
+itermax=140;
+EMFsubiter=1300;
 
 is1=1;
 is2=round(mf*28); {start of exposed electrode}
-is3=is2+round(mf*15);
-is4=is3+round(mf*50); {start of embedded electrode}
+is3=is2+round(mf*65);
+is4=is3+round(mf*150); {start of embedded electrode}
 is5=is4+round(mf*600); {end of embedded electrode}
 is6=is5+round(mf*36);
 is=is1;
@@ -23,9 +24,9 @@ ie=is6;
 
 
 js2=1; 
-js3=js2+round(mf*13); {was js2+round(mf*7)} {exposed electrode is between js3 and js4}
-js4=js3+round(mf*9);  {js3+round(mf*5)} {start of plasma/gas}
-js5=js4+round(mf*33*6);
+js3=js2+round(mf*13); {exposed electrode is between js3 and js4}
+js4=js3+round(mf*9);  {start of plasma/gas}
+js5=js4+round(mf*33*6*1.25);
 js6=js5+round(mf*50);
 js=js2;
 je=js6;
@@ -38,7 +39,7 @@ xs4=0;
 xs5=0.0048;
 xs6=0.015;
 dx=(xs5-xs4)/(is5-is4)/3;
-dy=dx/4;
+dy=dx/4/6; {?}
 ys0=-50e-6;
 ys1=0.0;
 ys2=37.5e-6;
@@ -85,12 +86,12 @@ Grid(
   {copy js4 to js5}
   Copy(is,js4,ie,js4,is,js5);
   Translate(is,js5,ie,js5,0.0,ys5-ys4);
-  Join(is,js4,ie,js5,j,GE,0.2e0,1.0e0,1.0e0);
+  Join(is,js4,ie,js5,j,GE,0.3e0,1.0e0,1.0e0);
 
   {copy js4 to je}
   Copy(is,js4,ie,js4,is,je);
   Translate(is,je,ie,je,0.0,ys6-ys4);
-  Join(is,js5,ie,je,j,GE,0.2e0,1.0e0,1.0e0);
+  Join(is,js5,ie,je,j,GE,0.4e0,1.0e0,1.0e0);
   
 );
 
@@ -278,11 +279,10 @@ Disc(
     EIGENVALCOND=EIGENVALCOND_PARENT; 
     POSFILTER_numiter=4;
     POSFILTER=POSFILTER_PARENT;
-     
   );
   Trapezoidal(
     weightm1_convection=0.5;
-    weightm1_default=0.0;
+    weightm1_default=0.25;
   );
   CDFplus(
     xi[1]=0.5;
@@ -359,11 +359,6 @@ Cycle(
         Region(is4,js2,  is5,js2,  INITEMF_TYPE1,-dphi/2);
       ););
     );
-    if (mod(iter,10)==0,
-      EMFsubiter=1300;
-    ,{else}
-      EMFsubiter=1400;
-    );
     if (time<40e-9,
       dt=dtref;   {physical time step in seconds}
       if (tf<1.8, 
@@ -371,19 +366,20 @@ Cycle(
       ,{else} 
         CFL=2.0*CFLfact;
       );
-      CFL=CFLfact;
+      CFL=CFLfact; {?????}
       if (iter<3, 
         CFL=0.0;
-        EMFsubiter=1300;
       );
     ,{else}
       if (iter==1, 
         dt=min(dt*2,3*0.4e-4/(330*mf*tf));
         CFL=0.2;
-        Model(Ohm(SetSolidConductivity(is2,js3,  is4,js4, 0 {S/m});););
       ,{else}
-        CFL=min(CFLfact,CFL*1.4);
+        CFL=min(0.8,min(CFLfact,CFL*1.4));
       );
+    );
+    if (dphi==0 && iter==1 && time>30e-9,
+      Model(Ohm(SetSolidConductivity(is2,js3,  is4,js4, 0 {S/m});););      
     );
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
     system("date");
@@ -411,40 +407,7 @@ Cycle(
 
 
 Post(
-{  xstation[1]=0.001; {m}
-  xstation[2]=0.002; {m}
-  xstation[3]=0.003; {m}
-  numsteps=300;
-  qmin=1.0; {m/s, as small a value as possible}
-  Pback_min=400; {Pa}
-  Pback_max=40000; {Pa}
-  Aback=1.0; {m2/m}
-  for (cnt,1,3,
-    XSTATION_Set(xstation[cnt]);
-    Pback=XSTATION_Pback(Aback, Pback_min, Pback_max, numsteps, qmin);
-    Fpot=XSTATION_Fpot(Pback, numsteps, qmin);
-    mdot=XSTATION_mdot();
-    Tstag=XSTATION_Tstag();
-    Pstag=XSTATION_Pstag(numsteps);
-    Pstar=XSTATION_Pstar();
-    T=XSTATION_T();
-    q=XSTATION_q();
-    rho=XSTATION_rho();
-    htstar=XSTATION_htstar();
-    printf("x      = %E m\n"
-           "Pback  = %E Pa\n"
-           "Fpot   = %E Ns/kg\n"
-           "mdot   = %E kg/ms\n"
-           "htstar = %E J/kg\n"
-           "Tstag  = %E K\n"
-           "Pstag  = %E Pa\n"
-           "Pstar  = %E Pa\n"
-           "T      = %E K\n"
-           "q      = %E m/s\n"
-           "rho    = %E kg/m3\n\n"
-           ,xstation[cnt],Pback,Fpot,mdot,htstar,Tstag,Pstag,Pstar,T,q,rho);
-  );
-}
+
   printf("\n");
   for (dim,1,2,
     Fshear[dim]=_Fshear(is,js, ie,je, dim,BDRY_WALLTFIXED1);
