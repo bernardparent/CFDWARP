@@ -7,9 +7,14 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 03b
+  * in LICENSES/CFDWARP-Proprietary
+    - minor change 
+
+
 2019 MAY 03a
   * in LICENSES/CFDWARP-Proprietary
-    - applied word wrapping at the 90th columns for better readability
+    - applied word wrapping at the 90th column for better readability
   * in various proprietary C files
     - applied word wrapping in CFDWARP-Proprietary license
 
