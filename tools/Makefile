@@ -6,13 +6,13 @@ LFLAGSLOCAL = -L../lib -lsoap -lexm -lgridg -lpthread -lm
 ####### Files
 
 HEADERS =       share.h
-SOURCES =	share.c bdrylayer.c normalshock.c shearlayer.c obliqueshock.c inlet.c inletgeom.c injector.c compressionfan.c cathode.c ringleb.c tauvt.c test.c calc.c tecgrid2D.c tecgrid3D.c mpitest.c average.c
-OBJECTS =	share.o bdrylayer.o normalshock.o shearlayer.o obliqueshock.o inlet.o inletgeom.o injector.o compressionfan.o cathode.o ringleb.o tauvt.o test.o calc.o tecgrid2D.o tecgrid3D.o mpitest.o average.o
-TARGETS  =	bdrylayer normalshock shearlayer obliqueshock inlet inletgeom injector compressionfan cathode ringleb tauvt test openmptest calc tecgrid2D tecgrid3D mpitest average
+SOURCES =	share.c bdrylayer.c normalshock.c shearlayer.c obliqueshock.c inlet.c inletgeom.c injector.c compressionfan.c cathode.c ringleb.c tauvt.c calc.c tecgrid2D.c tecgrid3D.c mpitest.c average.c
+OBJECTS =	share.o bdrylayer.o normalshock.o shearlayer.o obliqueshock.o inlet.o inletgeom.o injector.o compressionfan.o cathode.o ringleb.o tauvt.o calc.o tecgrid2D.o tecgrid3D.o mpitest.o average.o
+TARGETS  =	bdrylayer normalshock shearlayer obliqueshock inlet inletgeom injector compressionfan cathode ringleb tauvt openmptest calc tecgrid2D tecgrid3D mpitest average
 
 ####### Build rules
 
-all: bdrylayer normalshock shearlayer obliqueshock inlet injector inletgeom compressionfan cathode ringleb tauvt test openmptest calc tecgrid2D tecgrid3D mpitest average
+all: bdrylayer normalshock shearlayer obliqueshock inlet injector inletgeom compressionfan cathode ringleb tauvt openmptest calc tecgrid2D tecgrid3D mpitest average
 
 tecgrid2D: tecgrid2D.o 
 	$(L) tecgrid2D.o -o tecgrid2D $(LFLAGS) $(LFLAGSLOCAL)
@@ -52,9 +52,6 @@ ringleb: ringleb.o
 
 tauvt: tauvt.o
 	$(L) tauvt.o -o tauvt $(LFLAGS) $(LFLAGSLOCAL)
-
-test: test.o
-	$(L) test.o -o test $(LFLAGS) $(LFLAGSLOCAL)
 
 cathode: cathode.o 
 	$(L) cathode.o -o cathode $(LFLAGS) $(LFLAGSLOCAL)

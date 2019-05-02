@@ -7,6 +7,18 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 02a
+  * created directory LICENSES
+  * deleted LICENSE
+  * in LICENSES added 
+    - CFDWARP-Proprietary
+    - BSD-2-Clause
+  * in all .c and .h files
+    - added either the BSD-2-Clause or the CFDWARP-Proprietary license 
+  * in tools
+    - removed test.c
+
+
 2019 APR 29a
   * in bin
     - updated ns_SDBD.wrp

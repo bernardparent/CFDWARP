@@ -1,4 +1,19 @@
-Copyright (c) 1998-2019, Bernard Parent
+Usage-Guide:
+
+
+To use the BSD 2-clause License put the following SPDX tag/value pair into a 
+comment as close to the top of the source file as possible:
+
+SPDX-License-Identifier: BSD-2-Clause
+
+Immediately following the latter, put the License Text below into 
+comments.
+
+
+License-Text:
+
+
+Copyright (c) <year>, <Author>
 
 All rights reserved.
 
