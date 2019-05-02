@@ -344,7 +344,7 @@ void write_modules(FILE *outputfile){
   wfprintf(outputfile,"%s\n",center_string(linestr,linewidth,1));
 */
   wfprintf(outputfile,"\n");
-  wfprintf(outputfile,"%s\n",center_string("A CFD Code for Plasma & Reactive Flow",linewidth,1));
+  wfprintf(outputfile,"%s\n",center_string("CFD Code for Plasma & Reactive Flow",linewidth,1));
   write_hline(outputfile, linewidth, 2);
   write_modules_row(outputfile,"Version",VERSION,linewidth);
 

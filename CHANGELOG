@@ -7,6 +7,17 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 02b
+  * replaced in all *.wrp files
+    - 'A CFD Code for Plasma' -> ' CFD Code for Plasma' 
+  * in src/control.c
+    - in write_modules(), replaced 'A CFD Code for Plasma' for ' CFD Code for Plasma' 
+  * in README
+    - replaced 'A CFD Code for Plasma' for ' CFD Code for Plasma'
+  * in cycle/resconv/_MUSCL/resconv.c
+    - in write_disc_resconv_template(), changed the default INTERPOL from AOWENO7 to TVD2_VANLEER
+
+
 2019 MAY 02a
   * created directory LICENSES
   * deleted LICENSE
