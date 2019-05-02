@@ -14,15 +14,41 @@ All rights reserved.
 
 TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
-1. Definitions. "Discloser" shall mean the Copyright holder Bernard Parent. "Recipient" shall mean an individual or Legal Entity exercising permissions granted by this License. "Information" shall mean the software and algorithms in this file. "Purpose" shall mean the tasks assigned to the Recipient by Discloser.
+1. Definitions. "Discloser" shall mean the Copyright holder Bernard Parent. 
+   "Recipient" shall mean an individual or Legal Entity exercising permissions granted 
+   by this License. "Information" shall mean the software and algorithms in this file. 
+   "Purpose" shall mean the tasks assigned to the Recipient by Discloser.
 
-2. The Copyright notices and the Terms and Conditions must not be modified or removed from this source file.   
+2. The Copyright notices and the Terms and Conditions must not be modified or removed 
+   from this source file.   
 
-3. All right, title and interest in and to the Information shall remain the exclusive property of the Discloser and the Information shall be held in trust and confidence by Recipient for Discloser. No interest, licence or any right respecting the Information, other than expressly set out herein, is granted to Recipient by implication or otherwise.
+3. All right, title and interest in and to the Information shall remain the exclusive 
+   property of the Discloser and the Information shall be held in trust and confidence 
+   by Recipient for Discloser. No interest, licence or any right respecting the 
+   Information, other than expressly set out herein, is granted to Recipient by 
+   implication or otherwise.
 
-4. Recipient shall use all reasonable efforts to protect Discloser’s interest in the Information and keep it confidential, using a standard of care no less than the degree of care that Recipient would be reasonably expected to employ for his own similar confidential information. In particular Recipient shall not directly or indirectly disclose, allow access to, transmit or transfer the Information to a third party without the Discloser’s prior written consent. 
+4. Recipient shall use all reasonable efforts to protect Discloser’s interest in the 
+   Information and keep it confidential, using a standard of care no less than the 
+   degree of care that Recipient would be reasonably expected to employ for his own 
+   similar confidential information. In particular Recipient shall not directly or 
+   indirectly disclose, allow access to, transmit or transfer the Information to a third 
+   party without the Discloser’s prior written consent. 
 
-5. The Information shall not be copied, reproduced in any form or stored in a retrieval system or data base by Recipient without the prior written consent of Discloser, except for such copies and storage as may reasonably required internally by Recipient for the Purpose.
+5. The Information shall not be copied, reproduced in any form or stored in a retrieval 
+   system or data base by Recipient without the prior written consent of Discloser, 
+   except for such copies and storage as may reasonably required internally by Recipient 
+   for the Purpose.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+6. Disclaimer. This software is provided by the copyright holders and contributors 
+   "AS IS" and any express or implied warranties, including, but not limited to, the 
+   implied warranties of merchantability and fitness for a particular purpose are 
+   disclaimed. In no event shall the copyright holder or contributors be liable for any
+   direct, indirect, incidental, special, exemplary, or consequential damages (including
+   but not limited to, procurement of substitute goods or services; loss of use, data, 
+   or profits; or business interruption) however caused and on any theory of liability, 
+   whether in contract, strict liability, or tort (including negligence or otherwise)
+   arising in any way out of the use of this software, even if advised of the 
+   possibility of such damage. 
 
+END OF TERMS OF CONDITIONS
