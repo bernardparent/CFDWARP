@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 04a
+  * in *.c files
+    - within the license inserted word wraps at the 90th column for better readability
+
+
 2019 MAY 03c
   * in tools/replace.sh
     - added the mode pureperl which permits the search and replace of end of line characters
