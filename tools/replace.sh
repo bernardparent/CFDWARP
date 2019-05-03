@@ -73,7 +73,7 @@ FLAG           ARGUMENT                                      Required?
 -filename      '*.c' or '*Makefile' or '*.wrp' or '.config'  Y 
 -find          string that will be replaced                  Y
 -replace       string that will replace what was found       Y
--mode          rpl or perl (default is rpl)                  N
+-mode          rpl or perl or pureperl (default is rpl)      N
 -git           No argument. If set, will include files       N
                within .git directories.
 -w             No argument. If set, will only replace the    N
@@ -92,10 +92,16 @@ $0 -git -w -find 'John' -replace 'Mikey' -filename '*Makefile' -mode perl
 will search within all Makefiles recursively for the word John and replace it by Mikey using perl.
 
 
-SPECIAL CHARACTERS
+SPECIAL CHARACTERS (RPL, PERL, PUREPERL)
 
   ! must be escaped as \!
   ' must be written as '\''  or as '\"'\"'
+
+SPECIAL CHARACTERS (PUREPERL)
+
+  \ must be escaped as \\\ 
+  $ must be escaped as \\$ 
+  / must be escaped as \/  
 " 
 
   exit 1
@@ -138,6 +144,10 @@ if [ -n "$dryrun" ]; then
   echo $stringfind_orig' is escaped as '$stringfind
   echo $stringreplace_orig' is escaped as '$stringreplace
   exit 1
+fi
+
+if [[ "$mode" = "pureperl" ]]; then
+  mode="perl"
 fi
 
 case "$mode" in

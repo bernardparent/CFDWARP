@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 03c
+  * in tools/replace.sh
+    - added the mode pureperl which permits the search and replace of end of line characters
+
+
 2019 MAY 03b
   * in LICENSES/CFDWARP-Proprietary
     - minor change 
