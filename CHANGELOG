@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 04b
+  * in tools/replace.sh
+    - added the escaping of '(' and ')' for the mode perl
+
+  
 2019 MAY 04a
   * in *.c files
     - within the license inserted word wraps at the 90th column for better readability

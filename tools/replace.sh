@@ -97,8 +97,11 @@ SPECIAL CHARACTERS (RPL, PERL, PUREPERL)
   ! must be escaped as \!
   ' must be written as '\''  or as '\"'\"'
 
+
 SPECIAL CHARACTERS (PUREPERL)
 
+  ( must be escaped as \(
+  ) must be escaped as \)
   \ must be escaped as \\\ 
   $ must be escaped as \\$ 
   / must be escaped as \/  
@@ -134,6 +137,12 @@ if [[ "$mode" = "perl" ]]; then
   #escape the / 
   stringfind=${stringfind//\//\\\/}
   stringreplace=${stringreplace//\//\\\/}
+  #escape the ( 
+  stringfind=${stringfind//(/\\(}
+  stringreplace=${stringreplace//(/\\(}
+  #escape the ) 
+  stringfind=${stringfind//)/\\)}
+  stringreplace=${stringreplace//)/\\)}
 fi
 
 
