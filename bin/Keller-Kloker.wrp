@@ -80,10 +80,10 @@ Lz=2*pi/21*Lref;
 deltalam=0.025*Lref;
 deltaturb=0.175*Lref;
 
-mf=1;
+mf=1.0;
 
 is=1;
-ie=round(800*mf);
+ie=round(925*mf);
 js=1;
 je=round(60*mf);
 ks=1;
@@ -91,7 +91,7 @@ ke=round(40*mf);
 
 TURB_js=js;
 TURB_je=round(40*mf);
-TURB_is=round(100*mf);
+TURB_is=round(225*mf);
 TURB_ie=ie;
 TURB_ys=0;
 TURB_ye=deltaturb;
@@ -100,7 +100,7 @@ TURB_xe=Lx;
 TURB_dwall=20e-6/mf;
 
 HEAT_is=round(30*mf);
-HEAT_ie=round(50*mf);
+HEAT_ie=round(100*mf);
 HEAT_js=js;
 HEAT_je=round(10*mf);
 HEAT_ks=ks+round(10*mf);
@@ -339,6 +339,7 @@ Cycle(
       );
     );
   );
+
 );
 
 

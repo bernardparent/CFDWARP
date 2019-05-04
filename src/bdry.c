@@ -308,8 +308,8 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
     for1DL(i,zone.is,zone.ie)
       for2DL(j,zone.js,zone.je)
         for3DL(k,zone.ks,zone.ke)
-          if (is_node_link((*np)[_ai(gl,i,j,k)],TYPELEVEL)){
-            l1=_ai(gl,i,j,k);
+          l1=_ai(gl,i,j,k);
+          if (is_node_link((*np)[l1],TYPELEVEL) && is_node_bdry((*np)[l1],TYPELEVEL)){
             assert(is_node_bdry((*np)[l1],TYPELEVEL));
             l2=_node_link((*np)[l1],0,TYPELEVEL);
             switch (TYPELEVEL){   

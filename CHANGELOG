@@ -7,6 +7,16 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 04c
+  * in bin/Keller-Kloker.wrp
+    - increased the mesh density in heat addition zone and in transition zone
+  * in cycle/share/cycle_share.c
+    - in read_cycle() added a fatal_error if runtime module is not found 
+  * in src/bdry.c
+    - in read_bdry_actions(), now only Unlinks a node if it is a boundary node (when using the
+      action Unlink)
+
+
 2019 MAY 04b
   * in tools/replace.sh
     - added the escaping of '(' and ')' for the mode perl

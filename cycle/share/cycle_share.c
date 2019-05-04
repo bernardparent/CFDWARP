@@ -1109,6 +1109,8 @@ void read_cycle(char *argum, SOAP_codex_t *codexcontrol){
       fatal_error("The fluid module %s() was not found within Cycle().",_FLUID_ACTIONNAME);
     if (!gl->CYCLE_EMFIELD_READ) 
       fatal_error("The emfield module %s() was not found within Cycle().",_EMFIELD_ACTIONNAME);
+    if (!gl->cycle.RUNTIMEMODULEFOUND)
+      fatal_error("The module %s() was not found within Cycle().",_CYCLE_ACTIONNAME);
     init_cycle(argum,codexcontrol);
   }
 }
