@@ -7,6 +7,15 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 08a
+  * in src/bdry.c
+    - in read_bdry_actions(), added a free of bdryparam to get rid of memory leak  (Minindu)
+  * in src/common.c
+    - in create_node(), added initialization of np->bdryparam and np->linkarray to NULL (Minindu)
+    - in dispose_node(), added free of np->linkarray and np->bdryparam to get rid of memory leak 
+      (Minindu)
+
+
 2019 MAY 04c
   * in bin/Keller-Kloker.wrp
     - increased the mesh density in heat addition zone and in transition zone

@@ -172,6 +172,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
       end2DL
     end1DL
     codex->ACTIONPROCESSED=TRUE;
+    free( bdryparam );
   }
 
 

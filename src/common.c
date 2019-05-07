@@ -869,6 +869,8 @@ void invert_diagonal_matrix(sqmat_t mat1, sqmat_t mat2){
 
 void create_node(np_t *np, long i, long j, long k){
   np->bs=(npbs_t *) malloc(sizeof(npbs_t));
+  np->bdryparam=NULL;
+  np->linkarray=NULL;
   if (np->bs==NULL) {
     perror("malloc");
     fatal_error("Problem malloc'ing np->bs in create_node subroutine.");
@@ -969,7 +971,11 @@ bool resume_node(np_t *np){
 
 
 void dispose_node(np_t *np){
-  if (np->status!='W') free(np->bs);
+  if (np->status!='W') {
+    free(np->linkarray);
+    free(np->bdryparam);
+    free(np->bs);
+  }
   if (is_node_resumed(*np)) {
 #ifdef ZONETHREADS
     thread_lock_destroy(&(np->wk->lock),THREADTYPE_ZONE);
