@@ -37,11 +37,8 @@
 }
 
  
-P=100;
-TL=10;
-TR=1000;
 
-mf=20.0;
+mf=4.0;
 
 is=1;
 im=round(mf*15);
@@ -129,6 +126,9 @@ Init(
     _______________________________________________________________________________________
     }
     V=0;
+    P=100;
+    TL=10;
+    TR=1000;
     Region(is,js,  im,je,  INIT_TYPE1, V,0,P,TL);
     Region(im,js,  ie,je,  INIT_TYPE1, V,0,P,TR);
     {
@@ -142,26 +142,7 @@ Init(
 Disc(
   NavierStokesPerfect(
     zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
-  );
-  FDS(
-    AVERAGING=AVERAGING_ROE;
-    ACCURACY=ACCURACY_FIRSTORDER;
-    EIGENVALCOND=EIGENVALCOND_GNOFFO;
-  );
-  FVS(
-    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
-    AOWENO_gammalo=0.85;
-    AOWENO_gammahi=0.85;
-    INTERPOL=INTERPOL_FIRSTORDER;
-    EIGENVALCOND=EIGENVALCOND_GNOFFO;
-  );
-  FDSplus(
-    AVERAGING=AVERAGING_ARITH;
-    ACCURACY=ACCURACY_FIRSTORDER;
-    numiter=2;
-    xi=1.99;
-    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+    zetaA2=0.0e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   MUSCL(
     FLUX=FLUX_FDS;
@@ -170,9 +151,10 @@ Disc(
     AOWENO_gammalo=0.85;
     AOWENO_gammahi=0.85;
     INTERPOL=INTERPOL_FIRSTORDER;
-    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
+    POSFILTER=POSFILTER_NONE;
+    POSFILTER_numiter=4;
   );
-
   TVDRK(
     METHOD=METHOD_TVDRK2;
   );
@@ -191,7 +173,7 @@ Cycle(
   );
   PredictorCorrector(
     tmax=1e-4;    {simulation time span in seconds}
-    dt=tmax/500;   {physical time step in seconds}
+    dt=tmax/(mf*50);   {physical time step in seconds}
     if (time>tmax-0.1*dt,
       WriteDataFile(outputfilename"."round(time/dt));
       exit(EXIT_SUCCESS);

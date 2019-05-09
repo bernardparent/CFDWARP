@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 09b
+  * in bin
+    - updated stationary_contact_discontinuity.wrp
+
+
 2019 MAY 09a
   * in tools/*.sh
     - made the license easier to read by word wrapping on the 90th column
