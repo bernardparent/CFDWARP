@@ -316,7 +316,7 @@ void write_license ( FILE * outputfile ) {
   if (outputfile!=stdout) linewidth=maxlinewidth;
 
   wfprintf(outputfile,"\n");
-  sprintf(linestr,"  Copyright (c) 1998-2019, Bernard Parent\n  All rights reserved.\n\n  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:\n");
+  sprintf(linestr,"  Copyright 1998-2019 Bernard Parent\n  All rights reserved.\n\n  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:\n");
   wfprintf(outputfile,"%s\n",strwrpind(linestr, linewidth, -2));
 
   sprintf(linestr,"  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.");

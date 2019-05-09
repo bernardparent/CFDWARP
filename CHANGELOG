@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 09a
+  * in tools/*.sh
+    - made the license easier to read by word wrapping on the 90th column
+  * in various *.c files
+    - renamed "(c) Copyright" to "Copyright"
+ 
+
 2019 MAY 08a
   * in src/bdry.c
     - in read_bdry_actions(), added a free of bdryparam to get rid of memory leak  (Minindu)
