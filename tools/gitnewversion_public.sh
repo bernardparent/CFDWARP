@@ -26,7 +26,7 @@
 
 
 filecheck=".makefile-header-default"
-warppublic="../warp_public"
+warppublic="../CFDWARP_public"
 tmpfile="UHFGHnhKJLJGHGGHKJkljk_tmpfile_from_gitnewversion_public.txt"
 
 command -v git >/dev/null 2>&1 || { echo "ERROR: gitnewversion_public.sh requires git but it is not installed.  Aborting." >&2; exit 1; }

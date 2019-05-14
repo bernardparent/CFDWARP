@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 14c
+  * in tools/gitnewversion_public.sh
+    - replaced warp_public by CFDWARP_public
+
+
 2019 MAY 14b
   * in bin
     - Updated Noh2D.wrp
