@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define INTERPOL_TVD2_VANLEER 9
 #define INTERPOL_TVD2_SUPERBEE 10
 #define INTERPOL_TVD2_SMART 16
+#define INTERPOL_TVD2_MINMOD2 17
 #define INTERPOL_TVD5 11
 #define INTERPOL_CWENO3 12
 #define INTERPOL_CWENO5 13
@@ -98,6 +99,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"FLUX_FDS",FLUX_FDS); 
     SOAP_add_int_to_vars(codex,"FLUX_FVS",FLUX_FVS); 
     SOAP_add_int_to_vars(codex,"INTERPOL_TVD2_MINMOD",INTERPOL_TVD2_MINMOD); 
+    SOAP_add_int_to_vars(codex,"INTERPOL_TVD2_MINMOD2",INTERPOL_TVD2_MINMOD2); 
     SOAP_add_int_to_vars(codex,"INTERPOL_TVD2_VANLEER",INTERPOL_TVD2_VANLEER); 
     SOAP_add_int_to_vars(codex,"INTERPOL_TVD2_SUPERBEE",INTERPOL_TVD2_SUPERBEE); 
     SOAP_add_int_to_vars(codex,"INTERPOL_TVD2_SMART",INTERPOL_TVD2_SMART); 
@@ -148,7 +150,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     find_int_var_from_codex(codex,"INTERPOL",&gl->cycle.resconv.INTERPOL);
     if (
 #if (hbw_resconv_fluid>=2)
-        gl->cycle.resconv.INTERPOL!=INTERPOL_TVD2_MINMOD && gl->cycle.resconv.INTERPOL!=INTERPOL_TVD2_VANLEER 
+        gl->cycle.resconv.INTERPOL!=INTERPOL_TVD2_MINMOD && gl->cycle.resconv.INTERPOL!=INTERPOL_TVD2_MINMOD2 
+     && gl->cycle.resconv.INTERPOL!=INTERPOL_TVD2_VANLEER 
      && gl->cycle.resconv.INTERPOL!=INTERPOL_TVD2_SUPERBEE && gl->cycle.resconv.INTERPOL!=INTERPOL_TVD2_SMART && gl->cycle.resconv.INTERPOL!=INTERPOL_WENO3
      && gl->cycle.resconv.INTERPOL!=INTERPOL_FIRSTORDER && gl->cycle.resconv.INTERPOL!=INTERPOL_SECONDORDER
 #endif
@@ -166,7 +169,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
      )
       SOAP_fatal_error(codex,"INTERPOL must be set to either "
 #if (hbw_resconv_fluid>=2)      
-        "INTERPOL_FIRSTORDER, INTERPOL_SECONDORDER, INTERPOL_TVD2_MINMOD, INTERPOL_TVD2_VANLEER, INTERPOL_TVD2_SUPERBEE, INTERPOL_TVD2_SMART, INTERPOL_WENO3, "
+        "INTERPOL_FIRSTORDER, INTERPOL_SECONDORDER, INTERPOL_TVD2_MINMOD, INTERPOL_TVD2_MINMOD2, INTERPOL_TVD2_VANLEER, INTERPOL_TVD2_SUPERBEE, INTERPOL_TVD2_SMART, INTERPOL_WENO3, "
 #endif
 #if (hbw_resconv_fluid>=3)      
         "INTERPOL_AOWENO5, INTERPOL_WENO5, INTERPOL_CWENO3, INTERPOL_TVD5,"
@@ -224,6 +227,10 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t 
       case INTERPOL_TVD2_MINMOD:
         musclvarsL[flux]=_f_TVD2(musclvarsm3h[flux],musclvarsm1h[flux],musclvarsp1h[flux],LIMITER_MINMOD);
         musclvarsR[flux]=_f_TVD2(musclvarsp3h[flux],musclvarsp1h[flux],musclvarsm1h[flux],LIMITER_MINMOD);
+      break;
+      case INTERPOL_TVD2_MINMOD2:
+        musclvarsL[flux]=_f_TVD2(musclvarsm3h[flux],musclvarsm1h[flux],musclvarsp1h[flux],LIMITER_MINMOD2);
+        musclvarsR[flux]=_f_TVD2(musclvarsp3h[flux],musclvarsp1h[flux],musclvarsm1h[flux],LIMITER_MINMOD2);
       break;
       case INTERPOL_TVD2_VANLEER:
         musclvarsL[flux]=_f_TVD2(musclvarsm3h[flux],musclvarsm1h[flux],musclvarsp1h[flux],LIMITER_VANLEER);

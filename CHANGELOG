@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 14b
+  * in bin
+    - Updated Noh2D.wrp
+  * in cycle/resconv/_MUSCL/resconv.c
+    - added TVD2_MINMOD2 interpolation
+
+
 2019 MAY 14a
   * renamed
     - maxlinewidth -> MAX_LINE_WIDTH

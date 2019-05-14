@@ -71,7 +71,7 @@ initially but density varies as 1+t/r with r the radius from the origin
 }
 
 
-mf=1.8;
+mf=3.6;
 
 is=1;
 ie=round(30*mf);
@@ -195,7 +195,7 @@ Disc(
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_AOWENO5;
+    INTERPOL=INTERPOL_WENO5;
      
     EIGENVALCOND=EIGENVALCOND_PARENT;
     POSFILTER=POSFILTER_PARENT;
@@ -235,17 +235,17 @@ Cycle(
     Uref[3]=rhoref*aref;   
     Uref[4]=rhoref*aref*aref;  
   );
-  DualTimeStepping(
+  Multizone(
     iterglob=iterglob+1;
     tmax=0.6;    {simulation time span in seconds}
     dt=tmax/40/mf;   {physical time step in seconds}
-    sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
-    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
+    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
       if (time==0, 
         CFL=0.01;
       ,{else}
-        CFL=2.5;
+        CFL=1.5;
       );
       Init(NavierStokesPerfect(
         i=is;
@@ -288,7 +288,78 @@ Cycle(
       ););
 
     );
-    if (iter>20,CFL=max(CFL*0.95,0.45););
+    if (iter>20,CFL=max(CFL*0.95,0.9););
+
+    phi1=20;      {maximum number of gridlines per zone in each dimension}
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,phi1,dt);
+
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld) %3ld/%3ld%s \n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,numzones_updated,numzones_total,clipinfo);
+    if (ximax<xiverge || iter>70,
+      IncreaseTimeLevel();
+      WriteDataFile(outputfilename"."round(time/dt));
+      printf("dt=%E time=%Es\n",dt,time);
+      if (time>tmax-0.1*dt,
+        exit(EXIT_SUCCESS);
+      );
+    );
+  );
+
+  DualTimeStepping(
+    iterglob=iterglob+1;
+    tmax=0.6;    {simulation time span in seconds}
+    dt=tmax/40/mf;   {physical time step in seconds}
+    sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
+    if (iter==1,
+      if (time==0, 
+        CFL=0.01;
+      ,{else}
+        CFL=1.5;
+      );
+      Init(NavierStokesPerfect(
+        i=is;
+        if (i>=domain.is && i<=domain.ie,
+          for_parallel(j,domain.js,domain.je,
+            x=_x(i,j);
+            y=_y(i,j);
+            r=sqrt(x*x+y*y);
+            Region(i,j,  i,j,  INIT_TYPE3, -x/r,-y/r,1e-6,(1+time/r));
+          );
+        );
+        i=ie;
+        if (i>=domain.is && i<=domain.ie,
+          for_parallel(j,domain.js,domain.je,
+            x=_x(i,j);
+            y=_y(i,j);
+            r=sqrt(x*x+y*y);
+            Region(i,j,  i,j,  INIT_TYPE3, -x/r,-y/r,1e-6,(1+time/r));
+          );
+        );
+        j=js;
+        if (j>=domain.js && j<=domain.je,
+          for_parallel(i,domain.is,domain.ie,
+            x=_x(i,j);
+            y=_y(i,j);
+            r=sqrt(x*x+y*y);
+            Region(i,j,  i,j,  INIT_TYPE3, -x/r,-y/r,1e-6,(1+time/r));
+          );
+        );
+        j=je;
+        if (j>=domain.js && j<=domain.je,
+          for_parallel(i,domain.is,domain.ie,
+            x=_x(i,j);
+            y=_y(i,j);
+            r=sqrt(x*x+y*y);
+            Region(i,j,  i,j,  INIT_TYPE3, -x/r,-y/r,1e-6,(1+time/r));
+          );
+        );
+
+      ););
+
+    );
+    if (iter>20,CFL=max(CFL*0.95,0.9););
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
     if (CONVERGENCEHISTORY,
       printf("%6ld %6ld  %E \n",
