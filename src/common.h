@@ -133,7 +133,7 @@
 
 
 
-#define maxlinewidth 97
+#define MAX_LINE_WIDTH 97
 
 #include <math.h>
 #include <stdio.h>

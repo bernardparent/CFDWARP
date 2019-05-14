@@ -769,7 +769,7 @@ int main ( int argc, char **argv ) {
   int term_width, term_height, linewidth;
 
   find_terminal_window_size ( &term_width, &term_height );
-  linewidth = min ( maxlinewidth, max ( 43, term_width - 2 ) );
+  linewidth = min ( MAX_LINE_WIDTH, max ( 43, term_width - 2 ) );
 
   argint = NULL;
   input.name = NULL;

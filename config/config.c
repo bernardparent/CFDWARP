@@ -65,6 +65,8 @@ static char CO_str[CO_num][20]=
 typedef unsigned char bool;
 
 #define MAX_STR_LENGTH 5000
+#define MAX_LINE_WIDTH 90
+
 typedef char type_str[3*MAX_STR_LENGTH];
 
 typedef int keys_t[numkeys];
@@ -503,14 +505,14 @@ static void handle_options(FILE *scriptfile_applyconfig, FILE *scriptfile_remove
         find_default_option(current,option,numoption,&answer);
       }
       if (HELPFLAG && help[0]!=EOS && !HELPGIVEN) {
-        printf("?\n\n  %s\n\n  %s : ",strwrpind(help, 50, -2),current_formatted);
+        printf("?\n\n  %s\n\n  %s : ",strwrpind(help, MAX_LINE_WIDTH, -2),current_formatted);
         HELPGIVEN=TRUE;
       }
 #ifndef PROPRIETARY
       if (!HELPFLAG && (answer>0 && answer<=numoption) ) {
         if (strstr(optioncomment[answer-1],"[PROPRIETARY]")) {
           strcpy(strtmp,option[answer-1]);
-          if (!HELPGIVEN_PROPRIETARY) printf("%s\n\n  %s\n\n  %s : ",strnounderscore(strtmp),strwrpind(help_proprietary, 50, -2),current_formatted);
+          if (!HELPGIVEN_PROPRIETARY) printf("%s\n\n  %s\n\n  %s : ",strnounderscore(strtmp),strwrpind(help_proprietary, MAX_LINE_WIDTH, -2),current_formatted);
           HELPGIVEN_PROPRIETARY=TRUE;
           answer=0;
         }
@@ -750,6 +752,9 @@ static void output_makefileheader(FILE *scriptfile_applyconfig, long nd, long nu
   if (DEBUGGER) fprintf(scriptfile_applyconfig," -g");
   if (DEBUGGER && (COMPILER==CO_GCC || COMPILER==CO_MPICC)) fprintf(scriptfile_applyconfig," -fno-omit-frame-pointer"); 
   if (!DEBUG) fprintf(scriptfile_applyconfig," -DNDEBUG");
+#ifdef PROPRIETARY
+  fprintf(scriptfile_applyconfig," -DPROPRIETARY");
+#endif
   if (TEST) fprintf(scriptfile_applyconfig," -DTEST");
   if (M32) fprintf(scriptfile_applyconfig," -m32 -DM32");
   if (SANITIZE) fprintf(scriptfile_applyconfig," -fsanitize=address -fsanitize=undefined -fsanitize=bool -fsanitize=integer-divide-by-zero -fsanitize=null -fsanitize=vla-bound -fsanitize=bounds -fsanitize=signed-integer-overflow");
@@ -791,6 +796,9 @@ static void output_makefileheader(FILE *scriptfile_applyconfig, long nd, long nu
   if (DEBUGGER && (COMPILER==CO_GCC || COMPILER==CO_MPICC)) fprintf(scriptfile_applyconfig," -fno-omit-frame-pointer"); 
   if (PROFIL) fprintf(scriptfile_applyconfig," -pg");
   if (!DEBUG) fprintf(scriptfile_applyconfig," -DNDEBUG");
+#ifdef PROPRIETARY
+  fprintf(scriptfile_applyconfig," -DPROPRIETARY");
+#endif
   if (TEST) fprintf(scriptfile_applyconfig," -DTEST");
   if (M32) fprintf(scriptfile_applyconfig," -m32 -DM32");
   if (SANITIZE) fprintf(scriptfile_applyconfig," -fsanitize=address -fsanitize=undefined -fsanitize=bool -fsanitize=integer-divide-by-zero -fsanitize=null -fsanitize=vla-bound -fsanitize=bounds -fsanitize=signed-integer-overflow");

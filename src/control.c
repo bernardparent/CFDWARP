@@ -311,13 +311,16 @@ void write_license ( FILE * outputfile ) {
   char linestr[10000];
   int linewidth,term_width,term_height;
   find_terminal_window_size(&term_width,&term_height);
-  linewidth=min(maxlinewidth,max(40,term_width-2));
-  linewidth=min(linewidth,60);
-  if (outputfile!=stdout) linewidth=maxlinewidth;
+  linewidth=min(MAX_LINE_WIDTH,max(40,term_width-2));
+  if (outputfile!=stdout) linewidth=MAX_LINE_WIDTH;
 
   wfprintf(outputfile,"\n");
-  sprintf(linestr,"  Copyright 1998-2019 Bernard Parent\n  All rights reserved.\n\n  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:\n");
+  sprintf(linestr,"  Copyright 1998-2019 Bernard Parent, Derrick Alexander, Jason Etele, Thomas E. Schwartzentruber, Tim Hui, Minindu Weerakoon, Giovanni Fusina, Sathyan Padmanabhan, Prasanna T. Rajendran, Jaehyuk Lee, Van Tien Nguyen\n\n  All rights reserved.\n\n");
   wfprintf(outputfile,"%s\n",strwrpind(linestr, linewidth, -2));
+  
+  sprintf(linestr,  "  TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION");
+  wfprintf(outputfile,"%s\n\n",strwrpind(linestr, linewidth, -2));
+
 
   sprintf(linestr,"  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.");
   wfprintf(outputfile,"%s\n\n",strwrpind(linestr, linewidth, -5));
@@ -325,10 +328,14 @@ void write_license ( FILE * outputfile ) {
   sprintf(linestr,"  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.");
   wfprintf(outputfile,"%s\n\n",strwrpind(linestr, linewidth, -5));
 
-  sprintf(linestr,"  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.");
-  wfprintf(outputfile,"%s\n\n",strwrpind(linestr, linewidth, -2));
+#ifdef PROPRIETARY
+  sprintf(linestr,"  3. This software shall not be copied, reproduced in any form or stored in a retrieval system or data base without the prior written consent of Bernard Parent.");
+  wfprintf(outputfile,"%s\n\n",strwrpind(linestr, linewidth, -5));
+#endif
 
-  sprintf(linestr,"  The views and conclusions contained in the software and documentation are those of the authors and should not be interpreted as representing official policies, either expressed or implied, of the CFDWARP project.");
+
+
+  sprintf(linestr,"\n  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.");
   wfprintf(outputfile,"%s\n\n",strwrpind(linestr, linewidth, -2));
 
 }
@@ -347,8 +354,8 @@ void write_modules(FILE *outputfile){
   static char  str[maxstrlen];
 #endif
   find_terminal_window_size(&term_width,&term_height);
-  linewidth=min(maxlinewidth,max(50,term_width-2));
-  if (outputfile!=stdout) linewidth=maxlinewidth;
+  linewidth=min(MAX_LINE_WIDTH,max(50,term_width-2));
+  if (outputfile!=stdout) linewidth=MAX_LINE_WIDTH;
   for (cnt=0; cnt<numbib; cnt++) cite[cnt]=0;
 
   write_hline(outputfile, linewidth, 2);
@@ -444,7 +451,7 @@ void write_modules(FILE *outputfile){
   wfprintf(outputfile,"\n");
 
   if (outputfile==stdout) {
-    sprintf(linestr,"  CFDWARP is a Copyright (c) 1998-2019 of Bernard Parent. Use 'warp -l' for licensing terms.");
+    sprintf(linestr,"  Use 'warp -l' for licensing terms.");
     wfprintf(outputfile,"%s\n",strwrpind(linestr, linewidth, -2));
     wfprintf(outputfile,"\n");
     wfprintf(outputfile,"%s\n","  Use 'warp -h' to list command line options.");

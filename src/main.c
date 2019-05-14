@@ -37,9 +37,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static int SIGUSR1_CAUGHT;
 
-#define maxstrlen 4096
-#define lengthcol1 9
-#define lengthcol2 14
+#define MAX_STRING_LENGTH 4096
+#define LENGTH_COL1 9
+#define LENGTH_COL2 14
+#define MIN_LINE_WIDTH 43
 
 static void signal_1 ( int signal ) {
   SIGUSR1_CAUGHT = TRUE;
@@ -48,85 +49,83 @@ static void signal_1 ( int signal ) {
 
 
 void write_options ( FILE * outputfile ) {
-  int term_width, term_height, linewidth;  
+  int term_width, term_height, line_width;  
   char tmpstr[1000];
-  long minlinewidth;
-  minlinewidth=43;
 
   find_terminal_window_size ( &term_width, &term_height );
-  linewidth = min ( maxlinewidth, max ( minlinewidth, term_width - 2 ) );
+  line_width = min ( MAX_LINE_WIDTH, max ( MIN_LINE_WIDTH, term_width - 2 ) );
 
-  write_hline ( outputfile, linewidth, 2 );
-  write_options_row ( outputfile, "Flag", "Argument(s)", "Description", linewidth, lengthcol1, lengthcol2 );
-  write_hline ( outputfile, linewidth, 2 );
+  write_hline ( outputfile, line_width, 2 );
+  write_options_row ( outputfile, "Flag", "Argument(s)", "Description", line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_hline ( outputfile, line_width, 2 );
 #ifdef DISTMPI
   sprintf(tmpstr,"%d int",nd);
-  write_options_row ( outputfile, "-dom", tmpstr, "Number of MPI domains in each dimension", linewidth, lengthcol1, lengthcol2 );
+  write_options_row ( outputfile, "-dom", tmpstr, "Number of MPI domains in each dimension", line_width, LENGTH_COL1, LENGTH_COL2 );
 #endif
-  write_options_row ( outputfile, "-h", "none", "List command line options", linewidth, lengthcol1, lengthcol2 );
-  write_options_row ( outputfile, "-i", "string", "Input binary data file", linewidth, lengthcol1, lengthcol2 );
-  write_options_row ( outputfile, "-ia", "string", "Input ascii data file", linewidth, lengthcol1, lengthcol2 );
-  write_options_row ( outputfile, "-ii", "string", "Input interpolation data file", linewidth, lengthcol1, lengthcol2 );
+  write_options_row ( outputfile, "-h", "none", "List command line options", line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-i", "string", "Input binary data file", line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-ia", "string", "Input ascii data file", line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-ii", "string", "Input interpolation data file", line_width, LENGTH_COL1, LENGTH_COL2 );
 #ifdef UNSTEADY
   write_options_row ( outputfile, "-im1", "string", "Input time level minus 1 binary data file",
-                      linewidth, lengthcol1, lengthcol2 );
+                      line_width, LENGTH_COL1, LENGTH_COL2 );
 #if _RESTIME_BW > 2
   write_options_row ( outputfile, "-im2", "string", "Input time level minus 2 binary data file",
-                      linewidth, lengthcol1, lengthcol2 );
+                      line_width, LENGTH_COL1, LENGTH_COL2 );
 #endif
 #if _RESTIME_BW > 3
   write_options_row ( outputfile, "-im3", "string", "Input time level minus 3 binary data file",
-                      linewidth, lengthcol1, lengthcol2 );
+                      line_width, LENGTH_COL1, LENGTH_COL2 );
 #endif
 #endif
   write_options_row ( outputfile, "-l", "none", "Display licensing terms",
-                      linewidth, lengthcol1, lengthcol2 );
-  write_options_row ( outputfile, "-ncr", "none", "No clipping report", linewidth, lengthcol1, lengthcol2 );
+                      line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-ncr", "none", "No clipping report", line_width, LENGTH_COL1, LENGTH_COL2 );
 #if defined(EMFIELD) && defined(DISTMPI)
   write_options_row ( outputfile, "-nib", "none", 
-                      "No implicit BC between MPI subdomains when updating EMField properties", linewidth, lengthcol1, lengthcol2 );
+                      "No implicit BC between MPI subdomains when updating EMField properties", line_width, LENGTH_COL1, LENGTH_COL2 );
 #endif
-  write_options_row ( outputfile, "-nic", "none", "Set iteration count to nil", linewidth, lengthcol1, lengthcol2 );
+  write_options_row ( outputfile, "-nic", "none", "Set iteration count to nil", line_width, LENGTH_COL1, LENGTH_COL2 );
 #if defined(POSIXTHREADS) || defined(OPENMPTHREADS)
-  write_options_row ( outputfile, "-nst", "none", "No short threads", linewidth, lengthcol1, lengthcol2 );
+  write_options_row ( outputfile, "-nst", "none", "No short threads", line_width, LENGTH_COL1, LENGTH_COL2 );
 #endif
 #ifdef OPENMPTHREADS
-  write_options_row ( outputfile, "-nt", "int", "Set number of threads", linewidth, lengthcol1, lengthcol2 );
+  write_options_row ( outputfile, "-nt", "int", "Set number of threads", line_width, LENGTH_COL1, LENGTH_COL2 );
 #endif
-  write_options_row ( outputfile, "-nvr", "none", "No vars resetting at end of cycle module", linewidth, lengthcol1, lengthcol2 );
-  write_options_row ( outputfile, "-o", "string", "Output binary data file", linewidth, lengthcol1, lengthcol2 );
-  write_options_row ( outputfile, "-oa", "string", "Output ascii data file", linewidth, lengthcol1, lengthcol2 );
-  write_options_row ( outputfile, "-oi", "string", "Output interpolation data file", linewidth, lengthcol1, lengthcol2 );
+  write_options_row ( outputfile, "-nvr", "none", "No vars resetting at end of cycle module", line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-o", "string", "Output binary data file", line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-oa", "string", "Output ascii data file", line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-oi", "string", "Output interpolation data file", line_width, LENGTH_COL1, LENGTH_COL2 );
   sprintf(tmpstr,"%d int",nd+1);
   write_options_row ( outputfile, "-on", tmpstr, 
                       "Output node types nearby the node i,j,k with the bandwidth bw ("if2D("-on i j bw")if3D("-on i j k bw")")",
-                      linewidth, lengthcol1, lengthcol2 );
-  write_options_row ( outputfile, "-op", "string", "Output post file", linewidth, lengthcol1, lengthcol2 );
-  write_options_row ( outputfile, "-opg", "string", "Output grid-only post file", linewidth, lengthcol1, lengthcol2 );
+                      line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-op", "string", "Output post file", line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-opg", "string", "Output grid-only post file", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-opm", "string", "Execute the post module in control file",
-                      linewidth, lengthcol1, lengthcol2 );
-  write_options_row ( outputfile, "-or", "none", "Output maximum residual", linewidth, lengthcol1, lengthcol2 );
+                      line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-or", "none", "Output maximum residual", line_width, LENGTH_COL1, LENGTH_COL2 );
   sprintf(tmpstr,"%d int",nd*2);
   write_options_row ( outputfile, "-pr", tmpstr, 
-                      "Post file region ("if2D("-pr is js ie je")if3D("-pr is js ks ie je ke")")", linewidth, lengthcol1, lengthcol2 );
+                      "Post file region ("if2D("-pr is js ie je")if3D("-pr is js ks ie je ke")")", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-pt", "string", 
-                      "Post-processor type: tecplot (default), tecplotnoheader, nodplot, vtk, gnuplot", linewidth, lengthcol1, lengthcol2 );
+                      "Post-processor type: tecplot (default), tecplotnoheader, nodplot, vtk, gnuplot", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-px", "double", "Post file x-cuts (-px 0.1 0.2 0.55 ...)",
-                      linewidth, lengthcol1, lengthcol2 );
+                      line_width, LENGTH_COL1, LENGTH_COL2 );
 #ifdef _2DL
   write_options_row ( outputfile, "-py", "double", "Post file y-cuts (-py 0.1 0.2 0.55 ...)",
-                      linewidth, lengthcol1, lengthcol2 );
+                      line_width, LENGTH_COL1, LENGTH_COL2 );
 #endif
 #ifdef _3D
   write_options_row ( outputfile, "-pz", "double", "Post file z-cuts (-pz 0.1 0.2 0.55 ...)",
-                      linewidth, lengthcol1, lengthcol2 );
+                      line_width, LENGTH_COL1, LENGTH_COL2 );
 #endif
-  write_options_row ( outputfile, "-r", "string", "Read control file", linewidth, lengthcol1, lengthcol2 );
-  write_options_row ( outputfile, "-v", "none", "Version number and other info", linewidth, lengthcol1, lengthcol2 );
-  write_options_row ( outputfile, "-w", "string", "Write control file", linewidth, lengthcol1, lengthcol2 );
-  write_options_row ( outputfile, "-q", "none", "Quit before iterating", linewidth, lengthcol1, lengthcol2 );
+  write_options_row ( outputfile, "-r", "string", "Read control file", line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-v", "none", "Version number and other info", line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-w", "string", "Write control file", line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-q", "none", "Quit before iterating", line_width, LENGTH_COL1, LENGTH_COL2 );
 
-  write_hline ( outputfile, linewidth, 2 );
+  write_hline ( outputfile, line_width, 2 );
 
 }
 

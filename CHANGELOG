@@ -7,6 +7,24 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 14a
+  * renamed
+    - maxlinewidth -> MAX_LINE_WIDTH
+  * in config/config.c
+    - added definition of MAX_LINE_WIDTH
+    - in handle_options(), made word wrapping function of MAX_LINE_WIDTH
+    - in output_makefileheader(), added -DPROPRIETARY flag if code compiled with proprietary modules
+  * in src/control.c
+    - in write_license(), added all contributors to the Copyright 
+    - in write_license(), added 3rd condition if PROPRIETARY flag is set 
+  * in src/main.c
+    - renamed maxstrlen to MAX_STRING_LENGTH 
+    - renamed lengthcol1 to LENGTH_COL1 
+    - renamed lengthcol2 to LENGTH_COL2 
+    - defined MIN_LINE_WIDTH
+    - in write_options(), renamed minlinewidth to MIN_LINE_WIDTH
+
+
 2019 MAY 09b
   * in bin
     - updated stationary_contact_discontinuity.wrp
