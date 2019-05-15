@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 15a
+  * in src/control.c
+    - in write_license(), changed how the copyrights are written
+  * in lib/gridg/3Dbase.c and lib/gridg/2Dbase.c
+    - added a Copyright to Derrick C. Alexander
+
+
 2019 MAY 14c
   * in tools/gitnewversion_public.sh
     - replaced warp_public by CFDWARP_public

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 1998-2000 Bernard Parent
+Copyright 1998-2000 Bernard Parent.
+Copyright 2002 Derrick C. Alexander.
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
