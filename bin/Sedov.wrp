@@ -17,8 +17,8 @@ J.R. Kamm, F.X. Timmes, On efficient generation of numerically robust Sedov Solu
 }
 
 
- meshfact=0.25*1.8;
-tf=2;
+ meshfact=1;
+tf=4;
 
   is=1;  js=1;  ks=1;
   ie=is+2*round(64*meshfact); je=js+2*round(64*meshfact); 
@@ -35,9 +35,9 @@ Pcenter=(gamma-1)*rhoinit*epsilon0/Vorigin;
 
 tmax=1.0;   {simulation time span in seconds}
 
-CFLref=0.8; {use CFLref=0.5 for BDF2}
+CFLref=2.0; {use CFLref=0.5 for BDF2}
 CFLref_firstiter=0.3;
-itermax=30;
+itermax=50;
 
 Grid(
   Size(is,js, ie,je);
@@ -127,7 +127,7 @@ Init(
 Disc(
   NavierStokesPerfect(
     zetaA1=0.1e0;   {conditions the convective waves of the A jacobian}
-    zetaA2=0.1e0;
+    zetaA2=0.3e0;
   );
   FDSplus(
     AVERAGING=AVERAGING_ROE;
@@ -156,7 +156,7 @@ Disc(
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_AOWENO5;
+    INTERPOL=INTERPOL_WENO5;
      
     EIGENVALCOND=EIGENVALCOND_PARENT;
     POSFILTER=POSFILTER_PARENT;
@@ -212,15 +212,19 @@ Cycle(
         CFL=CFLref;            
      );
     );
-
-    
+    if (time+dt>tmax, 
+     dt=tmax-time;
+    );    
     if (time==0,
       CFLmax=CFLref_firstiter;
     ,{else}
       CFLmax=CFLref;
     );
-    CFL=min(CFLmax,CFL*1.5);
-
+    if (iter<13,
+      CFL=min(CFLmax,CFL*1.5);
+    , {else}
+      CFL=max(0.7,CFL*0.9);
+    );
     UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,dt);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
@@ -240,28 +244,36 @@ Cycle(
     sigma2=0.0;      {exponent of largest pseudotime step in all flux components}
     PRECONDITIONER=PRECON_LOCALTIMESTEP;
         
-
     if (iter==1,
      if (time==0,
-        dt=1e-4/meshfact/tf;
+        dt=1e-4/meshfact/tf/2;
+        CFL=0.01;
       ,{else}
-          dt=min(dt*1.4,tmax/round(50*meshfact)/tf);
+        dt=min(dt*1.4,tmax/round(50*meshfact)/tf);
+        CFL=CFLref;            
      );
     );
-
-    if (iter==1,
-      CFL=0.0001;
-    );
-    CFL=CFLref;
+    if (time+dt>tmax, 
+     dt=tmax-time;
+    );    
     if (time==0,
       CFLmax=CFLref_firstiter;
     ,{else}
       CFLmax=CFLref;
     );
-    CFL=min(CFLmax,CFL*1.5);
+    if (iter<13,
+      CFL=min(CFLmax,CFL*1.5);
+    , {else}
+      CFL=max(0.3,CFL*0.9);
+    );
     phi1=20*meshfact;     {maximum number of gridlines per zone in each dimension}
     iterglob=iterglob+1;        
     
+    if (iter<13,
+      CFL=min(CFLmax,CFL*1.5);
+    , {else}
+      CFL=max(0.7,CFL*0.9);
+    );
     UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,phi1,dt);
 
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld) %3ld/%3ld%s \n",

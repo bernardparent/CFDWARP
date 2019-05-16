@@ -54,7 +54,7 @@
 
 }
 
-CONVERGENCEHISTORY=FALSE; 
+CONVERGENCEHISTORY=TRUE; 
 
 {
 gamma= 5/3
@@ -71,7 +71,7 @@ initially but density varies as 1+t/r with r the radius from the origin
 }
 
 
-mf=3.6;
+mf=2;
 
 is=1;
 ie=round(30*mf);

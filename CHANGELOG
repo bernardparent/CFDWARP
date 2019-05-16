@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 16a
+  * in bin
+    - updated Sedov.wrp and Noh2D.wrp
+
+
 2019 MAY 15a
   * in src/control.c
     - in write_license(), changed how the copyrights are written
