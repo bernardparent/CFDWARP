@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 16b
+  * in cycle/share/res_share.c
+    - in _f_WENO3(), fixed an error related to the optimal weights: should be 1/4 and 3/4,
+      not 1/3 and 2/3
+
+
 2019 MAY 16a
   * in bin
     - updated Sedov.wrp and Noh2D.wrp

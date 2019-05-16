@@ -544,8 +544,8 @@ double _f_WENO3(double um1, double up0, double up1){
   IS1=sqr(up1-up0);
 
   /* optimal weights */
-  gamma0=1.0/3.0;
-  gamma1=2.0/3.0;
+  gamma0=1.0/4.0;
+  gamma1=3.0/4.0;
 
   eps=WENO_EPSILON;
   wtil0=gamma0/sqr(eps+IS0);
