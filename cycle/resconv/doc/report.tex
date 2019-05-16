@@ -654,7 +654,7 @@ Now we wish to find a $u_{\rm L}$ at the interface that is third-order accurate 
 First, the optimal $u_{\rm L}$ should be third-order accurate. Thus the optimal $u$ at the interface should be:
 %
 \begin{equation}
-u_{\rm L}=\frac{5}{6} u_i - \frac{1}{6} u_{i-1} + \frac{2}{6} u_{i+1}
+u_{\rm L}=\frac{6}{8} u_i - \frac{1}{8} u_{i-1} + \frac{3}{8} u_{i+1}
 \end{equation}
 %
 Substitute the former in the latter:
@@ -662,7 +662,7 @@ Substitute the former in the latter:
 \begin{equation}
 \gamma_0 u_0 + \gamma_1 u_1 
  = 
-\frac{5}{6} u_i - \frac{1}{6} u_{i-1} + \frac{2}{6} u_{i+1}
+\frac{6}{8} u_i - \frac{1}{8} u_{i-1} + \frac{3}{8} u_{i+1}
 \end{equation}
 %
 This gives one equation for two unknowns. The second equation is that the sum of the $\gamma$s must be one:
@@ -674,8 +674,8 @@ This gives one equation for two unknowns. The second equation is that the sum of
 From the latter two equations, we can easily show that:
 %
 \begin{align}
-\gamma_0&=\frac{1}{3}\alb
-\gamma_1&=\frac{2}{3}
+\gamma_0&=\frac{1}{4}\alb
+\gamma_1&=\frac{3}{4}
 \end{align}
 %
 The indicators of smoothness for each $u$ correspond to the square of the differences along each stencil:
