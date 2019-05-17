@@ -1,3 +1,12 @@
+
+CFDWARP TOOLS
+
+Compilation: type "make tools" within the main CFDWARP directory
+
+______________________________________________________________________________________________
+
+
+
 average.c                    reads the data from various input files and outputs the 
                              averaged values to an output file
 
@@ -39,6 +48,12 @@ tauvt.c                      finds the nitrogen vibrational energy relaxation ti
 tecgrid2D.c                  reads a 2D GRIDG script and creates a TECPLOT post file 
 
 tecgrid3D.c                  reads a 3D GRIDG script and creates a TECPLOT post file 
+
+
+
+
+SHELL SCRIPTS
+
 
 
 average.sh                   reads the data from various input files and outputs the 

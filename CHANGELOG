@@ -7,6 +7,13 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 17a
+  * in tools/README
+    - added information on how to compile the tools
+  * in model/share
+    - added emfield_share.c
+
+
 2019 MAY 16c
   * in cycle/resconv/doc/report.tex
     - fixed mistake in WENO3 outline related to the optimal weights
