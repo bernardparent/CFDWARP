@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 17b
+  * in bin
+    - modified Sedov.wrp
+    - removed flat_2.wrp, flat_3.wrp
+
+
 2019 MAY 17a
   * in tools/README
     - added information on how to compile the tools

@@ -3,18 +3,18 @@
 
 }
 
-Mx=2.5;
+Mx=2;
 My=0.0;
 P=10000.0;
 T=300.0;
 Rgas=286.0;
 rhoref=P/T/Rgas;
 aref=sqrt(1.4*Rgas*T);
-meshfact=0.5;
+meshfact=1;
 Hlayer=0.0007/(P/Rgas/T)/2;
 H=0.1;
 L=1.0;
-CFLmax=1.0;
+CFLmax=1.7;
 
   is=1;  js=1; jm=round(60*meshfact);
   ie=round(81*meshfact); je=round(101*meshfact);
@@ -104,15 +104,8 @@ Init(
 
 Disc(
   NavierStokesPerfect(
-    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA1=0.05e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
-  );
-  FDSplus(
-    AVERAGING=AVERAGING_ARITH;
-    ACCURACY=ACCURACY_FIRSTORDER;
-    numiter=2;
-    xi=1.99;
-    EIGENVALCOND=EIGENVALCOND_GNOFFO;
   );
   MUSCL(
     FLUX=FLUX_FDS;
@@ -121,20 +114,9 @@ Disc(
     AOWENO_gammalo=0.85;
     AOWENO_gammahi=0.85;
     INTERPOL=INTERPOL_TVD2_VANLEER;
-    EIGENVALCOND=EIGENVALCOND_PARENT;
-    POSFILTER=POSFILTER_PARENT;
-    POSFILTER_numiter=4;
-     
-  );
-  MUSCLplus(
-    FLUX=FLUX_FDSplusMultiD;
-    numiter=6;
-    AVERAGING=AVERAGING_ARITH;
-    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
-    AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_TVD2_VANLEER;
-    EIGENVALCOND=EIGENVALCOND_PASCAL;
+    EIGENVALCOND=EIGENVALCOND_HARTEN;
+    POSFILTER=POSFILTER_NONE;
+    POSFILTER_numiter=4;     
   );
   CDFplus(
     xi1=0.5; {should be set to 0.5 or less when used with 2nd order or higher convective fluxes}

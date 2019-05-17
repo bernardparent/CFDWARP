@@ -17,7 +17,7 @@ $!THREEDAXIS
   ASPECTRATIOLIMIT = 25
   BOXASPECTRATIOLIMIT = 25
 $!DELETELINEMAPS 
-$!ACTIVELINEMAPS  =  [1-2]
+$!ACTIVELINEMAPS  =  [1-4]
 $!GLOBALLINEPLOT 
   DATALABELS
     {
@@ -26,6 +26,11 @@ $!GLOBALLINEPLOT
   LEGEND
     {
     SHOW = YES
+    TEXTSHAPE
+      {
+      FONT = TIMES
+      HEIGHT = 3.3
+      }
     BOX
       {
       BOXTYPE = NONE
@@ -33,8 +38,8 @@ $!GLOBALLINEPLOT
     ROWSPACING = 2
     XYPOS
       {
-      X = 60.353
-      Y = 84.403
+      X = 55.674
+      Y = 98.466
       }
     }
 $!LINEMAP  [1]
@@ -43,11 +48,12 @@ $!LINEMAP  [1]
     {
     ZONE = 1
     XAXISVAR = 1
-    YAXISVAR = 11
+    YAXISVAR = 12
     }
   LINES
     {
     COLOR = RED
+    LINETHICKNESS = 0.4
     }
   SYMBOLS
     {
@@ -75,18 +81,20 @@ $!LINEMAP  [2]
   NAME = 'B'
   ASSIGN
     {
-    ZONE = 2
+    ZONE = 1
     XAXISVAR = 1
     YAXISVAR = 11
     }
   LINES
     {
+    SHOW = NO
     COLOR = GREEN
     }
   SYMBOLS
     {
     COLOR = GREEN
     FILLCOLOR = GREEN
+    SIZE = 1.8
     }
   BARCHARTS
     {
@@ -105,21 +113,67 @@ $!LINEMAP  [2]
       }
     }
 $!LINEMAP  [3]
-  NAME = '&DV&'
+  NAME = 'C'
   ASSIGN
     {
-    ZONE = 1
+    ZONE = 2
     XAXISVAR = 1
-    YAXISVAR = 5
+    YAXISVAR = 11
     }
   LINES
     {
+    SHOW = NO
+    COLOR = BLUE
+    }
+  SYMBOLS
+    {
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = CIRCLE
+      }
+    COLOR = BLUE
+    FILLMODE = USELINECOLOR
+    FILLCOLOR = BLUE
+    SIZE = 1
+    }
+  BARCHARTS
+    {
+    COLOR = BLUE
+    FILLCOLOR = BLUE
+    }
+  ERRORBARS
+    {
+    COLOR = BLUE
+    }
+  INDICES
+    {
+    JRANGE
+      {
+      MAX = 1
+      }
+    }
+$!LINEMAP  [4]
+  NAME = 'D'
+  ASSIGN
+    {
+    ZONE = 3
+    XAXISVAR = 1
+    YAXISVAR = 11
+    }
+  LINES
+    {
+    SHOW = NO
     COLOR = CYAN
     }
   SYMBOLS
     {
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = GRAD
+      }
     COLOR = CYAN
     FILLCOLOR = CYAN
+    SIZE = 1.8
     }
   BARCHARTS
     {
@@ -130,7 +184,14 @@ $!LINEMAP  [3]
     {
     COLOR = CYAN
     }
-$!LINEMAP  [4]
+  INDICES
+    {
+    JRANGE
+      {
+      MAX = 1
+      }
+    }
+$!LINEMAP  [5]
   NAME = '&DV&'
   ASSIGN
     {
@@ -156,7 +217,7 @@ $!LINEMAP  [4]
     {
     COLOR = YELLOW
     }
-$!LINEMAP  [5]
+$!LINEMAP  [6]
   NAME = '&DV&'
   ASSIGN
     {
@@ -182,7 +243,7 @@ $!LINEMAP  [5]
     {
     COLOR = PURPLE
     }
-$!LINEMAP  [6]
+$!LINEMAP  [7]
   NAME = '&DV&'
   ASSIGN
     {
@@ -208,7 +269,7 @@ $!LINEMAP  [6]
     {
     COLOR = RED
     }
-$!LINEMAP  [7]
+$!LINEMAP  [8]
   NAME = '&DV&'
   ASSIGN
     {
@@ -234,7 +295,7 @@ $!LINEMAP  [7]
     {
     COLOR = GREEN
     }
-$!LINEMAP  [8]
+$!LINEMAP  [9]
   NAME = '&DV&'
   ASSIGN
     {
@@ -260,7 +321,7 @@ $!LINEMAP  [8]
     {
     COLOR = BLUE
     }
-$!LINEMAP  [9]
+$!LINEMAP  [10]
   NAME = '&DV&'
   ASSIGN
     {
@@ -286,7 +347,7 @@ $!LINEMAP  [9]
     {
     COLOR = CYAN
     }
-$!LINEMAP  [10]
+$!LINEMAP  [11]
   NAME = '&DV&'
   ASSIGN
     {
@@ -316,34 +377,46 @@ $!XYLINEAXIS
   DEPXTOYRATIO = 1
   VIEWPORTPOSITION
     {
-    X1 = 18.69
-    Y1 = 11.284
-    X2 = 91.793
-    Y2 = 88.994
+    X1 = 17.426
+    Y1 = 11.142
+    X2 = 95.587
+    Y2 = 92.261
     }
-  VIEWPORTTOPSNAPTARGET = 88.9943181818
+  VIEWPORTTOPSNAPTARGET = 92.2613636364
 $!XYLINEAXIS 
   XDETAIL 1
     {
-    COORDSCALE = LOG
-    RANGEMIN = 0.0030882297262100214322
-    RANGEMAX = 1.3521466378777891038
+    RANGEMIN = -0.052788882595805580733
+    RANGEMAX = 0.99676731379862748561
     GRSPACING = 0.2
+    TICKLABEL
+      {
+      TEXTSHAPE
+        {
+        FONT = TIMES
+        HEIGHT = 3.3
+        }
+      }
     TITLE
       {
-      TITLEMODE = USETEXT
-      TEXT = 'X'
-      OFFSET = 5
+      OFFSET = 6
       }
     }
 $!XYLINEAXIS 
   YDETAIL 1
     {
     COORDSCALE = LOG
-    RANGEMIN = 0.00025207482057717866099
-    RANGEMAX = 0.0080000000000000001665
-    AUTOGRID = NO
-    GRSPACING = 0.002
+    RANGEMIN = 3.9374096288903851664E-05
+    RANGEMAX = 0.003937409628890610816
+    GRSPACING = 0.0005
+    TICKLABEL
+      {
+      TEXTSHAPE
+        {
+        FONT = TIMES
+        HEIGHT = 3.3
+        }
+      }
     TITLE
       {
       TITLEMODE = USETEXT
@@ -351,4 +424,6 @@ $!XYLINEAXIS
       OFFSET = 12
       }
     }
+$!LINEPLOTLAYERS 
+  SHOWSYMBOLS = YES
 $!SETSTYLEBASE CONFIG

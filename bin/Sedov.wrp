@@ -126,7 +126,7 @@ Init(
 
 Disc(
   NavierStokesPerfect(
-    zetaA1=0.1e0;   {conditions the convective waves of the A jacobian}
+    zetaA1=0.05e0;   {conditions the convective waves of the A jacobian}
     zetaA2=0.3e0;
   );
   FDSplus(
