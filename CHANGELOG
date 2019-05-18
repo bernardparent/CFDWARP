@@ -7,6 +7,11 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 18a
+  * in tools/gitnewversion_public.sh
+    - added code to replace proprietary files by their *_PUBLIC counterpart
+
+
 2019 MAY 17b
   * in bin
     - modified Sedov.wrp

@@ -130,6 +130,14 @@ chmod u+x removeproprietary.sh
 chmod u-x removeproprietary.sh
 cd ..
 
+echo "Searching for proprietary files that should be replaced by their *_PUBLIC counterpart.."
+find "./" -type f -name "*_PUBLIC" -exec bash -c '
+  for pathname do
+    mv -f $pathname ${pathname%_PUBLIC}
+    echo Substituting the proprietary file ${pathname%_PUBLIC} by the public version $pathname ..
+  done' bash {} +
+
+
 echo ' '
 echo 'Calling git status to check what changes will be pushed..'
 echo ' '
