@@ -16,6 +16,8 @@ Qbeam=2e4;
 
 UPDATEMODEL_FLUID_EMFIELD_TOGETHER=FALSE;
 
+DISC_OHM_BASED_POTENTIAL=FALSE;
+
 tmax=1e-6;   {simulation time span in seconds}
 
 
@@ -187,8 +189,25 @@ Disc(
   DriftDiffusion(
     aref=300.0;       {reference speed of sound in m/s used when conditioning Dstar eigenvalues  }
     zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
+
+    if (DISC_OHM_BASED_POTENTIAL,
+      betag[1]=-0.0010;
+      betag[2]=1.0000;
+      betaa[1]=0.9990;
+      betaa[2]=0.0000;
+    ,{else}
+      betaa[1]=0;
+      betaa[2]=0.0000;
+      betag[1]=0.00;
+      betag[2]=0.0;
+    );
   );
   Ohm(
+    if (DISC_OHM_BASED_POTENTIAL,
+      POTENTIAL=POTENTIAL_OHMBASED;
+    ,{else}
+      POTENTIAL=POTENTIAL_GAUSSBASED;
+    );
     Ediv=1000.0;        {a small positive number in V/m, needed to prevent a division by zero when
                        discretizing the electron pressure gradients within the potential equation}
   );
@@ -265,7 +284,12 @@ Cycle(
     if (iter==1,
       CFL=0.01;
     );
-    CFL=min(CFL*1.1,5.0);   
+    if (DISC_OHM_BASED_POTENTIAL,
+      CFLmax=2.0;
+    ,{else}
+      CFLmax=0.2;
+    );
+    CFL=min(CFL*1.01,CFLmax);   
     Lc=0.3e-3*1000;  {characteristic length scale used to solve the emfield equation}
     relaxEMF=1.0;
     if (!UPDATEMODEL_FLUID_EMFIELD_TOGETHER,

@@ -218,6 +218,33 @@ Then we obtain the following expression for the velocity $\vec{V}^k$:
 %
 
 
+\section{Potential Equation Based on Gauss's Law}
+
+The Gauss's law can be expressed as:
+%
+\begin{equation}
+    \sum_{i=1}^3 \frac{\partial }{\partial x_i} \epsilon_r \epsilon_0 \vec{E}_i = \rho_{\rm c} 
+\end{equation}
+%
+where $\epsilon_r$ is the relative permittivity (a non-dimensional term) and $\epsilon_0$ is the permittivity of free space, and $\rho_{\rm c}$ is the net charge density defined as:
+%
+\begin{equation}
+\rho_{\rm c}\equiv
+\sum_{k=1}^\ns C_k N_k
+\end{equation}
+%
+In electrostatics, the curl of the electric field is zero leading to the existence of an electric field potential. Thus, the electric field can be written as the negative of the gradient of the potential, resulting in the following form of Gauss's law:
+%
+\begin{equation}
+ \sum_{i=1}^3 \frac{\partial }{\partial x_i}\left(\epsilon_0 \epsilon_r \frac{\partial \phi}{\partial x_i} \right)=   -\rho_{\rm c} 
+\end{equation}
+%
+But $\epsilon_0$ is a constant:
+%
+\begin{equation}
+ \sum_{i=1}^3 \frac{\partial }{\partial x_i}\left( \epsilon_r \frac{\partial \phi}{\partial x_i} \right)=   -\frac{\rho_{\rm c}}{\epsilon_0} 
+\end{equation}
+%
 
 
 \section{Potential Equation Based on Ohm's Law}

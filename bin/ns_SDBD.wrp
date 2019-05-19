@@ -254,8 +254,17 @@ Disc(
     zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.2e0; {set to 0.25 usually}    {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
     zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
+    betag[1]=-0.0010;
+    betag[2]=-0.5000;
+    betag[3]=1.0000;
+    betag[4]=1.0000;
+    betaa[1]=0.9990;
+    betaa[2]=0.5000;
+    betaa[3]=0.0000;
+    betaa[4]=0.0000;
   );
   Ohm(
+    POTENTIAL=POTENTIAL_OHMBASED;
     Ediv=10.0;        {a small positive number in V/m, needed to prevent a division by zero when
                        discretizing the electron pressure gradients within the potential equation}
   );

@@ -41,8 +41,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MINRATIO_BDRY_RHO_P 0.1
 
 
+/* determines whether the gauss's law terms are added to the continuity equations */
+static double _betag_default(long k){
+  double betag;
+  betag=0.0;
+  if (speciestype[k]==SPECIES_IONPLUS) betag=1.0; 
+  if (speciestype[k]==SPECIES_IONMINUS) betag=-0.5; 
+  if (speciestype[k]==SPECIES_ELECTRON) betag=-0.001; 
+  return(betag);
+}
+
+
+static double _betaa_default(long k){
+  double betaa;
+  //if (speciestype[k]==SPECIES_IONMINUS || speciestype[k]==SPECIES_ELECTRON) betaa=1.0; else betaa=0.0;
+/* FOR TESTING PURPOSES ONLY: uncomment the following to prevent use of ambipolar form on negative ions 
+   NOTE: need to also alter find_Dstar() by adding Vkstar-Vstar on the diagonal for negative ions (see fluid_plasma.c)*/
+//  if (speciestype[k]==SPECIES_ELECTRON) betaa=1.0; else betaa=0.0;
+  if (speciestype[k]==SPECIES_NEUTRAL) betaa=0.0; else betaa=_betag_default(k)-_s(k);
+  return(betaa);
+}
+
+
 
 void write_disc_fluid_template(FILE **controlfile){
+#ifdef _FLUID_PLASMA
+  long spec;
+#endif
   wfprintf(*controlfile,
     "  %s(\n"
 #ifdef _FLUID_NEUTRALSTRANSPORT
@@ -58,8 +83,17 @@ void write_disc_fluid_template(FILE **controlfile){
 #ifdef _FLUID_PLASMA
     "    zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}\n"
 #endif
-    "  );\n"
   ,_FLUID_ACTIONNAME);
+#ifdef _FLUID_PLASMA
+  for (spec=0; spec<ncs; spec++)   
+    wfprintf(*controlfile,"    betag[%ld]=%6.4f;\n",spec+1,_betag_default(spec));
+  for (spec=0; spec<ncs; spec++)   
+//    wfprintf(*controlfile,"    betaa[%ld]=betag[%ld]%+d;\n",spec,spec,-(int)round(_s(spec)));
+    wfprintf(*controlfile,"    betaa[%ld]=%6.4f;\n",spec+1,_betaa_default(spec));
+#endif  
+  wfprintf(*controlfile,    
+    "  );\n"
+  );
 }
 
 
@@ -69,6 +103,10 @@ void read_disc_fluid_actions_2(char *actionname, char **argum, SOAP_codex_t *cod
 
 void read_disc_fluid_actions(char *actionname, char **argum, SOAP_codex_t *codex){
   long numvarsinit;
+#ifdef _FLUID_PLASMA
+  long spec;
+  char tmpstr[400];
+#endif
   void (*action_original) (char *, char **, struct SOAP_codex_t *);
   gl_t *gl=((readcontrolarg_t *)codex->action_args)->gl;
   if (strcmp(actionname,_FLUID_ACTIONNAME)==0) {
@@ -98,6 +136,17 @@ void read_disc_fluid_actions(char *actionname, char **argum, SOAP_codex_t *codex
 #endif
 #ifdef _FLUID_PLASMA
     find_double_var_from_codex(codex,"zetaD",&gl->model.fluid.zetaD);
+    for (spec=0; spec<ns; spec++){
+      if (spec<ncs){
+        sprintf(tmpstr,"betag[%ld]",spec+1);
+        find_double_var_from_codex(codex,tmpstr,&(gl->model.fluid.betag[spec]));
+        sprintf(tmpstr,"betaa[%ld]",spec+1);
+        find_double_var_from_codex(codex,tmpstr,&(gl->model.fluid.betaa[spec]));
+      } else {
+        gl->model.fluid.betag[spec]=0.0;
+        gl->model.fluid.betaa[spec]=0.0;
+      }    
+    }
 #endif
 
     SOAP_clean_added_vars(codex,numvarsinit);
@@ -1916,13 +1965,8 @@ double _betac(long k){
 
 
 /* determines whether the gauss's law terms are added to the continuity equations */
-double _betag(long k){
-  double betag;
-  betag=0.0;
-  if (speciestype[k]==SPECIES_IONPLUS) betag=1.0; 
-  if (speciestype[k]==SPECIES_IONMINUS) betag=-0.5; 
-  if (speciestype[k]==SPECIES_ELECTRON) betag=-0.001; 
-  return(betag);
+double _betag(gl_t *gl, long k){  
+  return(gl->model.fluid.betag[k]);
 }
 
 
@@ -1933,14 +1977,8 @@ double _betaplus(long k){
 }
 
 
-double _betaa(long k){
-  double betaa;
-  //if (speciestype[k]==SPECIES_IONMINUS || speciestype[k]==SPECIES_ELECTRON) betaa=1.0; else betaa=0.0;
-/* FOR TESTING PURPOSES ONLY: uncomment the following to prevent use of ambipolar form on negative ions 
-   NOTE: need to also alter find_Dstar() by adding Vkstar-Vstar on the diagonal for negative ions (see fluid_plasma.c)*/
-//  if (speciestype[k]==SPECIES_ELECTRON) betaa=1.0; else betaa=0.0;
-  if (speciestype[k]==SPECIES_NEUTRAL) betaa=0.0; else betaa=_betag(k)-_s(k);
-  return(betaa);
+double _betaa(gl_t *gl, long k){
+  return(gl->model.fluid.betaa[k]);
 }
 
 
@@ -2042,7 +2080,7 @@ double _sigma_positive(np_t *np, gl_t *gl, long l){
 double _alpha(np_t *np, gl_t *gl, long l, long k, long r){
   double alpha,sigma_positive;
   sigma_positive=_sigma_positive(np,gl,l);
-  alpha=_m(k)/_m(r)*(_delta(r,k)+_betaa(k)*_C(r)*_mu(np,gl,l,k)*_Nk(np[l],gl,k)/sigma_positive);
+  alpha=_m(k)/_m(r)*(_delta(r,k)+_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)*_Nk(np[l],gl,k)/sigma_positive);
   return(alpha);
 }
 
@@ -2053,7 +2091,7 @@ void find_alpha(np_t *np, gl_t *gl, long l, spec2_t alpha){
   sigma=_sigma_positive(np,gl,l);
   for (k=0; k<ns; k++){
     for (r=0; r<ns; r++){
-      alpha[k][r]=_calM(k)/_calM(r)*(_delta(r,k)+_betaa(k)*_C(r)*_mu(np,gl,l,k)*_Nk(np[l],gl,k)/sigma);
+      alpha[k][r]=_calM(k)/_calM(r)*(_delta(r,k)+_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)*_Nk(np[l],gl,k)/sigma);
       
     }
 #ifndef NDEBUG
@@ -2094,13 +2132,13 @@ void find_dZU_dU(np_t *np, gl_t *gl, long l, sqmat_t dZU_dU){
   for (k=0; k<ns; k++){
     for (r=0; r<ns; r++){
       /* wrt rhok[k] */
-      dZU_dU[k][k]+=1.0/_m(r)*_betaa(k)*_C(r)*_mu(np,gl,l,k)/sigma*_rhok(np[l],r);
+      dZU_dU[k][k]+=1.0/_m(r)*_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)/sigma*_rhok(np[l],r);
       /* wrt rhok[r] */
-      dZU_dU[k][r]+=1.0/_m(r)*_betaa(k)*_C(r)*_mu(np,gl,l,k)*_rhok(np[l],k)/sigma;
+      dZU_dU[k][r]+=1.0/_m(r)*_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)*_rhok(np[l],k)/sigma;
       /* wrt sigma */
       for (m=0; m<ns; m++){
         dsigma_drhom=_C(m)*_mu(np,gl,l,m)/_m(m);
-        dZU_dU[k][m]+=-1.0/_m(r)*_betaa(k)*_C(r)*_mu(np,gl,l,k)*_rhok(np[l],k)/sqr(sigma)*_rhok(np[l],r)*dsigma_drhom; 
+        dZU_dU[k][m]+=-1.0/_m(r)*_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)*_rhok(np[l],k)/sqr(sigma)*_rhok(np[l],r)*dsigma_drhom; 
       }
     }
   }
@@ -2115,7 +2153,7 @@ void find_LambdaZ(np_t *np, gl_t *gl, long l, sqmat_t LambdaZ) {
   set_matrix_to_identity(LambdaZ);
   for (k=0; k<ns; k++){
     for (r=0; r<ns; r++){
-      LambdaZ[k][k]+=1.0/_m(r)*_betaa(k)*_C(r)*_mu(np,gl,l,k)/sigma*_rhok(np[l],r);
+      LambdaZ[k][k]+=1.0/_m(r)*_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)/sigma*_rhok(np[l],r);
     }
   }
 
@@ -2135,7 +2173,7 @@ void find_Y1star_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, 
   }
 
   for (spec=0; spec<ns; spec++){
-    Ystar[spec]=metrics.Omega*Estar*_betag(spec);  
+    Ystar[spec]=metrics.Omega*Estar*_betag(gl,spec);  
   }
 
 }
@@ -2154,7 +2192,7 @@ void find_Y2star_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, 
   }
 
   for (spec=0; spec<ns; spec++){
-    Ystar[spec]=-metrics.Omega*Jstar*_betaa(spec);  
+    Ystar[spec]=-metrics.Omega*Jstar*_betaa(gl,spec);  
   }
 
 }

@@ -7,6 +7,25 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 19a
+  * in model/emfield/_Ohm*/emfield.c
+    - added code for Gauss-Based potential in find_Sstar_emfield(), 
+      find_linearization_coefficients_inner_node_emfield(), find_Fstar_interface_emfield(),
+      write_disc_emfield_template(), read_disc_emfield_actions()
+  * in model/emfield/_Ohm*/emfield.hh
+    - added POTENTIAL to gl_model_emfield_t
+  * in model/emfield/doc/report.tex
+    - added section "Potential Equation Based on Gauss's Law"
+  * in model/fluid/_*_plasma/fluid.hh and model/fluid/_drift-diffusion/fluid.hh
+    - added betaa,betag to gl_model_fluid_t
+  * in model/share/fluid_share.c
+    - renamed _betag to _betag_default
+    - renamed _betaa to _betaa_default
+    - in write_disc_fluid_template(), added initialization of betaa and betag
+    - in read_disc_fluid_actions(), added reading of betaa and betag from control file
+    - rewrote _betaa() and _betag() so that they return the value specified in the control file
+
+
 2019 MAY 18a
   * in tools/gitnewversion_public.sh
     - added code to replace proprietary files by their *_PUBLIC counterpart
