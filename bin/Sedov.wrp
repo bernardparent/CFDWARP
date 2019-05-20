@@ -46,8 +46,8 @@ Grid(
   Point(ie,je, Lx,Ly);
   Point(is,je, -Lx,Ly);
   JoinCorners(is,js, ie,je,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
-  Rotate(is,js,ie,je, 0,0, rad(22));
-);
+ { Rotate(is,js,ie,je, 0,0, rad(22));
+});
 
 
 Bdry(
@@ -155,8 +155,8 @@ Disc(
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_WENO5;
+    AOWENO_gammahi=1-1e-4;
+    INTERPOL=INTERPOL_AOWENO7;
      
     EIGENVALCOND=EIGENVALCOND_PARENT;
     POSFILTER=POSFILTER_PARENT;

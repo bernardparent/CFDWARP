@@ -7,6 +7,12 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 20a
+  * in bin
+    - added Sedov_exact.txt
+    - modified Sedov.wrp
+
+
 2019 MAY 19a
   * in model/emfield/_Ohm*/emfield.c
     - added code for Gauss-Based potential in find_Sstar_emfield(), 
