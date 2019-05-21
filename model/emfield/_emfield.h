@@ -24,19 +24,9 @@
     
   void find_Ek(np_t *np, gl_t *gl, long l, long spec, EXM_vec3D_t Ek);
 
-  void find_Ee_for_Townsend_ionization(np_t *np, gl_t *gl, long l, EXM_vec3D_t E);
-
-  void find_Estar_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, double *Estar);
-
-  void find_E_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, EXM_vec3D_t E);
- 
   void find_Ek_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, long spec, EXM_vec3D_t Ek);
 
   void find_J(np_t *np, gl_t *gl, long l, EXM_vec3D_t J);
-
-  void find_J_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, EXM_vec3D_t J);
-
-  void find_Jstar_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, double *Jstar);
 
   void find_post_variable_name_emfield(long varnum, char *varname);
 
@@ -44,21 +34,9 @@
 
   void find_emfield_force(np_t *np, gl_t *gl, long l, dim_t Femfield);
 
-  double _Qjoulek(np_t *np, gl_t *gl, long l, long k);
-
-  double _E_dot_J(np_t *np, gl_t *gl, long l);
-
-  double _E_dot_J_recast(np_t *np, gl_t *gl, long l);
-
-  double _E_dot_Je_over_mueNe(np_t *np, gl_t *gl, long l);
-
-  void find_Vk(np_t *np, gl_t *gl, long l, long spec, EXM_vec3D_t Vk);
-
   double _mu(np_t *np, gl_t *gl, long l, long spec);
 
   double _sigma(np_t *np, gl_t *gl, long l);
-
-  double _dTedXj_interface(np_t *np, gl_t *gl, metrics_t metrics, long l, long i, long j);
 
   void find_DeltaVk(np_t *np, gl_t *gl, long l, long spec, EXM_vec3D_t DeltaVk);
 
@@ -68,8 +46,8 @@
 
   double _Eemag_smoothed(np_t *np, gl_t *gl, long l);
 
-  double _epsilonr(np_t np, gl_t *gl);
-    
-  double _epsilonr_interface(np_t *np, gl_t *gl, long l, long theta);
+  bool is_node_bdry_dielectric(np_t np);
+
+  void find_DeltaVk_from_mu(np_t *np, gl_t *gl, long l, long spec, double mu, EXM_vec3D_t DeltaVk);
 
 #endif 

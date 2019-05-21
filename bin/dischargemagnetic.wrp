@@ -11,7 +11,7 @@ Qbeam=2e5;
 
 tmax=1e-6;   {simulation time span in seconds}
 
-DISC_OHM_BASED_POTENTIAL=FALSE;
+DISC_OHM_BASED_POTENTIAL=TRUE;
 
 meshfact=1.0;
 

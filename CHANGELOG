@@ -7,6 +7,22 @@ CFDWARP CHANGELOG
 _____________________________________________________________________________________________________
 
 
+2019 MAY 21a
+  * in model/beam/_ebeam_algebraic/beam.c
+    - added some missing includes (emfield_share.h and fluid_share.h)
+  * in model/emfield/_Ohm/emfield.c and model/emfield/_Ohm_generalized/emfield.c
+    - moved various functions that were present in both modules to model/share/emfield_share.c
+  * in model/share/emfield_share.c
+    - added various functions common to both model/emfield/_Ohm/emfield.c and 
+      model/emfield/_Ohm_generalized/emfield.c
+  * in model/fluid/_*_plasma/fluid_plasma.c and model/fluid/_*_plasma/fluid_source.c
+    - added #include <model/share/emfield_share.h>
+  * in model/fluid/_drift-diffusion/fluid.c
+    - added #include <model/share/emfield_share.h>
+  * in model/share/fluid_share.c
+    - in find_alpha(), fixed a bug when asserts are turned on: _betaa() was missing the *gl parameter
+
+
 2019 MAY 20a
   * in bin
     - added Sedov_exact.txt

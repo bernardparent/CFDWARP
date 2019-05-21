@@ -31,6 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/metrics/_metrics.h>
 #include <src/control.h>
 #include <src/bdry.h>
+#include <model/share/emfield_share.h>
+#include <model/share/fluid_share.h>
+#include <model/fluid/_fluid.h>
 
 #ifndef _FLUID_PLASMA
 #error The algebraic ebeam module can not be compiled with a fluid module without plasma support.

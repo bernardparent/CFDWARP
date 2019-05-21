@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <model/share/fluid_share.h>
+#include <model/share/emfield_share.h>
 #include <model/fluid/_fluid.h>
 #include <model/thermo/_thermo.h>
 #include <model/emfield/_emfield.h>
@@ -2097,8 +2098,8 @@ void find_alpha(np_t *np, gl_t *gl, long l, spec2_t alpha){
 #ifndef NDEBUG
     if (alpha[k][k]<=0.0){
       wfprintf(stderr,"alpha[%ld][%ld]=%E   \n",k,k,alpha[k][k]);
-      wfprintf(stderr,"mu_k=%E N_k=%E betaa_k=%E C_k=%E \n",_mu(np,gl,l,k),_Nk(np[l],gl,k),_betaa(k),_C(k));
-      wfprintf(stderr," sigma=%E betaa_k*C_k*mu_k*N_k=%E\n",sigma,_betaa(k)*_C(k)*_mu(np,gl,l,k)*_Nk(np[l],gl,k));
+      wfprintf(stderr,"mu_k=%E N_k=%E betaa_k=%E C_k=%E \n",_mu(np,gl,l,k),_Nk(np[l],gl,k),_betaa(gl,k),_C(k));
+      wfprintf(stderr," sigma=%E betaa_k*C_k*mu_k*N_k=%E\n",sigma,_betaa(gl,k)*_C(k)*_mu(np,gl,l,k)*_Nk(np[l],gl,k));
       fatal_error("alpha[k][k] is negative at node i=%ld j=%ld k=%ld.",_i(l,gl,0),_i(l,gl,1),_i(l,gl,2));
     }
 #endif
