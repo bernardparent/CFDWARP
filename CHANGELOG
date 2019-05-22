@@ -2,10 +2,17 @@
 _____________________________________________________________________________________________________
 
 
-CFDWARP CHANGELOG
+                                       CFDWARP CHANGELOG
 
 _____________________________________________________________________________________________________
 
+
+2019 MAY 22a
+  * in model/share/emfield_share.c
+    - commented out all functions unless EMFIELD is defined
+  * in CHANGELOG, COMPILE, CONTRIB, README, USAGE, and tools/README
+    - improved the layout and the text
+ 
 
 2019 MAY 21a
   * in model/beam/_ebeam_algebraic/beam.c

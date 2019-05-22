@@ -1,11 +1,16 @@
-___________________________________________________________________________________
 
-COMPILATION OF CFDWARP
-___________________________________________________________________________________
+__________________________________________________________________________________________
 
 
+                                COMPILATION OF CFDWARP
 
-CONFIGURE CFDWARP
+__________________________________________________________________________________________
+
+
+
+
+1. CFDWARP CONFIGURATION
+
 
 In the CFDWARP main directory (where this file COMPILE is located) first configure
 CFDWARP through the command
@@ -26,8 +31,8 @@ place and rerun it from the config directory when needed.
 
 
 
+2. WARP COMPILATION
 
-COMPILE CFDWARP
 
 Tweak .makefile-header if necessary in the top directory (this should only be 
 needed if compiling on an esoteric UNIX system or if you want to add additional 
@@ -42,7 +47,20 @@ The executable is named warp and is in the src directory.
 
 
 
-CREATE A CFDWARP PACKAGE
+2. TOOLS COMPILATION
+
+
+Clean the directories and create the tools with the commands: 
+
+make clean
+make tools
+
+The executables will be located in the tools directory.
+
+
+
+4. CFDWARP PACKAGE CREATION
+
 
 To create a tgz package that contains the warp executable along with some 
 documentation manuals, type at the prompt:
@@ -56,7 +74,8 @@ distribution.
 
 
 
-CPU PROFILING
+5. CPU PROFILING
+
 
 CPU profiling comes in handy to know which algorithms are not optimal and take
 up more resources than expected. To enable CPU profiling, compile warp with the 

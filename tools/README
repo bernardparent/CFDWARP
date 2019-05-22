@@ -1,10 +1,14 @@
 
-CFDWARP TOOLS
+______________________________________________________________________________________________
 
-Compilation: type "make tools" within the main CFDWARP directory
+
+                                       CFDWARP TOOLS
 
 ______________________________________________________________________________________________
 
+
+
+1. C TOOLS* 
 
 
 average.c                    reads the data from various input files and outputs the 
@@ -50,10 +54,11 @@ tecgrid2D.c                  reads a 2D GRIDG script and creates a TECPLOT post 
 tecgrid3D.c                  reads a 3D GRIDG script and creates a TECPLOT post file 
 
 
+* Compile the C tools by typing "make tools" within the main CFDWARP directory.
 
 
-SHELL SCRIPTS
 
+2. SHELL SCRIPTS
 
 
 average.sh                   reads the data from various input files and outputs the 

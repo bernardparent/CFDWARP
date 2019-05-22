@@ -1,21 +1,22 @@
 
-___________________________________________________________________________________
+____________________________________________________________________________
 
 
-CFDWARP USAGE
+                               CFDWARP USAGE
 
-___________________________________________________________________________________
-
-
+____________________________________________________________________________
 
 
-CREATE TEMPLATE CONTROL FILE
+
+
+1. CREATE TEMPLATE CONTROL FILE
 
 ./warp -w control.wrp
 
 
 
-EDIT CONTROL FILE
+2. EDIT CONTROL FILE
+
 
 Use your favourite editor and edit the control file:
 
@@ -29,7 +30,8 @@ the manuals.
 
 
 
-CHECK THE GRID
+3. CHECK THE GRID
+
 
 At the UNIX shell prompt, execute warp as follows:
 
@@ -49,7 +51,8 @@ paraview post.vtk
 
 
 
-CHECK THE BOUNDARY CONDITIONS
+4. CHECK THE BOUNDARY CONDITIONS
+
 
 For a 2D problem, you can verify if your boundary conditions are 
 implemented correctly through the following command:
@@ -65,7 +68,8 @@ the command becomes:
 
  
 
-CHECK THE INITIAL CONDITIONS
+5. CHECK THE INITIAL CONDITIONS
+
 
 The initial conditions can be verified by creating a tecplot 
 postfile directly from the control file:
@@ -82,7 +86,8 @@ respectively.
 
 
 
-RUN A CASE
+6. RUN A CASE
+
 
 Once the grid, boundary conditions, and initial conditions have been 
 verified to be valid, you can run a case as follows:
@@ -96,7 +101,8 @@ lower the CFL within the Cycle() module.
 
 
 
-RESTART A CASE
+7. RESTART A CASE
+
 
 If you wish to restart a case that is not yet converged, this can be 
 done with the following:
@@ -109,7 +115,8 @@ saved in the data file data.02.
 
 
 
-VISUALIZE THE DATA
+8. VISUALIZE THE DATA
+
 
 The data file can be transformed into a post file that can be read by
 tecplot or some other data visualization program through the command:
@@ -118,7 +125,8 @@ tecplot or some other data visualization program through the command:
 
 
 
-POST-PROCESS THE DATA 
+9. POST-PROCESS THE DATA 
+
 
 CFDWARP has some built-in functions within the Post() module part 
 of the control file to help with data post-processing. For instance, 
@@ -132,7 +140,8 @@ following at the shell prompt:
 
 
 
-RUN CFDWARP IN THE BACKGROUND
+10. RUN CFDWARP IN THE BACKGROUND
+
 
 You may wish occasionally to run warp in the "background" so that it 
 continues running even after you exit your shell. To do so,
@@ -164,7 +173,8 @@ scr.error. To restart a case, use:
 
 
 
-SEND A SIGNAL TO A RUNNING CFDWARP
+11. SEND A SIGNAL TO A RUNNING CFDWARP
+
 
 By sending the signal USR1 to a running warp, warp will save the 
 datafile  at the following iteration. For example, the following will 
@@ -177,11 +187,13 @@ its process ID through top, and then specifying the following:
 
 kill -USR1 PID
 
-where PID should be substituted by the process ID of CFDWARP found through top.
+where PID should be substituted by the process ID of CFDWARP found through 
+top.
 
 
 
-RUN CFDWARP WITH MPI
+12. RUN CFDWARP WITH MPI
+
 
 If CFDWARP was compiled with mpicc, then the following command 
 should be used at the prompt:
@@ -194,7 +206,8 @@ configured on your server.
        
 
 
-RUN CFDWARP WITH OPENMP THREADS
+13. RUN CFDWARP WITH OPENMP THREADS
+
 
 If CFDWARP was compiled with OPENMP threads, the number of threads can be 
 changed to 4 within the shell by typing:
@@ -211,13 +224,15 @@ one specified by the OMP_NUM_THREADS environment variable.
 
 
 
-CPU PROFILING
+14. CPU PROFILING
+
 
 If CFDWARP was compiled with the CPU profiling option (-pg flag), then run
 it as usual and wait for it to finish the job normally (don't kill it
 prematurely). This will output the file gmon.out in the local directory.
-When warp finishes, it will output a file called "gmon.out". This can be analyzed
-using gprof with the analysis outputted to an ascii file as follows:
+When warp finishes, it will output a file called "gmon.out". This can be 
+analyzed using gprof with the analysis outputted to an ascii file as 
+follows:
 
 gprof ./warp gmon.out > analysis.txt
 
@@ -230,7 +245,8 @@ CPU profiling information in the file analysis.txt.
 
 
 
-OTHER COMMANDS
+15. OTHER COMMANDS
+
 
 For other commands, see the list of possible flags that warp recognizes by
 typing warp without arguments at the prompt:

@@ -1,12 +1,18 @@
 
-CFDWARP CONTRIBUTIONS
-__________________________________________________________________________________________
+_________________________________________________________________________________________________
 
 
-Alexander, Derrick
+                                    CFDWARP CONTRIBUTIONS
+
+_________________________________________________________________________________________________
+
+
+
+Alexander, Derrick C.
   - implementation of the JoinAll2D subroutine in lib/gridgen/2Dbase.c
     and of the JoinAll3D in lib/gridgen/3Dbase.c.
   - the idea of how to do the x-cuts in src/post.c
+
 
 Etele, Jason
   - development of code tools/rocket_v?.c
@@ -19,6 +25,7 @@ Etele, Jason
   - in prim/_FANS_kpsi/prim_bdry.c, included the Reservoir2 boundary
     condition
 
+
 Fusina, Giovanni
   - implementation of the chemistry modules in prim/chem/_jachimowsky/
     and in prim/chem/_singh/
@@ -26,32 +33,43 @@ Fusina, Giovanni
     module prim/thermo/_hightemp/thermo.c
   - addition of the SHAREDMPI commands in src/main.c src/common.h and cycle/share/cycle_share.c
 
+
 Hui, Tim
   - implementation, derivation of the analytical jacobian in
     prim/chem/_jachimowsky/chem.c
   - all files in prim/chem/_lutz
 
+
 Lee, Jaehyuk
   - addition of EXM_invert_matrix_partial_pivoting() in lib/exm.c
   - addition of invert_matrix_partial_pivoting() in src/common.c
+
 
 Nguyen, Van Tien
   - addition of postfilename within Post() module that is specified through argument to
     -opm flag (see changes for version 19apr20a) 
 
+
 Padmanabhan, Sathyan 
   - tools/tauvt.c
 
-Schwartzentruber, Tom
+
+Parent, Bernard
+  - most modules
+
+
+Schwartzentruber, Thomas E.
   - implementation of superzone in cycle/share/cycle_share.c part of SHAREDMPI commands
     although this has been taken away since.
   - implementation of the subsonic outflow boundary condition based
     on constant Mach number in prim/_FANS_kpsi/prim_bdry.c
+
 	
-Thoguluva Rajendran, Prasanna
+Rajendran, Prasanna T.
   - addition of bin/taylor_green_vortex.*
   - tools/average.sh
   - tools/average.c
+
  
 Weerakoon, Minindu
   - Fixes to memory leaks problems (see CHANGELOG 19feb23a and 19feb27a and 19feb28b and 19may08a) 
