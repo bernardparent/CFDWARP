@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 MAY 23b
+  * in bin
+    - updated ns_SDBD.wrp
+  * in config/config.c
+    - changed MAX_LINE_WIDTH from 90 to 70
+
+
 2019 MAY 23a
   * in model/emfield
     - renamed _Ohm to _Epotential

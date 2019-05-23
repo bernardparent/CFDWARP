@@ -65,7 +65,7 @@ static char CO_str[CO_num][20]=
 typedef unsigned char bool;
 
 #define MAX_STR_LENGTH 5000
-#define MAX_LINE_WIDTH 90
+#define MAX_LINE_WIDTH 70
 
 typedef char type_str[3*MAX_STR_LENGTH];
 

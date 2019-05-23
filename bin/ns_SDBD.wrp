@@ -1,15 +1,20 @@
 
  
-meshlevel=3;
+meshlevel=1;
 
 mf=(1.41)^(-4+meshlevel); {1.0/1.41, 1.0, 1.41, 2.0, 2.82}
 
 tf=1.0; {tf=1 works great}
-CFLfact=1.6;
+CFLfact=0.8;
 
+{meshlevel=4, out.96ml4.110;  me_added: 6.58e-2;  Tmax=7853K;  
+ meshlevel=3, out.96ml3.78;   me_added: 6.22e-2;  Tmax=7978K;
+ meshlevel=2, out.96ml2.55;   me_added: 5.78e-2;  Tmax=7086K;
+ meshlevel=1, out.96ml2.39;   me_added: 5.06e-2;  Tmax=5474K;
+}
 
 dphimax=14000;
-itermax=140;
+itermax=round(220/sqrt(CFLfact));
 EMFsubiter=1300;
 
 is1=1;
@@ -249,22 +254,39 @@ Init(
 );
 
 
+USE_GAUSS_BASED_POTENTIAL=FALSE;
+
 Disc(
   NavierStokesPlasma(
     zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.2e0; {set to 0.25 usually}    {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
     zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
-    betag[1]=-0.0010;
-    betag[2]=-0.5000;
-    betag[3]=1.0000;
-    betag[4]=1.0000;
-    betaa[1]=0.9990;
-    betaa[2]=0.5000;
-    betaa[3]=0.0000;
-    betaa[4]=0.0000;
+    if (USE_GAUSS_BASED_POTENTIAL,
+      betag[1]=0;
+      betag[2]=0;
+      betag[3]=0;
+      betag[4]=0;
+      betaa[1]=0;
+      betaa[2]=0;
+      betaa[3]=0.0000;
+      betaa[4]=0.0000;
+    ,{else}
+      betag[1]=-0.0010;
+      betag[2]=-0.5000;
+      betag[3]=1.0000;
+      betag[4]=1.0000;
+      betaa[1]=0.9990;
+      betaa[2]=0.5000;
+      betaa[3]=0.0000;
+      betaa[4]=0.0000;
+    );
   );
   Epotential(
-    POTENTIAL=POTENTIAL_OHMBASED;
+    if (USE_GAUSS_BASED_POTENTIAL,
+      POTENTIAL=POTENTIAL_GAUSSBASED;
+    ,{else}
+      POTENTIAL=POTENTIAL_OHMBASED;
+    );
     Ediv=10.0;        {a small positive number in V/m, needed to prevent a division by zero when
                        discretizing the electron pressure gradients within the potential equation}
   );
@@ -324,7 +346,7 @@ Cycle(
                            near cathode when PRECONDITIONER is set to PRECON_LOCALTIMESTEPPLASMA} 
     relaxNi_bdry=0.8;     {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.1;     {the electron density relaxation factor at the boundary }
-    relaxTe=0.5;          {the electron temperature relaxation factor }
+    relaxTe=0.3;          {the electron temperature relaxation factor }
     rhoref=0.1;           {reference density in kg/m3}
     Tref=300.0;           {reference temperature in K}
     Teref=20000.0;        {reference electron temperature in K}
@@ -376,7 +398,7 @@ Cycle(
         CFL=2.0*CFLfact;
       );
       CFL=CFLfact; {?????}
-      if (iter<3, 
+      if (iter<6, 
         CFL=0.0;
       );
     ,{else}
@@ -394,8 +416,8 @@ Cycle(
     system("date");
     Lc=1e-3*4;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=1.0; {relaxation factor forced on the update of the emfield variables}
-    for (cnt,0,0,
-      UpdateEMField(Lc*100000,relaxEMF*1.0,dt,TSEMF_SOR,EMFsubiter); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+    for (cnt,1,1,
+      UpdateEMField(Lc*100000,relaxEMF*1.0,dt,TSEMF_SOR,round(EMFsubiter/1)); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
       {UpdateEMField(Lc,relaxEMF*0.3,dt,TSEMF_ADI);}
       {UpdateEMField(Lc*100000,relaxEMF*1.0,dt,TSEMF_IMAF,50);} {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
     );
