@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 MAY 23a
+  * in model/emfield
+    - renamed _Ohm to _Epotential
+    - renamed _Ohm_Generalized to _Epotential-Bfixed
+  * in *.wrp files
+    - renamed "Ohm(" to "Epotential("
+    - renamed "OhmGeneralized(" to "EpotentialBfixed("
+  * renamed
+    - _EMFIELD_OHMGENERALIZED  to _EMFIELD_EPOTENTIAL_BFIXED
+    - _EMFIELD_OHM  to _EMFIELD_EPOTENTIAL
+    
+
 2019 MAY 22b
   * in COMPILE and CONTRIB
     - small changes

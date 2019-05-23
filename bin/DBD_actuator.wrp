@@ -189,7 +189,7 @@ Bdry(
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
     }
   );
-  Ohm(
+  Epotential(
     {
     _________________________________________________________________________________________
 
@@ -241,7 +241,7 @@ Model(
     gamma=0.1e0;    {secondary emission coefficient used to calculate the electron density at the cathode}
     AXISYMMETRIC=NO;
   );
-  Ohm(
+  Epotential(
     Te_buffer=3000.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,T+Te_buffer);  
                        needed to prevent convergence hangs where |E| becomes close to 0;
                        set to as little a value as possible}
@@ -295,7 +295,7 @@ Init(
     Region(is,js,  ie,je, INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_O2plus,chi_N2plus,chi_O,chi_N,chi_O2,chi_N2,Tv,Te);
     }
   );
-  Ohm(
+  Epotential(
     {
     _______________________________________________________________________________________
 
@@ -326,7 +326,7 @@ Disc(
     );
     zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
   );
-  Ohm(
+  Epotential(
     Ediv=10.0;        {a small positive number in V/m, needed to prevent a division by zero when
                        discretizing the electron pressure gradients within the potential equation}
   );
@@ -414,7 +414,7 @@ Cycle(
     Uref[12]=rhoref*700.0*Tvref;  
     Uref[13]=rhoref*wion*414*Teref;  
   );
-  Ohm(
+  Epotential(
     xiverge_emfield=1e2; {residual convergence threshold for the potential equation}
     sigmaref=0.0000001; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
     Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
@@ -485,7 +485,7 @@ Cycle(
 
     if(iter==1,
       Model(
-        Ohm(
+        Epotential(
 
           SetElectroMotiveForce(is2,js0, is3,js1, dphi/(xs3-xs2){V/m},0.0{V/m}, 1e99{max power in W/m3});
           {it is necessary to do the following trick (setting the exposed electrode to a dielectric) when dphi is zero

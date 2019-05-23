@@ -323,7 +323,7 @@ typedef struct {
    fluxemfield_t dUstaremfield_tmp;
 #endif
 
-#ifdef _EMFIELD_OHMGENERALIZED
+#ifdef _EMFIELD_EPOTENTIAL_BFIXED
    EXM_vec3D_t B,E,J;
    dim_t EMFoverL;
    double EMFmaxpower;
@@ -331,7 +331,7 @@ typedef struct {
    chargedspec_t mumem;
    double sigmamem,Eemagmem,Eemagsmoothedmem;
 #endif
-#ifdef _EMFIELD_OHM
+#ifdef _EMFIELD_EPOTENTIAL
    EXM_vec3D_t E;
    dim_t EMFoverL;
    double EMFmaxpower;

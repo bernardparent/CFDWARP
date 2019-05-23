@@ -16,7 +16,7 @@ Qbeam=2e4;
 
 UPDATEMODEL_FLUID_EMFIELD_TOGETHER=FALSE;
 
-DISC_OHM_BASED_POTENTIAL=FALSE;
+DISC_OHM_BASED_POTENTIAL=TRUE;
 
 tmax=1e-6;   {simulation time span in seconds}
 
@@ -91,7 +91,7 @@ Bdry(
 
 
 
-  Ohm(
+  Epotential(
     {
     _________________________________________________________________________________________
 
@@ -127,7 +127,7 @@ Model(
     Temax=60000;
   );
  
-  Ohm(
+  Epotential(
     Jmax=24000.0;
     Te_buffer=3000.0; {when determining mue: Te=max(Te,T+Te_buffer);  
                       needed to prevent convergence hangs where |E| becomes close to 0;
@@ -164,7 +164,7 @@ Init(
          1,0.0,0.0,0.0);
       }
     );
-    Ohm(
+    Epotential(
       {
     _______________________________________________________________________________________
 
@@ -202,7 +202,7 @@ Disc(
       betag[2]=0.0;
     );
   );
-  Ohm(
+  Epotential(
     if (DISC_OHM_BASED_POTENTIAL,
       POTENTIAL=POTENTIAL_OHMBASED;
     ,{else}
@@ -239,7 +239,7 @@ Cycle(
     Uref[3]=N_N2*1e99;
     Uref[4]=Te_init*1e99;
   );
-  Ohm(
+  Epotential(
     xiverge_emfield=1e1; {residual convergence threshold for the potential equation}
     relaxphi_bdry=1.0; {relaxation factor for phi at the dielectric boundaries}
     sigmaref=0.000001; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
@@ -251,7 +251,7 @@ Cycle(
     sigma2=0.3;      {exponent of largest pseudotime step in all flux components}
     PRECONDITIONER=PRECON_LOCALTIMESTEP;
     if (iter==1,
-      Init(Ohm(Region(is,js1,is,js2,1,max(0.0,dphi-8*time/tmax*dphi)););); 
+      Init(Epotential(Region(is,js1,is,js2,1,max(0.0,dphi-8*time/tmax*dphi)););); 
       CFL=1;
     );
     CFL=min(CFL*1.1,0.8);

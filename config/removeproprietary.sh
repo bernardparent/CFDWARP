@@ -23,14 +23,14 @@ echo "Removing proprietary directory .././model/fluid/_drift-diffusion"
 rm -rf .././model/fluid/_drift-diffusion 
 cp -a _proprietary .././model/fluid/_drift-diffusion 
 ( printf "current drift-diffusion\nEND" ) > .././model/fluid/_drift-diffusion/.config 
-echo "Removing proprietary directory .././model/emfield/_Ohm"
-rm -rf .././model/emfield/_Ohm 
-cp -a _proprietary .././model/emfield/_Ohm 
-( printf "current Ohm\nEND" ) > .././model/emfield/_Ohm/.config 
-echo "Removing proprietary directory .././model/emfield/_Ohm_generalized"
-rm -rf .././model/emfield/_Ohm_generalized 
-cp -a _proprietary .././model/emfield/_Ohm_generalized 
-( printf "current Ohm_generalized\nEND" ) > .././model/emfield/_Ohm_generalized/.config 
+echo "Removing proprietary directory .././model/emfield/_Epotential"
+rm -rf .././model/emfield/_Epotential 
+cp -a _proprietary .././model/emfield/_Epotential 
+( printf "current Epotential\nEND" ) > .././model/emfield/_Epotential/.config 
+echo "Removing proprietary directory .././model/emfield/_Epotential-Bfixed"
+rm -rf .././model/emfield/_Epotential-Bfixed 
+cp -a _proprietary .././model/emfield/_Epotential-Bfixed 
+( printf "current Epotential-Bfixed\nEND" ) > .././model/emfield/_Epotential-Bfixed/.config 
 echo "Removing proprietary directory .././cycle/ts/_block_DDADI"
 rm -rf .././cycle/ts/_block_DDADI 
 cp -a _proprietary .././cycle/ts/_block_DDADI 

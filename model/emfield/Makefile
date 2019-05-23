@@ -8,8 +8,8 @@ clean:
 	( cd .active ; make clean )
 
 cleanall:
-	( cd _Ohm_generalized ; make cleanall )
-	( cd _Ohm ; make cleanall )
+	( cd _Epotential-Bfixed ; make cleanall )
+	( cd _Epotential ; make cleanall )
 	( cd _none ; make cleanall )
 	( cd doc ; make clean )
 
