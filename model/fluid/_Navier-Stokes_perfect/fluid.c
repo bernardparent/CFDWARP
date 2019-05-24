@@ -111,15 +111,11 @@ void read_model_fluid_actions_2(char *actionname, char **argum, SOAP_codex_t *co
     if (SOAP_number_argums(*argum)!=nd*2+1)
       SOAP_fatal_error(codex,"Number of arguments not equal to %ld in SetHeatDeposited(); action.",nd*2+1);
     find_zone_from_argum(*argum, 0, gl, codex, &zone);
-    for1DL(i,zone.is, zone.ie)
-      for2DL(j,zone.js, zone.je)
-        for3DL(k,zone.ks, zone.ke)
+    for_zone_ijk(zone,is,js,ks,ie,je,ke){
           if (is_node_in_zone(i, j, k, gl->domain_lim)){
             (*np)[_ai(gl,i,j,k)].bs->Qadd=SOAP_get_argum_double(codex,*argum,2*nd);
           }
-        end3DL
-      end2DL
-    end1DL
+    }
     codex->ACTIONPROCESSED=TRUE;    
   }
 
@@ -129,15 +125,11 @@ void read_model_fluid_actions_2(char *actionname, char **argum, SOAP_codex_t *co
     if (SOAP_number_argums(*argum)!=nd*2+nd)
       SOAP_fatal_error(codex,"Number of arguments not equal to %ld in SetBodyForce(); action.",nd*2+nd);
     find_zone_from_argum(*argum, 0, gl, codex, &zone);
-    for1DL(i,zone.is, zone.ie)
-      for2DL(j,zone.js, zone.je)
-        for3DL(k,zone.ks, zone.ke)
+    for_zone_ijk(zone,is,js,ks,ie,je,ke){
           if (is_node_in_zone(i, j, k, gl->domain_lim)){
             for (dim=0; dim<nd; dim++) (*np)[_ai(gl,i,j,k)].bs->Fbody[dim]=SOAP_get_argum_double(codex,*argum,2*nd+dim);
           }
-        end3DL
-      end2DL
-    end1DL
+    }
     codex->ACTIONPROCESSED=TRUE;
   }
 
@@ -154,9 +146,7 @@ void read_model_fluid_actions_2(char *actionname, char **argum, SOAP_codex_t *co
     }
     if (P>0.0){
      for (pass=1; pass<=2; pass++){
-      for1DL(i,gl->domain.is, gl->domain.ie)
-        for2DL(j,gl->domain.js, gl->domain.je)
-          for3DL(k,gl->domain.ks, gl->domain.ke)
+      for_zone_ijk(gl->domain,is,js,ks,ie,je,ke){
             l=_ai(gl,i,j,k);
             // only add heat to inner nodes, because heat addition has no effect on boundary nodes
             if (is_node_inner((*np)[l],TYPELEVEL_FLUID)) {
@@ -173,9 +163,7 @@ void read_model_fluid_actions_2(char *actionname, char **argum, SOAP_codex_t *co
                 }
               }
             }
-          end3DL
-        end2DL
-      end1DL
+      }
 #ifdef DISTMPI
       MPI_Allreduce(&Pfirstpass, &Pfirstpass_sum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       Pfirstpass=Pfirstpass_sum;
@@ -203,16 +191,12 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
 
     if (!gl->CONTROL_READ){
       gl->MODEL_FLUID_READ=TRUE;
-      for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-       for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-        for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+      for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
           (*((readcontrolarg_t *)codex->action_args)->np)[_ai(((readcontrolarg_t *)codex->action_args)->gl,i,j,k)].bs->Qadd=0.0e0;
           for (dim=0; dim<nd; dim++) {
               (*((readcontrolarg_t *)codex->action_args)->np)[_ai(((readcontrolarg_t *)codex->action_args)->gl,i,j,k)].bs->Fbody[dim]=0.0e0;
           }
-	end3DL
-       end2DL
-      end1DL
+      }
     }
     action_original=codex->action;
     codex->action=&read_model_fluid_actions_2;

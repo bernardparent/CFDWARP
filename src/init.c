@@ -99,17 +99,13 @@ void read_init_actions_emfield(char *actionname, char **argum, SOAP_codex_t *cod
     if (inittype<1 || inittype>totalinitvartypeemfield) 
       SOAP_fatal_error(codex,"Initial condition type %ld is out of bounds.",inittype);
     for (flux=0; flux<numinitvar_emfield; flux++) values[flux]=SOAP_get_argum_double(codex,*argum,flux+1);
-    for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-      for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-        for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+    for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
           if (is_node_valid((*np)[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)
             ) {
             init_node_emfield((*np)[_ai(gl,i,j,k)], gl, inittype, values);
             (*np)[_ai(gl,i,j,k)].INIT_EMFIELD=TRUE;
           }
-        end3DL
-      end2DL
-    end1DL
+    }
     codex->ACTIONPROCESSED=TRUE;
   }
 
@@ -123,18 +119,14 @@ void read_init_actions_emfield(char *actionname, char **argum, SOAP_codex_t *cod
       SOAP_fatal_error(codex,"Initial condition type %ld is out of bounds.",inittype);
     for (flux=0; flux<numinitvar_emfield; flux++)
       values[flux]=SOAP_get_argum_double(codex,*argum,flux+2);
-    for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-      for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-        for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+    for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
           if (   (is_node_valid((*np)[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD))
               && (_node_type((*np)[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)==bdrytype)
              ){
             init_node_emfield((*np)[_ai(gl,i,j,k)], gl, inittype, values);
             (*np)[_ai(gl,i,j,k)].INIT_EMFIELD=TRUE;
           }
-        end3DL
-      end2DL
-    end1DL
+    }
     codex->ACTIONPROCESSED=TRUE;
   }
 
@@ -158,18 +150,14 @@ void read_init_actions_emfield(char *actionname, char **argum, SOAP_codex_t *cod
     for (flux=0; flux<numinitvar_emfield; flux++)
       values[flux]=SOAP_get_argum_double(codex,*argum,flux+1+nd*2);
     find_zone_from_argum(*argum, 0, gl, codex, &zone);
-    for1DL(i,zone.is,zone.ie)
-      for2DL(j,zone.js,zone.je)
-        for3DL(k,zone.ks,zone.ke)
+    for_zone_ijk(zone,is,js,ks,ie,je,ke){
           if (is_node_in_zone(i, j, k, gl->domain_lim)){
             if (is_node_valid((*np)[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
               init_node_emfield((*np)[_ai(gl,i,j,k)], gl, inittype, values);
               (*np)[_ai(gl,i,j,k)].INIT_EMFIELD=TRUE;
             }
           }
-        end3DL
-      end2DL
-    end1DL
+    }
     codex->ACTIONPROCESSED=TRUE;
   }
 
@@ -204,17 +192,13 @@ void read_init_actions_fluid(char *actionname, char **argum, SOAP_codex_t *codex
     if (inittype<1 || inittype>totalinitvartypefluid) 
       SOAP_fatal_error(codex,"Initial condition type %ld is out of bounds.",inittype);
     for (flux=0; flux<numinitvar; flux++) values[flux]=SOAP_get_argum_double(codex,*argum,flux+1);
-    for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-      for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-        for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+    for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
           if (is_node_valid((*np)[_ai(gl,i,j,k)],TYPELEVEL_FLUID)
             ) {
             init_node_fluid((*np),_ai(gl,i,j,k), gl, inittype, values);
             (*np)[_ai(gl,i,j,k)].INIT_FLUID=TRUE;
           }
-        end3DL
-      end2DL
-    end1DL
+    }
     codex->ACTIONPROCESSED=TRUE;
   }
 
@@ -228,18 +212,14 @@ void read_init_actions_fluid(char *actionname, char **argum, SOAP_codex_t *codex
       SOAP_fatal_error(codex,"Initial condition type %ld is out of bounds.",inittype);
     for (flux=0; flux<numinitvar; flux++)
       values[flux]=SOAP_get_argum_double(codex,*argum,flux+2);
-    for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-      for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-        for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+    for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
           if (   (is_node_valid((*np)[_ai(gl,i,j,k)],TYPELEVEL_FLUID))
               && (_node_type((*np)[_ai(gl,i,j,k)],TYPELEVEL_FLUID)==bdrytype)
              ){
             init_node_fluid((*np),_ai(gl,i,j,k), gl, inittype, values);
             (*np)[_ai(gl,i,j,k)].INIT_FLUID=TRUE;
           }
-        end3DL
-      end2DL
-    end1DL
+    }
     codex->ACTIONPROCESSED=TRUE;
   }
 
@@ -264,18 +244,14 @@ void read_init_actions_fluid(char *actionname, char **argum, SOAP_codex_t *codex
     for (flux=0; flux<numinitvar; flux++)
       values[flux]=SOAP_get_argum_double(codex,*argum,flux+1+nd*2);
     find_zone_from_argum(*argum, 0, gl, codex, &zone);
-    for1DL(i,zone.is,zone.ie)
-      for2DL(j,zone.js,zone.je)
-        for3DL(k,zone.ks,zone.ke)
+    for_zone_ijk(zone,is,js,ks,ie,je,ke){
           if (is_node_in_zone(i, j, k, gl->domain_lim)){
             if (is_node_valid((*np)[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) {
               init_node_fluid((*np),_ai(gl,i,j,k), gl, inittype, values);
               (*np)[_ai(gl,i,j,k)].INIT_FLUID=TRUE;
             }
           }
-        end3DL
-      end2DL
-    end1DL
+    }
     codex->ACTIONPROCESSED=TRUE;
   }
 }
@@ -301,9 +277,7 @@ void read_init_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     /* this must not be performed if Init() is called within the cycle module or if reading data files to init the domain*/ 
     if (!gl->CONTROL_READ){
       #ifdef UNSTEADY
-       for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-        for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-         for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+        for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
           for (flux=0; flux<nf; flux++){
             (*np)[_ai(gl,i,j,k)].bs->Um1[flux]=(*np)[_ai(gl,i,j,k)].bs->U[flux];
             #if _RESTIME_BW > 2  
@@ -313,16 +287,12 @@ void read_init_actions(char *actionname, char **argum, SOAP_codex_t *codex){
             (*np)[_ai(gl,i,j,k)].bs->Um3[flux]=(*np)[_ai(gl,i,j,k)].bs->Um2[flux];
             #endif
           }
-         end3DL
-        end2DL
-       end1DL
+        }
       #endif
 
       #ifdef _RESTIME_STORAGE_TRAPEZOIDAL
 //       resume_nodes_only_in_zone_and_update_bdry_nodes(*np, gl, _zone_intersection(gl->domain_all,_zone_expansion(gl->domain,+hbw_res_fluid)));
-       for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-        for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-         for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+        for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
           #ifdef _RESTIME_STORAGE_TRAPEZOIDAL_RESIDUAL
            for (flux=0; flux<nf; flux++){
             (*np)[_ai(gl,i,j,k)].bs->trapezoidalm1[flux]=0.0;
@@ -332,9 +302,7 @@ void read_init_actions(char *actionname, char **argum, SOAP_codex_t *codex){
           #ifdef _RESTIME_STORAGE_TRAPEZOIDAL_MUSCLVARS
            if (is_node_valid((*np)[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) find_musclvars((*np)[_ai(gl,i,j,k)],gl,(*np)[_ai(gl,i,j,k)].bs->trapezoidalm1);
           #endif
-         end3DL
-        end2DL
-       end1DL
+        }
       #endif
     }
     codex->ACTIONPROCESSED=TRUE;
@@ -352,15 +320,11 @@ void read_init_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     #ifdef UNSTEADY
      /* this must not be performed if Init() is called within the cycle module or if reading data files to init the domain*/ 
      if (!gl->CONTROL_READ){
-      for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-       for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-        for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+       for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
           for (flux=0; flux<nfe; flux++){
             (*np)[_ai(gl,i,j,k)].bs->Uemfieldm1[flux]=(*np)[_ai(gl,i,j,k)].bs->Uemfield[flux];
           }
-        end3DL
-       end2DL
-      end1DL
+       }
      }
     #endif
     codex->ACTIONPROCESSED=TRUE;

@@ -715,9 +715,7 @@ void find_metrics_on_all_nodes(np_t *np, gl_t *gl, zone_t zone){
 #endif 
 
   /* first do the inner nodes */
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef EMFIELD
         // here  check if EMFIELD metrics is compatible with fluid metrics 
@@ -736,31 +734,21 @@ void find_metrics_on_all_nodes(np_t *np, gl_t *gl, zone_t zone){
           }
 #endif
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 
-
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         for (dim=0; dim<nd; dim++){
           l=_ai(gl,i,j,k);
           if (is_node_valid(np[l],TYPELEVEL) && is_node_valid(np[_al(gl,l,dim,+1)],TYPELEVEL)){
             update_metrics_at_interface(np,gl,l,_al(gl,l,dim,+1),dim);
           }
         }
-      end3DL
-    end2DL
-  end1DL
-
+  }
 
   /* then do the boundary nodes */
   /* note: we should use BDRYMETRICS_CENTERED instead of BDRYMETRICS_NORMAL on symmetry planes
      for best results: need to improve this */
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 
         if (is_node_bdry(np[l],TYPELEVEL)) {
@@ -841,9 +829,7 @@ void find_metrics_on_all_nodes(np_t *np, gl_t *gl, zone_t zone){
             fatal_error("Problem updating boundary node in find_metrics_on_all_nodes function at i=%ld j=%ld k=%ld.",_i(l,gl,0),_i(l,gl,1),_i(l,gl,2));
           }
         }
-      end3DL
-    end2DL
-  end1DL
+  }
   gl->METRICS_INITIALIZED=TRUE;
   //display_node_type_window(stdout, np, gl, TYPELEVEL, 1, 15, 1, 20);
 }
@@ -1047,9 +1033,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
 #ifdef DISTMPI
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
-    for1DL (i,gl->domain_all.is-1,gl->domain_all.ie+1)
-      for2DL (j,gl->domain_all.js-1,gl->domain_all.je+1)
-        for3DL (k,gl->domain_all.ks-1,gl->domain_all.ke+1)
+    for_zone_ijk (gl->domain_all,is-1,js-1,ks-1,ie+1,je+1,ke+1){
 #ifdef DISTMPI
           if (rank==0) {
 #endif
@@ -1078,9 +1062,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
           (*np)[_ai(gl,i,j,k)].bs->x[1]=val[1];
 #endif
           }
-        end3DL
-      end2DL
-    end1DL
+    }
 #ifdef DISTMPI
     MPI_Barrier(MPI_COMM_WORLD);
     if (rank==0) free(xgrid);
@@ -1138,9 +1120,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
 #else
     TYPELEVEL=TYPELEVEL_FLUID;
 #endif
-    for1DL (i,gl->domain_all.is,gl->domain_all.ie)
-      for2DL (j,gl->domain_all.js,gl->domain_all.je)
-        for3DL (k,gl->domain_all.ks,gl->domain_all.ke)
+    for_zone_ijk (gl->domain_all,is,js,ks,ie,je,ke){
           if (rank==_node_rank(gl, i, j, k) && is_node_valid((*np)[_ai(gl,i,j,k)],TYPELEVEL)) {
             metrics[0]=(*np)[_ai(gl,i,j,k)].bs->Omega;
             for (dim=0; dim<nd; dim++) {
@@ -1158,9 +1138,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
               }
             }              
           }
-        end3DL
-      end2DL
-    end1DL
+    }
     MPI_Barrier(MPI_COMM_WORLD);
 
 /*  if (is_node_in_zone(5,23,0,gl->domain_lim)){
@@ -1174,17 +1152,12 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     wfprintf(stdout,"done;\n");
     ((readcontrolarg_t *)codex->action_args)->module_level++;
     input=((readcontrolarg_t *)codex->action_args)->input;
-    for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-     for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+    for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
         (*np)[_ai(gl,i,j,k)].INIT_FLUID=FALSE;        
         #ifdef EMFIELD
           (*np)[_ai(gl,i,j,k)].INIT_EMFIELD=FALSE;        
         #endif
-      end3DL
-     end2DL
-    end1DL
-
+    }
     if (!input->INTERPOLATION){
       read_data_file(*input, *np, gl);
 #ifdef UNSTEADY
@@ -1227,9 +1200,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
        ((readcontrolarg_t *)codex->action_args)->gl->effiter_R_emfield=0.0;
 #endif
     }
-    for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-     for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+    for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
         if (is_node_valid((*np)[_ai(gl,i,j,k)], TYPELEVEL_FLUID) &&  !(*np)[_ai(gl,i,j,k)].INIT_FLUID){
           fatal_error("The fluid properties at node %ld"if2DL(",%ld")if3DL(",%ld")" were not initialized properly.",i
 #ifdef _2DL
@@ -1252,9 +1223,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
           );
         }
         #endif
-      end3DL
-     end2DL
-    end1DL
+    }
     codex->ACTIONPROCESSED=TRUE;
   }
   if (strcmp(actionname,"Disc")==0  && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
@@ -1388,13 +1357,9 @@ void read_control(char *control_filename, input_t input, bool CYCLEMODULE, bool 
 
   /* now compute gl->nn correctly */
   gl->nn=0;
-  for1DL(i,gl->domain.is,gl->domain.ie)
-    for2DL(j,gl->domain.js,gl->domain.je)
-      for3DL(k,gl->domain.ks,gl->domain.ke)
+  for_zone_ijk(gl->domain,is,js,ks,ie,je,ke){
         if (is_node_inner((*np)[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) gl->nn++;
-      end3DL
-    end2DL
-  end1DL
+  }
 #ifdef DISTMPI
   MPI_Allreduce(&gl->nn, &nn_sum, 1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
   gl->nn=nn_sum;

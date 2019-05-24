@@ -1003,13 +1003,9 @@ int main ( int argc, char **argv ) {
   }
   //dispose_node ( &npL );
   //dispose_node ( &npR );
-  for1DL ( i, gl.domain_lim.is, gl.domain_lim.ie )
-    for2DL ( j, gl.domain_lim.js, gl.domain_lim.je )
-      for3DL ( k, gl.domain_lim.ks, gl.domain_lim.ke )
+  for_zone_ijk ( gl.domain_lim,is,js,ks,ie,je,ke ){
         dispose_node ( &( npArray[_ai ( &gl, i, j, k )] ) );
-      end3DL 
-    end2DL 
-  end1DL 
+  }
   free_clipped_variables( &gl );
   free( gl.cycle.code_runtime );
   SOAP_free_codex ( &gl.cycle.codex );

@@ -74,9 +74,7 @@ void write_post_file_nodplot(np_t *np, gl_t *gl, zone_t zone, char *filename, bo
 
   wfprintf(stdout,"Writing to postfile %s for NODPLOT use..",filename);
 
-  for3DL(k,zone.ks,zone.ke)
-    for1DL(i,zone.is,zone.ie)
-      for2DL(j,zone.js,zone.je) 
+  for_zone_kij(zone,is,js,ks,ie,je,ke){
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
 #endif
@@ -96,9 +94,7 @@ void write_post_file_nodplot(np_t *np, gl_t *gl, zone_t zone, char *filename, bo
 #ifdef DISTMPI
         }
 #endif
-      end2DL
-    end1DL
-  end3DL
+  }
 #ifdef DISTMPI
   MPI_Barrier(MPI_COMM_WORLD);
 #endif
@@ -251,9 +247,7 @@ void write_post_file_tecplot(np_t *np, gl_t *gl, zone_t zone, char *filename, bo
 #ifdef DISTMPI
   if (rank==0 || gl->DISTDOMAIN) {
 #endif
-  for3DL(k,zone.ks,zone.ke)
-    for2DL(j,zone.js,zone.je)
-      for1DL(i,zone.is,zone.ie)
+    for_zone_kji(zone,is,js,ks,ie,je,ke){
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
 #endif
@@ -284,9 +278,7 @@ void write_post_file_tecplot(np_t *np, gl_t *gl, zone_t zone, char *filename, bo
 #ifdef DISTMPI
         }
 #endif
-      end1DL
-    end2DL
-  end3DL
+    }
 #ifdef DISTMPI
   }
   MPI_Barrier(MPI_COMM_WORLD);
@@ -406,9 +398,7 @@ void write_post_file_vtk(np_t *np, gl_t *gl, zone_t zone, char *filename, bool G
 /* here, output the grid x,y,z to the postfile */
   cntpoint=0;
   numcells=0;
-  for3DL(k,zone.ks,zone.ke)
-    for2DL(j,zone.js,zone.je)
-      for1DL(i,zone.is,zone.ie)
+  for_zone_kji(zone,is,js,ks,ie,je,ke){
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
 #endif
@@ -437,9 +427,7 @@ void write_post_file_vtk(np_t *np, gl_t *gl, zone_t zone, char *filename, bool G
 #ifdef DISTMPI
         }
 #endif
-      end1DL
-    end2DL
-  end3DL
+  }
 
 
   cntpoint=0;
@@ -448,9 +436,7 @@ void write_post_file_vtk(np_t *np, gl_t *gl, zone_t zone, char *filename, bool G
   wfprintf(postfile, "CELLS %ld ",numcells);
   wfprintf(postfile, "%ld\n",if2D(5)if3D(9)*numcells);
   
-  for3DL(k,zone.ks,zone.ke-1)
-    for2DL(j,zone.js,zone.je-1)
-      for1DL(i,zone.is,zone.ie-1)
+  for_zone_kji(zone,is,js,ks,ie-1,je-1,ke-1){
          if (CELLVALID[if2D(EXM_ai2(gl2d,i,j))if3D(EXM_ai3(gl3d,i,j,k))]) {
 #ifdef _2D
           wfprintf(postfile, "4 %ld %ld %ld %ld \n",l[EXM_ai2(gl2d,i,j)],l[EXM_ai2(gl2d,i+1,j)],l[EXM_ai2(gl2d,i+1,j+1)],l[EXM_ai2(gl2d,i,j+1)]);
@@ -459,9 +445,7 @@ void write_post_file_vtk(np_t *np, gl_t *gl, zone_t zone, char *filename, bool G
           wfprintf(postfile, "8 %ld %ld %ld %ld %ld %ld %ld %ld \n",l[EXM_ai3(gl3d,i,j,k+1)],l[EXM_ai3(gl3d,i+1,j,k+1)],l[EXM_ai3(gl3d,i+1,j,k)],l[EXM_ai3(gl3d,i,j,k)],l[EXM_ai3(gl3d,i,j+1,k+1)],l[EXM_ai3(gl3d,i+1,j+1,k+1)],l[EXM_ai3(gl3d,i+1,j+1,k)],l[EXM_ai3(gl3d,i,j+1,k)]);
 #endif          
          }
-      end1DL
-    end2DL
-  end3DL
+  }
   wfprintf(postfile, "\n");
   wfprintf(postfile, "CELL_TYPES %ld\n",numcells);
   for (cnt=0; cnt<numcells; cnt++){
@@ -500,9 +484,7 @@ void write_post_file_vtk(np_t *np, gl_t *gl, zone_t zone, char *filename, bool G
         }
       }
       if (!VECTORVAR) wfprintf(postfile, "LOOKUP_TABLE default \n");
-        for3DL(k,zone.ks,zone.ke)
-          for2DL(j,zone.js,zone.je)
-            for1DL(i,zone.is,zone.ie)
+        for_zone_kji(zone,is,js,ks,ie,je,ke){
 #ifdef DISTMPI
               if (_node_rank(gl,i,j,k)==rank) {
 #endif
@@ -527,9 +509,7 @@ void write_post_file_vtk(np_t *np, gl_t *gl, zone_t zone, char *filename, bool G
 #ifdef DISTMPI
               }
 #endif
-            end1DL
-          end2DL
-        end3DL
+        }
 
       postvar=postvar+varnd;
     } while (postvar<numpostvar+nd);
@@ -805,14 +785,10 @@ void create_domain_of_cuts_along_y(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
     /* find the lower and high j in *np that englobes y */
     zone.je=gl->domain.js;
     zone.js=gl->domain.je;
-    for1DL(i,gl->domain.is,gl->domain.ie)
-      for2DL(j,gl->domain.js,gl->domain.je)
-        for3DL(k,gl->domain.ks,gl->domain.ke)
+    for_zone_ijk(gl->domain,is,js,ks,ie,je,ke){
           if (_x(np[_ai(gl,i,j,k)],1)>=y) zone.js=min(zone.js,j);
           if (_x(np[_ai(gl,i,j,k)],1)<=y) zone.je=max(zone.je,j);
-        end3DL
-      end2DL
-    end1DL
+    }
     zone.js=max(gl->domain.js,zone.js-1);
     zone.je=min(gl->domain.je,zone.je+1);
     //resume_nodes_only_in_zone_and_update_bdry_nodes(np,gl,zone);
@@ -933,14 +909,10 @@ void create_domain_of_cuts_along_z(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
     /* find the lower and high k in *np that englobes z */
     zone.ke=gl->domain.ks;
     zone.ks=gl->domain.ke;
-    for1DL(i,gl->domain.is,gl->domain.ie)
-      for2DL(j,gl->domain.js,gl->domain.je)
-        for3DL(k,gl->domain.ks,gl->domain.ke)
+    for_zone_ijk(gl->domain,is,js,ks,ie,je,ke){
           if (_x(np[_ai(gl,i,j,k)],2)>=z) zone.ks=min(zone.ks,k);
           if (_x(np[_ai(gl,i,j,k)],2)<=z) zone.ke=max(zone.ke,k);
-        end3DL
-      end2DL
-    end1DL
+    }
     zone.ks=max(gl->domain.ks,zone.ks-1);
     zone.ke=min(gl->domain.ke,zone.ke+1);
     //resume_nodes_only_in_zone_and_update_bdry_nodes(np,gl,zone);
@@ -995,9 +967,7 @@ static void integrate_emfield_force(np_t *np, gl_t *gl, zone_t zone, dim_t Femfi
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
 
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1009,10 +979,7 @@ static void integrate_emfield_force(np_t *np, gl_t *gl, zone_t zone, dim_t Femfi
 #ifdef DISTMPI
         }
 #endif
-      end3DL
-    end2DL
-  end1DL
-
+  }
 
   /* here sum up all the contributions from the different processes */
 #ifdef DISTMPI
@@ -1040,9 +1007,7 @@ static void integrate_emfield_work(np_t *np, gl_t *gl, zone_t zone,
 #endif
   *Wemfield=0.0;
 
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1056,9 +1021,7 @@ static void integrate_emfield_work(np_t *np, gl_t *gl, zone_t zone,
 #ifdef DISTMPI
         }
 #endif
-      end3DL
-    end2DL
-  end1DL
+  }
 
   /* here sum up all the contributions from the different processes */
 #ifdef DISTMPI
@@ -1083,9 +1046,7 @@ static void integrate_EdotJ(np_t *np, gl_t *gl, zone_t zone, double *EdotJ){
 #endif
   *EdotJ=0.0;
 
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1096,9 +1057,7 @@ static void integrate_EdotJ(np_t *np, gl_t *gl, zone_t zone, double *EdotJ){
 #ifdef DISTMPI
         }
 #endif
-      end3DL
-    end2DL
-  end1DL
+  }
 
   /* here sum up all the contributions from the different processes */
 #ifdef DISTMPI
@@ -1124,9 +1083,7 @@ static void integrate_Qbeam(np_t *np, gl_t *gl, zone_t zone, double *Qbeam){
 #endif
   *Qbeam=0.0;
 
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1137,9 +1094,7 @@ static void integrate_Qbeam(np_t *np, gl_t *gl, zone_t zone, double *Qbeam){
 #ifdef DISTMPI
         }
 #endif
-      end3DL
-    end2DL
-  end1DL
+  }
 
   /* here sum up all the contributions from the different processes */
 #ifdef DISTMPI
@@ -1180,9 +1135,7 @@ static void integrate_area_on_bdry(np_t *np, gl_t *gl, zone_t zone,
 #endif
   for (dim=0; dim<nd; dim++) Awall[dim]=0.0;
 
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1199,9 +1152,7 @@ static void integrate_area_on_bdry(np_t *np, gl_t *gl, zone_t zone,
 #ifdef DISTMPI
         }
 #endif
-      end3DL
-    end2DL
-  end1DL
+  }
   /* here sum up all the contributions in Fwall_shear from the different processes */
 #ifdef DISTMPI
   for (dim=0; dim<nd; dim++) {
@@ -1231,9 +1182,7 @@ static void integrate_shear_force_on_bdry(np_t *np, gl_t *gl, zone_t zone,
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
   for (dim=0; dim<nd; dim++) Fwall_shear[dim]=0.0;
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1269,9 +1218,7 @@ static void integrate_shear_force_on_bdry(np_t *np, gl_t *gl, zone_t zone,
 #ifdef DISTMPI
         }
 #endif
-      end3DL
-    end2DL
-  end1DL
+  }
   /* here sum up all the contributions in Fwall_shear from the different processes */
 #ifdef DISTMPI
   for (dim=0; dim<nd; dim++) {
@@ -1302,9 +1249,7 @@ static void integrate_heat_to_surface_on_bdry(np_t *np, gl_t *gl, zone_t zone,
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
   *heat_to_surface=0.0;
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1344,9 +1289,7 @@ static void integrate_heat_to_surface_on_bdry(np_t *np, gl_t *gl, zone_t zone,
 #ifdef DISTMPI
         }
 #endif
-      end3DL
-    end2DL
-  end1DL
+  }
   /* here sum up all the contributions in heat_to_surface from the different processes */
 #ifdef DISTMPI
   MPI_Allreduce(&(*heat_to_surface), &tempsum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -1375,9 +1318,7 @@ static void integrate_pressure_force_on_bdry(np_t *np, gl_t *gl, zone_t zone,
 #endif
   for (dim=0; dim<nd; dim++) Fwall_P[dim]=0.0;
 
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1408,9 +1349,7 @@ static void integrate_pressure_force_on_bdry(np_t *np, gl_t *gl, zone_t zone,
 #ifdef DISTMPI
         }
 #endif
-      end3DL
-    end2DL
-  end1DL
+  }
   /* here sum up all the contributions in Fwall_shear from the different processes */
 #ifdef DISTMPI
   for (dim=0; dim<nd; dim++) {
@@ -1439,9 +1378,7 @@ static void integrate_metotal(np_t *np, gl_t *gl, zone_t zone, double *metotal){
 #endif
   *metotal=0.0;
   
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1454,9 +1391,7 @@ static void integrate_metotal(np_t *np, gl_t *gl, zone_t zone, double *metotal){
 #ifdef DISTMPI
         }
 #endif
-      end3DL
-    end2DL
-  end1DL
+  }
   /* here sum up all the contributions in Fwall_shear from the different processes */
 #ifdef DISTMPI
   MPI_Allreduce(metotal, &tempsum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -1483,9 +1418,7 @@ static void integrate_mass(np_t *np, gl_t *gl, zone_t zone, double *mass){
 #endif
   *mass=0.0;
   
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1498,9 +1431,7 @@ static void integrate_mass(np_t *np, gl_t *gl, zone_t zone, double *mass){
 #ifdef DISTMPI
         }
 #endif
-      end3DL
-    end2DL
-  end1DL
+  }
   /* here sum up all the contributions in Fwall_shear from the different processes */
 #ifdef DISTMPI
   MPI_Allreduce(mass, &tempsum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -2251,13 +2182,9 @@ static void read_post_actions(char *action, char **argum, SOAP_codex_t *codex){
     if (numcut>0) {
       if (*np_post!=*np) {
         /* if *np!=*np_post, then free the xcut domain first */
-        for1DL ( i, gl_post->domain_lim.is, gl_post->domain_lim.ie )
-          for2DL ( j, gl_post->domain_lim.js, gl_post->domain_lim.je )
-            for3DL ( k, gl_post->domain_lim.ks, gl_post->domain_lim.ke )
+        for_zone_ijk (gl_post->domain_lim,is,js,ks,ie,je,ke ){
               dispose_node ( &( (*np_post)[_ai ( gl_post, i, j, k )] ) );
-            end3DL
-          end2DL
-        end1DL
+        }
         free (*np_post);
       }
       xcut=(double *)malloc(numcut*sizeof(double));
@@ -2316,13 +2243,9 @@ void read_post(char *argum, SOAP_codex_t *codex){
   np_post = &(((readcontrolarg_t *)codex->action_args)->np_post);
   gl_post = &(((readcontrolarg_t *)codex->action_args)->gl_post);
   if ( *np_post != *np ){
-    for1DL ( i, gl_post->domain_lim.is, gl_post->domain_lim.ie )
-      for2DL ( j, gl_post->domain_lim.js, gl_post->domain_lim.je )
-        for3DL ( k, gl_post->domain_lim.ks, gl_post->domain_lim.ke )
+    for_zone_ijk ( gl_post->domain_lim,is,js,ks,ie,je,ke ){
           dispose_node ( &( (*np_post)[_ai ( gl_post, i, j, k )] ) );
-        end3DL
-      end2DL
-    end1DL
+    }
     free ( *np_post );
   }
 }

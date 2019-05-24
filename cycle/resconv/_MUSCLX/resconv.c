@@ -441,16 +441,12 @@ void init_Fstar_interfaces(np_t *np, gl_t *gl, zone_t zone){
   long i,j,k;
   zone_t newzone;
   newzone=_zone_intersection(gl->domain_all,_zone_expansion(zone,+1));
-  for1DL(i,newzone.is,newzone.ie)
-    for2DL(j,newzone.js,newzone.je)
-      for3DL(k,newzone.ks,newzone.ke)
+  for_zone_ijk(newzone,is,js,ks,ie,je,ke){
         if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)){
           free(np[_ai(gl,i,j,k)].wk->Fp1h);
           np[_ai(gl,i,j,k)].wk->Fp1h=NULL;
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 }
 
 

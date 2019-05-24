@@ -47,36 +47,24 @@ void find_NODEVALID_on_domain_all(np_t *np, gl_t *gl, int TYPELEVEL, bool *NODEV
   int THISNODEVALID;
 #endif
   
-  for1DL(i,gl->domain_lim_all.is,gl->domain_lim_all.ie)
-    for2DL(j,gl->domain_lim_all.js,gl->domain_lim_all.je)
-      for3DL(k,gl->domain_lim_all.ks,gl->domain_lim_all.ke)
+  for_zone_ijk(gl->domain_lim_all,is,js,ks,ie,je,ke){
         NODEVALID[_ai_all(gl,i,j,k)]=FALSE;
-      end3DL
-    end2DL
-  end1DL
+  }
 
 #ifdef DISTMPI
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  for1DL(i,gl->domain_all.is,gl->domain_all.ie)
-    for2DL(j,gl->domain_all.js,gl->domain_all.je)
-      for3DL(k,gl->domain_all.ks,gl->domain_all.ke)    
+  for_zone_ijk(gl->domain_all,is,js,ks,ie,je,ke){
         thisrank=_node_rank(gl, i, j, k);
         if (thisrank==rank) THISNODEVALID=(int)(is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL));
         MPI_Bcast(&THISNODEVALID,1,MPI_INT,thisrank,MPI_COMM_WORLD);           
         assert(THISNODEVALID==TRUE || THISNODEVALID==FALSE);          
         NODEVALID[_ai_all(gl,i,j,k)]=(bool)THISNODEVALID;
-      end3DL
-    end2DL
-  end1DL
+  }
   MPI_Barrier(MPI_COMM_WORLD);
 #else
-  for1DL(i,gl->domain_all.is,gl->domain_all.ie)
-    for2DL(j,gl->domain_all.js,gl->domain_all.je)
-      for3DL(k,gl->domain_all.ks,gl->domain_all.ke)
+  for_zone_ijk(gl->domain_all,is,js,ks,ie,je,ke){
         NODEVALID[_ai_all(gl,i,j,k)]=is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL);
-      end3DL
-    end2DL
-  end1DL
+  }
 #endif
 
 	
@@ -205,9 +193,7 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
 
   find_NODEVALID_on_domain_all(np, gl, TYPELEVEL_FLUID, NODEVALID);
 
-  for1DL(i,gl->domain_all.is,gl->domain_all.ie)
-    for2DL(j,gl->domain_all.js,gl->domain_all.je)
-      for3DL(k,gl->domain_all.ks,gl->domain_all.ke)
+  for_zone_ijk(gl->domain_all,is,js,ks,ie,je,ke){
 
 #ifdef DISTMPI
         if (rank==0) {
@@ -247,18 +233,13 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
           }
           np[_ai(gl,i,j,k)].INIT_FLUID=TRUE;
         }
-      end3DL
-    end2DL
-  end1DL
-
+  }
 
 
 
 #ifdef EMFIELD
   find_NODEVALID_on_domain_all(np, gl, TYPELEVEL_EMFIELD, NODEVALID);
-  for1DL(i,gl->domain_all.is,gl->domain_all.ie)
-    for2DL(j,gl->domain_all.js,gl->domain_all.je)
-      for3DL(k,gl->domain_all.ks,gl->domain_all.ke)
+  for_zone_ijk(gl->domain_all,is,js,ks,ie,je,ke){
 #ifdef DISTMPI
         if (rank==0) {
 #endif
@@ -291,18 +272,14 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
           }
           np[_ai(gl,i,j,k)].INIT_EMFIELD=TRUE;
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 #endif
 
 
 
 #ifdef _RESTIME_STORAGE_TRAPEZOIDAL
   find_NODEVALID_on_domain_all(np, gl, TYPELEVEL_FLUID, NODEVALID);
-  for1DL(i,gl->domain_all.is,gl->domain_all.ie)
-    for2DL(j,gl->domain_all.js,gl->domain_all.je)
-      for3DL(k,gl->domain_all.ks,gl->domain_all.ke)
+  for_zone_ijk(gl->domain_all,is,js,ks,ie,je,ke){
 
 #ifdef DISTMPI
         if (rank==0) {
@@ -333,9 +310,7 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
             np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux]=Res[flux];
           }
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 #endif
 
 
@@ -467,9 +442,7 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
 #ifdef DISTMPI
   for (proc=0; proc<numproc; proc++){
     domain=_domain_from_rank(proc,gl);
-    for1DL(i,domain.is,domain.ie)
-      for2DL(j,domain.js,domain.je)
-        for3DL(k,domain.ks,domain.ke)
+    for_zone_ijk(domain,is,js,ks,ie,je,ke){
           if (proc==rank){
             for (flux=0; flux<nf; flux++) U[flux]=np[_ai(gl,i,j,k)].bs->U[flux];
             if (proc!=0) {
@@ -482,24 +455,16 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
           }
           
           for (flux=0; flux<nf; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=U[flux];
-        end3DL
-      end2DL
-    end1DL
+    }
     MPI_Barrier(MPI_COMM_WORLD);
   }
 #else
-  for1DL(i,gl->domain_all.is,gl->domain_all.ie)
-    for2DL(j,gl->domain_all.js,gl->domain_all.je)
-      for3DL(k,gl->domain_all.ks,gl->domain_all.ke)
+  for_zone_ijk(gl->domain_all,is,js,ks,ie,je,ke){
         for (flux=0; flux<nf; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->U[flux];
-      end3DL
-    end2DL
-  end1DL
+  }
 #endif
 
-  for1DL(i,gl->domain_all.is,gl->domain_all.ie)
-    for2DL(j,gl->domain_all.js,gl->domain_all.je)
-      for3DL(k,gl->domain_all.ks,gl->domain_all.ke)
+  for_zone_ijk(gl->domain_all,is,js,ks,ie,je,ke){
         if (NODEVALID[_ai_all(gl,i,j,k)]) {
           switch (DATATYPE){
             case DATATYPE_BINARY:
@@ -513,9 +478,7 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
               fatal_error("DATATYPE must be either DATATYPE_ASCII or DATATYPE_BINARY.");
           }
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 
 
 #ifdef EMFIELD
@@ -523,9 +486,7 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
 #ifdef DISTMPI
   for (proc=0; proc<numproc; proc++){
     domain=_domain_from_rank(proc,gl);
-    for1DL(i,domain.is,domain.ie)
-      for2DL(j,domain.js,domain.je)
-        for3DL(k,domain.ks,domain.ke)
+    for_zone_ijk(domain,is,js,ks,ie,je,ke){
           if (proc==rank){
             for (flux=0; flux<nfe; flux++) U[flux]=np[_ai(gl,i,j,k)].bs->Uemfield[flux];
             if (proc!=0) {
@@ -538,24 +499,16 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
           }
           
           for (flux=0; flux<nfe; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=U[flux];
-        end3DL
-      end2DL
-    end1DL
+    }
     MPI_Barrier(MPI_COMM_WORLD);
   }
 #else
-  for1DL(i,gl->domain_all.is,gl->domain_all.ie)
-    for2DL(j,gl->domain_all.js,gl->domain_all.je)
-      for3DL(k,gl->domain_all.ks,gl->domain_all.ke)
+  for_zone_ijk(gl->domain_all,is,js,ks,ie,je,ke){
         for (flux=0; flux<nfe; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->Uemfield[flux];
-      end3DL
-    end2DL
-  end1DL
+  }
 #endif
 
-  for1DL(i,gl->domain_all.is,gl->domain_all.ie)
-    for2DL(j,gl->domain_all.js,gl->domain_all.je)
-      for3DL(k,gl->domain_all.ks,gl->domain_all.ke)
+  for_zone_ijk(gl->domain_all,is,js,ks,ie,je,ke){
         if (NODEVALID[_ai_all(gl,i,j,k)]) {
           switch (DATATYPE){
             case DATATYPE_BINARY:
@@ -569,9 +522,7 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
               fatal_error("DATATYPE must be either DATATYPE_ASCII or DATATYPE_BINARY.");
           }
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 #endif
 
 
@@ -581,9 +532,7 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
 #ifdef DISTMPI
   for (proc=0; proc<numproc; proc++){
     domain=_domain_from_rank(proc,gl);
-    for1DL(i,domain.is,domain.ie)
-      for2DL(j,domain.js,domain.je)
-        for3DL(k,domain.ks,domain.ke)
+    for_zone_ijk(domain,is,js,ks,ie,je,ke){
           if (proc==rank){
             for (flux=0; flux<nf; flux++) U[flux]=np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux];
             if (proc!=0) {
@@ -596,24 +545,16 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
           }
           
           for (flux=0; flux<nf; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=U[flux];
-        end3DL
-      end2DL
-    end1DL
+    }
     MPI_Barrier(MPI_COMM_WORLD);
   }
 #else
-  for1DL(i,gl->domain_all.is,gl->domain_all.ie)
-    for2DL(j,gl->domain_all.js,gl->domain_all.je)
-      for3DL(k,gl->domain_all.ks,gl->domain_all.ke)
+  for_zone_ijk(gl->domain_all,is,js,ks,ie,je,ke){
         for (flux=0; flux<nf; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux];
-      end3DL
-    end2DL
-  end1DL
+  }
 #endif
 
-  for1DL(i,gl->domain_all.is,gl->domain_all.ie)
-    for2DL(j,gl->domain_all.js,gl->domain_all.je)
-      for3DL(k,gl->domain_all.ks,gl->domain_all.ke)
+  for_zone_ijk(gl->domain_all,is,js,ks,ie,je,ke){
         if (NODEVALID[_ai_all(gl,i,j,k)]) {
           switch (DATATYPE){
             case DATATYPE_BINARY:
@@ -627,9 +568,7 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
               fatal_error("DATATYPE must be either DATATYPE_ASCII or DATATYPE_BINARY.");
           }
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 #endif
 
 
@@ -700,9 +639,7 @@ void read_data_file(input_t input, np_t *np, gl_t *gl){
     gl->INIT_EMFIELD_READ=TRUE;
   }
 #ifdef UNSTEADY
-    for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-      for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-        for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+    for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
           for (flux=0; flux<nf; flux++){
             (np)[_ai(gl,i,j,k)].bs->Um1[flux]=(np)[_ai(gl,i,j,k)].bs->U[flux];
           }
@@ -711,32 +648,22 @@ void read_data_file(input_t input, np_t *np, gl_t *gl){
             (np)[_ai(gl,i,j,k)].bs->Uemfieldm1[flux]=(np)[_ai(gl,i,j,k)].bs->Uemfield[flux];
           }
 #endif
-        end3DL
-      end2DL
-    end1DL
+    }
     if (input.M1) read_data_file_binary_ascii(input.name_m1, np, gl, 1, DATATYPE_BINARY);
 #if _RESTIME_BW > 2  
-      for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-        for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-          for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+      for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
             for (flux=0; flux<nf; flux++){
               (np)[_ai(gl,i,j,k)].bs->Um2[flux]=(np)[_ai(gl,i,j,k)].bs->Um1[flux];
             }
-          end3DL
-        end2DL
-      end1DL
+      }
       if (input.M2) read_data_file_binary_ascii(input.name_m2, np, gl, 2, DATATYPE_BINARY);
 #endif
 #if _RESTIME_BW > 3 
-      for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-        for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-          for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+      for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
             for (flux=0; flux<nf; flux++){
               (np)[_ai(gl,i,j,k)].bs->Um3[flux]=(np)[_ai(gl,i,j,k)].bs->Um2[flux];
             }
-          end3DL
-        end2DL
-      end1DL
+      }
       if (input.M3) read_data_file_binary_ascii(input.name_m3, np, gl, 3, DATATYPE_BINARY);
 #endif
 #endif
@@ -1053,17 +980,13 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 
   }
 
-  for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-    for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+  for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
         weight[_ai(gl,i,j,k)]=0.0e0;
 #ifdef OPENMPTHREADS
         omp_init_lock(&(nodelock[_ai(gl,i,j,k)]));
 #endif
         for (cnt=0; cnt<numinitvar; cnt++) (initvar[_ai(gl,i,j,k)])[cnt]=0.0;
-      end3DL
-    end2DL
-  end1DL
+  }
 
   zone=_zone_intersection(gl->domain_all,gl->domain_lim);
 
@@ -1086,18 +1009,14 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
       xmin[cntzone][dim]=1e99;
       xmax[cntzone][dim]=-1e99;
     }
-    for1DL(i,subzone[cntzone].is,subzone[cntzone].ie)
-      for2DL(j,subzone[cntzone].js,subzone[cntzone].je)
-        for3DL(k,subzone[cntzone].ks,subzone[cntzone].ke)
+    for_zone_ijk(subzone[cntzone],is,js,ks,ie,je,ke){
           if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)){
             for (dim=0; dim<nd; dim++){
               xmin[cntzone][dim]=min(xmin[cntzone][dim],_x(np[_ai(gl,i,j,k)],dim));
               xmax[cntzone][dim]=max(xmax[cntzone][dim],_x(np[_ai(gl,i,j,k)],dim));
             }
           }
-        end3DL
-      end2DL
-    end1DL
+    }
   }
 
 #ifdef DISTMPI
@@ -1115,9 +1034,7 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
       if (is_data_point_in_domain(x_file[l_file],xmin[cntzone],xmax[cntzone],radiusmax2_file[l_file])){
         zone=subzone[cntzone];
         if (find_interpolation_zone(np,gl,TYPELEVEL_FLUID,x_file[l_file],radiusmax2_file[l_file],&zone)){
-          for2DL(j,zone.js,zone.je)
-            for1DL(i,zone.is,zone.ie)
-              for3DL(k,zone.ks,zone.ke)
+          for_zone_jik(zone,is,js,ks,ie,je,ke){
                 if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)){
                   find_interpolation_weight(np,gl,_ai(gl,i,j,k),x_file[l_file],dx1_file[l_file],
 #ifdef _2DL
@@ -1139,9 +1056,7 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
                   omp_unset_lock(&(nodelock[_ai(gl,i,j,k)]));
 #endif
                 }
-              end3DL
-            end1DL
-          end2DL
+          }
         }
       } 
     }
@@ -1154,17 +1069,13 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 #ifdef OPENMPTHREADS
   #pragma omp parallel for private(i,j,k,cnt) schedule(static) 
 #endif
-  for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-    for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+  for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
 	  if (weight[_ai(gl,i,j,k)]>1e-99 && is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) {
             for (cnt=0; cnt<numinitvar; cnt++) initvar[_ai(gl,i,j,k)][cnt]=initvar[_ai(gl,i,j,k)][cnt]/weight[_ai(gl,i,j,k)];
             init_node_fluid(np,_ai(gl,i,j,k), gl, defaultinitvartypefluid, initvar[_ai(gl,i,j,k)]);
             np[_ai(gl,i,j,k)].INIT_FLUID=TRUE;
           }
-      end3DL
-    end2DL
-  end1DL
+  }
 
   free(initvar);
   free(initvar_file);
@@ -1245,32 +1156,24 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
     radiusmax2_file[l_file]*=1.1;
   }
 
-  for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-    for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+  for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
         weight[_ai(gl,i,j,k)]=0.0e0;
         for (cnt=0; cnt<numinitvar_emfield; cnt++) (initvar_emfield[_ai(gl,i,j,k)])[cnt]=0.0;
-      end3DL
-    end2DL
-  end1DL
+  }
 
   for (cntzone=0; cntzone<numsubzone; cntzone++){
     for (dim=0; dim<nd; dim++){
       xmin[cntzone][dim]=1e99;
       xmax[cntzone][dim]=-1e99;
     }
-    for1DL(i,subzone[cntzone].is,subzone[cntzone].ie)
-      for2DL(j,subzone[cntzone].js,subzone[cntzone].je)
-        for3DL(k,subzone[cntzone].ks,subzone[cntzone].ke)
+    for_zone_ijk(subzone[cntzone],is,js,ks,ie,je,ke){
           if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
             for (dim=0; dim<nd; dim++){
               xmin[cntzone][dim]=min(xmin[cntzone][dim],_x(np[_ai(gl,i,j,k)],dim));
               xmax[cntzone][dim]=max(xmax[cntzone][dim],_x(np[_ai(gl,i,j,k)],dim));
             }
           }
-        end3DL
-      end2DL
-    end1DL
+    }
   }
 
 #ifdef DISTMPI
@@ -1288,9 +1191,7 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
       if (is_data_point_in_domain(x_file[l_file],xmin[cntzone],xmax[cntzone],radiusmax2_file[l_file])){
         zone=subzone[cntzone];
         if (find_interpolation_zone(np,gl,TYPELEVEL_EMFIELD,x_file[l_file],radiusmax2_file[l_file],&zone)){
-          for2DL(j,zone.js,zone.je)
-            for1DL(i,zone.is,zone.ie)
-              for3DL(k,zone.ks,zone.ke)
+          for_zone_jik(zone,is,js,ks,ie,je,ke){
                 if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
                   find_interpolation_weight(np,gl,_ai(gl,i,j,k),x_file[l_file],dx1_file[l_file],
 #ifdef _2DL
@@ -1312,9 +1213,7 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
                   omp_unset_lock(&(nodelock[_ai(gl,i,j,k)]));
 #endif
                 }
-              end3DL
-            end1DL
-          end2DL
+          }
         }
       }
     }
@@ -1326,17 +1225,13 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 #ifdef OPENMPTHREADS
 #pragma omp parallel for private(i,j,k,cnt) schedule(static) 
 #endif
-  for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-    for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+  for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
         if (weight[_ai(gl,i,j,k)]>1e-99 && is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) {
           for (cnt=0; cnt<numinitvar_emfield; cnt++) initvar_emfield[_ai(gl,i,j,k)][cnt]=initvar_emfield[_ai(gl,i,j,k)][cnt]/weight[_ai(gl,i,j,k)];
           init_node_emfield(np[_ai(gl,i,j,k)], gl, defaultinitvartypeemfield, initvar_emfield[_ai(gl,i,j,k)]);
           np[_ai(gl,i,j,k)].INIT_EMFIELD=TRUE;
         }
-      end3DL
-    end2DL
-  end1DL
+  }
   free(initvar_emfield);
 
   free(initvar_emfield_file);
@@ -1347,13 +1242,9 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
   fclose(datafile);
   free(weight);
 #ifdef OPENMPTHREADS
-  for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-    for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+  for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
         omp_destroy_lock(&(nodelock[_ai(gl,i,j,k)]));
-      end3DL
-    end2DL
-  end1DL
+  }
   free(nodelock);
 #endif
 #ifdef DISTMPI
@@ -1457,15 +1348,11 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
     find_NODEVALID_on_domain_all(np, gl, TYPELEVEL, NODEVALID);
 
     numnodes=0;
-    for1DL(i,gl->domain_all.is,gl->domain_all.ie)
-      for2DL(j,gl->domain_all.js,gl->domain_all.je)
-        for3DL(k,gl->domain_all.ks,gl->domain_all.ke)
+    for_zone_ijk(gl->domain_all,is,js,ks,ie,je,ke){
 	  if (NODEVALID[_ai_all(gl,i,j,k)]) {
             numnodes++;
 	  }
-        end3DL
-      end2DL
-    end1DL
+    }
 
     if (pass==1){
 #ifdef UNSTEADY
@@ -1482,9 +1369,7 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 #endif
     }
 
-    for1DL(i,gl->domain_all.is,gl->domain_all.ie)
-      for2DL(j,gl->domain_all.js,gl->domain_all.je)
-        for3DL(k,gl->domain_all.ks,gl->domain_all.ke)
+    for_zone_ijk(gl->domain_all,is,js,ks,ie,je,ke){
 #ifdef DISTMPI
           if (pass==1){
             if (_node_rank(gl,i,j,k)==rank) {
@@ -1617,9 +1502,7 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
             wfwrite(dx3, sizeof(dim_t), 1, datafile);
 #endif
           } //end if nodevalid
-        end3DL
-      end2DL
-    end1DL
+    } // for_zone_ijk
   }//pass
 
 #ifdef DISTMPI

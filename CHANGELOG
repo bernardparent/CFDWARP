@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 MAY 24a
+  * in src/common.h
+    - added macros for_zone_ijk(), for_zone_jik(), for_zone_kij(), for_zone_kji()
+  * in various .c files
+    - replaced for1DL() for2DL() for3DL() loops by a single for_zone_*() loop
+
+
 2019 MAY 23b
   * in bin
     - updated ns_SDBD.wrp

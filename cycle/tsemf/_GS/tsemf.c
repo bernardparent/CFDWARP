@@ -66,9 +66,7 @@ static void init_dUstar_emfield_SOR2(np_t *np, gl_t *gl, long flux, zone_t zone)
   double fact;
   long i,j,k;
 
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
         if (is_node_valid(np[l],TYPELEVEL_EMFIELD)){
           assert_np(np[l],is_node_valid(np[l],TYPELEVEL_EMFIELD));
@@ -109,9 +107,7 @@ static void init_dUstar_emfield_SOR2(np_t *np, gl_t *gl, long flux, zone_t zone)
             }
           }
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 }
 
 
@@ -333,13 +329,9 @@ static void update_dUstar_emfield_SOR2_forward(np_t *np, gl_t *gl, long flux, zo
   for (iter=0; iter<numiter; iter++)  {
     MPI_Buffer_attach( buffer, buffersize );
 #ifndef NDEBUG
-    for1DL(i,zone.is-1,zone.ie+1)
-      for2DL(j,zone.js-1,zone.je+1)
-        for3DL(k,zone.ks-1,zone.ke+1)
+    for_zone_ijk(zone,is-1,js-1,ks-1,ie+1,je+1,ke+1){
           np[_ai(gl,i,j,k)].bs->TSEMF_UPDATED=FALSE;
-        end3DL
-      end2DL
-    end1DL
+    }
 #endif
 
     /* receive data from other processes before the threading starts */
@@ -553,14 +545,10 @@ static void update_dUstar_emfield_SOR2_forward(np_t *np, gl_t *gl, long flux, zo
 */
 
 #ifndef NDEBUG
-    for1DL(i,zone.is,zone.ie)
-      for2DL(j,zone.js,zone.je)
-        for3DL(k,zone.ks,zone.ke)
+    for_zone_ijk(zone,is,js,ks,ie,je,ke){
           if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD) && !np[_ai(gl,i,j,k)].bs->TSEMF_UPDATED) 
             fatal_error("Node not updated correctly at i=%ld j=%ld k=%ld.",i,j,k);
-        end3DL
-      end2DL
-    end1DL
+    }
 #endif
 
     MPI_Buffer_detach( &bbuffer, &bbuffersize );
@@ -640,13 +628,9 @@ static void update_dUstar_emfield_SOR2_backward(np_t *np, gl_t *gl, long flux, z
   for (iter=0; iter<numiter; iter++)  {
     MPI_Buffer_attach( buffer, buffersize );
 #ifndef NDEBUG
-    for1DL(i,zone.is-1,zone.ie+1)
-      for2DL(j,zone.js-1,zone.je+1)
-        for3DL(k,zone.ks-1,zone.ke+1)
+    for_zone_ijk(zone,is-1,js-1,ks-1,ie+1,je+1,ke+1){
           np[_ai(gl,i,j,k)].bs->TSEMF_UPDATED=FALSE;
-        end3DL
-      end2DL
-    end1DL
+    }
 #endif
 
     /* receive data from other processes before the threading starts */
@@ -858,14 +842,10 @@ static void update_dUstar_emfield_SOR2_backward(np_t *np, gl_t *gl, long flux, z
 
 
 #ifndef NDEBUG
-    for1DL(i,zone.is,zone.ie)
-      for2DL(j,zone.js,zone.je)
-        for3DL(k,zone.ks,zone.ke)
+    for_zone_ijk(zone,is,js,ks,ie,je,ke){
           if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD) && !np[_ai(gl,i,j,k)].bs->TSEMF_UPDATED) 
             fatal_error("Node not updated correctly at i=%ld j=%ld k=%ld.",i,j,k);
-        end3DL
-      end2DL
-    end1DL
+    }
 #endif
 
     MPI_Buffer_detach( &bbuffer, &bbuffersize );

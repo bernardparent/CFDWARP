@@ -88,13 +88,9 @@ void read_model_beam_actions(char *actionname, char **argum, SOAP_codex_t *codex
     if (((readcontrolarg_t *)codex->action_args)->VERBOSE) wfprintf(stdout,"%s..",_BEAM_ACTIONNAME);
     if (!gl->CONTROL_READ){
       gl->MODEL_BEAM_READ=TRUE;   
-      for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-       for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-        for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+      for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
 	      (*((readcontrolarg_t *)codex->action_args)->np)[_ai(((readcontrolarg_t *)codex->action_args)->gl,i,j,k)].bs->Qbeam=0.0;
-	end3DL
-       end2DL
-      end1DL
+      }
     }
     action_original=codex->action;
     codex->action=&read_and_init_beam_actions_2;

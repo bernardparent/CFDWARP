@@ -519,25 +519,17 @@ int main ( int argc, char **argv ) {
         fatal_error_if_options_remaining ( argc, argv );
         write_post_file ( nppost, &glpost, postzone, post_filename, postprocessor, GRIDONLY );
         if( FOUNDCUT ){
-          for1DL ( i, glpost.domain_lim.is, glpost.domain_lim.ie )
-            for2DL ( j, glpost.domain_lim.js, glpost.domain_lim.je )
-              for3DL ( k, glpost.domain_lim.ks, glpost.domain_lim.ke )
+          for_zone_ijk (glpost.domain_lim,is,js,ks,ie,je,ke){
                 dispose_node ( &( nppost[_ai ( &glpost, i, j, k )] ) );
-              end3DL 
-            end2DL 
-          end1DL 
+          }
           free ( nppost );
         }
       }
     }
 
-    for1DL ( i, gl.domain_lim.is, gl.domain_lim.ie )
-      for2DL ( j, gl.domain_lim.js, gl.domain_lim.je )
-        for3DL ( k, gl.domain_lim.ks, gl.domain_lim.ke )
+    for_zone_ijk (gl.domain_lim,is,js,ks,ie,je,ke ){
           dispose_node ( &( np[_ai ( &gl, i, j, k )] ) );
-        end3DL 
-      end2DL 
-    end1DL 
+    }
     free ( np );
 
   }

@@ -106,6 +106,27 @@
   #define ifn3D(a) a
 #endif
 
+#ifdef _1D
+  #define for_zone_ijk(zone,is,js,ks,ie,je,ke)  for (i=zone.is; i<=zone.ie; i++) for (j=0; j<=0; j++) for (k=0; k<=0; k++)
+  #define for_zone_jik(zone,is,js,ks,ie,je,ke)  for (j=0; j<=0; j++) for (i=zone.is; i<=zone.ie; i++) for (k=0; k<=0; k++)
+  #define for_zone_kij(zone,is,js,ks,ie,je,ke)  for (k=0; k<=0; k++) for (i=zone.is; i<=zone.ie; i++) for (j=0; j<=0; j++) 
+  #define for_zone_kji(zone,is,js,ks,ie,je,ke)  for (k=0; k<=0; k++) for (j=0; j<=0; j++) for (i=zone.is; i<=zone.ie; i++)  
+#endif
+
+#ifdef _2D
+  #define for_zone_ijk(zone,is,js,ks,ie,je,ke)  for (i=zone.is; i<=zone.ie; i++) for (j=zone.js; j<=zone.je; j++) for (k=0; k<=0; k++)
+  #define for_zone_jik(zone,is,js,ks,ie,je,ke)  for (j=zone.js; j<=zone.je; j++) for (i=zone.is; i<=zone.ie; i++) for (k=0; k<=0; k++)
+  #define for_zone_kij(zone,is,js,ks,ie,je,ke)  for (k=0; k<=0; k++) for (i=zone.is; i<=zone.ie; i++) for (j=zone.js; j<=zone.je; j++) 
+  #define for_zone_kji(zone,is,js,ks,ie,je,ke)  for (k=0; k<=0; k++) for (j=zone.js; j<=zone.je; j++) for (i=zone.is; i<=zone.ie; i++)  
+#endif
+
+#ifdef _3D
+  #define for_zone_ijk(zone,is,js,ks,ie,je,ke)  for (i=zone.is; i<=zone.ie; i++) for (j=zone.js; j<=zone.je; j++) for (k=zone.ks; k<=zone.ke; k++)
+  #define for_zone_jik(zone,is,js,ks,ie,je,ke)  for (j=zone.js; j<=zone.je; j++) for (i=zone.is; i<=zone.ie; i++) for (k=zone.ks; k<=zone.ke; k++)
+  #define for_zone_kij(zone,is,js,ks,ie,je,ke)  for (k=zone.ks; k<=zone.ke; k++) for (i=zone.is; i<=zone.ie; i++) for (j=zone.js; j<=zone.je; j++) 
+  #define for_zone_kji(zone,is,js,ks,ie,je,ke)  for (k=zone.ks; k<=zone.ke; k++) for (j=zone.js; j<=zone.je; j++) for (i=zone.is; i<=zone.ie; i++)  
+#endif
+
 #ifdef NDEBUG
   #define ifndebug(a) a
   #define ifdebug(a)

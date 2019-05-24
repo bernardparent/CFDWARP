@@ -402,9 +402,7 @@ void update_linked_nodes_2(np_t *np, gl_t *gl, int TYPELEVEL){
         zonerecv=_domain_lim_from_rank(rankrecv,gl);
         if (is_zone_intersecting_zone(zonesend,zonerecv)){
           zone=_zone_intersection(zonesend,zonerecv);
-          for1DL(i,zone.is,zone.ie)
-            for2DL(j,zone.js,zone.je)
-              for3DL(k,zone.ks,zone.ke)
+          for_zone_ijk(zone,is,js,ks,ie,je,ke){
                 if (ranksend==thisrank) {
 //                  if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)) printf("x");
                   if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK) && is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)){
@@ -422,9 +420,7 @@ void update_linked_nodes_2(np_t *np, gl_t *gl, int TYPELEVEL){
                     MPI_Recv(np[_ai(gl,i,j,k)].linkmusclvars,numlinkvars,MPI_DOUBLE,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
                   }
                 }
-              end3DL
-            end2DL
-          end1DL
+          }
         }
       }
     }
@@ -482,20 +478,13 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   MPI_Buffer_attach( buffer, buffersize );
 
 
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         np[_al(gl,i,j,k)].numlinkmusclvars=0;
-      end3DL
-    end2DL
-  end1DL
-  
+  }  
 
   /* first send the packets */
   cntsend=0;
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL)){
 #ifdef _CYCLE_MULTIZONE
           fatal_error("Linked nodes can not be used with Multizone cycle yet. Need to update update_linked_nodes() function.");
@@ -563,9 +552,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
             }
           }
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 
   numsend=cntsend;
 
@@ -602,9 +589,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   }
 
 
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL) && is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL)){
           l1=_node_link(np[_ai(gl,i,j,k)],0,TYPELEVEL);
           rank2=_node_rank(gl, i, j, k);
@@ -619,9 +604,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
             recvproc[cntproc]=rank1;
           }
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 
 
   cntproc=0;
@@ -632,9 +615,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
     MPI_Recv(sendvars,numsendvars,MPI_DOUBLE,thisproc,0,MPI_COMM_WORLD,&MPI_Status1);
 
     cntsend=0;
-    for1DL(i,zone.is,zone.ie)
-      for2DL(j,zone.js,zone.je)
-        for3DL(k,zone.ks,zone.ke)
+    for_zone_ijk(zone,is,js,ks,ie,je,ke){
           if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL) && is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL)){
             l2=_ai_all(gl,i,j,k);
             assert(is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL));
@@ -669,9 +650,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
               }
             }
           }
-        end3DL
-      end2DL
-    end1DL
+    }
     cntproc++;
   }
 
@@ -691,9 +670,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
 
 void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   long i,j,k,l1,l2,flux;
-  for1DL(i,gl->domain.is,gl->domain.ie)
-    for2DL(j,gl->domain.js,gl->domain.je)
-      for3DL(k,gl->domain.ks,gl->domain.ke)
+  for_zone_ijk(gl->domain,is,js,ks,ie,je,ke){
         l1=_ai(gl,i,j,k);
         if (is_node_bdry(np[l1],TYPELEVEL) && is_node_link(np[l1],TYPELEVEL)){
 #ifdef _CYCLE_MULTIZONE
@@ -713,9 +690,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
           }
 #endif
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 }
 
 
@@ -759,9 +734,7 @@ void resume_nodes_specified_in_function(np_t *np, gl_t *gl,
                          if3DL(*(gl->domain.ke-gl->domain.ks+4))*sizeof(long));
   numnoderes=0;
   numbdryres=0;
-  for1DL(i,gl->domain.is-1,gl->domain.ie+1)
-    for2DL(j,gl->domain.js-1,gl->domain.je+1)
-      for3DL(k,gl->domain.ks-1,gl->domain.ke+1)
+  for_zone_ijk(gl->domain,is-1,js-1,ks-1,ie+1,je+1,ke+1){
         if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)
            && is_node_in_region_extended_by_bb(FUNCT,gl,i,j,k)) {
           if (resume_node(&(np[_ai(gl,i,j,k)]))  ) {
@@ -775,9 +748,7 @@ void resume_nodes_specified_in_function(np_t *np, gl_t *gl,
         } else {
           suspend_node(&(np[_ai(gl,i,j,k)]));
         }
-      end3DL
-    end2DL
-  end1DL
+  }
   /* rebuild the working variables of the inner nodes of the nodes resumed*/
   for (cnt=0; cnt<numnoderes; cnt++){
     if (is_node_resumed(np[noderes[cnt]]) && is_node_inner(np[noderes[cnt]],TYPELEVEL_FLUID)){
@@ -792,14 +763,10 @@ void resume_nodes_specified_in_function(np_t *np, gl_t *gl,
   }
   /* suspend all nodes needed only to compute the boundary nodes.
      this is necessary to ensure that all non-suspended nodes are properly updated.*/
-  for1DL(i,gl->domain.is-1,gl->domain.ie+1)
-    for2DL(j,gl->domain.js-1,gl->domain.je+1)
-      for3DL(k,gl->domain.ks-1,gl->domain.ke+1)
+  for_zone_ijk(gl->domain,is-1,js-1,ks-1,ie+1,je+1,ke+1){
         if (!(is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID) && is_node_in_region(FUNCT,gl,i,j,k)))
           suspend_node(&(np[_ai(gl,i,j,k)]));
-      end3DL
-    end2DL
-  end1DL
+  }
   free(noderes);
   free(bdryres);
 }
@@ -819,9 +786,7 @@ void resume_nodes_only_in_zone_and_update_bdry_nodes(np_t *np, gl_t *gl, zone_t 
                          if3DL(*(gl->domain_lim.ke-gl->domain_lim.ks+1))*sizeof(long));
   numnoderes=0;
   numbdryres=0;
-  for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-    for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+  for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
         if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)
                  && (i>=zone.is-hbw_bdry_fluid) && (i<=zone.ie+hbw_bdry_fluid)
            if2DL(&& (j>=zone.js-hbw_bdry_fluid) && (j<=zone.je+hbw_bdry_fluid))
@@ -837,9 +802,7 @@ void resume_nodes_only_in_zone_and_update_bdry_nodes(np_t *np, gl_t *gl, zone_t 
         } else {
           suspend_node(&(np[_ai(gl,i,j,k)]));
         }
-      end3DL
-    end2DL
-  end1DL
+  }
   /* rebuild the working variables of the inner nodes of the nodes resumed*/
 #ifdef OPENMPTHREADS
 #pragma omp parallel for private(cnt) schedule(dynamic)
@@ -867,15 +830,11 @@ void resume_nodes_only_in_zone_and_update_bdry_nodes(np_t *np, gl_t *gl, zone_t 
   free(bdryres);
   /* suspend all nodes needed only to compute the boundary nodes.
      this is necessary to ensure that all non-suspended nodes are properly updated.*/
-  for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-    for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+  for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
         if (!(is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)
            && is_node_in_zone(i,j,k,zone)))
           suspend_node(&(np[_ai(gl,i,j,k)]));
-      end3DL
-    end2DL
-  end1DL
+  }
 }
 
 
@@ -890,18 +849,14 @@ void resume_nodes_in_zone(np_t *np, gl_t *gl, zone_t zone){
                          if3DL(*(gl->domain_lim.ke-gl->domain_lim.ks+1))*sizeof(long));
   numnoderes=0;
   zoneint=_zone_intersection(gl->domain_lim,zone);
-  for1DL(i,zoneint.is,zoneint.ie)
-    for2DL(j,zoneint.js,zoneint.je)
-      for3DL(k,zoneint.ks,zoneint.ke)
+  for_zone_ijk(zoneint,is,js,ks,ie,je,ke){
         if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) {
           if (resume_node(&(np[_ai(gl,i,j,k)]))  ) {
             noderes[numnoderes]=_ai(gl,i,j,k);
             numnoderes++;
           }
         } 
-      end3DL
-    end2DL
-  end1DL
+  }
   /* rebuild the working variables of the inner nodes of the nodes resumed*/
 #ifdef OPENMPTHREADS
 #pragma omp parallel for private(cnt) schedule(dynamic)
@@ -924,9 +879,7 @@ void resume_nodes_only_in_zone(np_t *np, gl_t *gl, zone_t zone){
                          if2DL(*(gl->domain_lim.je-gl->domain_lim.js+1))
                          if3DL(*(gl->domain_lim.ke-gl->domain_lim.ks+1))*sizeof(long));
   numnoderes=0;
-  for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-    for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+  for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
         if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)
                  && (i>=zone.is) && (i<=zone.ie)
            if2DL(&& (j>=zone.js) && (j<=zone.je))
@@ -938,9 +891,7 @@ void resume_nodes_only_in_zone(np_t *np, gl_t *gl, zone_t zone){
         } else {
           suspend_node(&(np[_ai(gl,i,j,k)]));
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 
   /* rebuild the working variables of the inner nodes of the nodes resumed*/
 #ifdef OPENMPTHREADS
@@ -954,15 +905,11 @@ void resume_nodes_only_in_zone(np_t *np, gl_t *gl, zone_t zone){
   free(noderes);
   /* suspend all nodes needed only to compute the boundary nodes.
      this is necessary to ensure that all non-suspended nodes are properly updated.*/
-  for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-    for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+  for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
         if (!(is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)
            && is_node_in_zone(i,j,k,zone)))
           suspend_node(&(np[_ai(gl,i,j,k)]));
-      end3DL
-    end2DL
-  end1DL
+  }
 }
 
 
@@ -975,9 +922,7 @@ void increase_time_level(np_t *np, gl_t *gl){
   gl->time+=gl->dt;
   gl->iter=0;
   add_double_to_codex(&(gl->cycle.codex),"time",gl->time);  
-  for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-    for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+  for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
         if ((is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID))){
           for (flux=0; flux<nf; flux++){
@@ -1003,9 +948,7 @@ void increase_time_level(np_t *np, gl_t *gl){
           }
         }
 #endif
-      end3DL
-    end2DL
-  end1DL
+  }
 }
 #endif//UNSTEADY
 
@@ -1494,9 +1437,7 @@ void find_ximax(np_t *np, gl_t *gl, zone_t zone, int IJK_UPDATE){
   long i,j,k;
   double xi;
   gl->ximax=0.0e0;
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)) {
           assert(is_node_resumed(np[_ai(gl,i,j,k)]));
           xi=np[_ai(gl,i,j,k)].wk->xi;
@@ -1512,9 +1453,7 @@ void find_ximax(np_t *np, gl_t *gl, zone_t zone, int IJK_UPDATE){
             }
           }
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 }
 
 
@@ -1618,15 +1557,11 @@ void setup_multizone(np_t *np, gl_t *gl, zone_t zone, zone_t lim, double xiverge
   multizone->ts=(zone_t *)malloc(numsubzones*sizeof(zone_t));
   for (cnt=0; cnt<numsubzones; cnt++){
     ximax=0.0e0;
-    for1DL(i,subzones[cnt].is,subzones[cnt].ie)
-      for2DL(j,subzones[cnt].js,subzones[cnt].je)
-        for3DL(k,subzones[cnt].ks,subzones[cnt].ke)
+    for_zone_ijk(subzones[cnt],is,js,ks,ie,je,ke){
           if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)) {
             ximax=max(ximax,np[_ai(gl,i,j,k)].wk->xi);
           }
-        end3DL
-      end2DL
-    end1DL
+    }
     if (ximax>xiverge || UPDATE_ALL_ZONES) {
       multizone->ts[multizone->numzones_ts]=subzones[cnt];
       (multizone->numzones_ts)++;
@@ -1763,9 +1698,7 @@ void exchange_U(np_t *np, gl_t *gl){
         zonerecv=_domain_lim_from_rank(rankrecv,gl);
         if (is_zone_intersecting_zone(zonesend,zonerecv)){
           zone=_zone_intersection(zonesend,zonerecv);
-          for1DL(i,zone.is,zone.ie)
-            for2DL(j,zone.js,zone.je)
-              for3DL(k,zone.ks,zone.ke)
+          for_zone_ijk(zone,is,js,ks,ie,je,ke){
                 if (ranksend==thisrank) {
                   for (flux=0; flux<nf; flux++) Ulocal[flux]=np[_ai(gl,i,j,k)].bs->U[flux];
                   MPI_Send(Ulocal,nf,MPI_DOUBLE,rankrecv,0,MPI_COMM_WORLD);
@@ -1775,9 +1708,7 @@ void exchange_U(np_t *np, gl_t *gl){
                   for (flux=0; flux<nf; flux++) np[_ai(gl,i,j,k)].bs->U[flux]=Ulocal[flux];
                   if (is_node_resumed(np[_ai(gl,i,j,k)])) find_prim_fluid(np,_ai(gl,i,j,k),gl);
                 }
-              end3DL
-            end2DL
-          end1DL
+          }
         }
       }
     }
@@ -1799,9 +1730,7 @@ void exchange_U_newer(np_t *np, gl_t *gl){
   
   for (proc=0; proc<numproc; proc++){
     domain=_domain_from_rank(proc,gl);
-    for1DL(i,domain.is,domain.ie)
-      for2DL(j,domain.js,domain.je)
-        for3DL(k,domain.ks,domain.ke)
+    for_zone_ijk(domain,is,js,ks,ie,je,ke){
           if (rank==_node_rank(gl, i, j, k) && is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) {
             for (flux=0; flux<nf; flux++) {
               Ulocal[flux]=np[_ai(gl,i,j,k)].bs->U[flux];
@@ -1817,9 +1746,7 @@ void exchange_U_newer(np_t *np, gl_t *gl){
               find_prim_fluid(np,_ai(gl,i,j,k),gl);
             }
           }
-        end3DL
-      end2DL
-    end1DL
+    }
   }
   
   MPI_Barrier(MPI_COMM_WORLD);
@@ -1832,9 +1759,7 @@ void exchange_U_old(np_t *np, gl_t *gl){
   flux_t Ulocal;
   int MPI_DATA;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  for1DL (i,gl->domain_all.is,gl->domain_all.ie)
-    for2DL (j,gl->domain_all.js,gl->domain_all.je)
-      for3DL (k,gl->domain_all.ks,gl->domain_all.ke)
+  for_zone_ijk (gl->domain_all,is,js,ks,ie,je,ke){
         if (rank==_node_rank(gl, i, j, k) && is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) {
           for (flux=0; flux<nf; flux++) {
             Ulocal[flux]=np[_ai(gl,i,j,k)].bs->U[flux];
@@ -1849,9 +1774,7 @@ void exchange_U_old(np_t *np, gl_t *gl){
             find_prim_fluid(np,_ai(gl,i,j,k),gl);
           }
         }
-      end3DL
-    end2DL
-  end1DL
+  }
   MPI_Barrier(MPI_COMM_WORLD);
 }
 #endif
@@ -2078,9 +2001,7 @@ void exchange_U_emfield(np_t *np, gl_t *gl){
         zonerecv=_domain_lim_from_rank(rankrecv,gl);
         if (is_zone_intersecting_zone(zonesend,zonerecv)){
           zone=_zone_intersection(zonesend,zonerecv);
-          for1DL(i,zone.is,zone.ie)
-            for2DL(j,zone.js,zone.je)
-              for3DL(k,zone.ks,zone.ke)
+          for_zone_ijk(zone,is,js,ks,ie,je,ke){
                 if (ranksend==thisrank) {
                   for (flux=0; flux<nfe; flux++) Ulocal[flux]=np[_ai(gl,i,j,k)].bs->Uemfield[flux];
                   MPI_Send(Ulocal,nfe,MPI_DOUBLE,rankrecv,0,MPI_COMM_WORLD);
@@ -2089,9 +2010,7 @@ void exchange_U_emfield(np_t *np, gl_t *gl){
                   MPI_Recv(Ulocal,nfe,MPI_DOUBLE,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
                   for (flux=0; flux<nfe; flux++) np[_ai(gl,i,j,k)].bs->Uemfield[flux]=Ulocal[flux];
                 }
-              end3DL
-            end2DL
-          end1DL
+          }
         }
       }
     }
@@ -2106,9 +2025,7 @@ void exchange_U_emfield_old(np_t *np, gl_t *gl){
   long i,j,k,flux;
   fluxemfield_t Ulocal;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  for1DL (i,gl->domain_all.is,gl->domain_all.ie)
-    for2DL (j,gl->domain_all.js,gl->domain_all.je)
-      for3DL (k,gl->domain_all.ks,gl->domain_all.ke)
+  for_zone_ijk (gl->domain_all,is,js,ks,ie,je,ke){
         if (rank==_node_rank(gl, i, j, k) && is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) {
           for (flux=0; flux<nfe; flux++) {
             Ulocal[flux]=np[_ai(gl,i,j,k)].bs->Uemfield[flux];
@@ -2120,9 +2037,7 @@ void exchange_U_emfield_old(np_t *np, gl_t *gl){
             np[_ai(gl,i,j,k)].bs->Uemfield[flux]=Ulocal[flux];
           }
         }
-      end3DL
-    end2DL
-  end1DL
+  }
   MPI_Barrier(MPI_COMM_WORLD);
 }
 #endif
@@ -2345,33 +2260,25 @@ void find_residual_emfield(np_t *np, gl_t *gl, zone_t zone){
   sweep_with_1D_segments(np,gl,zone,&update_residual_emfield, SWEEPTYPE_IJK, TYPELEVEL_EMFIELD,&is_node_inner,SEGMENTWORK_HEAVY,GRIDLEVEL_ONE);
 
   /* let's find max residual, and put it in gl*/
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) {
           np[_ai(gl,i,j,k)].bs->_xi_emfield=_xi_emfield(np[_ai(gl,i,j,k)],gl,np[_ai(gl,i,j,k)].bs->Resemfield);
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 }
 
 
 void find_ximax_emfield(np_t *np, gl_t *gl, zone_t zone){
   long i,j,k;
   gl->ximax_emfield=0.0e0;
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD) && np[_ai(gl,i,j,k)].bs->_xi_emfield>=gl->ximax_emfield) {
 	  gl->ximax_emfield=np[_ai(gl,i,j,k)].bs->_xi_emfield;
 	  gl->i_ximax_emfield=i;
 	  gl->j_ximax_emfield=j;
 	  gl->k_ximax_emfield=k;
 	}
-      end3DL
-    end2DL
-  end1DL
+  }
 }
 
 

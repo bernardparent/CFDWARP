@@ -900,17 +900,13 @@ void check_domain_values(np_t *np, gl_t *gl, char *message){
   long i,j,k;
   double P;
   resume_nodes_only_in_zone_and_update_bdry_nodes(np,gl,gl->domain);
-  for1DL(i,gl->domain.is,gl->domain.ie)
-    for2DL(j,gl->domain.js,gl->domain.je)
-      for3DL(k,gl->domain.ks,gl->domain.ke)
+  for_zone_ijk(gl->domain,is,js,ks,ie,je,ke){
         P=_Pstar(np[_ai(gl,i,j,k)]);
         if (P<4000 || P>6000) {
           printf("problem here %s\n",message);
           exit(EXIT_FAILURE);
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 
 }*/
 

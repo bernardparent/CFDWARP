@@ -110,14 +110,10 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
     if (sscanf(*argum,"%ld%n",&BCtype,&eos)!=1 || (*argum)[eos]!=EOS)
       SOAP_fatal_error(codex,"One argument could not be read properly "
                      "in All() part of Bdry(). Argument: %s.",*argum);
-    for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-      for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-        for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+    for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
           if (is_node_bdry((*np)[_ai(gl,i,j,k)],TYPELEVEL))
             update_node_type((*np),gl,TYPELEVEL,BCtype,_zone_from_point(i,j,k));
-        end3DL
-      end2DL
-    end1DL
+    }
     codex->ACTIONPROCESSED=TRUE;
   }
 
@@ -135,14 +131,10 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
                              "in Region() part of Bdry(). Arguments: %s .",*argum);
     }
     find_zone_from_argum(*argum, 0, gl, codex, &zone);
-    for1DL(i,zone.is,zone.ie)
-      for2DL(j,zone.js,zone.je)
-        for3DL(k,zone.ks,zone.ke)
+    for_zone_ijk(zone,is,js,ks,ie,je,ke){
           if (is_node_bdry((*np)[_ai(gl,i,j,k)],TYPELEVEL))
             update_node_type((*np),gl,TYPELEVEL,BCtype,_zone_from_point(i,j,k));
-        end3DL
-      end2DL
-    end1DL
+    }
     codex->ACTIONPROCESSED=TRUE;
   }
 
@@ -154,9 +146,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
     numparam=SOAP_number_argums(*argum)-2*nd-1;
     bdryparam=(double *)malloc(numparam*sizeof(double));
     for (param=0; param<numparam; param++) bdryparam[param]=SOAP_get_argum_double(codex,*argum,2*nd+param+1);
-    for1DL(i,zone.is,zone.ie)
-      for2DL(j,zone.js,zone.je)
-        for3DL(k,zone.ks,zone.ke)
+    for_zone_ijk(zone,is,js,ks,ie,je,ke){
           if (_node_type((*np)[_ai(gl,i,j,k)],TYPELEVEL)==BCtype){
             if ((*np)[_ai(gl,i,j,k)].bdryparam==NULL){
               (*np)[_ai(gl,i,j,k)].bdryparam=(double *)malloc(numparam*sizeof(double));
@@ -168,9 +158,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
             }
             (*np)[_ai(gl,i,j,k)].numbdryparam=numparam;
           }
-        end3DL
-      end2DL
-    end1DL
+    }
     codex->ACTIONPROCESSED=TRUE;
     free( bdryparam );
   }
@@ -306,9 +294,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
                              "in Unlink() part of Bdry(). Arguments: %s .",*argum);
     }
     find_zone_from_argum(*argum, 0, gl, codex, &zone);
-    for1DL(i,zone.is,zone.ie)
-      for2DL(j,zone.js,zone.je)
-        for3DL(k,zone.ks,zone.ke)
+    for_zone_ijk(zone,is,js,ks,ie,je,ke){
           l1=_ai(gl,i,j,k);
           if (is_node_link((*np)[l1],TYPELEVEL) && is_node_bdry((*np)[l1],TYPELEVEL)){
             assert(is_node_bdry((*np)[l1],TYPELEVEL));
@@ -346,9 +332,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
                 fatal_error("TYPELEVEL must be wither TYPELEVEL_FLUID or TYPELEVEL_EMFIELD in read_bdry_actions(), Unlink.");
             }
           }
-        end3DL
-      end2DL
-    end1DL
+    }
     codex->ACTIONPROCESSED=TRUE;
   }
 
@@ -543,39 +527,29 @@ bool is_multiple_bdry_direc(np_t *np, gl_t *gl, long l_A, int TYPELEVEL){
 void update_node_type(np_t *np, gl_t *gl, int TYPELEVEL, long type, zone_t zone){
   long i,j,k;
   zone=_zone_intersection(zone,gl->domain_lim);
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         if (TYPELEVEL==TYPELEVEL_FLUID) np[_ai(gl,i,j,k)].type=type;
         if (TYPELEVEL==TYPELEVEL_FLUID_WORK) np[_ai(gl,i,j,k)].type_wk=type;
 #ifdef EMFIELD
         if (TYPELEVEL==TYPELEVEL_EMFIELD) np[_ai(gl,i,j,k)].type_emf=type;
 #endif
 
-      end3DL
-    end2DL
-  end1DL
+  }
 }
 
 
 void copy_base_to_work_node_type(np_t *np, gl_t *gl, zone_t zone){
   long i,j,k;
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         np[_ai(gl,i,j,k)].type_wk=np[_ai(gl,i,j,k)].type;
-      end3DL
-    end2DL
-  end1DL
+  }
 }
 
 
 void update_inner_to_bdry_node_type(np_t *np, gl_t *gl, int TYPELEVEL, long type, zone_t zone){
   long i,j,k;
   zone=_zone_intersection(zone,gl->domain_lim);
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL)) {
           if (TYPELEVEL==TYPELEVEL_FLUID) np[_ai(gl,i,j,k)].type=type;
           if (TYPELEVEL==TYPELEVEL_FLUID_WORK) np[_ai(gl,i,j,k)].type_wk=type;
@@ -583,18 +557,14 @@ void update_inner_to_bdry_node_type(np_t *np, gl_t *gl, int TYPELEVEL, long type
           if (TYPELEVEL==TYPELEVEL_EMFIELD) np[_ai(gl,i,j,k)].type_emf=type;
 #endif
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 }
 
 
 void update_inner_and_bdry_to_node_type(np_t *np, gl_t *gl, int TYPELEVEL, long type, zone_t zone){
   long i,j,k;
   zone=_zone_intersection(zone,gl->domain_lim);
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL) || is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL)) {
           if (TYPELEVEL==TYPELEVEL_FLUID) np[_ai(gl,i,j,k)].type=type;
           if (TYPELEVEL==TYPELEVEL_FLUID_WORK) np[_ai(gl,i,j,k)].type_wk=type;
@@ -602,9 +572,7 @@ void update_inner_and_bdry_to_node_type(np_t *np, gl_t *gl, int TYPELEVEL, long 
           if (TYPELEVEL==TYPELEVEL_EMFIELD) np[_ai(gl,i,j,k)].type_emf=type;
 #endif
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 }
 
 
@@ -628,9 +596,7 @@ void adjust_node_type(np_t *np, gl_t *gl, zone_t zone, int TYPELEVEL){
   zone=_zone_intersection(zone,_zone_expansion(gl->domain_lim,-1));
   /* transform inner node to boundary node if along
      any direction, the segment is made up of only 1 node */
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         FLAG=FALSE;
         for (dim=0; dim<nd; dim++){
           l=_ai(gl,i,j,k);
@@ -640,16 +606,11 @@ void adjust_node_type(np_t *np, gl_t *gl, zone_t zone, int TYPELEVEL){
           }
         }
         if (FLAG) update_node_type(np,gl,TYPELEVEL,NODETYPE_BDRYOUTFLOW, _zone_from_point(i,j,k));
-
-      end3DL
-    end2DL
-  end1DL
+  }
 
 
   /* set to UNUSED all boundary nodes that have no inner nodes as a neighbor */
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         FLAG=FALSE;
           for (offset=-1; offset<=1; offset++){
             for (offset2=-1; offset2<=1; offset2++){
@@ -663,17 +624,12 @@ void adjust_node_type(np_t *np, gl_t *gl, zone_t zone, int TYPELEVEL){
         if ((!FLAG) && (is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL))) {
           update_node_type(np,gl,TYPELEVEL,NODETYPE_UNUSED, _zone_from_point(i,j,k));
         }
-      end3DL
-    end2DL
-  end1DL
-
+  }
 
   /* update BC nodes located in corners (in 3D) to outflow 
      --> don't do this anymore. This leads to problems with cross-difference terms within FDS
   */
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         FLAG=FALSE;
         for (dim=0; dim<nd; dim++){
           for (dim2=0; dim2<nd; dim2++){
@@ -692,9 +648,7 @@ void adjust_node_type(np_t *np, gl_t *gl, zone_t zone, int TYPELEVEL){
           //update_node_type(np,gl,TYPELEVEL,NODETYPE_UNUSED, _zone_from_point(i,j,k));
           //update_node_type(np,gl,TYPELEVEL,NODETYPE_BDRYOUTFLOW, _zone_from_point(i,j,k));
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 }
 
 
@@ -1109,9 +1063,7 @@ void display_node_type_window_local_process(FILE *outfile, np_t *np, gl_t *gl, i
 static void validate_inner_nodes(np_t *np, gl_t *gl, zone_t zone, int TYPELEVEL){
   long i,j,k,dim,l,noderem,ls;
 
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+  for_zone_ijk(zone,is,js,ks,ie,je,ke){
         ls=_ai(gl,i,j,k);
         if (is_node_inner(np[ls],TYPELEVEL)){
           for (dim=0; dim<nd; dim++){
@@ -1132,9 +1084,7 @@ static void validate_inner_nodes(np_t *np, gl_t *gl, zone_t zone, int TYPELEVEL)
             }
           }
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 }
 
 
@@ -1173,9 +1123,7 @@ void read_bdry(char *argum, SOAP_codex_t *codex){
   gl->BDRY_FLUID_READ=FALSE;
   gl->BDRY_EMFIELD_READ=FALSE;
 
-  for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-    for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+  for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
         //np[_ai(gl,i,j,k)].link=LINK_NONE;
         np[_ai(gl,i,j,k)].numlink=0;
         np[_ai(gl,i,j,k)].linkarray=NULL;
@@ -1192,9 +1140,7 @@ void read_bdry(char *argum, SOAP_codex_t *codex){
         np[_ai(gl,i,j,k)].numlinkmusclvars=0;
         np[_ai(gl,i,j,k)].linkmusclvars=NULL;
 #endif
-      end3DL
-    end2DL
-  end1DL
+  }
 
   update_node_type(np,gl,TYPELEVEL_FLUID,NODETYPE_UNUSED, gl->domain_lim);
   update_node_type(np,gl,TYPELEVEL_FLUID,NODETYPE_BDRY, gl->domain_all);
@@ -1238,9 +1184,7 @@ void read_bdry(char *argum, SOAP_codex_t *codex){
  /* update_node_type(*(((readcontrolarg_t *)codex->action_args)->np),gl,TYPELEVEL_FLUID,NODETYPE_BDRY, _zone_intersection(gl->domain_all,_zone_expansion(gl->domain_lim,-1)));
 */
 
-  for1DL (i,gl->domain_lim.is,gl->domain_lim.ie)
-    for2DL (j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL (k,gl->domain_lim.ks,gl->domain_lim.ke)
+  for_zone_ijk (gl->domain_lim,is,js,ks,ie,je,ke){
 //        if (is_node_in_zone(i,j,k,gl->domain) || is_node_in_zone(i,j,k,_zone_expansion(gl->domain_lim,-1))){
         (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].type=np[_ai(&gl_all,i,j,k)].type;
         (*(((readcontrolarg_t *)codex->action_args)->np))[_ai(gl,i,j,k)].type_wk=np[_ai(&gl_all,i,j,k)].type_wk;
@@ -1277,37 +1221,27 @@ void read_bdry(char *argum, SOAP_codex_t *codex){
 #endif
 
 //        }
-      end3DL
-    end2DL
-  end1DL
+  }
 
   free(np);
 //  wfprintf(stdout,"[MPI check of node types]");
   MPI_Comm_size(MPI_COMM_WORLD, &proc);
-  for1DL (i,gl->domain_lim.is,gl->domain_lim.ie)
-    for2DL (j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL (k,gl->domain_lim.ks,gl->domain_lim.ke)
+  for_zone_ijk (gl->domain_lim,is,js,ks,ie,je,ke){
         if (!is_node_in_zone(i, j, k, _domain_lim_from_rank(_node_rank(gl, i, j, k), gl))) {
           fatal_error("Problem with domain_lim_from_rank at i=%ld j=%ld k=%ld.",i,j,k);
         }
         if (_node_rank(gl, i, j, k)<0 || _node_rank(gl, i, j, k)>=proc){
           fatal_error("Node rank out of bounds at i=%ld j=%ld k=%ld.",i,j,k);
         } 
-      end3DL
-    end2DL
-  end1DL
+  }
 
 
-  for1DL (i,gl->domain_all.is,gl->domain_all.ie)
-    for2DL (j,gl->domain_all.js,gl->domain_all.je)
-      for3DL (k,gl->domain_all.ks,gl->domain_all.ke)
+  for_zone_ijk (gl->domain_all,is,js,ks,ie,je,ke){
         zone=_domain_from_rank(_node_rank(gl, i, j, k), gl);
         if (!is_node_in_zone(i, j, k, zone)) {
           fatal_error("Problem with domain_from_rank at rank=%d i=%ld j=%ld k=%ld [zone.is=%ld zone.ie=%ld zone.js=%ld zone.je=%ld].",_node_rank(gl,i,j,k),i,j,k,zone.is,zone.ie,zone.js,zone.je);
         }
-      end3DL
-    end2DL
-  end1DL
+  }
 
   MPI_Barrier(MPI_COMM_WORLD);
 
