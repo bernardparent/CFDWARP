@@ -226,17 +226,17 @@ void update_dUstar_emfield_SOR2_node(np_t *np, gl_t *gl, long plane, long planet
 static void find_mpivars_in_zone(np_t *np, gl_t *gl, long is, long js, long ks, long ie, long je, long ke, long flux, int *cntvars, double **mpivars){
   long i,j,k;
   *cntvars=0;
-  for1DL(i,is,ie)
-    for2DL(j,js,je)
-      for3DL(k,ks,ke)
+  for_1DL(i,is,ie){
+    for_2DL(j,js,je){
+      for_3DL(k,ks,ke){
         if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
           (*mpivars)=(double *)realloc(*mpivars,sizeof(double)*(*cntvars+1));
           (*mpivars)[*cntvars]=np[_ai(gl,i,j,k)].bs->dUstaremfield[flux];
           (*cntvars)++;
         }    
-      end3DL
-    end2DL
-  end1DL
+      }
+    }
+  }
 }
 
 
@@ -244,9 +244,9 @@ static void copy_mpivars_in_zone(np_t *np, gl_t *gl, long is, long js, long ks, 
   long i,j,k;
   int cntvars;
   cntvars=0;
-  for1DL(i,is,ie)
-    for2DL(j,js,je)
-      for3DL(k,ks,ke)
+  for_1DL(i,is,ie){
+    for_2DL(j,js,je){
+      for_3DL(k,ks,ke){
         if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
           np[_ai(gl,i,j,k)].bs->dUstaremfield[flux]=mpivars[cntvars];
           cntvars++;
@@ -254,9 +254,9 @@ static void copy_mpivars_in_zone(np_t *np, gl_t *gl, long is, long js, long ks, 
           np[_ai(gl,i,j,k)].bs->TSEMF_UPDATED=TRUE;
 #endif
         }    
-      end3DL
-    end2DL
-  end1DL
+      }
+    }
+  }
 #ifndef NDEBUG
   if (cntvars!=numvars) printf("cntvars=%d  numvars=%d\n",cntvars,numvars);
   assert(cntvars==numvars);
@@ -880,8 +880,8 @@ static void update_dUstar_emfield_SOR2_istation(np_t *np, gl_t *gl, long flux, l
   long j,k,l,l2,dim,theta,thetasgn,cnt;
   double sum,RHS,Cp0,Cp1,dtau;
 
-  for2DL(j,zone.js,zone.je)
-    for3DL(k,zone.ks,zone.ke)
+  for_2DL(j,zone.js,zone.je){
+    for_3DL(k,zone.ks,zone.ke){
       switch (SOR_SWEEP) {
         case SOR_SWEEP_FORWARD:
           l=_ai(gl,i,j,k);
@@ -924,8 +924,8 @@ static void update_dUstar_emfield_SOR2_istation(np_t *np, gl_t *gl, long flux, l
           }
         }
       }
-    end3DL
-  end2DL
+    }
+  }
 }
 
 

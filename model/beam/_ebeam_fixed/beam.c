@@ -66,15 +66,15 @@ void read_and_init_beam_actions_2(char *actionname, char **argum, SOAP_codex_t *
 /*
 *((readcontrolarg_t *)codex->action_args)->np
 */
-    for1DL(i,SOAP_get_argum_long(codex,*argum,0), SOAP_get_argum_long(codex,*argum,nd))
-      for2DL(j,SOAP_get_argum_long(codex,*argum,1), SOAP_get_argum_long(codex,*argum,nd+1))
-        for3DL(k,SOAP_get_argum_long(codex,*argum,2), SOAP_get_argum_long(codex,*argum,nd+2))
+    for_1DL(i,SOAP_get_argum_long(codex,*argum,0), SOAP_get_argum_long(codex,*argum,nd)){
+      for_2DL(j,SOAP_get_argum_long(codex,*argum,1), SOAP_get_argum_long(codex,*argum,nd+1)){
+        for_3DL(k,SOAP_get_argum_long(codex,*argum,2), SOAP_get_argum_long(codex,*argum,nd+2)){
           if (is_node_in_zone(i, j, k, gl->domain_lim)){
             (*((readcontrolarg_t *)codex->action_args)->np)[_ai(((readcontrolarg_t *)codex->action_args)->gl,i,j,k)].bs->Qbeam=SOAP_get_argum_double(codex,*argum,2*nd);
           }
-        end3DL
-      end2DL
-    end1DL
+        }
+      }
+    }
     codex->ACTIONPROCESSED=TRUE;
   }
 }

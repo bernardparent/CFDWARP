@@ -250,17 +250,17 @@ void update_dUstar_emfield_SOR_node(np_t *np, gl_t *gl, long l, long flux, int S
 static void find_mpivars_in_zone(np_t *np, gl_t *gl, long is, long js, long ks, long ie, long je, long ke, long flux, int *cntvars, double **mpivars){
   long i,j,k;
   *cntvars=0;
-  for1DL(i,is,ie)
-    for2DL(j,js,je)
-      for3DL(k,ks,ke)
+  for_1DL(i,is,ie){
+    for_2DL(j,js,je){
+      for_3DL(k,ks,ke){
         if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
           (*mpivars)=(double *)realloc(*mpivars,sizeof(double)*(*cntvars+1));
           (*mpivars)[*cntvars]=np[_ai(gl,i,j,k)].bs->dUstaremfield[flux];
           (*cntvars)++;
         }    
-      end3DL
-    end2DL
-  end1DL
+      }
+    }
+  }
 }
 
 
@@ -268,9 +268,9 @@ static void copy_mpivars_in_zone(np_t *np, gl_t *gl, long is, long js, long ks, 
   long i,j,k;
   int cntvars;
   cntvars=0;
-  for1DL(i,is,ie)
-    for2DL(j,js,je)
-      for3DL(k,ks,ke)
+  for_1DL(i,is,ie){
+    for_2DL(j,js,je){
+      for_3DL(k,ks,ke){
         if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
           np[_ai(gl,i,j,k)].bs->dUstaremfield[flux]=mpivars[cntvars];
           cntvars++;
@@ -278,9 +278,9 @@ static void copy_mpivars_in_zone(np_t *np, gl_t *gl, long is, long js, long ks, 
           np[_ai(gl,i,j,k)].bs->TSEMF_UPDATED=TRUE;
 #endif
         }    
-      end3DL
-    end2DL
-  end1DL
+      }
+    }
+  }
 #ifndef NDEBUG
   if (cntvars!=numvars) printf("cntvars=%d  numvars=%d\n",cntvars,numvars);
   assert(cntvars==numvars);
@@ -701,8 +701,8 @@ void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, z
   long j,k,l,dim,theta,thetasgn;
   double sum,RHS,Cp0,Cp1,dtau;
 
-  for2DL(j,zone.js,zone.je)
-    for3DL(k,zone.ks,zone.ke)
+  for_2DL(j,zone.js,zone.je){
+    for_3DL(k,zone.ks,zone.ke){
       l=0;  // to avoid compiler warning
       switch (SOR_SWEEP) {
         case SOR_SWEEP_FORWARD:
@@ -736,8 +736,8 @@ void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, z
           }
         }
       }
-    end3DL
-  end2DL
+    }
+  }
 }
 
 
@@ -820,8 +820,8 @@ void update_dUstar_emfield_Newton_ij_1(np_t *np, gl_t *gl, long k, long flux, zo
     }
   }
   line=0;
-  for2DL(j,zone.js,zone.je)
-    for1DL(i,zone.is,zone.ie)
+  for_2DL(j,zone.js,zone.je){
+    for_1DL(i,zone.is,zone.ie){
       /* for inner node */
       l=_ai(gl,i,j,k);
       if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) {
@@ -899,20 +899,20 @@ void update_dUstar_emfield_Newton_ij_1(np_t *np, gl_t *gl, long k, long flux, zo
         xdma[EXM_ai2(xdmagl,hbw,line)]=1.0;
       } 
       line++;
-    end1DL
-  end2DL
+    }
+  }
   EXM_solve_XDMA(xdma, xdmagl);
   line=0;
   /* update dUstar */
-  for2DL(j,zone.js,zone.je)
-    for1DL(i,zone.is,zone.ie)
+  for_2DL(j,zone.js,zone.je){
+    for_1DL(i,zone.is,zone.ie){
       if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
         np[_ai(gl,i,j,k)].bs->dUstaremfield[flux]=xdma[EXM_ai2(xdmagl,xdmagl.ie,line)]
                                /xdma[EXM_ai2(xdmagl,hbw,line)];
       }
       line++;
-    end1DL
-  end2DL
+    }
+  }
 
   free(xdma);
 }
@@ -943,8 +943,8 @@ void update_dUstar_emfield_Newton_ij_2(np_t *np, gl_t *gl, long k, long flux, zo
     }
   }
   line=0;
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
+  for_1DL(i,zone.is,zone.ie){
+    for_2DL(j,zone.js,zone.je){
       l=_ai(gl,i,j,k);
       if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) { 
         /* for inner node */
@@ -1031,20 +1031,20 @@ void update_dUstar_emfield_Newton_ij_2(np_t *np, gl_t *gl, long k, long flux, zo
         xdma[EXM_ai2(xdmagl,hbw,line)]=1.0;
 	  } 
       line++;
-    end2DL
-  end1DL
+    }
+  }
   EXM_solve_XDMA(xdma, xdmagl);
   line=0;
   /* update dU */
-  for1DL(i,zone.is,zone.ie)
-    for2DL(j,zone.js,zone.je)
+  for_1DL(i,zone.is,zone.ie){
+    for_2DL(j,zone.js,zone.je){
       if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
         np[_ai(gl,i,j,k)].bs->dUstaremfield[flux]=xdma[EXM_ai2(xdmagl,xdmagl.ie,line)]
                               /xdma[EXM_ai2(xdmagl,hbw,line)];
       }
       line++;
-    end2DL
-  end1DL
+    }
+  }
 
   free(xdma);
 }
@@ -1095,8 +1095,8 @@ void update_dUstar_emfield_Newton_jk(np_t *np, gl_t *gl, long i, long flux, zone
     }
   }
   line=0;
-  for2DL(j,zone.js,zone.je)
-    for3DL(k,zone.ks,zone.ke)
+  for_2DL(j,zone.js,zone.je){
+    for_3DL(k,zone.ks,zone.ke){
       /* for inner node */
       l=_ai(gl,i,j,k);
 	  if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) {
@@ -1178,21 +1178,21 @@ void update_dUstar_emfield_Newton_jk(np_t *np, gl_t *gl, long i, long flux, zone
 	    xdma[EXM_ai2(xdmagl,hbw,line)]=1.0;
 	  } 
       line++;
-    end3DL
-  end2DL
+    }
+  }
   EXM_solve_XDMA(xdma, xdmagl);
   line=0;
   /* update dUstar */
-  for2DL(j,zone.js,zone.je)
-    for3DL(k,zone.ks,zone.ke)
+  for_2DL(j,zone.js,zone.je){
+    for_3DL(k,zone.ks,zone.ke){
       if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
         assert(xdma[EXM_ai2(xdmagl,hbw,line)]!=0.0);
         np[_ai(gl,i,j,k)].bs->dUstaremfield[flux]=xdma[EXM_ai2(xdmagl,xdmagl.ie,line)]
                                /xdma[EXM_ai2(xdmagl,hbw,line)];
       }
       line++;
-    end3DL
-  end2DL
+    }
+  }
   free(xdma);
 }
 

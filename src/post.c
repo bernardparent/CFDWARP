@@ -141,9 +141,9 @@ void write_post_file_gnuplot(np_t *np, gl_t *gl, zone_t zone, char *filename, bo
 #ifdef DISTMPI
   if (rank==0 || gl->DISTDOMAIN) {
 #endif
-  for3DL(k,zone.ks,zone.ke)
-    for2DL(j,zone.js,zone.je)
-      for1DL(i,zone.is,zone.ie)
+  for_3DL(k,zone.ks,zone.ke){
+    for_2DL(j,zone.js,zone.je){
+      for_1DL(i,zone.is,zone.ie){
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
 #endif
@@ -170,15 +170,15 @@ void write_post_file_gnuplot(np_t *np, gl_t *gl, zone_t zone, char *filename, bo
 #ifdef DISTMPI
         }
 #endif
-      end1DL
+      }
       if (zone.is!=zone.ie) {
         wfprintf(postfile, "\n");
       }
-    end2DL
+    }
     if (zone.js!=zone.je && zone.is==zone.ie) {
       wfprintf(postfile, "\n");
     }
-  end3DL
+  }
 #ifdef DISTMPI
   }
   MPI_Barrier(MPI_COMM_WORLD);
@@ -609,13 +609,13 @@ void create_domain_of_cuts_along_x(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
   update_node_type(*npcut,glcut,TYPELEVEL_FLUID,NODETYPE_UNUSED,glcut->domain);
 
   /* first, find x,y,z on the new domain */
-  for1DL(icut,glcut->domain.is,glcut->domain.ie)
+  for_1DL(icut,glcut->domain.is,glcut->domain.ie){
     x=xcut[icut-1];
     wfprintf(stdout,"%E..",x);
-    for2DL(j,gl->domain_all.js-1,gl->domain_all.je+1)
-      for3DL(k,gl->domain_all.ks-1,gl->domain_all.ke+1)
+    for_2DL(j,gl->domain_all.js-1,gl->domain_all.je+1){
+      for_3DL(k,gl->domain_all.ks-1,gl->domain_all.ke+1){
         FOUND=FALSE;
-        for1DL(i,gl->domain.is+1,gl->domain.ie)
+        for_1DL(i,gl->domain.is+1,gl->domain.ie){
           if (_x(np[_ai(gl,i+0,j,k)],0)>=x && _x(np[_ai(gl,i-1,j,k)],0)<x) {
             FOUND=TRUE;
             for (dim=0; dim<nd; dim++) {
@@ -623,7 +623,7 @@ void create_domain_of_cuts_along_x(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
               xc[dim]=_x(np[_ai(gl,i+0,j,k)],dim);
             }
           }
-        end1DL
+        }
         if (FOUND) {
           (*npcut)[_ai(glcut,icut,j,k)].bs->x[0]=x;
           fact=(x-xl[0])/(xc[0]-xl[0]);
@@ -632,13 +632,13 @@ void create_domain_of_cuts_along_x(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
         } else {
           fatal_error("Could not interpolate at j=%ld k=%ld for xcut=%E m..",j,k,x);
         }
-      end3DL
-    end2DL
-  end1DL
+      }
+    }
+  }
 
   /* now, for the special case of a domain with only one node along i, find x,y,z on i-1 and i+1 */
-  for2DL(j,glcut->domain.js-1,glcut->domain.je+1)
-    for3DL(k,glcut->domain.ks-1,glcut->domain.ke+1)
+  for_2DL(j,glcut->domain.js-1,glcut->domain.je+1){
+    for_3DL(k,glcut->domain.ks-1,glcut->domain.ke+1){
       for (dim=0; dim<nd; dim++){
         (*npcut)[_ai(glcut,glcut->domain.is-1,j,k)].bs->x[dim]=
            (*npcut)[_ai(glcut,glcut->domain.is,j,k)].bs->x[dim];
@@ -647,32 +647,32 @@ void create_domain_of_cuts_along_x(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
       }
       (*npcut)[_ai(glcut,glcut->domain.ie+1,j,k)].bs->x[0]+=1.0;
       (*npcut)[_ai(glcut,glcut->domain.is-1,j,k)].bs->x[0]-=1.0;
-    end3DL
-  end2DL
+    }
+  }
 
   zone=gl->domain;
   /* now, find U on the new domain */
-  for1DL(icut,glcut->domain.is,glcut->domain.ie)
+  for_1DL(icut,glcut->domain.is,glcut->domain.ie){
     x=xcut[icut-1];
     /* find the lower and high i in *np that englobes x */
     zone.ie=gl->domain.is;
     zone.is=gl->domain.ie;
-    for2DL(j,gl->domain.js,gl->domain.je)
-      for3DL(k,gl->domain.ks,gl->domain.ke)
-        for1DL(i,gl->domain.is,gl->domain.ie)
+    for_2DL(j,gl->domain.js,gl->domain.je){
+      for_3DL(k,gl->domain.ks,gl->domain.ke){
+        for_1DL(i,gl->domain.is,gl->domain.ie){
           if (_x(np[_ai(gl,i,j,k)],0)>=x) zone.is=min(zone.is,i);
           if (_x(np[_ai(gl,i,j,k)],0)<=x) zone.ie=max(zone.ie,i);
-        end1DL
-      end3DL
-    end2DL
+        }
+      }
+    }
     zone.is=max(gl->domain.is,zone.is-1);
     zone.ie=min(gl->domain.ie,zone.ie+1);
     //resume_nodes_only_in_zone_and_update_bdry_nodes(np,gl,zone);
 
-    for2DL(j,gl->domain_all.js,gl->domain_all.je)
-      for3DL(k,gl->domain_all.ks,gl->domain_all.ke)
+    for_2DL(j,gl->domain_all.js,gl->domain_all.je){
+      for_3DL(k,gl->domain_all.ks,gl->domain_all.ke){
         FOUND=FALSE;
-        for1DL(i,gl->domain_all.is+1,gl->domain_all.ie)
+        for_1DL(i,gl->domain_all.is+1,gl->domain_all.ie){
           if (_x(np[_ai(gl,i+0,j,k)],0)>=x && _x(np[_ai(gl,i-1,j,k)],0)<x) {
             FOUND=TRUE;
             nodetype=min(_node_type(np[_ai(gl,i+0,j,k)],TYPELEVEL_FLUID),
@@ -683,7 +683,7 @@ void create_domain_of_cuts_along_x(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
                                       fact,1.0e0-fact,&initnum,initvar);
             }
           }
-        end1DL
+        }
 
         if (FOUND) {
           update_node_type((*npcut),glcut,TYPELEVEL_FLUID,nodetype, _zone_from_point(icut,j,k));
@@ -692,9 +692,9 @@ void create_domain_of_cuts_along_x(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
         } else {
           fatal_error("Could not interpolate at j=%ld k=%ld for xcut=%E m..",j,k,x);
         }
-      end3DL
-    end2DL
-  end1DL
+      }
+    }
+  }
   wfprintf(stdout,"done.\n");
 }
 
@@ -736,13 +736,13 @@ void create_domain_of_cuts_along_y(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
   update_node_type(*npcut,glcut,TYPELEVEL_FLUID,NODETYPE_UNUSED,glcut->domain);
 
   /* first, find x,y,z on the new domain */
-  for2DL(jcut,glcut->domain.js,glcut->domain.je)
+  for_2DL(jcut,glcut->domain.js,glcut->domain.je){
     y=ycut[jcut-1];
     wfprintf(stdout,"%E..",y);
-    for1DL(i,gl->domain_all.is-1,gl->domain_all.ie+1)
-      for3DL(k,gl->domain_all.ks-1,gl->domain_all.ke+1)
+    for_1DL(i,gl->domain_all.is-1,gl->domain_all.ie+1){
+      for_3DL(k,gl->domain_all.ks-1,gl->domain_all.ke+1){
         FOUND=FALSE;
-        for2DL(j,gl->domain.js+1,gl->domain.je)
+        for_2DL(j,gl->domain.js+1,gl->domain.je){
           if (_x(np[_ai(gl,i,j+0,k)],1)>=y && _x(np[_ai(gl,i,j-1,k)],1)<y) {
             FOUND=TRUE;
             for (dim=0; dim<nd; dim++) {
@@ -750,7 +750,7 @@ void create_domain_of_cuts_along_y(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
               xc[dim]=_x(np[_ai(gl,i,j+0,k)],dim);
             }
           }
-        end1DL
+        }
         if (FOUND) {
           (*npcut)[_ai(glcut,i,jcut,k)].bs->x[1]=y;
           fact=(y-xl[1])/(xc[1]-xl[1]);
@@ -760,13 +760,13 @@ void create_domain_of_cuts_along_y(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
         } else {
           fatal_error("Could not interpolate at i=%ld k=%ld for ycut=%E m..",i,k,y);
         }
-      end2DL
-    end1DL
-  end3DL
+      }
+    }
+  }
 
   /* now, for the special case of a domain with only one node along j, find x,y,z on j-1 and j+1 */
-  for1DL(i,glcut->domain.is-1,glcut->domain.ie+1)
-    for3DL(k,glcut->domain.ks-1,glcut->domain.ke+1)
+  for_1DL(i,glcut->domain.is-1,glcut->domain.ie+1){
+    for_3DL(k,glcut->domain.ks-1,glcut->domain.ke+1){
       for (dim=0; dim<nd; dim++){
         (*npcut)[_ai(glcut,i,glcut->domain.js-1,k)].bs->x[dim]=
            (*npcut)[_ai(glcut,i,glcut->domain.js,k)].bs->x[dim];
@@ -775,12 +775,12 @@ void create_domain_of_cuts_along_y(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
       }
       (*npcut)[_ai(glcut,i,glcut->domain.je+1,k)].bs->x[1]+=1.0;
       (*npcut)[_ai(glcut,i,glcut->domain.js-1,k)].bs->x[1]-=1.0;
-    end3DL
-  end1DL
+    }
+  }
 
   zone=gl->domain;
   /* now, find U on the new domain */
-  for2DL(jcut,glcut->domain.js,glcut->domain.je)
+  for_2DL(jcut,glcut->domain.js,glcut->domain.je){
     y=ycut[jcut-1];
     /* find the lower and high j in *np that englobes y */
     zone.je=gl->domain.js;
@@ -793,10 +793,10 @@ void create_domain_of_cuts_along_y(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
     zone.je=min(gl->domain.je,zone.je+1);
     //resume_nodes_only_in_zone_and_update_bdry_nodes(np,gl,zone);
 
-    for1DL(i,gl->domain_all.is,gl->domain_all.ie)
-      for3DL(k,gl->domain_all.ks,gl->domain_all.ke)
+    for_1DL(i,gl->domain_all.is,gl->domain_all.ie){
+      for_3DL(k,gl->domain_all.ks,gl->domain_all.ke){
         FOUND=FALSE;
-        for2DL(j,gl->domain_all.js+1,gl->domain_all.je)
+        for_2DL(j,gl->domain_all.js+1,gl->domain_all.je){
           if (_x(np[_ai(gl,i,j+0,k)],1)>=y && _x(np[_ai(gl,i,j-1,k)],1)<y) {
             FOUND=TRUE;
             nodetype=min(_node_type(np[_ai(gl,i,j+0,k)],TYPELEVEL_FLUID),
@@ -807,7 +807,7 @@ void create_domain_of_cuts_along_y(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
                                         fact,1.0e0-fact,&initnum,initvar);
             }
           }
-        end2DL
+        }
 
         if (FOUND) {
           update_node_type((*npcut),glcut,TYPELEVEL_FLUID,nodetype, _zone_from_point(i,jcut,k));
@@ -816,9 +816,9 @@ void create_domain_of_cuts_along_y(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
         } else {
           fatal_error("Could not interpolate at i=%ld k=%ld for ycut=%E m..",i,k,y);
         }
-      end3DL
-    end1DL
-  end2DL
+      }
+    }
+  }
   wfprintf(stdout,"done.\n");
 }
 #endif
@@ -861,13 +861,13 @@ void create_domain_of_cuts_along_z(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
   update_node_type(*npcut,glcut,TYPELEVEL_FLUID,NODETYPE_UNUSED,glcut->domain);
 
   /* first, find x,y,z on the new domain */
-  for3DL(kcut,glcut->domain.ks,glcut->domain.ke)
+  for_3DL(kcut,glcut->domain.ks,glcut->domain.ke){
     z=zcut[kcut-1];
     wfprintf(stdout,"%E..",z);
-    for1DL(i,gl->domain_all.is-1,gl->domain_all.ie+1)
-      for2DL(j,gl->domain_all.js-1,gl->domain_all.je+1)
+    for_1DL(i,gl->domain_all.is-1,gl->domain_all.ie+1){
+      for_2DL(j,gl->domain_all.js-1,gl->domain_all.je+1){
         FOUND=FALSE;
-        for3DL(k,gl->domain.ks+1,gl->domain.ke)
+        for_3DL(k,gl->domain.ks+1,gl->domain.ke){
           if (_x(np[_ai(gl,i,j,k+0)],2)>=z && _x(np[_ai(gl,i,j,k-1)],2)<z) {
             FOUND=TRUE;
             for (dim=0; dim<nd; dim++) {
@@ -875,7 +875,7 @@ void create_domain_of_cuts_along_z(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
               xc[dim]=_x(np[_ai(gl,i,j,k+0)],dim);
             }
           }
-        end1DL
+        }
         if (FOUND) {
           (*npcut)[_ai(glcut,i,j,kcut)].bs->x[2]=z;
           fact=(z-xl[2])/(xc[2]-xl[2]);
@@ -884,13 +884,13 @@ void create_domain_of_cuts_along_z(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
         } else {
           fatal_error("Could not interpolate at i=%ld j=%ld for zcut=%E m..",i,j,z);
         }
-      end2DL
-    end1DL
-  end3DL
+      }
+    }
+  }
 
   /* now, for the special case of a domain with only one node along k, find x,y,z on k-1 and k+1 */
-  for1DL(i,glcut->domain.is-1,glcut->domain.ie+1)
-    for2DL(j,glcut->domain.js-1,glcut->domain.je+1)
+  for_1DL(i,glcut->domain.is-1,glcut->domain.ie+1){
+    for_2DL(j,glcut->domain.js-1,glcut->domain.je+1){
       for (dim=0; dim<nd; dim++){
         (*npcut)[_ai(glcut,i,j,glcut->domain.ks-1)].bs->x[dim]=
            (*npcut)[_ai(glcut,i,j,glcut->domain.ks)].bs->x[dim];
@@ -899,12 +899,12 @@ void create_domain_of_cuts_along_z(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
       }
       (*npcut)[_ai(glcut,i,j,glcut->domain.ke+1)].bs->x[2]+=1.0;
       (*npcut)[_ai(glcut,i,j,glcut->domain.ks-1)].bs->x[2]-=1.0;
-    end2DL
-  end1DL
+    }
+  }
 
   zone=gl->domain;
   /* now, find U on the new domain */
-  for3DL(kcut,glcut->domain.ks,glcut->domain.ke)
+  for_3DL(kcut,glcut->domain.ks,glcut->domain.ke){
     z=zcut[kcut-1];
     /* find the lower and high k in *np that englobes z */
     zone.ke=gl->domain.ks;
@@ -917,10 +917,10 @@ void create_domain_of_cuts_along_z(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
     zone.ke=min(gl->domain.ke,zone.ke+1);
     //resume_nodes_only_in_zone_and_update_bdry_nodes(np,gl,zone);
 
-    for1DL(i,gl->domain_all.is,gl->domain_all.ie)
-      for2DL(j,gl->domain_all.js,gl->domain_all.je)
+    for_1DL(i,gl->domain_all.is,gl->domain_all.ie){
+      for_2DL(j,gl->domain_all.js,gl->domain_all.je){
         FOUND=FALSE;
-        for3DL(k,gl->domain_all.ks+1,gl->domain_all.ke)
+        for_3DL(k,gl->domain_all.ks+1,gl->domain_all.ke){
           if (_x(np[_ai(gl,i,j,k+0)],2)>=z && _x(np[_ai(gl,i,j,k-1)],2)<z) {
             FOUND=TRUE;
             nodetype=min(_node_type(np[_ai(gl,i,j,k+0)],TYPELEVEL_FLUID),
@@ -931,7 +931,7 @@ void create_domain_of_cuts_along_z(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
                                         fact,1.0e0-fact,&initnum,initvar);
             }
           }
-        end1DL
+        }
 
         if (FOUND) {
           update_node_type((*npcut),glcut,TYPELEVEL_FLUID,nodetype, _zone_from_point(i,j,kcut));
@@ -940,9 +940,9 @@ void create_domain_of_cuts_along_z(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
         } else {
           fatal_error("Could not interpolate at i=%ld j=%ld for zcut=%E m..",i,j,z);
         }
-      end2DL
-    end1DL
-  end3DL
+      }
+    }
+  }
   wfprintf(stdout,"done.\n");
 }
 #endif
@@ -1577,15 +1577,15 @@ static double fPstarc(void *arg, double Pback){
   q_min=((argfP_t *)arg)->q_min;
   i=((argfP_t *)arg)->i;
   /* integrate i station */
-  for3DL(k,zone.ks,zone.ke)
-    for2DL(j,zone.js,zone.je)
+  for_3DL(k,zone.ks,zone.ke){
+    for_2DL(j,zone.js,zone.je){
       l=_ai(gl,i,j,k);
       if (   is_node_inner(np[l],TYPELEVEL_FLUID) || is_node_bdry (np[l],TYPELEVEL_FLUID)  ) {
         if (reversibly_expand_q_and_rho_to_given_P(np[l], gl, Pback, &qc, &rhoc, numsteps, q_min)==0)
           A+=_rho(np[_ai(gl,i,j,k)])*_V(np[_ai(gl,i,j,k)],0)*area_yz(np,gl,i,j,k)/rhoc/qc;
       }
-    end2DL
-  end3DL
+    }
+  }
   return(A);
 }
 
@@ -1602,8 +1602,8 @@ static void verify_post_domain_is_single_x_plane(np_t *np, gl_t gl, zone_t zone,
 #endif
   FOUNDONE=FALSE;
   x=0.0;
-  for3DL(k,zone.ks,zone.ke)
-    for2DL(j,zone.js,zone.je)
+  for_3DL(k,zone.ks,zone.ke){
+    for_2DL(j,zone.js,zone.je){
       l=_ai(&gl,zone.is,j,k);
       if (   is_node_inner(np[l],TYPELEVEL_FLUID) || is_node_bdry (np[l],TYPELEVEL_FLUID)  ) {
         if (FOUNDONE && fabs(_x(np[l],0)-x)>1.0e-10)
@@ -1611,8 +1611,8 @@ static void verify_post_domain_is_single_x_plane(np_t *np, gl_t gl, zone_t zone,
 	FOUNDONE=TRUE;
 	x=_x(np[l],0);
       }
-    end2DL
-  end3DL
+    }
+  }
   //resume_nodes_only_in_zone_and_update_bdry_nodes(np,&gl,gl.domain_all);
 }
 
@@ -1636,14 +1636,14 @@ static double XSTATION_mdot (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *codex
 #endif
     verify_post_domain_is_single_x_plane(np,gl,zone,codex,"XSTATION_mdot");
     mdot=0.0;
-    for3DL(k,zone.ks,zone.ke)
-      for2DL(j,zone.js,zone.je)
+    for_3DL(k,zone.ks,zone.ke){
+      for_2DL(j,zone.js,zone.je){
         l=_ai(&gl,zone.is,j,k);
         if (   is_node_inner(np[l],TYPELEVEL_FLUID) || is_node_bdry (np[l],TYPELEVEL_FLUID)  ){
           mdot+=_rho(np[l])*_V(np[l],0)*area_yz(np,&gl,zone.is,j,k);
         }        
-      end2DL
-    end3DL
+      }
+    }
 #ifdef DISTMPI
   }
   MPI_Bcast(&mdot,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
@@ -1675,16 +1675,16 @@ static double XSTATION_Fpot (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *codex
     i=zone.is;
     verify_post_domain_is_single_x_plane(np,gl,zone,codex,"XSTATION_Fpot");
     ThrustPotential=0.0;
-    for3DL(k,zone.ks,zone.ke)
-      for2DL(j,zone.js,zone.je)
+    for_3DL(k,zone.ks,zone.ke){
+      for_2DL(j,zone.js,zone.je){
         l=_ai(&gl,i,j,k);
         if (   is_node_inner(np[l],TYPELEVEL_FLUID) || is_node_bdry (np[l],TYPELEVEL_FLUID)  ) {
           if (reversibly_expand_q_and_rho_to_given_P(np[l], &gl, Pback, &qc, &rhoc, numsteps, q_min)==0)
             ThrustPotential+=_rho(np[l])*_V(np[l],0)*area_yz(np,&gl,i,j,k)
                   /rhoc/qc*(rhoc*sqr(qc)+Pback);
         }
-      end2DL
-    end3DL
+      }
+    }
 #ifdef DISTMPI
   }
   MPI_Bcast(&ThrustPotential,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
@@ -1714,15 +1714,15 @@ static double _Fx_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *codex)
     i=zone.is;
     verify_post_domain_is_single_x_plane(np,gl,zone,codex,"_Fx_xstation");
     Fx=0.0;
-    for3DL(k,zone.ks,zone.ke)
-      for2DL(j,zone.js,zone.je)
+    for_3DL(k,zone.ks,zone.ke){
+      for_2DL(j,zone.js,zone.je){
         l=_ai(&gl,i,j,k);
         if (   is_node_inner(np[l],TYPELEVEL_FLUID) || is_node_bdry (np[l],TYPELEVEL_FLUID)  ) {
             Fx+=(_rho(np[l])*_V(np[l],0)*fabs(_V(np[l],0))
                 +_Pstar(np[l],&gl))*area_yz(np,&gl,i,j,k);
         }
-      end2DL
-    end3DL
+      }
+    }
 #ifdef DISTMPI
   }
   MPI_Bcast(&Fx,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
@@ -1803,16 +1803,16 @@ static double _mdotreacting_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_codex
     verify_post_domain_is_single_x_plane(np,gl,zone,codex,"_mdotreacting_xstation");
     mdotreacting=0.0;
 #ifdef _FLUID_MULTISPECIES
-    for3DL(k,zone.ks,zone.ke)
-      for2DL(j,zone.js,zone.je)
+    for_3DL(k,zone.ks,zone.ke){
+      for_2DL(j,zone.js,zone.je){
         l=_ai(&gl,zone.is,j,k);
         if (   is_node_inner(np[l],TYPELEVEL_FLUID) || is_node_bdry (np[l],TYPELEVEL_FLUID)  ) {
           if (_w_post(np[l],rank2)>=wstoichio2) creacting=_w_post(np[l],rank1);
             else creacting=wstoichio1*_w_post(np[l],rank2)/wstoichio2;
           mdotreacting+=_rho(np[l])*_V(np[l],0)*area_yz(np,&gl,zone.is,j,k)*creacting;
         }
-      end2DL
-    end3DL
+      }
+    }
 #endif
 #ifdef DISTMPI
   }
@@ -1842,14 +1842,14 @@ static double XSTATION_Pstag (np_t *np, gl_t gl, zone_t zone, SOAP_codex_t *code
 
     verify_post_domain_is_single_x_plane(np,gl,zone,codex,"XSTATION_Pstag");
     Pstagave=0.0;
-    for3DL(k,zone.ks,zone.ke)
-      for2DL(j,zone.js,zone.je)
+    for_3DL(k,zone.ks,zone.ke){
+      for_2DL(j,zone.js,zone.je){
         l=_ai(&gl,zone.is,j,k);
         if (   is_node_inner(np[l],TYPELEVEL_FLUID) || is_node_bdry (np[l],TYPELEVEL_FLUID)  )
           Pstagave+=_rho(np[l])*_V(np[l],0)*area_yz(np,&gl,zone.is,j,k)*
                     _Pstag(np[l],&gl,numsteps);
-      end2DL
-    end3DL
+      }
+    }
 #ifdef DISTMPI
   }
   MPI_Bcast(&Pstagave,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
@@ -1877,13 +1877,13 @@ static double _massavgproperty_xstation (np_t *np, gl_t gl, zone_t zone, SOAP_co
 #endif
     verify_post_domain_is_single_x_plane(np,gl,zone,codex,functionname);
     Qave=0.0;
-    for3DL(k,zone.ks,zone.ke)
-      for2DL(j,zone.js,zone.je)
+    for_3DL(k,zone.ks,zone.ke){
+      for_2DL(j,zone.js,zone.je){
         l=_ai(&gl,zone.is,j,k);
         if (   is_node_inner(np[l],TYPELEVEL_FLUID) || is_node_bdry (np[l],TYPELEVEL_FLUID)  )
           Qave+=_rho(np[l])*_V(np[l],0)*area_yz(np,&gl,zone.is,j,k)*(*PROPERTY)(np[l],&gl);
-      end2DL
-    end3DL
+      }
+    }
 #ifdef DISTMPI
   }
   MPI_Bcast(&Qave,1,MPI_DOUBLE,0,MPI_COMM_WORLD);

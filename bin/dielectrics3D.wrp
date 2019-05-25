@@ -147,8 +147,13 @@ Disc(
   DriftDiffusion(
     aref=300.0;       {reference speed of sound in m/s used when conditioning Dstar eigenvalues  }
     zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
+    betag[1]=-0.0010;
+    betag[2]=1.0000;
+    betaa[1]=0.9990;
+    betaa[2]=0.0000;
   );
   Epotential(
+    POTENTIAL=POTENTIAL_OHMBASED;
     Ediv=10.0;        {a small positive number in V/m, needed to prevent a division by zero when
                        discretizing the electron pressure gradients within the potential equation}
   );
@@ -195,7 +200,7 @@ Cycle(
     UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2);
     Lc=5e-3;  {characteristic length scale used to solve the emfield equation}
     relaxfact_emfield=1.0;  {relaxation factor forced on the update of the emfield variables}
-    UpdateEMField(Lc*1000,relaxfact_emfield,TSEMF_SOR2,1000);
+    UpdateEMField(Lc*1000,relaxfact_emfield,TSEMF_SOR,1000);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld,%4ld)  %6.0f %E (%4ld,%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,k_ximax,Lc,ximax_emfield,i_ximax_emfield,j_ximax_emfield,k_ximax_emfield,clipinfo);

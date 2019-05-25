@@ -755,10 +755,10 @@ void display_node_type_window(FILE *outfile, np_t *np, gl_t *gl, int TYPELEVEL,
           wfprintf(outfile,"S");
         }
       }
-    } /* for1DL */
+    } /* for_1DL */
 #ifdef _2DL
     if (PRINT && j!=jm) wfprintf(outfile,"\n"); else wfprintf(outfile,"<j=%ld\n",jm);
-  } /* for2DL */
+  } /* for_2DL */
 #else
   if (PRINT) wfprintf(outfile,"\n");
 #endif
@@ -976,10 +976,10 @@ void display_node_type_window_local_process(FILE *outfile, np_t *np, gl_t *gl, i
           fprintf(outfile,"S");
         }
       }
-    } /* for1DL */
+    } /* for_1DL */
 #ifdef _2DL
     if (PRINT && j!=jm) fprintf(outfile,"\n"); else fprintf(outfile,"<j=%ld\n",jm);
-  } /* for2DL */
+  } /* for_2DL */
 #else
   if (PRINT) fprintf(outfile,"\n");
 #endif

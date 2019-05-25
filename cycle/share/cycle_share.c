@@ -186,9 +186,9 @@ void sweep_with_1D_segments(np_t *np, gl_t *gl, zone_t zone,
     /* the first dimension loop */
     if (sweeptype==SWEEPTYPE_IJK || sweeptype==SWEEPTYPE_I) {
       cntsegment=0;
-      for2DL(j,zone.js,zone.je)
+      for_2DL(j,zone.js,zone.je){
        if (mod(j-gl->domain_all.js,GRIDLEVEL)==0){
-        for3DL(k,zone.ks,zone.ke)
+        for_3DL(k,zone.ks,zone.ke){
          if (mod(k-gl->domain_all.ks,GRIDLEVEL)==0){
           create_segments(np,gl,0,_ai(gl,zone.is-1,j,k),_ai(gl,zone.ie+1,j,k),
                         funct, segmentarg,&cntsegment, (bool)COUNTFLAG, TYPELEVEL,is_node_valid_local);
@@ -198,9 +198,9 @@ void sweep_with_1D_segments(np_t *np, gl_t *gl, zone_t zone,
             cntsegment=0;
           }
          }
-        end3DL
+        }
        }
-      end2DL
+      }
       if (cntsegment>0 && !COUNTFLAG) execute_function_on_all_segments(segmentarg,cntsegment,SEGMENTWORK);
       numthread=max(numthread,cntsegment);
     }
@@ -208,9 +208,9 @@ void sweep_with_1D_segments(np_t *np, gl_t *gl, zone_t zone,
 #ifdef _2DL
     if (sweeptype==SWEEPTYPE_IJK || sweeptype==SWEEPTYPE_J) {
       cntsegment=0;
-      for1DL(i,zone.is,zone.ie)
+      for_1DL(i,zone.is,zone.ie){
        if (mod(i-gl->domain_all.is,GRIDLEVEL)==0){
-        for3DL(k,zone.ks,zone.ke)
+        for_3DL(k,zone.ks,zone.ke){
          if (mod(k-gl->domain_all.ks,GRIDLEVEL)==0){
           create_segments(np,gl,1,_ai(gl,i,zone.js-1,k),_ai(gl,i,zone.je+1,k),
                           funct, segmentarg,&cntsegment,(bool)COUNTFLAG, TYPELEVEL,is_node_valid_local);
@@ -220,9 +220,9 @@ void sweep_with_1D_segments(np_t *np, gl_t *gl, zone_t zone,
             cntsegment=0;
           }
          }
-        end3DL
+        }
        }
-      end1DL
+      }
       if (cntsegment>0 && !COUNTFLAG) execute_function_on_all_segments(segmentarg,cntsegment,SEGMENTWORK);
       numthread=max(numthread,cntsegment);
     }
@@ -231,9 +231,9 @@ void sweep_with_1D_segments(np_t *np, gl_t *gl, zone_t zone,
 #ifdef _3DL
     if (sweeptype==SWEEPTYPE_IJK || sweeptype==SWEEPTYPE_K) {
       cntsegment=0;
-      for1DL(i,zone.is,zone.ie)
+      for_1DL(i,zone.is,zone.ie){
        if (mod(i-gl->domain_all.is,GRIDLEVEL)==0){
-        for2DL(j,zone.js,zone.je)
+        for_2DL(j,zone.js,zone.je){
          if (mod(j-gl->domain_all.js,GRIDLEVEL)==0){
           create_segments(np,gl,2,_ai(gl,i,j,zone.ks-1),_ai(gl,i,j,zone.ke+1),
                           funct, segmentarg, &cntsegment,(bool)COUNTFLAG, TYPELEVEL,is_node_valid_local);
@@ -243,9 +243,9 @@ void sweep_with_1D_segments(np_t *np, gl_t *gl, zone_t zone,
             cntsegment=0;
           }
          }
-        end2DL
+        }
        }
-      end1DL
+      }
       if (cntsegment>0 && !COUNTFLAG) execute_function_on_all_segments(segmentarg,cntsegment,SEGMENTWORK);
       numthread=max(numthread,cntsegment);
     }
@@ -710,13 +710,13 @@ static bool is_node_in_region_extended_by_bb(bool(*FUNCT)(gl_t *, long, long, lo
   bool tmp;
   long cnti,cntj,cntk;
   tmp=FALSE;
-  for1DL(cnti,i-hbw_bdry_fluid,i+hbw_bdry_fluid)
-    for2DL(cntj,j-hbw_bdry_fluid,j+hbw_bdry_fluid)
-      for3DL(cntk,k-hbw_bdry_fluid,k+hbw_bdry_fluid)
+  for_1DL(cnti,i-hbw_bdry_fluid,i+hbw_bdry_fluid){
+    for_2DL(cntj,j-hbw_bdry_fluid,j+hbw_bdry_fluid){
+      for_3DL(cntk,k-hbw_bdry_fluid,k+hbw_bdry_fluid){
         if (FUNCT(gl,cnti,cntj,cntk)) tmp=TRUE;
-      end3DL
-    end2DL
-  end1DL
+      }
+    }
+  }
   return(tmp);
 }
 

@@ -137,18 +137,18 @@ static void resize_marching_window(np_t *np, gl_t *gl, zone_t oldwindow, zone_t 
   adjust_node_type(np, gl, zone, TYPELEVEL_FLUID_WORK);
 
   if (newwindow.is<oldwindow.is){
-    for1DL(i,max(gl->domain.is,newwindow.is-hbw_res_fluid-hbw_bdry_fluid-max(hbw_res_fluid,hbw_bdry_fluid)),
-             max(gl->domain.is,oldwindow.is-hbw_bdry_fluid-hbw_res_fluid-1))
-      for2DL(j,gl->domain.js,gl->domain.je)
-        for3DL(k,gl->domain.ks,gl->domain.ke)
+    for_1DL(i,max(gl->domain.is,newwindow.is-hbw_res_fluid-hbw_bdry_fluid-max(hbw_res_fluid,hbw_bdry_fluid)),
+             max(gl->domain.is,oldwindow.is-hbw_bdry_fluid-hbw_res_fluid-1)){
+      for_2DL(j,gl->domain.js,gl->domain.je){
+        for_3DL(k,gl->domain.ks,gl->domain.ke){
           if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)) {
             assert(is_node_resumed(np[_ai(gl,i,j,k)]));
             np[_ai(gl,i,j,k)].wk->xi=0.0e0;
             for (flux=0; flux<nf; flux++) np[_ai(gl,i,j,k)].wk->Res[flux]=0.0e0;
           }
-        end3DL
-      end2DL
-    end1DL
+        }
+      }
+    }
   }
 
   if (oldwindow.ie!=newwindow.ie) {
@@ -215,14 +215,14 @@ static long _max_i_elliptic(np_t *np, gl_t *gl, zone_t zone){
   FOUND_ELLIPTIC=FALSE;
   do{
     i--;
-    for2DL(j,zone.js,zone.je)
-      for3DL(k,zone.ks,zone.ke)
+    for_2DL(j,zone.js,zone.je){
+      for_3DL(k,zone.ks,zone.ke){
         if (  is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)
            && (   _varphi(np,gl,_ai(gl,i,j,k),0)>gl->cycle.varphiverge
               )
 	   ) FOUND_ELLIPTIC=TRUE;
-      end3DL
-    end2DL
+      }
+    }
   } while (!FOUND_ELLIPTIC && i>zone.is);
   return(i);
 }

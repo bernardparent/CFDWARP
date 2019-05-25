@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+
+2019 MAY 25a
+  * renamed
+    - for1DL -> for_1DL
+    - for2DL -> for_2DL
+    - for3DL -> for_3DL
+  * in src/common.h
+    - changed the macro for for_1DL, for_2DL, for_3DL: now, they should be accompanied
+      by { and } and not by end1DL, end2DL, end3DL
+  * in src/common.h
+    - changed the macro for for_zone_*(): now sets k the ks in _2DL, and j to js in
+      _1DL (were previously set to 0). This is important for the MPI subdomain 
+      creation
+  
+
 2019 MAY 24a
   * in src/common.h
     - added macros for_zone_ijk(), for_zone_jik(), for_zone_kij(), for_zone_kji()

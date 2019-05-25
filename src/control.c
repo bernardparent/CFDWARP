@@ -980,9 +980,9 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     
         //  wfprintf(stdout,"[%dx%d opt domains]",ndomi_opt,ndomj_opt);
         err=1e99;
-        for1DL(ndomi,1,proc)
-          for2DL(ndomj,1,proc)
-            for3DL(ndomk,1,proc)
+        for_1DL(ndomi,1,proc){
+          for_2DL(ndomj,1,proc){
+            for_3DL(ndomk,1,proc){
               errthis=fabs((double)ndomi-ndomi_opt)/ndomi_opt+fabs((double)ndomj-ndomj_opt)/ndomj_opt +fabs((double)ndomk-ndomk_opt)/ndomk_opt;
               if (errthis<err && ndomi*ndomj*ndomk==proc){
                 gl->numdomain_i=ndomi;
@@ -990,9 +990,9 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
                 gl->numdomain_k=ndomk;
                 err=errthis;
               }
-            end3DL
-          end2DL
-        end1DL
+            }
+          }
+        }
       break;
       case DISTDOMAIN_METHOD_USERSPEC:
 #ifdef _2D

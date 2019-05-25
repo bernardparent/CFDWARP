@@ -1558,9 +1558,9 @@ zone_t _zone_intersection_experimental(zone_t zone1, zone_t zone2){
 
 void validate_data_structure(np_t *np,gl_t *gl){
   long i,j,k,i2,j2,k2;
-  for1DL(i,gl->domain_lim.is,gl->domain_lim.ie)
-    for2DL(j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL(k,gl->domain_lim.ks,gl->domain_lim.ke)
+  for_1DL(i,gl->domain_lim.is,gl->domain_lim.ie){
+    for_2DL(j,gl->domain_lim.js,gl->domain_lim.je){
+      for_3DL(k,gl->domain_lim.ks,gl->domain_lim.ke){
          find_ijk_from_l(gl, _ai(gl,i,j,k), &i2, &j2, &k2);
 #ifndef NDEBUG
          np[_ai(gl,i,j,k)].i=i;
@@ -1577,9 +1577,9 @@ void validate_data_structure(np_t *np,gl_t *gl){
                       "(i2=%ld j2=%ld k2=%ld).",i,j,k,i2,j2,k2);
 #endif
 
-      end3DL
-    end2DL
-  end1DL
+      }
+    }
+  }
 }
 
 
@@ -1608,14 +1608,14 @@ void init_data_structure(np_t **np, gl_t *gl, zone_t domain, zone_t domain_all){
 void init_data_structure_and_create_nodes(np_t **np, gl_t *gl, zone_t domain, zone_t domain_all){
   long i,j,k;
   init_data_structure(np,gl,domain,domain_all);
-  for1DL (i,gl->domain_lim.is,gl->domain_lim.ie)
-    for2DL (j,gl->domain_lim.js,gl->domain_lim.je)
-      for3DL (k,gl->domain_lim.ks,gl->domain_lim.ke)
+  for_1DL (i,gl->domain_lim.is,gl->domain_lim.ie){
+    for_2DL (j,gl->domain_lim.js,gl->domain_lim.je){
+      for_3DL (k,gl->domain_lim.ks,gl->domain_lim.ke){
         create_node(&((*np)[_ai(gl,i,j,k)]), i, j, k);
         suspend_node(&((*np)[_ai(gl,i,j,k)]));
-      end3DL
-    end2DL
-  end1DL
+      }
+    }
+  }
 }
 
 
@@ -1687,9 +1687,9 @@ zone_t _domain_from_rank_mem(int rank, gl_t *gl){
   zone.je=gl->domain_all.js;
   zone.ks=gl->domain_all.ke;
   zone.ke=gl->domain_all.ks;
-  for1DL(i,gl->domain_all.is,gl->domain_all.ie)
-    for2DL(j,gl->domain_all.js,gl->domain_all.je)
-      for3DL(k,gl->domain_all.ks,gl->domain_all.ke)
+  for_1DL(i,gl->domain_all.is,gl->domain_all.ie){
+    for_2DL(j,gl->domain_all.js,gl->domain_all.je){
+      for_3DL(k,gl->domain_all.ks,gl->domain_all.ke){
         if (_node_rank(gl, i, j, k)==rank){
           zone.is=min(zone.is,i);
           zone.ie=max(zone.ie,i);
@@ -1698,9 +1698,9 @@ zone_t _domain_from_rank_mem(int rank, gl_t *gl){
           zone.ks=min(zone.ks,k);
           zone.ke=max(zone.ke,k);
         }
-      end3DL
-    end2DL
-  end1DL
+      }
+    }
+  }
   if (zone.is>zone.ie || zone.js>zone.je || zone.ks>zone.ke){
     fatal_error("Problem in _domain_from_rank_mem() numdomain_i=%ld numdomain_j=%ld numdomain_k=%ld rank=%d zone.is=%ld .ie=%ld .js=%ld .je=%ld .ks=%ld .ke=%ld .",gl->numdomain_i,gl->numdomain_j,gl->numdomain_k,rank,zone.is,zone.ie,zone.js,zone.je,zone.ks,zone.ke);
   }
