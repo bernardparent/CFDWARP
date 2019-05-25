@@ -28,7 +28,7 @@
 if [ $# = 1 ]
 then
 {
-  indent -nut -nv -gnu -l110 -br -brf -brs -ce -cdw -sob -npsl -nbfda -prs  $1
+  indent -nut -nv -gnu -l110 -br -brf -brs -ce -cdw -sob -npsl -nbfda -nprs -bap -pcs -bad -ncs $1
 }
 else
 {

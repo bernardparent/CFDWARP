@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 MAY 25b
+  * in README
+    - added description of the code and unique capabilities
+  * in tools/indentwithwarpstyle.sh, made adjustment to the indent flags
+  
 
 2019 MAY 25a
   * renamed
