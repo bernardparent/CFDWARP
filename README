@@ -12,15 +12,19 @@
   CFDWARP is a 100,000+ line C code that is specifically tailored to simulate efficiently plasma 
   and reactive flows occurring in aerodynamics, combustion, hypersonics, re-entry, lightning, 
   and fuel reforming. CFDWARP is a high-order compressible flow solver that uses 
-  state-of-the-art flux discretization schemes and that is superior to other non-neutral plasma 
-  codes in two ways:
+  state-of-the-art flux discretization schemes suitable for Reynolds-averaged Navier-Stokes 
+  (RANS) and Implicit Large Eddy Simulation (ILES). CFDWARP is superior to other non-neutral 
+  plasma codes in two ways:
  
   (a) CFDWARP is the first CFD code that integrates the electron and ion equations along with 
-      the "bulk flow" equations using aerodynamic-scale (i.e. microsecond and higher) 
-      integration steplengths (see https://doi.org/10.2514/1.J054624).
+      the bulk flow equations using aerodynamic-scale (i.e. microsecond and higher) integration 
+      steplengths, permitting the simulation of non-neutral plasmas in about the same amount of 
+      computing effort as non-ionized reactive flows (see https://doi.org/10.2514/1.J054624).
       
   (b) CFDWARP is the first implicit solver for gas dynamics that preserves the positivity of 
-      the partial densities and of the pressure (see https://doi.org/10.1016/j.jcp.2018.01.046).
+      the partial densities and of the pressure, permitting the integration of chemically-
+      reacting flows in which a vacuum form such as blast waves or lightning (see
+      https://doi.org/10.1016/j.jcp.2018.01.046)
 
 
   Please read the file CONTRIB for the list of the CFDWARP contributors.
@@ -29,6 +33,3 @@
 
   Please read the file USAGE for instructions on how to operate the CFDWARP code.
  
-  Please refer to the manuals lib/gridg/doc/report.pdf and lib/soap/doc/report.pdf for 
-  information on the SOAP interpreter language and the GRIDG grid generation library used 
-  within the CFDWARP control file.

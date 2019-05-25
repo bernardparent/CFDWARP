@@ -11,6 +11,7 @@ ____________________________________________________________________________
 
 1. CREATE TEMPLATE CONTROL FILE
 
+
 ./warp -w control.wrp
 
 
@@ -252,9 +253,5 @@ For other commands, see the list of possible flags that warp recognizes by
 typing warp without arguments at the prompt:
 
 ./warp -h
-
-
-
-
 
 
