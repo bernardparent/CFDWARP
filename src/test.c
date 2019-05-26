@@ -1003,7 +1003,7 @@ int main ( int argc, char **argv ) {
   }
   //dispose_node ( &npL );
   //dispose_node ( &npR );
-  for_zone_ijk ( gl.domain_lim,is,js,ks,ie,je,ke ){
+  for_ijk ( gl.domain_lim,is,js,ks,ie,je,ke ){
         dispose_node ( &( npArray[_ai ( &gl, i, j, k )] ) );
   }
   free_clipped_variables( &gl );

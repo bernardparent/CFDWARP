@@ -900,7 +900,7 @@ void check_domain_values(np_t *np, gl_t *gl, char *message){
   long i,j,k;
   double P;
   resume_nodes_only_in_zone_and_update_bdry_nodes(np,gl,gl->domain);
-  for_zone_ijk(gl->domain,is,js,ks,ie,je,ke){
+  for_ijk(gl->domain,is,js,ks,ie,je,ke){
         P=_Pstar(np[_ai(gl,i,j,k)]);
         if (P<4000 || P>6000) {
           printf("problem here %s\n",message);

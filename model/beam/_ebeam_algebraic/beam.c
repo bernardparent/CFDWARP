@@ -88,7 +88,7 @@ void read_model_beam_actions(char *actionname, char **argum, SOAP_codex_t *codex
     wfprintf(stdout,"%s..",_BEAM_ACTIONNAME);
     gl->MODEL_BEAM_READ=TRUE;  
   
-    for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
+    for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
 	      (*((readcontrolarg_t *)codex->action_args)->np)[_ai(((readcontrolarg_t *)codex->action_args)->gl,i,j,k)].bs->QbeamoverN=0.0;
     }
 

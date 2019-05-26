@@ -74,7 +74,7 @@ void write_post_file_nodplot(np_t *np, gl_t *gl, zone_t zone, char *filename, bo
 
   wfprintf(stdout,"Writing to postfile %s for NODPLOT use..",filename);
 
-  for_zone_kij(zone,is,js,ks,ie,je,ke){
+  for_kij(zone,is,js,ks,ie,je,ke){
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
 #endif
@@ -247,7 +247,7 @@ void write_post_file_tecplot(np_t *np, gl_t *gl, zone_t zone, char *filename, bo
 #ifdef DISTMPI
   if (rank==0 || gl->DISTDOMAIN) {
 #endif
-    for_zone_kji(zone,is,js,ks,ie,je,ke){
+    for_kji(zone,is,js,ks,ie,je,ke){
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
 #endif
@@ -398,7 +398,7 @@ void write_post_file_vtk(np_t *np, gl_t *gl, zone_t zone, char *filename, bool G
 /* here, output the grid x,y,z to the postfile */
   cntpoint=0;
   numcells=0;
-  for_zone_kji(zone,is,js,ks,ie,je,ke){
+  for_kji(zone,is,js,ks,ie,je,ke){
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
 #endif
@@ -436,7 +436,7 @@ void write_post_file_vtk(np_t *np, gl_t *gl, zone_t zone, char *filename, bool G
   wfprintf(postfile, "CELLS %ld ",numcells);
   wfprintf(postfile, "%ld\n",if2D(5)if3D(9)*numcells);
   
-  for_zone_kji(zone,is,js,ks,ie-1,je-1,ke-1){
+  for_kji(zone,is,js,ks,ie-1,je-1,ke-1){
          if (CELLVALID[if2D(EXM_ai2(gl2d,i,j))if3D(EXM_ai3(gl3d,i,j,k))]) {
 #ifdef _2D
           wfprintf(postfile, "4 %ld %ld %ld %ld \n",l[EXM_ai2(gl2d,i,j)],l[EXM_ai2(gl2d,i+1,j)],l[EXM_ai2(gl2d,i+1,j+1)],l[EXM_ai2(gl2d,i,j+1)]);
@@ -484,7 +484,7 @@ void write_post_file_vtk(np_t *np, gl_t *gl, zone_t zone, char *filename, bool G
         }
       }
       if (!VECTORVAR) wfprintf(postfile, "LOOKUP_TABLE default \n");
-        for_zone_kji(zone,is,js,ks,ie,je,ke){
+        for_kji(zone,is,js,ks,ie,je,ke){
 #ifdef DISTMPI
               if (_node_rank(gl,i,j,k)==rank) {
 #endif
@@ -785,7 +785,7 @@ void create_domain_of_cuts_along_y(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
     /* find the lower and high j in *np that englobes y */
     zone.je=gl->domain.js;
     zone.js=gl->domain.je;
-    for_zone_ijk(gl->domain,is,js,ks,ie,je,ke){
+    for_ijk(gl->domain,is,js,ks,ie,je,ke){
           if (_x(np[_ai(gl,i,j,k)],1)>=y) zone.js=min(zone.js,j);
           if (_x(np[_ai(gl,i,j,k)],1)<=y) zone.je=max(zone.je,j);
     }
@@ -909,7 +909,7 @@ void create_domain_of_cuts_along_z(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
     /* find the lower and high k in *np that englobes z */
     zone.ke=gl->domain.ks;
     zone.ks=gl->domain.ke;
-    for_zone_ijk(gl->domain,is,js,ks,ie,je,ke){
+    for_ijk(gl->domain,is,js,ks,ie,je,ke){
           if (_x(np[_ai(gl,i,j,k)],2)>=z) zone.ks=min(zone.ks,k);
           if (_x(np[_ai(gl,i,j,k)],2)<=z) zone.ke=max(zone.ke,k);
     }
@@ -967,7 +967,7 @@ static void integrate_emfield_force(np_t *np, gl_t *gl, zone_t zone, dim_t Femfi
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
 
-  for_zone_ijk(zone,is,js,ks,ie,je,ke){
+  for_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1007,7 +1007,7 @@ static void integrate_emfield_work(np_t *np, gl_t *gl, zone_t zone,
 #endif
   *Wemfield=0.0;
 
-  for_zone_ijk(zone,is,js,ks,ie,je,ke){
+  for_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1046,7 +1046,7 @@ static void integrate_EdotJ(np_t *np, gl_t *gl, zone_t zone, double *EdotJ){
 #endif
   *EdotJ=0.0;
 
-  for_zone_ijk(zone,is,js,ks,ie,je,ke){
+  for_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1083,7 +1083,7 @@ static void integrate_Qbeam(np_t *np, gl_t *gl, zone_t zone, double *Qbeam){
 #endif
   *Qbeam=0.0;
 
-  for_zone_ijk(zone,is,js,ks,ie,je,ke){
+  for_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1135,7 +1135,7 @@ static void integrate_area_on_bdry(np_t *np, gl_t *gl, zone_t zone,
 #endif
   for (dim=0; dim<nd; dim++) Awall[dim]=0.0;
 
-  for_zone_ijk(zone,is,js,ks,ie,je,ke){
+  for_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1182,7 +1182,7 @@ static void integrate_shear_force_on_bdry(np_t *np, gl_t *gl, zone_t zone,
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
   for (dim=0; dim<nd; dim++) Fwall_shear[dim]=0.0;
-  for_zone_ijk(zone,is,js,ks,ie,je,ke){
+  for_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1249,7 +1249,7 @@ static void integrate_heat_to_surface_on_bdry(np_t *np, gl_t *gl, zone_t zone,
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
   *heat_to_surface=0.0;
-  for_zone_ijk(zone,is,js,ks,ie,je,ke){
+  for_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1318,7 +1318,7 @@ static void integrate_pressure_force_on_bdry(np_t *np, gl_t *gl, zone_t zone,
 #endif
   for (dim=0; dim<nd; dim++) Fwall_P[dim]=0.0;
 
-  for_zone_ijk(zone,is,js,ks,ie,je,ke){
+  for_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1378,7 +1378,7 @@ static void integrate_metotal(np_t *np, gl_t *gl, zone_t zone, double *metotal){
 #endif
   *metotal=0.0;
   
-  for_zone_ijk(zone,is,js,ks,ie,je,ke){
+  for_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -1418,7 +1418,7 @@ static void integrate_mass(np_t *np, gl_t *gl, zone_t zone, double *mass){
 #endif
   *mass=0.0;
   
-  for_zone_ijk(zone,is,js,ks,ie,je,ke){
+  for_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
         if (_node_rank(gl,i,j,k)==rank) {
@@ -2182,7 +2182,7 @@ static void read_post_actions(char *action, char **argum, SOAP_codex_t *codex){
     if (numcut>0) {
       if (*np_post!=*np) {
         /* if *np!=*np_post, then free the xcut domain first */
-        for_zone_ijk (gl_post->domain_lim,is,js,ks,ie,je,ke ){
+        for_ijk (gl_post->domain_lim,is,js,ks,ie,je,ke ){
               dispose_node ( &( (*np_post)[_ai ( gl_post, i, j, k )] ) );
         }
         free (*np_post);
@@ -2243,7 +2243,7 @@ void read_post(char *argum, SOAP_codex_t *codex){
   np_post = &(((readcontrolarg_t *)codex->action_args)->np_post);
   gl_post = &(((readcontrolarg_t *)codex->action_args)->gl_post);
   if ( *np_post != *np ){
-    for_zone_ijk ( gl_post->domain_lim,is,js,ks,ie,je,ke ){
+    for_ijk ( gl_post->domain_lim,is,js,ks,ie,je,ke ){
           dispose_node ( &( (*np_post)[_ai ( gl_post, i, j, k )] ) );
     }
     free ( *np_post );

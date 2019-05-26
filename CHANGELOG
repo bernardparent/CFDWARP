@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 MAY 26a
+  * renamed
+    - for_zone_ijk -> for_ijk
+    - for_zone_kji -> for_kji
+    - for_zone_kij -> for_kij
+    - for_zone_jik -> for_jik
+
+
 2019 MAY 25d
   * in README and USAGE
     - further changes

@@ -101,7 +101,7 @@ void runtime_actions_cycle_specific(char *actionname, char **argum, SOAP_codex_t
     if (SOAP_number_argums(*argum)!=1) SOAP_fatal_error(codex,"Number of arguments not equal to 1 in UpdateFluid(); action.");
     gl->dt=SOAP_get_argum_double(codex,*argum,0);
     if (gl->dt<=0.0) fatal_error("The time step dt must be positive when calling UpdateFluid.");
-    for_zone_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
+    for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
           l=_ai(gl,i,j,k);
           if ((is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID))){
             for (flux=0; flux<nf; flux++){
