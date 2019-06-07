@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 JUN 07a
+  * in model/emfield/_Epotential*/emfield.c
+    - got rid of UNSTEADYTERMS
+  * in model/emfield/_emfield.h
+    - added _phim1()
+  * in model/share/emfield_share.c
+    - fixed a bug: got rid of UNSTEADYTERMS as this wasn't set to TRUE as in emfield.c 
+
+
 2019 MAY 26a
   * renamed
     - for_zone_ijk -> for_ijk

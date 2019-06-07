@@ -42,6 +42,10 @@
 
   double _phi(np_t np, gl_t *gl);
 
+#ifdef UNSTEADY
+  double _phim1(np_t np, gl_t *gl);
+#endif
+
   double _Ekmag(np_t *np, gl_t *gl, long l, long spec);
 
   double _Eemag_smoothed(np_t *np, gl_t *gl, long l);

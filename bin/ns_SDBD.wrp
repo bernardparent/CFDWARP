@@ -5,7 +5,7 @@ meshlevel=1;
 mf=(1.41)^(-4+meshlevel); {1.0/1.41, 1.0, 1.41, 2.0, 2.82}
 
 tf=1.0; {tf=1 works great}
-CFLfact=0.8;
+CFLfact=1.6;
 
 {meshlevel=4, out.96ml4.110;  me_added: 6.58e-2;  Tmax=7853K;  
  meshlevel=3, out.96ml3.78;   me_added: 6.22e-2;  Tmax=7978K;
@@ -14,7 +14,7 @@ CFLfact=0.8;
 }
 
 dphimax=14000;
-itermax=round(220/sqrt(CFLfact));
+itermax=140/sqrt(CFLfact/1.6);
 EMFsubiter=1300;
 
 is1=1;
@@ -346,7 +346,7 @@ Cycle(
                            near cathode when PRECONDITIONER is set to PRECON_LOCALTIMESTEPPLASMA} 
     relaxNi_bdry=0.8;     {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.1;     {the electron density relaxation factor at the boundary }
-    relaxTe=0.3;          {the electron temperature relaxation factor }
+    relaxTe=0.5;          {the electron temperature relaxation factor }
     rhoref=0.1;           {reference density in kg/m3}
     Tref=300.0;           {reference temperature in K}
     Teref=20000.0;        {reference electron temperature in K}
@@ -398,7 +398,7 @@ Cycle(
         CFL=2.0*CFLfact;
       );
       CFL=CFLfact; {?????}
-      if (iter<6, 
+      if (iter<3, 
         CFL=0.0;
       );
     ,{else}
@@ -416,8 +416,8 @@ Cycle(
     system("date");
     Lc=1e-3*4;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=1.0; {relaxation factor forced on the update of the emfield variables}
-    for (cnt,1,1,
-      UpdateEMField(Lc*100000,relaxEMF*1.0,dt,TSEMF_SOR,round(EMFsubiter/1)); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+    for (cnt,0,0,
+      UpdateEMField(Lc*100000,relaxEMF*1.0,dt,TSEMF_SOR,EMFsubiter); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
       {UpdateEMField(Lc,relaxEMF*0.3,dt,TSEMF_ADI);}
       {UpdateEMField(Lc*100000,relaxEMF*1.0,dt,TSEMF_IMAF,50);} {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
     );
