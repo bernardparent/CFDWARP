@@ -10,8 +10,8 @@ ________________________________________________________________________________
 
 ALEXANDER, Derrick C.
 
-  - implementation of the JoinAll2D subroutine in lib/gridgen/2Dbase.c and of the JoinAll3D in 
-    lib/gridgen/3Dbase.c.
+  - implementation of the JoinAll2D subroutine in lib/gridg/2Dbase.c and of the JoinAll3D in 
+    lib/gridg/3Dbase.c.
 
   - implementation of x-cuts in src/post.c
 
