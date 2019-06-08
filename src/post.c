@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
 Copyright 2001-2006 Bernard Parent
+Copyright 2001-2002 Derrick Alexander
+Copyright 2019 Van Tien Nguyen
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:

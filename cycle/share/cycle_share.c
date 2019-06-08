@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
 Copyright 1998-2018 Bernard Parent
+Copyright 2001 Giovanni Fusina
+Copyright 2002 Thomas E. Schwartzentruber
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:

@@ -8,69 +8,91 @@ ________________________________________________________________________________
 
 
 
-Alexander, Derrick C.
-  - implementation of the JoinAll2D subroutine in lib/gridgen/2Dbase.c
-    and of the JoinAll3D in lib/gridgen/3Dbase.c.
-  - the idea of how to do the x-cuts in src/post.c
+ALEXANDER, Derrick C.
+
+  - implementation of the JoinAll2D subroutine in lib/gridgen/2Dbase.c and of the JoinAll3D in 
+    lib/gridgen/3Dbase.c.
+
+  - implementation of x-cuts in src/post.c
 
 
-Etele, Jason
-  - development of code tools/rocket_v?.c
-  - write-up of the documentation tools/doc/Rocket_v?
-  - implementation of the axisymmetric source terms in the subroutine
-    FindSaxisymmetric in prim/_kpsi/prim.c
-  - implementation of the kerosene-related species in
-    prim/thermo/_hightemp
-  - everything in the subdirectory prim/chem/_kerosene19s24r
-  - in prim/_FANS_kpsi/prim_bdry.c, included the Reservoir2 boundary
-    condition
+ETELE, Jason
+
+  - development of code tools/old/rocket_v4.c
+
+  - write-up of the documentation tools/doc/Rocket_v2
+
+  - implementation of the axisymmetric source terms in the subroutine find_Saxi() in 
+    model/share/fluid_share.c
+
+  - implementation of the kerosene-related species in model/thermo/_generic
+
+  - implementation of kerosene-air chemical solver in the subdirectory 
+    model/chem/old/_kerosene19s24r
+
+  - in model/share/fluid_share.c, implemented find_w_V_P_T_bdry_inflow_reservoir_2()
 
 
-Fusina, Giovanni
-  - implementation of the chemistry modules in prim/chem/_jachimowsky/
-    and in prim/chem/_singh/
-  - addition of several species in the high temperature
-    module prim/thermo/_hightemp/thermo.c
+FUSINA, Giovanni
+
+  - implementation of the chemistry modules in model/chem/_H2_Air_9s_20r_Jachimowsky
+
+  - implementation of the chemistry modules in model/chem/old/_singh
+
+  - addition of several species in  model/thermo/_generic/thermo.c
+
   - addition of the SHAREDMPI commands in src/main.c src/common.h and cycle/share/cycle_share.c
 
 
-Hui, Tim
-  - implementation, derivation of the analytical jacobian in
-    prim/chem/_jachimowsky/chem.c
-  - all files in prim/chem/_lutz
+HUI, Timothy
+
+  - implementation, derivation of the analytical jacobian in 
+    model/chem/_H2_Air_9s_20r_Jachimowsky/chem.c
+
+  - all files in model/chem/old/_lutz
 
 
-Lee, Jaehyuk
-  - addition of EXM_invert_matrix_partial_pivoting() in lib/exm.c
+LEE, Jaehyuk
+
+  - addition of EXM_invert_matrix_partial_pivoting() in   lib/exm/exm.c
+
   - addition of invert_matrix_partial_pivoting() in src/common.c
 
 
-Nguyen, Van Tien
+NGUYEN, Van Tien
+
   - addition of postfilename within Post() module that is specified through argument to
-    -opm flag (see changes for version 19apr20a) 
+    opm flag (see changes for version 19apr20a) 
 
 
-Padmanabhan, Sathyan 
+PADMANABHAN, Sathyan 
+
   - tools/tauvt.c
 
 
-Parent, Bernard
+PARENT, Bernard
+
   - most modules
 
-
-Schwartzentruber, Thomas E.
-  - implementation of superzone in cycle/share/cycle_share.c part of SHAREDMPI commands
-    although this has been taken away since.
-  - implementation of the subsonic outflow boundary condition based
-    on constant Mach number in prim/_FANS_kpsi/prim_bdry.c
-
 	
-Rajendran, Prasanna T.
+RAJENDRAN, Prasanna T.
+
   - addition of bin/taylor_green_vortex.*
+
   - tools/average.sh
+
   - tools/average.c
 
+
+SCHWARTZENTRUBER, Thomas E.
+
+  - implementation of superzone in cycle/share/cycle_share.c part of SHAREDMPI commands
+
+  - implementation of the subsonic outflow boundary condition based
+    on constant Mach number in model/share/fluid_share.c
+
  
-Weerakoon, Minindu
+WEERAKOON, Minindu
+
   - Fixes to memory leaks problems (see CHANGELOG 19feb23a and 19feb27a and 19feb28b and 19may08a) 
 

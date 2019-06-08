@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 JUN 08a
+  * in CONTRIB
+    - updated the contributions 
+  * in cycle/share/cycle_share.c, lib/exm/exm.c, model/chem/_H2_Air_9s_20r_Jachimowsky/chem.c,
+    model/share/fluid_share.c, model/thermo/_generic/thermo.c, src/common.c, src/main.c, src/post.c
+    - updated Copyright notices
+  * in model/chem/old/_kerosene19s24r/chem.c, model/chem/old/_lutz/chem.c, 
+    model/chem/old/_singh/chem.c
+    - added Copyright notice
+
+
 2019 JUN 07a
   * in model/emfield/_Epotential*/emfield.c
     - got rid of UNSTEADYTERMS

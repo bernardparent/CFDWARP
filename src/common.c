@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
 Copyright 1999-2006 Bernard Parent
+Copyright 2019 Jaehyuk Lee
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
