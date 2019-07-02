@@ -27,37 +27,37 @@
 
 
 if [ $# -eq 1 ]; then
-  echo "Checking arguments: $1 specified as new version of warp to use when creating tarball. [OK]";
+  echo "Checking arguments: $1 specified as new version of CFDWARP to use when creating tarball. [OK]";
 else 
-  echo "ERROR: tarwarp.sh needs one argument: the version string. Exiting.";
+  echo "ERROR: tarCFDWARP.sh needs one argument: the version string. Exiting.";
   exit 1
 fi
 
-if [ -d "warp" ]; then
-  echo "Checking that the warp directory exists. [OK]";
+if [ -d "CFDWARP" ]; then
+  echo "Checking that the CFDWARP directory exists. [OK]";
 else
-  echo "ERROR: Couldn't find warp directory. Exiting.";
+  echo "ERROR: Couldn't find CFDWARP directory. Exiting.";
   exit 1
 fi
 
-if [ -f "warp/.makefile-header-default" ]; then
-  echo "Checking that the file warp/.makefile-header-default exists. [OK]";
+if [ -f "CFDWARP/.makefile-header-default" ]; then
+  echo "Checking that the file CFDWARP/.makefile-header-default exists. [OK]";
 else
-  echo "ERROR: the file warp/.makefile-header-default could not be found. Exiting.";
+  echo "ERROR: the file CFDWARP/.makefile-header-default could not be found. Exiting.";
   exit 1
 fi
 
 
 
-echo 'copying warp directory to warp.'$1'...'
-cp -a warp warp.$1
-cd warp.$1
-echo 'cleaning warp'.$1' directory..'
+echo 'copying CFDWARP directory to CFDWARP.'$1'...'
+cp -a CFDWARP CFDWARP.$1
+cd CFDWARP.$1
+echo 'cleaning CFDWARP'.$1' directory..'
 make cleanall
 make cleanbin
 cd ..
 echo 'creating tarball..'
-tar -cpPvzf warp.$1.tgz warp.$1
+tar -cpPvzf CFDWARP.$1.tgz CFDWARP.$1
 echo 'cleaning up'
-rm -rf warp.$1
+rm -rf CFDWARP.$1
 echo 'done'

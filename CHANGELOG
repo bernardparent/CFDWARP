@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 JUL 02a
+  * in tools
+    - renamed tarwarp.sh to tarCFDWARP.sh
+  * in tarCFDWARP.sh
+    - replaced all instances of warp by CFDWARP   
+
+
 2019 JUN 08b
   * in CONTRIB
     - updated the contributions

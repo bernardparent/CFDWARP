@@ -107,6 +107,6 @@ replace.sh                   replaces a string by another string
 search.sh                    a script that lists the files (recursively in all 
                              subdirectories) that contain a certain string  
 
-tarwarp.sh                   creates a tarball of the warp directory
+tarCFDWARP.sh                creates a tarball of the CFDWARP directory
             
 upgrade.sh                   upgrades CFDWARP to its latest version       
