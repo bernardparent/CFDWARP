@@ -3,18 +3,56 @@
 meshlevel=1;
 
 mf=(1.41)^(-4+meshlevel); {1.0/1.41, 1.0, 1.41, 2.0, 2.82}
+tf=2.0; {tf=1 works great}
+iterfact=8.0;
 
-tf=1.0; {tf=1 works great}
-CFLfact=1.6;
+CFLfact=0.8;
 
-{meshlevel=4, out.96ml4.110;  me_added: 6.58e-2;  Tmax=7853K;  
- meshlevel=3, out.96ml3.78;   me_added: 6.22e-2;  Tmax=7978K;
- meshlevel=2, out.96ml2.55;   me_added: 5.78e-2;  Tmax=7086K;
- meshlevel=1, out.96ml2.39;   me_added: 5.06e-2;  Tmax=5474K;
+{
+CFLfact=1.6; PRECON_LOCALTIMESTEPPING
+
+ meshlevel=4, out.ml4tf1.110;  me_added: 6.58e-2;  Tmax=7853K;  
+
+ meshlevel=3, out.ml3tf2.156;   me_added: 6.03e-2;  Tmax=7320K;
+ meshlevel=3, out.ml3tf1.78;   me_added: 6.22e-2;  Tmax=7978K;
+
+ meshlevel=2, out.ml2tf4.220;   me_added: 5.79e-2;  Tmax=7103K;
+ meshlevel=2, out.ml2tf2.110;   me_added: 5.50e-2;  Tmax=6577K;
+ meshlevel=2, out.ml2tf1.55;   me_added: 5.78e-2;  Tmax=7086K;
+
+
+ meshlevel=1, out.ml1tf8.312;   me_added: 5.32e-2;  Tmax=4657K;
+ meshlevel=1, out.ml1tf4.156;   me_added: 4.87e-2;  Tmax=4699K;
+ meshlevel=1, out.ml1tf2.78;    me_added: 4.73e-2;  Tmax=4802K;
+ meshlevel=1, out.ml1tf1.39;   me_added: 5.06e-2;  Tmax=5474K;
+
+
+CFLfact1.0; PRECON_LOCALEIGENVALUE
+ meshlevel=1, out.ml1tf8.312;   me_added: 5.31e-2;  Tmax=4660K;
+ meshlevel=1, out.ml1tf4.156;   me_added: 5.15e-2;  Tmax=4913K;
+ meshlevel=1, out.ml1tf2.78;    me_added: 5.05e-2;  Tmax=5108K;
+ meshlevel=1, out.ml1tf1.39;    me_added: 4.85e-2;  Tmax=5186K;
+
+
+CFLfact1.0; PRECON_LOCALTIMESTEP
+ meshlevel=1, iter=3, tf=2, out.ml1tf2iter3.78;   me_added: 5.35e-2;  Tmax=4950K;
+ meshlevel=1, iter=1, tf=2, out.ml1tf2iter3.78;   me_added: 5.07e-2;  Tmax=5131K;
+
+
+CFLfact0.8; PRECON_LOCALTIMESTEP
+ meshlevel=1, iter=6, tf=1, out.ml1tf1iter6.39;   me_added: 5.15e-2;  Tmax=4337K;
+ meshlevel=1, iter=2, tf=1, out.ml1tf1iter2.39;   me_added: 5.13e-2;  Tmax=5195K;
+ meshlevel=1, iter=1, tf=1, out.ml1tf1iter1.39;   me_added: 5.01e-2;  Tmax=5376K;
+
+ meshlevel=1, iter=8, tf=2, out.ml1tf2iter2.78;   me_added: 5.414e-2;  Tmax=4400K;
+ meshlevel=1, iter=4, tf=2, out.ml1tf2iter2.78;   me_added: 5.395e-2;  Tmax=4450K;
+ meshlevel=1, iter=2, tf=2, out.ml1tf2iter2.78;   me_added: 5.34e-2;  Tmax=4987K;
+ meshlevel=1, iter=1, tf=2, out.ml1tf2iter1.78;   me_added: 5.20e-2;  Tmax=5267K;
+
 }
 
 dphimax=14000;
-itermax=140/sqrt(CFLfact/1.6);
+itermax=iterfact*140/sqrt(CFLfact/1.6);
 EMFsubiter=1300;
 
 is1=1;
