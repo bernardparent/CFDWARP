@@ -182,6 +182,13 @@ int main (int argc, char **argv) {
            fileName, firstfileName);
         printf ("numrowsinfile=%d,numcolsinfile=%d,numrows=%d,numcols=%d\n", numrows_infile, numcols_infile,
                 numrows, numcols);
+        for (i = start; i <= end; i = i + increm) { //remove generated files before aborting
+          sprintf (ichar, "%d", i);
+          strcpy (fileName, "____");
+          strcat (fileName, inputfileprefix);
+          strcat (fileName, ichar);
+          remove (fileName);
+        }
         exit (1);
       } else {
         numrows_infile = 0;

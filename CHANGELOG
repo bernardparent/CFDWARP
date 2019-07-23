@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+
+2019 JUL 23a
+  * in tools/average.c
+    - Fixed a bug where the program exited without deleting the temporarily generated files when it 
+      encountered files with different number of rows/columns
+
+
 2019 JUL 09a
   * in bin
     - updated Keller-Kloker.wrp
