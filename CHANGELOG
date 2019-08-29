@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 AUG 28a
+  * in config/config.c
+    - in output_makefileheader(), commented out the passing of the hostname and username 
+      (leads to problems on some machines)
+
 
 2019 JUL 23a
   * in tools/average.c

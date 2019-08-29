@@ -759,6 +759,7 @@ static void output_makefileheader(FILE *scriptfile_applyconfig, long nd, long nu
   if (M32) fprintf(scriptfile_applyconfig," -m32 -DM32");
   if (SANITIZE) fprintf(scriptfile_applyconfig," -fsanitize=address -fsanitize=undefined -fsanitize=bool -fsanitize=integer-divide-by-zero -fsanitize=null -fsanitize=vla-bound -fsanitize=bounds -fsanitize=signed-integer-overflow");
 
+/*
   if (getlogin()!=NULL){    
     char hostname[1024];
     hostname[1023] = '\0';
@@ -767,6 +768,7 @@ static void output_makefileheader(FILE *scriptfile_applyconfig, long nd, long nu
     fprintf (scriptfile_applyconfig," -D_USERNAME=\\\"\\\\\\\"%s\\\\\\\"\\\"",getlogin());
     fprintf (scriptfile_applyconfig," -D_HOSTNAME=\\\"\\\\\\\"%s\\\\\\\"\\\"",hostname);
   } 
+*/
 
   if (THREADTYPE==1) fprintf(scriptfile_applyconfig," -DPOSIXTHREADS -D_REENTRANT");
   if (THREADTYPE==2) fprintf(scriptfile_applyconfig," -DZONETHREADS -D_REENTRANT");
