@@ -341,7 +341,7 @@ void write_license ( FILE * outputfile ) {
   wfprintf(outputfile,"%s\n\n",strwrpind(linestr, linewidth, -5));
 
 #ifdef PROPRIETARY
-  sprintf(linestr,"  3. This software shall not be copied, reproduced in any form or stored in a retrieval system or data base without the prior written consent of Bernard Parent.");
+  sprintf(linestr,"  3. This software shall not be copied, and shall not be redistributed, and shall not be reproduced in any form, and shall not be stored in a retrieval system or data base without the prior written consent of Bernard Parent.");
   wfprintf(outputfile,"%s\n\n",strwrpind(linestr, linewidth, -5));
 #endif
 

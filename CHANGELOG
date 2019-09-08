@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 SEP 08b
+  * in src/control.c
+    - in write_license(), changed the proprietary clause 3 (displayed with -l flag)
+
+
 2019 SEP 08a
   * in model/emfield/_Epotential*/emfield.c
     - in _xi_emfield(), fixed a bug: the fabs() should be used over all terms, not just the residual
