@@ -88,66 +88,48 @@ CFLref=1.0;
 
 
 
-
-meshtype=1; {set to 1 for gridline on axis of symmetry ; 
-             set to 2 for no gridline on axis of symmetry ;}
-meshfact=1.0;
+mf=0.5;
 sizefact=0.02;
 
 dwall=15e-6;
 
-is=1;  js=1; 
-is1=round(8*meshfact);
-if (meshtype==1,
-  ie1=is1+round(64*meshfact)+1; 
-);
-if (meshtype==2,
-  ie1=is1+round(64*meshfact); 
-);
-ie=ie1+is1;
+L=1.0*sizefact; {length of each plate}
+H=L/3;
+R=L/40; {radius of bluntness where two plates meet}
+delta=10/180*pi; {angle between two plates}
 
-je=round(90*meshfact)+1;
-Rin_x=0.6*sizefact;
-Rin_y=Rin_x/0.3;
-Rout_x=Rin_x*3.38;
-Rout_y=Rin_y*2.8;
+is=1;  
+is1=round(50*mf);
+is2=is1+round(60*mf);
+ie=is2+round(50*mf);
 
+js=1;
+je=round(90*mf)+1;
 
 
 Grid(
   Size(is,js, ie,je);
 
-  if (meshtype==1 || meshtype==2,
-    theta=-pi/2;
-    dtheta=pi/(ie1-is1);
-    im=(ie1+is1)/2;
-    for (i,is1,ie1,
-      theta=((abs(i-im)/(ie1-im))^1.3)*pi/2;
-      x_in=-sqrt(1/(1/sqr(Rin_x)+sqr(tan(theta)/Rin_y)));
-      y_in=Rin_y*sqrt(1-sqr(x_in/Rin_x));
-      if (i-im<0, y_in=-y_in;);
-      Point(i,js, x_in,y_in);  
-    );
 
-    theta=-pi/2;
-    dtheta=pi/(ie1-is1);
-    im=(ie1+is1)/2;
-    for (i,is1,ie1,
-      theta=((abs(i-im)/(ie1-im))^1.1)*pi/2;
-      x_in=-sqrt(1/(1/sqr(Rout_x)+sqr(tan(theta)/Rout_y)));
-      y_in=Rout_y*sqrt(1-sqr(x_in/Rout_x));
-      if (i-im<0, y_in=-y_in;);
-      Point(i,je, x_in,y_in);  
-    );
+  {blunted leading edge}
+  for (i,is1,is2,
+    theta=(pi-delta)/(is2-is1)*(i-is1);
+    Point(i,js,-R*sin(theta),R*cos(theta));
+    Point(i,je,-(R+H)*sin(theta),(R+H)*cos(theta));
+    Join(i,js,i,je,j,FE,0.8,dwall,1.0);
+  );  
 
-    Join(is1,js,ie1,je,j,FE,0.8,dwall,1);
-  );
 
-  Corners(is,js,is,je,sizefact,-Rin_y,sizefact,-Rout_y*1.15);
-  JoinCorners(is,js,is1,je,EG,0.5,1.0,1.0,FE,0.8,dwall,1.0);
+  {first plate}
+  Corners(is,js,is,je,L,R,L,H+R);
+  Join(is,js,is,je,j, FE,0.8,dwall,1.0);
+  Join(is,js,is1,je,i,EG,0.8,1.0,1.0);
 
-  Corners(ie,js,ie,je,sizefact,Rin_y,sizefact,Rout_y*1.15);
-  JoinCorners(ie1,js,ie,je,GE,0.5,1.0,1.0,FE,0.8,dwall,1.0);
+  {second plate}
+  Point(ie,js,L,_y(is2,js)-(L-_x(is2,js))*tan(delta));
+  Point(ie,je,L,_y(ie,js)-H);
+  Join(ie,js,ie,je,j,FE,0.8,dwall,1.0);
+  Join(is2,js,ie,je,i,GE,0.2,1,1);
 );
 
 
@@ -215,8 +197,8 @@ Model(
     N2VIBJOULEHEATING=YES;
     REACTING=YES;
     emfieldworkheatfact=1;
-    sigmadiv=1e-4; {S/m}
-    etdiv=1e2;     {J/kg}
+    sigmadiv=1e-3; {S/m}
+    etdiv=1e3;     {J/kg}
     Pmin=1.0e2;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e2;     Tmax=Tmax_barrier;    {K}
     Tvmin=Tmin;     Tvmax=30000;  {K}
@@ -277,7 +259,11 @@ Init(
     chi_N2=0.75;
     All(INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_Oplus,chi_Nplus,chi_O2plus,chi_N2plus,chi_NOplus,chi_O,chi_N,chi_NO,chi_O2,chi_N2,Tv,Te);
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE6,Vx,Vy,P,Twall,chi_eminus,chi_O2minus,chi_Oplus,chi_Nplus,chi_O2plus,chi_N2plus,chi_NOplus,chi_O,chi_N,chi_NO,chi_O2,chi_N2,Tv,Te);
-
+{    T=10000;
+    Tv=T;
+    Te=T;
+    Region(is,js,ie,js+25, INIT_TYPE6,0,0,101300,T,chi_eminus,chi_O2minus,chi_Oplus,chi_Nplus,chi_O2plus,chi_N2plus,chi_NOplus,chi_O,chi_N,chi_NO,chi_O2,chi_N2,Tv,Te);
+}
     {
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_Oplus,chi_Nplus,chi_O2plus,chi_N2plus,chi_NOplus,chi_O,chi_N,chi_NO,chi_O2,chi_N2,Tv,Te);
     Region(is,js,  ie,je, INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_Oplus,chi_Nplus,chi_O2plus,chi_N2plus,chi_NOplus,chi_O,chi_N,chi_NO,chi_O2,chi_N2,Tv,Te);
@@ -390,25 +376,25 @@ Cycle(
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
-      CFL=0.01;
+      CFL=0.001;
     );
-    if (iter<5000,
-      CFLmax=0.6;
+    if (iter<10000,
+      CFLmax=0.4;
       Model(
-        NavierStokesPlasma(Tmax=8000; emfieldworkheatfact=0.0;);
-        Epotential(Jmax=200;);
+        NavierStokesPlasma(Tmax=6500; emfieldworkheatfact=0.0; sigmadiv=1e-2; etdiv=1e4;    );
+        Epotential(Jmax=200; );
       );
     ,{else}
       CFLmax=0.1;
       Model(
-        NavierStokesPlasma(Tmax=10000; emfieldworkheatfact=1.0;);
+        NavierStokesPlasma(Tmax=7000; emfieldworkheatfact=1.0; sigmadiv=1e-2; etdiv=1e2;);
         Epotential(Jmax=200000;);
       );
     );
-    CFL=min(CFL*1.05,CFLmax);
+    CFL=min(CFL*1.01,CFLmax);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
-    Lc=1;      {characteristic length scale in meters used to solve the emfield equation}
-    relaxEMF=0.2; {relaxation factor forced on the update of the emfield variables}
+    Lc=L*10000;      {characteristic length scale in meters used to solve the emfield equation}
+    relaxEMF=0.6; {relaxation factor forced on the update of the emfield variables}
     UpdateEMField(Lc,relaxEMF,TSEMF_SOR,500); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
     {UpdateEMField(Lc,1.0,TSEMF_IMAF,30);}
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",

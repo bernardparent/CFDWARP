@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 SEP 08a
+  * in model/emfield/_Epotential*/emfield.c
+    - in _xi_emfield(), fixed a bug: the fabs() should be used over all terms, not just the residual
+  * in bin
+    - added wedge_sheath.wrp
+    - modified jachimowski_wedge.wrp
+    - modified reentry_sheath.wrp
+
+
 2019 AUG 28a
   * in config/config.c
     - in output_makefileheader(), commented out the passing of the hostname and username 

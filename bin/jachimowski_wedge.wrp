@@ -122,11 +122,7 @@ Model(
     kmin=1.0e-30;   kmax=9.9e99;   {min and max TKE allowed in the domain in m2/s2}
     psimin=1e-10;   psimax=9.9e99; {min and max omega/epsilon allowed in the domain}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain}
-    zetaA1=0.1e0;     {conditions the eigenvalues of the A jacobian}
-    zetaA2=0.2;
-    zetaA3=0.2e0;  {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
     
-    EIGENVALCOND=EIGENVALCOND_PASCAL; {set the Lambda conditioning to EIGENVALCOND_PECLET or EIGENVALCOND_HARTEN}
     AXISYMMETRIC=NO; {set to YES to solve axisymmetric problems in 2D}
   );
 );
@@ -176,6 +172,24 @@ Init(
   );
 );
 
+
+Disc(
+  FavreReynolds(
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+    POSFILTER=POSFILTER_NONE;
+    POSFILTER_numiter=4;
+  );
+);
 
 Cycle(
   FavreReynolds(
