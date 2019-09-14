@@ -7,9 +7,9 @@ iterfact=0.2; {the higher iterfact, the less the solution convergence error; err
 
 CFLfact=0.8; {don't set to higher than 1 because this may lead to divergence}
 
-period=1e-4; {period in seconds}
-number_periods=3; {the first two periods establish the background plasma; the third and subsequent periods will be similar}
-Vpp=14000; {Voltage difference peak to peak in Volts}
+period=2e-6; {period in seconds}
+number_periods=1; {the first two periods establish the background plasma; the third and subsequent periods will be similar}
+Vpp=80000; {Voltage difference peak to peak in Volts}
 
 
 
@@ -20,8 +20,8 @@ is1=1;
 is2=round(mf*28); {start of exposed electrode}
 is3=is2+round(mf*65);
 is4=is3+round(mf*150); {start of embedded electrode}
-is5=is4+round(mf*600); {end of embedded electrode}
-is6=is5+round(mf*36);
+is5=is4+round(mf*150); {end of embedded electrode}
+is6=is5+round(mf*136);
 is=is1;
 ie=is6;
 
@@ -30,27 +30,28 @@ ie=is6;
 js2=1; 
 js3=js2+round(mf*13); {exposed electrode is between js3 and js4}
 js4=js3+round(mf*9);  {start of plasma/gas}
-js5=js4+round(mf*33*6*1.25);
+js5=js4+round(mf*33*2);
 js6=js5+round(mf*50);
 js=js2;
 je=js6;
 
 
-xs1=-0.003;
-xs2=-0.0021;
-xs3=-0.001;
+sizefact=10;
+xs1=-0.003*sizefact;
+xs2=-0.0021*sizefact;
+xs3=-0.001*sizefact;
 xs4=0;
-xs5=0.0048;
-xs6=0.006;
+xs5=0.001*sizefact;
+xs6=0.006*sizefact;
 dx=(xs5-xs4)/(is5-is4)/3;
 dy=dx/4/6; {?}
-ys0=-50e-6;
+ys0=-50e-6*sizefact;
 ys1=0.0;
-ys2=37.5e-6;
-ys3=0.3e-3-37.5e-6;
-ys4=0.3e-3;
-ys5=0.6e-3;
-ys6=1.3e-3;
+ys2=37.5e-6*sizefact;
+ys3=(0.3e-3-37.5e-6)*sizefact;
+ys4=0.3e-3*sizefact;
+ys5=0.6e-3*sizefact;
+ys6=1.3e-3*sizefact;
 
 
 Grid(
@@ -389,9 +390,9 @@ Cycle(
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
     {system("date");}
     Lc=1e-3*4;      {characteristic length scale in meters used to solve the emfield equation}
-    relaxEMF=1.0; {relaxation factor forced on the update of the emfield variables}
+    relaxEMF=0.7; {relaxation factor forced on the update of the emfield variables}
     for (cnt,0,0,
-      UpdateEMField(Lc*100000,relaxEMF*1.0,dt,TSEMF_SOR,EMFsubiter); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+      UpdateEMField(Lc*100000,relaxEMF,dt,TSEMF_SOR,1000); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
     );
 
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",

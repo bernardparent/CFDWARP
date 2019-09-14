@@ -57,7 +57,7 @@
 
 
 if (UNSTEADY,
-  mf=1.3; 
+  mf=0.4; 
 ,{else}
   mf=0.7;
 );
@@ -226,6 +226,7 @@ Model(
   NavierStokesPlasma(
     TEMODEL=TEMODEL_LOCAL;    {set TEMODEL to TEMODEL_LOCAL, TEMODEL_TRANSPORT, or TEMODEL_CONSTANT}
     N2VIBMODEL=N2VIBMODEL_MACHERET;
+    emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
     N2VIBJOULEHEATING=YES; {solve the nitrogen vibration energy joule heating source terms?}
     REACTING=YES;   {solve chemical reactions?}
     sigmadiv=1e-10; {minimum magnitude of sigma in S/m allowed when sigma appears on the denominator }
@@ -240,19 +241,12 @@ Model(
     wemin=1e-20;    wemax=1e-9;    {min and max electron mass fraction }
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
     gamma=0.1e0;    {secondary emission coefficient used to calculate the electron density at the cathode}
-    zetaA1=0.5e0;    {conditions the eigenvalues of the A jacobian}
-    zetaA2=0.2;
-    zetaA3=0.2;
-    EIGENVALCOND=EIGENVALCOND_PASCAL; {set the eigenvalue conditioning to EIGENVALCOND_PECLET, EIGENVALCOND_PASCAL [RECOMMENDED], or EIGENVALCOND_HARTEN}
-    zetaD=1.0;     {conditions the Dstar eigenvalues for the charged species}
     AXISYMMETRIC=NO;
   );
   Epotential(
     Te_buffer=3000.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,T+Te_buffer);  
                        needed to prevent convergence hangs where |E| becomes close to 0;
                        set to as little a value as possible}
-    Ediv=10.0;        {a small positive number in V/m, needed to prevent a division by zero when
-                       discretizing the electron pressure gradients within the potential equation}
     Jmax=200000.0;     {the maximum current density in A/m2 expected in the domain; this will affect only
                        the Townsend ionization rates; make sure Jmax > sigma*Emag in the converged solution.}
     SetRelativePermittivity(is,js, ie,je, 1.0 );
@@ -325,12 +319,68 @@ Init(
 );
 
 
+
+Disc(
+  NavierStokesPlasma(
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
+    betag[1]=-0.0010;
+    betag[2]=-0.5000;
+    betag[3]=1.0000;
+    betag[4]=1.0000;
+    betaa[1]=0.9990;
+    betaa[2]=0.5000;
+    betaa[3]=0.0000;
+    betaa[4]=0.0000;
+  );
+  Epotential(
+    POTENTIAL=POTENTIAL_OHMBASED;
+    Ediv=10.0;        {a small positive number in V/m, needed to prevent a division by zero when
+                       discretizing the electron pressure gradients within the potential equation}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+    POSFILTER=POSFILTER_NONE;
+    POSFILTER_numiter=4;
+  );
+  CDFplus(
+    xi[1]=0.5;
+    xi[2]=0.5;
+    xi[3]=0.5;
+    xi[4]=0.5;
+    xi[5]=0.5;
+    xi[6]=0.5;
+    xi[7]=0.5;
+    xi[8]=0.5;
+    xi[9]=0.5;
+    xi[10]=0.5;
+    xi[11]=0.5;
+    xi[12]=0.5;
+    xi[13]=0.5;
+    xi[14]=0.5;
+    xi[15]=0.5;
+    xi[16]=0.5;
+    xi[17]=0.5;
+    xi[18]=0.25;
+    xi[19]=0.25;
+  );
+);
+
+
+
 Cycle(
   NavierStokesPlasma(
     xiverge=1e2;         {residual convergence threshold}
-    zetaGammai=0.1;       {factor multiplying the pseudotime step of the ion species transport equations
+    zetaGammai=1.0;       {factor multiplying the pseudotime step of the ion species transport equations
                            when PRECONDITIONER is set to TRUE} 
-    zetaGammae=0.01;      {factor multiplying the pseudotime step of the electron species transport equations
+    zetaGammae=1.0;      {factor multiplying the pseudotime step of the electron species transport equations
                            near cathode when PRECONDITIONER is set to TRUE} 
     relaxNi_bdry=1.0; {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.2;    {the electron density relaxation factor at the boundary }
@@ -369,7 +419,7 @@ Cycle(
   DualTimeStepping(
     sigma1=0.4;      {exponent of largest pseudotime step in all dimensions}
     sigma2=0.0;      {exponent of largest pseudotime step in all flux components}
-    PRECONDITIONER=PRECON_LOCALEIGENVALUE;
+    PRECONDITIONER=PRECON_LOCALTIMESTEP;
     if (iter==1,
       CFL=CFLmin;
       Lc=3e-1;  {characteristic length scale used to solve the emfield equation}
@@ -407,18 +457,9 @@ Cycle(
     );
 
     UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,dt);
-    relaxEMF=1.0;  {relaxation factor forced on the update of the emfield variables}
-    subiter_tsemf=10;  {number of subiterations performed when inverting the matrix within tsemf}
-    for (cnt,0,3,
-      Lc=3e-1*10^(-mod(cnt,2));
-      {ADI}
-      Cycle(Epotential(sigmaref=0.1;););
-      UpdateEMField(Lc,relaxEMF,dt,TSEMF_ADI);
-      Lc=1.0;
-      {IMAF}
-      Cycle(Epotential(sigmaref=0.0000001;););
-      UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,subiter_tsemf);
-    );
+    relaxEMF=0.8;  {relaxation factor forced on the update of the emfield variables}
+    Lc=1.0;
+    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,500);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %6.0f %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,Lc,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);

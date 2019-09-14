@@ -13,7 +13,7 @@ makedvi:
 	( export TEXINPUTS=$(LATEXDIR) ; exec latex report )
 
 makeps:
-	( export TEXINPUTS=$(LATEXDIR) ; exec dvips -t a4 report.dvi -o report.ps )
+	( export TEXINPUTS=$(LATEXDIR) ; exec dvips report.dvi -o report.ps )
 
 makepdf:
 	( exec ps2pdf13 report.ps report.pdf )

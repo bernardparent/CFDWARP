@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 SEP 14a
+  * in bin
+    - added DBD_actuator_2.wrp, plasma_combustion_mixing.wrp
+    - altered DBD_actuator.wrp, plasma_assisted_combustion.wrp
+  * in model/fluid/doc/*/Makefile
+    - changed "dvips -t a4" to "dvips"
+
+
 2019 SEP 08b
   * in src/control.c
     - in write_license(), changed the proprietary clause 3 (displayed with -l flag)
