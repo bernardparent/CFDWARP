@@ -79,24 +79,25 @@
  
 
 xs=0;
-xs1=0.02; {start of first electrode}
-xs2=0.023; {end of first electrode}
-xs3=0.03; {start of second electrode}
-xs4=0.033; {end of second electrode}
-xe=0.05; {end of domain}
+xs1=0.22; {start of first electrode}
+xs2=0.223; {end of first electrode}
+xs3=0.23; {start of second electrode}
+xs4=0.233; {end of second electrode}
+xe=0.25+0.06; {end of domain}
 
 ys=0;  {start of hydrogen injection}
-ys1=0.003; {end of hydrogen injection}
+ys0=0.0007; {end of hydrogen injection}
+ys1=0.003; {end of arc influence}
 ye=0.02; {end of domain}
 
 mf=1.0;
 
 is=1;
-is1=round(35*mf);
+is1=round(65*mf);
 is2=is1+round(10*mf);
 is3=is2+round(25*mf);
 is4=is3+round(10*mf);
-ie=is4+round(35*mf);
+ie=is4+round(55*mf);
 
 js=1;
 js1=round(30*mf);
@@ -119,18 +120,21 @@ Grid(
   Join(is2,js,is3,js1,i,GG,0.5,1,1);
 
   {Join the domain entrance to the first electrode}
-  Corners(is,js,is,js1,xs,ys,xs,ys1);
+  Corners(is,js,is,js1,xs,ys,xs,ys0);
   Join(is,js,is,js1,j,FF,0.5,dwall,dwall*3);
   Join(is,js,is1,js1,i,fg,0.5,dwall*3,1);
 
   {Join the second electrode to the domain exit}
   Corners(ie,js,ie,js1,xe,ys,xe,ys1);
   Join(ie,js,ie,js1,j,FE,0.5,dwall,1.0);
-  Join(is4,js,ie,js1,i,GE,0.5,1.0,1.0);
+  Join(is4,js,ie,js1,i,GE,0.25,1.0,1.0);
 
   {Join the bottom to the top of the domain}
   Copy(is,js1,ie,js1,is,je);
   Translate(is,je,ie,je,0,ye-ys1);
+  for (i,is,ie, 
+    Point(i,je,_x(i,je),ye);
+  );
   Join(is,js1,ie,je,j,GE,0.5,1,1);
  
 );
@@ -159,7 +163,7 @@ Bdry(
     _________________________________________________________________________________________
     }
     All(BDRY_WALLTFIXED1);
-    {Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLTFIXED1,BDRY_WALLTFIXED1);}
+    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLTFIXED1,BDRY_OUTFLOWSUPERSONIC1);
     {
     Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
@@ -210,8 +214,8 @@ Model(
     ADD_ETA_TO_ETAT_WITHIN_QK=NO;  {say NO for standard kinetic energy transport model}
     kdiv=1.0e-50;   {m2/s2}
     psidiv=0.1e-3;  {1/s}
-    sigmadiv=1e-3; {S/m}
-    etdiv=1e3;     {J/kg}
+    sigmadiv=1e-6; {S/m}
+    etdiv=1e2;     {J/kg}
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e1;     Tmax=6.0e3;    {K}
     Tvmin=Tmin;     Tvmax=10.0e3;  {K}
@@ -258,10 +262,12 @@ Init(
     (a) In the freestream set psi to 110*q_infty for the k-omega models.
     (b) In the freestream make sure that 1E-5*q_infty^2/ReL<k<0.1*q_infty^2/ReL.
     }
-    Vx=0; {m/s}
+
+    {AIR STREAM  (obtained for a scramjet flight Mach number of 11 using a dynamic pressure of 65000 Pa in standard US atmosphere after 2 oblique shocks)}
+    Vx=3100; {m/s}
     Vy=0; {m/s}
-    P=10000; {Pa}
-    T=300; {K}
+    P=44000; {Pa}
+    T=1150; {K}
     k=1e-6;   {J/kg}
     psi=110*sqrt(Vx^2+Vy^2)+1000; {1/s for TURBMODEL_KOMEGA*}
     Tv=T; {K}
@@ -281,6 +287,41 @@ Init(
     chi_H2O2=1.0e-30;
     chi_N2=0.75;
     All(INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_O2plus,chi_N2plus,chi_N,chi_H2,chi_O2,chi_H,chi_O,chi_OH,chi_H2O,chi_HO2,chi_H2O2,chi_N2,k,psi,Tv,Te);
+    mdot_Air=Vx*(P/T/286)*(ye-ys0);
+
+    {H2 STREAM}
+    Vx=5700; {m/s}
+    Vy=0; {m/s}
+    P=P; {Pa}
+    T=200; {K}
+    Twall=1000; {K}
+    k=1e-6;   {J/kg}
+    psi=110*sqrt(Vx^2+Vy^2)+1000; {1/s for TURBMODEL_KOMEGA*}
+    Tv=T; {K}
+    Te=3000; {K}
+    chi_eminus=1e-12;
+    chi_O2minus=1.0e-30;
+    chi_O2plus=1e-12;
+    chi_N2plus=1.0e-30;
+    chi_N=1.0e-30;
+    chi_H2=1.0;
+    chi_O2=1.0e-30;
+    chi_H=1.0e-30;
+    chi_O=1.0e-30;
+    chi_OH=1.0e-30;
+    chi_H2O=1.0e-30;
+    chi_HO2=1.0e-30;
+    chi_H2O2=1.0e-30;
+    chi_N2=1.0e-30;
+    Region(is,js,  ie,js1, INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_O2plus,chi_N2plus,chi_N,chi_H2,chi_O2,chi_H,chi_O,chi_OH,chi_H2O,chi_HO2,chi_H2O2,chi_N2,k,psi,Tv,Te);
+    {make sure the wall temperature is 1000K}
+    Bdry(BDRY_WALLTFIXED1, INIT_TYPE6,Vx,Vy,P,Twall,chi_eminus,chi_O2minus,chi_O2plus,chi_N2plus,chi_N,chi_H2,chi_O2,chi_H,chi_O,chi_OH,chi_H2O,chi_HO2,chi_H2O2,chi_N2,k,psi,Tv,Te);
+
+    mdot_H2=Vx*(P/T/4124)*ys0;
+    Tstag_H2=(1+(1.666-1)/2*(Vx/sqrt(1.66*4124*T))^2)*T;
+    printf("\n mdot_H2/mdot_Air=%E   Tstag_H2=%E K\n",mdot_H2/mdot_Air,Tstag_H2);
+
+
     {
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_O2plus,chi_N2plus,chi_N,chi_H2,chi_O2,chi_H,chi_O,chi_OH,chi_H2O,chi_HO2,chi_H2O2,chi_N2,k,psi,Tv,Te);
     Region(is,js,  ie,je, INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_O2plus,chi_N2plus,chi_N,chi_H2,chi_O2,chi_H,chi_O,chi_OH,chi_H2O,chi_HO2,chi_H2O2,chi_N2,k,psi,Tv,Te);
@@ -409,21 +450,69 @@ Cycle(
     sigmaref=0.001; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
     Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
+  SteadyState(
+    if (mod(iter,50)==0,
+      WriteDataFile(outputfilename);
+    );
+    sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
+    if (iter==1,
+      CFL=0.00001;
+    );
+    if (iter<250,
+      CFLmax=0.8;
+    ,{else}
+      if (iter<500,
+        CFLmax=1.8;
+      ,{else}
+        CFLmax=3.0;
+      );
+    );
+    
+    CFL=min(CFL*1.15,CFLmax);
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
+    Lc=3e3;      {characteristic length scale in meters used to solve the emfield equation}
+    relaxEMF=0.3; {relaxation factor forced on the update of the emfield variables}
+    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,1000); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
+  );
+
   DualTimeStepping(
-    Vpp=8000;
-    itermax=50;
-    tmax=1.5e-6;    {simulation time span in seconds}
-    dt=tmax/(10*mf);   {physical time step in seconds}
+    Vpp=50000; {peak to peak voltage difference applied between electrodes}
+    number_of_periods=3;
+    period=40e-6; {time of one period}
+    time_within_period=time-period*floor(time/period);
+    dischargeduration=15e-6; {time spent in discharge in seconds}
+    dt_discharge=dischargeduration/(20*mf);   {physical time step in seconds}
+    dt_nodischarge=period/(15*mf);
+    itermax_discharge=60;
+    itermax_nodischarge=20;
+    tmax=period*number_of_periods;    {simulation time span in seconds}
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
       CFL=0.1;
     );
-    CFL=min(CFL*1.2,1.0);
-    if (time<tmax/2,
-      Deltaphi=time/(0.5*tmax)*Vpp;
+    CFL=min(CFL*1.5,1.0);
+    if (time_within_period<dischargeduration/2,
+      Deltaphi=max(0,time_within_period/(0.5*dischargeduration)*Vpp);
     ,{else}
-      Deltaphi=max(0,Vpp-(time-tmax/2)/(0.5*tmax)*Vpp);
+      Deltaphi=max(0,Vpp-(time_within_period-dischargeduration/2)/(0.5*dischargeduration)*Vpp);
+    );
+    
+    if (time_within_period<dischargeduration,
+      dt=dt_discharge;
+      itermax=itermax_discharge;
+    ,{else}
+      time_within_next_period=time+dt_nodischarge-period*floor((time+dt_nodischarge)/period);
+      if (time_within_next_period<dischargeduration,
+        dt=dt_nodischarge-time_within_next_period;
+      ,{else}
+        dt=dt_nodischarge;
+      );
+      itermax=itermax_nodischarge;
     );
     Init(Epotential(
       Region(is1,js,  is2,js,INITEMF_TYPE1,-Deltaphi/2);
@@ -439,7 +528,7 @@ Cycle(
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
     if (iter>itermax,
       IncreaseTimeLevel();
-      WriteDataFile(outputfilename"."round(time/dt));
+      WriteDataFile(outputfilename"."round(time/min(dt_discharge,dt_nodischarge)));
       printf("dt=%E time=%Es\n",dt,time);
       if (time>tmax-0.1*dt,
         exit(EXIT_SUCCESS);

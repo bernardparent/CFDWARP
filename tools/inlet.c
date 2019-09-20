@@ -68,7 +68,7 @@ int main ( int argc, char **argv ) {
               "-l   \t<length of the inlet [m]>        \tdouble   \tY\n" "\n\n" );
 
   } else {
-    T3 = 900.0e0;
+    T3 = 1150.0e0;
     gamma = 1.4e0;
     Rgas = 287.06e0;
     Pdynamic = 67032.0e0;

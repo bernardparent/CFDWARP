@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 SEP 20a
+  * in bin/plasma_combustion_mixing.wrp
+    - updated the control file.
+  * in src/bdry.c
+    - in _bdry_ID(), changed sprintf(ID,"%ld",nodetype); to sprintf(ID,"%d",(int)nodetype);
+      to get rid of compilation error
+
+
 2019 SEP 14a
   * in bin
     - added DBD_actuator_2.wrp, plasma_combustion_mixing.wrp

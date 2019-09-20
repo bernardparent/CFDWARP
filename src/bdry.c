@@ -660,7 +660,7 @@ char _bdry_ID(long nodetype){
   char ID[10];
   if (nodetype>9)
     sprintf(ID,"%c",(int)('a'+nodetype-10));
-  else sprintf(ID,"%ld",nodetype);
+  else sprintf(ID,"%d",(int)nodetype);
   return(ID[0]);
 }
 
