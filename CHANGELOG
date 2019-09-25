@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 SEP 24a
+  * moved model/emfield/doc to model/emfield/doc/Epotential
+  * created model/emfield/doc/RHT 
+    - based on document on Radiation Heat Transfer by Vasilis Tsakagiannis on overleaf
+  * in bin
+    - added DBD_actuator_3.wrp (from Van Tien Nguyen)
+    - added plasma_arc.wrp (arc filament in stagnant air)
+    - updated plasma_combustion_mixing.wrp
+  * in model/chem/
+    - added _H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret
+    
+
 2019 SEP 20a
   * in bin/plasma_combustion_mixing.wrp
     - updated the control file.
