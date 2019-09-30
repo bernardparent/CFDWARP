@@ -96,7 +96,7 @@ void find_Lambdaxt(np_t *np, gl_t *gl, long l, jacvars_t jacvars, metrics_t metr
   find_Lambda_from_jacvars(jacvars, metrics, Lambda);
 
   for (flux=0; flux<nf; flux++) {
-    assert(LambdaZ[flux][flux]>=0.0);
+    //assert(LambdaZ[flux][flux]>=0.0);
     Lambdaxt[flux][flux]=Lambda[flux][flux]/max(1.0,gl->dt*fabs(Lambda[flux][flux])/max(1e-99,LambdaZ[flux][flux]));
   }
 }

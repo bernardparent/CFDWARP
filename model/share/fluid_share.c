@@ -75,7 +75,7 @@ void write_disc_fluid_template(FILE **controlfile){
     "  %s(\n"
 #ifdef _FLUID_NEUTRALSTRANSPORT
     "    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}\n"
-    "    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}\n"
+    "    zetaA2=0.2e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}\n"
 #ifdef _RESCONV_ZETAADEN
     "    zetaA3=0.2e0; {conditions the eigenvalues of the inverted A jacobian}\n"
 #endif

@@ -7,6 +7,36 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 SEP 29a
+  * in bin/plasma_arc.wrp
+    - made modifications
+  * in cycle/restime/_CDF+/restime.c
+    - commented assert(LambdaZ[flux][flux]>=0.0); within find_Lambdaxt()
+  * in model/chem/_H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret/chem.c
+    - added T_MIN_MACHERET, T_MIN_DUNN_KANG, T_MIN_JACHIMOWSKI
+    - in find_W(), fixed bug: Dunn Kang reactions were not added properly
+  * in model/fluid/_Favre-Reynolds_plasma/fluid.c and model/fluid/_Navier-Stokes_plasma/fluid.c
+    - changed wimax and wemax to 1
+  * in model/fluid/_Favre-Reynolds_plasma/fluid_source.c 
+    and model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Semfield(), now takes the minmod between _E_dot_J_recast() and _E_dot_J()
+    - added _Tchem(), the temperature used to determine chemical reactions
+      which is set to _T() as before 
+    - in find_Schem() and find_dSchem_dU(), now calls _Tchem() instead of _T()
+    - in find_dSchem_dU(), implemented isfinite check
+  * in model/share/fluid_share.c
+    - in write_disc_fluid_template(), changed the default for zetaA2 from 0.3 to 0.2
+  * in model/thermo/_generic/thermo.c
+    - defined MAX_T_FOR_NUK_ETA_KAPPA_POLYNOMIALS 12000.0
+    - added H2+ species
+    - in find_default_init_number_density_string(), and 
+      find_default_init_number_density_fraction_string( changed the default molar fraction for
+      N2:O2 to 0.79:0.21 from 0.75:0.25
+    - in _Omega22() and _Omega11(), added checks when NDEBUG is not defined
+    - in find_nuk_eta_kappa(), implement limit of temperature set to     
+      MAX_T_FOR_NUK_ETA_KAPPA_POLYNOMIALS
+
+
 2019 SEP 24a
   * moved model/emfield/doc to model/emfield/doc/Epotential
   * created model/emfield/doc/RHT 

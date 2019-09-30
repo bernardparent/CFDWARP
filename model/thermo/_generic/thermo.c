@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <soap.h>
 
 #define T_accuracy 1.0e-12
-#define ns_c 39
+#define ns_c 40
 
 #define RN2 296.8E0
 #define Thetav 3353.0E0
@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // minimum range of temperature within one set to cpk, hk polynomial
 // make sure dTrangemin>dToverlap
 #define dTrangemin 100.0e0
+// maximum temperature in Kelvin used to determine the viscosity, thermal conductivity, and mass diffusion coefficients
+#define MAX_T_FOR_NUK_ETA_KAPPA_POLYNOMIALS 12000.0  
 
 typedef char speciesname_t[ns_c];
 
@@ -99,7 +101,8 @@ const static speciesname_t speciesname[ns_c]=
    "C3H8",
    "C12H23",
    "He",
-   "Air"
+   "Air",
+   "H2+"
   };
 
 
@@ -143,7 +146,8 @@ const static long numatoms[ns_c]=
    11, /*C3H8*/
    35, /*C12H23*/
    1, /*He*/
-   2 /*Air*/
+   2, /*Air*/
+   2 /*H2+*/
   }; 
 
 
@@ -205,7 +209,8 @@ const static double Peps[ns_c]=
    237.1E+0, //C3H8 from NASA TR R-132.pdf
    297.1E+0,  //C12H23 from NASA TR R-132.pdf
    10.22E+0, //He
-   78.46e0      /* Air -> obtained from N2 and O2 assuming 4:1 ratio */
+   78.46e0,      /* Air -> obtained from N2 and O2 assuming 4:1 ratio */
+   59.7e0 /* H2+ (unknown!, fixed to the one of H2) */
   };
 
 const static double Psig[ns_c]=
@@ -248,7 +253,8 @@ const static double Psig[ns_c]=
    0.5118E+0,//C3H8 from NASA TR R-132.pdf
    0.6182E+0, //C12H23 from NASA TR R-132.pdf     
    0.2551E+0, //He
-   0.3732e0    /* Air -> obtained from N2 and O2 assuming a 4:1 ratio */
+   0.3732e0,    /* Air -> obtained from N2 and O2 assuming a 4:1 ratio */
+   0.2827E+0 /* H2+ !! fixed to the one of H2 */
   };
 
 
@@ -300,7 +306,8 @@ const static double calM[ns_c]=
    44.09562E-3,  //C3H8
    167.31102E-3, //C12H23
    4.002602E-3, //He
-   28.96512e-3  // Air  
+   28.96512e-3,  // Air  
+   2.01533E-3 /* H2+ */
   };
 
 
@@ -346,7 +353,8 @@ const static long ck[ns_c]=
    0, /*C3H8*/
    0,  /*C12H23*/
    0, /*He */
-   0  /* Air */
+   0,  /* Air */
+   +1 /* H2+ */
   };
   
   
@@ -1779,6 +1787,54 @@ const static double Pa[ns_c][3][11]=
        +6.462263190e+03, /* b1 */
        -8.147411905e+00  /* b2 */
       }
+    },
+
+/* species H2+
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +298.150e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       -3.120886060e+04, /* a1 */
+        2.304622909e+02, /* a2 */
+        3.335564420e+00, /* a3 */
+       -2.419056763e-03, /* a4 */
+        7.006022340e-06, /* a5 */
+       -5.610010660e-09, /* a6 */
+        1.564169746e-12, /* a7 */
+        1.774104638e+05, /* b1 */
+       -8.278523760e-01  /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       +1.672225964e+06, /* a1 */
+       -6.595184990e+03, /* a2 */
+       +1.279321925e+01, /* a3 */
+       -5.509345260e-03, /* a4 */
+       +2.030669412e-06, /* a5 */
+       -3.351027480e-10, /* a6 */
+       +1.946089104e-14, /* a7 */
+       +2.189999548e+05, /* b1 */
+       -6.792710780e+01  /* b2 */
+      },
+      {
+       +6000.0e0,        /* Tmin [K] */ 
+       +20000.0e0,        /* Tmax [K] */
+       -1.822070983e+08, /* a1 */
+       +1.018196269e+05, /* a2 */
+       -1.245831898e+01, /* a3 */
+        1.076647496e-03, /* a4 */
+       -3.932290360e-08, /* a5 */
+        6.285405030e-13, /* a6 */
+       -2.094721880e-18, /* a7 */
+       -6.513101500e+05, /* b1 */
+        1.471415370e+02  /* b2 */
+      }
     }
    
   };
@@ -1836,10 +1892,10 @@ void find_default_init_number_density_string(long spec, char **Ndefault){
   /* set the default to 1e0 instead of 0.0 to avoid singularity problem when using positivity-preserving schemes*/
   strcpy(*Ndefault,"1.0e0");
     #ifdef specN2
-      if (spec==specN2) strcpy(*Ndefault,"0.75e24");
+      if (spec==specN2) strcpy(*Ndefault,"0.79e24");
     #endif
     #ifdef specO2
-      if (spec==specO2) strcpy(*Ndefault,"0.25e24");
+      if (spec==specO2) strcpy(*Ndefault,"0.21e24");
     #endif
     #if (!defined(specN2) && !defined(specO2))
       spec2=-1;
@@ -1865,8 +1921,8 @@ void find_default_init_number_density_fraction_string(long spec, char **chidefau
   /* set the default to 1e-30 instead of 0.0 to avoid singularity problem when using positivity-preserving schemes*/
   strcpy(*chidefault,"1.0e-30");
     #if (defined(specN2) && defined(specO2))
-      if (spec==specN2) strcpy(*chidefault,"0.75");
-      if (spec==specO2) strcpy(*chidefault,"0.25");
+      if (spec==specN2) strcpy(*chidefault,"0.79");
+      if (spec==specO2) strcpy(*chidefault,"0.21");
     #endif
     #if (defined(specO2) && !defined(specN2))
       if (spec==specO2) strcpy(*chidefault,"1.0");
@@ -2373,6 +2429,18 @@ double _Omega11(double T, double eps){
      +Pd[index][2]*Tstar*Tstar
      +Pd[index][3]*Tstar*Tstar*Tstar
      +Pd[index][4]*Tstar*Tstar*Tstar*Tstar;
+#ifndef NDEBUG
+  if (!(tmp>0.0)){
+    wfprintf(stderr,"\n  T=%E\n",T);
+    wfprintf(stderr,"  index=%ld\n",index);
+    wfprintf(stderr,"Pd[index][0]=%E\n",Pd[index][0]); 
+    wfprintf(stderr,"Pd[index][1]=%E\n",Pd[index][1]); 
+    wfprintf(stderr,"Pd[index][2]=%E\n",Pd[index][2]); 
+    wfprintf(stderr,"Pd[index][3]=%E\n",Pd[index][3]); 
+    wfprintf(stderr,"Pd[index][4]=%E\n",Pd[index][4]);
+    fatal_error("Problem in function _Omega11() part of thermo.c. Temperature may be out of polynomial bounds."); 
+  }
+#endif
   return(tmp);
 }
 
@@ -2392,6 +2460,16 @@ double _Omega22(double T, double eps){
   Astar=Pe[index][0]
        +Pe[index][1]*Tstar
        +Pe[index][2]*Tstar*Tstar;
+#ifndef NDEBUG
+  if (Astar<0.0){
+    wfprintf(stderr,"\n  T=%E\n",T);
+    wfprintf(stderr,"  index=%ld\n",index);
+    wfprintf(stderr,"  Pe[index][0]=%E\n",Pe[index][0]); 
+    wfprintf(stderr,"  Pe[index][1]=%E\n",Pe[index][1]); 
+    wfprintf(stderr,"  Pe[index][2]=%E\n",Pe[index][2]);
+    fatal_error("Problem in _Omega22() part of thermo.c. Temperature may be out of polynomial bounds.");
+  }
+#endif
   tmp=Astar*Omega11;
   return(tmp);
 }
@@ -2405,6 +2483,8 @@ void find_nuk_eta_kappa(spec_t w, double rho, double T,
   double chiden,sum;
   double calD[ns][ns];
 
+  // first make sure the temperature is not out of polynomial bounds
+  T=min(T,MAX_T_FOR_NUK_ETA_KAPPA_POLYNOMIALS);
   P=_P_from_w_rho_T(w,rho,T);
   for (spec=0; spec<ns; spec++){
     if (w[spec]<1.0E-12) w[spec]=1.0E-9;
@@ -2415,6 +2495,14 @@ void find_nuk_eta_kappa(spec_t w, double rho, double T,
       assert((calM[smap[spec]]*T)>=0.0e0);
       etak[spec]=8.44107E-7*sqrt(calM[smap[spec]]*T)/(Psig[smap[spec]]*Psig[smap[spec]]
                         *_Omega22(T,Peps[smap[spec]]));
+#ifndef NDEBUG
+      if (!(etak[spec]>0.0)){
+        wfprintf(stderr,"\n  _Omega22(T,Peps[smap[spec]])=%E\n",_Omega22(T,Peps[smap[spec]])); 
+        wfprintf(stderr,"  sqrt(calM[smap[spec]]*T)=%E\n",sqrt(calM[smap[spec]]*T));
+        fatal_error("  Problem computing etak in find_nuk_eta_kappa().");
+      }
+#endif
+      assert(etak[spec]>0.0);
       if (numatoms[smap[spec]]>1) {
         kappak[spec]=15.0e0/4.0e0*calR/calM[smap[spec]]*etak[spec]*
                   (0.115e0+0.354e0*calM[smap[spec]]*_cpk_from_T(spec,T)/calR);
@@ -2780,6 +2868,9 @@ double _muk_from_N_Tk_Ek(double N, double Tk, double Ek, long k){
       break;
       case SMAP_Oplus:
         mu=1.0/N*min(1.00E23/sqrt(Tk),1.00E12/sqrt(Estar)); //approximate: need to find it in litterature
+      break;
+      case SMAP_H2plus:
+        mu=1.0/N*min(4.00E23/sqrt(Tk),9.00E12/sqrt(Estar)); //approximate: need to verify
       break;
       default:
         fatal_error("Mobility can't be found for species %ld",k);
