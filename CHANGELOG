@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 OCT 02a
+  * in bin/reentry_sheath.wrp
+    - made changes
+  * in cycle/resconv/_FVS+/resconv.c, cycle/resconv/_FVS/resconv.c, cycle/share/res_share.c, src/bdry.c
+    - renamed abs() to labs()
+  * in src/common.c
+    - in find_subzones_in_zone_given_numsubzone(), fixed bug: fabs() should be labs()
+  * in model/fluid/*/fluid_post.c
+    - renamed finite() to isfinite() 
+    
+    
 2019 SEP 29a
   * in bin/plasma_arc.wrp
     - made modifications

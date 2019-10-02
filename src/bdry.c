@@ -466,7 +466,7 @@ void find_link_direc(np_t *np, gl_t *gl, long llink, long lbdry, int TYPELEVEL, 
     } else {
       *theta=*theta-LINKDIMSGN_BASE;
       *thetasgn=sign(*theta);
-      *theta=abs(*theta)-1;
+      *theta=labs(*theta)-1;
       if (!is_node_inner(np[_al(gl,llink,*theta,*thetasgn)],TYPELEVEL)) fatal_error("When linking a bdry node to an inner node and specifying a dimension and a direction sign, the node following the inner node along the direction sign must also be an inner node.");
     }
   } else {

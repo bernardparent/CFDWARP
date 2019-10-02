@@ -1350,7 +1350,7 @@ void find_subzones_in_zone_given_numsubzone(zone_t zone, long numsubzonedesired,
   zonelength=1;
   for (zonelengthlocal=3; zonelengthlocal<zonelengthmax; zonelengthlocal++){
     find_subzones_in_zone_given_zonelength(zonelengthlocal, zone, &numsubzonelocal, subzones);
-    if (fabs(numsubzonedesired-numsubzonelocal)<fabs(numsubzonedesired-*numsubzone)){
+    if (labs(numsubzonedesired-numsubzonelocal)<labs(numsubzonedesired-*numsubzone)){
       zonelength=zonelengthlocal;
       *numsubzone=numsubzonelocal;
     }

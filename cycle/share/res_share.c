@@ -51,28 +51,28 @@ void find_musclvarscycle_offset(np_t *np, gl_t *gl, long l, long theta, long off
   do {
     if (offset>0) cnt++; else cnt--;
     assert(is_node_in_domain_lim(l, gl));
-  } while(is_node_valid(np[_al(gl,l,theta,cnt)],TYPELEVEL_FLUID_WORK) && abs(cnt)<=abs(offset));
+  } while(is_node_valid(np[_al(gl,l,theta,cnt)],TYPELEVEL_FLUID_WORK) && labs(cnt)<=labs(offset));
   if (offset>0) cnt=min(offset,cnt-1); else cnt=max(cnt+1,offset);
   if (!is_node_valid(np[_al(gl,l,theta,cnt)],TYPELEVEL_FLUID_WORK)) fatal_error("problem finding musclvars in find_musclvarscycle_offset");
   if (cnt!=offset && is_node_link(np[_al(gl,l,theta,cnt)],TYPELEVEL_FLUID_WORK) ){
-    /* need to find musclvars abs(offset-cnt) nodes away from linked node */
+    /* need to find musclvars labs(offset-cnt) nodes away from linked node */
 #ifdef DISTMPI
     lbdry=_al(gl,l,theta,cnt);
     assert(is_node_bdry(np[lbdry],TYPELEVEL_FLUID_WORK));
     assert(is_node_link(np[lbdry],TYPELEVEL_FLUID_WORK));
     assert(np[_al(gl,l,theta,cnt)].linkmusclvars!=NULL);
-    if (np[lbdry].numlinkmusclvars<=(abs(offset-cnt)-1)){
-      fatal_error("Problem in find_musclvarscycle_offset: numlinkmusclvars=%d must be greater to (abs(offset-cnt)-1)=%ld",np[lbdry].numlinkmusclvars,(abs(offset-cnt)-1));
+    if (np[lbdry].numlinkmusclvars<=(labs(offset-cnt)-1)){
+      fatal_error("Problem in find_musclvarscycle_offset: numlinkmusclvars=%d must be greater to (labs(offset-cnt)-1)=%ld",np[lbdry].numlinkmusclvars,(labs(offset-cnt)-1));
     }
-    for (flux=0; flux<nmc; flux++) musclvars[flux]=np[lbdry].linkmusclvars[flux+(abs(offset-cnt)-1)*nmc]; 
+    for (flux=0; flux<nmc; flux++) musclvars[flux]=np[lbdry].linkmusclvars[flux+(labs(offset-cnt)-1)*nmc]; 
     assert(is_node_in_zone(_i(lbdry,gl,0),_i(lbdry,gl,1),_i(lbdry,gl,2),gl->domain_lim));
     //llink=_node_link(np[lbdry],0,TYPELEVEL_FLUID_WORK);
-    //find_musclvarscycle(np[_al_link(np,gl, llink,lbdry,abs(offset-cnt),TYPELEVEL_FLUID_WORK)], gl, musclvars);
+    //find_musclvarscycle(np[_al_link(np,gl, llink,lbdry,labs(offset-cnt),TYPELEVEL_FLUID_WORK)], gl, musclvars);
 #else
     lbdry=_al(gl,l,theta,cnt);
     assert(is_node_bdry(np[lbdry],TYPELEVEL_FLUID_WORK));
     llink=_node_link(np[lbdry],0,TYPELEVEL_FLUID_WORK);
-    find_musclvarscycle(np[_al_link(np,gl, llink,lbdry, abs(offset-cnt),TYPELEVEL_FLUID_WORK)], gl, musclvars);
+    find_musclvarscycle(np[_al_link(np,gl, llink,lbdry, labs(offset-cnt),TYPELEVEL_FLUID_WORK)], gl, musclvars);
 #endif
   } else {
     find_musclvarscycle(np[_al(gl,l,theta,cnt)], gl, musclvars);

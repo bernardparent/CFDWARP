@@ -992,7 +992,7 @@ double powint(double x, long y){
   double sum;
   long cnt;
   sum=1.0e0;
-  for (cnt=1; cnt<=abs(y); cnt++){
+  for (cnt=1; cnt<=labs(y); cnt++){
     sum=sum*x;
   }
   return(sum);
@@ -1098,7 +1098,7 @@ void EXM_invert_matrix_gaussian_elimination(EXM_mat_t mat, EXM_mat_t *matinv){
   double fact;
   EXM_mat_t mattmp;
   EXM_init_matrix(&mattmp,mat.glm.numrow,mat.glm.numcol);
-  if ((mat.glm.numrow==mat.glm.numcol)) {
+  if (mat.glm.numrow==mat.glm.numcol) {
     EXM_reinit_matrix(matinv,mat.glm.numrow,mat.glm.numcol);
     for (row=0; row<mat.glm.numrow; row++){
       for (col=0; col<mat.glm.numcol; col++){
@@ -1148,7 +1148,7 @@ void EXM_invert_matrix_partial_pivoting(EXM_mat_t mat, EXM_mat_t *matinv){
   double temp,pivotval,fact;
   EXM_mat_t mattmp;
   EXM_init_matrix(&mattmp,mat.glm.numrow,mat.glm.numcol);
-  if ((mat.glm.numrow==mat.glm.numcol)) {
+  if (mat.glm.numrow==mat.glm.numcol) {
     EXM_reinit_matrix(matinv,mat.glm.numrow,mat.glm.numcol);
     for (row=0; row<mat.glm.numrow; row++){
       for (col=0; col<mat.glm.numcol; col++){

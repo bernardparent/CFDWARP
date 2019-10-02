@@ -48,7 +48,7 @@ static double _qcnew_funct(void *arg, double q, double P){
   if (T>60000.0) {
     wfprintf(stderr,"T=%E along numerical differentiation of qc\n",T);
   }
-  if (!finite(T))
+  if (!isfinite(T))
     fatal_error("T not finite in functqc.");
   tmp=-(((argfpot_t *)arg)->R*T)/(P*q);
   return(tmp);

@@ -73,7 +73,7 @@ int find_root_eps(double *eps, double(*FUNCT)(void *, double), void *arg_ptr, ch
   *eps=EXM_find_root_zero_in(FUNCT,arg_ptr,0.2,5.0,1.0e-12,1.0e-12,&IFLAG);
   if (IFLAG==4) {
     *eps=EXM_find_root_Newton_Raphson(FUNCT, arg_ptr,  1.0, 0.01, 1.0e-12, 1.0e-12, &IFLAG);
-    if (IFLAG!=1 || !finite(*eps)) {
+    if (IFLAG!=1 || !isfinite(*eps)) {
 #ifdef NDEBUG
       SOAP_fatal_error(codex,"Problem finding root in grid segment.");
 #else
@@ -368,7 +368,7 @@ void find_x_along_segment(GRIDG_xgrid_t *xgrid, GRIDG_gl1d_t gl, double *seg,
   A2=xgrid[GRIDG_ai1(gl,i2)].Acs;
   direc=+1;
   if (i2<i1) direc=-1;
-  N=abs(i2-i1)+1;
+  N=labs(i2-i1)+1;
   L=seg[N-1];
   assert(L!=0.0e0);
   for (i=0; i<N; i++){
@@ -393,7 +393,7 @@ void find_xy_along_segment(GRIDG_xygrid_t *xygrid, GRIDG_gl2d_t gl, double *seg,
   direc=+1;
   if (i1!=i2) {
     if (i2<i1) direc=-1;
-    N=abs(i2-i1)+1;
+    N=labs(i2-i1)+1;
     L=seg[N-1];
     assert(L!=0.0e0);
     for (i=0; i<N; i++){
@@ -404,7 +404,7 @@ void find_xy_along_segment(GRIDG_xygrid_t *xygrid, GRIDG_gl2d_t gl, double *seg,
   }
   if (j1!=j2) {
     if (j2<j1) direc=-1;
-    N=abs(j2-j1)+1;
+    N=labs(j2-j1)+1;
     L=seg[N-1];
     assert(L!=0.0e0);
     for (j=0; j<N; j++){
@@ -431,7 +431,7 @@ void find_xyz_along_segment(GRIDG_xyzgrid_t *xyzgrid, GRIDG_gl3d_t gl, double *s
   direc=+1;
   if (i1!=i2) {
     if (i2<i1) direc=-1;
-    N=abs(i2-i1)+1;
+    N=labs(i2-i1)+1;
     L=seg[N-1];
     assert(L!=0.0e0);
     for (i=0; i<N; i++){
@@ -443,7 +443,7 @@ void find_xyz_along_segment(GRIDG_xyzgrid_t *xyzgrid, GRIDG_gl3d_t gl, double *s
   }
   if (j1!=j2) {
     if (j2<j1) direc=-1;
-    N=abs(j2-j1)+1;
+    N=labs(j2-j1)+1;
     L=seg[N-1];
     assert(L!=0.0e0);
     for (j=0; j<N; j++){
@@ -455,7 +455,7 @@ void find_xyz_along_segment(GRIDG_xyzgrid_t *xyzgrid, GRIDG_gl3d_t gl, double *s
   }
   if (k1!=k2) {
     if (k2<k1) direc=-1;
-    N=abs(k2-k1)+1;
+    N=labs(k2-k1)+1;
     L=seg[N-1];
     assert(L!=0.0e0);
     for (k=0; k<N; k++){
@@ -478,7 +478,7 @@ int find_x_along_i(GRIDG_xgrid_t *xgrid, double segval1, double segval2,
   int err;
 
   seg= (double *) malloc ((gl.ie-gl.is+3)*sizeof(double));
-  N=abs(i2-i1)+1;
+  N=labs(i2-i1)+1;
   L=fabs(xgrid[GRIDG_ai1(gl,i2)].x-xgrid[GRIDG_ai1(gl,i1)].x);
   err=(*find_segment)(seg, N, NLoverN, L, segval1, segval2, codex);
   find_x_along_segment(xgrid, gl, seg, i1, i2);
@@ -499,7 +499,7 @@ int find_xy_along_ij(GRIDG_xygrid_t *xygrid, double segval1, double segval2,
   int err;
 
   seg= (double *) malloc (max(gl.je-gl.js+3,gl.ie-gl.is+3)*sizeof(double));
-  N=max(abs(j2-j1)+1,abs(i2-i1)+1);
+  N=max(labs(j2-j1)+1,labs(i2-i1)+1);
   L=sqrt(sqr(xygrid[GRIDG_ai2(gl,i2,j2)].x-xygrid[GRIDG_ai2(gl,i1,j1)].x) +
          sqr(xygrid[GRIDG_ai2(gl,i2,j2)].y-xygrid[GRIDG_ai2(gl,i1,j1)].y));
   err=(*find_segment)(seg, N, NLoverN, L, segval1, segval2, codex);
@@ -520,7 +520,7 @@ int find_xyz_along_ijk(GRIDG_xyzgrid_t *xyzgrid, double segval1, double segval2,
   int err;
 
   seg= (double *) malloc (max(gl.ke-gl.ks+3,max(gl.je-gl.js+3,gl.ie-gl.is+3))*sizeof(double));
-  N=max(abs(k2-k1)+1,max(abs(j2-j1)+1,abs(i2-i1)+1));
+  N=max(labs(k2-k1)+1,max(labs(j2-j1)+1,labs(i2-i1)+1));
   L=sqrt(sqr(xyzgrid[GRIDG_ai3(gl,i2,j2,k2)].x-xyzgrid[GRIDG_ai3(gl,i1,j1,k1)].x) +
          sqr(xyzgrid[GRIDG_ai3(gl,i2,j2,k2)].y-xyzgrid[GRIDG_ai3(gl,i1,j1,k1)].y) +
          sqr(xyzgrid[GRIDG_ai3(gl,i2,j2,k2)].z-xyzgrid[GRIDG_ai3(gl,i1,j1,k1)].z));

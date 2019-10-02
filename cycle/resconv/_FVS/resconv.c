@@ -214,7 +214,7 @@ void find_Fplus_Fminus_offset(np_t *np, gl_t *gl, long l, long theta, long offse
   do {
     if (offset>0) cnt++; else cnt--;
     assert(is_node_in_domain_lim(l, gl));
-  } while(is_node_valid(np[_al(gl,l,theta,cnt)],TYPELEVEL_FLUID_WORK) && abs(cnt)<=abs(offset));
+  } while(is_node_valid(np[_al(gl,l,theta,cnt)],TYPELEVEL_FLUID_WORK) && labs(cnt)<=labs(offset));
   if (offset>0) cnt=min(offset,cnt-1); else cnt=max(cnt+1,offset);
   if (!is_node_valid(np[_al(gl,l,theta,cnt)],TYPELEVEL_FLUID_WORK)) fatal_error("problem finding Fplus/Fminus in find_Fplus_Fminus_offset");
   find_Fplus_Fminus(np, gl, _al(gl,l,theta,cnt), theta, metrics,  Deltaxt_p1h, Fplus, Fminus);
