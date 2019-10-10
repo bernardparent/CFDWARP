@@ -7,6 +7,23 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 OCT 09a
+  * in model/chem/_H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret
+    - added doc/
+  * in bin
+    - modified plasma_arc.wrp
+    - modified plasma_combustion_mixing.wrp
+  * in model/chem/_H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret/chem.c
+    - added find_W_Mendez
+    - added find_dW_dx_Mendez
+  * in model/share/chem_share.c
+    - added add_to_W_2r2p(), add_to_W_2r1p(), add_to_W_2r3p(), add_to_W_3r2p()
+    - added add_to_dW_2r1p(), add_to_dW_2r2p(), add_to_dW_2r3p()
+  * in model/thermo/_generic/thermo.c
+    - in find_Te_from_EoverN(), added linear extrapolation of Te beyond Te=60000K
+    - in find_dTe_dEoverN_from_EoverN(), added linear extrapolation of Te beyond Te=60000K
+    
+
 2019 OCT 02a
   * in bin/reentry_sheath.wrp
     - made changes

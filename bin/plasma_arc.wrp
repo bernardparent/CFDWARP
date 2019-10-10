@@ -445,9 +445,9 @@ Cycle(
   );
   DualTimeStepping(
     {NOTE: FOR PURE AIR, DON'T EXCEED 30000V AND A DISCHARGE DURATION OF 4E-7 SECOND (WILL LEAD TO A ARC FILAMENT T OF 5000K)}
-    Vpp=30000; {peak to peak voltage difference applied between electrodes}
+    Vpp=17000; {peak to peak voltage difference applied between electrodes}
     number_of_periods=3;
-    period=40e-6; {time of one period}
+    period=40e-5; {time of one period}
     time_within_period=time-period*floor(time/period);
     dischargeduration=4e-7; {time spent in discharge in seconds}
     dt_discharge=dischargeduration/(30*mf);   {physical time step in seconds}

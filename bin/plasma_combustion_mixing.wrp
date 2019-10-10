@@ -6,9 +6,9 @@
                                 CFD Code for Plasma & Reactive Flow
   _______________________________________________________________________________________________
 
-  Version                          19sep20a
+  Version                          19oct02a
   Compiler                         gcc 8.3.0 with OPENMP threads
-  Compiled on                      Sep 23 2019 at 10:53:22
+  Compiled on                      Oct  8 2019 at 14:57:34
   Cycle Strategy                   Standard
   Fluid Relaxation                 Block DDADI [2,1]
   EM Field Relaxation              Implicit schemes based on approximate factorization including
@@ -18,7 +18,7 @@
                                    AOWENO [10], and eigenvalue conditioning HARTEN, GNOFFO
                                    [12], PECLET [13], PASCAL [8], and PARENT positivity-
                                    preserving filter [14]
-  Temporal Discretization          Steady-State
+  Temporal Discretization          Positivity-Preserving Cross-Difference Formula [8]
   Fluid Model                      Favre-Reynolds with drift-diffusion plasma model [15]
   Thermodynamic Model              NASA Glenn Polynomials [16]
   Chemical Model                   H2 Air Plasma 18 species 78 reactions Jachimowsky-Dunn-Kang-
@@ -26,11 +26,11 @@
   EM Field Model                   Electric field potential [19]
   Beam Model                       None
   Number of Dimensions             2
-  Number of Flux Components        25
-  Number of Species                18
-  Number of Charged Species        7
-  List of Species                  e-, O2-, O2+, N2+, O+, N+, NO+, N, H2, O2, H, O, OH, H2O,
-                                   HO2, H2O2, NO, N2
+  Number of Flux Components        26
+  Number of Species                19
+  Number of Charged Species        8
+  List of Species                  e-, O2-, O2+, N2+, O+, N+, NO+, H2+, N, H2, O2, H, O, OH,
+                                   H2O, HO2, H2O2, NO, N2
   _______________________________________________________________________________________________
 
   [1]  RW MacCormack. "A New Implicit Algorithm for Fluid Flow", 13th Computational Fluid
@@ -90,20 +90,20 @@ xe=0.25+0.06; {end of domain}
 
 ys=0;  {start of hydrogen injection}
 ys0=0.0009; {end of hydrogen injection}
-ys1=0.003; {end of arc influence}
+ys1=0.0018; {end of arc influence}
 ye=0.02; {end of domain}
 
 mf=1.0;
 
 is=1;
 is1=round(65*mf);
-is2=is1+round(10*mf);
-is3=is2+round(25*mf);
-is4=is3+round(10*mf);
+is2=is1+round(15*mf);
+is3=is2+round(30*mf);
+is4=is3+round(15*mf);
 ie=is4+round(55*mf);
 
 js=1;
-js1=round(30*mf);
+js1=round(40*mf);
 je=js1+round(20*mf);
 
 dwall=15e-6;
@@ -207,7 +207,7 @@ Model(
     TURBSOURCE=YES;
     TEMODEL=TEMODEL_LOCAL;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
-    N2VIBJOULEHEATING=YES;
+    N2VIBJOULEHEATING=NO;
     REACTING=YES;
     emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
     Prt=0.9e0;
@@ -225,8 +225,8 @@ Model(
     kmin=1.0e-10;   kmax=9.9e99;   {m2/s2}
     psimin=1e-10;   psimax=9.9e99; {1/s}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain for neutrals}
-    wimin=1e-15;    wimax=1e-4;    {min and max ion mass fraction}
-    wemin=1e-20;    wemax=1e-9;    {min and max electron mass fraction}
+    wimin=1e-15;    wimax=1e0;    {min and max ion mass fraction}
+    wemin=1e-20;    wemax=1e0;    {min and max electron mass fraction}
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
     gamma=0.1e0;    {secondary emission coefficient}
     AXISYMMETRIC=NO;
@@ -280,9 +280,10 @@ Init(
     chi_Oplus=1.0e-30;
     chi_Nplus=1.0e-30;
     chi_NOplus=1.0e-30;
+    chi_H2plus=1.0e-30;
     chi_N=1.0e-30;
     chi_H2=1.0e-30;
-    chi_O2=0.25;
+    chi_O2=0.21;
     chi_H=1.0e-30;
     chi_O=1.0e-30;
     chi_OH=1.0e-30;
@@ -290,8 +291,9 @@ Init(
     chi_HO2=1.0e-30;
     chi_H2O2=1.0e-30;
     chi_NO=1.0e-30;
-    chi_N2=0.75;
-    All(INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_O2plus,chi_N2plus,chi_Oplus,chi_Nplus,chi_NOplus,chi_N,chi_H2,chi_O2,chi_H,chi_O,chi_OH,chi_H2O,chi_HO2,chi_H2O2,chi_NO,chi_N2,k,psi,Tv,Te);
+    chi_N2=0.79;
+
+    All(INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_O2plus,chi_N2plus,chi_Oplus,chi_Nplus,chi_NOplus,chi_H2plus,chi_N,chi_H2,chi_O2,chi_H,chi_O,chi_OH,chi_H2O,chi_HO2,chi_H2O2,chi_NO,chi_N2,k,psi,Tv,Te);
     mdot_Air=Vx*(P/T/286)*(ye-ys0);
 
     
@@ -305,13 +307,14 @@ Init(
     psi=110*sqrt(Vx^2+Vy^2)+1000; {1/s for TURBMODEL_KOMEGA*}
     Tv=T; {K}
     Te=3000; {K}
-       chi_eminus=1e-12;
+    chi_eminus=1e-12;
     chi_O2minus=1.0e-30;
     chi_O2plus=1e-12;
     chi_N2plus=1.0e-30;
     chi_Oplus=1.0e-30;
     chi_Nplus=1.0e-30;
     chi_NOplus=1.0e-30;
+    chi_H2plus=1.0e-30;
     chi_N=1.0e-30;
     chi_H2=1.0e0;
     chi_O2=1.0e-30;
@@ -321,11 +324,12 @@ Init(
     chi_H2O=1.0e-30;
     chi_HO2=1.0e-30;
     chi_H2O2=1.0e-30;
-    chi_N2=1.0e-8; {don't set to too low value or there will be problems determining Tv}
     chi_NO=1.0e-30;
-    Region(is,js,  ie,js1, INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_O2plus,chi_N2plus,chi_Oplus,chi_Nplus,chi_NOplus,chi_N,chi_H2,chi_O2,chi_H,chi_O,chi_OH,chi_H2O,chi_HO2,chi_H2O2,chi_NO,chi_N2,k,psi,Tv,Te);
+    chi_N2=1.0e-30;
+
+    Region(is,js,  ie,js1, INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_O2plus,chi_N2plus,chi_Oplus,chi_Nplus,chi_NOplus,chi_H2plus,chi_N,chi_H2,chi_O2,chi_H,chi_O,chi_OH,chi_H2O,chi_HO2,chi_H2O2,chi_NO,chi_N2,k,psi,Tv,Te);
     {make sure the wall temperature is 1000K}
-    Bdry(BDRY_WALLTFIXED1, INIT_TYPE6,Vx,Vy,P,Twall,chi_eminus,chi_O2minus,chi_O2plus,chi_N2plus,chi_Oplus,chi_Nplus,chi_NOplus,chi_N,chi_H2,chi_O2,chi_H,chi_O,chi_OH,chi_H2O,chi_HO2,chi_H2O2,chi_NO,chi_N2,k,psi,Tv,Te);
+    Bdry(BDRY_WALLTFIXED1, INIT_TYPE6,Vx,Vy,P,Twall,chi_eminus,chi_O2minus,chi_O2plus,chi_N2plus,chi_Oplus,chi_Nplus,chi_NOplus,chi_H2plus,chi_N,chi_H2,chi_O2,chi_H,chi_O,chi_OH,chi_H2O,chi_HO2,chi_H2O2,chi_NO,chi_N2,k,psi,Tv,Te);
 
     mdot_H2=Vx*(P/T/4124)*ys0;
     Tstag_H2=(1+(1.666-1)/2*(Vx/sqrt(1.66*4124*T))^2)*T;
@@ -369,6 +373,8 @@ Disc(
     betag[5]=1.0000;
     betag[6]=1.0000;
     betag[7]=1.0000;
+    betag[8]=1.0000;
+    
     betaa[1]=0.9990;
     betaa[2]=0.5000;
     betaa[3]=0.0000;
@@ -376,6 +382,7 @@ Disc(
     betaa[5]=0.0000;
     betaa[6]=0.0000;
     betaa[7]=0.0000;
+    betaa[8]=0.0000;
   );
   Epotential(
     POTENTIAL=POTENTIAL_OHMBASED;
@@ -415,10 +422,11 @@ Disc(
     xi[19]=0.5;
     xi[20]=0.5;
     xi[21]=0.5;
-    xi[22]=0.25;
+    xi[22]=0.5;
     xi[23]=0.25;
     xi[24]=0.25;
     xi[25]=0.25;
+    xi[26]=0.25;
   );
 
 );
@@ -449,7 +457,7 @@ Cycle(
     Uref[5]=wion*rhoref;   
     Uref[6]=wion*rhoref;   
     Uref[7]=wion*rhoref;   
-    Uref[8]=rhoref;   
+    Uref[8]=wion*rhoref;   
     Uref[9]=rhoref;   
     Uref[10]=rhoref;   
     Uref[11]=rhoref;   
@@ -460,13 +468,14 @@ Cycle(
     Uref[16]=rhoref;   
     Uref[17]=rhoref;   
     Uref[18]=rhoref;   
-    Uref[19]=rhoref*aref;   
+    Uref[19]=rhoref;   
     Uref[20]=rhoref*aref;   
-    Uref[21]=rhoref*aref*aref;  
-    Uref[22]=rhoref*kref;  
-    Uref[23]=rhoref*psiref;  
-    Uref[24]=rhoref*700.0*Tvref;  
-    Uref[25]=rhoref*wion*414*Teref;  
+    Uref[21]=rhoref*aref;   
+    Uref[22]=rhoref*aref*aref;  
+    Uref[23]=rhoref*kref;  
+    Uref[24]=rhoref*psiref;  
+    Uref[25]=rhoref*700.0*Tvref;  
+    Uref[26]=rhoref*wion*414*Teref;  
   );
   Epotential(
     xiverge_emfield=1e-2; {residual convergence threshold for the potential equation}
@@ -508,14 +517,14 @@ Cycle(
   );
 
   DualTimeStepping(
-    Vpp=40000; {peak to peak voltage difference applied between electrodes}
-    number_of_periods=3;
+    Vpp=24000; {peak to peak voltage difference applied between electrodes}
+    number_of_periods=12;
     period=50e-6; {time of one period}
     time_within_period=time-period*floor(time/period);
-    dischargeduration=25e-7; {time spent in discharge in seconds}
-    dt_discharge=dischargeduration/(15*mf);   {physical time step in seconds}
+    dischargeduration=50e-7; {time spent in discharge in seconds}
+    dt_discharge=dischargeduration/(20*mf);   {physical time step in seconds}
     dt_nodischarge=period/(15*mf);
-    itermax_discharge=50;
+    itermax_discharge=30;
     itermax_nodischarge=20;
     tmax=period*number_of_periods;    {simulation time span in seconds}
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
