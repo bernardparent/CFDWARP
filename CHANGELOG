@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 NOV 22a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - added kappa, kappae, kappav to the post variables
+  * in bin
+    - rename reentry_sheath.wrp to thermal_sheath.wrp and made changes to the control file
+  * in model/fluid/doc/Favre_Averaging/report.tex
+    - made a change to the section Crocco's theorem
+    
+
 2019 OCT 09b
   * in model/chem/_H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret/Makefile
     - added call to ( cd doc ; make clean )

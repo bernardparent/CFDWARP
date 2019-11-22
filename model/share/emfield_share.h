@@ -29,6 +29,8 @@
 
   double _E_dot_Je_over_mueNe(np_t *np, gl_t *gl, long l);
 
+  double _E_dot_Je(np_t *np, gl_t *gl, long l);
+
   void find_Vk(np_t *np, gl_t *gl, long l, long spec, EXM_vec3D_t Vk);
 
   double _dTedXj_interface(np_t *np, gl_t *gl, metrics_t metrics, long l, long i, long j);

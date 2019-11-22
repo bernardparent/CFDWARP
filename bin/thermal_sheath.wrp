@@ -75,14 +75,14 @@
 
 }
 
- Mx=24;
+ Mx=16;
 My=0.0;
 P=300/Mx^2*16^2;
 T=238;
-Twall=2000;
+Twall=3000;
 Tmax_barrier=25000;
-
-
+ADIABATIC_WALL=TRUE; {set to false for a fixed wall temperature set to Twall}
+SHEATH=TRUE; {set to false to simulate the problem without the plasma sheath}
 CFLref=1.0;
 
 
@@ -175,8 +175,11 @@ Bdry(
     _________________________________________________________________________________________
     }
     All(BDRY_WALLTFIXED1);
-    Faces(BDRY_OUTFLOWSUPERSONIC1,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLADIABATIC1,BDRY_INFLOWSUPERSONIC);
-
+    if (ADIABATIC_WALL,
+      Faces(BDRY_OUTFLOWSUPERSONIC1,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLADIABATIC1,BDRY_INFLOWSUPERSONIC);
+    ,{else}
+      Faces(BDRY_OUTFLOWSUPERSONIC1,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLTFIXED1,BDRY_INFLOWSUPERSONIC);
+    );
     {
     Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
@@ -399,7 +402,7 @@ Cycle(
         Epotential(Jmax=200;);
       );
     ,{else}
-      CFLmax=0.1;
+      CFLmax=0.4;
       Model(
         NavierStokesPlasma(Tmax=13000; emfieldworkheatfact=1.0;);
         Epotential(Jmax=200000;);
@@ -409,7 +412,9 @@ Cycle(
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     Lc=1;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.2; {relaxation factor forced on the update of the emfield variables}
-    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,500); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+    if (SHEATH,
+       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,500); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+    );
     {UpdateEMField(Lc,1.0,TSEMF_IMAF,30);}
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
