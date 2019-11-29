@@ -75,13 +75,13 @@
 
 }
 
- Mx=16;
+ Mx=18;
 My=0.0;
 P=300/Mx^2*16^2;
 T=238;
 Twall=3000;
 Tmax_barrier=25000;
-ADIABATIC_WALL=TRUE; {set to false for a fixed wall temperature set to Twall}
+ADIABATIC_WALL=FALSE; {set to false for a fixed wall temperature set to Twall}
 SHEATH=TRUE; {set to false to simulate the problem without the plasma sheath}
 CFLref=1.0;
 
@@ -309,8 +309,8 @@ Init(
 
 Disc(
   NavierStokesPlasma(
-    zetaA1=0.3e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA1=3.0e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.0e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
     zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
     betag[1]=-0.0010;
     betag[2]=-0.5000;
@@ -341,8 +341,8 @@ Disc(
     AOWENO_gammahi=0.95;
     INTERPOL=INTERPOL_TVD2_VANLEER;
      
-    EIGENVALCOND=EIGENVALCOND_PARENT;
-    POSFILTER=POSFILTER_PARENT;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
+    POSFILTER=POSFILTER_NONE;
     POSFILTER_numiter=4;
   );
 );
@@ -396,13 +396,13 @@ Cycle(
       CFL=0.01;
     );
     if (iter<7000,
-      CFLmax=0.8;
+      CFLmax=0.2;
       Model(
         NavierStokesPlasma(Tmax=8000; emfieldworkheatfact=0.0;);
         Epotential(Jmax=200;);
       );
     ,{else}
-      CFLmax=0.4;
+      CFLmax=0.1;
       Model(
         NavierStokesPlasma(Tmax=13000; emfieldworkheatfact=1.0;);
         Epotential(Jmax=200000;);

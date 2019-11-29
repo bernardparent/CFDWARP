@@ -1745,6 +1745,56 @@ where $k_{\rm ei}^{\rm N_2}$ and $k_{\rm ei}^{\rm O_2}$ are the Townsend reactio
 \end{table}
 %
 
+\subsection{Recast of $\vec{E}^k \cdot \vec{J}^k$}
+
+One of the source terms in the electron energy transport equation $\vec{E}^{\rm e} \cdot \vec{V}^{\rm e}$ can be rewritten differently. Recall the momentum equation of the electrons in Eq.\ (\ref{eqn:Vcharged}):
+%
+\begin{equation}
+  \vec{V}^k=\vec{V}^{\rm n} + s_k \mu_k \left(\vec{E}+\vec{V}^k \times \vec{B}\right)-\frac{\mu_k}{|C_k| N_k}\nabla P_k
+\end{equation}
+% 
+%
+\begin{equation}
+\vec{E}^k \cdot \vec{V}^k 
+ = \vec{E}^k \cdot \left( \vec{V}^{\rm n} + s_k \mu_k \vec{E}^k-\frac{\mu_k}{|C_k| N_k}\nabla P_k \right)
+\end{equation}
+% 
+Multiply both sides by $C_k N_k$:
+%
+\begin{equation}
+\vec{E}^k \cdot \vec{J}^k 
+ = C_k N_k \vec{E}^k \cdot \left( \vec{V}^{\rm n} + s_k \mu_k \vec{E}^k-\frac{\mu_k}{|C_k| N_k}\nabla P_k \right)
+\end{equation}
+% 
+Rearrange the RHS:
+%
+\begin{equation}
+\vec{E}^k \cdot \vec{J}^k 
+ = C_k N_k \vec{E}^k \cdot \left( \vec{V}^{\rm n} -\frac{\mu_k}{|C_k| N_k}\nabla P_k \right)
+  +C_k N_k \vec{E}^k \cdot \left(  s_k \mu_k \vec{E}^k \right)
+\end{equation}
+% 
+or
+%
+\begin{equation}
+\vec{E}^k \cdot \vec{J}^k 
+ = C_k N_k \vec{E}^k \cdot \left( \vec{V}^{\rm n} -\frac{\mu_k}{|C_k| N_k}\nabla P_k \right)
+  +|C_k| \mu_k N_k |\vec{E}^k|^2
+\end{equation}
+% 
+or,
+%
+\begin{equation}
+\frameeqn{
+\vec{E}^k \cdot \vec{J}^k 
+ =   C_k N_k \vec{E}^k \cdot \vec{V}^{\rm n} - s_k \mu_k \vec{E}^k \cdot \nabla P_k 
+  +|C_k| \mu_k N_k |\vec{E}^k|^2
+}
+\end{equation}
+% 
+
+
+
 
 \section{Electron Energy Loss Function}
 
@@ -1956,6 +2006,7 @@ Thus Eq.\ (\ref{eqn:zetae2}) can yield $\zeta_{\rm e}$ function of the electron 
 
 
 
+Note that the electron loss function is determined assuming a uniform plasma where there is no electron pressure gradient. It is not clear if the experiments used to determine the electron loss function involved significant pressure gradients. If so, it may be preferable to replace   $\vec{E}\cdot \vec{V}^{\rm e}$ in Eq.\ (\ref{eqn:eenergy})  by $\mu_{\rm e} N_{\rm e} |C_{\rm e}| \vec{E}^2$. 
 
 
 

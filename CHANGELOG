@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 NOV 28a
+  * in model/fluid/_*_plasma/fluid_source.c 
+    - in function find_Se(), changed S[fluxee] so that it is not function of the electron
+      pressure gradient 
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - in the section "Electron Energy Loss Function" added text explaining why it may be
+      preferable to replace E dot Je by mue*Ne*|Ce|*E^2 in the electron energy transport
+      equation
+    
+
 2019 NOV 22a
   * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
     - added kappa, kappae, kappav to the post variables
