@@ -47,7 +47,13 @@ ringleb.c                    generates exact solution for the Ringleb problem in
 shearlayer.c                 finds the convective Mach number and shear layer growth of 
                              a turbulent shear layer
 
+soap.c                       the soap interpreter (invoke it with #!./soap at the start of your 
+                             text file)
+
 tauvt.c                      finds the nitrogen vibrational energy relaxation time
+
+thermionic.c                 finds the current density out of a conductor due to thermionic
+                             emission
 
 tecgrid2D.c                  reads a 2D GRIDG script and creates a TECPLOT post file 
 
@@ -58,7 +64,7 @@ tecgrid3D.c                  reads a 3D GRIDG script and creates a TECPLOT post 
 
 
 
-2. SHELL SCRIPTS
+2. BASH SCRIPTS
 
 
 average.sh                   reads the data from various input files and outputs the 
@@ -110,3 +116,7 @@ search.sh                    a script that lists the files (recursively in all
 tarCFDWARP.sh                creates a tarball of the CFDWARP directory
             
 upgrade.sh                   upgrades CFDWARP to its latest version       
+
+
+
+

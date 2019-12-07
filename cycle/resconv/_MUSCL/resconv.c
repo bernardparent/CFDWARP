@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define INTERPOL_SECONDORDER 15
 #define POSFILTER_NONE 1
 #define POSFILTER_PARENT 2
+#define POSFILTER_TEST 3
 
 
 
@@ -116,6 +117,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"INTERPOL_FIRSTORDER",INTERPOL_FIRSTORDER); 
     SOAP_add_int_to_vars(codex,"INTERPOL_SECONDORDER",INTERPOL_SECONDORDER); 
     SOAP_add_int_to_vars(codex,"POSFILTER_PARENT",POSFILTER_PARENT); 
+    SOAP_add_int_to_vars(codex,"POSFILTER_TEST",POSFILTER_TEST); 
     SOAP_add_int_to_vars(codex,"POSFILTER_NONE",POSFILTER_NONE); 
 
     SOAP_add_int_to_vars(codex,"AOWENO_TYPE_COMPRESSIVE",AOWENO_TYPE_COMPRESSIVE); 
@@ -138,8 +140,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
 
 
     find_int_var_from_codex(codex,"POSFILTER",&gl->cycle.resconv.POSFILTER);
-    if (gl->cycle.resconv.POSFILTER!=POSFILTER_NONE  && gl->cycle.resconv.POSFILTER!=POSFILTER_PARENT)
-      SOAP_fatal_error(codex,"POSFILTER must be set to either POSFILTER_NONE or POSFILTER_PARENT.");
+    if (gl->cycle.resconv.POSFILTER!=POSFILTER_NONE  && gl->cycle.resconv.POSFILTER!=POSFILTER_PARENT && gl->cycle.resconv.POSFILTER!=POSFILTER_TEST)
+      SOAP_fatal_error(codex,"POSFILTER must be set to either POSFILTER_NONE or POSFILTER_PARENT or POSFILTER_TEST.");
     find_int_var_from_codex(codex,"POSFILTER_numiter",&gl->cycle.resconv.POSFILTER_numiter);
     if (gl->cycle.resconv.POSFILTER_numiter<1) SOAP_fatal_error(codex,"POSFILTER_numiter must be set to an integer greater or equal to 1.");
 
@@ -416,13 +418,22 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
           if (hbw_resconv_fluid>=4) find_musclvarscycle_offset(np,gl,l,theta,+4,musclvarsp4);
           if (hbw_resconv_fluid>=5) find_musclvarscycle_offset(np,gl,l,theta,+5,musclvarsp5);
           find_Fstar_interface_trapezoidal(np, gl, _al(gl,l,theta,-1), theta, musclvarsm5, musclvarsm4, musclvarsm3, musclvarsm2, musclvarsm1, musclvarsp0, musclvarsp1, musclvarsp2, musclvarsp3, musclvarsp4, Fm1h);
-          if (gl->cycle.resconv.POSFILTER==POSFILTER_PARENT){
+          if (gl->cycle.resconv.POSFILTER==POSFILTER_PARENT || gl->cycle.resconv.POSFILTER==POSFILTER_TEST){
             // apply positivity-preserving filter
             find_metrics_at_interface(np, gl, _al(gl,l,theta,-1), l, theta, &metrics);
             for (flux=0; flux<nf; flux++){
               Ftmp[flux]=Fm1h[flux];
             }
-            filter_Fstar_interface_positivity_preserving(np, gl, _al(gl,l,theta,-1), theta, metrics, gl->cycle.resconv.POSFILTER_numiter, gl->cycle.resconv.EIGENVALCOND, Ftmp, Fm1h, Lambdaminus_p1, Lambdaplus_p0);
+            switch (gl->cycle.resconv.POSFILTER) {
+              case POSFILTER_PARENT:
+                filter_Fstar_interface_positivity_preserving_PARENT(np, gl, _al(gl,l,theta,-1), theta, metrics, gl->cycle.resconv.POSFILTER_numiter, gl->cycle.resconv.EIGENVALCOND, Ftmp, Fm1h, Lambdaminus_p1, Lambdaplus_p0);
+              break;
+              case POSFILTER_TEST:
+                filter_Fstar_interface_positivity_preserving_TEST(np, gl, _al(gl,l,theta,-1), theta, metrics, gl->cycle.resconv.POSFILTER_numiter, gl->cycle.resconv.EIGENVALCOND, Ftmp, Fm1h, Lambdaminus_p1, Lambdaplus_p0);
+              break;
+              default:
+                fatal_error("POSFILTER must be set to POSFILTER_PARENT or POSFILTER_TEST in add_dFstar_residual().");
+            }
           }
 
         } else {
@@ -467,7 +478,7 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
             fatal_error("hbw_resconv_fluid can not be set to %ld",hbw_resconv_fluid);
         }
         find_Fstar_interface_trapezoidal(np, gl, l, theta, musclvarsm4, musclvarsm3, musclvarsm2, musclvarsm1, musclvarsp0, musclvarsp1, musclvarsp2, musclvarsp3, musclvarsp4, musclvarsp5, Fp1h);
-        if (gl->cycle.resconv.POSFILTER==POSFILTER_PARENT){
+        if (gl->cycle.resconv.POSFILTER==POSFILTER_PARENT || gl->cycle.resconv.POSFILTER==POSFILTER_TEST){
           for (flux=0; flux<nf; flux++) {
             Lambdaminus_p0[flux][flux]=Lambdaminus_p1[flux][flux];
           }
@@ -476,7 +487,16 @@ void add_dFstar_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
           for (flux=0; flux<nf; flux++){
             Ftmp[flux]=Fp1h[flux];
           }
-          filter_Fstar_interface_positivity_preserving(np, gl, l, theta, metrics, gl->cycle.resconv.POSFILTER_numiter, gl->cycle.resconv.EIGENVALCOND, Ftmp, Fp1h, Lambdaminus_p1, Lambdaplus_p0);
+          switch (gl->cycle.resconv.POSFILTER){
+            case POSFILTER_PARENT:
+              filter_Fstar_interface_positivity_preserving_PARENT(np, gl, l, theta, metrics, gl->cycle.resconv.POSFILTER_numiter, gl->cycle.resconv.EIGENVALCOND, Ftmp, Fp1h, Lambdaminus_p1, Lambdaplus_p0);
+            break;
+            case POSFILTER_TEST:
+              filter_Fstar_interface_positivity_preserving_TEST(np, gl, l, theta, metrics, gl->cycle.resconv.POSFILTER_numiter, gl->cycle.resconv.EIGENVALCOND, Ftmp, Fp1h, Lambdaminus_p1, Lambdaplus_p0);
+            break;
+            default:
+              fatal_error("POSFILTER must be set to POSFILTER_PARENT or POSFILTER_TEST in add_dFstar_residual().");
+          }
         }
 
 #ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
@@ -513,8 +533,11 @@ void find_Delta_Lambda_for_dtau(np_t *np, gl_t *gl, long l, long theta, flux_t D
     case POSFILTER_PARENT:
       for (flux=0; flux<nf; flux++) Delta_Lambda[flux]=np[l].bs->Delta_Lambda[theta][flux];
     break;
+    case POSFILTER_TEST:
+      for (flux=0; flux<nf; flux++) Delta_Lambda[flux]=np[l].bs->Delta_Lambda[theta][flux];
+    break;
     default:
-      fatal_error("POSFILTER must be set to either POSFILTER_NONE or POSFILTER_PARENT, not to %d",gl->cycle.resconv.POSFILTER);
+      fatal_error("POSFILTER must be set to either POSFILTER_NONE or POSFILTER_PARENT or POSFILTER_TEST, not to %d",gl->cycle.resconv.POSFILTER);
   }
 }
 

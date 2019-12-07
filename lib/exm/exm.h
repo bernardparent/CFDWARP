@@ -219,6 +219,8 @@ int process_flag_string(int argc, char **argv, char *flag, char **arg);
 
 int process_flag_int(int argc, char **argv, char *flag, int *arg);
 
+int process_flag_double(int argc, char **argv, char *flag, double *arg);
+
 int process_flag_int_multiple(int argc, char **argv, char *flag, int **arg);
 
 int process_flag_double_multiple(int argc, char **argv, char *flag, double **arg);

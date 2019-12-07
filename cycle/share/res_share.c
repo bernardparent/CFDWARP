@@ -1108,7 +1108,7 @@ static void find_Lambda_minus_plus_FDSplus_muscl(np_t *np, gl_t *gl, long lp0, l
 }
 
 
-void filter_Fstar_interface_positivity_preserving(np_t *np, gl_t *gl, long lp0, long theta, metrics_t metrics, long numiter, int EIGENVALCOND, flux_t Fint, flux_t Fpositive, sqmat_t lambdaminus, sqmat_t lambdaplus){
+void filter_Fstar_interface_positivity_preserving_PARENT(np_t *np, gl_t *gl, long lp0, long theta, metrics_t metrics, long numiter, int EIGENVALCOND, flux_t Fint, flux_t Fpositive, sqmat_t lambdaminus, sqmat_t lambdaplus){
 
   flux_t LUp0,LUp1,Up0,Up1,Vp1,Vp0;
   sqmat_t Lp0,Lp1,Linvp0,Linvp1;
@@ -1183,6 +1183,17 @@ void filter_Fstar_interface_positivity_preserving(np_t *np, gl_t *gl, long lp0, 
   multiply_matrix_and_vector(Linvp1,fluxtmp2,Fp1);
 
   for (flux=0; flux<nf; flux++) Fpositive[flux]=Fp0[flux]+Fp1[flux];
+}
+
+
+void filter_Fstar_interface_positivity_preserving_TEST(np_t *np, gl_t *gl, long lp0, long theta, metrics_t metrics, long numiter, int EIGENVALCOND, flux_t Fint, flux_t Fpositive, sqmat_t lambdaminus, sqmat_t lambdaplus){
+  flux_t Fpositive_PARENT;
+  long flux;
+  filter_Fstar_interface_positivity_preserving_PARENT(np, gl, lp0, theta, metrics, numiter, EIGENVALCOND, Fint, Fpositive_PARENT, lambdaminus, lambdaplus);
+  for (flux=0; flux<nf; flux++) {
+    if (flux==fluxet) Fpositive[flux]=Fint[flux];
+      else Fpositive[flux]=Fpositive_PARENT[flux];
+  }
 }
 
 

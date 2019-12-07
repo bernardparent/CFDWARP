@@ -75,14 +75,14 @@
 
 }
 
- Mx=18;
+ Mx=21;
 My=0.0;
 P=300/Mx^2*16^2;
 T=238;
 Twall=3000;
 Tmax_barrier=25000;
 ADIABATIC_WALL=FALSE; {set to false for a fixed wall temperature set to Twall}
-SHEATH=TRUE; {set to false to simulate the problem without the plasma sheath}
+SHEATH=FALSE; {set to false to simulate the problem without the plasma sheath}
 CFLref=1.0;
 
 
@@ -310,7 +310,7 @@ Init(
 Disc(
   NavierStokesPlasma(
     zetaA1=3.0e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.0e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
     zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
     betag[1]=-0.0010;
     betag[2]=-0.5000;
@@ -387,6 +387,13 @@ Cycle(
     Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
   SteadyState(
+{
+    if (!ADIABATIC_WALL && iter==165651,
+      Init(NavierStokesPlasma(
+        Bdry(BDRY_WALLTFIXED1, INIT_TYPE6,0,0,P,Twall,1e-30,1e-30,1e-30,1e-30,1e-30,1e-30,1e-30,1e-30,1e-30,1e-30,0.235,0.765,Twall,Twall);
+      ););
+    );
+}
     if (mod(iter,50)==0,
       WriteDataFile(outputfilename);
     );

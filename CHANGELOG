@@ -7,6 +7,23 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 DEC 06a
+  * renamed filter_Fstar_interface_positivity_preserving() 
+    to filter_Fstar_interface_positivity_preserving_PARENT()
+  * in cycle/resconv/_MUSCL/resconv.c
+    - added POSFILTER_TEST
+  * in cycle/share/res_share.c
+    - added filter_Fstar_interface_positivity_preserving_TEST()
+  * in bin
+    - added qmag.eqn
+    - modified thermal_sheath.wrp
+  * in tools
+    - added thermionic.c
+    - added soap.c
+  * in lib/exm/exm.c
+    - added function process_flag_double()
+        
+
 2019 NOV 28a
   * in model/fluid/_*_plasma/fluid_source.c 
     - in function find_Se(), changed S[fluxee] so that it is not function of the electron

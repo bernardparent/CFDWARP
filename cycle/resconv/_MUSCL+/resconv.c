@@ -232,11 +232,11 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, musclva
     break;
     case FLUX_FDSplusFilter:
       find_Fstar_interface_FDS_muscl(np, gl, l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, EIGENVALCOND_NONE, gl->cycle.resconv.AVERAGING, Finttmp);
-      filter_Fstar_interface_positivity_preserving(np, gl, l, theta, metrics, gl->cycle.resconv.numiter, gl->cycle.resconv.EIGENVALCOND, Finttmp, Fint, lambdaminusp1h,  lambdaplusm1h);
+      filter_Fstar_interface_positivity_preserving_PARENT(np, gl, l, theta, metrics, gl->cycle.resconv.numiter, gl->cycle.resconv.EIGENVALCOND, Finttmp, Fint, lambdaminusp1h,  lambdaplusm1h);
     break;
     case FLUX_FVSplusFilter:
       find_Fstar_interface_FVS_muscl(np, gl, l, _al(gl,l,theta,+1), theta, musclvarsL, musclvarsR, metrics, EIGENVALCOND_NONE, gl->cycle.resconv.AVERAGING, Finttmp);
-      filter_Fstar_interface_positivity_preserving(np, gl, l, theta, metrics, gl->cycle.resconv.numiter, gl->cycle.resconv.EIGENVALCOND, Finttmp, Fint, lambdaminusp1h,  lambdaplusm1h);
+      filter_Fstar_interface_positivity_preserving_PARENT(np, gl, l, theta, metrics, gl->cycle.resconv.numiter, gl->cycle.resconv.EIGENVALCOND, Finttmp, Fint, lambdaminusp1h,  lambdaplusm1h);
     break;
     default:
       fatal_error("gl->cycle.resconv.FLUX must be set to either FLUX_FDSplus, FLUX_FVSplus, or FLUX_FDSplusFilter, or FLUX_FVSplusFilter in find_Fstar_interface().");

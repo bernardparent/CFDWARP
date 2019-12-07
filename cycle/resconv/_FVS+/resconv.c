@@ -373,7 +373,7 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t 
     Finttmp[flux]=FplusL[flux]+FminusR[flux];
   } 
   
-  filter_Fstar_interface_positivity_preserving(np, gl, l, theta, metrics, gl->cycle.resconv.numiter, gl->cycle.resconv.EIGENVALCOND, Finttmp, Fint, lambdaminusp1h,  lambdaplusm1h);
+  filter_Fstar_interface_positivity_preserving_PARENT(np, gl, l, theta, metrics, gl->cycle.resconv.numiter, gl->cycle.resconv.EIGENVALCOND, Finttmp, Fint, lambdaminusp1h,  lambdaplusm1h);
 
 }
 
