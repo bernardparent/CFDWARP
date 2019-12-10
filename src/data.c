@@ -709,7 +709,7 @@ void find_interpolation_weight(np_t *np, gl_t *gl, long l, dim_t x_file, dim_t d
     //for (dim=0; dim<nd; dim++) thisweight=max(thisweight,fabs(mat3.cont[EXM_aim(mat3.glm,dim,0)]));
     for (dim=0; dim<nd; dim++) *thisweight+=fabs(pow(fabs(mat3.cont[EXM_aim(mat3.glm,dim,0)]),3.0));
     *thisweight=fabs(pow(*thisweight,1.0/3.0));
-    *thisweight=max(0.0,max(0.000004-(*thisweight)*0.000002,1.0-(*thisweight)));
+    *thisweight=max(1e-16,max(0.0003-(*thisweight)*0.00001,1.0-(*thisweight)));
     EXM_free_matrix(&mat1);
     EXM_free_matrix(&mat1inv);
     EXM_free_matrix(&mat2);

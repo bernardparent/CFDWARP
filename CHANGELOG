@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 DEC 09a
+  * in src/data.c
+    - in find_interpolation_weight(), made changes to how thisweight is computed (now
+      avoids a situation where a interpolated node could be given no value)
+      
+
 2019 DEC 06a
   * renamed filter_Fstar_interface_positivity_preserving() 
     to filter_Fstar_interface_positivity_preserving_PARENT()
