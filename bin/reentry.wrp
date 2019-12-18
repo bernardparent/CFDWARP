@@ -198,6 +198,7 @@ Init(
     w_O2=0.235;
     w_N2=0.765;
     All(INIT_TYPE2,Mx,My,P,T,w_eminus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
+    Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,Twall,w_eminus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
     {
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_eminus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
     Region(is,js,  ie,je, INIT_TYPE2,Mx,My,P,T,w_eminus,w_Oplus,w_Nplus,w_O2plus,w_N2plus,w_NOplus,w_O,w_N,w_NO,w_O2,w_N2);
@@ -274,7 +275,7 @@ Cycle(
     if (iter==1,
       CFL=0.06;
     );
-    CFL=min(CFL*1.03,0.5);
+    CFL=min(CFL*1.03,CFLref);
     UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,

@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 DEC 18a
+  * in cycle/*/cycle.c
+    - in runtime_actions_cycle_specific(), added gl->PRECONDITIONER!=PRECON_LOCALTIMESTEP2
+  * in cycle/share/cycle_share.c
+    - in add_constants_to_codex(), added PRECON_LOCALTIMESTEP2
+    - added find_Delta_Lambda_for_dtau_local()
+    - in find_dtau(), renamed find_Delta_Lambda_for_dtau() for find_Delta_Lambda_for_dtau_local()
+  * in model/share/fluid_share.c
+    - in find_Gamma(), added PRECON_LOCALTIMESTEP2
+  * in bin/thermal_sheath.wrp
+    - made modifications -> now can use CFL of 1 till Mach 25 when a sheath exists (the CFL used
+      to be restricted to 0.01 or less when the Mach number was more than 16 and a sheath was 
+      present)
+      
+
 2019 DEC 09a
   * in src/data.c
     - in find_interpolation_weight(), made changes to how thisweight is computed (now

@@ -75,26 +75,24 @@
 
 }
 
- Mx=21;
+ Mx=25;
 My=0.0;
 P=300/Mx^2*16^2;
 T=238;
 Twall=3000;
 Tmax_barrier=25000;
-ADIABATIC_WALL=FALSE; {set to false for a fixed wall temperature set to Twall}
-SHEATH=FALSE; {set to false to simulate the problem without the plasma sheath}
-CFLref=1.0;
+ADIABATIC_WALL=TRUE; {set to false for a fixed wall temperature set to Twall}
 
 
 
 
 
-meshtype=1; {set to 1 for gridline on axis of symmetry ; 
+meshtype=2; {set to 1 for gridline on axis of symmetry ; 
              set to 2 for no gridline on axis of symmetry ;}
-meshfact=1.0;
+meshfact=1.4;
 sizefact=0.02;
 
-dwall=15e-6;
+dwall=15e-6/meshfact;
 
 is=1;  js=1; 
 is1=round(8*meshfact);
@@ -309,7 +307,7 @@ Init(
 
 Disc(
   NavierStokesPlasma(
-    zetaA1=3.0e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA1=0.3e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
     zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
     betag[1]=-0.0010;
@@ -326,7 +324,6 @@ Disc(
     betaa[5]=0.0000;
     betaa[6]=0.0000;
     betaa[7]=0.0000;
-
   );
   Epotential(
     Ediv=1000.0;        {a small positive number in V/m, needed to prevent a division by zero when
@@ -339,20 +336,21 @@ Disc(
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_TVD2_VANLEER;
+    INTERPOL=INTERPOL_WENO5;
      
-    EIGENVALCOND=EIGENVALCOND_PECLET;
-    POSFILTER=POSFILTER_NONE;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+    POSFILTER=POSFILTER_PARENT;
     POSFILTER_numiter=4;
   );
+  
 );
 
 
 Cycle(
   NavierStokesPlasma(
     xiverge=1e-3;         {residual convergence threshold}
-    zetaGammai=1;       {factor multiplying the pseudotime step of the ion species transport equations} 
-    zetaGammae=1;       {factor multiplying the pseudotime step of the electron species transport equations
+    zetaGammai=1.0;       {factor multiplying the pseudotime step of the ion species transport equations} 
+    zetaGammae=1.0;       {factor multiplying the pseudotime step of the electron species transport equations
                            near cathode}
     relaxNi_bdry=1.0;     {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.5;     {the electron density relaxation factor at the boundary }
@@ -386,43 +384,50 @@ Cycle(
     sigmaref=3e-6; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
     Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
+  
   SteadyState(
-{
-    if (!ADIABATIC_WALL && iter==165651,
-      Init(NavierStokesPlasma(
-        Bdry(BDRY_WALLTFIXED1, INIT_TYPE6,0,0,P,Twall,1e-30,1e-30,1e-30,1e-30,1e-30,1e-30,1e-30,1e-30,1e-30,1e-30,0.235,0.765,Twall,Twall);
-      ););
-    );
-}
     if (mod(iter,50)==0,
       WriteDataFile(outputfilename);
     );
-    sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
+    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
       CFL=0.01;
     );
-    if (iter<7000,
-      CFLmax=0.2;
+    if (iter<3000*meshfact,
+      if (iter<2000*meshfact,
+        CFLmax=1.0;
+        sigma1=0.0;
+      ,
+        CFLmax=1.0;
+        sigma1=0.2;
+      );
       Model(
         NavierStokesPlasma(Tmax=8000; emfieldworkheatfact=0.0;);
         Epotential(Jmax=200;);
       );
+      
     ,{else}
-      CFLmax=0.1;
+      CFLmax=1.0;
+      sigma1=0.3;
       Model(
-        NavierStokesPlasma(Tmax=13000; emfieldworkheatfact=1.0;);
+        NavierStokesPlasma(Tmax=(iter-3000*meshfact)*2/meshfact+8000; emfieldworkheatfact=1.0;);
         Epotential(Jmax=200000;);
       );
     );
-    CFL=min(CFL*1.05,CFLmax);
-    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
-    Lc=1;      {characteristic length scale in meters used to solve the emfield equation}
-    relaxEMF=0.2; {relaxation factor forced on the update of the emfield variables}
-    if (SHEATH,
-       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,500); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+    if (iter>1000*meshfact,
+      Model(NavierStokesPlasma(TEMODEL=TEMODEL_TRANSPORT;););
     );
-    {UpdateEMField(Lc,1.0,TSEMF_IMAF,30);}
+    if (iter==round(3000*meshfact),CFL=0.03;);
+    CFL=min(CFL*1.025,CFLmax);
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP2,sigma1,sigma2);
+    Lc=1;      {characteristic length scale in meters used to solve the emfield equation}
+    relaxEMF=0.7; {relaxation factor forced on the update of the emfield variables}
+    if (iter>10*meshfact,
+      UpdateEMField(Lc,relaxEMF,TSEMF_SOR,500);
+      UpdateEMField(Lc,relaxEMF,TSEMF_SOR,500);
+      UpdateEMField(Lc,relaxEMF,TSEMF_SOR,500); 
+    );
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);

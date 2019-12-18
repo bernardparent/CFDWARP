@@ -1888,6 +1888,9 @@ void find_Gamma(np_t *np, gl_t *gl, long l, sqmat_t Gamma){
           case PRECON_LOCALTIMESTEP:
             Gamma[row][row]=1.0/dtau_constant;
           break;
+          case PRECON_LOCALTIMESTEP2:
+            Gamma[row][row]=1.0/dtau_constant;
+          break;
           case PRECON_CONSTANTTIMESTEP:
             Gamma[row][row]=1.0/gl->dtau;
           break;

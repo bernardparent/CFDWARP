@@ -1366,6 +1366,8 @@ void add_constants_to_codex(gl_t *gl, SOAP_codex_t *codex){
   SOAP_add_to_vars(codex,"PRECON_CONSTANTTIMESTEP",str);
   sprintf(str, "%d", PRECON_LOCALTIMESTEP);
   SOAP_add_to_vars(codex,"PRECON_LOCALTIMESTEP",str);
+  sprintf(str, "%d", PRECON_LOCALTIMESTEP2);
+  SOAP_add_to_vars(codex,"PRECON_LOCALTIMESTEP2",str);
   sprintf(str, "%d", PRECON_LOCALEIGENVALUE);
   SOAP_add_to_vars(codex,"PRECON_LOCALEIGENVALUE",str);
   sprintf(str, "%d", PRECON_LOCALEIGENVALUE2);
@@ -1920,6 +1922,32 @@ double _xi(np_t np, gl_t *gl, flux_t Res){
 }
 
 
+static void find_Delta_Lambda_for_dtau_local(np_t *np, gl_t *gl, long l, long dim, flux_t Delta_Lambda){
+  long offset,maxoffset,flux,dim2;
+  flux_t Delta_Lambda_tmp;
+  
+  find_Delta_Lambda_for_dtau(np, gl, l, dim, Delta_Lambda);
+  
+  if (gl->PRECONDITIONER==PRECON_LOCALTIMESTEP2){
+    maxoffset=1;
+    for (dim2=dim; dim2<=dim; dim2++){
+      for (offset=1; offset<=maxoffset; offset++){
+        if (is_node_inner(np[_al(gl,l,dim2,-offset)],TYPELEVEL_FLUID_WORK)){
+          find_Delta_Lambda_for_dtau(np, gl, _al(gl,l,dim2,-offset), dim, Delta_Lambda_tmp);
+          for (flux=0; flux<nf; flux++)
+            Delta_Lambda[flux]=max(Delta_Lambda[flux],Delta_Lambda_tmp[flux]);
+        }
+        if (is_node_inner(np[_al(gl,l,dim2,+offset)],TYPELEVEL_FLUID_WORK)){
+          find_Delta_Lambda_for_dtau(np, gl, _al(gl,l,dim2,+offset), dim, Delta_Lambda_tmp);
+          for (flux=0; flux<nf; flux++)
+            Delta_Lambda[flux]=max(Delta_Lambda[flux],Delta_Lambda_tmp[flux]);
+        }
+      }
+    }
+  }
+}
+
+
 void find_dtau(np_t *np, gl_t *gl, long l, flux_t dtau){
   double dtaumin,dtaumax;
   long dim,flux;
@@ -1934,7 +1962,7 @@ void find_dtau(np_t *np, gl_t *gl, long l, flux_t dtau){
     find_LambdaZ(np,gl,l,LambdaZ);
     set_matrix_to_identity(LambdaZ); //turn off effect of LambdaZ -> seems to be detrimental not beneficial
     for (dim=0; dim<nd; dim++){
-      find_Delta_Lambda_for_dtau(np, gl, l, dim, Delta_Lambda);
+      find_Delta_Lambda_for_dtau_local(np, gl, l, dim, Delta_Lambda);
       for (flux=0; flux<nf; flux++){
         assert(LambdaZ[flux][flux]>0.0);
         dtaulocal[flux][dim]=gl->dt/LambdaZ[flux][flux]/notzero(Delta_Lambda[flux]*gl->dt/LambdaZ[flux][flux]+1.0,1e-39);
@@ -1942,7 +1970,7 @@ void find_dtau(np_t *np, gl_t *gl, long l, flux_t dtau){
     }
 #else
     for (dim=0; dim<nd; dim++){
-      find_Delta_Lambda_for_dtau(np, gl, l, dim, Delta_Lambda);
+      find_Delta_Lambda_for_dtau_local(np, gl, l, dim, Delta_Lambda);
       for (flux=0; flux<nf; flux++){
         dtaulocal[flux][dim]=1.0/notzero(Delta_Lambda[flux],1e-39);
       }
