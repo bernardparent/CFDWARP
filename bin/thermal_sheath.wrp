@@ -89,10 +89,10 @@ ADIABATIC_WALL=TRUE; {set to false for a fixed wall temperature set to Twall}
 
 meshtype=2; {set to 1 for gridline on axis of symmetry ; 
              set to 2 for no gridline on axis of symmetry ;}
-meshfact=1.4;
+meshfact=1.0;
 sizefact=0.02;
 
-dwall=15e-6/meshfact;
+dsheath=50e-6;
 
 is=1;  js=1; 
 is1=round(8*meshfact);
@@ -104,6 +104,7 @@ if (meshtype==2,
 );
 ie=ie1+is1;
 
+js1=round(30*meshfact)+1;
 je=round(90*meshfact)+1;
 Rin_x=0.6*sizefact;
 Rin_y=Rin_x/0.3;
@@ -138,14 +139,26 @@ Grid(
       Point(i,je, x_in,y_in);  
     );
 
-    Join(is1,js,ie1,je,j,FE,0.8,dwall,1);
+    for (i,is1,ie1,
+      L=sqrt((_x(is1,je)-_x(i,js))^2+(_y(i,je)-_y(i,js))^2);
+      Point(i,js1,_x(i,js)+dsheath/L*(_x(i,je)-_x(i,js)),_y(i,js)+dsheath/L*(_y(i,je)-_y(i,js)));
+      Join(i,js,i,js1,j,EE,0.5,1.0,1.0);
+    );
+    Join(is1,js1,ie1,je,j,GE,0.8,1,1);
   );
 
-  Corners(is,js,is,je,sizefact,-Rin_y,sizefact,-Rout_y*1.15);
-  JoinCorners(is,js,is1,je,EG,0.5,1.0,1.0,FE,0.8,dwall,1.0);
+  Copy(is1,js,is1,je, is,js);
+  Translate(is,js,is,je,sizefact*1.0,0);
+  Translate(is,je,is,je,0,-sizefact*0.6);
+  Join(is,js1,is,je,j,GE,0.8,1.0,1.0);
+  Join(is,js,is1,je,i,EG,0.5,1.0,1.0);
 
-  Corners(ie,js,ie,je,sizefact,Rin_y,sizefact,Rout_y*1.15);
-  JoinCorners(ie1,js,ie,je,GE,0.5,1.0,1.0,FE,0.8,dwall,1.0);
+  Copy(ie1,js,ie1,je, ie,js);
+  Translate(ie,js,ie,je,sizefact*1.0,0);
+  Translate(ie,je,ie,je,0,sizefact*0.6);
+  Join(ie,js1,ie,je,j,GE,0.8,1.0,1.0);
+  Join(ie1,js,ie,je,i,GE,0.5,1.0,1.0);
+
 );
 
 
@@ -394,31 +407,35 @@ Cycle(
     if (iter==1,
       CFL=0.01;
     );
-    if (iter<3000*meshfact,
-      if (iter<2000*meshfact,
-        CFLmax=1.0;
-        sigma1=0.0;
-      ,
-        CFLmax=1.0;
-        sigma1=0.2;
-      );
+    if (iter<5000*meshfact,
+      CFLmax=0.8;
+      sigma1=0.0;
       Model(
-        NavierStokesPlasma(Tmax=8000; emfieldworkheatfact=0.0;);
+        NavierStokesPlasma(Tmax=8000; Temax=8000; emfieldworkheatfact=0.0;);
         Epotential(Jmax=200;);
       );
-      
-    ,{else}
-      CFLmax=1.0;
-      sigma1=0.3;
+    );
+    if (iter>=5000*meshfact && iter<9000*meshfact,
+      CFLmax=0.5;
+      sigma1=0.0;
       Model(
-        NavierStokesPlasma(Tmax=(iter-3000*meshfact)*2/meshfact+8000; emfieldworkheatfact=1.0;);
+        NavierStokesPlasma(Tmax=(iter-5000*meshfact)/meshfact+8000; Temax=60000; emfieldworkheatfact=1.0;);
         Epotential(Jmax=200000;);
       );
     );
+    if (iter>=9000*meshfact,
+      CFLmax=1.0;
+      sigma1=0.2;
+      Model(
+        NavierStokesPlasma(Tmax=(iter-5000*meshfact)/meshfact+8000; Temax=60000; emfieldworkheatfact=1.0;);
+        Epotential(Jmax=200000;);
+      );
+    );
+    
     if (iter>1000*meshfact,
       Model(NavierStokesPlasma(TEMODEL=TEMODEL_TRANSPORT;););
     );
-    if (iter==round(3000*meshfact),CFL=0.03;);
+    if (iter==round(5000*meshfact),CFL=0.03;);
     CFL=min(CFL*1.025,CFLmax);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP2,sigma1,sigma2);
     Lc=1;      {characteristic length scale in meters used to solve the emfield equation}

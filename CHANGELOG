@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 DEC 24a
+  * in bin/thermal_sheath.wrp
+    - added clipping of Te within Cycle() module in the early stages of convergence
+  * renamed model/chem/_Air_Plasma_12s_59r_Dunn-Kang-Macheret to 
+    model/chem/_Air_Plasma_12s_42r_Dunn-Kang-Macheret
+  * in model/chem/_Air_Plasma_12s_42r_Dunn-Kang-Macheret/chem.c
+    - got rid of redundant reactions
+  * in model/chem/_Air_Plasma_12s_42r_Dunn-Kang-Macheret
+    - added doc
+    
+
 2019 DEC 18a
   * in cycle/*/cycle.c
     - in runtime_actions_cycle_specific(), added gl->PRECONDITIONER!=PRECON_LOCALTIMESTEP2
