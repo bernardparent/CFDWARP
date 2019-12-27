@@ -7,13 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+
+2019 DEC 27b
+  * in model/fluid/_*_plasma/fluid_source.c
+    - in find_Se(), changed the electron energy source term back to to 19dec18a version 
+
+
 2019 DEC 27a
   * in model/fluid/_*_plasma/fluid_bdry.c
     - in update_bdry_wall(), added a clipping to ensure that the electron temperature at the wall
       never falls below the wall temperature
   * in model/fluid/_*_plasma/fluid_source.c
-    - in find_Se(), changed the electron energy source term back to E dot Je (was changed
-      1 month ago to E dot E excluding the pressure gradient contributions for testing purposes)
+    - in find_Se(), changed the electron energy source term to E dot Je for testing 
        
 
 2019 DEC 24a
