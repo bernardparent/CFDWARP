@@ -43,4 +43,10 @@
 
   void find_Vk_from_mu(np_t *np, gl_t *gl, long l, double mu, long spec, EXM_vec3D_t Vk);
 
+  void find_Vk_at_interface(np_t *np, gl_t *gl, long l, long theta, long spec, EXM_vec3D_t Vk);
+
+  void find_Vk_from_Vk_at_interfaces(np_t *np, gl_t *gl, long l, long spec, EXM_vec3D_t Vk);
+
+  void find_Jk_from_Jk_at_interfaces(np_t *np, gl_t *gl, long l, long spec, EXM_vec3D_t Jk);
+
 #endif /* _EMFIELD_SHARE_H */

@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2019 DEC 29a
+  * in model/emfield/_Epotential/emfield.c
+    - in find_post_variable_value_emfield(), replaced find_Vk() by ind_Vk_from_Vk_at_interfaces()
+  * in model/fluid/_Navier-Stokes/fluid_post.c
+    - added kappa to post variables
+  * in model/fluid/_Navier-Stokes/fluid.hh
+    - increased totalpostvarfluid to (7+nd+ns)
+  * in model/share/emfield_share.c
+    - added find_Vk_from_Vk_at_interfaces() and find_Jk_from_Jk_at_interfaces()
+    
 
 2019 DEC 27b
   * in model/fluid/_*_plasma/fluid_source.c
