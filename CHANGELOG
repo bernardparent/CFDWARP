@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JAN 01a
+  * in model/emfield/_Epotential/emfield.c
+    - in find_post_variable_value_emfield(), fixed a problem related to not finding Ve 
+      at the near boundary nodes
+    
+
 2019 DEC 29a
   * in model/emfield/_Epotential/emfield.c
     - in find_post_variable_value_emfield(), replaced find_Vk() by ind_Vk_from_Vk_at_interfaces()
