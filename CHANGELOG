@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JAN 04a
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c, model/fluid/_Navier-Stokes_plasma/fluid.h,
+    model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - added code needed for TEMODEL_EQUILIBRIUM
+    
+
 2020 JAN 01a
   * in model/emfield/_Epotential/emfield.c
     - in find_post_variable_value_emfield(), fixed a problem related to not finding Ve 
