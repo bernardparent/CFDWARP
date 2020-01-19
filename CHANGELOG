@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JAN 19a
+  * in bin
+    - updated 3DDBD_actuator.wrp
+  * in model/fluid/_*_plasma/fluid_bdry.c
+    - in update_bdry_wall(), removed the line which set the electron temperature at the wall at least
+      as high as the wall temperature
+  * in model/fluid/_*_plasma/fluid_source.c
+    - in find_Se(), reverted to the standard way of determining the electron temperature 
+      source terms (as in the doc model/fluid/doc/Transport_Equations
+      
+
 2020 JAN 04a
   * in model/fluid/_Navier-Stokes_plasma/fluid.c, model/fluid/_Navier-Stokes_plasma/fluid.h,
     model/fluid/_Navier-Stokes_plasma/fluid_source.c

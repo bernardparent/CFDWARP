@@ -220,6 +220,14 @@ Bdry(
     All(BDRY_WALLTFIXED1);
     Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLTFIXED1,BDRY_OUTFLOWSUPERSONIC1, BDRY_SYMMETRICAL2,BDRY_SYMMETRICAL2);
 
+    if (UNSTEADY,
+      for (i,is+1,ie-1,
+        for (j,js2+1,je-1,
+          Link(i,j,ks+1,i,j,ke);
+          Link(i,j,ks,i,j,ke-1);
+        );
+      );
+    );
     {
     Cut(is,js,ks,  ie,je,ke);
     Region(is,js,ks,  ie,je,ke,  BDRY_INFLOWSUPERSONIC);
@@ -274,6 +282,7 @@ Model(
     ,{else}
       REACTING=NO;
     );
+    emfieldworkheatfact=1.0;
     sigmadiv=1e-10; {minimum magnitude of sigma in S/m allowed when sigma appears on the denominator }
     etdiv=1e-1;     {minimum magnitude of et in J/kg allowed when et appears on the denominator}
     Pmin=2000;    Pmax=9.9e99;   {min and max pressure in Pa allowed in the domain}
@@ -286,15 +295,6 @@ Model(
     wemin=1e-19;    wemax=1e-9;    {min and max electron mass fraction }
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
     gamma=0.1e0;    {secondary emission coefficient used to calculate the electron density at the cathode}
-    zetaA1=0.0e0;    {conditions the eigenvalues of the A jacobian}
-    zetaA3=0.2;
-    if (UNSTEADY,
-      zetaA2=0.5;
-    ,{else}
-      zetaA2=0.1;
-    );
-    EIGENVALCOND=EIGENVALCOND_PASCAL; {set the eigenvalue conditioning to EIGENVALCOND_PECLET, EIGENVALCOND_PASCAL [RECOMMENDED], or EIGENVALCOND_HARTEN}
-    zetaD=0.3;     {conditions the Dstar eigenvalues for the charged species}
     AXISYMMETRIC=NO;
   );
   Epotential(
@@ -378,6 +378,56 @@ Init(
 );
 
 
+Disc(
+  NavierStokesPlasma(
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.2e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
+    betag[1]=-0.0010;
+    betag[2]=-0.5000;
+    betag[3]=1.0000;
+    betag[4]=1.0000;
+    betaa[1]=0.9990;
+    betaa[2]=0.5000;
+    betaa[3]=0.0000;
+    betaa[4]=0.0000;
+  );
+  Epotential(
+    POTENTIAL=POTENTIAL_OHMBASED;
+    Ediv=10.0;        {a small positive number in V/m, needed to prevent a division by zero when
+                       discretizing the electron pressure gradients within the potential equation}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_AOWENO7;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+    POSFILTER=POSFILTER_PARENT;
+    POSFILTER_numiter=4;
+  );
+  CDFplus(
+    xi[1]=0.5;
+    xi[2]=0.5;
+    xi[3]=0.5;
+    xi[4]=0.5;
+    xi[5]=0.5;
+    xi[6]=0.5;
+    xi[7]=0.5;
+    xi[8]=0.5;
+    xi[9]=0.5;
+    xi[10]=0.5;
+    xi[11]=0.5;
+    xi[12]=0.5;
+    xi[13]=0.25;
+    xi[14]=0.25;
+  );
+);
+
+
+
 Cycle(
   NavierStokesPlasma(
     xiverge=1e2;         {residual convergence threshold}
@@ -417,7 +467,7 @@ Cycle(
 
   DualTimeStepping(
     sigma1=0.3;      {exponent of largest pseudotime step in all dimensions}
-    sigma2=0.3;      {??? is set to 0.0 in 2DDBD.wrp.. exponent of largest pseudotime step in all flux components}
+    sigma2=0.0;      {??? is set to 0.0 in 2DDBD.wrp.. exponent of largest pseudotime step in all flux components}
 
     period=1.0/freq;
 
@@ -481,9 +531,6 @@ Cycle(
     );
     dphi=dphi;
     printf("%6.0f ",dphi);
-    if (iter==1,
-      Lc=3e-1;  {characteristic length scale used to solve the emfield equation}
-    );
     CFL=max(CFL,min(CFL*1.2,CFLmax)); {was CFL*1.2}
 
 
@@ -515,7 +562,7 @@ Cycle(
     );
 
     if (!DRYRUN,
-      UpdateFluid(CFL,PRECON_LOCALEIGENVALUE,sigma1,sigma2,dt);
+      UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
 
       if(timewithinperiod<timepulse+timeextpulse && timewithinperiod>timepulse-2*dtref_pulse*mf,
         fact_iter=4;
@@ -523,41 +570,10 @@ Cycle(
       ,{else}
         fact_iter=1;
       );
-      for (cnt,1,iter_tsemf*fact_iter,
-        {ADI}
-        if(timewithinperiod<timepulse+timeextpulse,
-          fact=1/2.0*3.3*2.5; {was fact=1/1.5}
-        , {else}
-          fact=1.0;
-        );
-        relaxEMF=0.5;
-        Lc=3e-2*fact;  
-        Cycle(Epotential(sigmaref=0.00001;);); {was 0.0001}
-        UpdateEMField(Lc,relaxEMF,dt,TSEMF_ADIk);
+      Lc=3e-1;  {characteristic length scale used to solve the emfield equation}
+      relaxEMF=0.7;
+      UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,300);
 
-
-        {IMAF}
-        relaxEMF=1.0;
-        Lc=10.0; {3e-2*fact;}
-        Cycle(Epotential(sigmaref=1e-9;););
-        UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,subiter_tsemf);
-
-
-        {ADI}
-        relaxEMF=0.5;
-        Lc=3e-3*fact;  
-        Cycle(Epotential(sigmaref=0.000001;);); {was 0.0001}
-        UpdateEMField(Lc,relaxEMF,dt,TSEMF_ADIk);
-
-
-        {IMAF}
-        relaxEMF=1.0;
-        Lc=100;
-        Cycle(Epotential(sigmaref=1e-9;););
-        UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,subiter_tsemf);
-
-
-      );
     );
 
     system("date");
