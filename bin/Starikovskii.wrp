@@ -1,12 +1,12 @@
 
  
-meshlevel=1;
+meshlevel=3;
 
 mf=(1.41)^(-4+meshlevel); {1.0/1.41, 1.0, 1.41, 2.0, 2.82}
-tf=2.0; {tf=1 works great}
-iterfact=8.0;
+tf=1.0; {tf=1 works great}
+iterfact=1.0;
 
-CFLfact=0.8;
+CFLfact=2.0;
 
 {
 CFLfact=1.6; PRECON_LOCALTIMESTEPPING
@@ -200,7 +200,7 @@ Bdry(
  
 Model(
   NavierStokesPlasma(
-    TEMODEL=TEMODEL_LOCAL;
+    TEMODEL=TEMODEL_TRANSPORT;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=YES;
     REACTING=YES;
@@ -257,15 +257,21 @@ Init(
     T=300; {K}
     Tv=T; {K}
     Te=3000; {K}
+    
     chi_eminus=0.5e-15;
     chi_O2minus=1.0e-30;
+    chi_Oplus=1e-12;
+    chi_Nplus=1.0e-30;
     chi_O2plus=0.2e-15;
     chi_N2plus=0.3e-15;
+    chi_NOplus=1.0e-30;
     chi_O=1.0e-30;
     chi_N=1.0e-30;
-    chi_O2=0.25;
-    chi_N2=0.75;
-    All(INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_O2plus,chi_N2plus,chi_O,chi_N,chi_O2,chi_N2,Tv,Te);
+    chi_NO=1.0e-30;
+    chi_O2=0.21;
+    chi_N2=0.79;
+    
+    All(INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_Oplus,chi_Nplus,chi_O2plus,chi_N2plus,chi_NOplus,chi_O,chi_N,chi_NO,chi_O2,chi_N2,Tv,Te);
     {
     Bdry(BDRY_WALLTFIXED, INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_O2plus,chi_N2plus,chi_O,chi_N,chi_O2,chi_N2,Tv,Te);
     Region(is,js,  ie,je, INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2minus,chi_O2plus,chi_N2plus,chi_O,chi_N,chi_O2,chi_N2,Tv,Te);
@@ -302,21 +308,33 @@ Disc(
     if (USE_GAUSS_BASED_POTENTIAL,
       betag[1]=0;
       betag[2]=0;
-      betag[3]=0;
-      betag[4]=0;
+      betag[3]=0.0000;
+      betag[4]=0.0000;
+      betag[5]=0.0000;
+      betag[6]=0.0000;
+      betag[7]=0.0000;
       betaa[1]=0;
       betaa[2]=0;
       betaa[3]=0.0000;
       betaa[4]=0.0000;
+      betaa[5]=0.0000;
+      betaa[6]=0.0000;
+      betaa[7]=0.0000;
     ,{else}
       betag[1]=-0.0010;
       betag[2]=-0.5000;
       betag[3]=1.0000;
       betag[4]=1.0000;
+      betag[5]=1.0000;
+      betag[6]=1.0000;
+      betag[7]=1.0000;
       betaa[1]=0.9990;
       betaa[2]=0.5000;
       betaa[3]=0.0000;
       betaa[4]=0.0000;
+      betaa[5]=0.0000;
+      betaa[6]=0.0000;
+      betaa[7]=0.0000;
     );
   );
   Epotential(
@@ -327,16 +345,6 @@ Disc(
     );
     Ediv=10.0;        {a small positive number in V/m, needed to prevent a division by zero when
                        discretizing the electron pressure gradients within the potential equation}
-  );
-  MUSCLplus(
-    FLUX=FLUX_FDSplus;
-    AVERAGING=AVERAGING_ARITH;
-    numiter=5;
-    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
-    AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_TVD2_VANLEER;
-    EIGENVALCOND=EIGENVALCOND_PASCAL; 
   );
   MUSCL(
     FLUX=FLUX_FDS;
@@ -365,8 +373,12 @@ Disc(
     xi[9]=0.5;
     xi[10]=0.5;
     xi[11]=0.5;
-    xi[12]=0.25;
-    xi[13]=0.25;
+    xi[12]=0.5;
+    xi[13]=0.5;
+    xi[14]=0.5;
+    xi[15]=0.5;
+    xi[16]=0.25;
+    xi[17]=0.25;
   );
   BDF(
     STENCIL=STENCIL_BDF2;
@@ -395,15 +407,19 @@ Cycle(
     Uref[2]=wion*rhoref;   
     Uref[3]=wion*rhoref;   
     Uref[4]=wion*rhoref;   
-    Uref[5]=rhoref*1e99;   
-    Uref[6]=rhoref*1e99;   
-    Uref[7]=rhoref*1e99;   
-    Uref[8]=rhoref*1e99;   
-    Uref[9]=rhoref*aref*1e99;   
-    Uref[10]=rhoref*aref*1e99;   
-    Uref[11]=rhoref*aref*aref*1e99;  
-    Uref[12]=rhoref*700.0*Tvref*1e99;  
-    Uref[13]=rhoref*wion*414*Teref*1e99;  
+    Uref[5]=wion*rhoref;   
+    Uref[6]=wion*rhoref;   
+    Uref[7]=wion*rhoref;   
+    Uref[8]=rhoref;   
+    Uref[9]=rhoref;   
+    Uref[10]=rhoref;   
+    Uref[11]=rhoref;   
+    Uref[12]=rhoref;   
+    Uref[13]=rhoref*aref;   
+    Uref[14]=rhoref*aref;   
+    Uref[15]=rhoref*aref*aref;  
+    Uref[16]=rhoref*700.0*Tvref;  
+    Uref[17]=rhoref*wion*414*Teref;  
   );
   Epotential(
     xiverge_emfield=1e-2; {residual convergence threshold for the potential equation}
@@ -413,7 +429,7 @@ Cycle(
   DualTimeStepping(
     tmax=25e-6;    {simulation time span in seconds}
     dtref=20e-9/(mf*60*tf);   {physical time step in seconds}
-    sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
+    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (time<20e-9,
       dphi=min(dphimax,time/9e-9*dphimax);
@@ -450,7 +466,7 @@ Cycle(
     if (dphi==0 && iter==1 && time>30e-9,
       Model(Epotential(SetSolidConductivity(is2,js3,  is4,js4, 0 {S/m});););      
     );
-    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP2,sigma1,sigma2,dt);
     system("date");
     Lc=1e-3*4;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=1.0; {relaxation factor forced on the update of the emfield variables}

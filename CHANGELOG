@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JAN 19b
+  * in src/control.c
+    - in find_metrics_on_all_nodes(), increased the zone size by 1 in all directions
+      (needed when using the electron energy transport equation and MPI)
+  * in bin
+    - renamed ns_SDBD.wrp to Starikovskii.wrp (and upgraded the control file)
+    
+ 
 2020 JAN 19a
   * in bin
     - updated 3DDBD_actuator.wrp

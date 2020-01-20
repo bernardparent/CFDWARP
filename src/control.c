@@ -699,6 +699,7 @@ static long _node_offset_from_cnt(long cnt){
 
 void find_metrics_on_all_nodes(np_t *np, gl_t *gl, zone_t zone){
   long i,j,k,TYPELEVEL,BDRYMETRICS;
+  zone_t newzone;
   long l_C,l_B,l_A,l,theta,thetasgn,dim;
 #ifdef _2DL
   long offset1,offset2,cnt1,cnt2;
@@ -736,7 +737,8 @@ void find_metrics_on_all_nodes(np_t *np, gl_t *gl, zone_t zone){
         }
   }
 
-  for_ijk(zone,is,js,ks,ie,je,ke){
+  find_zone_intersection(_zone_expansion(zone,+1),gl->domain_lim,&newzone);
+  for_ijk(newzone,is,js,ks,ie,je,ke){
         for (dim=0; dim<nd; dim++){
           l=_ai(gl,i,j,k);
           if (is_node_valid(np[l],TYPELEVEL) && is_node_valid(np[_al(gl,l,dim,+1)],TYPELEVEL)){
