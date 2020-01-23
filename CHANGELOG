@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JAN 22a
+  * in cycle/share/tsemf_share.c
+    - in update_dUstar_emfield_SOR_forward(), and update_dUstar_emfield_SOR_backward(),
+      added MPI_Barrier() just before free(buffer). This prevents some occasional slowdown
+      problem.
+       
+
 2020 JAN 19b
   * in src/control.c
     - in find_metrics_on_all_nodes(), increased the zone size by 1 in all directions

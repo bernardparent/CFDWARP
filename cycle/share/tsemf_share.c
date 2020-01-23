@@ -480,6 +480,8 @@ static void update_dUstar_emfield_SOR_forward(np_t *np, gl_t *gl, long flux, zon
     free(lplane[plane]);
   }
 
+  MPI_Barrier(MPI_COMM_WORLD);
+
   free(buffer);
   free(mpivars);
 
@@ -679,9 +681,9 @@ static void update_dUstar_emfield_SOR_backward(np_t *np, gl_t *gl, long flux, zo
     free(lplane[plane]);
   }
 
+  MPI_Barrier(MPI_COMM_WORLD);
   free(buffer);
   free(mpivars);
-
 }
 
 
