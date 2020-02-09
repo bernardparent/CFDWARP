@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 FEB 08a
+  * in find_NODEVALID_on_domain_all()
+    - added some MPI_Barrier(); in the ijk loop to prevent MPI hang on large data sets
+  * in read_data_file_binary_ascii()
+    - added some MPI_Barrier(); in the ijk loop before MPI_Bcast_Node()
+      to prevent MPI hang on large data sets
+  
+
 2020 JAN 22a
   * in cycle/share/tsemf_share.c
     - in update_dUstar_emfield_SOR_forward(), and update_dUstar_emfield_SOR_backward(),

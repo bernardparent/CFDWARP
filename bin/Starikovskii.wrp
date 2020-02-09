@@ -1,12 +1,12 @@
 
  
-meshlevel=3;
+meshlevel=2;
 
 mf=(1.41)^(-4+meshlevel); {1.0/1.41, 1.0, 1.41, 2.0, 2.82}
-tf=1.0; {tf=1 works great}
+tf=2.0; {tf=1 works great}
 iterfact=1.0;
 
-CFLfact=2.0;
+CFLfact=0.8;
 
 {
 CFLfact=1.6; PRECON_LOCALTIMESTEPPING
@@ -200,7 +200,7 @@ Bdry(
  
 Model(
   NavierStokesPlasma(
-    TEMODEL=TEMODEL_TRANSPORT;
+    TEMODEL=TEMODEL_LOCAL;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=YES;
     REACTING=YES;
@@ -460,7 +460,7 @@ Cycle(
         dt=min(dt*2,3*0.4e-4/(330*mf*tf));
         CFL=0.2;
       ,{else}
-        CFL=min(0.8,min(CFLfact,CFL*1.4));
+        CFL=min(0.5,min(CFLfact,CFL*1.4));
       );
     );
     if (dphi==0 && iter==1 && time>30e-9,

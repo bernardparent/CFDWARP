@@ -54,6 +54,7 @@ void find_NODEVALID_on_domain_all(np_t *np, gl_t *gl, int TYPELEVEL, bool *NODEV
 #ifdef DISTMPI
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
+        if (j==gl->domain_all.js && k==gl->domain_all.ks) MPI_Barrier(MPI_COMM_WORLD);
         thisrank=_node_rank(gl, i, j, k);
         if (thisrank==rank) THISNODEVALID=(int)(is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL));
         MPI_Bcast(&THISNODEVALID,1,MPI_INT,thisrank,MPI_COMM_WORLD);           
@@ -110,6 +111,7 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
 #ifdef EMFIELD
   Lcmem=gl->Lc;
 #endif
+
   datafile = fopen(filename, "r");
   if (datafile==NULL)
     fatal_error("Having problems opening datafile %s.",filename);
@@ -191,7 +193,9 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
     fatal_error("Data file format invalid.");
   }
 
+  wfprintf(stdout,"fluid.");
   find_NODEVALID_on_domain_all(np, gl, TYPELEVEL_FLUID, NODEVALID);
+  wfprintf(stdout,".");
 
   for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
 
@@ -217,6 +221,7 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
 #ifdef DISTMPI
         }
         MPI_Bcast_Node(&U, nf, MPI_DOUBLE, 0, MPI_COMM_WORLD, i, j, k, gl);
+        if (j==gl->domain_all.js && k==gl->domain_all.ks) MPI_Barrier(MPI_COMM_WORLD);
 #endif
         if (is_node_in_zone(i,j,k,gl->domain_lim)) {
           for (flux=0; flux<nf; flux++){
@@ -236,9 +241,10 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
   }
 
 
-
 #ifdef EMFIELD
+  wfprintf(stdout,"emfield.");
   find_NODEVALID_on_domain_all(np, gl, TYPELEVEL_EMFIELD, NODEVALID);
+  wfprintf(stdout,".");
   for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
 #ifdef DISTMPI
         if (rank==0) {
@@ -262,6 +268,7 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
 #ifdef DISTMPI
         }
         MPI_Bcast_Node(&Uemfield, nfe, MPI_DOUBLE, 0, MPI_COMM_WORLD, i, j, k, gl);
+        if (j==gl->domain_all.js && k==gl->domain_all.ks) MPI_Barrier(MPI_COMM_WORLD);
 #endif
         if (is_node_in_zone(i,j,k,gl->domain_lim)) {
           for (flux=0; flux<nfe; flux++) {
@@ -278,7 +285,9 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
 
 
 #ifdef _RESTIME_STORAGE_TRAPEZOIDAL
+  wfprintf(stdout,"trap.");
   find_NODEVALID_on_domain_all(np, gl, TYPELEVEL_FLUID, NODEVALID);
+  wfprintf(stdout,".");
   for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
 
 #ifdef DISTMPI
@@ -304,6 +313,7 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
 #ifdef DISTMPI
         }
         MPI_Bcast_Node(&Res, nf, MPI_DOUBLE, 0, MPI_COMM_WORLD, i, j, k, gl);
+        if (j==gl->domain_all.js && k==gl->domain_all.ks) MPI_Barrier(MPI_COMM_WORLD);
 #endif
         if (is_node_in_zone(i,j,k,gl->domain_lim)) {
           for (flux=0; flux<nf; flux++){
@@ -313,8 +323,8 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
   }
 #endif
 
-
   fclose(datafile);
+
   wfprintf(stdout,"done;\n");
   if (level!=0) gl->CFL=CFLmem;
 #ifdef EMFIELD
