@@ -244,7 +244,7 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
 
     for ( s = 0; s < ns; s++ ) {
       for ( k = 0; k < ns; k++ ) {
-        dWdrhok[s][k] = dWdX[s][k] / _calM ( k ) * 1.0e-06;
+        dWdrhok[s][k] = dWdX[s][k] / _calM ( k ) ;
       }
     }
 

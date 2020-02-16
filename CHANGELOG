@@ -7,6 +7,22 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 FEB 16a
+  * in bin
+    - updated Starikovskii.wrp, propane_blunt.wrp, propane_wedge.wrp, reentry.wrp
+  * in model/share/chem_share.c
+    - added functions add_to_W_3r3p(), add_to_dW_3r3p(), add_to_dW_3r2p()
+    - in add_to_dW_Arrhenius2r2p(), add_to_dW_Arrhenius3r2p(), add_to_dW_Arrhenius2r1p(),
+      add_to_dW_Arrhenius2r3p(), changed the units of dWdX to kg  s^(-1)  mole^(-1) 
+  * in model/chem/_Air_Plasma_11s_31r_Dunn-Kang/chem.c, model/chem/_C12H23_Air_16s_23r_Kundu/chem.c
+    model/chem/_C3H8_Air_16s_23r_Kundu/chem.c,
+    model/chem/_H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret/chem.c
+    adjusted the calls to add_to_dW_Arrhenius to take into account the new units
+  * in model/chem/_Air_Plasma_12s_42r_Dunn-Kang-Macheret/chem.c
+    - Rewrote all the Macheret reactions in terms of the newly added functions add_to_dW* and
+      add_to_W* within model/share/chem_share.c
+       
+    
 2020 FEB 08a
   * in find_NODEVALID_on_domain_all()
     - added some MPI_Barrier(); in the ijk loop to prevent MPI hang on large data sets

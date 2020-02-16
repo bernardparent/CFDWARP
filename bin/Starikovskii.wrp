@@ -1,6 +1,6 @@
 
  
-meshlevel=2;
+meshlevel=4;
 
 mf=(1.41)^(-4+meshlevel); {1.0/1.41, 1.0, 1.41, 2.0, 2.82}
 tf=2.0; {tf=1 works great}
@@ -455,6 +455,7 @@ Cycle(
       if (iter<3, 
         CFL=0.0;
       );
+      itermax_local=itermax;
     ,{else}
       if (iter==1, 
         dt=min(dt*2,3*0.4e-4/(330*mf*tf));
@@ -462,9 +463,10 @@ Cycle(
       ,{else}
         CFL=min(0.5,min(CFLfact,CFL*1.4));
       );
+      itermax_local=round(itermax/3);
     );
     if (dphi==0 && iter==1 && time>30e-9,
-      Model(Epotential(SetSolidConductivity(is2,js3,  is4,js4, 0 {S/m});););      
+      {Model(Epotential(SetSolidConductivity(is2,js3,  is4,js4, 0 {S/m}););); }     
     );
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP2,sigma1,sigma2,dt);
     system("date");
@@ -479,7 +481,7 @@ Cycle(
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
-    if (iter>itermax,
+    if (iter>itermax_local,
       IncreaseTimeLevel();
       WriteDataFile(outputfilename"."round(time/dtref));
       printf("dt=%E time=%Es\n",dt,time);

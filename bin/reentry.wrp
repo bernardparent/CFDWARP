@@ -269,8 +269,8 @@ Cycle(
     if (mod(iter,50)==0,
       WriteDataFile(outputfilename);
     );
-    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
-    sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}
+    sigma1=0.2;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     PRECONDITIONER=PRECON_LOCALTIMESTEP;
     if (iter==1,
       CFL=0.06;

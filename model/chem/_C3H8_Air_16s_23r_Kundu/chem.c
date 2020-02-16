@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* taken from Kundu, K.P., Penko, P.F., VanOverbeke, T.J., "A Practical Mechanism for Computing Combustion in Gas Turbine Engines," 35th Joint Propulsion Conference and Exhibit, AIAA Paper 99-2218, 1999. */
 
 #define Xmin 1e-40
-#define Tmin 300.0              //T needs to be clipped to prevent instabilities
+#define Tmin 750.0              //T needs to be clipped to prevent instabilities
 
 void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
   long k;
@@ -461,7 +461,7 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
 
   for ( s = 0; s < ns; s++ ) {
     for ( k = 0; k < ns; k++ ) {
-      dWdrhok[s][k] += dWdX[s][k] / _calM ( k ) * 1.0e-06;
+      dWdrhok[s][k] += dWdX[s][k] / _calM ( k ) ;
     }
   }
 

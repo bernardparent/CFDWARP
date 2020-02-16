@@ -47,7 +47,7 @@
  
 
 is=1;  js=1; 
-ie=30; je=30;
+ie=100; je=100;
 
 Grid(
   Size(is,js, ie,je);
@@ -98,9 +98,6 @@ Model(
     Tmin=1.0e1;     Tmax=6.0e3;    {min and max temperature allowed in the domain in K}
     Twmin=Tmin;     Twmax=Tmax;    {min and max wall temperature allowed on any wall boundary node in K}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain}
-    zetaA1=0.1e0;     {conditions the eigenvalues of the A jacobian}
-    zetaA2=0.3;
-    EIGENVALCOND=EIGENVALCOND_PASCAL; {set the eigenvalue conditioning to EIGENVALCOND_PECLET, EIGENVALCOND_PASCAL [RECOMMENDED], or EIGENVALCOND_HARTEN}
     AXISYMMETRIC=NO; {set to YES to solve axisymmetric problems in 2D}
   );
 );
@@ -123,8 +120,8 @@ Init(
     _______________________________________________________________________________________
 
     }
-    Mx=3;
-    My=-2;
+    Mx=5;
+    My=-3;
     P=10000; {Pa}
     T=700; {K}
     k=1e-6; {J/kg}
@@ -150,6 +147,25 @@ Init(
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_H,w_O,w_N,w_H2,w_O2,w_N2,w_OH,w_CH,w_CO,w_NH,w_NO,w_CO2,w_HO2,w_H2O,w_C2H2,w_C3H8);
     Region(is,js,  ie,je, INIT_TYPE2,Mx,My,P,T,w_H,w_O,w_N,w_H2,w_O2,w_N2,w_OH,w_CH,w_CO,w_NH,w_NO,w_CO2,w_HO2,w_H2O,w_C2H2,w_C3H8);
     }
+  );
+);
+
+
+Disc(
+  NavierStokes(
+    zetaA1=0.2e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+    POSFILTER=POSFILTER_PARENT;
+    POSFILTER_numiter=4;
   );
 );
 
@@ -184,12 +200,12 @@ Cycle(
       WriteDataFile(outputfilename);
     );
     sigma1=0.5;   {exponent of maximum pseudotime step in all dimensions}
-    sigma2=0.5;   {exponent of maximum pseudotime step in all fluxes}
+    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     PRECONDITIONER=PRECON_LOCALTIMESTEP;
     if (iter==1,
       CFL=0.1;
     );
-    CFL=min(CFL*1.05,0.5);
+    CFL=min(CFL*1.05,1.5);
     UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
