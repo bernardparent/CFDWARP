@@ -2231,7 +2231,7 @@ double findmu(double epsilonk[SPECIES], double sigmak[SPECIES],
 	      double Molw[SPECIES], struct eqout eqfinal[1], double T, int ns)
   { 
     /*finds the coefficient of viscosity at the given temperature
-     NOTE: Molw must be in kg/gmol not kg/kgmol thus the 1.0e-3 factor in 
+     NOTE: Molw must be in kg/mole not kg/kgmol thus the 1.0e-3 factor in 
      calculating mu[k]; star values are NOT sonic conditions*/
     int k, l;
     double minor, tstark, astar, omega11, omega22;

@@ -6,8 +6,8 @@
 #include <src/common.h> /* only needed for display_matrix() function */
 
 #define nr 24 /* Note: ns is specified in chem.hh */
-#define Rcal 1.986E0  /*[cal/(gmol K)], this is different than calR = 
-			8.314 J/gmol K in _thermo.h*/
+#define Rcal 1.986E0  /*[cal/(mole K)], this is different than calR = 
+			8.314 J/mole K in _thermo.h*/
 
 static double Cf[nr]=
   {

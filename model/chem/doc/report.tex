@@ -113,7 +113,7 @@ W_k = {\cal M}_k \sum_{r=1}^{\nr} \left( \nu''_{r,k} - \nu'_{r,k} \right)
 - k_{b,r} \prod_{m=1}^{\ns} \left[ X_m \right]^{\nu''_{r,m}} \right]
 \end{equation}
 %
-where $W_k$ is the mass created per unit volume per unit time in $\rm kg/(cm^3\cdot s)$, and where $\nr$ is the number of elementary reactions, $\ns$ is the number of species involved, ${\cal M}_k$ is the molecular weight of species $k$ in kg/gmol, $X_m$ is the number of moles per unit volume of species $m$ in gmol/cm$^3$, $\nu'_{r,k}$ is the stoichiometric coefficient for the reactants of reaction $r$, $\nu''_{r,k}$ is the stoichiometric coefficient for the products of reaction $r$, $k_b$ is the backward reaction rate constant and
+where $W_k$ is the mass created per unit volume per unit time in $\rm kg/(cm^3\cdot s)$, and where $\nr$ is the number of elementary reactions, $\ns$ is the number of species involved, ${\cal M}_k$ is the molecular weight of species $k$ in kg/mole, $X_m$ is the number of moles per unit volume of species $m$ in mole/cm$^3$, $\nu'_{r,k}$ is the stoichiometric coefficient for the reactants of reaction $r$, $\nu''_{r,k}$ is the stoichiometric coefficient for the products of reaction $r$, $k_b$ is the backward reaction rate constant and
 $k_f$ is the forward reaction rate constant, given by the
 modified Arrhenius equation:
 %
@@ -124,14 +124,14 @@ k_f = AT^n \exp(-E/{\cal R}T)
 where $\cal R$ is the universal gas constant:
 %
 \begin{equation}
- {\cal R}=1.9872036 ~\frac{\rm cal}{\rm gmol\cdot K}
+ {\cal R}=1.9872036 ~\frac{\rm cal}{\rm mole\cdot K}
 \end{equation}
 %
 and where the coefficients $A$, $n$ and $E$ are germane to a particular combustion
 model and are listed in  Table \ref{tab:jachimowsky} and \ref{tab:jachimowsky-thirdbody} (Jachimowsky hydrogen-air model) and Table \ref{tab:dunn-kang} (Dunn-Kang high-temperature air plasma model). Note that a gram-mole is the same as the SI unit mole and corresponds to:
 %
 \begin{equation}
-{\rm gmol}={\rm mole}=6.023 \times 10^{23}~{\rm particules}
+{\rm mole}={\rm mole}=6.023 \times 10^{23}~{\rm particules}
 \end{equation}
 %
 
@@ -168,8 +168,8 @@ each calculated at a reference pressure (one atmosphere).
 
 
 
-The units for $A$ are in $[\textrm{cm}^{3b}\cdot (\textrm{gmol}\cdot \textrm{s})^{-b} \cdot \textrm{K}^{-n} ]$ where $b=1$ for two-body reactions and 
-$b=2$ for three-body reactions. On the other hand, the units for $E$ are in $[\rm {cal}/{gmol}]$.
+The units for $A$ are in $[\textrm{cm}^{3b}\cdot (\textrm{mole}\cdot \textrm{s})^{-b} \cdot \textrm{K}^{-n} ]$ where $b=1$ for two-body reactions and 
+$b=2$ for three-body reactions. On the other hand, the units for $E$ are in $[\rm {cal}/{mole}]$.
 
 The symbol $M$ denotes a third-body collision partner, a species acting as a catalyst only.
 The concentration of $M$ is simply determined from the equation:
@@ -256,7 +256,7 @@ for most species and reactions except those listed in Table
 \tablecaption{Dunn-Kang 11-species 31-reaction high-temperature air model \cite{nasa:1973:dunn,aiaaconf:1987:Bussing}.}
 \begin{tabular}{ccccc} 
 \toprule
-\multicolumn{2}{c}{Reaction} & $A$, $\textrm{cm}^3\cdot(\textrm{gmol}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/gmol  \\ 
+\multicolumn{2}{c}{Reaction} & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole  \\ 
 \midrule
 (1) & $\rm O_2 + N \rightarrow 2O+N$ & 3.6 $\times$ 10$^{18}$  & -1 & 118,800 \\
 (2) & $\rm O_2 + NO \rightarrow 2O+NO$ & 3.6 $\times$ 10$^{18}$ & -1 & 118,800 \\
