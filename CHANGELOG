@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 FEB 16c
+  * renamed 
+    - add_to_W_Arrhenius2r2p -> add_to_W_Arrhenius_2r2p
+    - add_to_W_Arrhenius3r2p -> add_to_W_Arrhenius_3r2p
+    - add_to_W_Arrhenius2r1p -> add_to_W_Arrhenius_2r1p
+    - add_to_W_Arrhenius2r3p -> add_to_W_Arrhenius_2r3p
+    - add_to_dW_Arrhenius2r2p -> add_to_dW_Arrhenius_2r2p
+    - add_to_dW_Arrhenius3r2p -> add_to_dW_Arrhenius_3r2p
+    - add_to_dW_Arrhenius2r1p -> add_to_dW_Arrhenius_2r1p
+    - add_to_dW_Arrhenius3r2p -> add_to_dW_Arrhenius_3r2p
+    - add_to_dW_Arrhenius2r1p -> add_to_dW_Arrhenius_2r1p
+    - add_to_dW_Arrhenius2r3p -> add_to_dW_Arrhenius_2r3p
+
+
 2020 FEB 16b
   * renamed in all files gmol for mole
   
