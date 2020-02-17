@@ -62,22 +62,22 @@ void add_to_W_Arrhenius_3r2p(int specR1, int specR2, int specR3,
 void add_to_dW_Arrhenius_2r1p(int specR1, int specR2,
                              int specP1, 
                              double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t dGsdT,
-                             spec_t dWdT, spec2_t dWdX);
+                             spec_t dWdT, spec2_t dWdrhok);
 
 void add_to_dW_Arrhenius_2r2p(int specR1, int specR2,
                              int specP1, int specP2,
                              double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t dGsdT,
-                             spec_t dWdT, spec2_t dWdX);
+                             spec_t dWdT, spec2_t dWdrhok);
 
 void add_to_dW_Arrhenius_2r3p(int specR1, int specR2,
                              int specP1, int specP2, int specP3,
                              double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t dGsdT,
-                             spec_t dWdT, spec2_t dWdX);
+                             spec_t dWdT, spec2_t dWdrhok);
 
 void add_to_dW_Arrhenius_3r2p(int specR1, int specR2, int specR3,
                              int specP1, int specP2,
                              double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t dGsdT,
-                             spec_t dWdT, spec2_t dWdX);
+                             spec_t dWdT, spec2_t dWdrhok);
 
 
 void test_dW_dx(spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam);

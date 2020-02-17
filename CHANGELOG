@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 FEB 17a
+  * in model/share/chem_share.c
+    - in add_to_dW_Arrhenius_*(), changed last parameter from dWdX to dWdrhok and made
+      changes to functions in consequence
+  * in model/chem/_Air_Plasma_11s_31r_Dunn-Kang/chem.c, model/chem/_Air_Plasma_12s_42r_Dunn-Kang-Macheret/chem.c
+    model/chem/_C12H23_Air_16s_23r_Kundu/chem.c, model/chem/_C3H8_Air_16s_23r_Kundu/chem.c,
+    model/chem/_H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret/chem.c,
+    changed calls to add_to_dW_Arrhenius_*()
+  * in model/chem/_Air_Plasma_12s_42r_Dunn-Kang-Macheret/chem.c, regrouped all chemical reactions
+    within one function (used to be split in two functions:  Macheret and Dunn-Kang functions)
+  
+
 2020 FEB 16c
   * renamed 
     - add_to_W_Arrhenius2r2p -> add_to_W_Arrhenius_2r2p
