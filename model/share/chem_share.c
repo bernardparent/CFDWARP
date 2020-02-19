@@ -734,7 +734,6 @@ void add_to_dW_Arrhenius_2r3p(int specR1, int specR2,
      -Gs[specR1]
      -Gs[specR2]; /* J/mole */
   Kc=1E-6 * THERMO_P_REF/(calR*T) * max(Kcmin, exp(-dG0/(calR*T))); /* mole/cm^3 */
-  
   sum=X[specR1]*X[specR2]
      -X[specP1]*X[specP2]*X[specP3]/Kc; /* mole cm^(-3) (s)^(-1) */
 /*  W[specR1]-=_calM(specR1)*kf*1e6*sum;

@@ -1,6 +1,6 @@
 
  
-meshlevel=4;
+meshlevel=3;
 
 mf=(1.41)^(-4+meshlevel); {1.0/1.41, 1.0, 1.41, 2.0, 2.82}
 tf=2.0; {tf=1 works great}
@@ -429,7 +429,7 @@ Cycle(
   DualTimeStepping(
     tmax=25e-6;    {simulation time span in seconds}
     dtref=20e-9/(mf*60*tf);   {physical time step in seconds}
-    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
+    sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (time<20e-9,
       dphi=min(dphimax,time/9e-9*dphimax);
@@ -444,6 +444,7 @@ Cycle(
         Region(is4,js2,  is5,js2,  INITEMF_TYPE1,-dphi/2);
       ););
     );
+    EMFcntmax=0;
     if (time<40e-9,
       dt=dtref;   {physical time step in seconds}
       if (tf<1.8, 
@@ -464,6 +465,7 @@ Cycle(
         CFL=min(0.5,min(CFLfact,CFL*1.4));
       );
       itermax_local=round(itermax/3);
+      if (meshlevel>3, EMFcntmax=1;);
     );
     if (dphi==0 && iter==1 && time>30e-9,
       {Model(Epotential(SetSolidConductivity(is2,js3,  is4,js4, 0 {S/m}););); }     
@@ -472,7 +474,7 @@ Cycle(
     system("date");
     Lc=1e-3*4;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=1.0; {relaxation factor forced on the update of the emfield variables}
-    for (cnt,0,0,
+    for (EMFcnt,0,EMFcntmax,
       UpdateEMField(Lc*100000,relaxEMF*1.0,dt,TSEMF_SOR,EMFsubiter); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
       {UpdateEMField(Lc,relaxEMF*0.3,dt,TSEMF_ADI);}
       {UpdateEMField(Lc*100000,relaxEMF*1.0,dt,TSEMF_IMAF,50);} {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}

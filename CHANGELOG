@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 FEB 19a
+  * in model/chem/_Air_Plasma_11s_31r_Dunn-Kang/chem.c
+    and in model/chem/_Air_Plasma_12s_42r_Dunn-Kang-Macheret/chem.c    
+    - took away clipping of temperature (reactions used to be turned off for T<500~K)
+    - added if conditions for all reactions 
+    
+
 2020 FEB 17a
   * in model/share/chem_share.c
     - in add_to_dW_Arrhenius_*(), changed last parameter from dWdX to dWdrhok and made
