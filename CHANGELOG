@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 MAY 16a
+  * in model/chem/doc/report.tex
+    - got rid of future work and made minor modifications
+
+
 2020 FEB 19a
   * in model/chem/_Air_Plasma_11s_31r_Dunn-Kang/chem.c
     and in model/chem/_Air_Plasma_12s_42r_Dunn-Kang-Macheret/chem.c    
