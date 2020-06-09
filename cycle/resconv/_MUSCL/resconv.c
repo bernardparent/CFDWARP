@@ -69,8 +69,8 @@ void write_disc_resconv_template(FILE **controlfile){
     "    AOWENO_gammalo=0.95;\n"
     "    AOWENO_gammahi=0.999;\n"
     "    INTERPOL=INTERPOL_TVD2_VANLEER;\n"
-    "    EIGENVALCOND=EIGENVALCOND_GNOFFO;\n"
-    "    POSFILTER=POSFILTER_NONE;\n"
+    "    EIGENVALCOND=EIGENVALCOND_PARENT;\n"
+    "    POSFILTER=POSFILTER_PARENT;\n"
     "    POSFILTER_numiter=4;\n"
     "  );\n"
   ,_RESCONV_ACTIONNAME);

@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUN 08a
+  * in cycle/resconv/_MUSCL/resconv.c
+    - changed defaults for EIGENVALCOND to PARENT and for POSFILTER to PARENT
+  * renamed
+    - add_to_W_Arrhenius* -> add_to_W_fwbw*
+    - add_to_dW_Arrhenius* -> add_to_dW_fwbw*
+  * in model/chem/_Air_Plasma_12s_42r_Dunn-Kang-Macheret/doc/report.tex
+    - Changed the title of the Macheret reactions table
+  * in model/chem/.config
+    - made Air_Plasma_12s_42r_Dunn-Kang-Macheret non-proprietary
+  * in model/chem/_Air_Plasma_12s_42r_Dunn-Kang-Macheret/chem.c
+    - changed license to BSD2
+    
+
 2020 MAY 16a
   * in model/chem/doc/report.tex
     - got rid of future work and made minor modifications

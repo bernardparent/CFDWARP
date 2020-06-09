@@ -377,7 +377,7 @@ void add_to_dW_3r2p ( int specR1, int specR2, int specR3, int specP1, int specP2
    Gs in J/mole
    W in kg m^(-3) s^(-1)
 */
-void add_to_W_Arrhenius_2r2p(int specR1, int specR2,
+void add_to_W_fwbw_2r2p(int specR1, int specR2,
                             int specP1, int specP2,
                             double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t W){
   double kf,dG0,Kc,kb,sum;
@@ -407,7 +407,7 @@ void add_to_W_Arrhenius_2r2p(int specR1, int specR2,
    Gs in J/mole
    W in kg m^(-3) s^(-1)
 */
-void add_to_W_Arrhenius_3r2p(int specR1, int specR2, int specR3,
+void add_to_W_fwbw_3r2p(int specR1, int specR2, int specR3,
                             int specP1, int specP2,
                             double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t W){
   double kf,dG0,Kc,kb,sum;
@@ -441,7 +441,7 @@ void add_to_W_Arrhenius_3r2p(int specR1, int specR2, int specR3,
    Gs in J/mole
    W in kg m^(-3) s^(-1)
 */
-void add_to_W_Arrhenius_2r1p(int specR1, int specR2,
+void add_to_W_fwbw_2r1p(int specR1, int specR2,
                             int specP1,
                             double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t W){
   double kf,dG0,Kc,kb,sum;
@@ -470,7 +470,7 @@ void add_to_W_Arrhenius_2r1p(int specR1, int specR2,
    Gs in J/mole
    W in kg m^(-3) s^(-1)
 */
-void add_to_W_Arrhenius_2r3p(int specR1, int specR2,
+void add_to_W_fwbw_2r3p(int specR1, int specR2,
                             int specP1, int specP2, int specP3,
                             double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t W){
   double kf,dG0,Kc,kb,sum;
@@ -506,7 +506,7 @@ void add_to_W_Arrhenius_2r3p(int specR1, int specR2,
    dWdT in kg m^(-3) s^(-1) K^(-1)
    dWdrhok in s^(-1)
 */
-void add_to_dW_Arrhenius_2r2p(int specR1, int specR2,
+void add_to_dW_fwbw_2r2p(int specR1, int specR2,
                              int specP1, int specP2,
                              double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t dGsdT,
                              spec_t dWdT, spec2_t dWdrhok){
@@ -578,7 +578,7 @@ void add_to_dW_Arrhenius_2r2p(int specR1, int specR2,
    dWdT in kg m^(-3) s^(-1) K^(-1)
    dWdrhok in s^(-1)
 */
-void add_to_dW_Arrhenius_3r2p(int specR1, int specR2, int specR3,
+void add_to_dW_fwbw_3r2p(int specR1, int specR2, int specR3,
                              int specP1, int specP2,
                              double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t dGsdT,
                              spec_t dWdT, spec2_t dWdrhok){
@@ -664,7 +664,7 @@ void add_to_dW_Arrhenius_3r2p(int specR1, int specR2, int specR3,
    dWdT in kg m^(-3) s^(-1) K^(-1)
    dWdrhok in s^(-1)
 */
-void add_to_dW_Arrhenius_2r1p(int specR1, int specR2,
+void add_to_dW_fwbw_2r1p(int specR1, int specR2,
                              int specP1, 
                              double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t dGsdT,
                              spec_t dWdT, spec2_t dWdrhok){
@@ -721,7 +721,7 @@ void add_to_dW_Arrhenius_2r1p(int specR1, int specR2,
    dWdT in kg m^(-3) s^(-1) K^(-1)
    dWdrhok in s^(-1)
 */
-void add_to_dW_Arrhenius_2r3p(int specR1, int specR2,
+void add_to_dW_fwbw_2r3p(int specR1, int specR2,
                              int specP1, int specP2, int specP3,
                              double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t dGsdT,
                              spec_t dWdT, spec2_t dWdrhok){
