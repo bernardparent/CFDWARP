@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
 Copyright 1998-1999 Bernard Parent
+Copyright 2020      Prasanna Thoguluva Rajendran
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -785,6 +786,45 @@ static void functions_builtin(char *function, char **argum,
     *returnstr=(char *)realloc(*returnstr,maxnumlen*sizeof(char));
     if (sscanf(*argum,"%lg%n",&tmp,&eos)==1 && (*argum)[eos]==EOS) strcpy(*returnstr,"1");
       else strcpy(*returnstr,"0");
+  }
+
+  if (strcmp(function,"spline")==0) {
+    long N,n;
+    double *f,*b,*x;
+    double thisx;
+
+    N=SOAP_number_argums(*argum);
+    if (mod(N-1,2)!=0) SOAP_fatal_error(codex,"Number of arguments within spline must be an odd number.");
+    N=(N-1)/2;
+    if (N<4) SOAP_fatal_error(codex,"Number of data points supplied within spline must be at least 4.");
+  
+    x=(double *)malloc(N*sizeof(double));
+    f=(double *)malloc(N*sizeof(double));
+    b=(double *)malloc(N*sizeof(double));
+  
+    for (n=0; n<N; n++) {
+      SOAP_substitute_argum(argum, n*2, codex);    
+      x[n]=SOAP_get_argum_double(codex, *argum, n*2);
+      SOAP_substitute_argum(argum, n*2+1, codex);    
+      f[n]=SOAP_get_argum_double(codex, *argum, n*2+1);
+    }
+    /* check if data points are valid (x[n+1]>x[n]) */
+    for (n=0; n<N-1; n++){
+      if (x[n+1]<=x[n]) SOAP_fatal_error(codex, "Data points supplied to spline must be such that x[i+1]>x[i]."); 
+    }
+
+    SOAP_substitute_argum(argum, N*2, codex);    
+    thisx=SOAP_get_argum_double(codex, *argum, N*2);
+    /* check if point is out of range */
+    if (thisx<x[0] || thisx>x[N-1]) SOAP_fatal_error(codex, "Ensure that x lies between x[0] and x[N].");
+  
+    EXM_find_spline(N, x, f, b);
+    *returnstr=(char *)realloc(*returnstr,maxnumlen*sizeof(char));
+    sprintf(*returnstr,"%20.15E",EXM_f_from_spline(N, x, f, b, thisx));
+
+    free(x);
+    free(b);
+    free(f);
   }
 
 }

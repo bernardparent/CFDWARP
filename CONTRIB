@@ -82,6 +82,8 @@ RAJENDRAN, Prasanna T.
   - tools/average.sh
 
   - tools/average.c
+  
+  - addition of spline function in lib/soap/soap.c
 
 
 SCHWARTZENTRUBER, Thomas E.

@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUN 09a
+  * in lib/soap/doc/report.tex
+    - added function spline
+  * in lib/soap/soap.c
+    - in functions_builtin(), added function spline
+    
+
 2020 JUN 08a
   * in cycle/resconv/_MUSCL/resconv.c
     - changed defaults for EIGENVALCOND to PARENT and for POSFILTER to PARENT
