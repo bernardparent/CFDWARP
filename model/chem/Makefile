@@ -15,6 +15,7 @@ cleanall:
 	( cd _Air_TEST_3s_0r ; make cleanall )
 	( cd _He_Air_3s_0r ; make cleanall )
 	( cd _H2_Air_3s_0r ; make cleanall )
+	( cd _Cs_Air_Plasma ; make cleanall )
 	( cd _Air_Plasma_8s_28r_Macheret ; make cleanall )
 	( cd _Air_Plasma_12s_42r_Dunn-Kang-Macheret ; make cleanall )
 	( cd _Air_Plasma_6s_15r ; make cleanall )

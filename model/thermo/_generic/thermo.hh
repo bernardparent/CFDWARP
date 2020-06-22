@@ -43,6 +43,8 @@
 #define SMAP_He      37
 #define SMAP_Air     38
 #define SMAP_H2plus  39
+#define SMAP_Cs      40
+#define SMAP_Csplus  41
 
 
 

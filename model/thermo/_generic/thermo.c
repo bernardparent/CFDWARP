@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
+Copyright 2020 Bernard Parent
 Copyright 1998-2018 Bernard Parent
 Copyright 2001 Jason Etele
 Copyright 2000 Giovanni Fusina
@@ -30,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <soap.h>
 
 #define T_accuracy 1.0e-12
-#define ns_c 40
+  #define ns_c 42
 
 #define RN2 296.8E0
 #define Thetav 3353.0E0
@@ -102,7 +103,9 @@ const static speciesname_t speciesname[ns_c]=
    "C12H23",
    "He",
    "Air",
-   "H2+"
+   "H2+",
+   "Cs",
+   "Cs+"
   };
 
 
@@ -147,21 +150,26 @@ const static long numatoms[ns_c]=
    35, /*C12H23*/
    1, /*He*/
    2, /*Air*/
-   2 /*H2+*/
+   2, /*H2+*/
+   1, /*Cs*/
+   1  /*Cs+*/
   }; 
 
 
 
 /*
 transport properties: Lennard-Jones Potential Parameters: epsilon & sigma
-Primary Reference: for all species not mention in the secondary reference
+
+Primary Reference: all species except those not mentioned in the secondary reference
 Svehla, R.A,"Estimated Viscosities and Thermal Conductivites of Gases at high temperature,"
 	NASA TR R-132, 1962
+CFDWARP/model/thermo/_generic/ref/NASA-TR-R-132.pdf
 
 Secondary Reference: HO2, HCO, C2H3, C2H5, C4H8, CH2O, CH3, CH3O
 Sandia National Laboratories, "A Fortran Computer Code Package for the Evaluation of Gas Phase
 	Multicomponent Transport Properties," SAND86-8246, 1986
 Sandia National Laboratories: SAND86-8246 Update/Revision, 1998
+CFDWARP/model/thermo/_generic/ref/SAND86-8246.pdf
 
 the transport properties of CHO, H2CO, C4H8O, C6H12O, C8H16, and C12H24
 are calculated as           HCO, CH2O, C4H8, C2H5OC2H5, C6H12, and C6H12 respectively
@@ -210,7 +218,9 @@ const static double Peps[ns_c]=
    297.1E+0,  //C12H23 from NASA TR R-132.pdf
    10.22E+0, //He
    78.46e0,      /* Air -> obtained from N2 and O2 assuming 4:1 ratio */
-   59.7e0 /* H2+ (unknown!, fixed to the one of H2) */
+   59.7e0, /* H2+ (unknown!, fixed to the one of H2) */
+   1375.0,      /* Cs (unknown!, fixed to one of Na) */
+   1375.0       /* Cs+ (unknown!, fixed to one of Na*/
   };
 
 const static double Psig[ns_c]=
@@ -254,17 +264,18 @@ const static double Psig[ns_c]=
    0.6182E+0, //C12H23 from NASA TR R-132.pdf     
    0.2551E+0, //He
    0.3732e0,    /* Air -> obtained from N2 and O2 assuming a 4:1 ratio */
-   0.2827E+0 /* H2+ !! fixed to the one of H2 */
+   0.2827E+0, /* H2+ !! fixed to the one of H2 */
+   0.3567E+0, /* Cs, unknown!, fixed to the one of Na */
+   0.3567E+0  /* Cs+, unknown!, fixed to the one of Na */
   };
 
 
 /*
 Molecular Weight Reference:
 NASA RP-1311 volume I & II, 1994 & 1996
+
+
 */     
-
-
-
 
 const static double calM[ns_c]=
   {
@@ -307,7 +318,9 @@ const static double calM[ns_c]=
    167.31102E-3, //C12H23
    4.002602E-3, //He
    28.96512e-3,  // Air  
-   2.01533E-3 /* H2+ */
+   2.01533E-3, /* H2+ */
+   132.90545E-3,       /* Cs */
+   132.90490E-3       /* Cs+ */
   };
 
 
@@ -354,7 +367,9 @@ const static long ck[ns_c]=
    0,  /*C12H23*/
    0, /*He */
    0,  /* Air */
-   +1 /* H2+ */
+   +1, /* H2+ */
+   0, /* Cs */
+   +1 /* Cs+ */
   };
   
   
@@ -362,11 +377,10 @@ const static long ck[ns_c]=
 const static double Pa[ns_c][3][11]=
   {
 
-/* These polynomials come from this paper by McBride and Gordon:
-
-	NASA Glenn Coefficients for Calculating Thermodynamic Properties
-	of Individual Species (2002), NASA-TP-2002-211556, september 2002
-
+/* These polynomials come from 
+	McBride, B. "NASA Glenn Coefficients for Calculating Thermodynamic Properties
+	of Individual Species" NASA-TP-2002-211556, september 2002
+  CFDWARP/model/thermo/_generic/ref/mcbride.2002.pdf
 */
 
 /* species e-
@@ -1835,6 +1849,103 @@ const static double Pa[ns_c][3][11]=
        -6.513101500e+05, /* b1 */
         1.471415370e+02  /* b2 */
       }
+    },
+    
+/* species Cs
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +200.0e0,            /* Tmin [K] */
+       +1000.0e0,           /* Tmax [K] */
+       +5.466584070e+01,    /* a1 */
+       -8.279346040e-01,    /* a2 */
+       +2.504942210e+00,    /* a3 */
+       -1.494620690e-05,    /* a4 */
+       +2.425976774e-08,    /* a5 */
+       -2.013172322e-11,    /* a6 */
+       +6.704271991e-15,    /* a7 */
+       +8.459321390e+03,    /* b1 */
+       +6.848825772e+00     /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       +6.166040900e+06, /* a1 */
+       -1.896175522e+04, /* a2 */
+       +2.483229903e+01, /* a3 */
+       -1.251977234e-02, /* a4 */
+       +3.309017390e-06, /* a5 */
+       -3.354012020e-10, /* a6 */
+       +9.626500908e-15, /* a7 */
+       +1.285111231e+05, /* b1 */
+       -1.522942188e+02  /* b2 */
+      },
+      {
+       +6000.0e0,        /* Tmin [K] */ 
+       +20000.0e0,        /* Tmax [K] */
+       -9.566231720e+08, /* a1 */
+       +4.321690420e+05, /* a2 */
+       -6.371801020e+01, /* a3 */
+       +5.246260580e-03, /* a4 */
+       -2.366560159e-07, /* a5 */
+       +5.848488480e-12, /* a6 */
+       -6.169370441e-17, /* a7 */
+       -3.585268840e+06, /* b1 */
+       +6.156618174e+02  /* b2 */
+      }
+    },
+
+
+/* species Cs+
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +298.150e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       +0.000000000e+00, /* a1 */
+       +0.000000000e+00, /* a2 */
+       +2.500000000e+00, /* a3 */
+       +0.000000000e+00, /* a4 */
+       +0.000000000e+00, /* a5 */
+       +0.000000000e+00, /* a6 */
+       +0.000000000e+00, /* a7 */
+       +5.438737820e+04, /* b1 */
+       +6.182757992e+00  /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       +0.000000000e+00, /* a1 */
+       +0.000000000e+00, /* a2 */
+       +2.500000000e+00, /* a3 */
+       +0.000000000e+00, /* a4 */
+       +0.000000000e+00, /* a5 */
+       +0.000000000e+00, /* a6 */
+       +0.000000000e+00, /* a7 */
+       +5.438737820e+04, /* b1 */
+       +6.182757992e+00  /* b2 */
+      },
+      {
+       +6000.0e0,        /* Tmin [K] */ 
+       +20000.0e0,       /* Tmax [K] */
+       -2.479469300e+08, /* a1 */
+       +1.405115456e+05, /* a2 */
+       -2.805027359e+01, /* a3 */
+       +3.087928133e-03, /* a4 */
+       -1.273598265e-07, /* a5 */
+       -3.748818380e-13, /* a6 */
+       +1.214944533e-16, /* a7 */
+       -1.072498017e+06, /* b1 */
+       +2.756827325e+02  /* b2 */
+      }
     }
    
   };
@@ -2707,9 +2818,9 @@ double _sk_from_T(long spec, double T){
   }
 #endif
 
-#if (defined(speceminus) && !defined(_CHEM_SET_TE_TO_T_FOR_ARRHENIUS_REACTIONS))
+#if (defined(speceminus) && !defined(_CHEM_SET_TE_TO_T_FOR_FWBW_REACTIONS))
   if (_FLUID_EENERGY && spec==speceminus){
-    fatal_error("In _sk_from_T() part of thermo.c, spec can't be set to speceminus when the electron temperature is not equal to the gas temperature. Probably, you are trying to solve a chemical reaction in Arrhenius form that involves the electron species. You should rewrite it as 2 distinct reactions that don't involve the equilibrium constant.");
+    fatal_error("In _sk_from_T() part of thermo.c, spec can't be set to speceminus when the electron temperature is not equal to the gas temperature. Probably, you are trying to solve a chemical reaction in forward-backward form that involves the electron species. You should rewrite it as 2 distinct reactions that don't involve the equilibrium constant.");
   }
 #endif
 
@@ -2762,9 +2873,9 @@ double _dsk_dT_from_T(long spec, double T){
     } 
   }
 #endif
-#if (defined(speceminus) && !defined(_CHEM_SET_TE_TO_T_FOR_ARRHENIUS_REACTIONS))
+#if (defined(speceminus) && !defined(_CHEM_SET_TE_TO_T_FOR_FWBW_REACTIONS))
   if (_FLUID_EENERGY && spec==speceminus){
-    fatal_error("In _dsk_dT_from_T part of thermo.c, spec can't be set to speceminus when the electron temperature is not equal to the gas temperature. Probably, you are trying to solve a chemical reaction in Arrhenius form that involves the electron species. You should rewrite it as 2 distinct reactions that don't involve the equilibrium constant.");
+    fatal_error("In _dsk_dT_from_T part of thermo.c, spec can't be set to speceminus when the electron temperature is not equal to the gas temperature. Probably, you are trying to solve a chemical reaction in forward-backward form that involves the electron species. You should rewrite it as 2 distinct reactions that don't involve the equilibrium constant.");
   }
 #endif
 
@@ -2788,54 +2899,14 @@ double _dmueN_dTe_from_Te(double Te){
 }
 
 
-double _dmukN_dTk_from_Tk_EkoverN(double Tk, double Ekstar, long k){
-  double dmuN_dT;
-  dmuN_dT=0.0;
-#ifdef speceminus
-  if (CHEM_NEUTRAL && k==speceminus){
-    /* electrons */
-    dmuN_dT=_dmueN_dTe_from_Te(Tk);
-  } else {
-#endif
-    /* electrons */
-    if (smap[k]==0){
-      dmuN_dT=_dmueN_dTe_from_Te(Tk);
-    }
-    /* O2+ ion */
-    if (smap[k]==5){
-      if (1.18E23/sqrt(Tk)<3.61E12/sqrt(Ekstar)){
-        dmuN_dT=-0.5*1.18E23*pow(Tk,-1.5);
-      } else {
-        dmuN_dT=0.0;
-      }
-    }
-    /* N2+ ion */
-    if (smap[k]==6){
-      if (0.75E23/sqrt(Tk)<2.03E12/sqrt(Ekstar)){
-        dmuN_dT=-0.5*0.75E23*pow(Tk,-1.5);
-      } else {
-        dmuN_dT=0.0;
-      }
-    }
-    /* O2- ion */
-    if (smap[k]==9){
-      if (0.97E23/sqrt(Tk)<3.56E19*pow(Ekstar,-0.1)){
-        dmuN_dT=-0.5*0.97E23*pow(Tk,-1.5);
-      } else {
-        dmuN_dT=0.0;
-      }
-    }
-#ifdef speceminus
-  }
-#endif
-  return(dmuN_dT);
-
-
-}
 
 /* find the mobility of species k [m2/Vs] using the species temperature Tk [K] and electric field in the species reference frame Ek [V/m] 
+
   O2+, N2+, and NO+ are found from Sinnott, G., Golden, D. E., & Varney, R. N. (1968). Positive-Ion Mobilities in Dry Air. Physical Review, 170(1), 272–275. doi:10.1103/physrev.170.272 
+
   O2- is found from GOSHO, Y. AND HARADA, A., “A New Technique for Measuring Negative Ion Mobilities at Atmospheric Pressure,” Journal of Physics D, Vol. 16, 1983, pp. 1159–1166.
+   
+  H2+, Cs+, N+, O+, O- are approximated using Fig. 8 in THE MOBILITIES OF SMALL IONS THE ATMOSPHERE AND THEIR RELATIONSHIP by E. UNGETHUM, Aerosol Science, 1974, Vol. 5, pp. 25 37. 
 */ 
 double _muk_from_N_Tk_Ek(double N, double Tk, double Ek, long k){
   double mu,Estar;
@@ -2854,23 +2925,29 @@ double _muk_from_N_Tk_Ek(double N, double Tk, double Ek, long k){
       case SMAP_O2plus:
         mu=1.0/N*min(1.18E23/sqrt(Tk),3.61E12/sqrt(Estar));
       break;
+      case SMAP_Oplus:
+        mu=1.0/N*min(1.4*1.18E23/sqrt(Tk),1.4*3.61E12/sqrt(Estar)); //based on O2+ with mass adjustment
+      break;
       case SMAP_N2plus:
         mu=1.0/N*min(0.75E23/sqrt(Tk),2.03E12/sqrt(Estar));
       break;
-      case SMAP_NOplus:
-        mu=1.0/N*min(1.62E23/sqrt(Tk),4.47E12/sqrt(Estar));
+      case SMAP_Nplus:
+        mu=1.0/N*min(1.4*0.75E23/sqrt(Tk),1.4*2.03E12/sqrt(Estar)); //based on N2+ with mass adjustment
       break;
       case SMAP_O2minus:
         mu=1.0/N*min(0.97E23/sqrt(Tk),3.56E19*pow(Estar,-0.1));
       break;
-      case SMAP_Nplus:
-        mu=1.0/N*min(1.00E23/sqrt(Tk),1.00E12/sqrt(Estar)); //approximate: need to find it in litterature
+      case SMAP_Ominus:
+        mu=1.0/N*min(1.4*0.97E23/sqrt(Tk),1.4*3.56E19*pow(Estar,-0.1)); //based on O2- with mass adjustment
       break;
-      case SMAP_Oplus:
-        mu=1.0/N*min(1.00E23/sqrt(Tk),1.00E12/sqrt(Estar)); //approximate: need to find it in litterature
+      case SMAP_NOplus:
+        mu=1.0/N*min(1.62E23/sqrt(Tk),4.47E12/sqrt(Estar));
       break;
       case SMAP_H2plus:
-        mu=1.0/N*min(4.0*1.00E23/sqrt(Tk),4.0*2.50E12/sqrt(Estar)); //approximate: need to verify
+        mu=1.0/N*min(4.0*1.00E23/sqrt(Tk),4.0*2.50E12/sqrt(Estar)); //based on Air+ with mass adjustment
+      break;
+      case SMAP_Csplus:
+        mu=1.0/N*min(3.0/8.0*1.00E23/sqrt(Tk),3.0/8.0*2.50E12/sqrt(Estar)); //based on Air+ with mass adjustment
       break;
       default:
         fatal_error("Mobility can't be found for species %ld",k);
@@ -2879,6 +2956,94 @@ double _muk_from_N_Tk_Ek(double N, double Tk, double Ek, long k){
   }
 #endif
   return(mu);
+}
+
+
+double _dmukN_dTk_from_Tk_EkoverN(double Tk, double Ekstar, long k){
+  double dmuN_dT;
+  dmuN_dT=0.0;
+#ifdef speceminus
+  if (CHEM_NEUTRAL && k==speceminus){
+    /* electrons */
+    dmuN_dT=_dmueN_dTe_from_Te(Tk);
+  } else {
+#endif
+    switch (smap[k]){
+      case SMAP_eminus:
+        dmuN_dT=_dmueN_dTe_from_Te(Tk);
+      break;
+      case SMAP_O2plus:
+        if (1.18E23/sqrt(Tk)<3.61E12/sqrt(Ekstar)){
+          dmuN_dT=-0.5*1.18E23*pow(Tk,-1.5);
+        } else {
+          dmuN_dT=0.0;
+        }
+      break;
+      case SMAP_Oplus:
+        if (1.18E23/sqrt(Tk)<3.61E12/sqrt(Ekstar)){
+          dmuN_dT=-0.5*1.4*1.18E23*pow(Tk,-1.5);
+        } else {
+          dmuN_dT=0.0;
+        }
+      break;
+      case SMAP_N2plus:
+        if (0.75E23/sqrt(Tk)<2.03E12/sqrt(Ekstar)){
+          dmuN_dT=-0.5*0.75E23*pow(Tk,-1.5);
+        } else {
+          dmuN_dT=0.0;
+        }
+      break;
+      case SMAP_Nplus:
+        if (0.75E23/sqrt(Tk)<2.03E12/sqrt(Ekstar)){
+          dmuN_dT=-0.5*1.4*0.75E23*pow(Tk,-1.5);
+        } else {
+          dmuN_dT=0.0;
+        }
+      break;
+      case SMAP_O2minus:
+        if (0.97E23/sqrt(Tk)<3.56E19*pow(Ekstar,-0.1)){
+          dmuN_dT=-0.5*0.97E23*pow(Tk,-1.5);
+        } else {
+          dmuN_dT=0.0;
+        }
+      break;
+      case SMAP_Ominus:
+        if (0.97E23/sqrt(Tk)<3.56E19*pow(Ekstar,-0.1)){
+          dmuN_dT=-0.5*1.4*0.97E23*pow(Tk,-1.5);
+        } else {
+          dmuN_dT=0.0;
+        }
+      break;
+      case SMAP_NOplus:
+        if (1.62E23/sqrt(Tk)<4.47E12/sqrt(Ekstar)){
+          dmuN_dT=-0.5*1.62E23*pow(Tk,-1.5);
+        } else {
+          dmuN_dT=0.0;
+        }
+      break;
+      case SMAP_H2plus:
+        if (4.0*1.00E23/sqrt(Tk)<4.0*2.50E12/sqrt(Ekstar)){
+          dmuN_dT=-0.5*4.0*1.00E23*pow(Tk,-1.5);
+        } else {
+          dmuN_dT=0.0;
+        }
+      break;
+      case SMAP_Csplus:
+        if (3.0/8.0*1.00E23/sqrt(Tk)<3.0/8.0*2.50E12/sqrt(Ekstar)){
+          dmuN_dT=-0.5*3.0/8.0*1.00E23*pow(Tk,-1.5);
+        } else {
+          dmuN_dT=0.0;
+        }
+      break;
+      default:
+        fatal_error("dmukN_dTk_from_Tk_EkoverN can't be found for species %ld",k);
+    }
+#ifdef speceminus
+  }
+#endif
+  return(dmuN_dT);
+
+
 }
 
 

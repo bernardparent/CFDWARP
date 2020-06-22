@@ -7,6 +7,24 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUN 21a
+  * in src/post.c
+    - in read_post_actions(), added code to get rid of memory check error reports but
+      kept the code commented out (not yet tested sufficiently)
+  * renamed
+    - _CHEM_SET_TE_TO_T_FOR_ARRHENIUS_REACTIONS to _CHEM_SET_TE_TO_T_FOR_FWBW_REACTIONS
+  * in model/chem/_Air_Plasma_12s_42r_Dunn-Kang-Macheret/doc/report.tex
+    - renamed \rightarrow to \rightleftarrows within the Dunn-Kang reactions
+  * in model/thermo/_generic/thermo.c
+    - added species Cs and Cs+ 
+    - in _dmukN_dTk_from_Tk_EkoverN(), added code for N+, O+, O-, H2+, Cs+
+    - in _dmukN_dTk_from_Tk_EkoverN(), added error check if dmukN_dTk can't be found for charged
+      species requested
+    - in _muk_from_N_Tk_Ek(), added code for Cs+ and O- and changed code for N+, O+
+  * in src/control.c
+    - in write_license(), updated Copyright years for Bernard Parent and Prasanna Rajendran
+      
+
 2020 JUN 09a
   * in lib/soap/doc/report.tex
     - added function spline

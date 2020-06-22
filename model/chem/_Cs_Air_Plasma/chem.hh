@@ -1,5 +1,5 @@
-#define _CHEM_AIRPLASMA12S42RDUNNKANGMACHERET
-#define _CHEM_METHOD "Air Plasma 12 species 42 reactions Dung-Kang-Macheret [dunn1973a,parent2016a]"
+#define _CHEM_CSAIRPLASMA
+#define _CHEM_METHOD "Cesium Air Plasma  [dunn1973a,parent2016a]"
 #define _CHEM_PLASMA
 
 #define CHEM_NEUTRAL FALSE
