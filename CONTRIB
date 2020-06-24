@@ -93,6 +93,12 @@ SCHWARTZENTRUBER, Thomas E.
   - implementation of the subsonic outflow boundary condition based
     on constant Mach number in model/share/fluid_share.c
 
+
+TRINH, AARON
+
+  - addition of species  Ar, C, C2, CN, NCO, Ar+, C+, C2+, CN+, CO+ in model/thermo/_generic/thermo.c 
+  
+
  
 WEERAKOON, Minindu
 

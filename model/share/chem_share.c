@@ -247,11 +247,11 @@ void add_to_dW_2r3p ( int specR1, int specR2, int specP1, int specP2, int specP3
 
 
 
-/* kf in cm^3 s^(-1) 
+/* kf in cm^6 s^(-1) 
    N in cm^(-3)
-   dkfdT in cm^3 s^(-1) K^(-1)
-   dkfdTv in cm^3 s^(-1) K^(-1)
-   dkfdTe in cm^3 s^(-1) K^(-1)
+   dkfdT in cm^6 s^(-1) K^(-1)
+   dkfdTv in cm^6 s^(-1) K^(-1)
+   dkfdTe in cm^6 s^(-1) K^(-1)
    dWdrhok in s^(-1)
    dWdT in kg m^(-3) s^(-1) K^(-1)
    dWdTv in kg m^(-3) s^(-1) K^(-1)
@@ -312,11 +312,11 @@ void add_to_dW_3r3p ( int specR1, int specR2, int specR3, int specP1, int specP2
 }
 
 
-/* kf in cm^3 s^(-1) 
+/* kf in cm^6 s^(-1) 
    N in cm^(-3)
-   dkfdT in cm^3 s^(-1) K^(-1)
-   dkfdTv in cm^3 s^(-1) K^(-1)
-   dkfdTe in cm^3 s^(-1) K^(-1)
+   dkfdT in cm^6 s^(-1) K^(-1)
+   dkfdTv in cm^6 s^(-1) K^(-1)
+   dkfdTe in cm^6 s^(-1) K^(-1)
    dWdrhok in s^(-1)
    dWdT in kg m^(-3) s^(-1) K^(-1)
    dWdTv in kg m^(-3) s^(-1) K^(-1)
@@ -868,4 +868,63 @@ void test_dW_dx(spec_t rhok, spec_t mu, double T, double Te, double Tv, double E
     
   exit(1);  
 }
+
+
+
+/* find the forward reaction rate cofficient kf = A * (calA)^(1-numreactant) * T^n * exp(-E/(R*T))
+ * 
+ * numreactant : the number of reactants
+ * A           : pre-exponential factor in cm^3 * (mole s)^(-1) K^(-n)
+ * n           : temperature exponent
+ * E           : activation energy of the reaction in cal/mole
+ * R           : universal gas constant = 1.9872	cal/(K mol)
+ * kf          : reaction rate coefficient in cm^3/s (2 reactants) or cm^6/s (3 reactants)
+ * T           : temperature in K
+ */
+double _kf_Arrhenius(long numreactant, double A, double n, double E, double T){
+  double kf,R;
+  R=1.9872;
+  switch (numreactant){
+    case 2:
+      kf=A/calA*pow(T,n)*exp(-E/(R*T));
+    break;
+    case 3:
+      kf=A/sqr(calA)*pow(T,n)*exp(-E/(R*T));    
+    break;
+    default:
+      fatal_error("numreactant can not be set to %ld in _kf_Arrhenius",numreactant);
+      kf=0.0;
+  }
+  return(kf);
+}
+
+
+/* find derivative of kf with respect to T with kf=A * (calA)^(1-numreactant) * T^n * exp(-E/(R*T))
+ * 
+ * numreactant : the number of reactants
+ * A           : pre-exponential factor in cm^3 * (mole s)^(-1) K^(-n)
+ * n           : temperature exponent
+ * E           : activation energy of the reaction in cal/mole
+ * R           : universal gas constant = 1.9872	cal/(K mol)
+ * dkfdT       : cm^3/sK (2 reactants) or cm^6/sK (3 reactants)
+ * T           : temperature in K
+ */
+double _dkfdT_Arrhenius(long numreactant, double A, double n, double E, double T){
+  double dkfdT,R;
+  R=1.9872;
+  switch (numreactant){
+    case 2:
+      dkfdT=(A/calA)*n*pow(T,n-1.0)*exp(-E/(R*T))-E/(R*T*T)*(A/calA)*pow(T,n)*exp(-E/(R*T));
+    break;
+    case 3:
+      dkfdT=(A/sqr(calA))*n*pow(T,n-1.0)*exp(-E/(R*T))-E/(R*T*T)*(A/sqr(calA))*pow(T,n)*exp(-E/(R*T));
+    break;
+    default:
+      fatal_error("numreactant can not be set to %ld in _kf_Arrhenius",numreactant);
+      dkfdT=0.0;
+  }
+  return(dkfdT);
+}
+
+
 

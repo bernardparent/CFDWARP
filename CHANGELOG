@@ -7,7 +7,26 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUN 24a
+  * moved
+    - _Cs_Air_Plasma to _Cs_Air_Plasma_13s_Lenard
+  * in model/chem/_Cs_Air_Plasma_13s_Lenard/chem.c
+    - added most of the chemical reactions (except for townsend ionization of NO+)
+  * in model/chem
+    - added _CO2_Plasma_23s_Park (with the templates taken from _Cs_Air_Plasma_13s_Lenard)
+  * in model/share/chem_share.c
+    - fixed units of kf (error was within comments, does not affect the code)
+    - added _kf_Arrhenius()
+    - added _dkfdT_Arrhenius()
+  * in model/share/chem_share.h
+    - added comments for the units of the various parameters 
+  * in model/thermo/_generic/thermo.c
+    - added 10 new species for the Mars atmosphere (Aaron Trinh)
+    
+
 2020 JUN 21a
+  * in model/chem
+    - added _Cs_Air_Plasma
   * in src/post.c
     - in read_post_actions(), added code to get rid of memory check error reports but
       kept the code commented out (not yet tested sufficiently)

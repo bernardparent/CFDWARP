@@ -15,7 +15,6 @@ cleanall:
 	( cd _Air_TEST_3s_0r ; make cleanall )
 	( cd _He_Air_3s_0r ; make cleanall )
 	( cd _H2_Air_3s_0r ; make cleanall )
-	( cd _Cs_Air_Plasma ; make cleanall )
 	( cd _Air_Plasma_8s_28r_Macheret ; make cleanall )
 	( cd _Air_Plasma_12s_42r_Dunn-Kang-Macheret ; make cleanall )
 	( cd _Air_Plasma_6s_15r ; make cleanall )
@@ -27,6 +26,8 @@ cleanall:
 	( cd _C3H8_Air_16s_23r_Kundu ; make cleanall )
 	( cd _C12H23_Air_16s_23r_Kundu ; make cleanall )
 	( cd _CH4_Air_20s_52r_Yungster ; make cleanall )
+	( cd _Cs_Air_Plasma_13s_Lenard ; make cleanall )
+	( cd _CO2_Plasma_23s_Park ; make cleanall )
 
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.

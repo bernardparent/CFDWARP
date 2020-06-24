@@ -45,9 +45,16 @@
 #define SMAP_H2plus  39
 #define SMAP_Cs      40
 #define SMAP_Csplus  41
-
-
-
+#define SMAP_Ar      42
+#define SMAP_C       43
+#define SMAP_C2      44
+#define SMAP_CN      45
+#define SMAP_NCO     46
+#define SMAP_Arplus  47
+#define SMAP_Cplus   48
+#define SMAP_C2plus  49
+#define SMAP_CNplus  50
+#define SMAP_COplus  51
 
 
 
