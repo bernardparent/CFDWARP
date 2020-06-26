@@ -88,7 +88,27 @@ const static bool REACTION[46]=
    TRUE, /* reaction 45 */
   };
 
+#define specEND -1
 
+const static long specM1[]=
+  {
+   specN, specN2, specNO, specNOplus, specEND
+  };
+
+const static long specM2[]=
+  {
+   specO, specO2, specNO, specNOplus, specEND
+  };
+
+const static long specM3[]=
+  {
+   specO, specO2, specN, specN2, specNOplus, specEND
+  };
+
+const static long specM4[]=
+  {
+   specO, specO2, specN, specN2, specNO, specEND
+  };
 
 
 void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
@@ -116,10 +136,8 @@ void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double 
   
   if (REACTION[3]){
     kf=_kf_Arrhenius(2, 3.0e18, -1.0, 59400.0*R, T);
-    add_to_W_2r3p ( specO2, specN,   specO, specO, specN,  kf   , N, W);
-    add_to_W_2r3p ( specO2, specN2,   specO, specO, specN2,  kf , N, W);
-    add_to_W_2r3p ( specO2, specNO,   specO, specO, specNO,  kf , N, W);
-    add_to_W_2r3p ( specO2, specNOplus,   specO, specO, specNOplus,  kf , N, W);
+    for (k=0; specM1[k]!=specEND; k++)
+      add_to_W_2r3p ( specO2, specM1[k],   specO, specO, specM1[k],  kf   , N, W); 
   }
   
   if (REACTION[4])
@@ -130,19 +148,14 @@ void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double 
 
   if (REACTION[6]){
     kf=_kf_Arrhenius(2, 1.9e19, -1.0, 113200.0*R, T);
-    add_to_W_2r3p ( specN2, specO,   specN, specN, specO,   kf , N, W);
-    add_to_W_2r3p ( specN2, specO2,  specN, specN, specO2,   kf , N, W);
-    add_to_W_2r3p ( specN2, specNO,  specN, specN, specNO,   kf , N, W);
-    add_to_W_2r3p ( specN2, specNOplus,  specN, specN, specNOplus,   kf , N, W);
+    for (k=0; specM2[k]!=specEND; k++)
+      add_to_W_2r3p ( specN2, specM2[k],   specN, specN, specM2[k],   kf , N, W);
   }
   
   if (REACTION[7]){
     kf=_kf_Arrhenius(2, 2.4e17, -0.5, 75500.0*R, T);
-    add_to_W_2r3p ( specNO, specO,     specN, specO, specO,     kf , N, W);
-    add_to_W_2r3p ( specNO, specO2,    specN, specO, specO2,    kf , N, W);
-    add_to_W_2r3p ( specNO, specN,     specN, specO, specN,     kf , N, W);
-    add_to_W_2r3p ( specNO, specN2,    specN, specO, specN2,    kf , N, W);
-    add_to_W_2r3p ( specNO, specNOplus,specN, specO, specNOplus,kf , N, W);
+    for (k=0; specM3[k]!=specEND; k++)
+      add_to_W_2r3p ( specNO, specM3[k],     specN, specO, specM3[k],     kf , N, W);
   }
 
   if (REACTION[8])
@@ -162,10 +175,8 @@ void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double 
 
   if (REACTION[13]){
     kf=_kf_Arrhenius(3, 2.5e15, -0.5, 0.0, T);
-    add_to_W_3r2p ( specO, specO, specN,   specO2, specN,    kf , N, W);
-    add_to_W_3r2p ( specO, specO, specN2,   specO2, specN2,    kf , N, W);
-    add_to_W_3r2p ( specO, specO, specNO,   specO2, specNO,    kf , N, W);
-    add_to_W_3r2p ( specO, specO, specNOplus,   specO2, specNOplus,    kf , N, W);
+    for (k=0; specM1[k]!=specEND; k++)
+      add_to_W_3r2p ( specO, specO, specM1[k],   specO2, specM1[k],    kf , N, W);
   }
 
   if (REACTION[14])
@@ -176,19 +187,14 @@ void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double 
 
   if (REACTION[16]){
     kf=_kf_Arrhenius(3, 1e18, -1.0, 0.0, T);
-    add_to_W_3r2p ( specN, specN, specO,   specN2, specO,    kf , N, W);
-    add_to_W_3r2p ( specN, specN, specO2,   specN2, specO2,    kf , N, W);
-    add_to_W_3r2p ( specN, specN, specNO,   specN2, specNO,    kf , N, W);
-    add_to_W_3r2p ( specN, specN, specNOplus,   specN2, specNOplus,    kf , N, W);
+    for (k=0; specM2[k]!=specEND; k++)
+      add_to_W_3r2p ( specN, specN, specM2[k],   specN2, specM2[k],    kf , N, W);
   }     
 
   if (REACTION[17]){
     kf=_kf_Arrhenius(3, 6e16, -0.5, 0.0, T);
-    add_to_W_3r2p ( specN, specO, specO,   specNO, specO,    kf , N, W);
-    add_to_W_3r2p ( specN, specO, specO2,  specNO, specO2,    kf , N, W);
-    add_to_W_3r2p ( specN, specO, specN,   specNO, specN,    kf , N, W);
-    add_to_W_3r2p ( specN, specO, specN2,  specNO, specN2,    kf , N, W);
-    add_to_W_3r2p ( specN, specO, specNOplus,  specNO, specNOplus,    kf , N, W);
+    for (k=0; specM3[k]!=specEND; k++)
+      add_to_W_3r2p ( specN, specO, specM3[k],   specNO, specM3[k],    kf , N, W);
   }     
 
   if (REACTION[18])
@@ -204,6 +210,9 @@ void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double 
 
     if (REACTION[21])
       add_to_W_2r3p ( specO2, speceminus,   specO2plus, speceminus, speceminus,   exp ( -0.0102785 * sqr ( theta ) - 2.42260e-75 * pow ( theta, 46.0 ) ), N, W);
+
+    if (REACTION[22])
+      add_to_W_2r3p ( specNO, speceminus,   specNOplus, speceminus, speceminus,   exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), N, W);
 
     if (REACTION[23])
       add_to_W_2r3p ( specCs, speceminus,   specCsplus, speceminus, speceminus,    _kf_Arrhenius(2, 1.6e32, -3.3, 45172.0*R, Te), N, W);
@@ -223,11 +232,8 @@ void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double 
 
   if (REACTION[28]){
     kf=3.0e19/sqr(calA);
-    add_to_W_3r2p ( speceminus, specCsplus, specO,   specCs, specO,  kf  , N, W);
-    add_to_W_3r2p ( speceminus, specCsplus, specO2,  specCs, specO2, kf  , N, W);
-    add_to_W_3r2p ( speceminus, specCsplus, specN,   specCs, specN,  kf  , N, W);
-    add_to_W_3r2p ( speceminus, specCsplus, specN2,  specCs, specN2, kf  , N, W);
-    add_to_W_3r2p ( speceminus, specCsplus, specNO,  specCs, specNO, kf  , N, W);
+    for (k=0; specM4[k]!=specEND; k++)
+      add_to_W_3r2p ( speceminus, specCsplus, specM4[k],   specCs, specM4[k],  kf  , N, W);
   }
 
   if (REACTION[29])
@@ -238,11 +244,8 @@ void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double 
 
   if (REACTION[31]){
     kf=_kf_Arrhenius(3, 8.5e19, -0.5, 0.0, Te);
-    add_to_W_3r2p ( speceminus, specO, specO,   specOminus, specO,  kf  , N, W);
-    add_to_W_3r2p ( speceminus, specO, specO2,   specOminus, specO2,  kf  , N, W);
-    add_to_W_3r2p ( speceminus, specO, specN,   specOminus, specN,  kf  , N, W);
-    add_to_W_3r2p ( speceminus, specO, specN2,   specOminus, specN2,  kf  , N, W);
-    add_to_W_3r2p ( speceminus, specO, specNO,   specOminus, specNO,  kf  , N, W);
+    for (k=0; specM4[k]!=specEND; k++)
+      add_to_W_3r2p ( speceminus, specO, specM4[k],   specOminus, specM4[k],  kf  , N, W);
   }
   
   if (REACTION[33])
@@ -253,11 +256,8 @@ void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double 
 
   if (REACTION[35]){
     kf=_kf_Arrhenius(2, 1.4e12, 1.0, 17016.0*R, T);
-    add_to_W_2r3p ( specOminus, specO,   specO, speceminus, specO,   kf, N, W);
-    add_to_W_2r3p ( specOminus, specO2,   specO, speceminus, specO2,   kf, N, W);
-    add_to_W_2r3p ( specOminus, specN,   specO, speceminus, specN,   kf, N, W);
-    add_to_W_2r3p ( specOminus, specN2,   specO, speceminus, specN2,   kf, N, W);
-    add_to_W_2r3p ( specOminus, specNO,   specO, speceminus, specNO,   kf, N, W);
+    for (k=0; specM4[k]!=specEND; k++)
+      add_to_W_2r3p ( specOminus, specM4[k],   specO, speceminus, specM4[k],   kf, N, W);
   }
 
   if (REACTION[36]){
@@ -269,23 +269,11 @@ void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double 
   
   if (REACTION[37]){
     kf=2.0e-25 * pow ( 300.0 / T, 2.5 );
-    add_to_W_3r3p ( specN2, specN2plus, specO2minus,  specO2, specN2, specN2,   kf, N, W);
-    add_to_W_3r3p ( specO2, specN2plus, specO2minus,  specO2, specN2, specO2,   kf, N, W);
-    add_to_W_3r3p ( specN,  specN2plus, specO2minus,  specO2, specN2, specN,    kf, N, W);
-    add_to_W_3r3p ( specO,  specN2plus, specO2minus,  specO2, specN2, specO,    kf, N, W);
-    add_to_W_3r3p ( specNO, specN2plus, specO2minus,  specO2, specN2, specNO,   kf, N, W);
-    
-    add_to_W_3r3p ( specN2, specO2plus, specO2minus,  specO2, specO2, specN2,   kf, N, W);
-    add_to_W_3r3p ( specO2, specO2plus, specO2minus,  specO2, specO2, specO2,   kf, N, W);
-    add_to_W_3r3p ( specN,  specO2plus, specO2minus,  specO2, specO2, specN,    kf, N, W);
-    add_to_W_3r3p ( specO,  specO2plus, specO2minus,  specO2, specO2, specO,    kf, N, W);
-    add_to_W_3r3p ( specNO, specO2plus, specO2minus,  specO2, specO2, specNO,   kf, N, W);
-    
-    add_to_W_3r3p ( specN2, specNOplus, specO2minus,  specO2, specNO, specN2,   kf, N, W);
-    add_to_W_3r3p ( specO2, specNOplus, specO2minus,  specO2, specNO, specO2,   kf, N, W);
-    add_to_W_3r3p ( specN,  specNOplus, specO2minus,  specO2, specNO, specN,    kf, N, W);
-    add_to_W_3r3p ( specO,  specNOplus, specO2minus,  specO2, specNO, specO,    kf, N, W);
-    add_to_W_3r3p ( specNO, specNOplus, specO2minus,  specO2, specNO, specNO,   kf, N, W);
+    for (k=0; specM4[k]!=specEND; k++){
+      add_to_W_3r3p ( specM4[k], specN2plus, specO2minus,  specO2, specN2, specM4[k],   kf, N, W);
+      add_to_W_3r3p ( specM4[k], specO2plus, specO2minus,  specO2, specO2, specM4[k],   kf, N, W);
+      add_to_W_3r3p ( specM4[k], specNOplus, specO2minus,  specO2, specNO, specM4[k],   kf, N, W);
+    }
   }
 
   if (REACTION[38])
@@ -299,11 +287,8 @@ void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double 
     
   if (REACTION[41]){
     kf=_kf_Arrhenius(2, 1.2e12, 1.18, 45172.0*R, T);
-    add_to_W_2r3p ( specCs, specO,    specCsplus, speceminus, specO,   kf, N, W);    
-    add_to_W_2r3p ( specCs, specO2,   specCsplus, speceminus, specO2,  kf, N, W);    
-    add_to_W_2r3p ( specCs, specN,    specCsplus, speceminus, specN,   kf, N, W);    
-    add_to_W_2r3p ( specCs, specN2,   specCsplus, speceminus, specN2,  kf, N, W);    
-    add_to_W_2r3p ( specCs, specNO,   specCsplus, speceminus, specNO,  kf, N, W);    
+    for (k=0; specM4[k]!=specEND; k++)
+      add_to_W_2r3p ( specCs, specM4[k],    specCsplus, speceminus, specM4[k],   kf, N, W);    
   }
 
   if (REACTION[42])
@@ -379,10 +364,8 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
     dkfdT=_dkfdT_Arrhenius(2, 3.0e18, -1.0, 59400.0*R, T);
     dkfdTv=0.0;
     dkfdTe=0.0;
-    add_to_dW_2r3p ( specO2, specN,   specO, specO, specN,  kf   , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_2r3p ( specO2, specN2,   specO, specO, specN2,  kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_2r3p ( specO2, specNO,   specO, specO, specNO,  kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_2r3p ( specO2, specNOplus,   specO, specO, specNOplus,  kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+    for (k=0; specM1[k]!=specEND; k++)
+      add_to_dW_2r3p ( specO2, specM1[k],   specO, specO, specM1[k],  kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe); 
   }
   
   if (REACTION[4]) {
@@ -407,10 +390,8 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
     dkfdT=_dkfdT_Arrhenius(2, 1.9e19, -1.0, 113200.0*R, T);
     dkfdTv=0.0;
     dkfdTe=0.0;
-    add_to_dW_2r3p ( specN2, specO,   specN, specN, specO,   kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_2r3p ( specN2, specO2,  specN, specN, specO2,   kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_2r3p ( specN2, specNO,  specN, specN, specNO,   kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_2r3p ( specN2, specNOplus,  specN, specN, specNOplus,   kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+    for (k=0; specM2[k]!=specEND; k++)
+      add_to_dW_2r3p ( specN2, specM2[k],   specN, specN, specM2[k],   kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
   
   if (REACTION[7]){
@@ -418,11 +399,8 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
     dkfdT=_dkfdT_Arrhenius(2, 2.4e17, -0.5, 75500.0*R, T);
     dkfdTv=0.0;
     dkfdTe=0.0;
-    add_to_dW_2r3p ( specNO, specO,     specN, specO, specO,     kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_2r3p ( specNO, specO2,    specN, specO, specO2,    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_2r3p ( specNO, specN,     specN, specO, specN,     kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_2r3p ( specNO, specN2,    specN, specO, specN2,    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_2r3p ( specNO, specNOplus,specN, specO, specNOplus,kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+    for (k=0; specM3[k]!=specEND; k++)
+      add_to_dW_2r3p ( specNO, specM3[k],     specN, specO, specM3[k],     kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
   if (REACTION[8]){
@@ -470,10 +448,8 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
     dkfdT=_dkfdT_Arrhenius(3, 2.5e15, -0.5, 0.0, T);
     dkfdTv=0.0;
     dkfdTe=0.0;    
-    add_to_dW_3r2p ( specO, specO, specN,   specO2, specN,    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( specO, specO, specN2,   specO2, specN2,    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( specO, specO, specNO,   specO2, specNO,    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( specO, specO, specNOplus,   specO2, specNOplus,    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+    for (k=0; specM1[k]!=specEND; k++)
+      add_to_dW_3r2p ( specO, specO, specM1[k],   specO2, specM1[k],    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
   if (REACTION[14]){
@@ -497,10 +473,8 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
     dkfdT=_dkfdT_Arrhenius(3, 1e18, -1.0, 0.0, T);
     dkfdTv=0.0;
     dkfdTe=0.0;            
-    add_to_dW_3r2p ( specN, specN, specO,   specN2, specO,    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( specN, specN, specO2,   specN2, specO2,    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( specN, specN, specNO,   specN2, specNO,    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( specN, specN, specNOplus,   specN2, specNOplus,    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+    for (k=0; specM2[k]!=specEND; k++)
+      add_to_dW_3r2p ( specN, specN, specM2[k],   specN2, specM2[k],    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }     
 
   if (REACTION[17]){
@@ -508,11 +482,8 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
     dkfdT=_dkfdT_Arrhenius(3, 6e16, -0.5, 0.0, T);
     dkfdTv=0.0;
     dkfdTe=0.0;                
-    add_to_dW_3r2p ( specN, specO, specO,   specNO, specO,    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( specN, specO, specO2,  specNO, specO2,    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( specN, specO, specN,   specNO, specN,    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( specN, specO, specN2,  specNO, specN2,    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( specN, specO, specNOplus,  specNO, specNOplus,    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+    for (k=0; specM3[k]!=specEND; k++)
+      add_to_dW_3r2p ( specN, specO, specM3[k],   specNO, specM3[k],    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }     
 
   if (REACTION[18]){
@@ -522,9 +493,6 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
     dkfdTe=0.0;                
     add_to_dW_2r2p ( specN, specNO,   specO, specN2,    kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
-
-
-
 
   if (REACTION[19]){
     kf=_kf_Arrhenius(2, 1.8e8, 1.5, 3020.0*R, T);
@@ -551,6 +519,14 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
       dkfdT=0.0;
       dkfdTv=0.0;
       add_to_dW_2r3p ( specO2, speceminus,   specO2plus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+    }
+
+    if (REACTION[22]){
+      kf=exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) );
+      dkfdTe = 0.0;
+      dkfdT=0.0;
+      dkfdTv=0.0;
+      add_to_dW_2r3p ( specNO, speceminus,   specNOplus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
     }
 
     if (REACTION[23]){
@@ -603,11 +579,8 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
     dkfdT=0.0;
     dkfdTv=0.0;      
     dkfdTe=0.0;
-    add_to_dW_3r2p ( speceminus, specCsplus, specO,   specCs, specO,  kf  , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( speceminus, specCsplus, specO2,  specCs, specO2, kf  , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( speceminus, specCsplus, specN,   specCs, specN,  kf  , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( speceminus, specCsplus, specN2,  specCs, specN2, kf  , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( speceminus, specCsplus, specNO,  specCs, specNO, kf  , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+    for (k=0; specM4[k]!=specEND; k++)
+      add_to_dW_3r2p ( speceminus, specCsplus, specM4[k],   specCs, specM4[k],  kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
   if (REACTION[29]){
@@ -631,11 +604,8 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
     dkfdT=0.0;
     dkfdTv=0.0;
     dkfdTe=_dkfdT_Arrhenius(3, 8.5e19, -0.5, 0.0, Te);
-    add_to_dW_3r2p ( speceminus, specO, specO,   specOminus, specO,  kf  , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( speceminus, specO, specO2,   specOminus, specO2,  kf  , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( speceminus, specO, specN,   specOminus, specN,  kf  , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( speceminus, specO, specN2,   specOminus, specN2,  kf  , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r2p ( speceminus, specO, specNO,   specOminus, specNO,  kf  , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+    for (k=0; specM4[k]!=specEND; k++)
+      add_to_dW_3r2p ( speceminus, specO, specM4[k],   specOminus, specM4[k],  kf  , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
 
@@ -660,11 +630,8 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
     dkfdT=_dkfdT_Arrhenius(2, 1.4e12, 1.0, 17016.0*R, T);
     dkfdTv=0.0;
     dkfdTe=0.0;
-    add_to_dW_2r3p ( specOminus, specO,   specO, speceminus, specO,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_2r3p ( specOminus, specO2,   specO, speceminus, specO2,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_2r3p ( specOminus, specN,   specO, speceminus, specN,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_2r3p ( specOminus, specN2,   specO, speceminus, specN2,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_2r3p ( specOminus, specNO,   specO, speceminus, specNO,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+    for (k=0; specM4[k]!=specEND; k++)
+      add_to_dW_2r3p ( specOminus, specM4[k],   specO, speceminus, specM4[k],   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
 
@@ -683,25 +650,11 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
     dkfdTe = 0.0;
     dkfdT = -2.5 * kf / T ;
     dkfdTv=0.0;
-    add_to_dW_3r3p ( specO2minus, specO2plus, specO,   specO2, specO2, specO,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r3p ( specO2minus, specN2plus, specO,   specO2, specN2, specO,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r3p ( specO2minus, specNOplus, specO,   specO2, specNO, specO,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-
-    add_to_dW_3r3p ( specO2minus, specO2plus, specO2,   specO2, specO2, specO2,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r3p ( specO2minus, specN2plus, specO2,   specO2, specN2, specO2,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r3p ( specO2minus, specNOplus, specO2,   specO2, specNO, specO2,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-
-    add_to_dW_3r3p ( specO2minus, specO2plus, specN,   specO2, specO2, specN,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r3p ( specO2minus, specN2plus, specN,   specO2, specN2, specN,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r3p ( specO2minus, specNOplus, specN,   specO2, specNO, specN,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-
-    add_to_dW_3r3p ( specO2minus, specO2plus, specN2,   specO2, specO2, specN2,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r3p ( specO2minus, specN2plus, specN2,   specO2, specN2, specN2,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r3p ( specO2minus, specNOplus, specN2,   specO2, specNO, specN2,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-
-    add_to_dW_3r3p ( specO2minus, specO2plus, specNO,   specO2, specO2, specNO,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r3p ( specO2minus, specN2plus, specNO,   specO2, specN2, specNO,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-    add_to_dW_3r3p ( specO2minus, specNOplus, specNO,   specO2, specNO, specNO,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+    for (k=0; specM4[k]!=specEND; k++){
+      add_to_dW_3r3p ( specM4[k], specN2plus, specO2minus,  specO2, specN2, specM4[k],   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_3r3p ( specM4[k], specO2plus, specO2minus,  specO2, specO2, specM4[k],   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_3r3p ( specM4[k], specNOplus, specO2minus,  specO2, specNO, specM4[k],   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+    }
   }
 
   if (REACTION[38]) {
@@ -711,8 +664,6 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
     dkfdTv=0.0;
     add_to_dW_2r3p ( specO2, specO2minus,   specO2, specO2, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
-
-
 
   if (REACTION[39]){
     kf=_kf_Arrhenius(2, 1e17, 0.07, 39836.0*R, T);
@@ -735,11 +686,8 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
     dkfdT=_dkfdT_Arrhenius(2, 1.2e12, 1.18, 45172.0*R, T);
     dkfdTv=0.0;
     dkfdTe=0.0;
-    add_to_dW_2r3p ( specCs, specO,    specCsplus, speceminus, specO,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);    
-    add_to_dW_2r3p ( specCs, specO2,   specCsplus, speceminus, specO2,  kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);    
-    add_to_dW_2r3p ( specCs, specN,    specCsplus, speceminus, specN,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);    
-    add_to_dW_2r3p ( specCs, specN2,   specCsplus, speceminus, specN2,  kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);    
-    add_to_dW_2r3p ( specCs, specNO,   specCsplus, speceminus, specNO,  kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);    
+    for (k=0; specM4[k]!=specEND; k++)
+      add_to_dW_2r3p ( specCs, specM4[k],    specCsplus, speceminus, specM4[k],   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);    
   }
 
   if (REACTION[42]){

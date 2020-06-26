@@ -2,13 +2,13 @@
 \newlength\lengthfigure                  % declare a figure width unit
 \setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
 \usepackage{psfrag}         % use it to substitute a string in a eps figure
-\usepackage{subfigure}
 \usepackage{rotating}
 \usepackage{pstricks}
 \usepackage[innercaption]{sidecap} % the cute space-saving side captions
 \usepackage{scalefnt}
 \usepackage{bm}
 \usepackage{amsmath}
+\usepackage{subcaption}
 
 %%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\alb}{\vspace{0.2cm}\\} % array line break
@@ -182,7 +182,7 @@ abstract
        &  ${\rm exp}(-0.0102785\cdot {\rm ln}^2 E^\star - 2.42260\cdot 10^{-75} \cdot {\rm ln}^{46}E^\star)$~cm$^3$/s
        & \cite{jcp:2014:parent} \\
     22  & $\rm e^- + NO   \rightarrow NO^+ + e^- + e^-$  
-       &  ?
+       &  ${\rm exp}(-5.9890\cdot 10^{-6} \cdot {\rm ln}^4 E^\star + 2.5988\cdot 10^{-84} \cdot {\rm ln}^{51}E^\star)$~cm$^3$/s
        & BOLSIG+ \\
     23  & $\rm  e^- + Cs  \rightarrow Cs^+ + e^- + e^-$  
        &  $1.6\cdot 10^{32} \cdot {\cal A}^{-1} \cdot T_{\rm e}^{-3.3} \cdot \exp(-45172/T_{\rm e})$~cm$^3$/s
@@ -278,7 +278,15 @@ abstract
 
 
 
+\begin{figure}[!t]
+  \centering
+        \begin{subfigure}{0.49\textwidth}
+            \includegraphics[width=0.99\linewidth]{NO_1.jpg}
+            \caption{ Reaction 22: $\rm e^- + NO   \rightarrow e^- + e^- + NO^+ $. In the $E/N$ range 3 $\cdot$ 10$^{-20}$ to 187$\cdot$ 10$^{-20}$ V$\cdot$m$^2$, the maximum relative error between the BOLSIG+ data and the curve fit is of 14.9\% and the mean error is of 4.04\%.}
+        \end{subfigure}
+% \caption{Average heat flux to the wall and skin friction during the $1^{st}$, $3^{rd}$, $5^{th}$ and $20^{th}$ period.}
 
+\end{figure}
 
 
 

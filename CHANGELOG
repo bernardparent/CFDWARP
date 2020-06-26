@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUN 25a
+  * in model/chem/_CO2_Plasma_23s_Park/doc/Makefile and model/chem/_Cs_Air_Plasma_13s_Lenard/doc/Makefile
+    - fixed a bug within the make clean
+  * in model/chem/_Cs_Air_Plasma_13s_Lenard/chem.c
+    - added loops within reactions in which M1, M2, etc appeared to shorten the code
+    - added Townsend ionization of NO+
+  * in model/chem/_Cs_Air_Plasma_13s_Lenard/doc/report.tex
+    - added Townsend ionization of NO+
+    - added figure 1 comparing NO+ Townsend ionization curve fit to BOLSIG+ data
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c and model/fluid/_Favre-Reynolds_plasma/fluid_source.c
+    - in find_dSemfield_dU(), changed spec loops from 1..ns to 1..ncs where  
+
+
 2020 JUN 24a
   * moved
     - _Cs_Air_Plasma to _Cs_Air_Plasma_13s_Lenard
