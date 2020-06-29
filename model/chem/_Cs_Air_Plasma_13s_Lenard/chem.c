@@ -115,9 +115,14 @@ void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double 
   double N[ns];
   double theta,kf;
   long k;
-  double R;
+  double R,Estar_from_Te,Te_from_Estar;
   
-
+  
+  find_EoverN_from_Te(Te, &Estar_from_Te);
+  //if (Estar_from_Te>Estar) Estar=Estar_from_Te;   //??? needs to be verified
+  find_Te_from_EoverN(Estar, &Te_from_Estar);
+  Te_from_Estar=max(300.0,Te_from_Estar); 
+    
   /* find properties needed by add_to_W* functions */
   R=1.9872;
   for ( k = 0; k < ns; k++ ) {
@@ -319,7 +324,7 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, s;                    
   spec_t N;
-  double R,theta,kf,dkfdTe,dkfdT,dkfdTv;
+  double R,theta,kf,dkfdTe,dkfdT,dkfdTv,Te_from_Estar;
   
   
   R=1.9872;
@@ -341,6 +346,8 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
   Estar = max ( Estarmin, Estar );
   theta = log ( Estar );
 
+  find_Te_from_EoverN(Estar, &Te_from_Estar);
+  Te_from_Estar=max(300.0,Te_from_Estar); 
 
 
   if (REACTION[1]) {
@@ -529,6 +536,10 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
       add_to_dW_2r3p ( specNO, speceminus,   specNOplus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
     }
 
+
+  }
+
+  if (TOWNSEND){
     if (REACTION[23]){
       kf=_kf_Arrhenius(2, 1.6e32, -3.3, 45172.0*R, Te);
       dkfdTe = _dkfdT_Arrhenius(2, 1.6e32, -3.3, 45172.0*R, Te);
@@ -536,10 +547,7 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
       dkfdTv=0.0;      
       add_to_dW_2r3p ( specCs, speceminus,   specCsplus, speceminus, speceminus,    kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
     }
-
   }
-
-
   
 
   if (REACTION[24]){

@@ -126,4 +126,7 @@ void find_Te_from_EoverN(double Estar, double *Te);
 
 void find_dTe_dEoverN_from_EoverN(double Estar, double *dTedEstar);
 
+void find_EoverN_from_Te(double Te, double *EoverN);
+
+
 #endif /* _THERMO_H */

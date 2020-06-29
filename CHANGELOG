@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUN 29a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - in find_post_variable_name_fluid() and find_post_variable_value_fluid() changed the ordering
+      of a and rhoc
+  * in model/share/chem_share.c
+    - in _dkfdT_Arrhenius(), fixed a sign bug in dkfdT
+  * in model/thermo/_generic/thermo.c
+    - added find_EoverN_from_Te()
+  * in model/chem/_Air_Plasma_11s_31r_Dunn-Kang/
+    - added doc
+    
+
 2020 JUN 25a
   * in model/chem/_CO2_Plasma_23s_Park/doc/Makefile and model/chem/_Cs_Air_Plasma_13s_Lenard/doc/Makefile
     - fixed a bug within the make clean

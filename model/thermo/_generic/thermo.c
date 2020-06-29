@@ -3710,6 +3710,21 @@ void find_Te_from_EoverN(double Estar, double *Te){
 }
 
 
+void find_EoverN_from_Te(double Te, double *Estar){
+  long cnt;
+  double Te_new,dTedEstar;
+  cnt=0;
+  *Estar=0.5e-20;
+  do {
+    find_Te_from_EoverN(*Estar, &Te_new);
+    find_dTe_dEoverN_from_EoverN(*Estar, &dTedEstar);
+    (*Estar)-=(Te_new-Te)/dTedEstar;
+    cnt++;
+  } while (cnt<100 && fabs((Te_new-Te)/Te)>1e-5);
+  if (cnt==100) fatal_error("Problem finding Eover in find_EoverN_from_Te. Te=%E Te_new=%E",Te,Te_new);
+}
+
+
 
 /*
 static double _Res_Telocal(double EoverN, double Te){

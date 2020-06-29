@@ -914,10 +914,10 @@ double _dkfdT_Arrhenius(long numreactant, double A, double n, double E, double T
   R=1.9872;
   switch (numreactant){
     case 2:
-      dkfdT=(A/calA)*n*pow(T,n-1.0)*exp(-E/(R*T))-E/(R*T*T)*(A/calA)*pow(T,n)*exp(-E/(R*T));
+      dkfdT=(A/calA)*n*pow(T,n-1.0)*exp(-E/(R*T))+E/(R*T*T)*(A/calA)*pow(T,n)*exp(-E/(R*T));
     break;
     case 3:
-      dkfdT=(A/sqr(calA))*n*pow(T,n-1.0)*exp(-E/(R*T))-E/(R*T*T)*(A/sqr(calA))*pow(T,n)*exp(-E/(R*T));
+      dkfdT=(A/sqr(calA))*n*pow(T,n-1.0)*exp(-E/(R*T))+E/(R*T*T)*(A/sqr(calA))*pow(T,n)*exp(-E/(R*T));
     break;
     default:
       fatal_error("numreactant can not be set to %ld in _kf_Arrhenius",numreactant);
