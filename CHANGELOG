@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUL 01b
+  * in cycle/share/cycle_share.c
+    - in function exchange_U(), added threading of find_prim_fluid() by Minindu Weerakoon
+    
+
 2020 JUL 01a
   * in model/chem/*/chem.c
     - added find_Qei() and find_dQei_dx()

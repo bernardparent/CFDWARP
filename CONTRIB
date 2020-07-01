@@ -104,3 +104,4 @@ WEERAKOON, Minindu
 
   - Fixes to memory leaks problems (see CHANGELOG 19feb23a and 19feb27a and 19feb28b and 19may08a) 
 
+  - Speed improvement of function exchange_U() in cycle_share.c

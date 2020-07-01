@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
 Copyright 1998-2018 Bernard Parent
+Copyright 2020 Minindu Weerakoon
 Copyright 2001 Giovanni Fusina
 Copyright 2002 Thomas E. Schwartzentruber
 
@@ -1689,10 +1690,12 @@ long _numthread_optimized(long numzone){
 void exchange_U(np_t *np, gl_t *gl){
   int rankrecv,numproc,ranksend,thisrank;
   long i,j,k,flux;
+  long cnt = 0;
+  long *nodenums = NULL;
   zone_t zonesend,zonerecv,zone;
   flux_t Ulocal;
   MPI_Status MPI_Status1;
-
+ 
   MPI_Comm_rank(MPI_COMM_WORLD, &thisrank);
   MPI_Comm_size(MPI_COMM_WORLD, &numproc);
   for (ranksend=0; ranksend<numproc; ranksend++){
@@ -1710,14 +1713,23 @@ void exchange_U(np_t *np, gl_t *gl){
                 if (rankrecv==thisrank) {
                   MPI_Recv(Ulocal,nf,MPI_DOUBLE,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
                   for (flux=0; flux<nf; flux++) np[_ai(gl,i,j,k)].bs->U[flux]=Ulocal[flux];
-                  if (is_node_resumed(np[_ai(gl,i,j,k)])) find_prim_fluid(np,_ai(gl,i,j,k),gl);
+                  if (is_node_resumed(np[_ai(gl,i,j,k)])){
+                    nodenums=(long *)realloc(nodenums,(cnt+1)*sizeof(long));
+                    nodenums[cnt]=_ai(gl,i,j,k);
+                    cnt++;
+                  }
                 }
           }
         }
       }
     }
-  } 
-   
+  }
+ 
+#ifdef OPENMPTHREADS
+#pragma omp parallel for private(i) schedule(dynamic)
+#endif
+  for (i=0; i<cnt; i++) find_prim_fluid(np,nodenums[i],gl);
+  free(nodenums);
   MPI_Barrier(MPI_COMM_WORLD);
 }
 
