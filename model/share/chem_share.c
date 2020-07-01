@@ -800,12 +800,12 @@ void add_to_dW_fwbw_2r3p(int specR1, int specR2,
 }
 
 
-void test_dW_dx(spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam){
+void test_dW_dx(spec_t rhokref, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam){
   long r,s; 
   spec_t dWdT,dWdTe,dWdTv,dWdQbeam;
   spec2_t dWrhok,dWrhok2;   
   spec_t rhok2,dWdT2,W,W2;
-  double dQbeam,dT,N,N2,Estar2;
+  double drhok,dQbeam,dT,N,N2,Estar2;
  
   find_W(rhok, T, Te, Tv, Estar, Qbeam, W);      
   find_dW_dx(rhok, mu, T, Te, Tv, Estar, Qbeam,
@@ -829,11 +829,12 @@ void test_dW_dx(spec_t rhok, spec_t mu, double T, double Te, double Tv, double E
   /* find dWrhok numerically */
   for (s=0; s<ns; s++){
     for (r=0; r<ns; r++) rhok2[r]=rhok[r];
-    rhok2[s]+=rhok[s]/1e3+1.0e-10;
+    drhok=max(0.0,rhok[s]/1e3)+1.0e-8*rhokref[s];
+    rhok2[s]+=drhok;
     N2=N+(rhok2[s]-rhok[s])/_m(s);
     Estar2=Estar*N/N2;
     find_W(rhok2, T, Te,Tv,Estar2,Qbeam, W2);
-    for (r=0; r<ns; r++) dWrhok2[r][s]=(W2[r]-W[r])/(rhok[s]/1e3+1.0e-10);
+    for (r=0; r<ns; r++) dWrhok2[r][s]=(W2[r]-W[r])/(drhok);
   }
   for (r=0; r<ns; r++){
     wfprintf(stdout,"\n\ndW[%ld]drhok:\n",r);
@@ -850,7 +851,7 @@ void test_dW_dx(spec_t rhok, spec_t mu, double T, double Te, double Tv, double E
 
   // find dWdT numerically 
    wfprintf(stdout,"\n\ndWdT:\n");
-   dT=T/100000.0;
+   dT=T/10000.0;
   find_W(rhok, T+dT, Te,Tv,Estar,Qbeam, W2);
   for (s=0; s<ns; s++) dWdT2[s]=(W2[s]-W[s])/dT;
   for (s=0; s<ns; s++){  
@@ -859,7 +860,7 @@ void test_dW_dx(spec_t rhok, spec_t mu, double T, double Te, double Tv, double E
   
   // find dWdTe numerically 
    wfprintf(stdout,"\n\ndWdTe:\n");
-  dT=Te/100000.0;
+  dT=Te/10000.0;
   find_W(rhok, T, Te+dT,Tv,Estar,Qbeam, W2);
   for (s=0; s<ns; s++) dWdT2[s]=(W2[s]-W[s])/dT;
   for (s=0; s<ns; s++){  

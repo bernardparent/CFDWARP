@@ -233,7 +233,7 @@ void test_dSchem_dU(np_t *np, gl_t *gl, long l){
   for (spec=0; spec<ns; spec++) rhok[spec]=_rhok(np[l],spec);
   for (spec=0; spec<ns; spec++) mu[spec]=_mu(np,gl,l,spec);
 
-  test_dW_dx(rhok, mu,_T(np[l],gl), _T(np[l],gl), _Tv(np[l]), Estar, _Qbeam(np[l],gl));
+  test_dW_dx(gl->cycle.fluid.Uref, rhok, mu,_T(np[l],gl), _T(np[l],gl), _Tv(np[l]), Estar, _Qbeam(np[l],gl));
 }
 
 

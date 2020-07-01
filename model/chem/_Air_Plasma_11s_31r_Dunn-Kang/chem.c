@@ -329,3 +329,74 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
 
 
 }
+
+
+
+
+void find_Qei(spec_t rhok, double Estar, double Te, double *Qei){
+  double kf,ionizationpotential,theta;
+  long spec;
+  
+  theta=log(Estar);
+  *Qei=0.0;
+  /* e- + spec -> e- + e- + spec+ */
+  for (spec=0; spec<ns; spec++){
+    switch (spec){
+      case specO2:
+        kf=exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0))*1E-6; /* m3/s */
+        ionizationpotential=1.947E-18; /* J */
+        #ifdef TEST
+          kf=1e-17;
+        #endif
+      break;
+      case specN2:
+        kf=exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0))*1E-6; /* m3/s */
+        ionizationpotential=2.507E-18; /* J */
+        #ifdef TEST
+          kf=1e-18;
+        #endif
+      break; 
+      default:
+        kf=0.0;
+        ionizationpotential=0.0;
+    }
+    (*Qei) += kf * ionizationpotential * rhok[speceminus] / _calM ( speceminus ) * rhok[spec] / _calM ( spec ) * sqr(calA);
+  }
+}
+
+
+
+void find_dQei_dx(spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
+  double kf,ionizationpotential,theta;
+  long spec;
+  
+  for (spec=0; spec<ns; spec++) dQeidrhok[spec]=0.0;
+  *dQeidTe=0.0;  
+  theta=log(Estar);
+
+  /* e- + spec -> e- + e- + spec+ */
+  for (spec=0; spec<ns; spec++){
+    switch (spec){
+      case specO2:
+        kf=exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0))*1E-6; 
+        ionizationpotential=1.947E-18; 
+        #ifdef TEST
+          kf=1e-17;
+        #endif
+      break;
+      case specN2:
+        kf=exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0))*1E-6; 
+        ionizationpotential=2.507E-18; 
+        #ifdef TEST
+          kf=1e-18;
+        #endif
+      break; 
+      default:
+        kf=0.0;
+        ionizationpotential=0.0;
+    }
+    dQeidrhok[spec] += kf * ionizationpotential * rhok[speceminus] / _calM ( speceminus )  / _calM ( spec ) * sqr(calA);
+    dQeidrhok[speceminus] += kf * ionizationpotential / _calM ( speceminus ) * rhok[spec] / _calM ( spec ) * sqr(calA);
+  }
+
+}

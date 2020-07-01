@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUL 01a
+  * in model/chem/*/chem.c
+    - added find_Qei() and find_dQei_dx()
+  * in model/fluid/*/fluid_source.c and model/fluid/_drift-diffusion/fluid.c
+    - in test_dSchem_dU(), added gl->cycle.fluid.Uref as first argument to test_dW_dx()
+  * in model/fluid/*_plasma/fluid_source.c
+    - in find_Se(), added call to find_Qei() and removed pre-existing code that found Qei
+    - in find_dSe_dU_transport(), added call to find_dQei_dx() and removed pre-existing code
+      that found dQei_drhok
+  * in model/share/chem_share.c 
+    - in test_dW_dx(), added parameter rhokref and made drhok function of rhokref
+  * in model/fluid/_Favre-Reynolds_plasma/fluid.c and model/fluid/_Favre-Reynolds_plasma/fluid_source.c
+    - added option TEMODEL_EQUILIBRIUM with code based on _Navier-Stokes_plasma/fluid.c
+    
+
 2020 JUN 29a
   * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
     - in find_post_variable_name_fluid() and find_post_variable_value_fluid() changed the ordering

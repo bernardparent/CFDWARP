@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fluid_source.h"
 #include <model/metrics/_metrics.h>
 #include <model/chem/_chem.h>
+#include <model/share/chem_share.h>
 #include <model/emfield/_emfield.h>
 #include <model/thermo/_thermo.h>
 #include <model/_model.h>
@@ -145,7 +146,7 @@ void test_dSchem_dU(np_t *np, gl_t *gl, long l){
   Estar=0.0;
   for (spec=0; spec<ns; spec++) rhok[spec]=_rhok(np[l],spec);
   for (spec=0; spec<ns; spec++) mu[spec]=_mu(np,gl,l,spec);
-  test_dW_dx(rhok, mu,_T(np[l],gl), _T(np[l],gl), _T(np[l],gl), Estar, _Qbeam(np[l],gl));
+  test_dW_dx(gl->cycle.fluid.Uref, rhok, mu,_T(np[l],gl), _T(np[l],gl), _T(np[l],gl), Estar, _Qbeam(np[l],gl));
 }
 
 
