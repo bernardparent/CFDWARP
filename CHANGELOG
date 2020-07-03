@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUL 02a
+  * in model/chem/_Cs_Air_Plasma_13s_Lenard/chem.c
+    - re-ordered the reactions so that the ones involving Cesium are all located at the end
+  * in model/chem/_Cs_Air_Plasma_13s_Lenard/doc/report.tex
+    - re-ordered the reactions so that the ones involving Cesium are all located at the end
+    
+
 2020 JUL 01b
   * in cycle/share/cycle_share.c
     - in function exchange_U(), added threading of find_prim_fluid() by Minindu Weerakoon
