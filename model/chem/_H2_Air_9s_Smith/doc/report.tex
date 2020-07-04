@@ -1,0 +1,177 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{bm}
+\usepackage{amsmath}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\efficiency}{\eta}
+\newcommand{\ordi}{{\rm d}}
+\newcommand{\unitvecdiff}[2]{\overline{\vec{#1} - \vec{#2}}}
+%\let\vec\bf
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\rhos}{\rho}
+\newcommand{\Cv}{{C_{\rm v}}}
+\newcommand{\Cp}{{C_{\rm p}}}
+\newcommand{\Sct}{{{\rm Sc}_{\rm T}}}
+\newcommand{\Prt}{{{\rm Pr}_{\rm T}}}
+\newcommand{\nd}{{{n}_{\rm d}}}
+\newcommand{\ns}{{{n}_{\rm s}}}
+\newcommand{\nn}{{{n}_{\rm n}}}
+\newcommand{\nr}{{{n}_{\rm r}}}
+\newcommand{\ndm}{{\bar{n}_{\rm d}}}
+\newcommand{\nsm}{{\bar{n}_{\rm s}}}
+\newcommand{\turb}{_{\rm T}}
+\newcommand{\mut}{{\mu\turb}}
+\newcommand{\mfa}{\scriptscriptstyle}
+\newcommand{\mfb}{\scriptstyle}
+\newcommand{\mfc}{\textstyle}
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\hlinex}{\vspace{-0.34cm}~~\\ \hline \vspace{-0.31cm}~~\\}
+\newcommand{\hlinextop}{\vspace{-0.46cm}~~\\ \hline \hline \vspace{-0.32cm}~~\\}
+\newcommand{\hlinexbot}{\vspace{-0.37cm}~~\\ \hline \hline \vspace{-0.50cm}~~\\}
+\newcommand{\tablespacing}{\vspace{-0.4cm}}
+\newcommand{\fontxfig}{\footnotesize\scalefont{0.918}}
+\newcommand{\fontgnu}{\footnotesize\scalefont{0.896}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{0.9}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\author{
+  Bernard Parent 
+}
+
+\email{
+  bernparent@gmail.com
+}
+
+\department{
+  Aerospace and Mechanical Engineering
+}
+
+\institution{
+  University of Arizona
+}
+
+\title{Dunn-Kang Air Plasma Kinetics for Re-Entry Flows
+}
+
+\date{
+  December 2019
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+%  \tableofcontents
+%  \makenomenclature
+%  \listoftables
+%%  \listoffigures
+
+
+
+%\section{Chemical Models in Arrhenius Form}
+
+
+
+
+
+
+%
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Dunn-Kang 11-species 31-reaction high-temperature air model \cite{nasa:1973:dunn,aiaaconf:1987:Bussing}.}
+\begin{tabular}{ccccc} 
+\toprule
+\multicolumn{2}{c}{Reaction} & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole  \\ 
+\midrule
+(1) & $\rm O_2 + N \rightleftarrows 2O+N$ & 3.6 $\times$ 10$^{18}$  & -1 & 118,800 \\
+(2) & $\rm O_2 + NO \rightleftarrows 2O+NO$ & 3.6 $\times$ 10$^{18}$ & -1 & 118,800 \\
+(3) & $\rm N_2 + O \rightleftarrows 2N+O$ & 1.9 $\times$ 10$^{17}$ & -0.5 & 226,000 \\
+(4) & $\rm N_2 + NO \rightleftarrows 2N+NO$ & 1.9 $\times$ 10$^{17}$ & -0.5 & 226,000 \\
+(5) & $\rm N_2 + O_2 \rightleftarrows 2N+O_2$ & 1.9 $\times$ 10$^{17}$ & -0.5 & 226,000 \\
+(6) & $\rm NO + O_2 \rightleftarrows N+O+O_2$ & 3.9 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
+(7) & $\rm NO + N_2 \rightleftarrows N+O+N_2$ & 3.9 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
+(8) & $\rm O + NO \rightleftarrows N+O_2$ & 3.2 $\times$ 10$^{9}$ & 1 & 39,400 \\
+(9) & $\rm O + N_2 \rightleftarrows N+NO$ & 7 $\times$ 10$^{13}$ & 0 & 76,000 \\
+(10) & $\rm N + N_2 \rightleftarrows 2N+N$ & 4.085 $\times$ 10$^{22}$ & -1.5 & 226,000 \\
+(11) & $\rm O + N \rightleftarrows NO^{+}+e^{-}$ & 1.4 $\times$ 10$^{6}$ & 1.5 & 63,800 \\
+(12) & $\rm O + e^- \rightleftarrows O^++2e^-$ & 3.6 $\times$ 10$^{31}$ & -2.91 & 316,000 \\
+(13) & $\rm N + e^- \rightleftarrows N^++2e^-$ & 1.1 $\times$ 10$^{32}$ & -3.14 & 338,000 \\
+(14) & $\rm O + O \rightleftarrows O_2^{+}+e^-$ & 1.6 $\times$ 10$^{17}$ & -0.98 & 161,600 \\
+(15) & $\rm O + O_2^+ \rightleftarrows O_2+O^+$ & 2.92 $\times$ 10$^{18}$ & -1.11 & 56,000 \\
+(16) & $\rm N_2 + N^+ \rightleftarrows N+N_2^{+}$ & 2.02 $\times$ 10$^{11}$ & 0.81 & 26,000 \\
+(17) & $\rm N + N \rightleftarrows N_2^{+} + e^-$ & 1.4 $\times$ 10$^{13}$ & 0 & 135,600 \\
+(18) & $\rm O + NO^+ \rightleftarrows NO + O^+$ & 3.63 $\times$ 10$^{15}$ & -0.6 & 101,600 \\
+(19) & $\rm N_2 + O^+ \rightleftarrows O + N_2^{+}$ & 3.4 $\times$ 10$^{19}$ & -2 & 46,000 \\
+(20) & $\rm N + NO^+ \rightleftarrows NO + N^+$ & 1 $\times$ 10$^{19}$ & -0.93 & 122,000 \\
+(21) & $\rm O_2 + NO^+ \rightleftarrows NO + O_2^{+}$ & 1.8 $\times$ 10$^{15}$ & 0.17 & 66,000 \\
+(22) & $\rm O + NO^+ \rightleftarrows O_2 + N^+$ & 1.34 $\times$ 10$^{13}$ & 0.31 & 154,540 \\
+(23) & $\rm O_2 + O \rightleftarrows 2O + O$ & 9 $\times$ 10$^{19}$ & -1 & 119,000 \\
+(24) & $\rm O_2 + O_2 \rightleftarrows 2O + O_2$ & 3.24 $\times$ 10$^{19}$ & -1 & 119,000 \\
+(25) & $\rm O_2 + N_2 \rightleftarrows 2O + N_2$ & 7.2 $\times$ 10$^{18}$ & -1 & 119,000 \\
+(26) & $\rm N_2 + N_2 \rightleftarrows 2N + N_2$ & 4.7 $\times$ 10$^{17}$ & -0.5 & 226,000 \\
+(27) & $\rm NO + O \rightleftarrows N + 2O$ & 7.8 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
+(28) & $\rm NO + N \rightleftarrows O + 2N$ & 7.8 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
+(29) & $\rm NO + NO \rightleftarrows N + O + NO$ & 7.8 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
+(30) & $\rm O2 + N2 \rightleftarrows NO + NO^+ + e^-$ & 1.38 $\times$ 10$^{20}$ & -1.84 & 282,000 \\
+(31) & $\rm NO + N2 \rightleftarrows NO^+ + e^- + N_2$ & 2.2 $\times$ 10$^{15}$ & -0.35 & 216,000 \\
+\bottomrule
+\end{tabular}
+\label{tab:dunn-kang}
+\end{threeparttable}
+\end{center}
+\end{table}
+%
+
+
+
+
+
+
+
+
+
+
+
+
+\bibliographystyle{warpdoc}
+\bibliography{all}
+
+
+\end{document}
+
+
+
