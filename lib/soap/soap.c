@@ -820,7 +820,7 @@ static void functions_builtin(char *function, char **argum,
   
     EXM_find_spline(N, x, f, b);
     *returnstr=(char *)realloc(*returnstr,maxnumlen*sizeof(char));
-    sprintf(*returnstr,"%20.15E",EXM_f_from_spline(N, x, f, b, thisx));
+    sprintf(*returnstr,DOUBLEFORMAT,EXM_f_from_spline(N, x, f, b, thisx));
 
     free(x);
     free(b);
@@ -1999,6 +1999,7 @@ void SOAP_process_code(char *code, SOAP_codex_t *codex, int SOAP_VARS){
       if (ASSIGN) argum[cnt2]=EOS; else argum[cnt2-1]=EOS;
       /* if (codex->VERBOSE) printf("action='%s'  argum='%s'\n",action,argum); */
       if (ASSIGN) {
+        substitute_functions(&argum, codex);
         update_var(&action,&argum,codex);
       } else {
         if (codex->ACTION) (codex->action)(action,&argum,codex);

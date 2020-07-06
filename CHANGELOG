@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUL 06a
+  * in lib/soap/soap.c
+    - in functions_builtin(), changed the double format of the spline function to the standard
+      DOUBLEFORMAT
+    - in SOAP_process_code(), added substitute_functions() just before update_var() to 
+      speed up the processing of function calls with a large number of arguments
+      (Prasanna Rajendran contribution)
+      
+
 2020 JUL 03a
   * in model/chem/
     - added _H2_Air_9s_Smith
