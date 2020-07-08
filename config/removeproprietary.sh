@@ -11,6 +11,10 @@ echo "Removing proprietary directory .././model/chem/_H2_Air_Plasma_18s_78r_Jach
 rm -rf .././model/chem/_H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret 
 cp -a _proprietary .././model/chem/_H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret 
 ( printf "current H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret\nEND" ) > .././model/chem/_H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret/.config 
+echo "Removing proprietary directory .././model/chem/_Cs_Air_Plasma_13s_Lenard"
+rm -rf .././model/chem/_Cs_Air_Plasma_13s_Lenard 
+cp -a _proprietary .././model/chem/_Cs_Air_Plasma_13s_Lenard 
+( printf "current Cs_Air_Plasma_13s_Lenard\nEND" ) > .././model/chem/_Cs_Air_Plasma_13s_Lenard/.config 
 echo "Removing proprietary directory .././model/fluid/_Navier-Stokes_plasma"
 rm -rf .././model/fluid/_Navier-Stokes_plasma 
 cp -a _proprietary .././model/fluid/_Navier-Stokes_plasma 
