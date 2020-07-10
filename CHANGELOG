@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUL 09a
+  * in model/chem/Makefile
+    - added _H2_Air_9s_Smith within cleanall
+  * in model/fluid/_Navier-Stokes/fluid_post.c
+    - in find_post_variable_name_fluid() and find_post_variable_value_fluid()
+      changed mass fraction for number density for the charged species
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - in read_model_fluid_actions() and read_model_fluid_actions() added N2VIBMODEL_EQUILIBRIUM
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in _tauvt() and find_dSvib_dU(), added N2VIBMODEL_EQUILIBRIUM
+    
+
 2020 JUL 07a
   * in model/chem/
     - added _H2_Air_Plasma_17s_Lenard-Smith
