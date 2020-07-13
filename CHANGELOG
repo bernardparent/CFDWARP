@@ -7,6 +7,23 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUL 13a
+  * in model/emfield/_Epotential/emfield.c
+    - in find_post_variable_value_emfield(), now finds Ve using find_Ve_from_J instead 
+      of find_Vk_from_Vk_at_interfaces
+  * in model/fluid/_*_plasma/fluid_plasma.c
+    - in find_Dstar(), instead of find_Vk, now uses find_Ve_from_J and find_Vk_from_Vk_at_interfaces
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - in find_post_variable_name_fluid() and find_post_variable_value_fluid(), added post
+      variables EoverN and Telocal
+  * in model/share/emfield_share.c
+    - added find_Ve_from_J()
+  * in src/data.c
+    - in read_data_file_binary_ascii(), added code such that a data file that was written without
+      the trapezoidal time stepping can be read by trapezoidal time stepping by initializing the
+      residual to zero (contrib by Prasanna Rajendran)
+      
+
 2020 JUL 09a
   * in model/chem/Makefile
     - added _H2_Air_9s_Smith within cleanall

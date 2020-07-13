@@ -79,6 +79,8 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
   double CFLmem;
 #ifdef _RESTIME_STORAGE_TRAPEZOIDAL
   flux_t Res;
+  bool NORES=FALSE;
+  long NOREScount=0;
 #endif
 #ifndef UNSTEADY
   double tmp_double;
@@ -296,13 +298,17 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
           if (NODEVALID[_ai_all(gl,i,j,k)]) {
             switch (DATATYPE){
               case DATATYPE_BINARY:
-                if (fread(Res, sizeof(flux_t), 1, datafile)!=1)
-                  fatal_error("Could not read residual data properly needed with trapezoidal method.");
+                if (fread(Res, sizeof(flux_t), 1, datafile)!=1){
+                  NORES=TRUE;
+                  NOREScount++;
+                }
               break;
               case DATATYPE_ASCII:
                 for (flux=0; flux<nf; flux++){
-                  if (fscanf(datafile,"%lg%*[^\n]",&(Res[flux]))!=1)
-                    fatal_error("Could not read all data properly.");
+                  if (fscanf(datafile,"%lg%*[^\n]",&(Res[flux]))!=1){
+                    NORES=TRUE;
+                    NOREScount++;
+                  }  
                 }
               break;
               default:
@@ -312,15 +318,19 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
           }
 #ifdef DISTMPI
         }
-        MPI_Bcast_Node(&Res, nf, MPI_DOUBLE, 0, MPI_COMM_WORLD, i, j, k, gl);
+		MPI_Bcast(&NORES, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
+        if (!NORES) MPI_Bcast_Node(&Res, nf, MPI_DOUBLE, 0, MPI_COMM_WORLD, i, j, k, gl);
         if (j==gl->domain_all.js && k==gl->domain_all.ks) MPI_Barrier(MPI_COMM_WORLD);
 #endif
         if (is_node_in_zone(i,j,k,gl->domain_lim)) {
           for (flux=0; flux<nf; flux++){
-            np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux]=Res[flux];
+            if (!NORES) np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux]=Res[flux];
+            else if (NORES) np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux]=0.0;
           }
         }
+		NORES=FALSE;
   }
+  if(NOREScount>0) wfprintf(stdout,"WARNING: The residual at the previous time step could not be found within the data file %s. The residual has been set to zero..",filename);
 #endif
 
   fclose(datafile);
