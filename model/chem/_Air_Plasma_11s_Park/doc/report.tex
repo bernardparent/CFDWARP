@@ -1,0 +1,178 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{bm}
+\usepackage{amsmath}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\efficiency}{\eta}
+\newcommand{\ordi}{{\rm d}}
+\newcommand{\unitvecdiff}[2]{\overline{\vec{#1} - \vec{#2}}}
+%\let\vec\bf
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\rhos}{\rho}
+\newcommand{\Cv}{{C_{\rm v}}}
+\newcommand{\Cp}{{C_{\rm p}}}
+\newcommand{\Sct}{{{\rm Sc}_{\rm T}}}
+\newcommand{\Prt}{{{\rm Pr}_{\rm T}}}
+\newcommand{\nd}{{{n}_{\rm d}}}
+\newcommand{\ns}{{{n}_{\rm s}}}
+\newcommand{\nn}{{{n}_{\rm n}}}
+\newcommand{\nr}{{{n}_{\rm r}}}
+\newcommand{\ndm}{{\bar{n}_{\rm d}}}
+\newcommand{\nsm}{{\bar{n}_{\rm s}}}
+\newcommand{\turb}{_{\rm T}}
+\newcommand{\mut}{{\mu\turb}}
+\newcommand{\mfa}{\scriptscriptstyle}
+\newcommand{\mfb}{\scriptstyle}
+\newcommand{\mfc}{\textstyle}
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\hlinex}{\vspace{-0.34cm}~~\\ \hline \vspace{-0.31cm}~~\\}
+\newcommand{\hlinextop}{\vspace{-0.46cm}~~\\ \hline \hline \vspace{-0.32cm}~~\\}
+\newcommand{\hlinexbot}{\vspace{-0.37cm}~~\\ \hline \hline \vspace{-0.50cm}~~\\}
+\newcommand{\tablespacing}{\vspace{-0.4cm}}
+\newcommand{\fontxfig}{\footnotesize\scalefont{0.918}}
+\newcommand{\fontgnu}{\footnotesize\scalefont{0.896}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{0.9}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\author{
+  Bernard Parent 
+}
+
+\email{
+  bernparent@gmail.com
+}
+
+\department{
+  Aerospace and Mechanical Engineering
+}
+
+\institution{
+  University of Arizona
+}
+
+\title{Park Air Plasma Kinetics for Re-Entry Flows
+}
+
+\date{
+  July 2020
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+%  \tableofcontents
+%  \makenomenclature
+%  \listoftables
+%%  \listoffigures
+
+
+
+%\section{Chemical Models in Arrhenius Form}
+
+
+
+
+
+
+%
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Park 11-species high-temperature air model \cite{jtht:1993:park}.}
+\begin{tabular}{ccccccc} 
+\toprule
+No. & Reaction\tnote{(b)} & Controlling temperature & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole~\tnote{(a)} & Ref.\\ 
+\midrule
+1 & $\rm N_2 + M_1 \rightleftarrows N + N + M_1$ & $\sqrt{T T_{\rm v}}$ & 3.0 $\times$ 10$^{22}$  & $-1.6$ & $113200 \cdot R$ & \cite{book:1990:park}\\
+2 & $\rm N_2 + M_2 \rightleftarrows N + N + M_2$ & $\sqrt{T T_{\rm v}}$ & 7.0 $\times$ 10$^{21}$  & $-1.6$ & $113200 \cdot R$ & \cite{book:1990:park}\\
+3 & $\rm N_2 + e^- \rightleftarrows N + N + e^-$ & $\sqrt{T T_{\rm v}}$ & 1.2 $\times$ 10$^{25}$  & $-1.6$ & $113200 \cdot R$ & \cite{aiaaconf:1991:sharma}\\
+4 & $\rm O_2 + M_1 \rightleftarrows O + O + M_1$ & $\sqrt{T T_{\rm v}}$ & 1.0 $\times$ 10$^{22}$  & $-1.5$ & $59500 \cdot R$ & \cite{book:1990:park}\\
+5 & $\rm O_2 + M_2 \rightleftarrows O + O + M_2$ & $\sqrt{T T_{\rm v}}$ & 2.0 $\times$ 10$^{21}$  & $-1.5$ & $59500 \cdot R$ & \cite{book:1990:park}\\
+6 & $\rm NO + M_1 \rightleftarrows N + O + M_1$ & $\sqrt{T T_{\rm v}}$ & 1.1 $\times$ 10$^{17}$  & 0.0 & $75500 \cdot R$ & \cite{book:1990:park}\\
+7 & $\rm NO + M_2 \rightleftarrows N + O + M_2$ & $\sqrt{T T_{\rm v}}$ & 5.0 $\times$ 10$^{15}$  & 0.0 & $75500 \cdot R$ & \cite{book:1990:park}\\
+8 & $\rm NO + O \rightleftarrows N + O_2 $ & $T$ & 8.4 $\times$ 10$^{12}$  & 0.0 & $19450 \cdot R$ & \cite{book:1990:park}\\
+9 & $\rm N_2 + O \rightleftarrows NO + N $ & $T$ & 6.4 $\times$ 10$^{17}$  & $-1.0$ & $38400 \cdot R$ & \cite{book:1990:park}\\
+10 & $\rm N + O \rightleftarrows NO^+ + e^- $ & $T$ & 8.8 $\times$ 10$^{8}$  & 1.0 & $31900 \cdot R$ & \cite{jtht:1993:park}\\
+11 & $\rm O + O \rightleftarrows O_2^+ + e^- $ & $T$ & 7.1 $\times$ 10$^{2}$  & 2.7 & $80600 \cdot R$ & \cite{jtht:1993:park}\\
+12 & $\rm N + N \rightleftarrows N_2^+ + e^- $ & $T$ & 4.4 $\times$ 10$^{7}$  & 1.5 & $67500 \cdot R$ & \cite{jtht:1993:park}\\
+13 & $\rm NO^+ + O \rightleftarrows N^+ + O_2 $ & $T$ & 1.0 $\times$ 10$^{12}$  & 0.5 & $77200 \cdot R$ & \cite{book:1990:park}\\
+14 & $\rm N^+ + N_2 \rightleftarrows N_2^+ + N $ & $T$ & 1.0 $\times$ 10$^{12}$  & 0.5 & $12200 \cdot R$ & \cite{book:1990:park}\\
+15 & $\rm O_2^+ + N \rightleftarrows N^+ + O_2 $ & $T$ & 8.7 $\times$ 10$^{13}$  & 0.14 & $28600 \cdot R$ & \cite{book:1990:park}\\
+16 & $\rm O^+ + NO \rightleftarrows N^+ + O_2 $ & $T$ & 1.4 $\times$ 10$^{5}$  & 1.90 & $26600 \cdot R$ & \cite{book:1990:park}\\
+17 & $\rm O_2^+ + N_2 \rightleftarrows N_2^+ + O_2 $ & $T$ & 9.9 $\times$ 10$^{12}$  & 0.00 & $40700 \cdot R$ & \cite{book:1990:park}\\
+18 & $\rm O_2^+ + O \rightleftarrows O^+ + O_2 $ & $T$ & 4.0 $\times$ 10$^{12}$  & $-0.09$ & $18000 \cdot R$ & \cite{book:1990:park}\\
+19 & $\rm NO^+ + N \rightleftarrows O^+ + N_2 $ & $T$ & 3.4 $\times$ 10$^{13}$  & $-1.08$ & $12800 \cdot R$ & \cite{book:1990:park}\\
+20 & $\rm NO^+ + O_2 \rightleftarrows O_2^+ + NO $ & $T$ & 2.4 $\times$ 10$^{13}$  & 0.41 & $32600 \cdot R$ & \cite{book:1990:park}\\
+21 & $\rm NO^+ + O \rightleftarrows O_2^+ + N $ & $T$ & 7.2 $\times$ 10$^{12}$  & 0.29 & $48600 \cdot R$ & \cite{book:1990:park}\\
+22 & $\rm O^+ + N_2 \rightleftarrows N_2^+ + O $ & $T$ & 9.1 $\times$ 10$^{11}$  & 0.36 & $22800 \cdot R$ & \cite{book:1990:park}\\
+23 & $\rm NO^+ + N \rightleftarrows N_2^+ + O $ & $T$ & 7.2 $\times$ 10$^{13}$  & 0.00 & $35500 \cdot R$ & \cite{book:1990:park}\\
+24 & $\rm O + e^- \rightleftarrows O^+ + e^- + e^- $ & $T_{\rm e}$ & 3.9 $\times$ 10$^{33}$  & $-3.78$ & $158500 \cdot R$ & \cite{book:1990:park}\\
+25 & $\rm N + e^- \rightleftarrows N^+ + e^- + e^- $ & $T_{\rm e}$ & 2.5 $\times$ 10$^{34}$  & $-3.82$ & $168600 \cdot R$ & \cite{book:1990:park}\\
+26 & $\rm O^+ + e^- \rightarrow O + {\it hv} $ & $T_{\rm e}$ & 1.07 $\times$ 10$^{11}$  & $-0.52$ & $0$ & \cite{jtht:1993:park}\\
+27 & $\rm N^+ + e^- \rightarrow N + {\it hv} $ & $T_{\rm e}$ & 1.52 $\times$ 10$^{11}$  & $-0.48$ & $0$ & \cite{jtht:1993:park}\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol 
+\item[{b}] $\rm M_1=N,~O,~N^+,~O^+$
+\item[{~}] $\rm M_2=N_2,~O_2,~NO,~N_2^+,~O_2^+,~NO^+$
+\end{tablenotes}
+\label{tab:park}
+\end{threeparttable}
+\end{center}
+\end{table}
+%
+
+
+
+
+
+
+
+
+
+
+
+
+\bibliographystyle{warpdoc}
+\bibliography{all}
+
+
+\end{document}
+
+
+

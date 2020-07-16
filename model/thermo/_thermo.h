@@ -34,6 +34,8 @@ double _cp_from_w_T(spec_t w, double T);
 
 double _cpk_from_T(long spec, double T);
 
+double _cpk_from_T_equilibrium(long spec, double T);
+
 double _R(spec_t w);
 
 double _a_from_w_T(spec_t w,  double T);
@@ -43,6 +45,8 @@ double _e_from_w_T(spec_t w, double T);
 double _h_from_w_T(spec_t w, double T);
 
 double _hk_from_T(long spec, double T);
+
+double _hk_from_T_equilibrium(long spec, double T);
 
 double _P_from_w_rho_T(spec_t w, double rho, double T);
 
@@ -55,6 +59,8 @@ double _s_from_w_T(spec_t w, double T);
 double _dTskdT_from_T(long spec, double T);
 
 double _sk_from_T(long spec, double T);
+
+double _sk_from_T_equilibrium(long spec, double T);
 
 double _T_from_w_e(spec_t w, double e);
 
@@ -86,6 +92,8 @@ void find_default_init_number_density_string(long spec, char **Ndefault);
 void find_default_init_number_density_fraction_string(long spec, char **chidefault);
 
 double _dsk_dT_from_T(long spec, double T);
+
+double _dsk_dT_from_T_equilibrium(long spec, double T);
 
 
 /* electron energy */

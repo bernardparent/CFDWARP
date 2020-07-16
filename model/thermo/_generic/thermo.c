@@ -2720,6 +2720,38 @@ double _cpk_from_T(long spec, double T){
 }
 
 
+double _cpk_from_T_equilibrium(long spec, double T){
+  double cpk,dTplus;
+  long index,index2;
+  double T2,T3,T4,weight2;
+  
+  find_Pa_index(spec, &T,&index,&dTplus,&index2,&weight2);
+  T2=T*T;
+  T3=T2*T;
+  T4=T3*T;
+    
+  cpk=calR/calM[smap[spec]]*(Pa[smap[spec]][index][2]/T2+
+                             Pa[smap[spec]][index][3]/T+
+                             Pa[smap[spec]][index][4]+
+                             Pa[smap[spec]][index][5]*T+
+			     Pa[smap[spec]][index][6]*T2+
+			     Pa[smap[spec]][index][7]*T3+
+			     Pa[smap[spec]][index][8]*T4);
+  if (index2!=index) {
+    cpk=weight2*
+        calR/calM[smap[spec]]*(Pa[smap[spec]][index2][2]/T2+
+                               Pa[smap[spec]][index2][3]/T+
+                               Pa[smap[spec]][index2][4]+
+                               Pa[smap[spec]][index2][5]*T+
+	    		       Pa[smap[spec]][index2][6]*T2+
+		 	       Pa[smap[spec]][index2][7]*T3+
+			       Pa[smap[spec]][index2][8]*T4)
+        +(1.0-weight2)*cpk;
+  }
+  return(cpk);
+}
+
+
 
 double _cp_from_w_T(spec_t w, double T){
   double cpmix;
@@ -2787,6 +2819,49 @@ double _hk_from_T(long spec, double T){
 #endif
   if (fabs(dTplus)>1e-20){
     tmp=tmp+_cpk_from_T(spec, T)*dTplus;
+  }
+  return(tmp);
+}
+
+
+double _hk_from_T_equilibrium(long spec, double T){
+  double tmp,dTplus;
+  long index,index2;
+  double T2,T3,T4,T5,weight2;
+  
+
+  find_Pa_index(spec, &T,&index,&dTplus,&index2,&weight2);  
+  T2=T*T;
+  T3=T2*T;
+  T4=T3*T;
+  T5=T4*T;
+  
+  tmp=calR/calM[smap[spec]]*(
+             -Pa[smap[spec]][index][2]/T
+             +Pa[smap[spec]][index][3]*log(T)
+             +Pa[smap[spec]][index][4]*T
+             +Pa[smap[spec]][index][5]*T2/2.0e0+
+             +Pa[smap[spec]][index][6]*T3/3.0e0+
+             +Pa[smap[spec]][index][7]*T4/4.0e0+
+             +Pa[smap[spec]][index][8]*T5/5.0e0+
+             +Pa[smap[spec]][index][9]
+	     );
+	 
+  if (index2!=index){
+    tmp=(1.0-weight2)*tmp+weight2*calR/calM[smap[spec]]*(
+             -Pa[smap[spec]][index2][2]/T
+             +Pa[smap[spec]][index2][3]*log(T)
+             +Pa[smap[spec]][index2][4]*T
+             +Pa[smap[spec]][index2][5]*T2/2.0e0+
+             +Pa[smap[spec]][index2][6]*T3/3.0e0+
+             +Pa[smap[spec]][index2][7]*T4/4.0e0+
+             +Pa[smap[spec]][index2][8]*T5/5.0e0+
+             +Pa[smap[spec]][index2][9]
+	     );
+  }	     
+	         
+  if (fabs(dTplus)>1e-20){
+    tmp=tmp+_cpk_from_T_equilibrium(spec, T)*dTplus;
   }
   return(tmp);
 }
@@ -3351,15 +3426,51 @@ double _sk_from_T(long spec, double T){
   }
 #endif
 
-#if (defined(speceminus) && !defined(_CHEM_SET_TE_TO_T_FOR_FWBW_REACTIONS))
+#if (defined(speceminus))
   if (_FLUID_EENERGY && spec==speceminus){
-    fatal_error("In _sk_from_T() part of thermo.c, spec can't be set to speceminus when the electron temperature is not equal to the gas temperature. Probably, you are trying to solve a chemical reaction in forward-backward form that involves the electron species. You should rewrite it as 2 distinct reactions that don't involve the equilibrium constant.");
+    fatal_error("In _sk_from_T() part of thermo.c, spec can't be set to speceminus when the electron temperature is not equal to the gas temperature.");
   }
 #endif
 
   tmp+=_cpk_from_T(spec, T)*log((T+dTplus)/T);  
   return(tmp);
 }
+
+
+double _sk_from_T_equilibrium(long spec, double T){
+  double tmp,dTplus,weight2;
+  long index,index2;
+  
+  
+  find_Pa_index(spec, &T,&index,&dTplus,&index2,&weight2);  
+    
+  tmp=calR/calM[smap[spec]]*(-Pa[smap[spec]][index][2]/T/T/2.0e0
+                             -Pa[smap[spec]][index][3]/T
+                             +Pa[smap[spec]][index][4]*log(T)
+                             +Pa[smap[spec]][index][5]*T
+                             +Pa[smap[spec]][index][6]*T*T/2.0e0
+                             +Pa[smap[spec]][index][7]*T*T*T/3.0e0
+			     +Pa[smap[spec]][index][8]*T*T*T*T/4.0e0
+			     +Pa[smap[spec]][index][10]);
+  if (index2!=index){
+    tmp=(1.0-weight2)*tmp+weight2*calR/calM[smap[spec]]*(-Pa[smap[spec]][index2][2]/T/T/2.0e0
+                             -Pa[smap[spec]][index2][3]/T
+                             +Pa[smap[spec]][index2][4]*log(T)
+                             +Pa[smap[spec]][index2][5]*T
+                             +Pa[smap[spec]][index2][6]*T*T/2.0e0
+                             +Pa[smap[spec]][index2][7]*T*T*T/3.0e0
+			     +Pa[smap[spec]][index2][8]*T*T*T*T/4.0e0
+			     +Pa[smap[spec]][index2][10]);
+
+  }
+
+
+  assert(T!=0.0e0);
+
+  tmp+=_cpk_from_T_equilibrium(spec, T)*log((T+dTplus)/T);  
+  return(tmp);
+}
+
 
 
 double _s_from_w_T(spec_t w, double T){
@@ -3406,11 +3517,42 @@ double _dsk_dT_from_T(long spec, double T){
     } 
   }
 #endif
-#if (defined(speceminus) && !defined(_CHEM_SET_TE_TO_T_FOR_FWBW_REACTIONS))
+#if (defined(speceminus))
   if (_FLUID_EENERGY && spec==speceminus){
-    fatal_error("In _dsk_dT_from_T part of thermo.c, spec can't be set to speceminus when the electron temperature is not equal to the gas temperature. Probably, you are trying to solve a chemical reaction in forward-backward form that involves the electron species. You should rewrite it as 2 distinct reactions that don't involve the equilibrium constant.");
+    fatal_error("In _dsk_dT_from_T part of thermo.c, spec can't be set to speceminus when the electron temperature is not equal to the gas temperature.");
   }
 #endif
+
+  return(tmp);
+}
+
+
+double _dsk_dT_from_T_equilibrium(long spec, double T){
+  double tmp,dTplus;
+  long index,index2;
+  double weight2;
+  
+  find_Pa_index(spec, &T,&index,&dTplus,&index2,&weight2);  
+  tmp=calR/calM[smap[spec]]*(+Pa[smap[spec]][index][2]/T/T/T
+                             +Pa[smap[spec]][index][3]/T/T
+                             +Pa[smap[spec]][index][4]/T
+                             +Pa[smap[spec]][index][5]
+                             +Pa[smap[spec]][index][6]*T
+                             +Pa[smap[spec]][index][7]*T*T
+			     +Pa[smap[spec]][index][8]*T*T*T);
+  if (index2!=index){
+    tmp=(1.0-weight2)*tmp+weight2*calR/calM[smap[spec]]*(+Pa[smap[spec]][index2][2]/T/T/T
+                             +Pa[smap[spec]][index2][3]/T/T
+                             +Pa[smap[spec]][index2][4]/T
+                             +Pa[smap[spec]][index2][5]
+                             +Pa[smap[spec]][index2][6]*T
+                             +Pa[smap[spec]][index2][7]*T*T
+			     +Pa[smap[spec]][index2][8]*T*T*T);
+
+  }			       
+
+
+  if (dTplus!=0.0) tmp+=_cpk_from_T_equilibrium(spec, T)/(T+dTplus);
 
   return(tmp);
 }

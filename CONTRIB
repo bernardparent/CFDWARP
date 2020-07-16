@@ -85,6 +85,9 @@ RAJENDRAN, Prasanna T.
   
   - addition of spline function in lib/soap/soap.c 
 
+  - improvement of read_data_file_sbinary_ascii() to set residual to zero when reading non-trapezoidal
+    data file with trapezoidal method
+
 
 SCHWARTZENTRUBER, Thomas E.
 

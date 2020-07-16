@@ -3,7 +3,6 @@
 #define _CHEM_PLASMA
 
 #define CHEM_NEUTRAL FALSE
-#define _CHEM_SET_TE_TO_T_FOR_FWBW_REACTIONS 
 
 #define ns 12
 #define ncs 7

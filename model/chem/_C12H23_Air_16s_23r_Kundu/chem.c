@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
   long k;
-  spec_t X, Gs;
+  spec_t X;
   double brr, frr;
 
   for ( k = 0; k < ns; k++ )
@@ -45,7 +45,6 @@ void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double 
 
   for ( k = 0; k < ns; k++ ) {
     X[k] = max ( -1e6, rhok[k] / _calM ( k ) * 1.0e-06 );       /* moles per cm3 */
-    Gs[k] = ( _hk_from_T ( k, T ) - T * _sk_from_T ( k, T ) ) * _calM ( k );    /* J/moles */
   }
 
   X[specH2] = max ( Xmin, X[specH2] );
@@ -122,57 +121,57 @@ void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double 
     W[k] *= 1.0e+06 * _calM ( k );
 
   // reaction #6: H2 + OH -> H2O + H
-  add_to_W_fwbw_2r2p ( specH2, specOH, specH2O, specH, 1.17e+11, 1.3, 3626.0e0, T, X, Gs, W );
+  add_to_W_fwbw_2r2p ( specH2, specOH, specH2O, specH, 1.17e+11, 1.3, 3626.0e0, T, X, W );
 
   // reaction #7: H2 + O -> H + OH
-  add_to_W_fwbw_2r2p ( specH2, specO, specH, specOH, 2.50e+15, 0.0, 6000.0e0, T, X, Gs, W );
+  add_to_W_fwbw_2r2p ( specH2, specO, specH, specOH, 2.50e+15, 0.0, 6000.0e0, T, X, W );
 
   // reaction #8: H + O2 -> O + OH
-  add_to_W_fwbw_2r2p ( specH, specO2, specO, specOH, 4.00e+14, 0.0, 18000.0e0, T, X, Gs, W );
+  add_to_W_fwbw_2r2p ( specH, specO2, specO, specOH, 4.00e+14, 0.0, 18000.0e0, T, X, W );
 
   // reaction #9: H2 + H + H -> H2+ H2
-  add_to_W_fwbw_3r2p ( specH2, specH, specH, specH2, specH2, 4.00e+20, -1.0, 0.0e0, T, X, Gs, W );
+  add_to_W_fwbw_3r2p ( specH2, specH, specH, specH2, specH2, 4.00e+20, -1.0, 0.0e0, T, X, W );
 
   // reaction #10: H + O2 -> HO2
-  add_to_W_fwbw_2r1p ( specH, specO2, specHO2, 1.00e+15, -0.87, 0.0e0, T, X, Gs, W );
+  add_to_W_fwbw_2r1p ( specH, specO2, specHO2, 1.00e+15, -0.87, 0.0e0, T, X, W );
 
   // reaction #11: H + HO2 -> H2 + O2
-  add_to_W_fwbw_2r2p ( specH, specHO2, specH2, specO2, 1.50e+14, 0.0e0, 0.0e0, T, X, Gs, W );
+  add_to_W_fwbw_2r2p ( specH, specHO2, specH2, specO2, 1.50e+14, 0.0e0, 0.0e0, T, X, W );
 
   // reaction #12: O + HO2 -> OH + O2
-  add_to_W_fwbw_2r2p ( specO, specHO2, specOH, specO2, 2.50e+13, 0.0e0, 0.0e0, T, X, Gs, W );
+  add_to_W_fwbw_2r2p ( specO, specHO2, specOH, specO2, 2.50e+13, 0.0e0, 0.0e0, T, X, W );
 
   // reaction #13: CO + OH -> CO2 + H
-  add_to_W_fwbw_2r2p ( specCO, specOH, specCO2, specH, 1.51e+07, 1.3e0, -758.0, T, X, Gs, W );
+  add_to_W_fwbw_2r2p ( specCO, specOH, specCO2, specH, 1.51e+07, 1.3e0, -758.0, T, X, W );
 
   // reaction #14: N2 + CH+ CH -> C2H2 + N2 
-  add_to_W_fwbw_3r2p ( specN2, specCH, specCH, specC2H2, specN2, 1.00e+18, 0.0e0, -758.0, T, X, Gs, W );
+  add_to_W_fwbw_3r2p ( specN2, specCH, specCH, specC2H2, specN2, 1.00e+18, 0.0e0, -758.0, T, X, W );
 
   // reaction #15: C2H2 + O2 -> CO + CO + H2 
-  add_to_W_fwbw_2r3p ( specC2H2, specO2, specCO, specCO, specH2, 3.00e+16, 0.0e0, 19000.0, T, X, Gs, W );
+  add_to_W_fwbw_2r3p ( specC2H2, specO2, specCO, specCO, specH2, 3.00e+16, 0.0e0, 19000.0, T, X, W );
 
   // reaction #16: CH + O -> CO + H 
-  add_to_W_fwbw_2r2p ( specCH, specO, specCO, specH, 1.00e+12, 0.7e0, 0.0, T, X, Gs, W );
+  add_to_W_fwbw_2r2p ( specCH, specO, specCO, specH, 1.00e+12, 0.7e0, 0.0, T, X, W );
 
   // reaction #17: CH + OH -> CO + H2 
-  add_to_W_fwbw_2r2p ( specCH, specOH, specCO, specH2, 1.00e+13, 0.0e0, 0.0, T, X, Gs, W );
+  add_to_W_fwbw_2r2p ( specCH, specOH, specCO, specH2, 1.00e+13, 0.0e0, 0.0, T, X, W );
 
   // reaction #18: CH + NO -> NH + CO 
-  add_to_W_fwbw_2r2p ( specCH, specNO, specNH, specCO, 1.00e+11, 0.0e0, 0.0, T, X, Gs, W );
+  add_to_W_fwbw_2r2p ( specCH, specNO, specNH, specCO, 1.00e+11, 0.0e0, 0.0, T, X, W );
 
   // reaction #19: N2 + O -> N + NO 
-  add_to_W_fwbw_2r2p ( specN2, specO, specN, specNO, 9.00e+13, 0.0e0, 75000.0, T, X, Gs, W );
+  add_to_W_fwbw_2r2p ( specN2, specO, specN, specNO, 9.00e+13, 0.0e0, 75000.0, T, X, W );
 
   // reaction #20: N + O2 -> NO + O 
-  add_to_W_fwbw_2r2p ( specN, specO2, specNO, specO, 6.30e+09, 1.0e0, 6300.0, T, X, Gs, W );
+  add_to_W_fwbw_2r2p ( specN, specO2, specNO, specO, 6.30e+09, 1.0e0, 6300.0, T, X, W );
   // reaction #21: NO + H -> N + OH 
-  add_to_W_fwbw_2r2p ( specNO, specH, specN, specOH, 1.00e+12, 0.0e0, 0.0, T, X, Gs, W );
+  add_to_W_fwbw_2r2p ( specNO, specH, specN, specOH, 1.00e+12, 0.0e0, 0.0, T, X, W );
 
   // reaction #22: NH + O -> NO + H 
-  add_to_W_fwbw_2r2p ( specNH, specO, specNO, specH, 2.5e+4, 2.64e0, 0.0, T, X, Gs, W );
+  add_to_W_fwbw_2r2p ( specNH, specO, specNO, specH, 2.5e+4, 2.64e0, 0.0, T, X, W );
 
   // reaction #23:  NH + NO -> N2 + OH
-  add_to_W_fwbw_2r2p ( specNH, specNO, specN2, specOH, 2.00e+15, -0.8, 0.0, T, X, Gs, W );
+  add_to_W_fwbw_2r2p ( specNH, specNO, specN2, specOH, 2.00e+15, -0.8, 0.0, T, X, W );
 
   }
 }
@@ -184,7 +183,7 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
   double rho, frr, dfrrdT, brr, dbrrdT;
   double XM, tmp1, tmp2;
   double dWdX[ns][ns];
-  spec_t X, w, Gs, dGsdT;
+  spec_t X, w;
 
 
   for ( r = 0; r < ns; r++ ) {
@@ -221,8 +220,6 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
 
   for ( k = 0; k < ns; k++ ) {
     dWdT[k] = 0.0e0;
-    Gs[k] = ( _hk_from_T ( k, T ) - T * _sk_from_T ( k, T ) ) * _calM ( k );    /* J/moles */
-    dGsdT[k] = ( _cpk_from_T ( k, T ) - T * _dsk_dT_from_T ( k, T ) - _sk_from_T ( k, T ) ) * _calM ( k );
   }
 
   for ( row = 0; row < ns; row++ ) {
@@ -390,71 +387,71 @@ void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double
 
   // reaction #6: H2 + OH -> H2O + H
   add_to_dW_fwbw_2r2p ( specH2, specOH,
-                            specH2O, specH, 1.17e+11, 1.3, 3626.0e0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+                            specH2O, specH, 1.17e+11, 1.3, 3626.0e0, T, X, dWdT, dWdrhok );
 
   // reaction #7: H2 + O -> H + OH
   add_to_dW_fwbw_2r2p ( specH2, specO,
-                            specH, specOH, 2.50e+15, 0.0, 6000.0e0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+                            specH, specOH, 2.50e+15, 0.0, 6000.0e0, T, X, dWdT, dWdrhok );
 
   // reaction #8: H + O2 -> O + OH
   add_to_dW_fwbw_2r2p ( specH, specO2,
-                            specO, specOH, 4.00e+14, 0.0, 18000.0e0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+                            specO, specOH, 4.00e+14, 0.0, 18000.0e0, T, X, dWdT, dWdrhok );
 
   // reaction #9: H2 + H + H -> 2H2
   add_to_dW_fwbw_3r2p ( specH2, specH, specH,
-                            specH2, specH2, 4.00e+20, -1.0, 0.0e0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+                            specH2, specH2, 4.00e+20, -1.0, 0.0e0, T, X, dWdT, dWdrhok );
 
   // reaction #10: H + O2 -> HO2
-  add_to_dW_fwbw_2r1p ( specH, specO2, specHO2, 1.00e+15, -0.87, 0.0e0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+  add_to_dW_fwbw_2r1p ( specH, specO2, specHO2, 1.00e+15, -0.87, 0.0e0, T, X, dWdT, dWdrhok );
 
   // reaction #11: H + HO2 -> H2 + O2
   add_to_dW_fwbw_2r2p ( specH, specHO2,
-                            specH2, specO2, 1.50e+14, 0.0e0, 0.0e0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+                            specH2, specO2, 1.50e+14, 0.0e0, 0.0e0, T, X, dWdT, dWdrhok );
 
   // reaction #12: O + HO2 -> OH + O2
   add_to_dW_fwbw_2r2p ( specO, specHO2,
-                            specOH, specO2, 2.50e+13, 0.0e0, 0.0e0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+                            specOH, specO2, 2.50e+13, 0.0e0, 0.0e0, T, X, dWdT, dWdrhok );
 
   // reaction #13: CO + OH -> CO2 + H
   add_to_dW_fwbw_2r2p ( specCO, specOH,
-                            specCO2, specH, 1.51e+07, 1.3e0, -758.0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+                            specCO2, specH, 1.51e+07, 1.3e0, -758.0, T, X, dWdT, dWdrhok );
 
   // reaction #14: N2 + CH+ CH -> C2H2 + N2 
   add_to_dW_fwbw_3r2p ( specN2, specCH, specCH,
-                            specC2H2, specN2, 1.00e+18, 0.0e0, -758.0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+                            specC2H2, specN2, 1.00e+18, 0.0e0, -758.0, T, X, dWdT, dWdrhok );
 
   // reaction #15: C2H2 + O2 -> CO + CO + H2 
   add_to_dW_fwbw_2r3p ( specC2H2, specO2,
-                            specCO, specCO, specH2, 3.00e+16, 0.0e0, 19000.0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+                            specCO, specCO, specH2, 3.00e+16, 0.0e0, 19000.0, T, X, dWdT, dWdrhok );
 
   // reaction #16: CH + O -> CO + H 
-  add_to_dW_fwbw_2r2p ( specCH, specO, specCO, specH, 1.00e+12, 0.7e0, 0.0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+  add_to_dW_fwbw_2r2p ( specCH, specO, specCO, specH, 1.00e+12, 0.7e0, 0.0, T, X, dWdT, dWdrhok );
 
   // reaction #17: CH + OH -> CO + H2 
   add_to_dW_fwbw_2r2p ( specCH, specOH,
-                            specCO, specH2, 1.00e+13, 0.0e0, 0.0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+                            specCO, specH2, 1.00e+13, 0.0e0, 0.0, T, X, dWdT, dWdrhok );
 
   // reaction #18: CH + NO -> NH + CO 
   add_to_dW_fwbw_2r2p ( specCH, specNO,
-                            specNH, specCO, 1.00e+11, 0.0e0, 0.0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+                            specNH, specCO, 1.00e+11, 0.0e0, 0.0, T, X, dWdT, dWdrhok );
 
   // reaction #19: N2 + O -> N + NO 
   add_to_dW_fwbw_2r2p ( specN2, specO,
-                            specN, specNO, 9.00e+13, 0.0e0, 75000.0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+                            specN, specNO, 9.00e+13, 0.0e0, 75000.0, T, X, dWdT, dWdrhok );
 
   // reaction #20: N + O2 -> NO + O 
   add_to_dW_fwbw_2r2p ( specN, specO2,
-                            specNO, specO, 6.30e+09, 1.0e0, 6300.0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+                            specNO, specO, 6.30e+09, 1.0e0, 6300.0, T, X, dWdT, dWdrhok );
 
   // reaction #21: NO + H -> N + OH 
-  add_to_dW_fwbw_2r2p ( specNO, specH, specN, specOH, 1.00e+12, 0.0e0, 0.0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+  add_to_dW_fwbw_2r2p ( specNO, specH, specN, specOH, 1.00e+12, 0.0e0, 0.0, T, X, dWdT, dWdrhok );
 
   // reaction #22: NH + O -> NO + H 
-  add_to_dW_fwbw_2r2p ( specNH, specO, specNO, specH, 2.5e+4, 2.64e0, 0.0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+  add_to_dW_fwbw_2r2p ( specNH, specO, specNO, specH, 2.5e+4, 2.64e0, 0.0, T, X, dWdT, dWdrhok );
 
   // reaction #23:  NH + NO -> N2 + OH
   add_to_dW_fwbw_2r2p ( specNH, specNO,
-                            specN2, specOH, 2.00e+15, -0.8, 0.0, T, X, Gs, dGsdT, dWdT, dWdrhok );
+                            specN2, specOH, 2.00e+15, -0.8, 0.0, T, X, dWdT, dWdrhok );
 
   }
 }

@@ -80,54 +80,51 @@ void add_to_dW_3r3p ( int specR1, int specR2, int specR3, int specP1, int specP2
    E in cal mole^(-1) 
    T in Kelvin
    X in mole/cm3
-   Gs in J/mole
    W in kg m^(-3) s^(-1)
 */
 
 void add_to_W_fwbw_2r1p(int specR1, int specR2,
                             int specP1,
-                            double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t W);
+                            double A, double n, double E, double T, spec_t X, spec_t W);
 
 void add_to_W_fwbw_2r2p(int specR1, int specR2,
                             int specP1, int specP2,
-                            double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t W);
+                            double A, double n, double E, double T, spec_t X, spec_t W);
 
 void add_to_W_fwbw_2r3p(int specR1, int specR2,
                             int specP1, int specP2, int specP3,
-                            double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t W);
+                            double A, double n, double E, double T, spec_t X, spec_t W);
 
 void add_to_W_fwbw_3r2p(int specR1, int specR2, int specR3,
                             int specP1, int specP2,
-                            double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t W);
+                            double A, double n, double E, double T, spec_t X, spec_t W);
 
 /* A in cm^3 (mole s)^(-1) K^(-n) 
    E in cal mole^(-1) 
    T in Kelvin
    X in mole/cm3
-   Gs in J/mole
-   dGsdT in J mole^(-1) K^(-1)
    dWdT in kg m^(-3) s^(-1) K^(-1)
    dWdrhok in s^(-1)
 */
 
 void add_to_dW_fwbw_2r1p(int specR1, int specR2,
                              int specP1, 
-                             double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t dGsdT,
+                             double A, double n, double E, double T, spec_t X, 
                              spec_t dWdT, spec2_t dWdrhok);
 
 void add_to_dW_fwbw_2r2p(int specR1, int specR2,
                              int specP1, int specP2,
-                             double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t dGsdT,
+                             double A, double n, double E, double T, spec_t X, 
                              spec_t dWdT, spec2_t dWdrhok);
 
 void add_to_dW_fwbw_2r3p(int specR1, int specR2,
                              int specP1, int specP2, int specP3,
-                             double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t dGsdT,
+                             double A, double n, double E, double T, spec_t X, 
                              spec_t dWdT, spec2_t dWdrhok);
 
 void add_to_dW_fwbw_3r2p(int specR1, int specR2, int specR3,
                              int specP1, int specP2,
-                             double A, double n, double E, double T, spec_t X, spec_t Gs, spec_t dGsdT,
+                             double A, double n, double E, double T, spec_t X, 
                              spec_t dWdT, spec2_t dWdrhok);
 
 

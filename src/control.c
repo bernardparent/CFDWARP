@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   typedef GRIDG_gl3d_t glgrid_t;
 #endif
 
-#define numbib 40
+#define numbib 42
 #define maxstrlen 4096
 
 typedef char longstr_t[maxstrlen];
@@ -92,7 +92,9 @@ const static longstr_t bibname[numbib]=
    "frankel1950a",
    "gnoffo2004a",
    "parent2017a",
-   "parent2019a"
+   "parent2019a",
+   "lenard1964a",
+   "park1993a"
   };
 
 const static longstr_t bib[numbib]=
@@ -214,7 +216,13 @@ const static longstr_t bib[numbib]=
    "B Parent. \"Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows\", AIAA Journal, 55:141-152, 2017.",
 
    //parent2019a
-   "B Parent. \"Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler Equations\", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019."
+   "B Parent. \"Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler Equations\", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.",
+   
+   //lenard1964a
+   "M Lenard. \"Ionization of Cesium and Sodium Contaminated Air in the Hypersonic Slender Body Boundary Layer\", General Electric Missile and Space Division Technical Report R64SD22, 1964.",
+   
+   //park1993a
+   "C Park. \"Review of Chemical-Kinetic Problems of Future NASA Missions, I: Earth Entries,\" Journal of Thermophysics and Heat Transfer 7:385-398, 1993."
 
   };
 

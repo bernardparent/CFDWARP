@@ -7,6 +7,38 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUL 15a
+  * in model/chem/*/chem.c
+    - in find_W() took away calculations of Gs[k] and took away Gs arguments from add_to_W_fwbw*()
+    - in find_dW_dx() took away calculations of Gs[k] and dGsdT[k] and took away Gs and dGsdt
+      arguments from add_to_dW_fwbw*()
+  * in model/chem/_Air_Plasma_12s_42r_Dunn-Kang-Macheret/chem.hh and
+    model/chem/_H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret/chem.hh
+    - deleted #define _CHEM_SET_TE_TO_T_FOR_FWBW_REACTIONS
+  * in model/chem/_CO2_Plasma_23s_Park/
+    - erased reactions 
+  * in model/chem/_Cs_Air_Plasma_13s_Lenard/chem.hh
+    - added reference [lenard1964a]
+  * in model/fluid/_Favre-Reynolds*/fluid_post.c
+    - in find_post_variable_name_fluid() and find_post_variable_value_fluid()
+      changed mass fraction for number density for the charged species
+  * in model/share/chem_share.c
+    - added functions _Gs() and _dGsdT() which now call _cpk_from_T_equilibrium(), 
+      _hk_from_T_equilibrium(), _sk_from_T_equilibrium(), _dsk_dT_from_T_equilibrium() instead of
+      _cpk_from_T(), _hk_from_T(), _sk_from_T(), _dsk_dT_from_T()
+    - in add_to_W_fwbw*(), got rid of Gs[] parameters and now call _Gs() 
+    - in add_to_dW_fwbw*(), got rid of Gs[] and dGsdT[] parameters and now call _Gs() and _dGsdT()
+  * in model/thermo/_generic/thermo.c
+    - added functions _cpk_from_T_equilibrium(), _hk_from_T_equilibrium(), _sk_from_T_equilibrium(),
+      _dsk_dT_from_T_equilibrium()
+    - in _sk_from_T() and _dsk_dT_from_T(), took away condition dependent on 
+      _CHEM_SET_TE_TO_T_FOR_FWBW_REACTIONS
+  * in src/control.c
+    - added bibs lenard1964a and park1993a
+  * in model/chem/
+    - added _Air_Plasma_11s_Park/  
+
+
 2020 JUL 13a
   * in model/emfield/_Epotential/emfield.c
     - in find_post_variable_value_emfield(), now finds Ve using find_Ve_from_J instead 
