@@ -7,6 +7,49 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUL 21a
+  * in cycle/*/cycle.c
+    - in write_runtime_template(), changed sigma2 to 0.0 from 0.3
+  * in model/emfield/_Epotential-Bfixed/emfield.c
+    - in find_post_variable_value_emfield(), now find Ve using find_Ve_from_J() instead of
+      find_Vk()
+  * in model/emfield/_Epotential/emfield.c
+    - added _Tk_smooth()
+    - in _mu_mem(), changed Tk=max(gl->model.emfield.Te_buffer,Tk); from 
+      Tk=max(Tk,_T(np[l],gl)+gl->model.emfield.Te_buffer);  for the electrons
+    - in _mu_mem(), made mue function of _Tk_smooth()  instead of simply Te at the node
+  * in model/fluid/_Favre-Reynolds_Tv/fluid.c
+    - added TEMODEL_TVEQUILIBRIUM to write_model_fluid_template(), read_model_fluid_actions(),
+      read_model_fluid_actions()
+  * in model/fluid/_Favre-Reynolds_Tv/fluid.h
+    - added definitions for TEMODEL_TEQUILIBRIUM, TEMODEL_TVEQUILIBRIUM
+  * in model/fluid/_Favre-Reynolds_Tv/fluid_source.c
+    - in find_Schem() and find_dSchem_dU(), added code to make T=Tv in case TEMODEL_TVEQUILIBRIUM 
+      is chosen
+  * renamed 
+    - TEMODEL_EQUILIBRIUM to TEMODEL_TEQUILIBRIUM
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - in write_model_fluid_template(), reformat_w(), add_dUstar_to_U(), _relaxTe_effective() 
+      changed wimin, wimax, wemin, wemax to chiimin, chiimax, chiemin, chiemax, 
+    - deleted reformat_rhok_old()
+    - in read_model_fluid_actions() and find_prim_fluid_mem(), add_dUstar_to_U(), added TEMODEL_TVEQUILIBRIUM
+    - in update_Te_local(), took away code for TEMODEL_TEQUILIBRIUM because this function is not
+      called when TEMODEL is TEMODEL_TEQUILIBRIUM or TEMODEL_TVEQUILIBRIUM
+  * in model/fluid/_Navier-Stokes_plasma/fluid_plasma.c
+    - in find_Dstar(), now find Ve using find_Ve_from_Je() instead of find_Ve_from_J()
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - added _Techem()
+    - in find_Se(), changed Ne from _Nesmoothed() to _Nk(np[l],gl,speceminus)
+    - in find_Se() and find_dSe_dU(), added TEMODEL_TVEQUILIBRIUM
+    - in find_Schem() and find_dSchem_dU(), Te is now fixed to _Techem()
+  * in model/share/emfield_share.c
+    - in find_Ve_from_J(), changed the division constant used in notzero from 1e-10 to 1e-30
+    - added find_Ve_from_Je()
+    - rewrote _E_dot_Je_over_mueNe() so that it uses find_Jk_from_Jk_at_interfaces() to find Je
+  * in model/chem/
+    - added _Cs_Air_Plasma_15s_Lenard-Park
+    
+    
 2020 JUL 15a
   * in model/chem/*/chem.c
     - in find_W() took away calculations of Gs[k] and took away Gs arguments from add_to_W_fwbw*()

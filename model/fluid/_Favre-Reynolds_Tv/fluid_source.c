@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/beam/_beam.h>
 #include <model/_model.h>
 #include <model/share/fluid_share.h>
+#include <model/share/chem_share.h>
 
 
 double _tauvt(np_t np, gl_t *gl){
@@ -73,14 +74,26 @@ static void find_Svib(np_t *np, gl_t *gl, long l, flux_t S){
 void find_Schem(np_t *np, gl_t *gl, long l, flux_t S){
   spec_t W,rhok;
   long flux,spec;
-  double EoverN;
+  double EoverN,Te;
 
   for (flux=0; flux<nf; flux++){
     S[flux]=0.0;
   }
   EoverN=0.0;
   for (spec=0; spec<ns; spec++) rhok[spec]=_rhok(np[l],spec);
-  find_W(rhok, _T(np[l],gl), _T(np[l],gl), _Tv(np[l]), EoverN, _Qbeam(np[l],gl), W);
+  switch (gl->model.fluid.TEMODEL){ 
+    case TEMODEL_TEQUILIBRIUM:
+      Te=_T(np[l],gl);
+    break;
+    case TEMODEL_TVEQUILIBRIUM:
+      Te=_Tv(np[l]);
+    break;
+    default:
+      Te=0.0;  // needed to avoid warning about unitialized Te
+      fatal_error("Problem with TEMODEL in find_Schem().");
+  }  
+  
+  find_W(rhok, _T(np[l],gl), Te, _Tv(np[l]), EoverN, _Qbeam(np[l],gl), W);
   for (spec=0; spec<ns; spec++){
     S[spec]=W[spec];
   }
@@ -193,7 +206,16 @@ static void find_dSchem_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
            dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam);
   find_dT_dU(np[l], gl, dTdU);
   find_dTv_dU(np[l], gl, dTvdU);
-  find_dT_dU(np[l], gl, dTedU);
+  switch (gl->model.fluid.TEMODEL){ 
+    case TEMODEL_TEQUILIBRIUM:
+      find_dT_dU(np[l], gl, dTedU);
+    break;
+    case TEMODEL_TVEQUILIBRIUM:
+      find_dTv_dU(np[l], gl, dTedU);
+    break;
+    default:
+      fatal_error("Problem with TEMODEL in find_dSchem_dU().");
+  }  
   for ( k = 0; k < nf; k++ ){
     for ( s = 0; s < nf; s++ ){
       dS_dU[k][s]=0.0e0;

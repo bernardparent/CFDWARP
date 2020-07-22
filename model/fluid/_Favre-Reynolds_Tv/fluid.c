@@ -56,6 +56,7 @@ void write_model_fluid_template(FILE **controlfile){
     "    RAPCOMP=NO;\n"
     "    TURBSOURCE=YES;\n"
     "    N2VIBMODEL=N2VIBMODEL_MACHERET;\n"
+    "    TEMODEL=TEMODEL_TEQUILIBRIUM;\n" 
     "    REACTING=YES;\n"
     "    Prt=0.9e0;\n"
     "    Sct=1.0e0;\n"
@@ -133,6 +134,8 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
     SOAP_add_int_to_vars(codex,"TURBMODEL_KOMEGA2008",TURBMODEL_KOMEGA2008); 
     SOAP_add_int_to_vars(codex,"N2VIBMODEL_MACHERET",N2VIBMODEL_MACHERET);
     SOAP_add_int_to_vars(codex,"N2VIBMODEL_MILLIKAN",N2VIBMODEL_MILLIKAN);
+    SOAP_add_int_to_vars(codex,"TEMODEL_TEQUILIBRIUM",TEMODEL_TEQUILIBRIUM);
+    SOAP_add_int_to_vars(codex,"TEMODEL_TVEQUILIBRIUM",TEMODEL_TVEQUILIBRIUM);
 
     gl->MODEL_FLUID_READ=TRUE;
 
@@ -163,6 +166,9 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
     find_int_var_from_codex(codex,"N2VIBMODEL",&gl->model.fluid.N2VIBMODEL);
     if (gl->model.fluid.N2VIBMODEL!=N2VIBMODEL_MACHERET && gl->model.fluid.N2VIBMODEL!=N2VIBMODEL_MILLIKAN)
       SOAP_fatal_error(codex,"N2VIBMODEL must be set to either N2VIBMODEL_MACHERET or N2VIBMODEL_MILLIKAN.");
+    find_int_var_from_codex(codex,"TEMODEL",&gl->model.fluid.TEMODEL);
+    if (gl->model.fluid.TEMODEL!=TEMODEL_TEQUILIBRIUM && gl->model.fluid.TEMODEL!=TEMODEL_TVEQUILIBRIUM)
+      SOAP_fatal_error(codex,"TEMODEL must be set to either TEMODEL_TEQUILIBRIUM or TEMODEL_TVEQUILIBRIUM.");
     find_int_var_from_codex(codex,"TURBMODEL",&gl->model.fluid.TURBMODEL);
     if (gl->model.fluid.TURBMODEL!=TURBMODEL_KEPSILON && gl->model.fluid.TURBMODEL!=TURBMODEL_KOMEGA1988 && gl->model.fluid.TURBMODEL!=TURBMODEL_KOMEGA2008)
       SOAP_fatal_error(codex,"TURBMODEL must be set to either TURBMODEL_KEPSILON or TURBMODEL_KOMEGA1988 or TURBMODEL_KOMEGA2008.");

@@ -45,7 +45,7 @@ void write_runtime_template(FILE **controlfile){
   "    );\n"
 #endif
   "    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}\n"
-  "    sigma2=0.3;   {exponent of maximum pseudotime step in all fluxes}\n"
+  "    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}\n"
   "    if (iter==1,\n"
   "      CFL=0.1;\n"
   "    );\n"

@@ -51,6 +51,6 @@ typedef struct {
   double Pmin,Pmax,Tmin,Tmax,wmin,kmin,kmax,
          psimin,psimax,aref,Eref,evref,kref,psiref,
          Tvmin,Tvmax,Twmin,Twmax;
-  int DILATDISSIP,TURBMODEL,N2VIBMODEL;
+  int DILATDISSIP,TURBMODEL,N2VIBMODEL,TEMODEL;
 } gl_model_fluid_t;
 
