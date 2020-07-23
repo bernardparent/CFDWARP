@@ -7,6 +7,31 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUL 22a
+  * in model/emfield/_Epotential-Bfixed/emfield.c
+    - added _Tk_smooth()
+    - in find_Ek_muk_mem(), now calls _Tk_smooth() instead of _Tk() for electrons
+  * in model/fluid/_Favre-Reynolds_plasma/fluid.c
+    - in write_model_fluid_template(), reformat_w(), add_dUstar_to_U(),  
+      changed wimin, wimax, wemin, wemax to chiimin, chiimax, chiemin, chiemax 
+    - deleted reformat_rhok_old()
+  * in model/fluid/_Favre-Reynolds_plasma/fluid_plasma.c
+    - in find_Dstar(), now find Ve using find_Ve_from_Je() instead of find_Ve_from_J()
+  * in model/fluid/_Favre-Reynolds_plasma/fluid_source.c
+    - in find_Se() and find_dSe_dU_transport(), changed Ne from _Nesmoothed() to _Nk(np[l],gl,speceminus)
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - in add_dUstar_to_U(), added a missing switch case for TEMODEL_TRANSPORT 
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Se() and find_dSe_dU(), added missing switch case for TEMODEL_CONSTANT
+    - in find_dSe_dU_transport(), changed Ne from _Nesmoothed() to _Nk(np[l],gl,speceminus)
+  * in model/thermo/_generic/thermo.c
+    - fixed bug in species NCO NASA Glenn enthalpy polynomial for the third set of coefficients
+  * in model/chem/_H2_Air_9s_Smith/doc/report.tex
+    - added Smith reactions from Ajjay Omprakas
+  * in model/emfield/_Epotential/emfield.c
+    - in _mu_mem(), added a clip to Te with Te_buffer even when node is not inner
+
+
 2020 JUL 21a
   * in cycle/*/cycle.c
     - in write_runtime_template(), changed sigma2 to 0.0 from 0.3
@@ -29,7 +54,7 @@ ________________________________________________________________________________
   * renamed 
     - TEMODEL_EQUILIBRIUM to TEMODEL_TEQUILIBRIUM
   * in model/fluid/_Navier-Stokes_plasma/fluid.c
-    - in write_model_fluid_template(), reformat_w(), add_dUstar_to_U(), _relaxTe_effective() 
+    - in write_model_fluid_template(), reformat_w(), add_dUstar_to_U(),  
       changed wimin, wimax, wemin, wemax to chiimin, chiimax, chiemin, chiemax, 
     - deleted reformat_rhok_old()
     - in read_model_fluid_actions() and find_prim_fluid_mem(), add_dUstar_to_U(), added TEMODEL_TVEQUILIBRIUM

@@ -49,11 +49,11 @@
 
 
 \author{
-  Bernard Parent 
+  Ajjay Omprakas 
 }
 
 \email{
-  bernparent@gmail.com
+  ajjayomprakas@gmail.com
 }
 
 \department{
@@ -64,11 +64,11 @@
   University of Arizona
 }
 
-\title{Dunn-Kang Air Plasma Kinetics for Re-Entry Flows
+\title{Hydrogen - Air High pressure combustion reaction mechanism
 }
 
 \date{
-  December 2019
+  June 2020
 }
 
 %\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
@@ -112,45 +112,45 @@ abstract
 \fontsizetable
 \begin{center}
 \begin{threeparttable}
-\tablecaption{Dunn-Kang 11-species 31-reaction high-temperature air model \cite{nasa:1973:dunn,aiaaconf:1987:Bussing}.}
+\tablecaption{Hydrogen - Air High pressure combustion reaction mechanism \cite{GRImech}.}
 \begin{tabular}{ccccc} 
 \toprule
 \multicolumn{2}{c}{Reaction} & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole  \\ 
 \midrule
-(1) & $\rm O_2 + N \rightleftarrows 2O+N$ & 3.6 $\times$ 10$^{18}$  & -1 & 118,800 \\
-(2) & $\rm O_2 + NO \rightleftarrows 2O+NO$ & 3.6 $\times$ 10$^{18}$ & -1 & 118,800 \\
-(3) & $\rm N_2 + O \rightleftarrows 2N+O$ & 1.9 $\times$ 10$^{17}$ & -0.5 & 226,000 \\
-(4) & $\rm N_2 + NO \rightleftarrows 2N+NO$ & 1.9 $\times$ 10$^{17}$ & -0.5 & 226,000 \\
-(5) & $\rm N_2 + O_2 \rightleftarrows 2N+O_2$ & 1.9 $\times$ 10$^{17}$ & -0.5 & 226,000 \\
-(6) & $\rm NO + O_2 \rightleftarrows N+O+O_2$ & 3.9 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
-(7) & $\rm NO + N_2 \rightleftarrows N+O+N_2$ & 3.9 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
-(8) & $\rm O + NO \rightleftarrows N+O_2$ & 3.2 $\times$ 10$^{9}$ & 1 & 39,400 \\
-(9) & $\rm O + N_2 \rightleftarrows N+NO$ & 7 $\times$ 10$^{13}$ & 0 & 76,000 \\
-(10) & $\rm N + N_2 \rightleftarrows 2N+N$ & 4.085 $\times$ 10$^{22}$ & -1.5 & 226,000 \\
-(11) & $\rm O + N \rightleftarrows NO^{+}+e^{-}$ & 1.4 $\times$ 10$^{6}$ & 1.5 & 63,800 \\
-(12) & $\rm O + e^- \rightleftarrows O^++2e^-$ & 3.6 $\times$ 10$^{31}$ & -2.91 & 316,000 \\
-(13) & $\rm N + e^- \rightleftarrows N^++2e^-$ & 1.1 $\times$ 10$^{32}$ & -3.14 & 338,000 \\
-(14) & $\rm O + O \rightleftarrows O_2^{+}+e^-$ & 1.6 $\times$ 10$^{17}$ & -0.98 & 161,600 \\
-(15) & $\rm O + O_2^+ \rightleftarrows O_2+O^+$ & 2.92 $\times$ 10$^{18}$ & -1.11 & 56,000 \\
-(16) & $\rm N_2 + N^+ \rightleftarrows N+N_2^{+}$ & 2.02 $\times$ 10$^{11}$ & 0.81 & 26,000 \\
-(17) & $\rm N + N \rightleftarrows N_2^{+} + e^-$ & 1.4 $\times$ 10$^{13}$ & 0 & 135,600 \\
-(18) & $\rm O + NO^+ \rightleftarrows NO + O^+$ & 3.63 $\times$ 10$^{15}$ & -0.6 & 101,600 \\
-(19) & $\rm N_2 + O^+ \rightleftarrows O + N_2^{+}$ & 3.4 $\times$ 10$^{19}$ & -2 & 46,000 \\
-(20) & $\rm N + NO^+ \rightleftarrows NO + N^+$ & 1 $\times$ 10$^{19}$ & -0.93 & 122,000 \\
-(21) & $\rm O_2 + NO^+ \rightleftarrows NO + O_2^{+}$ & 1.8 $\times$ 10$^{15}$ & 0.17 & 66,000 \\
-(22) & $\rm O + NO^+ \rightleftarrows O_2 + N^+$ & 1.34 $\times$ 10$^{13}$ & 0.31 & 154,540 \\
-(23) & $\rm O_2 + O \rightleftarrows 2O + O$ & 9 $\times$ 10$^{19}$ & -1 & 119,000 \\
-(24) & $\rm O_2 + O_2 \rightleftarrows 2O + O_2$ & 3.24 $\times$ 10$^{19}$ & -1 & 119,000 \\
-(25) & $\rm O_2 + N_2 \rightleftarrows 2O + N_2$ & 7.2 $\times$ 10$^{18}$ & -1 & 119,000 \\
-(26) & $\rm N_2 + N_2 \rightleftarrows 2N + N_2$ & 4.7 $\times$ 10$^{17}$ & -0.5 & 226,000 \\
-(27) & $\rm NO + O \rightleftarrows N + 2O$ & 7.8 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
-(28) & $\rm NO + N \rightleftarrows O + 2N$ & 7.8 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
-(29) & $\rm NO + NO \rightleftarrows N + O + NO$ & 7.8 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
-(30) & $\rm O2 + N2 \rightleftarrows NO + NO^+ + e^-$ & 1.38 $\times$ 10$^{20}$ & -1.84 & 282,000 \\
-(31) & $\rm NO + N2 \rightleftarrows NO^+ + e^- + N_2$ & 2.2 $\times$ 10$^{15}$ & -0.35 & 216,000 \\
+    1$^a$ & $\rm 2O + M2 \rightleftarrows  O_2 + M2$&$1.2 \times 10^{17}$& -1.0 &  0\\
+    2$^a$ & $\rm O +  H + M2 \rightleftarrows  OH + M2$  & $ 5 \times 10^{17} $& -1.0 &  0\\
+    3& $\rm O +  H_2  \rightleftarrows  OH + H$  & $ 3.87 \times 10^{4} $& 2.7 & 6260 \\
+    4 & $\rm O +  HO_2  \rightleftarrows  OH + O_2$  & $ 2.0 \times 10^{13} $& 0 & 0 \\
+    5 & $\rm O +  H_2O_2  \rightleftarrows  OH + HO_2$  & $ 9.63 \times 10^{6} $& 2.0 & 4000  \\
+    6$^b$ & $\rm H + O_2 + M1  \rightleftarrows  HO_2 + M1$  & $ 2.8 \times 10^{18} $& -0.862 & 0 \\
+    7 & $\rm H + 2O_2  \rightleftarrows  HO_2 + O_2$  & $ 2.8 \times 10^{19} $& -1.24 & 0 \\
+    8 & $\rm H + O_2 + H_2O  \rightleftarrows  HO_2 + H_2O$  & $ 11.26 \times 10^{18} $& -0.76 & 0 \\
+    9 & $\rm H + O_2 + N_2  \rightleftarrows  HO_2 + N_2$  & $ 2.6 \times 10^{19} $& -1.24 & 0 \\
+    10 & $\rm H + O_2 \rightleftarrows  OH + O$  & $ 2.65 \times 10^{16} $& -0.6707 & 17041 \\
+    11$^a$ & $\rm 2H + M2 \rightleftarrows  H_2 + M2$  & $ 1.0 \times 10^{18} $& -1.0 & 0 \\
+    12 & $\rm 2H + H_2 \rightleftarrows  2H_2 $  & $ 9.0 \times 10^{16} $& -0.6 & 0 \\
+    13 & $\rm 2H + H_2O \rightleftarrows  H_2 + H_2O$  & $ 6.0 \times 10^{19} $& -1.25 & 0 \\
+    14$^a$ & $\rm H + OH + M2 \rightleftarrows  H_2O + M2$  & $ 2.2 \times 10^{22} $& -2.0 & 0 \\
+    15 & $\rm H + HO_2 \rightleftarrows  H_2O + O$  & $ 3.97 \times 10^{12} $& 0 & 671 \\
+    16 & $\rm H + HO_2 \rightleftarrows  OH + OH$  & $ 0.84 \times 10^{14} $& 0 & 635 \\
+    17 & $\rm H + H_2O_2 \rightleftarrows  HO_2 + H_2$  & $ 1.2 \times 10^{7} $& 2.0 & 5200 \\
+    18 & $\rm H + H_2O_2 \rightleftarrows  OH + H_2O$  & $ 1 \times 10^{13} $& 0 & 3600 \\
+    19 & $\rm OH + H_2 \rightleftarrows  H + H_2O$  & $ 2.16 \times 10^{08} $& 1.510 & 3430 \\
+    20$^a$ & $\rm 2OH + M2 \rightleftarrows  H_2O_2 + M2$  & $ 7.4 \times 10^{13} $& -0.371 & 0 \\
+    21 & $\rm 2OH \rightleftarrows  H_2O + O$  & $ 3.57 \times 10^{04} $& 2.4 & -2100 \\
+    22 & $\rm OH + HO_2 \rightleftarrows  H_2O + O_2$  & $ 1.45 \times 10^{13} $& 0 & -500 \\
+    23 & $\rm OH + H_2O_2 \rightleftarrows  H_2O + HO_2$  & $ 2.0 \times 10^{12} $& 0 & 427 \\
+    24 & $\rm OH + H_2O_2 \rightleftarrows  H_2O + HO_2$  & $ 1.7 \times 10^{18} $& 0 & 29410  \\
+    25 & $\rm HO_2 + HO_2 \rightleftarrows  O_2 + H_2O_2$  & $ 1.3 \times 10^{11} $& 0 & -1630  \\
+    26 & $\rm HO_2 + HO_2 \rightleftarrows  O_2 + H_2O_2$  & $ 4.2 \times 10^{14} $& 0 & 12000  \\
+    27 & $\rm OH + HO_2 \rightleftarrows  O_2 + H_2O$  & $ 0.5 \times 10^{16} $& -1.0 & 17330  \\
 \bottomrule
 \end{tabular}
-\label{tab:dunn-kang}
+\label{tab:smith-reaction}
+\begin{tablenotes}
+\item[{a}] The reaction includes third body were M1 is taken to be H$_2$O, N$_2$, O$_2$
+\item[{b}] The reaction includes third body were M2 is taken to be H$_2$O, N$_2$, H$_2$\\
+\end{tablenotes}
 \end{threeparttable}
 \end{center}
 \end{table}
