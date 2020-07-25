@@ -1,5 +1,5 @@
 #define _CHEM_CSAIRPLASMA
-#define _CHEM_METHOD "CO2 Plasma 23s Park"
+#define _CHEM_METHOD "CO2 Plasma 23s Park [park1994a]"
 #define _CHEM_PLASMA
 
 #define CHEM_NEUTRAL FALSE
@@ -59,7 +59,19 @@ const static long smap[ns] = {
   SMAP_O2plus,
   SMAP_CNplus,
   SMAP_COplus,
-  SMAP_NOplus
+  SMAP_NOplus,  
+  SMAP_C2,
+  SMAP_Ar,
+  SMAP_C,
+  SMAP_N,
+  SMAP_O,
+  SMAP_N2,
+  SMAP_O2,
+  SMAP_CN,
+  SMAP_CO,
+  SMAP_NO,
+  SMAP_CO2,
+  SMAP_NCO
 };
 
 const static long speciestype[ns] = {
@@ -73,7 +85,19 @@ const static long speciestype[ns] = {
   SPECIES_IONPLUS,
   SPECIES_IONPLUS,
   SPECIES_IONPLUS,
-  SPECIES_IONPLUS
+  SPECIES_IONPLUS,
+  SPECIES_NEUTRAL,
+  SPECIES_NEUTRAL,
+  SPECIES_NEUTRAL,
+  SPECIES_NEUTRAL,
+  SPECIES_NEUTRAL,
+  SPECIES_NEUTRAL,
+  SPECIES_NEUTRAL,
+  SPECIES_NEUTRAL,
+  SPECIES_NEUTRAL,
+  SPECIES_NEUTRAL,
+  SPECIES_NEUTRAL,
+  SPECIES_NEUTRAL
 };
 
 

@@ -65,6 +65,11 @@ NGUYEN, Van Tien
     opm flag (see changes for version 19apr20a) 
 
 
+OMPRAKAS, Ajjay
+
+  - addition of Smith H2-Air chemical model in model/chem/_H2_Air_9s_Smith
+  
+
 PADMANABHAN, Sathyan 
 
   - tools/tauvt.c
@@ -101,6 +106,7 @@ TRINH, AARON
 
   - addition of species  Ar, C, C2, CN, NCO, Ar+, C+, C2+, CN+, CO+ in model/thermo/_generic/thermo.c 
   
+  - implementation of Park's Mars entry model in model/chem/_CO2_Plasma_23s_Park/
 
  
 WEERAKOON, Minindu

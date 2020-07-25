@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   typedef GRIDG_gl3d_t glgrid_t;
 #endif
 
-#define numbib 42
+#define numbib 44
 #define maxstrlen 4096
 
 typedef char longstr_t[maxstrlen];
@@ -94,7 +94,9 @@ const static longstr_t bibname[numbib]=
    "parent2017a",
    "parent2019a",
    "lenard1964a",
-   "park1993a"
+   "park1993a",
+   "park1994a",
+   "smith1999a"
   };
 
 const static longstr_t bib[numbib]=
@@ -222,7 +224,13 @@ const static longstr_t bib[numbib]=
    "M Lenard. \"Ionization of Cesium and Sodium Contaminated Air in the Hypersonic Slender Body Boundary Layer\", General Electric Missile and Space Division Technical Report R64SD22, 1964.",
    
    //park1993a
-   "C Park. \"Review of Chemical-Kinetic Problems of Future NASA Missions, I: Earth Entries,\" Journal of Thermophysics and Heat Transfer 7:385-398, 1993."
+   "C Park. \"Review of Chemical-Kinetic Problems of Future NASA Missions, I: Earth Entries,\" Journal of Thermophysics and Heat Transfer 7:385-398, 1993.",
+   
+   //park1994a
+   "C Park, JT Howe, and RL Jaffe, \"Review of Chemical-Kinetic Problems of Future NASA Missions, II; Mars Entries,\" Journal of Thermophysics and Heat Transfer, 8:9-12, 1994.",
+   
+   //smith1999a
+   "G Smith, D Golden, M Frenklach, N Moriarty, B Eiteneer, B Goldenberg, C Bowman, R Hanson, S Song, W Gardiner, V Lissianski, and Q Zhiwei, \"GRIMech 3.0, Chemical Kinetic Mechanism\", 1999."
 
   };
 

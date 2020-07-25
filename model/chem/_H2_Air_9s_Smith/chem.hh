@@ -1,5 +1,5 @@
 #define _CHEM_H2_AIR_9S_SMITH
-#define _CHEM_METHOD "H2-Air 9 species Smith"
+#define _CHEM_METHOD "H2-Air 9 species Smith [smith1999a]"
 
 #define CHEM_NEUTRAL TRUE
 #define ns 9

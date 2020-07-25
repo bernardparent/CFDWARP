@@ -1,7 +1,7 @@
 /*
 SPDX-License-Identifier: BSD-2-Clause
 
-Copyright 2020 Bernard Parent
+Copyright 2020 Aaron Trinh
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /* set all reactions to true except for testing purposes */
-const static bool REACTION[43]=
+const static bool REACTION[44]=
   {
    TRUE, /* reaction 0 */
    TRUE, /* reaction 1 */
@@ -83,27 +83,203 @@ const static bool REACTION[43]=
    TRUE, /* reaction 40 */
    TRUE, /* reaction 41 */
    TRUE, /* reaction 42 */
+   TRUE  /* reaction 43 */
   };
 
 #define specEND -1
 
+const static long specM1[]=
+  {
+    specAr, specC, specN, specO, specC2, specN2, specO2, specCN, specCO, specNO, specCO2, specNCO,
+    specArplus, specCplus, specNplus, specOplus, specC2plus, specN2plus, specO2plus, specCNplus,
+    specCOplus, specNOplus, specEND
+  };
+  
+const static long specM2[]=
+  {
+    specAr, specC2, specN2, specO2, specCN, specCO, specNO, specCO2, specEND
+  };
+  
+const static long specM3[]=
+  {
+    specC, specN, specO, specEND
+  };
+
+const static long specM4[]=
+  {
+    specAr, specC2, specN2, specO2, specCN, specCO, specEND
+  };
+  
+const static long specM5[]=
+  {
+    specC, specN, specO, specNO, specCO2, specEND
+  };
+  
+const static long specM6[]=
+  {
+    specC2, specN2, specO2, specCN, specCO, specNO, specCO2, specEND
+  };
 
 void find_W (spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W) {
   double N[ns];
-  double theta,kf;
+  double theta,kf,Ta;
   long k;
   double R;
-  
+  spec_t X;  
 
   /* find properties needed by add_to_W* functions */
   R = 1.9872;
+  Ta=sqrt(T*Tv);
   for (k = 0; k < ns; k++) {
+    X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
     W[k] = 0.0;
     N[k] = rhok[k] / _calM (k ) * 1.0e-6 * calA;  /* particules/cm^3 */
   }
   Estar = max (Estarmin, Estar);
   theta = log (Estar);
 
+  
+  if (REACTION[1])
+    for (k = 0; specM1[k]!=specEND; k++)
+      add_to_W_fwbw_2r3p (specC2, specM1[k], specC, specC, specM1[k], 3.7e14, 0.0, 69900.0*R, Ta, X, W);   
+  
+  if (REACTION[2])
+    for (k = 0; specM2[k]!=specEND; k++)
+      add_to_W_fwbw_2r3p (specN2, specM2[k], specN, specN, specM2[k], 7.0e21, -1.60, 69900.0*R, Ta, X, W);   
+  
+  if (REACTION[3])    
+    for (k = 0; specM3[k]!=specEND; k++)
+      add_to_W_fwbw_2r3p (specN2, specM3[k], specN, specN, specM3[k], 3.0e22, -1.60, 113200.0*R, Ta, X, W);   
+  
+  if (REACTION[4])
+    add_to_W_fwbw_2r3p (specN2, speceminus, specN, specN, speceminus, 1.2e25, -1.60, 113200.0*R, Ta, X, W);   
+  
+  if (REACTION[5])
+    for (k = 0; specM2[k]!=specEND; k++)
+      add_to_W_fwbw_2r3p (specO2, specM2[k], specO, specO, specM2[k], 2.0e21, -1.50, 59750.0*R, Ta, X, W);  
+  
+  if (REACTION[6])
+    for (k = 0; specM3[k]!=specEND; k++)
+      add_to_W_fwbw_2r3p (specO2, specM3[k], specO, specO, specM3[k], 1.0e22, -1.50, 59750.0*R, Ta, X, W);   
+  
+  if (REACTION[7])
+    for (k = 0; specM1[k]!=specEND; k++)
+      add_to_W_fwbw_2r3p (specCN, specM1[k], specC, specN, specM1[k], 2.5e14, 0.00, 71000.0*R, Ta, X, W);   
+  
+  if (REACTION[8])
+    add_to_W_fwbw_2r3p (specCO, specAr, specC, specO, specAr, 2.3e19, -1.00, 129000.0*R, Ta, X, W);
+  
+  if (REACTION[9])
+    for (k = 0; specM2[k]!=specEND; k++)
+      add_to_W_fwbw_2r3p (specCO, specM2[k], specC, specO, specM2[k], 3.4e20, -1.00, 129000.0*R, Ta, X, W);   
+  
+  if (REACTION[10])
+    for (k = 0; specM3[k]!=specEND; k++)
+      add_to_W_fwbw_2r3p (specCO, specM3[k], specC, specO, specM3[k], 2.3e20, -1.00, 129000.0*R, Ta, X, W);   
+  
+  if (REACTION[11])
+    for (k = 0; specM4[k]!=specEND; k++)
+      add_to_W_fwbw_2r3p (specNO, specM4[k], specN, specO, specM4[k], 5.0e15, 0.00, 75500.0*R, Ta, X, W);   
+  
+  if (REACTION[12])
+    for (k = 0; specM5[k]!=specEND; k++)
+      add_to_W_fwbw_2r3p (specNO, specM5[k], specN, specO, specM5[k], 1.1e17, 0.00, 75500.0*R, Ta, X, W);   
+  
+  if (REACTION[13])
+    add_to_W_fwbw_2r3p (specCO2, specAr, specCO, specO, specAr, 6.9e20, -1.50, 63275.0*R, Ta, N, W);
+  
+  if (REACTION[14])
+    for (k = 0; specM3[k]!=specEND; k++)
+      add_to_W_fwbw_2r3p (specCO2, specM3[k], specCO, specO, specM3[k], 1.4e22, -1.00, 63275.0*R, Ta, X, W);   
+  
+  if (REACTION[15])
+    for (k = 0; specM6[k]!=specEND; k++)
+      add_to_W_fwbw_2r3p (specCO2, specM6[k], specCO, specO, specM6[k], 6.9e21, -1.00, 63275.0*R, Ta, X, W);   
+  
+  if (REACTION[16])
+    for (k = 0; specM1[k]!=specEND; k++)
+      add_to_W_fwbw_2r3p (specNCO, specM1[k], specCO, specN, specM1[k], 6.3e16, -0.50, 24000.0*R, Ta, X, W);   
+  
+  if (REACTION[17])
+    add_to_W_fwbw_2r2p (specNO, specO, specN, specO2, 8.4e12, 0.00, 19450.0*R, T, X, W);
+
+  if (REACTION[18])
+    add_to_W_fwbw_2r2p (specN2, specO, specNO, specN, 6.4e17, -1.00, 38370.0*R, T, X, W);
+
+  if (REACTION[19])
+    add_to_W_fwbw_2r2p (specCO, specO, specC, specO2, 3.9e13, -0.18, 69200.0*R, T, X, W);
+    
+  if (REACTION[20])
+    add_to_W_fwbw_2r2p (specCO, specC, specC2, specO, 2.0e17, -1.00, 58000.0*R, T, X, W);
+    
+  if (REACTION[21])
+    add_to_W_fwbw_2r2p (specCO, specN, specCN, specO, 1.0e14, 0.00, 38600.0*R, T, X, W);
+
+  if (REACTION[22])
+    add_to_W_fwbw_2r2p (specN2, specC, specCN, specN, 1.1e14, -0.11, 23200.0*R, T, X, W);
+
+  if (REACTION[23])
+    add_to_W_fwbw_2r2p (specCN, specO, specNO, specC, 1.6e13, 0.10, 14600.0*R, T, X, W);
+    
+  if (REACTION[24])
+    add_to_W_fwbw_2r2p (specCN, specC, specC2, specN, 5.0e13, 0.00, 13000.0*R, T, X, W);
+    
+  if (REACTION[25])
+    add_to_W_fwbw_2r2p (specCO2, specO, specO2, specCO, 2.1e13, 0.00, 27800.0*R, T, X, W);
+
+  if (REACTION[26])
+    add_to_W_fwbw_2r2p (specCN, specO2, specNCO, specO, 6.6e12, 0.00, -200.0*R, T, X, W);
+
+  if (REACTION[27])
+    add_to_W_fwbw_2r2p (specCN, specCO2, specNCO, specCO, 4.0e14, 0.00, 19200.0*R, T, X, W);
+    
+  if (REACTION[28])
+    add_to_W_fwbw_2r2p (specCN, specNO, specNCO, specN, 1.0e14, 0.00, 21200.0*R, T, X, W);
+    
+  if (REACTION[29])
+    add_to_W_fwbw_2r2p (specCO, specNO, specNCO, specO, 3.8e17, -0.873, 51600.0*R, T, X, W);
+
+  if (REACTION[30])
+    add_to_W_fwbw_2r2p (specCN, specCO, specNCO, specC, 1.5e16, -0.487, 65800.0*R, T, X, W);
+    
+  if (REACTION[31])
+    add_to_W_fwbw_2r2p (specN, specO, specNOplus, speceminus, 8.8e8, 1.00, 31900.0*R, T, X, W);
+    
+  if (REACTION[32])
+    add_to_W_fwbw_2r2p (specO, specO, specO2plus, speceminus, 7.1e2, 2.70, 80600.0*R, T, X, W);
+    
+  if (REACTION[33])
+    add_to_W_fwbw_2r2p (specC, specO, specCOplus, speceminus, 8.8e8, 1.00, 33100.0*R, T, X, W);
+
+  if (REACTION[34])
+    add_to_W_fwbw_2r2p (specNOplus, specC, specNO, specCplus, 1.0e13, 0.00, 23200.0*R, T, X, W);
+
+  if (REACTION[35])
+    add_to_W_fwbw_2r2p (specO2plus, specO, specOplus, specO2, 4.0e12, -0.09, 18000.0*R, T, X, W);
+    
+  if (REACTION[36])
+    add_to_W_fwbw_2r2p (specNOplus, specN, specOplus, specN2, 3.4e13, -1.08, 12800.0*R, T, X, W);
+    
+  if (REACTION[37])
+    add_to_W_fwbw_2r2p (specNOplus, specO, specO2plus, specN, 7.2e12, 0.29, 48600.0*R, T, X, W);
+
+  if (REACTION[38])
+    add_to_W_fwbw_2r2p (specCO, specCplus, specCOplus, specC, 1.0e13, 0.00, 31400.0*R, T, X, W);
+
+  if (REACTION[39])
+    add_to_W_fwbw_2r2p (specO2, specCplus, specO2plus, specC, 1.0e13, 0.00, 9400.0*R, T, X, W);
+    
+  if (REACTION[40])
+    add_to_W_fwbw_2r3p (specC, speceminus, specCplus, speceminus, speceminus, 3.9e33, -3.78, 130700.0*R, Tv, X, W);
+    
+  if (REACTION[41])
+    add_to_W_fwbw_2r3p (specO, speceminus, specOplus, speceminus, speceminus, 3.9e33, -3.78, 158500.0*R, Tv, X, W);
+
+  if (REACTION[42])
+    add_to_W_fwbw_2r1p (specOplus, speceminus, specO, 1.07e11, -0.52, 0.00, Tv, X, W);
+    
+  if (REACTION[43])
+    add_to_W_fwbw_2r1p (specCplus, speceminus, specC, 2.02e11, -0.46, 0.00, Tv, X, W);
   
 }
 
@@ -116,14 +292,21 @@ void find_W (spec_t rhok, double T, double Te, double Tv, double Estar, double Q
 
 void find_dW_dx (spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam) {
-  long k, s;                    
+  long k, s, spec;                    
+  spec_t dWdTa;
+  spec_t X;
   spec_t N;
-  double R,theta,kf,dkfdTe,dkfdT,dkfdTv;
+  double Ta,R,theta,kf,dkfdTe,dkfdT,dkfdTv,dTadTv,dTadT;
   
+  for ( k = 0; k < ns; k++ ) {
+    X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
+  }
   
   R=1.9872;
+  Ta=sqrt(T*Tv);
   /* initialize all derivatives to zero */
   for (s = 0; s < ns; s++) {
+    dWdTa[s] = 0.0;
     dWdT[s] = 0.0;
     dWdTe[s] = 0.0;
     dWdTv[s] = 0.0;
@@ -140,9 +323,175 @@ void find_dW_dx (spec_t rhok, spec_t mu, double T, double Te, double Tv, double 
   Estar = max (Estarmin, Estar);
   theta = log (Estar);
 
+  if (REACTION[1])
+    for (k = 0; specM1[k]!=specEND; k++)
+      add_to_dW_fwbw_2r3p (specC2, specM1[k], specC, specC, specM1[k], 3.7e14, 0.0, 69900.0*R, Ta, X, dWdTa, dWdrhok);   
+  
+  if (REACTION[2])
+    for (k = 0; specM2[k]!=specEND; k++)
+      add_to_dW_fwbw_2r3p (specN2, specM2[k], specN, specN, specM2[k], 7.0e21, -1.60, 69900.0*R, Ta, X, dWdTa, dWdrhok);   
+  
+  if (REACTION[3])    
+    for (k = 0; specM3[k]!=specEND; k++)
+      add_to_dW_fwbw_2r3p (specN2, specM3[k], specN, specN, specM3[k], 3.0e22, -1.60, 113200.0*R, Ta, X, dWdTa, dWdrhok);   
+  
+  if (REACTION[4])
+    add_to_dW_fwbw_2r3p (specN2, speceminus, specN, specN, speceminus, 1.2e25, -1.60, 113200.0*R, Ta, X, dWdTa, dWdrhok);   
+  
+  if (REACTION[5])
+    for (k = 0; specM2[k]!=specEND; k++)
+      add_to_dW_fwbw_2r3p (specO2, specM2[k], specO, specO, specM2[k], 2.0e21, -1.50, 59750.0*R, Ta, X, dWdTa, dWdrhok);  
+  
+  if (REACTION[6])
+    for (k = 0; specM3[k]!=specEND; k++)
+      add_to_dW_fwbw_2r3p (specO2, specM3[k], specO, specO, specM3[k], 1.0e22, -1.50, 59750.0*R, Ta, X, dWdTa, dWdrhok);   
+  
+  if (REACTION[7])
+    for (k = 0; specM1[k]!=specEND; k++)
+      add_to_dW_fwbw_2r3p (specCN, specM1[k], specC, specN, specM1[k], 2.5e14, 0.00, 71000.0*R, Ta, X, dWdTa, dWdrhok);   
+  
+  if (REACTION[8])
+    add_to_dW_fwbw_2r3p (specCO, specAr, specC, specO, specAr, 2.3e19, -1.00, 129000.0*R, Ta, X, dWdTa, dWdrhok);
+  
+  if (REACTION[9])
+    for (k = 0; specM2[k]!=specEND; k++)
+      add_to_dW_fwbw_2r3p (specCO, specM2[k], specC, specO, specM2[k], 3.4e20, -1.00, 129000.0*R, Ta, X, dWdTa, dWdrhok);   
+  
+  if (REACTION[10])
+    for (k = 0; specM3[k]!=specEND; k++)
+      add_to_dW_fwbw_2r3p (specCO, specM3[k], specC, specO, specM3[k], 2.3e20, -1.00, 129000.0*R, Ta, X, dWdTa, dWdrhok);   
+  
+  if (REACTION[11])
+    for (k = 0; specM4[k]!=specEND; k++)
+      add_to_dW_fwbw_2r3p (specNO, specM4[k], specN, specO, specM4[k], 5.0e15, 0.00, 75500.0*R, Ta, X, dWdTa, dWdrhok);
+  
+  if (REACTION[12])
+    for (k = 0; specM5[k]!=specEND; k++)
+      add_to_dW_fwbw_2r3p (specNO, specM5[k], specN, specO, specM5[k], 1.1e17, 0.00, 75500.0*R, Ta, X, dWdTa, dWdrhok);
+  
+  if (REACTION[13])
+    add_to_dW_fwbw_2r3p (specCO2, specAr, specCO, specO, specAr, 6.9e20, -1.50, 63275.0*R, Ta, N, dWdTa, dWdrhok);
+  
+  if (REACTION[14])
+    for (k = 0; specM3[k]!=specEND; k++)
+      add_to_dW_fwbw_2r3p (specCO2, specM3[k], specCO, specO, specM3[k], 1.4e22, -1.00, 63275.0*R, Ta, X, dWdTa, dWdrhok);   
+  
+  if (REACTION[15])
+    for (k = 0; specM6[k]!=specEND; k++)
+      add_to_dW_fwbw_2r3p (specCO2, specM6[k], specCO, specO, specM6[k], 6.9e21, -1.00, 63275.0*R, Ta, X, dWdTa, dWdrhok);   
+  
+  if (REACTION[16])
+    for (k = 0; specM1[k]!=specEND; k++)
+      add_to_dW_fwbw_2r3p (specNCO, specM1[k], specCO, specN, specM1[k], 6.3e16, -0.50, 24000.0*R, Ta, X, dWdTa, dWdrhok);
+  
+  if (REACTION[17])
+    add_to_dW_fwbw_2r2p (specNO, specO, specN, specO2, 8.4e12, 0.00, 19450.0*R, T, X, dWdT, dWdrhok);
 
+  if (REACTION[18])
+    add_to_dW_fwbw_2r2p (specN2, specO, specNO, specN, 6.4e17, -1.00, 38370.0*R, T, X, dWdT, dWdrhok);
+
+  if (REACTION[19])
+    add_to_dW_fwbw_2r2p (specCO, specO, specC, specO2, 3.9e13, -0.18, 69200.0*R, T, X, dWdT, dWdrhok);
+    
+  if (REACTION[20])
+    add_to_dW_fwbw_2r2p (specCO, specC, specC2, specO, 2.0e17, -1.00, 58000.0*R, T, X, dWdT, dWdrhok);
+    
+  if (REACTION[21])
+    add_to_dW_fwbw_2r2p (specCO, specN, specCN, specO, 1.0e14, 0.00, 38600.0*R, T, X, dWdT, dWdrhok);
+
+  if (REACTION[22])
+    add_to_dW_fwbw_2r2p (specN2, specC, specCN, specN, 1.1e14, -0.11, 23200.0*R, T, X, dWdT, dWdrhok);
+
+  if (REACTION[23])
+    add_to_dW_fwbw_2r2p (specCN, specO, specNO, specC, 1.6e13, 0.10, 14600.0*R, T, X, dWdT, dWdrhok);
+    
+  if (REACTION[24])
+    add_to_dW_fwbw_2r2p (specCN, specC, specC2, specN, 5.0e13, 0.00, 13000.0*R, T, X, dWdT, dWdrhok);
+    
+  if (REACTION[25])
+    add_to_dW_fwbw_2r2p (specCO2, specO, specO2, specCO, 2.1e13, 0.00, 27800.0*R, T, X, dWdT, dWdrhok);
+
+  if (REACTION[26])
+    add_to_dW_fwbw_2r2p (specCN, specO2, specNCO, specO, 6.6e12, 0.00, -200.0*R, T, X, dWdT, dWdrhok);
+
+  if (REACTION[27])
+    add_to_dW_fwbw_2r2p (specCN, specCO2, specNCO, specCO, 4.0e14, 0.00, 19200.0*R, T, X, dWdT, dWdrhok);
+    
+  if (REACTION[28])
+    add_to_dW_fwbw_2r2p (specCN, specNO, specNCO, specN, 1.0e14, 0.00, 21200.0*R, T, X, dWdT, dWdrhok);
+    
+  if (REACTION[29])
+    add_to_dW_fwbw_2r2p (specCO, specNO, specNCO, specO, 3.8e17, -0.873, 51600.0*R, T, X, dWdT, dWdrhok);
+
+  if (REACTION[30])
+    add_to_dW_fwbw_2r2p (specCN, specCO, specNCO, specC, 1.5e16, -0.487, 65800.0*R, T, X, dWdT, dWdrhok);
+    
+  if (REACTION[31])
+    add_to_dW_fwbw_2r2p (specN, specO, specNOplus, speceminus, 8.8e8, 1.00, 31900.0*R, T, X, dWdT, dWdrhok);
+    
+  if (REACTION[32])
+    add_to_dW_fwbw_2r2p (specO, specO, specO2plus, speceminus, 7.1e2, 2.70, 80600.0*R, T, X, dWdT, dWdrhok);
+    
+  if (REACTION[33])
+    add_to_dW_fwbw_2r2p (specC, specO, specCOplus, speceminus, 8.8e8, 1.00, 33100.0*R, T, X, dWdT, dWdrhok);
+
+  if (REACTION[34])
+    add_to_dW_fwbw_2r2p (specNOplus, specC, specNO, specCplus, 1.0e13, 0.00, 23200.0*R, T, X, dWdT, dWdrhok);
+
+  if (REACTION[35])
+    add_to_dW_fwbw_2r2p (specO2plus, specO, specOplus, specO2, 4.0e12, -0.09, 18000.0*R, T, X, dWdT, dWdrhok);
+    
+  if (REACTION[36])
+    add_to_dW_fwbw_2r2p (specNOplus, specN, specOplus, specN2, 3.4e13, -1.08, 12800.0*R, T, X, dWdT, dWdrhok);
+    
+  if (REACTION[37])
+    add_to_dW_fwbw_2r2p (specNOplus, specO, specO2plus, specN, 7.2e12, 0.29, 48600.0*R, T, X, dWdT, dWdrhok);
+
+  if (REACTION[38])
+    add_to_dW_fwbw_2r2p (specCO, specCplus, specCOplus, specC, 1.0e13, 0.00, 31400.0*R, T, X, dWdT, dWdrhok);
+
+  if (REACTION[39])
+    add_to_dW_fwbw_2r2p (specO2, specCplus, specO2plus, specC, 1.0e13, 0.00, 9400.0*R, T, X, dWdT, dWdrhok);
+    
+  if (REACTION[40])
+    add_to_dW_fwbw_2r3p (specC, speceminus, specCplus, speceminus, speceminus, 3.9e33, -3.78, 130700.0*R, Tv, X, dWdTv, dWdrhok);
+    
+  if (REACTION[41])
+    add_to_dW_fwbw_2r3p (specO, speceminus, specOplus, speceminus, speceminus, 3.9e33, -3.78, 158500.0*R, Tv, X, dWdTv, dWdrhok);
+
+  if (REACTION[42])
+    add_to_dW_fwbw_2r1p (specOplus, speceminus, specO, 1.07e11, -0.52, 0.00, Tv, X, dWdTv, dWdrhok);
+    
+  if (REACTION[43])
+    add_to_dW_fwbw_2r1p (specCplus, speceminus, specC, 2.02e11, -0.46, 0.00, Tv, X, dWdTv, dWdrhok);
+  
+  
+  dTadT=0.5/Ta*Tv;
+  dTadTv=0.5/Ta*T;
+  for (spec=0; spec<ns; spec++){
+    dWdT[spec]+=dWdTa[spec]*dTadT;
+    dWdTv[spec]+=dWdTa[spec]*dTadTv;
+  }
   
 }
+
+
+void find_Qei(spec_t rhok, double Estar, double Te, double *Qei){
+  *Qei=0.0;
+}
+
+
+
+void find_dQei_dx(spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
+  long spec;
+  
+  for (spec=0; spec<ns; spec++) dQeidrhok[spec]=0.0;
+  *dQeidTe=0.0;  
+
+}
+
+
+  
 
 
 

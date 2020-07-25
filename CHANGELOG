@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUL 24a
+  * in src/control.c
+    - added park1994a and smith1999a to the bibs
+  * deleted
+    - model/chem/_H2_Air_9s_Smith/doc/townsend/
+  * in model/chem/_H2_Air_9s_Smith
+    - added contributions from Ajjay Omprakas to chem.c, chem.hh and report.tex
+  * in model/chem/_CO2_Plasma_23s_Park
+    - added contributions from Aaron Trinh to chem.c, chem.hh and report.tex
+
+
 2020 JUL 22a
   * in model/emfield/_Epotential-Bfixed/emfield.c
     - added _Tk_smooth()
