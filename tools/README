@@ -117,6 +117,7 @@ tarCFDWARP.sh                creates a tarball of the CFDWARP directory
             
 upgrade.sh                   upgrades CFDWARP to its latest version       
 
-
+vtk2vtu.sh                   transforms a vtk postfile into a vtu postfile (which TECPLOT can read)
+                             using PARAVIEW's pvpython scripting language
 
 

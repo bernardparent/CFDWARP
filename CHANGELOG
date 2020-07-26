@@ -7,7 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
-2020 JUL 24a
+2020 JUL 25b
+  * in tools
+    - added vtk2vtu.sh
+  * in tools/README
+    - added description of vtk2vtu.sh
+    
+  
+2020 JUL 25a
   * in src/control.c
     - added park1994a and smith1999a to the bibs
   * deleted
