@@ -23,7 +23,6 @@ cleanall:
 	( cd _N2_Plasma_3s_3r ; make cleanall )
 	( cd _H2_Air_9s_20r_Jachimowsky ; make cleanall )
 	( cd _H2_Air_9s_Smith ; make cleanall )
-	( cd _H2_Air_Plasma_17s_Lenard-Smith ; make cleanall )
 	( cd _H2_Air_Plasma_14s_47r_Jachimowsky-Macheret ; make cleanall )
 	( cd _H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret ; make cleanall )
 	( cd _C3H8_Air_16s_23r_Kundu ; make cleanall )

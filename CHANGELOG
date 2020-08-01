@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 JUL 31a
+  * deleted
+    - model/chem/_H2_Air_Plasma_17s_Lenard-Smith/
+  * in model/share/chem_share.c
+    - added add_to_W_fw_2r2p(), add_to_W_bw_2r2p(),
+            add_to_W_fw_3r2p(), add_to_W_bw_3r2p(),
+            add_to_W_fw_2r1p(), add_to_W_bw_2r1p(),
+            add_to_W_fw_2r3p(), add_to_W_bw_2r3p(),
+            add_to_dW_fw_2r2p(), add_to_dW_bw_2r2p(),
+            add_to_dW_fw_3r2p(), add_to_dW_bw_3r2p(),
+            add_to_dW_fw_2r1p(), add_to_dW_bw_2r1p(),
+            add_to_dW_fw_2r3p(), add_to_dW_bw_2r3p()
+            
+
 2020 JUL 25b
   * in tools
     - added vtk2vtu.sh

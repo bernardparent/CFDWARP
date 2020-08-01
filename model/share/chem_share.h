@@ -87,7 +87,23 @@ void add_to_W_fwbw_2r1p(int specR1, int specR2,
                             int specP1,
                             double A, double n, double E, double T, spec_t X, spec_t W);
 
+void add_to_W_fw_2r1p(int specR1, int specR2,
+                            int specP1,
+                            double A, double n, double E, double T, spec_t X, spec_t W);
+
+void add_to_W_bw_2r1p(int specR1, int specR2,
+                            int specP1,
+                            double A, double n, double E, double T, spec_t X, spec_t W);
+
 void add_to_W_fwbw_2r2p(int specR1, int specR2,
+                            int specP1, int specP2,
+                            double A, double n, double E, double T, spec_t X, spec_t W);
+
+void add_to_W_fw_2r2p(int specR1, int specR2,
+                            int specP1, int specP2,
+                            double A, double n, double E, double T, spec_t X, spec_t W);
+
+void add_to_W_bw_2r2p(int specR1, int specR2,
                             int specP1, int specP2,
                             double A, double n, double E, double T, spec_t X, spec_t W);
 
@@ -95,7 +111,24 @@ void add_to_W_fwbw_2r3p(int specR1, int specR2,
                             int specP1, int specP2, int specP3,
                             double A, double n, double E, double T, spec_t X, spec_t W);
 
+void add_to_W_fw_2r3p(int specR1, int specR2,
+                            int specP1, int specP2, int specP3,
+                            double A, double n, double E, double T, spec_t X, spec_t W);
+
+void add_to_W_bw_2r3p(int specR1, int specR2,
+                            int specP1, int specP2, int specP3,
+                            double A, double n, double E, double T, spec_t X, spec_t W);
+
+
 void add_to_W_fwbw_3r2p(int specR1, int specR2, int specR3,
+                            int specP1, int specP2,
+                            double A, double n, double E, double T, spec_t X, spec_t W);
+
+void add_to_W_fw_3r2p(int specR1, int specR2, int specR3,
+                            int specP1, int specP2,
+                            double A, double n, double E, double T, spec_t X, spec_t W);
+
+void add_to_W_bw_3r2p(int specR1, int specR2, int specR3,
                             int specP1, int specP2,
                             double A, double n, double E, double T, spec_t X, spec_t W);
 
@@ -112,7 +145,28 @@ void add_to_dW_fwbw_2r1p(int specR1, int specR2,
                              double A, double n, double E, double T, spec_t X, 
                              spec_t dWdT, spec2_t dWdrhok);
 
+void add_to_dW_fw_2r1p(int specR1, int specR2,
+                             int specP1, 
+                             double A, double n, double E, double T, spec_t X, 
+                             spec_t dWdT, spec2_t dWdrhok);
+
+void add_to_dW_bw_2r1p(int specR1, int specR2,
+                             int specP1, 
+                             double A, double n, double E, double T, spec_t X, 
+                             spec_t dWdT, spec2_t dWdrhok);
+
+
 void add_to_dW_fwbw_2r2p(int specR1, int specR2,
+                             int specP1, int specP2,
+                             double A, double n, double E, double T, spec_t X, 
+                             spec_t dWdT, spec2_t dWdrhok);
+
+void add_to_dW_fw_2r2p(int specR1, int specR2,
+                             int specP1, int specP2,
+                             double A, double n, double E, double T, spec_t X, 
+                             spec_t dWdT, spec2_t dWdrhok);
+
+void add_to_dW_bw_2r2p(int specR1, int specR2,
                              int specP1, int specP2,
                              double A, double n, double E, double T, spec_t X, 
                              spec_t dWdT, spec2_t dWdrhok);
@@ -122,7 +176,27 @@ void add_to_dW_fwbw_2r3p(int specR1, int specR2,
                              double A, double n, double E, double T, spec_t X, 
                              spec_t dWdT, spec2_t dWdrhok);
 
+void add_to_dW_fw_2r3p(int specR1, int specR2,
+                             int specP1, int specP2, int specP3,
+                             double A, double n, double E, double T, spec_t X, 
+                             spec_t dWdT, spec2_t dWdrhok);
+
+void add_to_dW_bw_2r3p(int specR1, int specR2,
+                             int specP1, int specP2, int specP3,
+                             double A, double n, double E, double T, spec_t X, 
+                             spec_t dWdT, spec2_t dWdrhok);
+
 void add_to_dW_fwbw_3r2p(int specR1, int specR2, int specR3,
+                             int specP1, int specP2,
+                             double A, double n, double E, double T, spec_t X, 
+                             spec_t dWdT, spec2_t dWdrhok);
+
+void add_to_dW_fw_3r2p(int specR1, int specR2, int specR3,
+                             int specP1, int specP2,
+                             double A, double n, double E, double T, spec_t X, 
+                             spec_t dWdT, spec2_t dWdrhok);
+
+void add_to_dW_bw_3r2p(int specR1, int specR2, int specR3,
                              int specP1, int specP2,
                              double A, double n, double E, double T, spec_t X, 
                              spec_t dWdT, spec2_t dWdrhok);
