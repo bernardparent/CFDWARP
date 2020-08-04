@@ -396,23 +396,8 @@ static double _dGsdT(long spec, double T){
 void add_to_W_fwbw_2r2p(int specR1, int specR2,
                             int specP1, int specP2,
                             double A, double n, double E, double T, spec_t X, spec_t W){
-  double kf,dG0,Kc,kb,sum;
-
-  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^3 (mole s)^(-1) */
-  dG0=_Gs(specP1,T)
-     +_Gs(specP2,T)
-     -_Gs(specR1,T)
-     -_Gs(specR2,T); /* J/mole */
-  Kc=max(Kcmin, exp(-dG0/(calR*T)));
-  kb=kf/Kc; /* cm^3 (mole s)^(-1) */
-  sum=kf*X[specR1]*X[specR2]
-     -kb*X[specP1]*X[specP2]; /* mole cm^(-3) (s)^(-1) */
-  if (exp(-dG0/(calR*T))>Kcmin){
-    W[specR1]-=_calM(specR1)*sum*1e6;
-    W[specR2]-=_calM(specR2)*sum*1e6;
-    W[specP1]+=_calM(specP1)*sum*1e6;
-    W[specP2]+=_calM(specP2)*sum*1e6; /* kg m^(-3) s^(-1) */
-  }
+  add_to_W_fw_2r2p(specR1, specR2, specP1, specP2, A, n, E, T, X, W);
+  add_to_W_bw_2r2p(specR1, specR2, specP1, specP2, A, n, E, T, X, W);
 } 
 
 
@@ -475,26 +460,8 @@ void add_to_W_bw_2r2p(int specR1, int specR2,
 void add_to_W_fwbw_3r2p(int specR1, int specR2, int specR3,
                             int specP1, int specP2,
                             double A, double n, double E, double T, spec_t X, spec_t W){
-  double kf,dG0,Kc,kb,sum;
-
-  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^3 (mole s)^(-1) */
-  dG0=_Gs(specP1,T)
-     +_Gs(specP2,T)
-     -_Gs(specR1,T)
-     -_Gs(specR2,T)
-     -_Gs(specR3,T); /* J/mole */
-  Kc=max(Kcmin, exp(-dG0/(calR*T)));
-  Kc /= 1E-6 * THERMO_P_REF/(calR*T); /* mole/cm^3 */
-  kb=kf/Kc; /* cm^3 (mole s)^(-1) */
-  sum=kf*X[specR1]*X[specR2]*X[specR3]
-     -kb*X[specP1]*X[specP2]; /* mole cm^(-3) (s)^(-1) */
-  if (exp(-dG0/(calR*T))>Kcmin){
-    W[specR1]-=_calM(specR1)*sum*1e6;
-    W[specR2]-=_calM(specR2)*sum*1e6;
-    W[specR3]-=_calM(specR3)*sum*1e6;
-    W[specP1]+=_calM(specP1)*sum*1e6;
-    W[specP2]+=_calM(specP2)*sum*1e6; /* kg m^(-3) s^(-1) */
-  }
+  add_to_W_fw_3r2p(specR1, specR2, specR3, specP1, specP2, A, n, E, T, X, W);
+  add_to_W_bw_3r2p(specR1, specR2, specR3, specP1, specP2, A, n, E, T, X, W);
 } 
 
 
@@ -561,22 +528,8 @@ void add_to_W_bw_3r2p(int specR1, int specR2, int specR3,
 void add_to_W_fwbw_2r1p(int specR1, int specR2,
                             int specP1,
                             double A, double n, double E, double T, spec_t X, spec_t W){
-  double kf,dG0,Kc,kb,sum;
-
-  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^3 (mole s)^(-1) */
-  dG0=_Gs(specP1,T)
-     -_Gs(specR1,T)
-     -_Gs(specR2,T); /* J/mole */
-  Kc=max(Kcmin, exp(-dG0/(calR*T)));
-  Kc /= 1E-6 * THERMO_P_REF/(calR*T); /* mole/cm^3 */
-  kb=kf/Kc; /* cm^3 (mole s)^(-1) */
-  sum=kf*X[specR1]*X[specR2]
-     -kb*X[specP1]; /* mole cm^(-3) (s)^(-1) */
-  if (exp(-dG0/(calR*T))>Kcmin){
-    W[specR1]-=_calM(specR1)*sum*1e6;
-    W[specR2]-=_calM(specR2)*sum*1e6;
-    W[specP1]+=_calM(specP1)*sum*1e6; /* kg m^(-3) s^(-1) */
-  }
+  add_to_W_fw_2r1p(specR1, specR2, specP1, A, n, E, T, X, W);
+  add_to_W_bw_2r1p(specR1, specR2, specP1, A, n, E, T, X, W);
 } 
 
 
@@ -635,27 +588,8 @@ void add_to_W_bw_2r1p(int specR1, int specR2,
 void add_to_W_fwbw_2r3p(int specR1, int specR2,
                             int specP1, int specP2, int specP3,
                             double A, double n, double E, double T, spec_t X, spec_t W){
-  double kf,dG0,Kc,kb,sum;
-
-  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^3 (mole s)^(-1) */
-  dG0=_Gs(specP1,T)
-     +_Gs(specP2,T)
-     +_Gs(specP3,T)
-     -_Gs(specR1,T)
-     -_Gs(specR2,T); /* J/mole */
-  Kc=max(Kcmin,exp(-dG0/(calR*T)));
-  if (exp(-dG0/(calR*T))>Kcmin){
-    Kc *= 1E-6 * THERMO_P_REF/(calR*T); /* mole/cm^3 */
-    kb=kf/Kc; /*  cm^6 (mole)^(-2) s^(-1) */
-    sum=kf*X[specR1]*X[specR2]
-     -kb*X[specP1]*X[specP2]*X[specP3]; /* mole cm^(-3) (s)^(-1) */
-    W[specR1]-=_calM(specR1)*sum*1e6;
-    W[specR2]-=_calM(specR2)*sum*1e6;
-    W[specP1]+=_calM(specP1)*sum*1e6;
-    W[specP2]+=_calM(specP2)*sum*1e6; 
-    W[specP3]+=_calM(specP3)*sum*1e6; 
-    /* kg m^(-3) s^(-1) */
-  }
+  add_to_W_fw_2r3p(specR1, specR2, specP1, specP2, specP3, A, n, E, T, X, W);
+  add_to_W_bw_2r3p(specR1, specR2, specP1, specP2, specP3, A, n, E, T, X, W);
 }
 
 
@@ -726,61 +660,8 @@ void add_to_dW_fwbw_2r2p(int specR1, int specR2,
                              int specP1, int specP2,
                              double A, double n, double E, double T, spec_t X, 
                              spec_t dWdT, spec2_t dWdrhok){
-  double kf,dG0,Kc,sum,dkfdT,dsumdT,dKcdToverKc,dG0dT;
-
-  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^3 (mole s)^(-1) */
-  dG0=_Gs(specP1,T)
-     +_Gs(specP2,T)
-     -_Gs(specR1,T)
-     -_Gs(specR2,T); /* J/mole */
-  Kc=max(Kcmin,exp(-dG0/(calR*T)));
-  sum=X[specR1]*X[specR2]
-     -X[specP1]*X[specP2]/Kc; /* mole cm^(-3) (s)^(-1) */
-/*  W[specR1]-=_calM(specR1)*kf*1e6*sum;
-  W[specR2]-=_calM(specR2)*kf*1e6*sum;
-  W[specP1]+=_calM(specP1)*kf*1e6*sum;
-  W[specP2]+=_calM(specP2)*kf*1e6*sum;*/ /* kg m^(-3) s^(-1) */
-  /* dWdT */
-  dG0dT=_dGsdT(specP1,T)+_dGsdT(specP2,T)-_dGsdT(specR1,T)-_dGsdT(specR2,T);
-  dKcdToverKc=(dG0/(calR*sqr(T)))-dG0dT/(calR*T);
-  dsumdT=X[specP1]*X[specP2]/Kc*dKcdToverKc;
-  if (exp(-dG0/(calR*T))<Kcmin){
-    dKcdToverKc=0.0;
-    dsumdT=0.0;
-  }
-  dkfdT= kf*n/T 
-       + kf*(E/(sqr(T)*1.987192004e0));
-
-  if (exp(-dG0/(calR*T))>Kcmin){
-    dWdT[specR1] -= _calM(specR1)*dkfdT*1e6*sum + _calM(specR1)*kf*1e6*dsumdT;
-    dWdT[specR2] -= _calM(specR2)*dkfdT*1e6*sum + _calM(specR2)*kf*1e6*dsumdT;
-    dWdT[specP1] += _calM(specP1)*dkfdT*1e6*sum + _calM(specP1)*kf*1e6*dsumdT;
-    dWdT[specP2] += _calM(specP2)*dkfdT*1e6*sum + _calM(specP2)*kf*1e6*dsumdT; 
- 
-    /* dW[specR1]dX */
-    dWdrhok[specR1][specR1]-=_calM(specR1)/_calM(specR1)*kf*X[specR2];
-    dWdrhok[specR1][specR2]-=_calM(specR1)/_calM(specR2)*kf*X[specR1];
-    dWdrhok[specR1][specP1]-=-_calM(specR1)/_calM(specP1)*kf*X[specP2]/Kc;
-    dWdrhok[specR1][specP2]-=-_calM(specR1)/_calM(specP2)*kf*X[specP1]/Kc;
-
-    /* dW[specR2]dX */
-    dWdrhok[specR2][specR1]-=_calM(specR2)/_calM(specR1)*kf*X[specR2];
-    dWdrhok[specR2][specR2]-=_calM(specR2)/_calM(specR2)*kf*X[specR1];
-    dWdrhok[specR2][specP1]-=-_calM(specR2)/_calM(specP1)*kf*X[specP2]/Kc;
-    dWdrhok[specR2][specP2]-=-_calM(specR2)/_calM(specP2)*kf*X[specP1]/Kc;
-
-    /* dW[specP1]dX */
-    dWdrhok[specP1][specR1]+=_calM(specP1)/_calM(specR1)*kf*X[specR2];
-    dWdrhok[specP1][specR2]+=_calM(specP1)/_calM(specR2)*kf*X[specR1];
-    dWdrhok[specP1][specP1]+=-_calM(specP1)/_calM(specP1)*kf*X[specP2]/Kc;
-    dWdrhok[specP1][specP2]+=-_calM(specP1)/_calM(specP2)*kf*X[specP1]/Kc;
-
-    /* dW[specP2]dX */
-    dWdrhok[specP2][specR1]+=_calM(specP2)/_calM(specR1)*kf*X[specR2];
-    dWdrhok[specP2][specR2]+=_calM(specP2)/_calM(specR2)*kf*X[specR1];
-    dWdrhok[specP2][specP1]+=-_calM(specP2)/_calM(specP1)*kf*X[specP2]/Kc;
-    dWdrhok[specP2][specP2]+=-_calM(specP2)/_calM(specP2)*kf*X[specP1]/Kc;
-  }
+  add_to_dW_fw_2r2p(specR1, specR2, specP1, specP2, A, n, E, T, X, dWdT, dWdrhok);
+  add_to_dW_bw_2r2p(specR1, specR2, specP1, specP2, A, n, E, T, X, dWdT, dWdrhok);
 } 
 
 
@@ -900,75 +781,8 @@ void add_to_dW_fwbw_3r2p(int specR1, int specR2, int specR3,
                              int specP1, int specP2,
                              double A, double n, double E, double T, spec_t X, 
                              spec_t dWdT, spec2_t dWdrhok){
-  double kf,dG0,Kc,sum,dkfdT,dsumdT,dKcdToverKc,dG0dT;
-
-  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^3 (mole s)^(-1) */
-  dG0=_Gs(specP1,T)
-     +_Gs(specP2,T)
-     -_Gs(specR1,T)
-     -_Gs(specR2,T)
-     -_Gs(specR3,T); /* J/mole */
-  Kc=max(Kcmin,exp(-dG0/(calR*T)));
-  Kc /= 1E-6 * THERMO_P_REF/(calR*T); /* mole/cm^3 */
-
-  sum=X[specR1]*X[specR2]*X[specR3]
-     -X[specP1]*X[specP2]/Kc; /* mole cm^(-3) (s)^(-1) */
-/*  W[specR1]-=_calM(specR1)*kf*1e6*sum;
-  W[specR2]-=_calM(specR2)*kf*1e6*sum;
-  W[specP1]+=_calM(specP1)*kf*1e6*sum;
-  W[specP2]+=_calM(specP2)*kf*1e6*sum;*/ /* kg m^(-3) s^(-1) */
-
-  /* dWdT */
-  dG0dT=_dGsdT(specP1,T)+_dGsdT(specP2,T)-_dGsdT(specR1,T)-_dGsdT(specR2,T)-_dGsdT(specR3,T);
-  dKcdToverKc=(dG0/(calR*sqr(T)))-dG0dT/(calR*T)+1.0/T;
-
-  dsumdT=X[specP1]*X[specP2]/Kc*dKcdToverKc;
-  dkfdT= kf*n/T 
-       + kf*(E/(sqr(T)*1.987192004e0));
-
-  if (exp(-dG0/(calR*T))>Kcmin){
-
-    dWdT[specR1] -= _calM(specR1)*dkfdT*1e6*sum + _calM(specR1)*kf*1e6*dsumdT;
-    dWdT[specR2] -= _calM(specR2)*dkfdT*1e6*sum + _calM(specR2)*kf*1e6*dsumdT;
-    dWdT[specR3] -= _calM(specR3)*dkfdT*1e6*sum + _calM(specR3)*kf*1e6*dsumdT;
-    dWdT[specP1] += _calM(specP1)*dkfdT*1e6*sum + _calM(specP1)*kf*1e6*dsumdT;
-    dWdT[specP2] += _calM(specP2)*dkfdT*1e6*sum + _calM(specP2)*kf*1e6*dsumdT; 
-
-    /* dW[specR1]dX */
-    dWdrhok[specR1][specR1]-=_calM(specR1)/_calM(specR1)*kf*X[specR2]*X[specR3];
-    dWdrhok[specR1][specR2]-=_calM(specR1)/_calM(specR2)*kf*X[specR1]*X[specR3];
-    dWdrhok[specR1][specR3]-=_calM(specR1)/_calM(specR3)*kf*X[specR1]*X[specR2];
-    dWdrhok[specR1][specP1]-=-_calM(specR1)/_calM(specP1)*kf*X[specP2]/Kc;
-    dWdrhok[specR1][specP2]-=-_calM(specR1)/_calM(specP2)*kf*X[specP1]/Kc;
-
-    /* dW[specR2]dX */
-    dWdrhok[specR2][specR1]-=_calM(specR2)/_calM(specR1)*kf*X[specR2]*X[specR3];
-    dWdrhok[specR2][specR2]-=_calM(specR2)/_calM(specR2)*kf*X[specR1]*X[specR3];
-    dWdrhok[specR2][specR3]-=_calM(specR2)/_calM(specR3)*kf*X[specR1]*X[specR2];
-    dWdrhok[specR2][specP1]-=-_calM(specR2)/_calM(specP1)*kf*X[specP2]/Kc;
-    dWdrhok[specR2][specP2]-=-_calM(specR2)/_calM(specP2)*kf*X[specP1]/Kc;
-
-    /* dW[specR3]dX */
-    dWdrhok[specR3][specR1]-=_calM(specR3)/_calM(specR1)*kf*X[specR2]*X[specR3];
-    dWdrhok[specR3][specR2]-=_calM(specR3)/_calM(specR2)*kf*X[specR1]*X[specR3];
-    dWdrhok[specR3][specR3]-=_calM(specR3)/_calM(specR3)*kf*X[specR1]*X[specR2];
-    dWdrhok[specR3][specP1]-=-_calM(specR3)/_calM(specP1)*kf*X[specP2]/Kc;
-    dWdrhok[specR3][specP2]-=-_calM(specR3)/_calM(specP2)*kf*X[specP1]/Kc;
-
-    /* dW[specP1]dX */
-    dWdrhok[specP1][specR1]+=_calM(specP1)/_calM(specR1)*kf*X[specR2]*X[specR3];
-    dWdrhok[specP1][specR2]+=_calM(specP1)/_calM(specR2)*kf*X[specR1]*X[specR3];
-    dWdrhok[specP1][specR3]+=_calM(specP1)/_calM(specR3)*kf*X[specR1]*X[specR2];
-    dWdrhok[specP1][specP1]+=-_calM(specP1)/_calM(specP1)*kf*X[specP2]/Kc;
-    dWdrhok[specP1][specP2]+=-_calM(specP1)/_calM(specP2)*kf*X[specP1]/Kc;
-
-    /* dW[specP2]dX */
-    dWdrhok[specP2][specR1]+=_calM(specP2)/_calM(specR1)*kf*X[specR2]*X[specR3];
-    dWdrhok[specP2][specR2]+=_calM(specP2)/_calM(specR2)*kf*X[specR1]*X[specR3];
-    dWdrhok[specP2][specR3]+=_calM(specP2)/_calM(specR3)*kf*X[specR1]*X[specR2];
-    dWdrhok[specP2][specP1]+=-_calM(specP2)/_calM(specP1)*kf*X[specP2]/Kc;
-    dWdrhok[specP2][specP2]+=-_calM(specP2)/_calM(specP2)*kf*X[specP1]/Kc;
-  }
+  add_to_dW_fw_3r2p(specR1, specR2, specR3, specP1, specP2, A, n, E, T, X, dWdT, dWdrhok);
+  add_to_dW_bw_3r2p(specR1, specR2, specR3, specP1, specP2, A, n, E, T, X, dWdT, dWdrhok);
 } 
 
 
@@ -1101,49 +915,8 @@ void add_to_dW_fwbw_2r1p(int specR1, int specR2,
                              int specP1, 
                              double A, double n, double E, double T, spec_t X, 
                              spec_t dWdT, spec2_t dWdrhok){
-  double kf,dG0,Kc,sum,dkfdT,dsumdT,dKcdToverKc,dG0dT;
-
-  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^3 (mole s)^(-1) */
-  dG0=_Gs(specP1,T)
-     -_Gs(specR1,T)
-     -_Gs(specR2,T); /* J/mole */
-  Kc=max(Kcmin, exp(-dG0/(calR*T)));
-  Kc /= 1E-6 * THERMO_P_REF/(calR*T); /* mole/cm^3 */
-
-  sum=X[specR1]*X[specR2]
-     -X[specP1]/Kc; /* mole cm^(-3) (s)^(-1) */
-
-  /* dWdT */
-  dG0dT=_dGsdT(specP1,T)-_dGsdT(specR1,T)-_dGsdT(specR2,T);
-  
-  dKcdToverKc=(dG0/(calR*sqr(T)))-dG0dT/(calR*T)+1.0/T;
-
-  dsumdT=X[specP1]/Kc*dKcdToverKc;
-  dkfdT= kf*n/T 
-       + kf*(E/(sqr(T)*1.987192004e0));
-
-  if (exp(-dG0/(calR*T))>Kcmin){
-    dWdT[specR1] -= _calM(specR1)*dkfdT*1e6*sum + _calM(specR1)*kf*1e6*dsumdT;
-    dWdT[specR2] -= _calM(specR2)*dkfdT*1e6*sum + _calM(specR2)*kf*1e6*dsumdT;
-    dWdT[specP1] += _calM(specP1)*dkfdT*1e6*sum + _calM(specP1)*kf*1e6*dsumdT;
-  
-
-    /* dW[specR1]dX */
-    dWdrhok[specR1][specR1]-=_calM(specR1)/_calM(specR1)*kf*X[specR2];
-    dWdrhok[specR1][specR2]-=_calM(specR1)/_calM(specR2)*kf*X[specR1];
-    dWdrhok[specR1][specP1]-=-_calM(specR1)/_calM(specP1)*kf/Kc;
-
-    /* dW[specR2]dX */
-    dWdrhok[specR2][specR1]-=_calM(specR2)/_calM(specR1)*kf*X[specR2];
-    dWdrhok[specR2][specR2]-=_calM(specR2)/_calM(specR2)*kf*X[specR1];
-    dWdrhok[specR2][specP1]-=-_calM(specR2)/_calM(specP1)*kf/Kc;
-
-    /* dW[specP1]dX */
-    dWdrhok[specP1][specR1]+=_calM(specP1)/_calM(specR1)*kf*X[specR2];
-    dWdrhok[specP1][specR2]+=_calM(specP1)/_calM(specR2)*kf*X[specR1];
-    dWdrhok[specP1][specP1]+=-_calM(specP1)/_calM(specP1)*kf/Kc;
-  }
-
+  add_to_dW_fw_2r1p(specR1, specR2, specP1, A, n, E, T, X, dWdT, dWdrhok);
+  add_to_dW_bw_2r1p(specR1, specR2, specP1, A, n, E, T, X, dWdT, dWdrhok);
 } 
 
 
@@ -1251,78 +1024,8 @@ void add_to_dW_fwbw_2r3p(int specR1, int specR2,
                              int specP1, int specP2, int specP3,
                              double A, double n, double E, double T, spec_t X, 
                              spec_t dWdT, spec2_t dWdrhok){
-  double kf,dG0,Kc,sum,dkfdT,dsumdT,dKcdToverKc,dG0dT;
-
-  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^3 (mole s)^(-1) */
-  dG0=_Gs(specP1,T)
-     +_Gs(specP2,T)
-     +_Gs(specP3,T)
-     -_Gs(specR1,T)
-     -_Gs(specR2,T); /* J/mole */
-  Kc=1E-6 * THERMO_P_REF/(calR*T) * max(Kcmin, exp(-dG0/(calR*T))); /* mole/cm^3 */
-  sum=X[specR1]*X[specR2]
-     -X[specP1]*X[specP2]*X[specP3]/Kc; /* mole cm^(-3) (s)^(-1) */
-/*  W[specR1]-=_calM(specR1)*kf*1e6*sum;
-  W[specR2]-=_calM(specR2)*kf*1e6*sum;
-  W[specP1]+=_calM(specP1)*kf*1e6*sum;
-  W[specP2]+=_calM(specP2)*kf*1e6*sum;
-  W[specP3]+=_calM(specP3)*kf*1e6*sum;*/
- /* kg m^(-3) s^(-1) */
-
-  // dWdT 
-  dG0dT=_dGsdT(specP1,T)+_dGsdT(specP2,T)+_dGsdT(specP3,T)-_dGsdT(specR1,T)-_dGsdT(specR2,T);
-  dKcdToverKc=( dG0/(calR*sqr(T)) - dG0dT/(calR*T) - 1.0/T);
-  if (exp(-dG0/(calR*T))<Kcmin) dKcdToverKc=-1.0/T;
-
-
-  dsumdT=X[specP1]*X[specP2]*X[specP3]/Kc*dKcdToverKc;
-
-  dkfdT= kf*n/T 
-       + kf*(E/(sqr(T)*1.987192004e0));
-
-  if (exp(-dG0/(calR*T))>Kcmin ){
-
-    dWdT[specR1] -= _calM(specR1)*dkfdT*1e6*sum + _calM(specR1)*kf*1e6*dsumdT;
-    dWdT[specR2] -= _calM(specR2)*dkfdT*1e6*sum + _calM(specR2)*kf*1e6*dsumdT;
-    dWdT[specP1] += _calM(specP1)*dkfdT*1e6*sum + _calM(specP1)*kf*1e6*dsumdT;
-    dWdT[specP2] += _calM(specP2)*dkfdT*1e6*sum + _calM(specP2)*kf*1e6*dsumdT; 
-    dWdT[specP3] += _calM(specP3)*dkfdT*1e6*sum + _calM(specP3)*kf*1e6*dsumdT; 
-
-    // dW[specR1]dX 
-    dWdrhok[specR1][specR1]-=_calM(specR1)/_calM(specR1)*kf*X[specR2];
-    dWdrhok[specR1][specR2]-=_calM(specR1)/_calM(specR2)*kf*X[specR1];
-    dWdrhok[specR1][specP1]-=-_calM(specR1)/_calM(specP1)*kf*X[specP2]*X[specP3]/Kc;
-    dWdrhok[specR1][specP2]-=-_calM(specR1)/_calM(specP2)*kf*X[specP1]*X[specP3]/Kc;
-    dWdrhok[specR1][specP3]-=-_calM(specR1)/_calM(specP3)*kf*X[specP1]*X[specP2]/Kc;
-
-    // dW[specR2]dX 
-    dWdrhok[specR2][specR1]-=_calM(specR2)/_calM(specR1)*kf*X[specR2];
-    dWdrhok[specR2][specR2]-=_calM(specR2)/_calM(specR2)*kf*X[specR1];
-    dWdrhok[specR2][specP1]-=-_calM(specR2)/_calM(specP1)*kf*X[specP2]*X[specP3]/Kc;
-    dWdrhok[specR2][specP2]-=-_calM(specR2)/_calM(specP2)*kf*X[specP1]*X[specP3]/Kc;
-    dWdrhok[specR2][specP3]-=-_calM(specR2)/_calM(specP3)*kf*X[specP1]*X[specP2]/Kc;
-
-    // dW[specP1]dX 
-    dWdrhok[specP1][specR1]+=_calM(specP1)/_calM(specR1)*kf*X[specR2];
-    dWdrhok[specP1][specR2]+=_calM(specP1)/_calM(specR2)*kf*X[specR1];
-    dWdrhok[specP1][specP1]+=-_calM(specP1)/_calM(specP1)*kf*X[specP2]*X[specP3]/Kc;
-    dWdrhok[specP1][specP2]+=-_calM(specP1)/_calM(specP2)*kf*X[specP1]*X[specP3]/Kc;
-    dWdrhok[specP1][specP3]+=-_calM(specP1)/_calM(specP3)*kf*X[specP1]*X[specP2]/Kc;
-
-    // dW[specP2]dX 
-    dWdrhok[specP2][specR1]+=_calM(specP2)/_calM(specR1)*kf*X[specR2];
-    dWdrhok[specP2][specR2]+=_calM(specP2)/_calM(specR2)*kf*X[specR1];
-    dWdrhok[specP2][specP1]+=-_calM(specP2)/_calM(specP1)*kf*X[specP2]*X[specP3]/Kc;
-    dWdrhok[specP2][specP2]+=-_calM(specP2)/_calM(specP2)*kf*X[specP1]*X[specP3]/Kc;
-    dWdrhok[specP2][specP3]+=-_calM(specP2)/_calM(specP3)*kf*X[specP1]*X[specP2]/Kc;
-
-    // dW[specP3]dX 
-    dWdrhok[specP3][specR1]+=_calM(specP3)/_calM(specR1)*kf*X[specR2];
-    dWdrhok[specP3][specR2]+=_calM(specP3)/_calM(specR2)*kf*X[specR1];
-    dWdrhok[specP3][specP1]+=-_calM(specP3)/_calM(specP1)*kf*X[specP2]*X[specP3]/Kc;
-    dWdrhok[specP3][specP2]+=-_calM(specP3)/_calM(specP2)*kf*X[specP1]*X[specP3]/Kc;
-    dWdrhok[specP3][specP3]+=-_calM(specP3)/_calM(specP3)*kf*X[specP1]*X[specP2]/Kc; 
-  }
+  add_to_dW_fw_2r3p(specR1, specR2, specP1, specP2, specP3, A, n, E, T, X, dWdT, dWdrhok);
+  add_to_dW_bw_2r3p(specR1, specR2, specP1, specP2, specP3, A, n, E, T, X, dWdT, dWdrhok);
 }
 
 

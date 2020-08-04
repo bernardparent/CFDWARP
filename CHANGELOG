@@ -7,6 +7,23 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 03a
+  * in cycle/share/cycle_share.c
+    - deleted exchange_U_newer() and exchange_U_old()
+    - renamed exchange_U() to exchange_U_old()
+    - rewrote exchange_U() so that MPI_Buffer is used instead of MPI_Send and MPI_Recv for
+      improved performance. (rewrite by Minindu Weerakoon and Prasanna T. Rajendran)
+  * in model/chem/_Air_Plasma_11s_Park/doc/report.tex
+    - added the Park-Candler-Boyd model
+    - modified the Park model to include a backward controlling temperature different from
+      a forward controlling temperature
+  * in model/share/chem_share.c
+    - in add_to_W_fwbw*(), deleted redundant code and added calls to add_to_W_fw*() and
+      add_to_W_bw*()
+    - in add_to_dW_fwbw*(), deleted redundant code and added calls to add_to_dW_fw*() and
+      add_to_dW_bw*()
+      
+
 2020 JUL 31a
   * deleted
     - model/chem/_H2_Air_Plasma_17s_Lenard-Smith/

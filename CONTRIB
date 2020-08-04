@@ -93,6 +93,8 @@ RAJENDRAN, Prasanna T.
   - improvement of read_data_file_sbinary_ascii() to set residual to zero when reading non-trapezoidal
     data file with trapezoidal method
 
+  - Speed improvement of function exchange_U() in cycle_share.c through MPI_Buffer
+
 
 SCHWARTZENTRUBER, Thomas E.
 
@@ -113,4 +115,4 @@ WEERAKOON, Minindu
 
   - Fixes to memory leaks problems (see CHANGELOG 19feb23a and 19feb27a and 19feb28b and 19may08a) 
 
-  - Speed improvement of function exchange_U() in cycle_share.c
+  - Speed improvement of function exchange_U() in cycle_share.c through threading

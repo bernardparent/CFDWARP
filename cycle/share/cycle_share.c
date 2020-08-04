@@ -1688,6 +1688,114 @@ long _numthread_optimized(long numzone){
 
 
 void exchange_U(np_t *np, gl_t *gl){
+  int bl,rankrecv,numproc,ranksend,thisrank,pack_size_Ulocal,pack_size_cnt;
+  long i,j,k,flux,iterator,cnt,prevcnt,total;
+  long primcnt=0;
+  long bufsize=0;
+  long *recvcnt,*sendcnt,*processcnt;
+  long *primnodenums=NULL;
+  long *processnodenums;
+  double *buf,*bufptr;
+  zone_t zonesend,zonerecv,zone;
+  flux_t *recvUlocal;
+  flux_t *sendUlocal=NULL;
+  MPI_Status MPI_Status1;
+ 
+  MPI_Comm_rank(MPI_COMM_WORLD, &thisrank);
+  MPI_Comm_size(MPI_COMM_WORLD, &numproc);
+  recvcnt=(long *)malloc(numproc*sizeof(long));
+  sendcnt=(long *)malloc(numproc*sizeof(long));
+  processcnt=(long *)malloc(numproc*sizeof(long));
+  processnodenums=(long *)malloc(numproc*sizeof(long));
+  for (i=0; i<numproc; i++){
+    sendcnt[i]=0;
+    processcnt[i]=0;
+  }
+  for (ranksend=0; ranksend<numproc; ranksend++){
+    zonesend=_domain_from_rank(ranksend,gl);
+    for (rankrecv=0; rankrecv<numproc; rankrecv++){
+      if (rankrecv!=ranksend && (ranksend==thisrank || rankrecv==thisrank)){
+        zonerecv=_domain_lim_from_rank(rankrecv,gl);
+        if (is_zone_intersecting_zone(zonesend,zonerecv)){
+          zone=_zone_intersection(zonesend,zonerecv);
+          for_ijk(zone,is,js,ks,ie,je,ke){
+                if (ranksend==thisrank) {
+                  for (total=0,iterator=0; iterator<numproc; iterator++) total+=sendcnt[iterator];
+                  for (prevcnt=0,iterator=0; iterator<=rankrecv; iterator++) prevcnt+=sendcnt[iterator];
+                  sendUlocal=(flux_t *)realloc(sendUlocal,(total+1)*sizeof(flux_t));
+                  for (iterator=prevcnt+1;iterator<total+1;iterator++){
+                    for (flux=0; flux<nf; flux++) *(*(sendUlocal + iterator) + flux)=*(*(sendUlocal + iterator-1) + flux);
+                  }
+                  for (flux=0; flux<nf; flux++) *(*(sendUlocal + prevcnt) + flux)=np[_ai(gl,i,j,k)].bs->U[flux];
+                  sendcnt[rankrecv]++;
+                }
+                if (rankrecv==thisrank){
+                  for (prevcnt=0,iterator=0; iterator<=ranksend; iterator++) prevcnt+=processcnt[iterator];
+                  processnodenums=(long *)realloc(processnodenums,(prevcnt+1)*sizeof(long));
+                  processnodenums[prevcnt]=_ai(gl,i,j,k);
+                  processcnt[ranksend]++;
+                  if (is_node_resumed(np[_ai(gl,i,j,k)])){
+                    primnodenums=(long *)realloc(primnodenums,(primcnt+1)*sizeof(long));
+                    primnodenums[primcnt]=_ai(gl,i,j,k);
+                    primcnt++;
+                  }
+                }
+          }
+        }
+      }
+    }
+  }
+ 
+  if(numproc != 1){
+    for (rankrecv=0; rankrecv<numproc; rankrecv++){
+      if (thisrank!=rankrecv){
+        MPI_Pack_size(nf*sendcnt[rankrecv],MPI_DOUBLE,MPI_COMM_WORLD,&pack_size_Ulocal);
+        MPI_Pack_size(1,MPI_LONG,MPI_COMM_WORLD,&pack_size_cnt);
+        bufsize+=(2*MPI_BSEND_OVERHEAD)+pack_size_Ulocal+pack_size_cnt;
+      }
+    }
+    buf=(double *)malloc(bufsize);
+    MPI_Buffer_attach(buf, bufsize);
+    for (rankrecv=0; rankrecv<numproc; rankrecv++){
+      if (thisrank!=rankrecv){
+        for (prevcnt=0,iterator=0; iterator<rankrecv; iterator++) prevcnt+=sendcnt[iterator];
+        MPI_Bsend(&sendcnt[rankrecv],1,MPI_LONG,rankrecv,1,MPI_COMM_WORLD);
+        MPI_Bsend(&sendUlocal[prevcnt],nf*sendcnt[rankrecv],MPI_DOUBLE,rankrecv,0,MPI_COMM_WORLD);
+      }
+    }
+    free(sendUlocal);
+    for (ranksend=0; ranksend<numproc; ranksend++){
+      if (thisrank!=ranksend){
+        MPI_Recv(&recvcnt[ranksend],1,MPI_LONG,ranksend,1,MPI_COMM_WORLD,&MPI_Status1);
+        recvUlocal=(flux_t *)malloc(recvcnt[ranksend]*sizeof(flux_t));
+        MPI_Recv(recvUlocal,recvcnt[ranksend]*nf,MPI_DOUBLE,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
+        for (cnt=0; cnt<recvcnt[ranksend]; cnt++){
+          for (prevcnt=0,iterator=0; iterator<ranksend; iterator++) prevcnt+=processcnt[iterator];
+          for (flux=0; flux<nf; flux++) np[processnodenums[prevcnt+cnt]].bs->U[flux]=*(*(recvUlocal + cnt) + flux);
+        }
+        free(recvUlocal);
+      }
+    }
+
+#ifdef OPENMPTHREADS
+#pragma omp parallel for private(cnt) schedule(dynamic)
+#endif
+    for (cnt=0; cnt<primcnt; cnt++) find_prim_fluid(np,primnodenums[cnt],gl);
+ 
+    MPI_Buffer_detach(&bufptr,&bl);
+    free(buf);
+  }
+  
+  free(processnodenums);
+  free(primnodenums);
+  free(processcnt);
+  free(recvcnt);
+  free(sendcnt);
+  MPI_Barrier(MPI_COMM_WORLD);
+}
+
+
+void exchange_U_old(np_t *np, gl_t *gl){  //same as above but without the MPI_Buffer
   int rankrecv,numproc,ranksend,thisrank;
   long i,j,k,flux;
   long cnt = 0;
@@ -1733,66 +1841,6 @@ void exchange_U(np_t *np, gl_t *gl){
   MPI_Barrier(MPI_COMM_WORLD);
 }
 
-
-
-void exchange_U_newer(np_t *np, gl_t *gl){
-  int rank,numproc,proc;
-  long i,j,k,flux;
-  zone_t domain;
-  flux_t Ulocal;
-  int MPI_DATA;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &numproc);
-  
-  for (proc=0; proc<numproc; proc++){
-    domain=_domain_from_rank(proc,gl);
-    for_ijk(domain,is,js,ks,ie,je,ke){
-          if (rank==_node_rank(gl, i, j, k) && is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) {
-            for (flux=0; flux<nf; flux++) {
-              Ulocal[flux]=np[_ai(gl,i,j,k)].bs->U[flux];
-            }
-          }
-          MPI_DATA=MPI_Bcast_Node(Ulocal,nf,MPI_DOUBLE,_node_rank(gl,i,j,k),MPI_COMM_WORLD,i,j,k,gl);
-//          MPI_DATA=MPI_Bcast(Ulocal,nf,MPI_DOUBLE,_node_rank(gl,i,j,k),MPI_COMM_WORLD,i,j,k,gl);
-          if (is_node_in_zone(i,j,k,gl->domain_lim) && is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) {
-            for (flux=0; flux<nf; flux++) {
-              np[_ai(gl,i,j,k)].bs->U[flux]=Ulocal[flux];
-            }
-            if (MPI_DATA==MPI_DATA_RECEIVED && is_node_resumed(np[_ai(gl,i,j,k)])) {
-              find_prim_fluid(np,_ai(gl,i,j,k),gl);
-            }
-          }
-    }
-  }
-  
-  MPI_Barrier(MPI_COMM_WORLD);
-}
-
-
-void exchange_U_old(np_t *np, gl_t *gl){
-  int rank;
-  long i,j,k,flux;
-  flux_t Ulocal;
-  int MPI_DATA;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  for_ijk (gl->domain_all,is,js,ks,ie,je,ke){
-        if (rank==_node_rank(gl, i, j, k) && is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) {
-          for (flux=0; flux<nf; flux++) {
-            Ulocal[flux]=np[_ai(gl,i,j,k)].bs->U[flux];
-          }
-        }
-        MPI_DATA=MPI_Bcast_Node(Ulocal,nf,MPI_DOUBLE,_node_rank(gl,i,j,k),MPI_COMM_WORLD,i,j,k,gl);
-        if (is_node_in_zone(i,j,k,gl->domain_lim) && is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) {
-          for (flux=0; flux<nf; flux++) {
-            np[_ai(gl,i,j,k)].bs->U[flux]=Ulocal[flux];
-          }
-          if (MPI_DATA==MPI_DATA_RECEIVED && is_node_resumed(np[_ai(gl,i,j,k)])) {
-            find_prim_fluid(np,_ai(gl,i,j,k),gl);
-          }
-        }
-  }
-  MPI_Barrier(MPI_COMM_WORLD);
-}
 #endif
 
 
