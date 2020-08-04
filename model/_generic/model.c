@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/fluid/_fluid.h>
 #include <model/emfield/_emfield.h>
 #include <model/beam/_beam.h>
+#include <model/chem/_chem.h>
 
 
 void find_clipped_variables_list(gl_t *gl, char **cliplist){
@@ -244,6 +245,7 @@ void write_model_template(FILE **controlfile){
     "Model(\n"
   );
   write_model_fluid_template(controlfile);
+  write_model_chem_template(controlfile);
   write_model_emfield_template(controlfile);
   write_model_beam_template(controlfile);
   wfprintf(*controlfile,
@@ -254,6 +256,7 @@ void write_model_template(FILE **controlfile){
 
 void read_model_actions(char *actionname, char **argum, SOAP_codex_t *codex){
   read_model_fluid_actions(actionname, argum, codex);
+  read_model_chem_actions(actionname, argum, codex);
   read_model_emfield_actions(actionname, argum, codex);
   read_model_beam_actions(actionname, argum, codex);
 }
@@ -262,6 +265,7 @@ void read_model_actions(char *actionname, char **argum, SOAP_codex_t *codex){
 void read_model(char *argum, SOAP_codex_t *codex){
   gl_t *gl=((readcontrolarg_t *)codex->action_args)->gl;
   if (!gl->CONTROL_READ){
+    gl->MODEL_CHEM_READ=FALSE;
     gl->MODEL_FLUID_READ=FALSE;
     gl->MODEL_EMFIELD_READ=FALSE;
     gl->MODEL_BEAM_READ=FALSE;
@@ -273,6 +277,10 @@ void read_model(char *argum, SOAP_codex_t *codex){
 
   if (!gl->MODEL_FLUID_READ) 
     fatal_error("The fluid module %s was not found within Model().",_FLUID_ACTIONNAME);
+#ifdef _CHEM_ACTIONNAME
+  if (!gl->MODEL_CHEM_READ) 
+    fatal_error("The chem module %s was not found within Model().",_CHEM_ACTIONNAME);
+#endif
   if (!gl->MODEL_EMFIELD_READ) 
     fatal_error("The emfield module %s was not found within Model().",_EMFIELD_ACTIONNAME);
   if (!gl->MODEL_BEAM_READ) 

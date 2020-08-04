@@ -38,3 +38,7 @@ const static long speciestype[ns] = {
   SPECIES_NEUTRAL,
   SPECIES_NEUTRAL
 };
+
+
+typedef struct {
+} gl_model_chem_t;

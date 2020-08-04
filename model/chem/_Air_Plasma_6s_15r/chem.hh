@@ -50,3 +50,5 @@ const static long speciestype[ns] = {
 };
 
 
+typedef struct {
+} gl_model_chem_t;

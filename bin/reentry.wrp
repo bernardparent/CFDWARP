@@ -166,6 +166,9 @@ Model(
     wmin=1.0e-200;                  {min mass fraction allowed in the domain}
     AXISYMMETRIC=NO; {set to YES to solve axisymmetric problems in 2D}
   );
+  AirPlasma11s(
+    CHEMMODEL=CHEMMODEL_DUNNKANG;
+  );
 );
 
 
@@ -275,6 +278,7 @@ Cycle(
     if (iter==1,
       CFL=0.06;
     );
+    system("date");
     CFL=min(CFL*1.03,CFLref);
     UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",

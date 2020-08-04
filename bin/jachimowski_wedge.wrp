@@ -43,7 +43,7 @@
 }
 
 {bug when reading interpolation file created with mf=2 and when mf is set to 0.9 --> check this}
-mf=4.0;
+mf=40.0;
 
 is=1;  js=1; 
 ie=round(30*mf); je=round(30*mf);
@@ -224,6 +224,7 @@ Cycle(
     if (iter==1,
       CFL=0.1;
     );
+    system("date");
     CFL=min(CFL*1.1,1.0);
     UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",

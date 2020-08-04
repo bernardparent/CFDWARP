@@ -31,7 +31,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define nr 13
 
-void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
+void write_model_chem_template(FILE **controlfile){
+}
+
+
+void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex){
+}
+
+
+void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
   long spec;
   double kf[nr];
   double Wp[nr];
@@ -176,7 +184,7 @@ void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double 
     W[spec] = W[spec] / calA * calM[spec] * 1.0e6;
 }
 
-void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam,
+void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, r, s, spec;           /* counters */
   spec_t calM;

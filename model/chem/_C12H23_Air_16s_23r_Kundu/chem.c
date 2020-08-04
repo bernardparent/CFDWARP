@@ -33,7 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define Xmin 1e-40
 #define Tmin 750.0              //T needs to be clipped to prevent instabilities with some reactions (WARNING: SHOULD LOOK INTO THIS)
 
-void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
+void write_model_chem_template(FILE **controlfile){
+}
+
+
+void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex){
+}
+
+
+void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
   long k;
   spec_t X;
   double brr, frr;
@@ -176,7 +184,7 @@ void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double 
   }
 }
 
-void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam,
+void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, p, r, s;              /* counters */
   long row, col;

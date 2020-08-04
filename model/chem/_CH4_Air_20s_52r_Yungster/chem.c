@@ -333,7 +333,15 @@ double _dkfdthird ( long r, double third, double T ) {
   return ( tmp );
 }
 
-void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
+void write_model_chem_template(FILE **controlfile){
+}
+
+
+void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex){
+}
+
+
+void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
 
   long spec;
   long r, k;
@@ -751,7 +759,7 @@ void FinddKcdT ( double T, react_t Kc, react_t dKcdT ) {
 
 }
 
-void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam,
+void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long r, k, p;
   double kf[nr], kb[nr], react[nr];

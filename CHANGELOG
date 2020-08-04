@@ -7,6 +7,25 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 04a
+  * in model/_generic/model.c
+    - in write_model_template(), added call to write_model_chem_template()
+    - in read_model_actions(), added call to read_model_chem_actions()
+  * in model/chem/*/chem.c
+    - added write_model_chem_template()
+    - added read_model_chem_actions()
+    - added gl parameter to find_W () and find_dW_dx ()
+  * in model/chem/*/chem.hh
+    - added definition of gl_model_chem_t
+  * in model/fluid/*/fluid_source.c and model/fluid/_drift-diffusion/fluid.c
+    - added gl parameter to find_W() and find_dW_dx()
+  * in model/share/chem_share.c
+    - in test_dW_dx(), added gl to the list of parameters and added to calls to find_W() and 
+      find_dW_dx() 
+  * in src/common.h
+    - in gl_t, added MODEL_CHEM_READ
+    
+
 2020 AUG 03a
   * in cycle/share/cycle_share.c
     - deleted exchange_U_newer() and exchange_U_old()

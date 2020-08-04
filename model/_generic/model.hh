@@ -45,4 +45,5 @@ typedef struct {
   gl_model_emfield_t emfield;
 #endif
   gl_model_fluid_t fluid;
+  gl_model_chem_t chem;
 } gl_model_t;

@@ -21,7 +21,7 @@ ____________________________________________________________________________
 
 Use your favourite editor and edit the control file:
 
-pluma control.wrp
+geany control.wrp
 
 The control file uses the SOAP interpreter language, for which a manual
 is provided (see lib/soap/doc). As well, the grid generation is done 

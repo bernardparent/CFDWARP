@@ -26,13 +26,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/chem/_chem.h>
 #include <model/_model.h>
 
-void find_W ( spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
+
+
+void write_model_chem_template(FILE **controlfile){
+}
+
+
+void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex){
+}
+
+
+void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
   long spec;
   for ( spec = 0; spec < ns; spec++ )
     W[spec] = 0.0;
 }
 
-void find_dW_dx ( spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam,
+void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, s;                    /* counters */
 

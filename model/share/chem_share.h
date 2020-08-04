@@ -230,6 +230,6 @@ double _dkfdT_Arrhenius(long numreactant, double A, double n, double E, double T
 
 
 
-void test_dW_dx(spec_t rhokref, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam);
+void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam);
 
 #endif /* _CHEM_SHARE_H */

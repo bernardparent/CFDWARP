@@ -1149,15 +1149,15 @@ void add_to_dW_bw_2r3p(int specR1, int specR2,
 }
 
 
-void test_dW_dx(spec_t rhokref, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam){
+void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam){
   long r,s; 
   spec_t dWdT,dWdTe,dWdTv,dWdQbeam;
   spec2_t dWrhok,dWrhok2;   
   spec_t rhok2,dWdT2,W,W2;
   double drhok,dQbeam,dT,N,N2,Estar2;
  
-  find_W(rhok, T, Te, Tv, Estar, Qbeam, W);      
-  find_dW_dx(rhok, mu, T, Te, Tv, Estar, Qbeam,
+  find_W(gl, rhok, T, Te, Tv, Estar, Qbeam, W);      
+  find_dW_dx(gl, rhok, mu, T, Te, Tv, Estar, Qbeam,
               dWrhok, dWdT, dWdTe, dWdTv, dWdQbeam);
 
   N=0.0;
@@ -1169,7 +1169,7 @@ void test_dW_dx(spec_t rhokref, spec_t rhok, spec_t mu, double T, double Te, dou
   // find dWdQbeam numerically    
    wfprintf(stdout,"\n\ndWdQbeam:\n");
    dQbeam=Qbeam/10000.0+1.0e2;
-   find_W(rhok, T, Te,Tv,Estar, Qbeam+dQbeam, W2);
+   find_W(gl, rhok, T, Te,Tv,Estar, Qbeam+dQbeam, W2);
    for (s=0; s<ns; s++) dWdT2[s]=(W2[s]-W[s])/dQbeam;
    for (s=0; s<ns; s++){  
      wfprintf(stdout,"%15.15E  %15.15E\n",dWdQbeam[s],dWdT2[s]);
@@ -1182,7 +1182,7 @@ void test_dW_dx(spec_t rhokref, spec_t rhok, spec_t mu, double T, double Te, dou
     rhok2[s]+=drhok;
     N2=N+(rhok2[s]-rhok[s])/_m(s);
     Estar2=Estar*N/N2;
-    find_W(rhok2, T, Te,Tv,Estar2,Qbeam, W2);
+    find_W(gl, rhok2, T, Te,Tv,Estar2,Qbeam, W2);
     for (r=0; r<ns; r++) dWrhok2[r][s]=(W2[r]-W[r])/(drhok);
   }
   for (r=0; r<ns; r++){
@@ -1201,7 +1201,7 @@ void test_dW_dx(spec_t rhokref, spec_t rhok, spec_t mu, double T, double Te, dou
   // find dWdT numerically 
    wfprintf(stdout,"\n\ndWdT:\n");
    dT=T/10000.0;
-  find_W(rhok, T+dT, Te,Tv,Estar,Qbeam, W2);
+  find_W(gl, rhok, T+dT, Te,Tv,Estar,Qbeam, W2);
   for (s=0; s<ns; s++) dWdT2[s]=(W2[s]-W[s])/dT;
   for (s=0; s<ns; s++){  
     wfprintf(stdout,"%15.15E  %15.15E\n",dWdT[s],dWdT2[s]);
@@ -1210,7 +1210,7 @@ void test_dW_dx(spec_t rhokref, spec_t rhok, spec_t mu, double T, double Te, dou
   // find dWdTe numerically 
    wfprintf(stdout,"\n\ndWdTe:\n");
   dT=Te/10000.0;
-  find_W(rhok, T, Te+dT,Tv,Estar,Qbeam, W2);
+  find_W(gl, rhok, T, Te+dT,Tv,Estar,Qbeam, W2);
   for (s=0; s<ns; s++) dWdT2[s]=(W2[s]-W[s])/dT;
   for (s=0; s<ns; s++){  
     wfprintf(stdout,"%15.15E  %15.15E\n",dWdTe[s],dWdT2[s]);

@@ -1,6 +1,7 @@
 #define _CHEM_AIR11S31R
 #define _CHEM_METHOD "Air Plasma 11s 31r Dunn-Kang [dunn1973a]"
 #define _CHEM_PLASMA
+#define _CHEM_ACTIONNAME "AirPlasma11s"
 
 #define ns 11
 #define ncs 6
@@ -62,3 +63,9 @@ const static long speciestype[ns] = {
   SPECIES_NEUTRAL,
   SPECIES_NEUTRAL
 };
+
+
+typedef struct {
+  int CHEMMODEL;
+} gl_model_chem_t;
+

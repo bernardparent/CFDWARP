@@ -68,7 +68,7 @@ static void find_Schem(np_t *np, gl_t *gl, long l, flux_t S){
   }
   for (spec=0; spec<ns; spec++) rhok[spec]=_rhok(np[l],spec);
   Estar=0.0;
-  find_W(rhok, _T(np[l],gl), _T(np[l],gl), _T(np[l],gl), Estar, _Qbeam(np[l],gl), W);
+  find_W(gl, rhok, _T(np[l],gl), _T(np[l],gl), _T(np[l],gl), Estar, _Qbeam(np[l],gl), W);
   for (spec=0; spec<ns; spec++){
     S[spec]=W[spec];
   }
@@ -121,7 +121,7 @@ static void find_dSchem_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
   for (s=0; s<ns; s++) rhok[s]=_rhok(np[l],s);
   for (s=0; s<ns; s++) mu[s]=_mu(np,gl,l,s);
 
-  find_dW_dx(rhok, mu, _T(np[l],gl), _T(np[l],gl), _T(np[l],gl), Estar,_Qbeam(np[l],gl),
+  find_dW_dx(gl, rhok, mu, _T(np[l],gl), _T(np[l],gl), _T(np[l],gl), Estar,_Qbeam(np[l],gl),
            dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam);
   find_dT_dU(np[l], gl, dTdU);
   for ( k = 0; k < nf; k++ ){
@@ -146,7 +146,7 @@ void test_dSchem_dU(np_t *np, gl_t *gl, long l){
   Estar=0.0;
   for (spec=0; spec<ns; spec++) rhok[spec]=_rhok(np[l],spec);
   for (spec=0; spec<ns; spec++) mu[spec]=_mu(np,gl,l,spec);
-  test_dW_dx(gl->cycle.fluid.Uref, rhok, mu,_T(np[l],gl), _T(np[l],gl), _T(np[l],gl), Estar, _Qbeam(np[l],gl));
+  test_dW_dx(gl, gl->cycle.fluid.Uref, rhok, mu,_T(np[l],gl), _T(np[l],gl), _T(np[l],gl), Estar, _Qbeam(np[l],gl));
 }
 
 
