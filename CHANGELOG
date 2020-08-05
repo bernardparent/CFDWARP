@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 05a
+  * deleted model/chem/_Cs_Air_Plasma_*
+  * in model/chem
+    - added _Cs_Air_Plasma_15s
+  * in model/chem/_chem.h and model/chem/*/chem.c
+    - added gl parameter to find_Qei() and find_dQei_dx()
+  * in model/fluid/_*_plasma/fluid_source.c
+    - in find_Se() and find_dSe_dU_transport(), added gl parameter to find_Qei() and find_dQei_dx()
+
+
 2020 AUG 04b
   * in model/chem/
     - added _Air_Plasma_11s/

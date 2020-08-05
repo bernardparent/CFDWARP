@@ -489,7 +489,7 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double 
 
 
 
-void find_Qei(spec_t rhok, double Estar, double Te, double *Qei){
+void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
   double kf,ionizationpotential,theta;
   long spec;
   
@@ -522,7 +522,7 @@ void find_Qei(spec_t rhok, double Estar, double Te, double *Qei){
 
 
 
-void find_dQei_dx(spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
+void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
   double kf,ionizationpotential,theta;
   long spec;
   
