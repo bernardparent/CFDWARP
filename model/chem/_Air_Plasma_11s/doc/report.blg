@@ -1,0 +1,52 @@
+This is BibTeX, Version 0.99d (TeX Live 2019/dev/Debian)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: report.aux
+The style file: warpdoc.bst
+Database file #1: all.bib
+Warning--empty pages in nasa:1973:dunn
+Warning--empty booktitle in aiaaconf:1987:Bussing
+Warning--empty pages in aiaaconf:1987:Bussing
+Warning--empty booktitle in aiaaconf:1991:sharma
+Warning--empty pages in aiaaconf:1991:sharma
+You've used 9 entries,
+            2310 wiz_defined-function locations,
+            643 strings with 5888 characters,
+and the built_in function-call counts, 1950 in all, are:
+= -- 137
+> -- 63
+< -- 4
++ -- 25
+- -- 16
+* -- 216
+:= -- 268
+add.period$ -- 17
+call.type$ -- 9
+change.case$ -- 0
+chr.to.int$ -- 0
+cite$ -- 14
+duplicate$ -- 109
+empty$ -- 233
+format.name$ -- 16
+if$ -- 420
+int.to.chr$ -- 0
+int.to.str$ -- 9
+missing$ -- 10
+newline$ -- 31
+num.names$ -- 9
+pop$ -- 33
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 26
+stack$ -- 0
+substring$ -- 130
+swap$ -- 39
+text.length$ -- 4
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 5
+while$ -- 16
+width$ -- 10
+write$ -- 80
+(There were 5 warnings)

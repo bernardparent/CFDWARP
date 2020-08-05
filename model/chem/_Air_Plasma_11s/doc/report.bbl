@@ -1,0 +1,46 @@
+\begin{thebibliography}{1}
+\newcommand{\enquote}[1]{``#1''}
+
+\bibitem{nasa:1973:dunn}
+{\sc Dunn, M.~G. and Kang, S.~W.}, \enquote{Theroretical and Experimental
+  Studies of Reentry Plasmas,} {\em NASA CR-2232\/}, 1973.
+
+\bibitem{aiaaconf:1987:Bussing}
+{\sc Bussing, T. and Eberhardt, S.}, \enquote{Chemistry Associated with
+  Hypersonic Vehicles,} June 1987, AIAA Paper 87-1292.
+
+\bibitem{book:1990:park}
+{\sc Park, C.}, {\em Nonequilibrium Hypersonic Aerothermodynamics\/}, Wiley,
+  New-York, 1990.
+
+\bibitem{aiaaconf:1991:sharma}
+{\sc Sharma, S.~P., Gillespie, W.~D., and Meyer, S.~A.}, \enquote{Shock Front
+  Radiation Measurements in Air,} Jan. 1991, AIAA Paper 91-0573.
+
+\bibitem{jtht:1993:park}
+{\sc Park, C.}, \enquote{Review of Chemical-Kinetic Problems of Future NASA
+  Missions, I: Earth Entries,} {\em Journal of Thermophysics and Heat
+  Transfer\/}, Vol.~7, No.~3, 1993, pp.~385--398.
+
+\bibitem{jtht:1991:candler}
+{\sc Candler, G.~V. and MacCormack, R.~W.}, \enquote{Computation of Weakly
+  Ionized Hypersonic Flows in Thermochemical Nonequilibrium,} {\em Journal of
+  Thermophysics and Heat Transfer\/}, Vol.~5, 1991, pp.~266--273.
+
+\bibitem{jcp:1997:bose}
+{\sc Bose, D. and Candler, G.~V.}, \enquote{Thermal rate constants of the
+  O2+N→NO+O reaction based on the A2 and A4 potential-energy surfaces,} {\em
+  The Journal of Chemical Physics\/}, Vol.~107, No.~16, 1997, pp.~6136--6145.
+
+\bibitem{jcp:1996:bose}
+{\sc Bose, D. and Candler, G.~V.}, \enquote{Thermal rate constants of the
+  N2+O→NO+N reaction using ab initio 3A and 3A potential energy surfaces,}
+  {\em The Journal of Chemical Physics\/}, Vol.~104, No.~8, 1996,
+  pp.~2825--2833.
+
+\bibitem{pf:2007:boyd}
+{\sc Boyd, I.~D.}, \enquote{Modeling of associative ionization reactions in
+  hypersonic rarefied flows,} {\em Physics of Fluids\/}, Vol.~19, No.~9, 2007,
+  pp.~096102.
+
+\end{thebibliography}

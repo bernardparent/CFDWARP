@@ -1,3 +1,0 @@
-#!/bin/sh
-gcc -Wall -O4 townsend.c -lm -o townsend
-./townsend

@@ -23,15 +23,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <model/chem/_chem.h>
-#include <model/_model.h>
 #include <model/thermo/_thermo.h>
 #include <model/share/chem_share.h>
-#include <src/control.h>
-
-#define CHEMMODEL_NONE 1
-#define CHEMMODEL_DUNNKANG 2
-
 
 
 const static bool REACTION[32]=
@@ -72,51 +65,7 @@ const static bool REACTION[32]=
 
 
 
-void write_model_chem_template(FILE **controlfile){
-  wfprintf(*controlfile,
-    "  %s(\n"
-    "    CHEMMODEL=CHEMMODEL_DUNNKANG;\n"
-    "  );\n"
-  ,_CHEM_ACTIONNAME);
-}
-
-
-
-void read_model_chem_actions_2(char *actionname, char **argum, SOAP_codex_t *codex){
-}
-
-
-void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex){
-  long numvarsinit;
-  void (*action_original) (char *, char **, struct SOAP_codex_t *);
-  gl_t *gl=((readcontrolarg_t *)codex->action_args)->gl;
-  if (strcmp(actionname,_CHEM_ACTIONNAME)==0) {
-    SOAP_count_all_vars(codex, &numvarsinit);
-
-    if (((readcontrolarg_t *)codex->action_args)->VERBOSE) wfprintf(stdout,"%s..",_CHEM_ACTIONNAME);
-    SOAP_add_int_to_vars(codex,"CHEMMODEL_NONE",CHEMMODEL_NONE); 
-    SOAP_add_int_to_vars(codex,"CHEMMODEL_DUNNKANG",CHEMMODEL_DUNNKANG); 
-    gl->MODEL_CHEM_READ=TRUE;
-
-    action_original=codex->action;
-    codex->action=&read_model_chem_actions_2;
-    SOAP_process_code(*argum, codex, SOAP_VARS_KEEP_ALL);
-    codex->action=action_original;
-
-    find_int_var_from_codex(codex,"CHEMMODEL",&gl->model.chem.CHEMMODEL);
-    if (gl->model.chem.CHEMMODEL!=CHEMMODEL_DUNNKANG && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)
-      SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_DUNNKANG or CHEMMODEL_NONE.");
-
-    SOAP_clean_added_vars(codex,numvarsinit);
-    codex->ACTIONPROCESSED=TRUE;
-  }
-}
-
-
-
-
-
-void find_W_DunnKang ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
+void find_W_DunnKang1973 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
   long k;
   spec_t X;
 
@@ -221,10 +170,10 @@ void find_W_DunnKang ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, do
   if (REACTION[31])
     add_to_W_fwbw_2r3p ( specNO, specN2,
                              specNOplus, speceminus, specN2, 2.2E15, -0.35, 216000.0, T, X, W );
-  
 }
 
-void find_dW_dx_DunnKang ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, 
+
+void find_dW_dx_DunnKang1973 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, 
                   double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, s;                    /* counters */
@@ -371,81 +320,4 @@ void find_dW_dx_DunnKang ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te
     add_to_dW_fwbw_2r3p ( specNO, specN2,
                                specNOplus, speceminus, specN2,
                                2.2E15, -0.35, 216000.0, T, X, dWdT, dWdrhok );
-
-
 }
-
-
-void find_W_None ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
-  long k;
-
-  for ( k = 0; k < ns; k++ ) {
-    W[k] = 0.0;
-  }
-}
-
-
-void find_dW_dx_None ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, 
-                  double Estar, double Qbeam,
-                  spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
-  long k, s;                    /* counters */
-
-  for ( s = 0; s < ns; s++ ) {
-    dWdT[s] = 0.0;
-    dWdTe[s] = 0.0;
-    dWdTv[s] = 0.0;
-    dWdQbeam[s] = 0.0;
-    for ( k = 0; k < ns; k++ ) {
-      dWdrhok[s][k] = 0.0;
-    }
-  }
-}
-
-
-void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
-  switch (gl->model.chem.CHEMMODEL){
-    case CHEMMODEL_DUNNKANG: 
-      find_W_DunnKang ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
-    break;
-    case CHEMMODEL_NONE: 
-      find_W_None ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );    
-    break;
-    default:
-      fatal_error("Problem with CHEMMODEL in find_W() within chem.c");
-  }
-
-}
-
-
-void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, 
-                  double Estar, double Qbeam,
-                  spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
-  switch (gl->model.chem.CHEMMODEL){
-    case CHEMMODEL_DUNNKANG: 
-      find_dW_dx_DunnKang ( gl, rhok, mu, T, Te, Tv, 
-                  Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
-    break;
-    case CHEMMODEL_NONE: 
-      find_dW_dx_None ( gl, rhok, mu, T, Te, Tv, 
-                  Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
-    break;
-    default:
-      fatal_error("Problem with CHEMMODEL in find_W() within chem.c");
-  }
-
-}
-
-
-void find_Qei(spec_t rhok, double Estar, double Te, double *Qei){  
-  *Qei=0.0;
-}
-
-
-
-void find_dQei_dx(spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
-  long spec;
-  
-  for (spec=0; spec<ns; spec++) dQeidrhok[spec]=0.0;
-  *dQeidTe=0.0;  
-}
-

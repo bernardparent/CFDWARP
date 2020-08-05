@@ -1206,6 +1206,17 @@ void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, spec_t mu, double T, doub
   for (s=0; s<ns; s++){  
     wfprintf(stdout,"%15.15E  %15.15E\n",dWdT[s],dWdT2[s]);
   } 
+
+
+  // find dWdTv numerically 
+   wfprintf(stdout,"\n\ndWdTv:\n");
+  dT=Tv/10000.0;
+  find_W(gl, rhok, T, Te,Tv+dT,Estar,Qbeam, W2);
+  for (s=0; s<ns; s++) dWdT2[s]=(W2[s]-W[s])/dT;
+  for (s=0; s<ns; s++){  
+    wfprintf(stdout,"%15.15E  %15.15E\n",dWdTv[s],dWdT2[s]);
+  }
+
   
   // find dWdTe numerically 
    wfprintf(stdout,"\n\ndWdTe:\n");

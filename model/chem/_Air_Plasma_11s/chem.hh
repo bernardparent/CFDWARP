@@ -1,5 +1,5 @@
-#define _CHEM_AIR11S31R
-#define _CHEM_METHOD "Air Plasma 11s 31r Dunn-Kang [dunn1973a]"
+#define _CHEM_AIRPLASMA11S
+#define _CHEM_METHOD "Air Plasma 11s Dunn-Kang [dunn1973a]"
 #define _CHEM_PLASMA
 #define _CHEM_ACTIONNAME "AirPlasma11s"
 
