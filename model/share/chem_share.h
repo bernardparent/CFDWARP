@@ -132,6 +132,19 @@ void add_to_W_bw_3r2p(int specR1, int specR2, int specR3,
                             int specP1, int specP2,
                             double A, double n, double E, double T, spec_t X, spec_t W);
 
+void add_to_W_fwbw_1r2p(int specR1, 
+                            int specP1, int specP2, 
+                            double A, double n, double E, double T, spec_t X, spec_t W);
+
+void add_to_W_fw_1r2p(int specR1, 
+                            int specP1, int specP2, 
+                            double A, double n, double E, double T, spec_t X, spec_t W);
+
+void add_to_W_bw_1r2p(int specR1, 
+                            int specP1, int specP2, 
+                            double A, double n, double E, double T, spec_t X, spec_t W);
+
+
 /* A in cm^3 (mole s)^(-1) K^(-n) 
    E in cal mole^(-1) 
    T in Kelvin
@@ -201,6 +214,21 @@ void add_to_dW_bw_3r2p(int specR1, int specR2, int specR3,
                              double A, double n, double E, double T, spec_t X, 
                              spec_t dWdT, spec2_t dWdrhok);
 
+void add_to_dW_fwbw_1r2p(int specR1, 
+                             int specP1, int specP2, 
+                             double A, double n, double E, double T, spec_t X, 
+                             spec_t dWdT, spec2_t dWdrhok);
+
+
+void add_to_dW_fw_1r2p(int specR1, 
+                             int specP1, int specP2, 
+                             double A, double n, double E, double T, spec_t X, 
+                             spec_t dWdT, spec2_t dWdrhok);
+
+void add_to_dW_bw_1r2p(int specR1, 
+                             int specP1, int specP2, 
+                             double A, double n, double E, double T, spec_t X, 
+                             spec_t dWdT, spec2_t dWdrhok);
 
 /* find the forward reaction rate cofficient kf = A * (calA)^(1-numreactant) * T^n * exp(-E/(R*T))
  * 

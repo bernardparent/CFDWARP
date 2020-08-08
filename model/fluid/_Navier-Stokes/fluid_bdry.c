@@ -303,6 +303,9 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
   for (spec=0; spec<ns; spec++){
     wwall[spec]=_f_symmetry(ACCURACY,_w(np[lB],spec),_w(np[lC],spec));
   }
+  for (spec=0; spec<ncs; spec++) 
+    wwall[spec]=0.0;
+  
   reformat_w(gl,wwall,"_bdry",&ref_flag);
 
   find_Pstar_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY, &Pwall);

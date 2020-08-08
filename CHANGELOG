@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 08a
+  * in model/chem/_CH4_Air_20s_52r_Yungster/chem.c, model/chem/_CO2_Plasma_23s_Park/chem.c
+    - added missing calls to write_model_chem_template() and read_model_chem_actions()
+  * in model/fluid/_Favre-Reynolds/fluid_bdry.c and model/fluid/_Navier-Stokes/fluid_bdry.c
+    - in update_bdry_wall(), now set the charged species densities to 0 at the wall
+  * in model/share/chem_share.c
+    - added add_to_*_1r2p() functions from Ajjay Omprakas
+  * in model/thermo/_generic/thermo.c
+    - in _muk_from_N_Tk_Ek(), added approximate mobilities for Ar+, C+, C2+, CN+, CO+
+    
+
 2020 AUG 07a
   * in model/chem/_Air_Plasma_11s/chem.c
     - added lenard1964 as an option

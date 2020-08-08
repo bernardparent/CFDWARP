@@ -69,6 +69,8 @@ OMPRAKAS, Ajjay
 
   - addition of Smith H2-Air chemical model in model/chem/_H2_Air_9s_Smith
   
+  - addition of add_to_*_*_1r2p to model/share/chem_share.c
+  
 
 PADMANABHAN, Sathyan 
 

@@ -37,12 +37,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef double react_t[nr];
 
-void write_chem_template ( FILE ** controlfile ) {
 
+void write_model_chem_template(FILE **controlfile){
 }
 
-void read_and_init_chem_actions ( char *action, char **argum, SOAP_codex_t * codex ) {
 
+void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex){
 }
 
 /*const static long mR[nr][ns+1]=

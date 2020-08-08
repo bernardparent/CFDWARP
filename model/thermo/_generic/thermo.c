@@ -3673,6 +3673,21 @@ double _muk_from_N_Tk_Ek(double N, double Tk, double Ek, long k){
       case SMAP_Csplus:
         mu=1.0/N*min(3.0/8.0*1.00E23/sqrt(Tk),3.0/8.0*2.50E12/sqrt(Estar)); //based on Air+ with mass adjustment
       break;
+      case SMAP_Arplus:
+        mu=1.0/N*min(0.85*1.00E23/sqrt(Tk),0.85*2.50E12/sqrt(Estar)); //based on Air+ with mass adjustment
+      break;
+      case SMAP_Cplus:
+        mu=1.0/N*min(1.55*1.00E23/sqrt(Tk),1.55*2.50E12/sqrt(Estar)); //based on Air+ with mass adjustment
+      break;
+      case SMAP_C2plus:
+        mu=1.0/N*min(1.10*1.00E23/sqrt(Tk),1.10*2.50E12/sqrt(Estar)); //based on Air+ with mass adjustment
+      break;
+      case SMAP_CNplus:
+        mu=1.0/N*min(1.06*1.00E23/sqrt(Tk),1.06*2.50E12/sqrt(Estar)); //based on Air+ with mass adjustment
+      break;
+      case SMAP_COplus:
+        mu=1.0/N*min(1.02*1.00E23/sqrt(Tk),1.02*2.50E12/sqrt(Estar)); //based on Air+ with mass adjustment
+      break;
       default:
         fatal_error("Mobility can't be found for species %ld",k);
     }
