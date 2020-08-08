@@ -212,12 +212,12 @@ void init_node_3(np_t *np, long l, gl_t *gl, initvar_t values){
     sum=sum+sqr(Init2.V[dim]);
   }
   rho=1.0e0;
-  find_nuk_eta_kappa(Init2.w, rho, Init2.T, nuk, &eta, &kappa);
+  Init2.Tv=values[nd+4+ns];
+  find_nuk_eta_kappa(Init2.w, rho, Init2.T, _Te_from_T_Tv(gl,Init2.T,Init2.Tv), nuk, &eta, &kappa);
   rho=Re*eta/sqrt(sum);
   Init2.P=_P_from_w_rho_T(Init2.w,rho,Init2.T);
   Init2.k=values[nd+2+ns];
   Init2.psi=values[nd+3+ns];
-  Init2.Tv=values[nd+4+ns];
   find_U_init_2(np, l, gl, Init2);
 }
 

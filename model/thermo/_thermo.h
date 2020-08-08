@@ -70,7 +70,7 @@ double _T_from_rhok_P(spec_t rhok, double P);
 
 double _T_from_w_rho_P(spec_t w, double rho, double P);
 
-void find_nuk_eta_kappa(spec_t w, double rho, double T, 
+void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
                    spec_t nuk, double *eta, double *kappa);
 		     
 double _de_dP_at_constant_rho(spec_t rhok, double T);

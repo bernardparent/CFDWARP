@@ -200,7 +200,7 @@ void init_node_3(np_t *np, long l, gl_t *gl, initvar_t values){
     sum=sum+sqr(Init2.V[dim]);
   }
   rho=1.0e0;
-  find_nuk_eta_kappa(Init2.w, rho, Init2.T, nuk, &eta, &kappa);
+  find_nuk_eta_kappa(Init2.w, rho, Init2.T, Init2.T, nuk, &eta, &kappa);
   rho=Re*eta/sqrt(sum);
   Init2.P=_P_from_w_rho_T(Init2.w,rho,Init2.T);
   find_U_init_2(np, l, gl, Init2);

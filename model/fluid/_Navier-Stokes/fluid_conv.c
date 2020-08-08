@@ -231,7 +231,7 @@ double _a_from_jacvars(jacvars_t jacvars){
 double _eta_from_jacvars(jacvars_t jacvars){
   spec_t nu;
   double eta,kappa;
-  find_nuk_eta_kappa(jacvars.w, jacvars.rho, jacvars.T,  nu, &eta, &kappa);
+  find_nuk_eta_kappa(jacvars.w, jacvars.rho, jacvars.T, jacvars.T,  nu, &eta, &kappa);
   return(eta);
 }
 
@@ -943,7 +943,7 @@ double _Pe_from_jacvars(jacvars_t jacvars, metrics_t metrics){
     Vstar+=jacvars.V[dim]*metrics.X[dim];
     Xmag2+=sqr(metrics.X[dim]);
   }
-  find_nuk_eta_kappa(jacvars.w, jacvars.rho, jacvars.T, nu, &eta, &kappa);
+  find_nuk_eta_kappa(jacvars.w, jacvars.rho, jacvars.T, jacvars.T, nu, &eta, &kappa);
   assert(eta>0.0);
   Pe=jacvars.rho/eta*fabs(Vstar)/Xmag2;
   return(Pe);

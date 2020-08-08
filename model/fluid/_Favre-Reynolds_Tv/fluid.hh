@@ -35,7 +35,7 @@ typedef struct {
   double k,psi,dPdrhoetstar,htstar,ev;
   spec_t w,dPdrhok;
   dim_t V,dPdrhou;
-  double rho,P,T;
+  double rho,P,T,Te;
   double zetaA1,zetaA3,zetaA2;
   int EIGENVALCOND;
 } jacvars_t;
@@ -46,7 +46,7 @@ typedef struct {
   bool AXISYMMETRIC;
 #endif
   bool RAPCOMP,TURBSOURCE,
-       REACTING,ADD_ETA_TO_ETAT_WITHIN_QK;
+       REACTING,ADD_ETA_TO_ETAT_WITHIN_QK,SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL;
   double kdiv,psidiv,zetaA1,zetaA3,zetaA2,Prt,Sct;
   double Pmin,Pmax,Tmin,Tmax,wmin,kmin,kmax,
          psimin,psimax,aref,Eref,evref,kref,psiref,

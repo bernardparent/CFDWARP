@@ -7,6 +7,35 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 07a
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - added lenard1964 as an option
+    - added add_W_Townsend ()
+    - added add_dW_dx_Townsend ()
+    - in find_Qei() and find_dQei_dx(), added ionization energies for O2 and N2 if Townsend 
+      ionization is chosen
+  * in model/chem/_Air_Plasma_11s/
+    - added lenard1964.c
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - added the Lenard chemical solver
+  * in model/fluid/*/fluid.c, model/fluid/*/fluid_post.c, model/fluid/*/fluid_conv.c, 
+       model/fluid/*/fluid_init.c
+    - added extra parameter Te to find_nuk_eta_kappa()
+  * in model/fluid/_Favre-Reynolds_Tv/fluid.c
+    - added _Te_from_T_Tv() and _Te()
+    - in write_model_fluid_template() and read_model_fluid_actions(), added 
+      SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL
+  * in model/fluid/_Favre-Reynolds_Tv/fluid_bdry.c
+    - in update_bdry_wall(), set wwall to zero for charged species is set as such
+  * in model/fluid/_Favre-Reynolds_Tv/fluid_conv.c
+    - in find_jacvars*(), added jacvars->Te=..
+  * in model/fluid/_drift-diffusion/fluid.c
+    - in test_dSchem_dU(), fixed a bug: gl->model.rhok should be rhok
+  * in model/thermo/_generic/thermo.c
+    - in find_nuk_eta_kappa(), added parameter Te
+    - in _mueN_from_Te() and _dmueN_dTe_from_Te() added clip for electron mobility at T=300K
+    
+
 2020 AUG 05a
   * deleted model/chem/_Cs_Air_Plasma_*
   * in model/chem

@@ -57,6 +57,7 @@ void write_model_fluid_template(FILE **controlfile){
     "    TURBSOURCE=YES;\n"
     "    N2VIBMODEL=N2VIBMODEL_MACHERET;\n"
     "    TEMODEL=TEMODEL_TEQUILIBRIUM;\n" 
+    "    SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL=TRUE;\n"
     "    REACTING=YES;\n"
     "    Prt=0.9e0;\n"
     "    Sct=1.0e0;\n"
@@ -163,6 +164,7 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
     find_double_var_from_codex(codex,"Prt",&gl->model.fluid.Prt);
     find_bool_var_from_codex(codex,"ADD_ETA_TO_ETAT_WITHIN_QK",&gl->model.fluid.ADD_ETA_TO_ETAT_WITHIN_QK);
     find_bool_var_from_codex(codex,"TURBSOURCE",&gl->model.fluid.TURBSOURCE);
+    find_bool_var_from_codex(codex,"SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL",&gl->model.fluid.SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL);
     find_int_var_from_codex(codex,"N2VIBMODEL",&gl->model.fluid.N2VIBMODEL);
     if (gl->model.fluid.N2VIBMODEL!=N2VIBMODEL_MACHERET && gl->model.fluid.N2VIBMODEL!=N2VIBMODEL_MILLIKAN)
       SOAP_fatal_error(codex,"N2VIBMODEL must be set to either N2VIBMODEL_MACHERET or N2VIBMODEL_MILLIKAN.");
@@ -440,6 +442,28 @@ double _Tv(np_t np){
 }
 
 
+double _Te_from_T_Tv(gl_t *gl, double T, double Tv){
+  double Te;
+  switch (gl->model.fluid.TEMODEL){ 
+    case TEMODEL_TEQUILIBRIUM:
+      Te=T;
+    break;
+    case TEMODEL_TVEQUILIBRIUM:
+      Te=Tv;
+    break;
+    default:
+      Te=0.0;  // needed to avoid warning about unitialized Te
+      fatal_error("Problem with TEMODEL in _Te_from_T_Tv().");
+  }
+  return(Te);   
+}
+
+double _Te(np_t np, gl_t *gl){
+  double Te;
+  Te=_Te_from_T_Tv(gl, _T(np, gl), _Tv(np));
+  return(Te);
+}
+
 double _etstar (np_t np){
   double ret;
   assert_np(np,_rho(np)!=0.0e0);
@@ -474,7 +498,7 @@ double _eta(np_t np, gl_t *gl) {
     ret=np.wk->etamem;
   } else { 
     find_w(np,w); 
-    find_nuk_eta_kappa(w, _rho(np), _T(np,gl),  nu, &eta, &kappa);
+    find_nuk_eta_kappa(w, _rho(np), _T(np,gl),  _Te(np,gl), nu, &eta, &kappa);
     ret=eta;
   }
   return(ret);
@@ -488,7 +512,7 @@ double _nu(np_t np, gl_t *gl, long spec) {
     ret=np.wk->numem[spec];
   } else {
     find_w(np,w); 
-    find_nuk_eta_kappa(w, _rho(np), _T(np,gl),  nu, &eta, &kappa);
+    find_nuk_eta_kappa(w, _rho(np), _T(np,gl), _Te(np,gl),  nu, &eta, &kappa);
     ret=nu[spec];  
   }
   return(ret);
@@ -505,7 +529,7 @@ double _kappa(np_t np, gl_t *gl) {
     T=_T(np,gl);
     find_w(np,w);
     cp=_cp_from_w_T(w,T);
-    find_nuk_eta_kappa(w, _rho(np), T,  nu, &eta, &kappa);
+    find_nuk_eta_kappa(w, _rho(np), T, _Te(np,gl), nu, &eta, &kappa);
     ret=cp*_eta(np,gl)/( /* Prandtl number */(_eta(np,gl))/(kappa)*(cp+w[specN2]*_dev_dTv_from_Tv(T)) );
 
   }
@@ -904,7 +928,7 @@ void reformat_k_psi(gl_t *gl, double *k, double *psi, char *suffix,  bool *flag)
 
 void find_prim_fluid_mem(np_t *np, long l, gl_t *gl, double P, double T){
   spec_t w;
-  double sum1,sum,rho,k,eta,psitilde;
+  double Te,Tv,sum1,sum,rho,k,eta,psitilde;
   spec_t dPdrhok;
   dim_t dPdrhoV;
   double dPdrhoetstar,htstar;
@@ -934,7 +958,9 @@ void find_prim_fluid_mem(np_t *np, long l, gl_t *gl, double P, double T){
   for (dim=0; dim<nd; dim++){
     np[l].wk->Vmem[dim]=np[l].bs->U[ns+dim]/rho;
   }
-  find_nuk_eta_kappa(w, rho, T,  np[l].wk->numem, &(np[l].wk->etamem), &(np[l].wk->kappamem));
+  Tv=_Tv_from_ev(np[l].bs->U[fluxev]/(rho*w[specN2]));
+  Te=_Te_from_T_Tv(gl,T,Tv);
+  find_nuk_eta_kappa(w, rho, T, Te, np[l].wk->numem, &(np[l].wk->etamem), &(np[l].wk->kappamem));
   np[l].wk->kappamem=_cp_from_w_T(w,T)*np[l].wk->etamem/( /* Prandtl number */(np[l].wk->etamem)/(np[l].wk->kappamem)*(_cp_from_w_T(w,T)+w[specN2]*_dev_dTv_from_Tv(T)) );
 
   k=_k(np[l]);

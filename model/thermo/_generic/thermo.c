@@ -3207,13 +3207,14 @@ double _Omega22(double T, double eps){
 }
 
 
-void find_nuk_eta_kappa(spec_t w, double rho, double T, 
+void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
                    spec_t nuk, double *eta, double *kappa){
   long spec,k,l;
   spec_t etak,kappak,chik;
   double P,etamix,kappamix,Nn;
   double chiden,sum;
   double calD[ns][ns];
+  double nuwsum,wsum;
 
   // first make sure the temperature is not out of polynomial bounds
   T=min(T,MAX_T_FOR_NUK_ETA_KAPPA_POLYNOMIALS);
@@ -3298,21 +3299,51 @@ void find_nuk_eta_kappa(spec_t w, double rho, double T,
   }
   
   for (k=0; k<ns; k++){
-    if (speciestype[k]==SPECIES_NEUTRAL){ /* don't add the charged species */
-      sum=0.0e0;
-      for (l=0; l<ns; l++){
-        if (l!=k && speciestype[l]==SPECIES_NEUTRAL) { /* don't add the charged species */
-          assert(calD[k][l]!=0.0e0);
-          sum=sum+chik[l]/calD[k][l];
+    switch (speciestype[k]){
+      case SPECIES_NEUTRAL:
+        sum=0.0e0;
+        for (l=0; l<ns; l++){
+          if (l!=k && speciestype[l]==SPECIES_NEUTRAL) { /* don't add the charged species */
+            assert(calD[k][l]!=0.0e0);
+            sum=sum+chik[l]/calD[k][l];
+          }
         }
-      }
-      assert((sum+1.0E-20)!=0.0e0);
-      nuk[k]=rho*(1.0e0-chik[k])/(sum+1.0E-20);
-    } else {
-      nuk[k]=0.0;
+        assert((sum+1.0E-20)!=0.0e0);
+        nuk[k]=rho*(1.0e0-chik[k])/(sum+1.0E-20);
+      break; 
+  /* now set the diffusion coefficients of the ions
+   * such will only be used when solving a quasi-neutral plasma
+   * such will not be used by the fluid modules when solving the drift-diffusion model
+   */
+      case SPECIES_IONPLUS:
+        nuk[k]=_muk_from_N_Tk_Ek(Nn, T,  0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
+      break;
+      case SPECIES_IONMINUS:
+        nuk[k]=_muk_from_N_Tk_Ek(Nn, T,  0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
+      break;
+      case SPECIES_ELECTRON:
+        nuk[k]=0.0;
+      break;
+      default:
+        fatal_error("Problem with speciestype in find_nuk_eta_kappa().");
     }
   }
   
+#ifdef speceminus
+  /* now set the ambipolar diffusion coefficient of the electrons from the ions diffusion coefficient
+   * such will only be used when solving a quasi-neutral plasma
+   * such will not be used by the fluid modules when solving the drift-diffusion model
+   */
+  nuwsum=0.0;
+  wsum=0.0;
+  for (k=0; k<ncs; k++){
+    if (speciestype[k]==SPECIES_IONPLUS || speciestype[k]==SPECIES_IONMINUS){
+      nuwsum+=nuk[k]*w[k]; 
+      wsum+=w[k];
+    }
+  }
+  nuk[speceminus]=nuwsum/wsum;
+#endif
 }
 
 
@@ -3574,6 +3605,7 @@ double _dsk_dT_from_T_equilibrium(long spec, double T){
 /* product of electron mobility and number density as a function of electron temperature */
 double _mueN_from_Te(double Te){
   double mueN;
+  Te=max(Te,300.0);
   mueN=3.74E19*exp(33.5/sqrt(log(Te)));
   return(mueN);
 }
@@ -3581,8 +3613,12 @@ double _mueN_from_Te(double Te){
 
 double _dmueN_dTe_from_Te(double Te){
   double logTe,dmueNdTe;
-  logTe=log(Te);
-  dmueNdTe=-6.2645E20*exp(33.5/sqrt(logTe))/(Te*pow(logTe,1.5e0));
+  if (Te>300.0){
+    logTe=log(Te);
+    dmueNdTe=-6.2645E20*exp(33.5/sqrt(logTe))/(Te*pow(logTe,1.5e0));
+  } else {
+    dmueNdTe=0.0;
+  }
   return(dmueNdTe);
 }
 

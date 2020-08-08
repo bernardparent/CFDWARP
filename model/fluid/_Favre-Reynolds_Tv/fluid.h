@@ -63,6 +63,10 @@
 
   double _T (np_t np, gl_t *gl);
   
+  double _Te(np_t np, gl_t *gl);
+
+  double _Te_from_T_Tv(gl_t *gl, double T, double Tv);
+
   double _w(np_t np, long spec);
 
   double _etastar (np_t *np, long l, gl_t *gl);

@@ -15,14 +15,6 @@ echo "Removing proprietary directory .././model/chem/_Cs_Air_Plasma_15s"
 rm -rf .././model/chem/_Cs_Air_Plasma_15s 
 cp -a _proprietary .././model/chem/_Cs_Air_Plasma_15s 
 ( printf "current Cs_Air_Plasma_15s\nEND" ) > .././model/chem/_Cs_Air_Plasma_15s/.config 
-echo "Removing proprietary directory .././model/chem/_Cs_Air_Plasma_13s_Lenard"
-rm -rf .././model/chem/_Cs_Air_Plasma_13s_Lenard 
-cp -a _proprietary .././model/chem/_Cs_Air_Plasma_13s_Lenard 
-( printf "current Cs_Air_Plasma_13s_Lenard\nEND" ) > .././model/chem/_Cs_Air_Plasma_13s_Lenard/.config 
-echo "Removing proprietary directory .././model/chem/_Cs_Air_Plasma_15s_Lenard-Park"
-rm -rf .././model/chem/_Cs_Air_Plasma_15s_Lenard-Park 
-cp -a _proprietary .././model/chem/_Cs_Air_Plasma_15s_Lenard-Park 
-( printf "current Cs_Air_Plasma_15s_Lenard-Park\nEND" ) > .././model/chem/_Cs_Air_Plasma_15s_Lenard-Park/.config 
 echo "Removing proprietary directory .././model/fluid/_Navier-Stokes_plasma"
 rm -rf .././model/fluid/_Navier-Stokes_plasma 
 cp -a _proprietary .././model/fluid/_Navier-Stokes_plasma 

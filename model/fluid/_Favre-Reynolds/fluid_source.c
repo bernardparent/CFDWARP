@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/_model.h>
 #include <model/emfield/_emfield.h>
 #include <model/share/fluid_share.h>
+#include <model/share/chem_share.h>
 
 
 static void find_Schem(np_t *np, gl_t *gl, long l, flux_t S){

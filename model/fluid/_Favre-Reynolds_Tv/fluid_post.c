@@ -179,7 +179,7 @@ void find_post_variable_value_fluid(np_t *np, long l, gl_t *gl,
     if (varnum>=ns && varnum<ns+nd) *varvalue=_V(np[l],varnum-ns);
     //assert(is_node_resumed(np[l]));
     find_w(np[l],w);
-    find_nuk_eta_kappa(w, _rho(np[l]), _T(np[l],gl),  nu, &eta, &kappa);
+    find_nuk_eta_kappa(w, _rho(np[l]), _T(np[l],gl), _Te(np[l],gl), nu, &eta, &kappa);
     
     switch (varnum) {
       case nd+ns+0:   *varvalue=_rho(np[l]);       break;

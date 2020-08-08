@@ -304,7 +304,7 @@ double _a_from_jacvars(jacvars_t jacvars){
 double _eta_from_jacvars(jacvars_t jacvars){
   spec_t nu;
   double eta,kappa;
-  find_nuk_eta_kappa(jacvars.w, jacvars.rho, jacvars.T,  nu, &eta, &kappa);
+  find_nuk_eta_kappa(jacvars.w, jacvars.rho, jacvars.T, jacvars.Te, nu, &eta, &kappa);
   return(eta);
 }
 
@@ -1102,8 +1102,10 @@ void find_jacvars_at_interface_Roe_average(jacvars_t jacvarsL, jacvars_t jacvars
   }
 
   jacvars->T=T;
+  jacvars->Te=_Te_from_T_Tv(gl,T,_Tv_from_ev(ev));
   
   set_jacvars_eigenconditioning_constants(gl, jacvars);
+  
 }
 
 
@@ -1153,6 +1155,7 @@ void find_jacvars_at_interface_arith_average(jacvars_t jacvarsL, jacvars_t jacva
   }
 
   jacvars->T=T;
+  jacvars->Te=_Te_from_T_Tv(gl,T,_Tv_from_ev(ev));
   
   set_jacvars_eigenconditioning_constants(gl, jacvars);
 }
@@ -1184,6 +1187,7 @@ void find_jacvars(np_t np, gl_t *gl, metrics_t metrics, long theta, jacvars_t *j
   jacvars->P=_P(np,gl);
 
   jacvars->T=_T(np,gl);
+  jacvars->Te=_Te_from_T_Tv(gl,jacvars->T,_Tv_from_ev(jacvars->ev));
 
   set_jacvars_eigenconditioning_constants(gl, jacvars);
 }
@@ -1369,6 +1373,7 @@ void find_jacvars_from_musclvars(flux_t musclvars, metrics_t metrics, gl_t *gl, 
   }
 
   jacvars->T=T;
+  jacvars->Te=_Te_from_T_Tv(gl,T,Tv);
 
   set_jacvars_eigenconditioning_constants(gl, jacvars);
 }
@@ -1402,6 +1407,7 @@ void find_jacvars_from_U(flux_t U, metrics_t metrics, gl_t *gl, long theta, jacv
 
   jacvars->P=P;
   jacvars->T=T;
+  jacvars->Te=_Te_from_T_Tv(gl,T,_Tv_from_ev(jacvars->ev));
 
   jacvars->htstar=U[fluxet]/rho+P/rho+2.0e0/3.0e0*jacvars->k;
   jacvars->dPdrhoetstar=1.0e0/(rho*_de_dP_at_constant_rho(rhok,T));
@@ -1442,7 +1448,7 @@ double _Pe_from_jacvars(jacvars_t jacvars, metrics_t metrics){
     Vstar+=jacvars.V[dim]*metrics.X[dim];
     Xmag2+=sqr(metrics.X[dim]);
   }
-  find_nuk_eta_kappa(jacvars.w, jacvars.rho, jacvars.T, nu, &eta, &kappa);
+  find_nuk_eta_kappa(jacvars.w, jacvars.rho, jacvars.T, jacvars.Te, nu, &eta, &kappa);
   assert(eta>0.0);
   Pe=jacvars.rho/eta*fabs(Vstar)/Xmag2;
   return(Pe);
