@@ -14,4 +14,7 @@ void find_dQei_dx_Lenard1964(gl_t *gl, spec_t rhok, double Estar, double Te, spe
 
 void find_Qei_Lenard1964(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei);
 
+void find_We_Lenard1964 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, 
+                          double *We_create, double *We_destroy );
+
 #endif

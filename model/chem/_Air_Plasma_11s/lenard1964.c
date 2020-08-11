@@ -374,3 +374,22 @@ void find_dW_dx_Lenard1964 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double 
 }
 
 
+
+
+void find_We_Lenard1964 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, 
+                          double *We_create, double *We_destroy ) {
+  long k;
+  spec_t N;
+  double R;
+
+  R=1.9872;
+  for ( k = 0; k < ns; k++ ) {
+    N[k] = rhok[k] / _calM ( k ) * 1e-6 * calA;
+  }
+  *We_create=0.0;
+  *We_destroy=0.0;
+  if (REACTION[10])
+    *We_create+=_kf_Arrhenius(2, 1.3e8, 1.0, 31900.0*R, Tv)*N[specN]*N[specO]/ calA * _calM(speceminus) * 1.0e6;
+  if (REACTION[20])
+    *We_destroy+=_kf_Arrhenius(2, 2e19, -1.0, 0.0, Te)*N[speceminus]*N[specNOplus]/ calA * _calM(speceminus) * 1.0e6;
+}

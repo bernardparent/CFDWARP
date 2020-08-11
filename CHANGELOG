@@ -7,6 +7,22 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 10a
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - added find_We()
+  * in model/chem/_Air_Plasma_11s/lenard1964.c
+    - added find_We_Lenard1964()
+  * in model/fluid/_*_plasma/fluid_source.c
+    - in find_Se() and find_dSe_dU_transport(), changed (Te-T) to (Te-Tv) within Qen
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - in write_model_fluid_template() and read_model_fluid_actions() added option 
+      TETRANSPORT_WEEE_TWOTEMPERATURE
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Se(), added option TETRANSPORT_WEEE_TWOTEMPERATURE
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - in the outline of the term Qen, changed Te-T to Te-Tv and added explanations
+      
+
 2020 AUG 08a
   * in model/chem/_CH4_Air_20s_52r_Yungster/chem.c, model/chem/_CO2_Plasma_23s_Park/chem.c
     - added missing calls to write_model_chem_template() and read_model_chem_actions()
