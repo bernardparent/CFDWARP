@@ -6,14 +6,14 @@
     [  Air  ]
 }
 
-Mx=8.0;
+Mx=2.23;
 My=0.0;
-P=100000;
-T=300;
-L=1.0;
-H=0.2;
+P=8000;
+T=150;
+L=0.55;
+H=0.02;
 mf=1;
-dwall=1e-6/(P/286/T)/mf;
+dwall=1e-6/(P/286/T)/mf/5;
   is=1;  js=1; 
   ie=round(mf*70); je=round(mf*70);
 
@@ -132,34 +132,19 @@ Init(
 
 Disc(
   FavreReynolds(
-    zetaA1=0.0e0;  {conditions the convective waves of the A jacobian; set it to 0.0 usually but make
-                    sure that the shock structure obtained is similar to when zetaA1 is set to 0.3}
-    zetaA2=0.25;
-    zetaA3=0.2e0;  {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.2e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   MUSCL(
     FLUX=FLUX_FDS;
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
-    AOWENO_gammalo=0.85;
-    AOWENO_gammahi=0.85;
-    INTERPOL=INTERPOL_AOWENO5;
-    EIGENVALCOND=EIGENVALCOND_GNOFFO;
-  );
-  MUSCLplus(
-    FLUX=FLUX_FDSplus;
-    numiter=2;
-    AVERAGING=AVERAGING_ARITH;
-    AOWENO_TYPE=AOWENO_TYPE_COMPRESSIVE;
     AOWENO_gammalo=0.95;
-    AOWENO_gammahi=0.95;
-    INTERPOL=INTERPOL_AOWENO5;
-    EIGENVALCOND=EIGENVALCOND_PASCAL;
-  );
-  FDSCauchy(
-    AVERAGING=AVERAGING_ROE;
-    ACCURACY=ACCURACY_SECONDORDER;
-    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
+    POSFILTER=POSFILTER_PARENT;
+    POSFILTER_numiter=10;
   );
 );
 

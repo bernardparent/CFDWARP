@@ -330,6 +330,14 @@ where $\nu_k$ is the mass diffusion coefficient and $w_k$ the mass fraction and 
 
 \section{Charged Species Mass Conservation}
 
+The charged species transport equation can be written as:
+%
+\begin{equation}
+  \frac{\partial N_k}{\partial t} + \sum_{i=1}^3 \frac{\partial}{\partial x_i} N_k \vec{V}_i^k = W_k
+\end{equation}
+%
+where $W_k$ is the rate of particule production for the $k$th species per unit volume due to chemical reactions and where $N_k$ is the number density of species $k$, and $\vec{V}_k$ is the $k$th species velocity including both drift and diffusion.
+
 As was shown in Ref.\ \cite{jcp:2015:parent}, and based on prior theory outlined in Refs. \cite{jcp:2014:parent,jcp:2011:parent:2, jcp:2013:parent}, it is more computationally efficient write the $k$th charged species transport equation in ambipolar form and to add some terms to enforce Gauss's law as follows:
 %
 \begin{align}

@@ -320,8 +320,9 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
     Tvwall=_f_symmetry(ACCURACY,_Tv(np[lB]),_Tv(np[lC]));
   } else {
     Twall=_T(np[lA],gl);
+    Tvwall=Twall;
     // make the vibrational temperature at the wall adiabatic
-    Tvwall=_f_symmetry(ACCURACY,_Tv(np[lB]),_Tv(np[lC]));
+    //Tvwall=_f_symmetry(ACCURACY,_Tv(np[lB]),_Tv(np[lC]));
   }
   /* clip Twall and Tvwall so that they remain within the user-specified bounds */
   Twall=max(gl->model.fluid.Twmin,min(gl->model.fluid.Twmax,Twall));

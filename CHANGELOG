@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 12a
+  * in model/emfield/doc/Epotential/report.tex
+    - fixed a typo: charges species should be charged species
+  * in model/fluid/_Favre-Reynolds_Tv/fluid_bdry.c and model/fluid/_plasma/fluid_bdry.c
+    - in update_bdry_wall(), now fix Tv at the wall equal to the wall temperature (used to be
+      a zero-gradient condition)
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - in the section "Charged Species Mass Conservation", added the standard non-computationally
+      efficient form for completeness
+    
+
 2020 AUG 10a
   * in model/chem/_Air_Plasma_11s/chem.c
     - added find_We()
