@@ -64,7 +64,7 @@ CFLref=1.0;
 
 meshtype=1; {set to 1 for gridline on axis of symmetry ; 
              set to 2 for no gridline on axis of symmetry ;}
-meshfact=1.0;
+meshfact=12.0;
 sizefact=0.02;
 
 dwall=30e-6/meshfact;
@@ -167,7 +167,9 @@ Model(
     AXISYMMETRIC=NO; {set to YES to solve axisymmetric problems in 2D}
   );
   AirPlasma11s(
-    CHEMMODEL=CHEMMODEL_DUNNKANG;
+    CHEMMODEL=CHEMMODEL_DUNNKANG1973;
+    TOWNSENDIONIZATION=FALSE; {include reactions function of EoverN}
+    TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
   );
 );
 
@@ -276,7 +278,7 @@ Cycle(
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     PRECONDITIONER=PRECON_LOCALTIMESTEP;
     if (iter==1,
-      CFL=0.06;
+      CFL=0.01;
     );
     system("date");
     CFL=min(CFL*1.03,CFLref);

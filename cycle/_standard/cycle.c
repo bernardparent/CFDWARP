@@ -47,7 +47,7 @@ void write_runtime_template(FILE **controlfile){
   "    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}\n"
   "    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}\n"
   "    if (iter==1,\n"
-  "      CFL=0.1;\n"
+  "      CFL=0.01;\n"
   "    );\n"
   "    CFL=min(CFL*1.05,0.5);\n"
   "    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2"
@@ -56,13 +56,13 @@ void write_runtime_template(FILE **controlfile){
 #endif
   ");\n"
 #ifdef EMFIELD
-  "    Lc=3e-3;      {characteristic length scale in meters used to solve the emfield equation}\n"
-  "    relaxEMF=0.3; {relaxation factor forced on the update of the emfield variables}\n"
+  "    Lc=1e0;      {characteristic length scale in meters used to solve the emfield equation}\n"
+  "    relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}\n"
   "    UpdateEMField(Lc,relaxEMF"
 #ifdef UNSTEADY
     ",dt"
 #endif
-  "); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}\n"
+  ",TSEMF_SOR,500); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}\n"
 #endif
   "    printf(\"%%6.2f %%6ld %%9.3f   %%E (%%4ld"
 #ifdef _2DL

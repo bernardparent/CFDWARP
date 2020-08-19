@@ -23,6 +23,8 @@
 #define hbw_bdry_fluid 2
 // hbw_mem_fluid is the neighbor-nodes bandwidth   on which the node fluid props depend when being resumed
 #define hbw_mem_fluid 1
+// hbw_mem_fluid_metrics is the neighbor-nodes-metrics bandwidth on which the node fluid props depend
+#define hbw_mem_fluid_metrics 1
 
 typedef double spec_t[ns];
 typedef double chargedspec_t[ncs];

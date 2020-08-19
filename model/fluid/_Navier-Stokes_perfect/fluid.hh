@@ -19,6 +19,8 @@
 #define hbw_bdry_fluid 3
 // hbw_mem_fluid is the neighbor-nodes bandwidth   on which the node fluid props depend when being resumed
 #define hbw_mem_fluid 0
+// hbw_mem_fluid_metrics is the neighbor-nodes-metrics bandwidth on which the node fluid props depend
+#define hbw_mem_fluid_metrics 1
 
 #define FLUX_LAMBDA_CONVECTIVE 0
 

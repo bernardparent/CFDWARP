@@ -1123,7 +1123,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     wfprintf(stdout,"Bdry..");
     read_bdry(*argum, codex);
 #ifdef DISTMPI
-    find_metrics_on_all_nodes((*np), gl, _zone_intersection(gl->domain_all,_zone_expansion(gl->domain,+1)));
+    find_metrics_on_all_nodes((*np), gl, _zone_intersection(gl->domain_all,_zone_expansion(gl->domain,+hbw_mem_fluid_metrics)));
 #else
     find_metrics_on_all_nodes((*np), gl, gl->domain);
 #endif

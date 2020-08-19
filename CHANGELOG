@@ -7,6 +7,27 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 18a
+  * in cycle/_standard/cycle.c
+    - in write_runtime_template(), changed the default values for CFL, Lc, relaxEMF, UpdateEMField
+  * in model/chem/_Air_Plasma_11s/chem.hh
+    - added _CHEM_WEEE_TWOTEMPERATURE
+  * in model/fluid/*/fluid.hh
+    - added the definition of hbw_mem_fluid_metrics
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Schem(), in case _CHEM_WEEE_TWOTEMPERATURE is not defined and 
+      TETRANSPORT_WEEE_TWOTEMPERATURE is set to TRUE, output fatal error
+  * in model/share/emfield_share.c
+    - in find_J_at_node_from_Jstar_at_interfaces(), added some asserts to verify if the node is
+      valid (TYPELEVEL_FLUID) at the location needed by find_metrics_at_interface()
+  * in src/control.c
+    - in readcontrol_actions(), now calls find_metrics_on_all_nodes() using "hbw_mem_fluid_metrics"
+      instead of "+1"
+  * in bin
+    - added MHD_generator_cesium.wrp
+    - added reentry_wedge.wrp
+      
+
 2020 AUG 12a
   * in model/emfield/doc/Epotential/report.tex
     - fixed a typo: charges species should be charged species

@@ -2,6 +2,7 @@
 #define _CHEM_METHOD "Air Plasma 11s Dunn-Kang [dunn1973a]"
 #define _CHEM_PLASMA
 #define _CHEM_ACTIONNAME "AirPlasma11s"
+#define _CHEM_WEEE_TWOTEMPERATURE
 
 #define ns 11
 #define ncs 6
