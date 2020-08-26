@@ -3,7 +3,6 @@
 Copyright 2001 Giovanni Fusina
 Copyright 2002 Timothy Hui
 
-
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
 
@@ -25,19 +24,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <model/chem/_chem.h>
-#include <model/_model.h>
-#include <model/.active/model.h>
 #include <model/thermo/_thermo.h>
-#include <model/metrics/_metrics.h>
-#include <model/fluid/_fluid.h>
-
-/*********************************************************************************
-   Define the number of chemical reactions for the Jachimowski combustion model.
-   There are 21 reactions here because C counts arrays from 0, and the 0 value
-   is not used.  This is done for convenience and clarity so the reaction 1
-   corresponds to reaction 1, instead of 0 to 1, 1 to 2, etc.
-**********************************************************************************/
+#include <model/share/chem_share.h>
 
 #define maxreact 21
 
@@ -45,25 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef double react_t[maxreact];
 
-/* Declare functions to access various properties: temperature, velocity,
-   composition, and density */
 
-void write_chem_template ( FILE ** controlfile ) {
-}
-
-void read_and_init_chem_actions ( char *action, char **argum, SOAP_codex_t * codex ) {
-
-}
-
-void write_model_chem_template(FILE **controlfile){
-}
-
-
-void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex){
-}
-
-
-void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
+void find_W_Jachimowski1988old ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
   long k, r, s;
   double X[ns];
   double w[ns], rho, frr[maxreact], Kc[maxreact];
@@ -287,7 +258,7 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
  source term.
 ************************************************************************/
 
-void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam,
+void find_dW_dx_Jachimowski1988old ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, p, r, s;              /* counters */
   long row, col;

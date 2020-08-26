@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 26a
+  * in model/chem
+    - deleted _H2_Air_9s_20r_Jachimowsky
+    - deleted _H2_Air_9s_Smith
+    - added _H2_Air_9s in which the Jachimowki model with N2 inert is now located
+    
+
 2020 AUG 18a
   * in cycle/_standard/cycle.c
     - in write_runtime_template(), changed the default values for CFL, Lc, relaxEMF, UpdateEMField

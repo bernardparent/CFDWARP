@@ -43,7 +43,7 @@
 }
 
 {bug when reading interpolation file created with mf=2 and when mf is set to 0.9 --> check this}
-mf=40.0;
+mf=3.0;
 
 is=1;  js=1; 
 ie=round(30*mf); je=round(30*mf);
@@ -125,6 +125,9 @@ Model(
     
     AXISYMMETRIC=NO; {set to YES to solve axisymmetric problems in 2D}
   );
+  H2Air9s(
+    CHEMMODEL=CHEMMODEL_JACHIMOWSKI1988;
+  );
 );
 
 
@@ -185,7 +188,7 @@ Disc(
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.999;
     INTERPOL=INTERPOL_TVD2_VANLEER;
-    EIGENVALCOND=EIGENVALCOND_GNOFFO;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
     POSFILTER=POSFILTER_NONE;
     POSFILTER_numiter=4;
   );
@@ -193,7 +196,7 @@ Disc(
 
 Cycle(
   FavreReynolds(
-    xiverge=1e1;  {residual convergence threshold}
+    xiverge=1e-2;  {residual convergence threshold}
     rhoref=1.0;  {reference density in kg/m3}
     aref=300.0;  {reference sound speed in m/s}
     kref=1e4;  {reference turbulence kinetic energy in m2/s2}

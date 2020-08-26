@@ -1,5 +1,6 @@
-#define _CHEM_H2_AIR_9S_SMITH
-#define _CHEM_METHOD "H2-Air 9 species Smith [smith1999a]"
+#define _CHEM_H2_AIR_9S
+#define _CHEM_METHOD "H2-Air 9 species Jachimowski [jachimowski1988a]"
+#define _CHEM_ACTIONNAME "H2Air9s"
 
 #define CHEM_NEUTRAL TRUE
 #define ns 9
@@ -59,6 +60,7 @@ const static long speciestype[ns] = {
 
 
 
-typedef struct {
-} gl_model_chem_t;
 
+typedef struct {
+  int CHEMMODEL;
+} gl_model_chem_t;

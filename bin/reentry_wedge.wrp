@@ -85,7 +85,7 @@ Hflow=0.05; {height of the flow above the plate}
 Hbdry=0.01; {height of boundary layer at the domain exit}
 Lbow=0.0015;
 
-mf=9;
+mf=2;
 
 dxwall=3e-6/mf;
 
@@ -433,6 +433,7 @@ Cycle(
       CFLmax=0.3;
     );
     system("date");
+  
     CFL=min(CFL*1.01,CFLmax);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     Lc=3e3;      {characteristic length scale in meters used to solve the emfield equation}
@@ -445,6 +446,7 @@ Cycle(
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
+    {if (iter==12, exit(EXIT_SUCCESS););}
   );
 );
 
