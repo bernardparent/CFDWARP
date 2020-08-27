@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <soap.h>
 
 #define T_accuracy 1.0e-12
-  #define ns_c 52
+  #define ns_c 54
 
 #define RN2 296.8E0
 #define Thetav 3353.0E0
@@ -115,7 +115,9 @@ const static speciesname_t speciesname[ns_c]=
    "C+",
    "C2+",
    "CN+",
-   "CO+"
+   "CO+",
+   "HNO",
+   "NO2"
   };
 
 
@@ -172,7 +174,9 @@ const static long numatoms[ns_c]=
    1,  /*C+*/ 
    2,  /*C2+*/
    2,  /*CN+*/
-   2   /*CO+*/
+   2,  /*CO+*/
+   3,  /*HNO*/
+   3   /*NO2*/
   }; 
 
 
@@ -185,7 +189,7 @@ Svehla, R.A,"Estimated Viscosities and Thermal Conductivites of Gases at high te
 	NASA TR R-132, 1962
 CFDWARP/model/thermo/_generic/ref/NASA-TR-R-132.pdf
 
-Secondary Reference: HO2, HCO, C2H3, C2H5, C4H8, CH2O, CH3, CH3O
+Secondary Reference: HO2, HCO, C2H3, C2H5, C4H8, CH2O, CH3, CH3O, HNO, NO2
 Sandia National Laboratories, "A Fortran Computer Code Package for the Evaluation of Gas Phase
 	Multicomponent Transport Properties," SAND86-8246, 1986
 Sandia National Laboratories: SAND86-8246 Update/Revision, 1998
@@ -245,8 +249,8 @@ const static double Peps[ns_c]=
    10.22E+0,    //He
    78.46e0,     /* Air -> obtained from N2 and O2 assuming 4:1 ratio */
    59.7e0,      /* H2+ (unknown!, fixed to the one of H2) */
-   1375.0,      /* Cs (unknown!, fixed to one of Na) */
-   1375.0,      /* Cs+ (unknown!, fixed to one of Na*/
+   71.4,        /* Cs (unknown!, fixed to one of N2) */
+   71.4,        /* Cs+ (unknown!, fixed to one of N2*/
    93.3,        /*Ar*/
    30.6,        /*C*/ 
    78.8,        /*C2*/ 
@@ -256,7 +260,9 @@ const static double Peps[ns_c]=
    30.6,        /*C+*/  /* !! unknown value: fixed to the one of C */
    78.8,        /*C2+*/  /* !! unknown value: fixed to the one of C2 */
    75.0,        /*CN+*/  /* !! unknown value: fixed to the one of CN */
-   91.7         /*CO+*/  /* !! unknown value: fixed to the one of CO */
+   91.7,        /*CO+*/  /* !! unknown value: fixed to the one of CO */
+   116.7,        /*HNO*/
+   200.0,        /*NO2*/
   };
 
 const static double Psig[ns_c]=
@@ -312,7 +318,9 @@ const static double Psig[ns_c]=
    0.3385E+0,   /*C+ !! fixed to the one of C */
    0.3913E+0,   /*C2+* !! fixed to the one of C2 */
    0.3856E+0,   /*CN+* !! fixed to the one of CN */
-   0.3690E+0    /*CO+* !! fixed to the one of CO */  
+   0.3690E+0,   /*CO+* !! fixed to the one of CO */  
+   0.3492E+0,   /*HNO*/
+   0.2500E+0,   /*NO2*/
   };
 
 
@@ -377,7 +385,9 @@ const static double calM[ns_c]=
    12.10115E-3,    /*C+*/
    24.20285E-3,    /*C2+*/
    26.01685E-3,    /*CN+*/
-   28.10045E-3     /*CO+*/
+   28.10045E-3,    /*CO+*/
+   31.01400E-3,    /*HNO*/
+   46.00550E-3,    /*NO2*/
   };
   
 
@@ -436,6 +446,8 @@ const static long ck[ns_c]=
    +1, /*C2+*/
    +1, /*CN+*/
    +1, /*CO+*/
+   0,  /*HNO*/
+   0,  /*NO2*/
   };
   
   
@@ -2491,6 +2503,102 @@ const static double Pa[ns_c][3][11]=
        -3.803269410e-16, /* a7 */
        -1.688617704e+06, /* b1 */
        +6.291980420e+02  /* b2 */
+      }
+    },
+
+/* species HNO
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +200.0e0,        /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       -6.854764860e+04,
+       +9.551627200e+02,
+       -6.000720210e-01,
+        7.995176750e-03,
+       -6.547079160e-07,
+       -3.670513400e-09,
+        1.783392519e-12,
+        6.435351260e+03,
+        3.048166179e+01
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +(6000.0e0-dTrangemin),        /* Tmax [K] */
+       -5.795614980e+06,
+        1.945457427e+04,
+       -2.152568374e+01,
+        1.797428992e-02,
+       -4.976040670e-06,
+        6.397924170e-10,
+       -3.142619368e-14,
+       -1.104192372e+05,
+        1.818650338e+02
+      },
+      {
+       +(6000.0e0-dTrangemin),        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       -5.795614980e+06,
+        1.945457427e+04,
+       -2.152568374e+01,
+        1.797428992e-02,
+       -4.976040670e-06,
+        6.397924170e-10,
+       -3.142619368e-14,
+       -1.104192372e+05,
+        1.818650338e+02
+      }
+    },
+
+/* species NO2
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +200.00e0,        /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       -5.642038780e+04,
+       +9.633085720e+02,
+       -2.434510974e+00,
+        1.927760886e-02,
+       -1.874559328e-05,
+        9.145497730e-09,
+       -1.777647635e-12,
+       -1.547925037e+03,
+        4.067851210e+01
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +(6000.0e0-dTrangemin),        /* Tmax [K] */
+        7.213001570e+05,
+       -3.832615200e+03,
+        1.113963285e+01,
+       -2.238062246e-03,
+        6.547723430e-07,
+       -7.611335900e-11,
+        3.328361050e-15,
+        2.502497403e+04,
+       -4.305130040e+01
+      },
+      {
+       +(6000.0e0-dTrangemin),        /* Tmin [K] */
+       +6000.0e0,       /* Tmax [K] */
+        7.213001570e+05,
+       -3.832615200e+03,
+        1.113963285e+01,
+       -2.238062246e-03,
+        6.547723430e-07,
+       -7.611335900e-11,
+        3.328361050e-15,
+        2.502497403e+04,
+       -4.305130040e+01
       }
     }
    

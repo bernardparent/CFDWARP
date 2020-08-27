@@ -55,6 +55,8 @@
 #define SMAP_C2plus  49
 #define SMAP_CNplus  50
 #define SMAP_COplus  51
+#define SMAP_HNO     52
+#define SMAP_NO2     53
 
 
 

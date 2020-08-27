@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 26b
+  * in model/chem
+    - added _H2_Air_13s which includes the Jachimowski model with N reactions 
+  * in model/thermo/_generic/thermo.c
+    - added species HNO and NO2
+    - changed approximation of Peps for Cs and Cs+ (unknown) from Na to N2
+  * in src/control.c
+    - fixed spelling mistake jachimowsky  -> jachimowski
+  * in src/test.c
+    - in main(), commented out the dispose_node and free() calls because they created a hang
+      when the code is compiled with mpicc
+      
+
 2020 AUG 26a
   * in model/chem
     - deleted _H2_Air_9s_20r_Jachimowsky

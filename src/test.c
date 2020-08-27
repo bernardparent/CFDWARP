@@ -761,7 +761,6 @@ int main ( int argc, char **argv ) {
   input_t input;
   int *argint, argoneint;
   char tmpstr[1000];
-  long i,j,k;
 
 #ifdef _FLUID_MULTISPECIES
   double Tmin, Tmax, dT;
@@ -1003,6 +1002,8 @@ int main ( int argc, char **argv ) {
   }
   //dispose_node ( &npL );
   //dispose_node ( &npR );
+/* 
+  long i,j,k;
   for_ijk ( gl.domain_lim,is,js,ks,ie,je,ke ){
         dispose_node ( &( npArray[_ai ( &gl, i, j, k )] ) );
   }
@@ -1012,6 +1013,6 @@ int main ( int argc, char **argv ) {
   free ( npArray ); 
   free ( control_filename );
   free ( input.name );
-  free ( argint );
+  free ( argint );*/
   return ( EXIT_SUCCESS );
 }

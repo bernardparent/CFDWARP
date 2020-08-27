@@ -74,7 +74,7 @@ const static longstr_t bibname[numbib]=
    "yee1990a", 
    "parent2016b",
    "parent2018a",
-   "jachimowsky1988a",
+   "jachimowski1988a",
    "yungster1994a",
    "kundu1999a",
    "jiang1996a",   
@@ -163,8 +163,8 @@ const static longstr_t bib[numbib]=
    //parent2018a
    "B Parent. \"Positivity-Preserving Dual Time Stepping Schemes for Gas Dynamics\", Journal of Computational Physics 361:391-411, 2018.",
 
-   //jachimowsky1988a
-   "CJ Jachimowsky. \"An Analytical Study of the Hydrogen-Air Reaction Mechanism With Application To Scramjet Combustion\", NASA TP-2791, 1988.",
+   //jachimowski1988a
+   "CJ Jachimowski. \"An Analytical Study of the Hydrogen-Air Reaction Mechanism With Application To Scramjet Combustion\", NASA TP-2791, 1988.",
 
    //yungster1994a
    "S Yungster and MJ Rabinowitz. \"Computation of Shock-Induced Combustion Using a Detailed Methane-Air Mechanism\", Journal of Propulsion and Power 10:609-617, 1994.",

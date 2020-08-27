@@ -1,0 +1,171 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{bm}
+\usepackage{amsmath}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\ordi}{{\rm d}}
+%\let\vec\bf
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\mfa}{\scriptscriptstyle}
+\newcommand{\mfb}{\scriptstyle}
+\newcommand{\mfc}{\textstyle}
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\hlinex}{\vspace{-0.34cm}~~\\ \hline \vspace{-0.31cm}~~\\}
+\newcommand{\hlinextop}{\vspace{-0.46cm}~~\\ \hline \hline \vspace{-0.32cm}~~\\}
+\newcommand{\hlinexbot}{\vspace{-0.37cm}~~\\ \hline \hline \vspace{-0.50cm}~~\\}
+\newcommand{\tablespacing}{\vspace{-0.4cm}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{0.9}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\author{
+  Bernard Parent 
+}
+
+\email{
+  bernparent@gmail.com
+}
+
+\department{
+  Aerospace and Mechanical Engineering
+}
+
+\institution{
+  University of Arizona
+}
+
+\title{Thirteen Species Hydrogen Air  Kinetics 
+}
+
+\date{
+  August 2020
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+%  \tableofcontents
+%  \makenomenclature
+%  \listoftables
+%%  \listoffigures
+
+
+
+
+
+
+
+%
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Jachimowski 13-species 33-reactions hydrogen-air model \cite{nasa:1988:jachimowski}.}
+\begin{tabular}{ccccc} 
+\toprule
+\multicolumn{2}{c}{Reaction\tnote{a,b}} & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole  \\ 
+\midrule
+(1) & H$_{2}$ + O$_{2} \rightleftarrows$ OH + OH & 1.70 $\times$ 10$^{13}$ & 0 & 48 000 \\
+(2) & H + O$_{2} \rightleftarrows$ OH + O & 2.60 $\times$ 10$^{14}$ & 0 & 16 800 \\
+(3) & O + H$_{2} \rightleftarrows$ OH + H & 1.80 $\times$ 10$^{10}$ & 1.00 & 8 900 \\
+(4) & OH + H$_{2} \rightleftarrows$ H$_{2}$O + H & 2.20 $\times$ 10$^{13}$ & 0 & 5 150 \\
+(5) & OH + OH $\rightleftarrows$ H$_{2}$O + O & 6.30 $\times$ 10$^{12}$ & 0 & 1 090 \\
+(6) & H + OH + M $\rightleftarrows$ H$_{2}$O + M & $\eta_1 \times 2.20 \times 10^{22}$ & -2.00 & 0 \\
+(7) & H + H + M $\rightleftarrows$ H$_{2}$ + M & $\eta_2 \times 6.40 \times 10^{17}$ & -1.00 & 0 \\
+(8) & H + O + M $\rightleftarrows$ OH + M & $\eta_3 \times 6.00 \times 10^{16}$ & -0.60 & 0 \\
+(9) & H + O$_{2}$ + M $\rightleftarrows$ HO$_{2}$ + M & $\eta_4 \times 2.10 \times 10^{15}$ & 0 & -1 000 \\
+(10) & HO$_{2}$ + H $\rightleftarrows$ H$_{2}$ + O$_{2}$ & 1.30 $\times$ 10$^{13}$ & 0 & 0 \\
+(11) & HO$_{2}$ + H $\rightleftarrows$ OH + OH & 1.40 $\times$ 10$^{14}$ & 0 & 1 080 \\
+(12) & HO$_{2}$ + H $\rightleftarrows$ H$_{2}$O + O & 1.00 $\times$ 10$^{13}$ & 0 & 1 080 \\
+(13) & HO$_{2}$ + O $\rightleftarrows$ O$_{2}$ + OH & 1.50 $\times$ 10$^{13}$ & 0 &  950 \\
+(14) & HO$_{2}$ + OH $\rightleftarrows$ H$_{2}$O + O$_{2}$ & 8.00 $\times$ 10$^{12}$ & 0 & 0 \\
+(15) & HO$_{2}$ + HO$_{2} \rightleftarrows$ H$_{2}$O$_{2}$ + O$_{2}$ & 2.00 $\times$ 10$^{12}$ & 0 & 0 \\
+(16) & H + H$_{2}$O$_{2} \rightleftarrows$ H$_{2}$ + HO$_{2}$ & 1.40 $\times$ 10$^{12}$ & 0 & 3 600 \\
+(17) & O + H$_{2}$O$_{2} \rightleftarrows$ OH + HO$_{2}$ & 1.40 $\times$ 10$^{13}$ & 0 & 6 400 \\
+(18) & OH + H$_{2}$O$_{2} \rightleftarrows$ H$_{2}$O + HO$_{2}$ & 6.10 $\times$ 10$^{12}$ & 0 & 1 430 \\
+(19) & M + H$_{2}$O$_{2} \rightleftarrows$ OH + OH + M & $\eta_5 \times 1.20 \times 10^{17}$ & 0 & 45 500 \\
+(20) & O + O + M $\rightleftarrows$ O$_{2}$ + M & $\eta_6 \times 6.00 \times 10^{17}$ & 0 & -1 800 \\
+(21) & N + N + M $\rightleftarrows$ N$_{2}$ + M & $\eta_6 \times 2.8 \times 10^{17}$ & -0.75 & 0 \\
+(22) & N + O$_2$  $\rightleftarrows$ NO + O & $6.4 \times 10^{9}$ & 1.0 & 6 300 \\
+(23) & N + NO  $\rightleftarrows$ N$_2$ + O & $1.6 \times 10^{13}$ & 0.0 & 0 \\
+(24) & N + OH  $\rightleftarrows$ NO + H & $6.3 \times 10^{11}$ & 0.5 & 0 \\
+(25) & H + NO + M  $\rightleftarrows$ HNO + M & $\eta_6 \times 5.4 \times 10^{15}$ & 0.0 & -600 \\
+(26) & H + HNO  $\rightleftarrows$ NO + H$_2$ & $4.8 \times 10^{12}$ & 0.0 & 0 \\
+(27) & O + HNO  $\rightleftarrows$ NO + OH & $5.0 \times 10^{11}$ & 0.5 & 0 \\
+(28) & OH + HNO  $\rightleftarrows$ NO + H$_2$O & $3.6 \times 10^{13}$ & 0.0 & 0 \\
+(29) & HO$_2$ + HNO  $\rightleftarrows$ NO + H$_2$O$_2$ & $2.0 \times 10^{12}$ & 0.0 & 0 \\
+(30) & HO$_2$ + NO  $\rightleftarrows$ NO$_2$ + OH & $3.4 \times 10^{12}$ & 0.0 & -260 \\
+(31) & H + NO$_2$  $\rightleftarrows$ NO + OH & $3.5 \times 10^{14}$ & 0.0 & 1500 \\
+(32) & O + NO$_2$  $\rightleftarrows$ NO + O$_2$ & $1.0 \times 10^{13}$ & 0.0 & 600 \\
+(33) & M + NO$_2$  $\rightleftarrows$ NO + O+M & $\eta_6 \times 1.16 \times 10^{16}$ & 0.0 & 66000 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item[{a}] $\rm M=H_2,~H_2 O,~all~other~species.$
+\item[{b}] $\eta_1=1,~6,~1,...,1;~~\eta_2=2,~6,~1,...,1;~~\eta_3=1,~5,~1,...,1;~~\eta_4=2,~16,~1,...,1;~~\eta_5=1,~15,~1,...,1;~~\eta_6=1,...,1.$
+\end{tablenotes}
+\label{tab:jachimowski}
+\end{threeparttable}
+\end{center}
+\end{table}
+%
+
+
+
+
+
+
+
+
+%insert a few newpages here to make sure the refs section follows the tables
+~
+\newpage
+~
+\newpage
+~
+\newpage
+~
+\newpage
+
+
+
+\bibliographystyle{warpdoc}
+\bibliography{all}
+
+
+\end{document}
+
+
+
