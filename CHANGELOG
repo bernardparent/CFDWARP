@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 28a
+  * in model/chem/_H2_Air_13s/jachimowski1988.c
+    - fixed bug: bool REACTION[33] should be bool REACTION[34]
+  * in model/chem/
+    - added _H2_Cs_Air_Plasma_22s
+    
+
 2020 AUG 26b
   * in model/chem
     - added _H2_Air_13s which includes the Jachimowski model with N reactions 

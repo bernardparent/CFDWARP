@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/share/chem_share.h>
 
 
-const static bool REACTION[33]=
+const static bool REACTION[34]=
   {
    TRUE, /* reaction 0 */
    TRUE, /* reaction 1 */
