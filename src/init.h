@@ -16,8 +16,10 @@ void write_init_template(FILE **controlfile);
 */
 void read_init(char *argum, SOAP_codex_t *codex);
 
-void reformat_initvar_species_fractions(initvar_t initvar, long row);
+void reformat_initvar_species_fractions(gl_t *gl, initvar_t initvar_orig, initvar_t initvar, long specstart);
 
-void ensure_positivity_of_determinative_property(initvar_t initvar, long row_start, long row_end);
+void reformat_initvar_densities(gl_t *gl, initvar_t initvar_orig, initvar_t initvar, long specstart);
+
+void verify_positivity_of_determinative_property(initvar_t initvar, long row_start, long row_end);
 
 #endif /* _INIT_H */

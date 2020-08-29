@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/thermo/_thermo.h>
 #include <model/_model.h>
 #include <src/init.h>
+#include <model/share/fluid_share.h>
 
 #define INIT_TYPE1 1
 #define INIT_TYPE2 2
@@ -51,34 +52,22 @@ typedef struct {
 } Init2_t;
 
 
-void find_init_string(char *str){
-  long spec;
-  char *specname=(char *)malloc(sizeof(char));
-  strcpy(str,"INIT_TYPE2,Mx");
-  if2DL(
-    strcat(str,",My");
-  )
-  if3DL(
-    strcat(str,",Mz");
-  )
-  strcat(str,",P,T");
-  for (spec=0; spec<ns; spec++){
-    find_species_variable_name(spec, &specname);
-    strcat(str,",w_");    
-    strcat(str,specname);
-  }
-  strcat(str,",k,psi,Tv");
-  free(specname);
-}
-
 
 void write_init_fluid_template(FILE **controlfile){
-  char *specname,*initstr,*wdefault;
-  long spec;
+  char *specname,*initstr,*wdefault,*specstr1,*specstr2;
   wdefault=(char *)malloc(sizeof(char));
   specname=(char *)malloc(sizeof(char));
   initstr=(char *)malloc(sizeof(char)*1000);
-  find_init_string(initstr);
+  specstr1=(char *)malloc(sizeof(char));
+  specstr2=(char *)malloc(sizeof(char));
+
+  find_init_mass_fraction_templates(&specstr1,&specstr2);
+
+  
+  strcpy(initstr,"INIT_TYPE2,Mx"if2DL(",My")if3DL(",Mz")",P,T");
+  strcat(initstr,specstr2);
+  strcat(initstr,",k,psi,Tv");
+    
   wfprintf(*controlfile,
   "  %s(\n"
   ,_FLUID_ACTIONNAME);
@@ -112,25 +101,19 @@ void write_init_fluid_template(FILE **controlfile){
   "    k=1e-6; {J/kg}\n"
   "    psi=110*sqrt(Mx^2"if2DL("+My^2")if3DL("+Mz^2")")*sqrt(1.4*287*T); {1/s for TURBMODEL_KOMEGA*}\n"
   "    Tv=300; {K}\n"
-  );
-  
-  for (spec=0; spec<ns; spec++){
-    find_species_variable_name(spec, &specname);
-    find_default_init_mass_fraction_string(spec, &wdefault);
-    wfprintf(*controlfile,
-  "    w_%s=%s;\n",specname,wdefault);
-  }
-  wfprintf(*controlfile,
+  "%s"
   "    All(%s);\n"
   "    {\n"
   "    Bdry(BDRY_WALLTFIXED1, %s);\n"
   "    Region(is,"if2DL("js,")if3DL("ks,")"  ie,"if2DL("je,")if3DL("ke,")" %s);\n"
   "    }\n"
-  "  );\n",initstr,initstr,initstr
+  "  );\n",specstr1,initstr,initstr,initstr
   );
   free(specname);
   free(wdefault);
   free(initstr);
+  free(specstr1);
+  free(specstr2);
 }
 
 
@@ -158,11 +141,12 @@ void find_U_init_2(np_t *np, long l, gl_t *gl, Init2_t Init2){
 
 
 /* V[dim], T,rho,w[spec],k,psi,Tv */
-void init_node_1(np_t *np, long l, gl_t *gl, initvar_t values){
+void init_node_1(np_t *np, long l, gl_t *gl, initvar_t initvar){
   long dim,spec;
   Init1_t Init1;
-  reformat_initvar_species_fractions(values,nd+2);
-  ensure_positivity_of_determinative_property(values,nd,nd+ns+4);
+  initvar_t values;
+  reformat_initvar_species_fractions(gl, initvar, values,nd+2);
+  verify_positivity_of_determinative_property(values,nd,nd+ns+4);
 
   for (dim=0; dim<nd; dim++) Init1.V[dim]=values[dim];
   Init1.T=values[nd];
@@ -174,12 +158,13 @@ void init_node_1(np_t *np, long l, gl_t *gl, initvar_t values){
 }
 
 /* M[dim], P,T,w[spec],k,psi,Tv */
-void init_node_2(np_t *np, long l, gl_t *gl, initvar_t values){
+void init_node_2(np_t *np, long l, gl_t *gl, initvar_t initvar){
   long dim,spec;
   double a;
   Init2_t Init2;
-  reformat_initvar_species_fractions(values,nd+2);
-  ensure_positivity_of_determinative_property(values,nd,nd+ns+4);
+  initvar_t values;
+  reformat_initvar_species_fractions(gl, initvar, values,nd+2);
+  verify_positivity_of_determinative_property(values,nd,nd+ns+4);
 
   Init2.P=values[nd];
   Init2.T=values[nd+1];
@@ -194,13 +179,14 @@ void init_node_2(np_t *np, long l, gl_t *gl, initvar_t values){
 
 
 /* M[dim], Re,T,w[spec],k,psi,Tv */
-void init_node_3(np_t *np, long l, gl_t *gl, initvar_t values){
+void init_node_3(np_t *np, long l, gl_t *gl, initvar_t initvar){
   long dim,spec;
   double a,Re,eta,kappa,sum,rho;
   spec_t nuk;
   Init2_t Init2;
-  reformat_initvar_species_fractions(values,nd+2);
-  ensure_positivity_of_determinative_property(values,nd,nd+ns+4);
+  initvar_t values;
+  reformat_initvar_species_fractions(gl, initvar, values,nd+2);
+  verify_positivity_of_determinative_property(values,nd,nd+ns+4);
 
   Init2.T=values[nd+1];
   Re=values[nd];
@@ -223,13 +209,14 @@ void init_node_3(np_t *np, long l, gl_t *gl, initvar_t values){
 
 
 /* Mflight and angles in degrees (if necessary), P,T,w[spec],k,psi,Tv */
-void init_node_4(np_t *np, long l, gl_t *gl, initvar_t values){
+void init_node_4(np_t *np, long l, gl_t *gl, initvar_t initvar){
   long dim,spec;
   double a,theta,M_flight,phi;
   Init2_t Init2;
+  initvar_t values;
   dim_t Mk;
-  reformat_initvar_species_fractions(values,nd+2);
-  ensure_positivity_of_determinative_property(values,nd,nd+ns+4);
+  reformat_initvar_species_fractions(gl, initvar, values,nd+2);
+  verify_positivity_of_determinative_property(values,nd,nd+ns+4);
 
   Init2.P=values[nd];
   Init2.T=values[nd+1];
@@ -260,11 +247,12 @@ void init_node_4(np_t *np, long l, gl_t *gl, initvar_t values){
 
 
 /* V[dim], P,T,w[spec],k,psi,Tv */
-void init_node_5(np_t *np, long l, gl_t *gl, initvar_t values){
+void init_node_5(np_t *np, long l, gl_t *gl, initvar_t initvar){
   long dim,spec;
   Init2_t Init2;
-  reformat_initvar_species_fractions(values,nd+2);
-  ensure_positivity_of_determinative_property(values,nd,nd+ns+4);
+  initvar_t values;
+  reformat_initvar_species_fractions(gl, initvar, values,nd+2);
+  verify_positivity_of_determinative_property(values,nd,nd+ns+4);
 
   Init2.P=values[nd];
   Init2.T=values[nd+1];
@@ -277,12 +265,13 @@ void init_node_5(np_t *np, long l, gl_t *gl, initvar_t values){
 }
 
 /* V[dim], P,T,chi[spec],k,psi,Tv */
-void init_node_6(np_t *np, long l, gl_t *gl, initvar_t values){
+void init_node_6(np_t *np, long l, gl_t *gl, initvar_t initvar){
   long dim,spec;
   double rho;
   Init2_t Init2;
-  reformat_initvar_species_fractions(values,nd+2);
-  ensure_positivity_of_determinative_property(values,nd,nd+ns+4);
+  initvar_t values;
+  reformat_initvar_species_fractions(gl, initvar, values,nd+2);
+  verify_positivity_of_determinative_property(values,nd,nd+ns+4);
 
   Init2.P=values[nd];
   Init2.T=values[nd+1];
@@ -297,25 +286,25 @@ void init_node_6(np_t *np, long l, gl_t *gl, initvar_t values){
 }
 
 
-void init_node_fluid(np_t *np, long l, gl_t *gl, long inittype, initvar_t values){
+void init_node_fluid(np_t *np, long l, gl_t *gl, long inittype, initvar_t initvar){
   switch (inittype) {
     case INIT_TYPE1: 
-      init_node_1(np, l, gl, values); 
+      init_node_1(np, l, gl, initvar); 
     break;
     case INIT_TYPE2: 
-      init_node_2(np, l, gl, values); 
+      init_node_2(np, l, gl, initvar); 
     break;
     case INIT_TYPE3: 
-      init_node_3(np, l, gl, values); 
+      init_node_3(np, l, gl, initvar); 
     break;
     case INIT_TYPE4: 
-      init_node_4(np, l, gl, values); 
+      init_node_4(np, l, gl, initvar); 
     break;
     case INIT_TYPE5: 
-      init_node_5(np, l, gl, values); 
+      init_node_5(np, l, gl, initvar); 
     break;
     case INIT_TYPE6: 
-      init_node_6(np, l, gl, values); 
+      init_node_6(np, l, gl, initvar); 
     break;
     default:
       fatal_error("Initial condition type %ld invalid.",inittype);

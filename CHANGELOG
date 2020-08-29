@@ -7,6 +7,29 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 29a
+  * in model/fluid/*/fluid_init.c and 
+    - removed find_init_string() and rewrote the code within write_init_fluid_template()
+    - in write_init_fluid_template(), added call to find_init_mass_fraction_templates()
+      or find_init_densities_templates() or find_init_molar_fraction_templates()
+    - in init_node*() changed the call to reformat_initvar_species_fractions() to include gl
+  * in model/share/fluid_share.c
+    - added find_init_mass_fraction_templates(), find_init_molar_fraction_templates(),
+      find_init_number_density_templates()
+  * in model/thermo/_generic/thermo.c
+    - deleted find_default_init_mass_fraction_string(), find_default_init_number_density_string(),
+      find_default_init_number_density_fraction_string()
+  * in src/common.h
+    - in gl_t, added initspecies[ns] and nsinit
+  * in src/init.c
+    - added reorder_initvar_species()
+    - rewrote reformat_initvar_species_fractions() to tackle case where not all species are listed
+      within the init call
+    - in read_init_actions_fluid(), added the action Species()
+    - in read_init_actions(), initialized gl->nsinit and gl->initspecies[spec] before and after
+      reading the module Init()
+      
+
 2020 AUG 28a
   * in model/chem/_H2_Air_13s/jachimowski1988.c
     - fixed bug: bool REACTION[33] should be bool REACTION[34]

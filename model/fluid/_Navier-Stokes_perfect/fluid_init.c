@@ -88,44 +88,47 @@ void find_U_init_2(np_t *np, long l, gl_t *gl, Init1_t Init1){
 
 
 /* V[dim], P,T */
-void init_node_1(np_t *np, long l, gl_t *gl, initvar_t values){
-  long dim;
+void init_node_1(np_t *np, long l, gl_t *gl, initvar_t initvar){
+  long dim,flux;
   Init1_t Init1;
-  ensure_positivity_of_determinative_property(values,nd,nd+1);
+  
+  verify_positivity_of_determinative_property(initvar,nd,nd+1);
 
-  for (dim=0; dim<nd; dim++) Init1.V[dim]=values[dim];
-  Init1.P=values[nd];
-  Init1.T=values[nd+1];
+  for (dim=0; dim<nd; dim++) Init1.V[dim]=initvar[dim];
+  Init1.P=initvar[nd];
+  Init1.T=initvar[nd+1];
   //printf("-- P=%E T=%E\n",Init1.P,Init1.T);
   find_U_init_2(np, l, gl, Init1);
 }
 
 
 /* M[dim], P,T */
-void init_node_2(np_t *np, long l, gl_t *gl, initvar_t values){
-  long dim;
+void init_node_2(np_t *np, long l, gl_t *gl, initvar_t initvar){
+  long dim,flux;
   double a;
   Init1_t Init1;
-  ensure_positivity_of_determinative_property(values,nd,nd+1);
 
-  Init1.P=values[nd];
-  Init1.T=values[nd+1];
+  verify_positivity_of_determinative_property(initvar,nd,nd+1);
+
+  Init1.P=initvar[nd];
+  Init1.T=initvar[nd+1];
   a=sqrt(gl->model.fluid.gamma*gl->model.fluid.R*Init1.T);
-  for (dim=0; dim<nd; dim++) Init1.V[dim]=values[dim]*a;
+  for (dim=0; dim<nd; dim++) Init1.V[dim]=initvar[dim]*a;
   find_U_init_2(np, l, gl, Init1);
 }
 
 
 /* V[dim], P,rho */
-void init_node_3(np_t *np, long l, gl_t *gl, initvar_t values){
-  long dim;
+void init_node_3(np_t *np, long l, gl_t *gl, initvar_t initvar){
+  long dim,flux;
   double T,P,rho;
   Init1_t Init1;
-  ensure_positivity_of_determinative_property(values,nd,nd+1);
 
-  for (dim=0; dim<nd; dim++) Init1.V[dim]=values[dim];
-  P=values[nd];
-  rho=values[nd+1];
+  verify_positivity_of_determinative_property(initvar,nd,nd+1);
+
+  for (dim=0; dim<nd; dim++) Init1.V[dim]=initvar[dim];
+  P=initvar[nd];
+  rho=initvar[nd+1];
   T=P/rho/gl->model.fluid.R;
   Init1.P=P;
   Init1.T=T;
@@ -134,16 +137,16 @@ void init_node_3(np_t *np, long l, gl_t *gl, initvar_t values){
 }
 
 
-void init_node_fluid(np_t *np, long l, gl_t *gl, long inittype, initvar_t values){
+void init_node_fluid(np_t *np, long l, gl_t *gl, long inittype, initvar_t initvar){
   switch (inittype) {
     case INIT_TYPE1: 
-      init_node_1(np, l, gl, values); 
+      init_node_1(np, l, gl, initvar); 
     break;
     case INIT_TYPE2: 
-      init_node_2(np, l, gl, values); 
+      init_node_2(np, l, gl, initvar); 
     break;
     case INIT_TYPE3: 
-      init_node_3(np, l, gl, values); 
+      init_node_3(np, l, gl, initvar); 
     break;
     default:
       fatal_error("Initial condition type %ld invalid.",inittype);

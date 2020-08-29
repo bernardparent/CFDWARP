@@ -151,4 +151,11 @@ void find_LambdaZ(np_t *np, gl_t *gl, long l, sqmat_t LambdaZ);
 
 #endif
 
+void find_init_mass_fraction_templates(char **specstr1, char **specstr2);
+
+void find_init_molar_fraction_templates(char **specstr1, char **specstr2);
+
+void find_init_number_density_templates(char **specstr1, char **specstr2);
+
+
 #endif /* _FLUID_SHARE_H */

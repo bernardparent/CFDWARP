@@ -85,12 +85,6 @@ void find_species_name(long spec, char **name);
 
 void find_species_variable_name(long spec, char **name);
 
-void find_default_init_mass_fraction_string(long spec, char **wdefault);
-
-void find_default_init_number_density_string(long spec, char **Ndefault);
-
-void find_default_init_number_density_fraction_string(long spec, char **chidefault);
-
 double _dsk_dT_from_T(long spec, double T);
 
 double _dsk_dT_from_T_equilibrium(long spec, double T);

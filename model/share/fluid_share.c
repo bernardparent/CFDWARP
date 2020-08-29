@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2015-2018 Bernard Parent
+Copyright 2015-2018,2020 Bernard Parent
 Copyright 2001 Jason Etele
 Copyright 2002 Thomas E. Schwartzentruber
 
@@ -2224,3 +2224,197 @@ void find_LambdaZ(np_t *np, gl_t *gl, long l, sqmat_t LambdaZ) {
 
 
 #endif
+
+
+
+void find_init_mass_fraction_templates(char **specstr1, char **specstr2){
+  *specstr1=(char *)realloc(*specstr1,1000*sizeof(char));
+  *specstr2=(char *)realloc(*specstr2,1000*sizeof(char));
+  #if (defined(specN2) && defined(specO2))
+    strcpy(*specstr1,
+    "    Species(\"O2\", \"N2\", \"default\");\n"
+    "    w_O2=0.235;\n"
+    "    w_N2=0.765;\n"
+    "    w_default=1e-30;\n"
+    );  
+    strcpy(*specstr2, ",w_O2,w_N2,w_default");
+  #endif
+  #if (defined(specN2) && !defined(specO2))
+    strcpy(*specstr1,
+    "    Species(\"N2\", \"default\");\n"
+    "    w_N2=1.0;\n"
+    "    w_default=1e-30;\n"
+    );  
+    strcpy(*specstr2, ",w_N2,w_default");
+  #endif
+  #if (defined(specO2) && !defined(specN2))
+    strcpy(*specstr1,
+    "    Species(\"O2\",  \"default\");\n"
+    "    w_O2=1.0;\n"
+    "    w_default=1e-30;\n"
+    );  
+    strcpy(*specstr2, ",w_O2,w_default");
+  #endif
+  #if (defined(specCO2) && !defined(specN2) && !defined(specO2))
+    strcpy(*specstr1,
+    "    Species(\"CO2\", \"default\");\n"
+    "    w_CO2=1.0;\n"
+    "    w_default=1e-30;\n"
+    );  
+    strcpy(*specstr2, ",w_CO2,w_default");
+  #endif
+
+}
+
+
+void find_init_molar_fraction_templates(char **specstr1, char **specstr2){
+  char *chargedstr1,*chargedstr2,*chargedstr3;
+  *specstr1=(char *)realloc(*specstr1,1000*sizeof(char));
+  *specstr2=(char *)realloc(*specstr2,1000*sizeof(char));
+  chargedstr1=(char *)malloc(1000*sizeof(char));
+  chargedstr2=(char *)malloc(1000*sizeof(char));
+  chargedstr3=(char *)malloc(1000*sizeof(char));
+  strcpy(chargedstr1,"");
+  strcpy(chargedstr2,"");
+  strcpy(chargedstr3,"");
+  
+  #if (defined(speceminus) && FALSE)
+    long specionplus;
+    char *nameionplus;
+    nameionplus=(char *)malloc(1000*sizeof(char));
+    specionplus=0;
+    do {
+      specionplus++;
+    } while(_Charge_number(specionplus)<=0 && specionplus<ns);
+    find_species_name(specionplus, &nameionplus);
+    if (specionplus==ns) fatal_error("Problem finding a positive ion in find_init_molar_fraction_templates().");
+    strcat(chargedstr3,",\"e-\",\"");
+    strcat(chargedstr3,nameionplus);
+    strcat(chargedstr3,"\"");
+    find_species_variable_name(specionplus, &nameionplus);
+    strcat(chargedstr1,
+    "    chi_eminus=1e-12;\n"
+    "    chi_"
+    );
+    strcat(chargedstr1,nameionplus);
+    strcat(chargedstr1,"=1e-12;\n");
+    strcat(chargedstr2,",chi_eminus,chi_");
+    strcat(chargedstr2,nameionplus);
+    free(nameionplus);
+  #endif   
+  #if (defined(speceminus))
+    strcat(chargedstr3,",\"e-\"");
+    strcat(chargedstr1,
+    "    chi_eminus=1e-12;\n"
+    );
+    strcat(chargedstr2,",chi_eminus");
+  #endif   
+  #if (defined(specN2) && defined(specO2))
+    strcpy(*specstr1,
+    "    Species(\"O2\",\"N2\"");
+    strcat(*specstr1,chargedstr3);
+    strcat(*specstr1,",\"default\");\n"
+    "    chi_O2=0.21;\n"
+    "    chi_N2=0.79;\n"
+    );
+    strcat(*specstr1,chargedstr1);
+    strcat(*specstr1,
+    "    chi_default=1e-30;\n"
+    );  
+    strcpy(*specstr2, ",chi_O2,chi_N2");
+    strcat(*specstr2, chargedstr2);
+    strcat(*specstr2, ",chi_default");
+  #endif
+  #if (defined(specN2) && !defined(specO2))
+    strcpy(*specstr1,
+    "    Species(\"N2\", \"default\");\n"
+    "    chi_N2=1.0;\n"
+    "    chi_default=1e-30;\n"
+    );  
+    strcpy(*specstr2, ",chi_N2,chi_default");
+  #endif
+  #if (defined(specO2) && !defined(specN2))
+    strcpy(*specstr1,
+    "    Species(\"O2\",  \"default\");\n"
+    "    chi_O2=1.0;\n"
+    "    chi_default=1e-30;\n"
+    );  
+    strcpy(*specstr2, ",chi_O2,chi_default");
+  #endif
+  #if (defined(specCO2) && !defined(specN2) && !defined(specO2))
+    strcpy(*specstr1,
+    "    Species(\"CO2\", \"default\");\n"
+    "    chi_CO2=1.0;\n"
+    "    chi_default=1e-30;\n"
+    );  
+    strcpy(*specstr2, ",chi_CO2,chi_default");
+  #endif
+  free(chargedstr1);
+  free(chargedstr2);
+  free(chargedstr3);
+}
+
+
+
+void find_init_number_density_templates(char **specstr1, char **specstr2){
+  char *chargedstr1,*chargedstr2,*chargedstr3;
+  *specstr1=(char *)realloc(*specstr1,1000*sizeof(char));
+  *specstr2=(char *)realloc(*specstr2,1000*sizeof(char));
+  chargedstr1=(char *)malloc(1000*sizeof(char));
+  chargedstr2=(char *)malloc(1000*sizeof(char));
+  chargedstr3=(char *)malloc(1000*sizeof(char));
+  strcpy(chargedstr1,"");
+  strcpy(chargedstr2,"");
+  strcpy(chargedstr3,"");
+  
+  #if (defined(speceminus))
+    strcat(chargedstr3,",\"e-\"");
+    strcat(chargedstr1,
+    "    N_eminus=1e12; {1/m3} \n"
+    );
+    strcat(chargedstr2,",N_eminus");
+  #endif   
+  #if (defined(specN2) && defined(specO2))
+    strcpy(*specstr1,
+    "    Species(\"O2\",\"N2\"");
+    strcat(*specstr1,chargedstr3);
+    strcat(*specstr1,",\"default\");\n"
+    "    N_O2=0.21*1e24; {1/m3}\n"
+    "    N_N2=0.79*1e24;\n"
+    );
+    strcat(*specstr1,chargedstr1);
+    strcat(*specstr1,
+    "    N_default=1e9;\n"
+    );  
+    strcpy(*specstr2, ",N_O2,N_N2");
+    strcat(*specstr2, chargedstr2);
+    strcat(*specstr2, ",N_default");
+  #endif
+  #if (defined(specN2) && !defined(specO2))
+    strcpy(*specstr1,
+    "    Species(\"N2\", \"default\");\n"
+    "    N_N2=1e24; {1/m3}\n"
+    "    N_default=1e9;\n"
+    );  
+    strcpy(*specstr2, ",N_N2,N_default");
+  #endif
+  #if (defined(specO2) && !defined(specN2))
+    strcpy(*specstr1,
+    "    Species(\"O2\",  \"default\");\n"
+    "    N_O2=1e24; {1/m3}\n"
+    "    N_default=1e9;\n"
+    );  
+    strcpy(*specstr2, ",N_O2,N_default");
+  #endif
+  #if (defined(specCO2) && !defined(specN2) && !defined(specO2))
+    strcpy(*specstr1,
+    "    Species(\"CO2\", \"default\");\n"
+    "    N_CO2=1e24; {1/m3}\n"
+    "    N_default=1e9;\n"
+    );  
+    strcpy(*specstr2, ",N_CO2,N_default");
+  #endif
+  free(chargedstr1);
+  free(chargedstr2);
+  free(chargedstr3);
+}
