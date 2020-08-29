@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 29b
+  * in model/fluid/*/fluid.c
+    - in write_cycle_fluid_template(), added species and dimensions loops for Uref
+  * in src/control.c
+    - in read_control(), added numspec, numdim, numflux, and SPECIESTYPE to codex
+    
+
 2020 AUG 29a
   * in model/fluid/*/fluid_init.c and 
     - removed find_init_string() and rewrote the code within write_init_fluid_template()

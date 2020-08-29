@@ -63,25 +63,20 @@ void write_model_fluid_template(FILE **controlfile){
 
 
 void write_cycle_fluid_template(FILE **controlfile){
-  long spec,dim;
   wfprintf(*controlfile,
     "  %s(\n"
     "    xiverge=1e-3;  {residual convergence threshold}\n"
     "    rhoref=1.0;  {reference density in kg/m3}\n"
     "    aref=300.0;  {reference sound speed in m/s}\n" 
-  ,_FLUID_ACTIONNAME);
-  for (spec=0; spec<ns; spec++){
-    wfprintf(*controlfile,
-    "    Uref[%d]=rhoref;   \n",spec+1);
-  }
-  for (dim=0; dim<nd; dim++){
-    wfprintf(*controlfile,
-    "    Uref[%d]=rhoref*aref;   \n",ns+dim+1);
-  }
-  wfprintf(*controlfile,
-    "    Uref[%d]=rhoref*aref*aref;  \n"
-    "  );\n",nd+ns+1);
-  
+    "    for (spec,1,numspec,\n"
+    "      Uref[spec]=rhoref;\n"
+    "    );\n"
+    "    for (dim,1,numdim,\n"
+    "      Uref[numspec+dim]=rhoref*aref;\n"
+    "    );\n"
+    "    Uref[numspec+numdim+1]=rhoref*aref*aref;\n"  
+    "  );\n"
+  ,_FLUID_ACTIONNAME);  
 }
 
 

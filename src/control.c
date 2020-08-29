@@ -341,6 +341,7 @@ void write_license ( FILE * outputfile ) {
                   "  Copyright 2011 Minha Kim.\n"
                   "  Copyright 2014 Sathyan Padmanabhan.\n"
                   "  Copyright 2019-2020 Prasanna T. Rajendran.\n"
+                  "  Copyright 2020 Aaron Trinh.\n"
                   "  Copyright 2019 Jaehyuk Lee.\n"
                   "  Copyright 2019 Van Tien Nguyen.\n"
                   "\n");
@@ -1295,9 +1296,10 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
 void read_control(char *control_filename, input_t input, bool CYCLEMODULE, bool POSTMODULE, bool GRIDONLY,
                  bool RESETITERCOUNT, np_t **np, gl_t *gl){
   SOAP_codex_t codex;
-  long i,j,k;
+  long i,j,k,spec;
   readcontrolarg_t readcontrolarg;
   char *code;
+  char str[100];
 #ifdef DISTMPI
   long nn_sum;
   int rank;
@@ -1352,6 +1354,17 @@ void read_control(char *control_filename, input_t input, bool CYCLEMODULE, bool 
   add_string_to_codex(&codex,"domain.ks",   "UNDEFINED");
   add_string_to_codex(&codex,"domain.ke",   "UNDEFINED");
 #endif
+  add_int_to_codex(&codex,"numspec",   ns);
+  add_int_to_codex(&codex,"numdim",   nd);
+  add_int_to_codex(&codex,"numflux",   nf);
+  for (spec=0; spec<ns; spec++){
+    sprintf(str,"SPECIESTYPE[%ld]",spec+1);
+    add_int_to_codex(&codex,str,speciestype[spec]);
+  }
+  add_int_to_codex(&codex,"SPECIESTYPE_IONPLUS",   SPECIES_IONPLUS);
+  add_int_to_codex(&codex,"SPECIESTYPE_IONMINUS",   SPECIES_IONMINUS);
+  add_int_to_codex(&codex,"SPECIESTYPE_ELECTRON",   SPECIES_ELECTRON);
+  add_int_to_codex(&codex,"SPECIESTYPE_NEUTRAL",   SPECIES_NEUTRAL);
 
   thread_lock_init(&(gl->lock),THREADTYPE_ALL);
   gl->nn=LONG_MAX;

@@ -82,7 +82,6 @@ void write_model_fluid_template(FILE **controlfile){
 
 
 
-
 void write_cycle_fluid_template(FILE **controlfile){
   long spec,dim;
   wfprintf(*controlfile,
@@ -95,24 +94,19 @@ void write_cycle_fluid_template(FILE **controlfile){
     "    psiref=1e8;    {reference specific dissipation rate of the TKE in 1/s for TURBMODEL_KOMEGA*\n"
     "                    reference dissipation rate of the TKE in m2/s3 for TURBMODEL_KEPSILON}\n" 
     "    aref=sqrt(1.4*287*Tref);  {reference sound speed in m/s}\n" 
-  ,_FLUID_ACTIONNAME);
-  for (spec=0; spec<ns; spec++){
-    wfprintf(*controlfile,
-    "    Uref[%d]=rhoref;   \n",spec+1);
-  }
-  for (dim=0; dim<nd; dim++){
-    wfprintf(*controlfile,
-    "    Uref[%d]=rhoref*aref;   \n",ns+dim+1);
-  }
-  wfprintf(*controlfile,
-    "    Uref[%d]=rhoref*aref*aref;  \n"
-    "    Uref[%d]=rhoref*kref;  \n"
-    "    Uref[%d]=rhoref*psiref;  \n"
-    "    Uref[%d]=rhoref*700.0*Tvref;  \n"
-    "  );\n",nd+ns+1,nd+ns+2,nd+ns+3,nd+ns+4);
-
+    "    for (spec,1,numspec,\n"
+    "      Uref[spec]=rhoref;\n"
+    "    );\n"
+    "    for (dim,1,numdim,\n"
+    "      Uref[numspec+dim]=rhoref*aref;\n"
+    "    );\n"
+    "    Uref[numspec+numdim+1]=rhoref*aref*aref;\n"  
+    "    Uref[numspec+numdim+2]=rhoref*kref;  \n"
+    "    Uref[numspec+numdim+3]=rhoref*psiref;  \n"
+    "    Uref[numspec+numdim+4]=rhoref*700.0*Tvref;  \n"
+    "  );\n"
+  ,_FLUID_ACTIONNAME);  
 }
-
 
 
 

@@ -70,9 +70,7 @@ void write_model_fluid_template(FILE **controlfile){
 
 }
 
-
 void write_cycle_fluid_template(FILE **controlfile){
-  long spec,dim;
   wfprintf(*controlfile,
     "  %s(\n"
     "    xiverge=1e-3;{residual convergence threshold}\n"
@@ -81,21 +79,19 @@ void write_cycle_fluid_template(FILE **controlfile){
     "    kref=1e4;    {reference turbulence kinetic energy in m2/s2}\n" 
     "    psiref=1e8;  {reference specific dissipation rate of the TKE in 1/s if for TURBMODEL_KOMEGA*\n"
     "                  reference dissipation rate of the TKE in m2/s3 for TURBMODEL_KEPSILON}\n" 
-  ,_FLUID_ACTIONNAME);
-  for (spec=0; spec<ns; spec++){
-    wfprintf(*controlfile,
-    "    Uref[%d]=rhoref;   \n",spec+1);
-  }
-  for (dim=0; dim<nd; dim++){
-    wfprintf(*controlfile,
-    "    Uref[%d]=rhoref*aref;   \n",ns+dim+1);
-  }
-  wfprintf(*controlfile,
-    "    Uref[%d]=rhoref*aref*aref;  \n"
-    "    Uref[%d]=rhoref*kref;  \n"
-    "    Uref[%d]=rhoref*psiref;  \n"
-    "  );\n",nd+ns+1,nd+ns+2,nd+ns+3);  
+    "    for (spec,1,numspec,\n"
+    "      Uref[spec]=rhoref;\n"
+    "    );\n"
+    "    for (dim,1,numdim,\n"
+    "      Uref[numspec+dim]=rhoref*aref;\n"
+    "    );\n"
+    "    Uref[numspec+numdim+1]=rhoref*aref*aref;\n"  
+    "    Uref[numspec+numdim+2]=rhoref*kref;  \n"
+    "    Uref[numspec+numdim+3]=rhoref*psiref;  \n"
+    "  );\n"
+  ,_FLUID_ACTIONNAME);  
 }
+
 
 
 void read_model_fluid_actions_2(char *actionname, char **argum, SOAP_codex_t *codex){
