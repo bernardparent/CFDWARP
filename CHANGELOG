@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 29c
+  * in model/share/fluid_share.c
+    - deleted _betag_default()
+    - deleted _betaa_default()
+    - in write_disc_fluid_template(), added charged species loop for betaa and betag
+    
+
 2020 AUG 29b
   * in model/fluid/*/fluid.c
     - in write_cycle_fluid_template(), added species and dimensions loops for Uref

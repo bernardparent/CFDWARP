@@ -44,33 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MINRATIO_BDRY_RHO_P 0.1
 
 
-/* determines whether the gauss's law terms are added to the continuity equations */
-static double _betag_default(long k){
-  double betag;
-  betag=0.0;
-  if (speciestype[k]==SPECIES_IONPLUS) betag=1.0; 
-  if (speciestype[k]==SPECIES_IONMINUS) betag=-0.5; 
-  if (speciestype[k]==SPECIES_ELECTRON) betag=-0.001; 
-  return(betag);
-}
-
-
-static double _betaa_default(long k){
-  double betaa;
-  //if (speciestype[k]==SPECIES_IONMINUS || speciestype[k]==SPECIES_ELECTRON) betaa=1.0; else betaa=0.0;
-/* FOR TESTING PURPOSES ONLY: uncomment the following to prevent use of ambipolar form on negative ions 
-   NOTE: need to also alter find_Dstar() by adding Vkstar-Vstar on the diagonal for negative ions (see fluid_plasma.c)*/
-//  if (speciestype[k]==SPECIES_ELECTRON) betaa=1.0; else betaa=0.0;
-  if (speciestype[k]==SPECIES_NEUTRAL) betaa=0.0; else betaa=_betag_default(k)-_s(k);
-  return(betaa);
-}
 
 
 
 void write_disc_fluid_template(FILE **controlfile){
-#ifdef _FLUID_PLASMA
-  long spec;
-#endif
   wfprintf(*controlfile,
     "  %s(\n"
 #ifdef _FLUID_NEUTRALSTRANSPORT
@@ -88,15 +65,25 @@ void write_disc_fluid_template(FILE **controlfile){
 #endif
   ,_FLUID_ACTIONNAME);
 #ifdef _FLUID_PLASMA
-  for (spec=0; spec<ncs; spec++)   
-    wfprintf(*controlfile,"    betag[%ld]=%6.4f;\n",spec+1,_betag_default(spec));
-  for (spec=0; spec<ncs; spec++)   
-//    wfprintf(*controlfile,"    betaa[%ld]=betag[%ld]%+d;\n",spec,spec,-(int)round(_s(spec)));
-    wfprintf(*controlfile,"    betaa[%ld]=%6.4f;\n",spec+1,_betaa_default(spec));
-#endif  
-  wfprintf(*controlfile,    
-    "  );\n"
+  wfprintf(*controlfile,
+    "    for (spec,1,numspec,\n"
+    "      if (SPECIESTYPE[spec]==SPECIESTYPE_IONPLUS,\n"
+    "        betag[spec]=1.0;\n"
+    "        betaa[spec]=0.0;\n"
+    "      );\n"
+    "      if (SPECIESTYPE[spec]==SPECIESTYPE_IONMINUS,\n"
+    "        betag[spec]=-0.5;\n"
+    "        betaa[spec]=0.5;\n"
+    "      );\n"
+    "      if (SPECIESTYPE[spec]==SPECIESTYPE_ELECTRON,\n"
+    "        betag[spec]=-0.001;\n"
+    "        betaa[spec]=0.999;\n"
+    "      );\n"
+    "    );\n"
   );
+#endif
+  wfprintf(*controlfile,
+    "  );\n");
 }
 
 
