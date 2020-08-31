@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 31a
+  * in cycle/restime/_CDF+/restime.c
+    - in write_disc_restime_template() made xi[] loop function of numdim and numspec
+  * in model/fluid/_Navier-Stokes/fluid_init.c
+    - added missing #include <model/share/fluid_share.h>
+  * in model/fluid/*/fluid_bdry.c
+    - in write_bdry_fluid_template() added Twall param to BDRY_WALLTFIXED1
+    - in update_bdry_wall(), now calls _bdry_param(np,gl,lA,0,TYPELEVEL_FLUID_WORK) to find
+      T at the wall node for BDRY_WALLTFIXED1
+      
+
 2020 AUG 30a
   * in src/bdry.c
     - in _bdry_param(), changed error message wording

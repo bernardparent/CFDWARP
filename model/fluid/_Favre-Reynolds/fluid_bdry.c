@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2000-2002, 2017 Bernard Parent
+Copyright 2000-2002,2017,2020 Bernard Parent
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -68,7 +68,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    BDRY_OUTFLOWSUBSONICMFIXED1       %c   Outflow, subsonic, M fixed\n"
     "    BDRY_SYMMETRICAL2                 %c   Symmetrical, 2nd order\n"
     "    BDRY_SYMMETRICAL1                 %c   Symmetrical, 1st order\n"
-    "    BDRY_WALLTFIXED1                  %c   Wall, T specified\n"
+    "    BDRY_WALLTFIXED1                  %c   Wall, T specified, param Twall\n"
     "    BDRY_WALLADIABATIC1               %c   Wall, Adiabatic\n"
     "    BDRY_SLIPWALL1                    %c   Slip wall, 1st order, Adiabatic\n"
     "    BDRY_FREESTREAM1                  %c   Freestream, 1o, params Vx,Vy,"if3DL("Vz,")" P, T\n"
@@ -77,8 +77,9 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    All(BDRY_WALLTFIXED1);\n"
     "    Plane(\"i\",is,BDRY_INFLOWSUPERSONIC);\n"
     "    Plane(\"i\",ie,BDRY_OUTFLOWSUPERSONIC1);\n"
-    "    Plane(\"j\",js,BDRY_WALLTFIXED1);\n"
-    "    Plane(\"j\",je,BDRY_WALLTFIXED1);\n"
+    "    Twall=300.0; {K}\n"
+    "    Plane(\"j\",js,BDRY_WALLTFIXED1,Twall);\n"
+    "    Plane(\"j\",je,BDRY_WALLTFIXED1,Twall);\n"
 #ifdef _3D
     "    Plane(\"k\",ks,BDRY_SYMMETRICAL2);\n"
     "    Plane(\"k\",ke,BDRY_SYMMETRICAL2);\n"
@@ -324,7 +325,7 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
   if (ADIABATIC) {
     Twall=_f_symmetry(ACCURACY,_T(np[lB],gl),_T(np[lC],gl));
   } else {
-    Twall=_T(np[lA],gl);
+    Twall=_bdry_param(np,gl,lA,0,TYPELEVEL_FLUID_WORK);
   }
   /* clip Twall so that it remains within the user-specified bounds */
   Twall=max(gl->model.fluid.Twmin,min(gl->model.fluid.Twmax,Twall));

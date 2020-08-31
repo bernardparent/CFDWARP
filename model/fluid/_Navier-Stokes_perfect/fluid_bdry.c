@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2010-2011 Bernard Parent
+Copyright 2010-2011,2020 Bernard Parent
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -64,8 +64,8 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    BDRY_SYMMETRICAL1          %c     Symmetrical, 1o\n"
     "    BDRY_SYMMETRICAL2          %c     Symmetrical, 2o\n"
     "    BDRY_SYMMETRICAL3          %c     Symmetrical, 3o\n"
-    "    BDRY_WALLTFIXED1           %c     Wall, T specified, 1o\n"
-    "    BDRY_WALLTFIXED2           %c     Wall, T specified, 2o\n"
+    "    BDRY_WALLTFIXED1           %c     Wall, T specified, 1o, param Twall\n"
+    "    BDRY_WALLTFIXED2           %c     Wall, T specified, 2o, param Twall\n"
     "    BDRY_WALLADIABATIC1        %c     Wall, adiabatic, 1o\n"
     "    BDRY_WALLADIABATIC2        %c     Wall, adiabatic, 2o\n"
     "    BDRY_INFLOWSUBSONIC1       %c     Subsonic Inflow 1o (Constant Tstag, Pstag at inflow)\n"
@@ -76,8 +76,9 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    All(BDRY_OUTFLOWSUPERSONIC1);\n"
     "    Plane(\"i\",is,BDRY_INFLOWSUPERSONIC);\n"
     "    Plane(\"i\",ie,BDRY_OUTFLOWSUPERSONIC1);\n"
-    "    Plane(\"j\",js,BDRY_SYMMETRICAL2);\n"
-    "    Plane(\"j\",je,BDRY_SYMMETRICAL2);\n"
+    "    Twall=300.0; {K}\n"
+    "    Plane(\"j\",js,BDRY_WALLTFIXED1,Twall);\n"
+    "    Plane(\"j\",je,BDRY_WALLTFIXED1,Twall);\n"
 #ifdef _3D
     "    Plane(\"k\",ks,BDRY_SYMMETRICAL2);\n"
     "    Plane(\"k\",ke,BDRY_SYMMETRICAL2);\n"
@@ -295,7 +296,7 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
   if (ADIABATIC) {
     Twall=_f_symmetry(ACCURACY,_T(np[lB],gl),_T(np[lC],gl));
   } else {
-    Twall=_T(np[lA],gl);
+    Twall=_bdry_param(np,gl,lA,0,TYPELEVEL_FLUID_WORK);
   }
   /* clip Twall so that it remains within the user-specified bounds */
   Twall=max(gl->model.fluid.Tmin,min(gl->model.fluid.Tmax,Twall));

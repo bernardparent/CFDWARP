@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2015-2018 Bernard Parent
+Copyright 2015-2018,2020 Bernard Parent
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -33,21 +33,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 void write_disc_restime_template(FILE **controlfile){
-  long flux;
   wfprintf(*controlfile,
     "  %s(\n"
+    "    for(flux,1,numflux,\n"
+    "      if (flux<=numspec+numdim+1,\n"
+    "        xi[flux]=0.5;\n"
+    "      );\n"
+    "      if (flux>numspec+numdim+1,\n"
+    "        xi[flux]=0.25;\n"
+    "      );\n"
+    "    );\n"
+    "  );\n"
   ,_RESTIME_ACTIONNAME);
-  for (flux=0; flux<nf; flux++){
-    if (flux>fluxet){
-      wfprintf(*controlfile,
-      "    xi[%ld]=0.25;\n",flux+1);
-    } else {
-      wfprintf(*controlfile,
-      "    xi[%ld]=0.5;\n",flux+1);
-    }
-  }
-  wfprintf(*controlfile,
-    "  );\n");
 }
 
 

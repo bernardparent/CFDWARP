@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <src/init.h>
 #include <model/thermo/_thermo.h>
 #include <model/_model.h>
+#include <model/share/fluid_share.h>
 
 
 #define INIT_TYPE1 1
