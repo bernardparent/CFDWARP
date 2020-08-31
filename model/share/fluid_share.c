@@ -2215,6 +2215,7 @@ void find_LambdaZ(np_t *np, gl_t *gl, long l, sqmat_t LambdaZ) {
 
 
 void find_init_mass_fraction_templates(char **specstr1, char **specstr2){
+  char *specname;
   *specstr1=(char *)realloc(*specstr1,1000*sizeof(char));
   *specstr2=(char *)realloc(*specstr2,1000*sizeof(char));
   #if (defined(specN2) && defined(specO2))
@@ -2250,12 +2251,22 @@ void find_init_mass_fraction_templates(char **specstr1, char **specstr2){
     );  
     strcpy(*specstr2, ",w_CO2,w_default");
   #endif
-
+  if (ns==1){
+    specname=(char *)malloc(sizeof(char));
+    find_species_variable_name(0, &specname);
+    strcpy(*specstr1,"    w_");
+    strcat(*specstr1,specname);
+    strcat(*specstr1,"=1.0;\n");
+    strcpy(*specstr2, ",w_");
+    strcat(*specstr2,specname); 
+    free(specname);   
+  }
 }
 
 
 void find_init_molar_fraction_templates(char **specstr1, char **specstr2){
   char *chargedstr1,*chargedstr2,*chargedstr3;
+  char *specname;
   *specstr1=(char *)realloc(*specstr1,1000*sizeof(char));
   *specstr2=(char *)realloc(*specstr2,1000*sizeof(char));
   chargedstr1=(char *)malloc(1000*sizeof(char));
@@ -2336,6 +2347,17 @@ void find_init_molar_fraction_templates(char **specstr1, char **specstr2){
     );  
     strcpy(*specstr2, ",chi_CO2,chi_default");
   #endif
+  if (ns==1){
+    specname=(char *)malloc(sizeof(char));
+    find_species_variable_name(0, &specname);
+    strcpy(*specstr1,"    chi_");
+    strcat(*specstr1,specname);
+    strcat(*specstr1,"=1.0;\n");
+    strcpy(*specstr2, ",chi_");
+    strcat(*specstr2,specname); 
+    free(specname);   
+  }
+
   free(chargedstr1);
   free(chargedstr2);
   free(chargedstr3);
@@ -2344,6 +2366,7 @@ void find_init_molar_fraction_templates(char **specstr1, char **specstr2){
 
 
 void find_init_number_density_templates(char **specstr1, char **specstr2){
+  char *specname;
   char *chargedstr1,*chargedstr2,*chargedstr3;
   *specstr1=(char *)realloc(*specstr1,1000*sizeof(char));
   *specstr2=(char *)realloc(*specstr2,1000*sizeof(char));
@@ -2401,6 +2424,16 @@ void find_init_number_density_templates(char **specstr1, char **specstr2){
     );  
     strcpy(*specstr2, ",N_CO2,N_default");
   #endif
+  if (ns==1){
+    specname=(char *)malloc(sizeof(char));
+    find_species_variable_name(0, &specname);
+    strcpy(*specstr1,"    N_");
+    strcat(*specstr1,specname);
+    strcat(*specstr1,"=1e24;\n");
+    strcpy(*specstr2, ",N_");
+    strcat(*specstr2,specname); 
+    free(specname);   
+  }
   free(chargedstr1);
   free(chargedstr2);
   free(chargedstr3);

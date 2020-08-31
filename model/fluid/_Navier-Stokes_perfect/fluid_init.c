@@ -89,7 +89,7 @@ void find_U_init_2(np_t *np, long l, gl_t *gl, Init1_t Init1){
 
 /* V[dim], P,T */
 void init_node_1(np_t *np, long l, gl_t *gl, initvar_t initvar){
-  long dim,flux;
+  long dim;
   Init1_t Init1;
   
   verify_positivity_of_determinative_property(initvar,nd,nd+1);
@@ -104,7 +104,7 @@ void init_node_1(np_t *np, long l, gl_t *gl, initvar_t initvar){
 
 /* M[dim], P,T */
 void init_node_2(np_t *np, long l, gl_t *gl, initvar_t initvar){
-  long dim,flux;
+  long dim;
   double a;
   Init1_t Init1;
 
@@ -120,7 +120,7 @@ void init_node_2(np_t *np, long l, gl_t *gl, initvar_t initvar){
 
 /* V[dim], P,rho */
 void init_node_3(np_t *np, long l, gl_t *gl, initvar_t initvar){
-  long dim,flux;
+  long dim;
   double T,P,rho;
   Init1_t Init1;
 

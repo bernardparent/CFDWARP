@@ -41,7 +41,7 @@ double _bdry_param(np_t *np, gl_t *gl, long l, short param, int TYPELEVEL){
   }
 #endif
   if (TYPELEVEL==TYPELEVEL_FLUID || TYPELEVEL==TYPELEVEL_FLUID_WORK){
-    if (param>=np[l].numbdryparam) fatal_error("Fluid boundary node (%ld,%ld,%ld) needs at least %d parameter(s) specified. Specify those within Bdry() module using Param action.", _i(l,gl,0),_i(l,gl,1),_i(l,gl,2),param+1);
+    if (param>=np[l].numbdryparam) fatal_error("Fluid boundary node (%ld,%ld,%ld) needs at least %d parameter(s) specified. Specify those within the Bdry() module as additional parameters following the boundary condition type.", _i(l,gl,0),_i(l,gl,1),_i(l,gl,2),param+1);
     bdryparam=np[l].bdryparam[param];
   }
   return(bdryparam);
@@ -84,7 +84,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
   np=((readcontrolarg_t *)codex->action_args)->np;
   gl=((readcontrolarg_t *)codex->action_args)->gl;
   TYPELEVEL=((readcontrolarg_t *)codex->action_args)->TYPELEVEL;
-
+  bdryparam=(double *)malloc(sizeof(double));
 
 #ifdef EMFIELD
   if (strcmp(action,_EMFIELD_ACTIONNAME)==0){
@@ -107,12 +107,27 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
 
   if (strcmp(action,"All")==0) {
     SOAP_substitute_all_argums(argum, codex);
-    if (sscanf(*argum,"%ld%n",&BCtype,&eos)!=1 || (*argum)[eos]!=EOS)
-      SOAP_fatal_error(codex,"One argument could not be read properly "
-                     "in All() part of Bdry(). Argument: %s.",*argum);
+    BCtype=SOAP_get_argum_long(codex,*argum,0);
+    numparam=SOAP_number_argums(*argum)-1;
+    if (numparam>0){
+      bdryparam=(double *)realloc(bdryparam,numparam*sizeof(double));
+      for (param=0; param<numparam; param++) bdryparam[param]=SOAP_get_argum_double(codex,*argum,1+param);
+    }                 
     for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
-          if (is_node_bdry((*np)[_ai(gl,i,j,k)],TYPELEVEL))
-            update_node_type((*np),gl,TYPELEVEL,BCtype,_zone_from_point(i,j,k));
+      if (is_node_bdry((*np)[_ai(gl,i,j,k)],TYPELEVEL)){
+        update_node_type((*np),gl,TYPELEVEL,BCtype,_zone_from_point(i,j,k));
+        if (numparam>0){
+          if ((*np)[_ai(gl,i,j,k)].bdryparam==NULL){
+            (*np)[_ai(gl,i,j,k)].bdryparam=(double *)malloc(numparam*sizeof(double));
+          } else {
+            (*np)[_ai(gl,i,j,k)].bdryparam=(double *)realloc((*np)[_ai(gl,i,j,k)].bdryparam,numparam*sizeof(double));
+          }
+          for (param=0; param<numparam; param++){
+            (*np)[_ai(gl,i,j,k)].bdryparam[param]=bdryparam[param];
+          }
+          (*np)[_ai(gl,i,j,k)].numbdryparam=numparam;        
+        }
+      }
     }
     codex->ACTIONPROCESSED=TRUE;
   }
@@ -121,19 +136,86 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
   if (strcmp(action,"Region")==0) {
     SOAP_substitute_all_argums(argum, codex);
     #ifdef _2D
-      if (sscanf(*argum,"%ld,%ld,%ld,%ld,%ld%n",&is,&js,&ie,&je,&BCtype,&eos)!=5
+      if (sscanf(*argum,"%ld,%ld,%ld,%ld,%ld",&is,&js,&ie,&je,&BCtype)!=5){
     #endif
     #ifdef _3D
-      if (sscanf(*argum,"%ld,%ld,%ld,%ld,%ld,%ld,%ld%n",&is,&js,&ks,&ie,&je,&ke,&BCtype,&eos)!=7
+      if (sscanf(*argum,"%ld,%ld,%ld,%ld,%ld,%ld,%ld",&is,&js,&ks,&ie,&je,&ke,&BCtype)!=7){
     #endif
-      || (*argum)[eos]!=EOS){
       SOAP_fatal_error(codex,"One or more argument(s) could not be read properly "
                              "in Region() part of Bdry(). Arguments: %s .",*argum);
     }
+    numparam=SOAP_number_argums(*argum)-(nd*2+1);
+    if (numparam>0){
+      bdryparam=(double *)realloc(bdryparam,numparam*sizeof(double));
+      for (param=0; param<numparam; param++) bdryparam[param]=SOAP_get_argum_double(codex,*argum,(nd*2+1)+param);
+    }                 
     find_zone_from_argum(*argum, 0, gl, codex, &zone);
     for_ijk(zone,is,js,ks,ie,je,ke){
-          if (is_node_bdry((*np)[_ai(gl,i,j,k)],TYPELEVEL))
-            update_node_type((*np),gl,TYPELEVEL,BCtype,_zone_from_point(i,j,k));
+      if (is_node_bdry((*np)[_ai(gl,i,j,k)],TYPELEVEL)){
+        update_node_type((*np),gl,TYPELEVEL,BCtype,_zone_from_point(i,j,k));
+        if (numparam>0){
+          if ((*np)[_ai(gl,i,j,k)].bdryparam==NULL){
+            (*np)[_ai(gl,i,j,k)].bdryparam=(double *)malloc(numparam*sizeof(double));
+          } else {
+            (*np)[_ai(gl,i,j,k)].bdryparam=(double *)realloc((*np)[_ai(gl,i,j,k)].bdryparam,numparam*sizeof(double));
+          }
+          for (param=0; param<numparam; param++){
+            (*np)[_ai(gl,i,j,k)].bdryparam[param]=bdryparam[param];
+          }
+          (*np)[_ai(gl,i,j,k)].numbdryparam=numparam;        
+        }
+      }
+    }
+    codex->ACTIONPROCESSED=TRUE;
+  }
+
+  char planedim;
+  long planeloc;
+  if (strcmp(action,"Plane")==0) {
+    SOAP_substitute_all_argums(argum, codex);
+      if (sscanf(*argum,"\"%c\",%ld,%ld",&planedim,&planeloc,&BCtype)!=3){
+      SOAP_fatal_error(codex,"One or more argument(s) could not be read properly "
+                             "in Plane() part of Bdry(). Arguments: %s .",*argum);
+    }
+    numparam=SOAP_number_argums(*argum)-3;
+    if (numparam>0){
+      bdryparam=(double *)realloc(bdryparam,numparam*sizeof(double));
+      for (param=0; param<numparam; param++) bdryparam[param]=SOAP_get_argum_double(codex,*argum,3+param);
+    }
+    zone=gl->domain_lim;
+    switch (planedim){
+      case 'i':
+        zone.is=planeloc;
+        zone.ie=planeloc;
+      break; 
+      case 'j':
+        zone.js=planeloc;
+        zone.je=planeloc;      
+      break; 
+#ifdef _3D
+      case 'k':
+        zone.ks=planeloc;
+        zone.ke=planeloc;      
+      break; 
+#endif
+      default:
+        fatal_error("In Bdry(), planedim can not be set to %c.",planedim);
+    }
+    for_ijk(zone,is,js,ks,ie,je,ke){
+      if (is_node_bdry((*np)[_ai(gl,i,j,k)],TYPELEVEL)){
+        update_node_type((*np),gl,TYPELEVEL,BCtype,_zone_from_point(i,j,k));
+        if (numparam>0){
+          if ((*np)[_ai(gl,i,j,k)].bdryparam==NULL){
+            (*np)[_ai(gl,i,j,k)].bdryparam=(double *)malloc(numparam*sizeof(double));
+          } else {
+            (*np)[_ai(gl,i,j,k)].bdryparam=(double *)realloc((*np)[_ai(gl,i,j,k)].bdryparam,numparam*sizeof(double));
+          }
+          for (param=0; param<numparam; param++){
+            (*np)[_ai(gl,i,j,k)].bdryparam[param]=bdryparam[param];
+          }
+          (*np)[_ai(gl,i,j,k)].numbdryparam=numparam;        
+        }
+      }
     }
     codex->ACTIONPROCESSED=TRUE;
   }
@@ -144,7 +226,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
     find_zone_from_argum(*argum, 0, gl, codex, &zone);
     BCtype=SOAP_get_argum_long(codex,*argum,2*nd);
     numparam=SOAP_number_argums(*argum)-2*nd-1;
-    bdryparam=(double *)malloc(numparam*sizeof(double));
+    bdryparam=(double *)realloc(bdryparam,numparam*sizeof(double));
     for (param=0; param<numparam; param++) bdryparam[param]=SOAP_get_argum_double(codex,*argum,2*nd+param+1);
     for_ijk(zone,is,js,ks,ie,je,ke){
           if (_node_type((*np)[_ai(gl,i,j,k)],TYPELEVEL)==BCtype){
@@ -160,7 +242,6 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
           }
     }
     codex->ACTIONPROCESSED=TRUE;
-    free( bdryparam );
   }
 
 
@@ -390,6 +471,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
 #endif
     codex->ACTIONPROCESSED=TRUE;
   }
+  free(bdryparam);
 }
 
 

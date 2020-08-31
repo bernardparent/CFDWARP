@@ -47,7 +47,7 @@
 }
 
 scale=1.0;
-M=2.0;
+M=0.5;
 T=300; {K}
 gamma=1.4;
 R=286.0;        {J/kgK }
@@ -124,9 +124,13 @@ Bdry(
     }
     BDRY_CYLINDERSURFACE=BDRY_WALLTFIXED2;
     All(BDRY_OUTFLOWSUPERSONIC1);
-    Faces(BDRY_SYMMETRICAL1,BDRY_SYMMETRICAL1, BDRY_CYLINDERSURFACE ,BDRY_FREESTREAM1);
-    Param(is,js,ie,je, BDRY_FREESTREAM1, Vx,Vy,P,T);
-    for(j,js+1,je-1,
+    Plane("i",is,BDRY_SYMMETRICAL1);
+    Plane("i",ie,BDRY_SYMMETRICAL1);
+    Plane("j",js,BDRY_CYLINDERSURFACE);
+    Plane("j",je,BDRY_FREESTREAM1, Vx,Vy,P);
+    
+{    Param(is,js,ie,je, BDRY_FREESTREAM1, Vx,Vy,P,T);
+}    for(j,js+1,je-1,
       Link(ie,j, is+1,j);
       Link(ie-1,j, is,j);
     );

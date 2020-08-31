@@ -7,6 +7,28 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 30a
+  * in src/bdry.c
+    - in _bdry_param(), changed error message wording
+    - in read_bdry_actions(), added code to handle bdry extra parameters to be read within actions
+      All(), Region()
+    - in read_bdry_actions(), added new Plane() action to specify boundary conditions on a plane;
+      Plane is now the approach to specify conditions on the faces instead of the cumbersome Faces() 
+      which can not be used  in conjunction with boundary extra parameters
+  * in model/fluid/*/fluid_bdry.c and model/fluid/_drift-diffusion/fluid.c
+    - in write_bdry_fluid_template(), removed Param() within template
+    - in write_bdry_fluid_template(), removed Faces() within template
+    - in write_bdry_fluid_template(), added Plane() within template
+  * in model/fluid/_Navier-Stokes_perfect/fluid_init.c
+    - removed unneeded flux variable  within init_node_*()
+  * in model/share/fluid_share.c
+    - in find_init_mass_fraction_templates(), find_init_molar_fraction_templates(),   
+      find_init_number_density_templates(), added code to handle special case ns=1
+  * in src/init.c
+    - in read_init_actions_fluid(), made sure that Species() is not executed when there is only
+      one species specified within the model
+      
+
 2020 AUG 29c
   * in model/share/fluid_share.c
     - deleted _betag_default()

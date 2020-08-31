@@ -302,7 +302,7 @@ void read_init_actions_fluid(char *actionname, char **argum, SOAP_codex_t *codex
   }
   
   
-  if (strcmp(actionname,"Species")==0) {
+  if (ns>1 && strcmp(actionname,"Species")==0) {
     nsinit=SOAP_number_argums(*argum);
     if (nsinit>ns) SOAP_fatal_error(codex,"Number of species within Species() can not be higher than the number of species in the chemical solver.");
     gl->nsinit=nsinit;

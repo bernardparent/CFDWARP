@@ -74,16 +74,24 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    _________________________________________________________________________________________\n"
     "    }\n"
     "    All(BDRY_OUTFLOWSUPERSONIC1);\n"
-    "    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1"     if2DL(",  BDRY_SYMMETRICAL2,BDRY_SYMMETRICAL2")   if3DL(",  BDRY_SYMMETRICAL2,BDRY_SYMMETRICAL2")  ");\n"
+    "    Plane(\"i\",is,BDRY_INFLOWSUPERSONIC);\n"
+    "    Plane(\"i\",ie,BDRY_OUTFLOWSUPERSONIC1);\n"
+    "    Plane(\"j\",js,BDRY_SYMMETRICAL2);\n"
+    "    Plane(\"j\",je,BDRY_SYMMETRICAL2);\n"
+#ifdef _3D
+    "    Plane(\"k\",ks,BDRY_SYMMETRICAL2);\n"
+    "    Plane(\"k\",ke,BDRY_SYMMETRICAL2);\n"
+#endif
     "    {\n"
     "    Cut(is" if2DL(",js") if3DL(",ks") ",  ie" if2DL(",je") if3DL(",ke") ");\n"
     "    Region(is" if2DL(",js") if3DL(",ks") ",  ie" if2DL(",je") if3DL(",ke") ",  BDRY_INFLOWSUPERSONIC);\n"
     "    Link(i1" if2DL(",j1") if3DL(",k1") ",  i2" if2DL(",j2") if3DL(",k2") ");\n"
-    "    Param(is" if2DL(",js") if3DL(",ks") ",  ie" if2DL(",je") if3DL(",ke") ",  BDRY_FREESTREAM1, Vx,Vy,"if3DL("Vz,")"P,T);\n"
     "    }\n"
-    "  );\n",_bdry_ID(BDRY_INFLOWSUPERSONIC),_bdry_ID(BDRY_OUTFLOWSUPERSONIC1),_bdry_ID(BDRY_SYMMETRICAL1),_bdry_ID(BDRY_SYMMETRICAL2),
-             _bdry_ID(BDRY_SYMMETRICAL3),_bdry_ID(BDRY_WALLTFIXED1),_bdry_ID(BDRY_WALLTFIXED2),_bdry_ID(BDRY_WALLADIABATIC1),
-             _bdry_ID(BDRY_WALLADIABATIC2),_bdry_ID(BDRY_INFLOWSUBSONIC1),_bdry_ID(BDRY_OUTFLOWSUBSONIC1),_bdry_ID(BDRY_FREESTREAM1)
+    "  );\n",_bdry_ID(BDRY_INFLOWSUPERSONIC),_bdry_ID(BDRY_OUTFLOWSUPERSONIC1),
+             _bdry_ID(BDRY_SYMMETRICAL1),_bdry_ID(BDRY_SYMMETRICAL2),_bdry_ID(BDRY_SYMMETRICAL3),
+             _bdry_ID(BDRY_WALLTFIXED1),_bdry_ID(BDRY_WALLTFIXED2),_bdry_ID(BDRY_WALLADIABATIC1),
+             _bdry_ID(BDRY_WALLADIABATIC2),_bdry_ID(BDRY_INFLOWSUBSONIC1),
+             _bdry_ID(BDRY_OUTFLOWSUBSONIC1),_bdry_ID(BDRY_FREESTREAM1)
   );
 }
 
