@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 AUG 31b
+  * in model/chem/_H2_Cs_Air_Plasma_22s/chem.c
+    - fixed a bug: the ionization reactions shouldn't set W to zero but add to it
+  * in bin
+    - added bluntwedge.wrp
+    
+
 2020 AUG 31a
   * in cycle/restime/_CDF+/restime.c
     - in write_disc_restime_template() made xi[] loop function of numdim and numspec

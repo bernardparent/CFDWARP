@@ -128,6 +128,13 @@ Model(
   H2Air9s(
     CHEMMODEL=CHEMMODEL_JACHIMOWSKI1988;
   );
+  H2Air13s(
+    CHEMMODEL=CHEMMODEL_JACHIMOWSKI1988;
+  );
+  H2CsAirPlasma22s(
+    COMBUSTIONMODEL=COMBUSTIONMODEL_JACHIMOWSKI1988;
+    IONIZATIONMODEL=IONIZATIONMODEL_LENARD1964;
+  );
 );
 
 
@@ -160,14 +167,10 @@ Init(
     psi=110*sqrt(Mx^2+My^2)*sqrt(1.4*287*T); {1/s for TURBMODEL=TURBMODEL_KOMEGA*}
     w_H2=0.03;
     w_O2=0.235;
-    w_H=1e-30;
-    w_O=1e-30;
-    w_OH=1e-30;
-    w_H2O=1e-30;
-    w_HO2=1e-30;
-    w_H2O2=1e-30;
+    w_default=1e-30;
     w_N2=0.735;
-    All(2,Mx,My,P,T,w_H2,w_O2,w_H,w_O,w_OH,w_H2O,w_HO2,w_H2O2,w_N2,k,psi);
+    Species("H2","O2","N2","default");
+    All(2,Mx,My,P,T,w_H2,w_O2,w_N2,w_default,k,psi);
     {
     Bdry(BDRY_WALLTFIXED1, 2,Mx,My,P,T,w_H2,w_O2,w_H,w_O,w_OH,w_H2O,w_HO2,w_H2O2,w_N2,k,psi);
     Region(is,js,  ie,je, 2,Mx,My,P,T,w_H2,w_O2,w_H,w_O,w_OH,w_H2O,w_HO2,w_H2O2,w_N2,k,psi);
@@ -202,20 +205,16 @@ Cycle(
     kref=1e4;  {reference turbulence kinetic energy in m2/s2}
     psiref=1e8;  {reference specific dissipation rate of the TKE in 1/s if TURBMODEL=TURBMODEL_KOMEGA*
                   reference dissipation rate of the TKE in m2/s3 if TURBMODEL=TURBMODEL_KEPSILON}
-    Uref[1]=rhoref;   
-    Uref[2]=rhoref;   
-    Uref[3]=rhoref;   
-    Uref[4]=rhoref;   
-    Uref[5]=rhoref;   
-    Uref[6]=rhoref;   
-    Uref[7]=rhoref;   
-    Uref[8]=rhoref;   
-    Uref[9]=rhoref;   
-    Uref[10]=rhoref*aref;   
-    Uref[11]=rhoref*aref;   
-    Uref[12]=rhoref*aref*aref;  
-    Uref[13]=rhoref*kref;  
-    Uref[14]=rhoref*psiref;  
+    for (spec,1,numspec,
+      Uref[spec]=rhoref;
+    );
+    for (dim,1,numdim,
+      Uref[numspec+dim]=rhoref*aref;
+    );
+    Uref[numspec+numdim+1]=rhoref*aref*aref;
+    Uref[numspec+numdim+2]=rhoref*kref;  
+    Uref[numspec+numdim+3]=rhoref*psiref;  
+
   );
   SteadyState(
     if (mod(iter,50)==0,
