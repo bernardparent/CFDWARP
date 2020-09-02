@@ -133,13 +133,9 @@ double _Tstag(np_t np, gl_t *gl){
 void find_post_variable_name_fluid(long varnum, char *varname){
   char *speciesname;
   speciesname=(char *)malloc(sizeof(char));
-  if (varnum<ncs) {
+  if (varnum<ns) {
     find_species_name(varnum,&speciesname);
-    sprintf(varname,"N_%s",speciesname);
-  }
-  if (varnum>=ncs && varnum<ns) {
-    find_species_name(varnum,&speciesname);
-    sprintf(varname,"w_%s",speciesname);
+    sprintf(varname,"chi_%s",speciesname);
   }
   free(speciesname);
 
@@ -160,7 +156,8 @@ void find_post_variable_name_fluid(long varnum, char *varname){
 void find_post_variable_value_fluid(np_t *np, long l, gl_t *gl,
                           long varnum, double *varvalue){
   spec_t w,nu;
-  double eta,kappa;
+  double eta,kappa,N;
+  long spec;
 
 /*  double Ptest,dPdrhoetstar;
   spec_t dPdrhok;
@@ -171,8 +168,9 @@ void find_post_variable_value_fluid(np_t *np, long l, gl_t *gl,
 
   *varvalue=0.0;
   if (is_node_valid(np[l],TYPELEVEL_FLUID)){
-    if (varnum<ncs) *varvalue=_rhok(np[l],varnum)/_m(varnum);
-    if (varnum>=ncs && varnum<ns) *varvalue=_w(np[l],varnum);
+    N=0.0;
+    for (spec=0; spec<ns; spec++) N+=_rhok(np[l],spec)/_m(spec);
+    if (varnum<ns) *varvalue=(_rhok(np[l],varnum)/_m(varnum))/N;
     if (varnum>=ns && varnum<ns+nd) *varvalue=_V(np[l],varnum-ns);
     //assert(is_node_resumed(np[l]));
     find_w(np[l],w);

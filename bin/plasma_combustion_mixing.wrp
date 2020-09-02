@@ -223,7 +223,7 @@ Model(
     sigmadiv=1e-6; {S/m}
     etdiv=1e2;     {J/kg}
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
-    Tmin=2.0e2;     Tmax=12.0e3;    {K}
+    Tmin=2.0e2;     Tmax=16.0e3;    {K}
     Tvmin=Tmin;     Tvmax=12.0e3;  {K}
     Temin=Tmin;     Temax=60.0e3;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
@@ -245,6 +245,10 @@ Model(
     SetRelativePermittivity(is,js, ie,je, 1.0 );
     SetSolidConductivity(is,js, ie,je, 0.0 {S/m});
     SetElectroMotiveForce(is,js, ie,je, 0.0{V/m},0.0{V/m}, 1e99{max power in W/m3});
+  );
+  H2AirPlasma13s(
+    COMBUSTIONMODEL=COMBUSTIONMODEL_JACHIMOWSKI1988;
+    IONIZATIONMODEL=IONIZATIONMODEL_PARENT2014;
   );
   H2CsAirPlasma22s(
     COMBUSTIONMODEL=COMBUSTIONMODEL_JACHIMOWSKI1988;
@@ -390,7 +394,7 @@ Cycle(
                            near cathode}
     relaxNi_bdry=1.0;     {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.2;     {the electron density relaxation factor at the boundary }
-    relaxTe=0.3;          {the electron temperature relaxation factor }
+    relaxTe=0.9;          {the electron temperature relaxation factor }
     rhoref=0.1;           {reference density in kg/m3}
     Tref=300.0;           {reference temperature in K}
     Teref=20000.0;        {reference electron temperature in K}
@@ -440,10 +444,13 @@ Cycle(
     ,{else}
       if (iter<1000,
         CFLmax=1.8;
+        sigma1=0.0;
       ,{else}
         CFLmax=2.8;
+        sigma1=0.0;
       );
     );
+    system("date");
     if (iter<3000,
       Model(FavreReynoldsPlasma(REACTING=NO;););
     ,{else}
@@ -472,10 +479,6 @@ Cycle(
     tmax=period*number_of_periods;    {simulation time span in seconds}
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
-    if (iter==1,
-      CFL=0.03;
-    );
-    CFL=min(CFL*1.5,0.6);
     if (time_within_period<dischargeduration/2,
       Deltaphi=max(0,time_within_period/(0.5*dischargeduration)*Vpp);
     ,{else}
@@ -483,9 +486,17 @@ Cycle(
     );
     
     if (time_within_period<dischargeduration,
+      if (iter==1,
+        CFL=0.03;
+      );
+      CFL=min(CFL*1.5,2.2);
       dt=dt_discharge;
       itermax=itermax_discharge;
     ,{else}
+      if (iter==1,
+        CFL=0.5;
+      );
+      CFL=min(CFL*1.5,3.0);
       time_within_next_period=time+dt_nodischarge-period*floor((time+dt_nodischarge)/period);
       if (time_within_next_period<dischargeduration,
         dt=dt_nodischarge-time_within_next_period;

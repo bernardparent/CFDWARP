@@ -43,10 +43,10 @@
 }
 
 {bug when reading interpolation file created with mf=2 and when mf is set to 0.9 --> check this}
-mf=3.0;
+mf=1.0;
 
 is=1;  js=1; 
-ie=round(30*mf); je=round(30*mf);
+ie=round(180*mf); je=round(60*mf);
 
 Grid(
   Size(is,js, ie,je);
@@ -130,6 +130,10 @@ Model(
   );
   H2Air13s(
     CHEMMODEL=CHEMMODEL_JACHIMOWSKI1988;
+  );
+  H2AirPlasma13s(
+    COMBUSTIONMODEL=COMBUSTIONMODEL_JACHIMOWSKI1988;
+    IONIZATIONMODEL=IONIZATIONMODEL_PARENT2014;
   );
   H2CsAirPlasma22s(
     COMBUSTIONMODEL=COMBUSTIONMODEL_JACHIMOWSKI1988;
