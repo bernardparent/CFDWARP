@@ -1,0 +1,327 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{bm}
+\usepackage{amsmath}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\ordi}{{\rm d}}
+%\let\vec\bf
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\mfa}{\scriptscriptstyle}
+\newcommand{\mfb}{\scriptstyle}
+\newcommand{\mfc}{\textstyle}
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\hlinex}{\vspace{-0.34cm}~~\\ \hline \vspace{-0.31cm}~~\\}
+\newcommand{\hlinextop}{\vspace{-0.46cm}~~\\ \hline \hline \vspace{-0.32cm}~~\\}
+\newcommand{\hlinexbot}{\vspace{-0.37cm}~~\\ \hline \hline \vspace{-0.50cm}~~\\}
+\newcommand{\tablespacing}{\vspace{-0.4cm}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{0.9}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\author{
+  Bernard Parent 
+}
+
+\email{
+  bernparent@gmail.com
+}
+
+\department{
+  Aerospace and Mechanical Engineering
+}
+
+\institution{
+  University of Arizona
+}
+
+\title{Eleven Species High-Temperature Air Plasma Kinetics for Earth Entry Flows
+}
+
+\date{
+  August 2020
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+%  \tableofcontents
+%  \makenomenclature
+%  \listoftables
+%%  \listoffigures
+
+
+
+%\section{Chemical Models in Arrhenius Form}
+
+
+
+
+
+
+%
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Dunn-Kang (1973) 5-species 17-reaction high-temperature air model \cite{nasa:1973:dunn,aiaaconf:1987:Bussing}.}
+\begin{tabular}{ccccc} 
+\toprule
+\multicolumn{2}{c}{Reaction} & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole  \\ 
+\midrule
+(1) & $\rm O_2 + N \rightleftarrows 2O+N$ & 3.6 $\times$ 10$^{18}$  & -1 & 118,800 \\
+(2) & $\rm O_2 + NO \rightleftarrows 2O+NO$ & 3.6 $\times$ 10$^{18}$ & -1 & 118,800 \\
+(3) & $\rm N_2 + O \rightleftarrows 2N+O$ & 1.9 $\times$ 10$^{17}$ & -0.5 & 226,000 \\
+(4) & $\rm N_2 + NO \rightleftarrows 2N+NO$ & 1.9 $\times$ 10$^{17}$ & -0.5 & 226,000 \\
+(5) & $\rm N_2 + O_2 \rightleftarrows 2N+O_2$ & 1.9 $\times$ 10$^{17}$ & -0.5 & 226,000 \\
+(6) & $\rm NO + O_2 \rightleftarrows N+O+O_2$ & 3.9 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
+(7) & $\rm NO + N_2 \rightleftarrows N+O+N_2$ & 3.9 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
+(8) & $\rm O + NO \rightleftarrows N+O_2$ & 3.2 $\times$ 10$^{9}$ & 1 & 39,400 \\
+(9) & $\rm O + N_2 \rightleftarrows N+NO$ & 7 $\times$ 10$^{13}$ & 0 & 76,000 \\
+(10) & $\rm N + N_2 \rightleftarrows 2N+N$ & 4.085 $\times$ 10$^{22}$ & -1.5 & 226,000 \\
+(11) & $\rm O_2 + O \rightleftarrows 2O + O$ & 9 $\times$ 10$^{19}$ & -1 & 119,000 \\
+(12) & $\rm O_2 + O_2 \rightleftarrows 2O + O_2$ & 3.24 $\times$ 10$^{19}$ & -1 & 119,000 \\
+(13) & $\rm O_2 + N_2 \rightleftarrows 2O + N_2$ & 7.2 $\times$ 10$^{18}$ & -1 & 119,000 \\
+(14) & $\rm N_2 + N_2 \rightleftarrows 2N + N_2$ & 4.7 $\times$ 10$^{17}$ & -0.5 & 226,000 \\
+(15) & $\rm NO + O \rightleftarrows N + 2O$ & 7.8 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
+(16) & $\rm NO + N \rightleftarrows O + 2N$ & 7.8 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
+(17) & $\rm NO + NO \rightleftarrows N + O + NO$ & 7.8 $\times$ 10$^{20}$ & -1.5 & 151,000 \\
+\bottomrule
+\end{tabular}
+\label{tab:dunn-kang}
+\end{threeparttable}
+\end{center}
+\end{table}
+%
+
+
+
+
+
+
+
+%
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Park (1993) 5-species high-temperature air model \cite{jtht:1993:park}.}
+\begin{tabular}{cccccccc} 
+\toprule
+No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole~\tnote{(a)} & Ref.\\ 
+~   & ~                   & Control. Temp.   & Control. Temp.\tnote{(c)} &~ & ~ & ~ & ~\\
+\midrule
+1 & $\rm N_2 + M_1 \rightleftarrows N + N + M_1$ & $\sqrt{T T_{\rm v}}$ & $T$ & 3.0 $\times$ 10$^{22}$  & $-1.6$ & $113200 \cdot R$ & \cite{book:1990:park}\\
+2 & $\rm N_2 + M_2 \rightleftarrows N + N + M_2$ & $\sqrt{T T_{\rm v}}$ & $T$ & 7.0 $\times$ 10$^{21}$  & $-1.6$ & $113200 \cdot R$ & \cite{book:1990:park}\\
+3 & $\rm O_2 + M_1 \rightleftarrows O + O + M_1$ & $\sqrt{T T_{\rm v}}$ & $T$ & 1.0 $\times$ 10$^{22}$  & $-1.5$ & $59500 \cdot R$ & \cite{book:1990:park}\\
+4 & $\rm O_2 + M_2 \rightleftarrows O + O + M_2$ & $\sqrt{T T_{\rm v}}$ & $T$ & 2.0 $\times$ 10$^{21}$  & $-1.5$ & $59500 \cdot R$ & \cite{book:1990:park}\\
+5 & $\rm NO + M_3 \rightleftarrows N + O + M_3$ & $\sqrt{T T_{\rm v}}$ & $T$ & 1.1 $\times$ 10$^{17}$  & 0.0 & $75500 \cdot R$ & \cite{book:1990:park}\\
+6 & $\rm NO + M_4 \rightleftarrows N + O + M_4$ & $\sqrt{T T_{\rm v}}$ & $T$ & 5.0 $\times$ 10$^{15}$  & 0.0 & $75500 \cdot R$ & \cite{book:1990:park}\\
+7 & $\rm NO + O \rightleftarrows N + O_2 $ & $T$ & $T$ & 8.4 $\times$ 10$^{12}$  & 0.0 & $19450 \cdot R$ & \cite{book:1990:park}\\
+8 & $\rm N_2 + O \rightleftarrows NO + N $ & $T$ & $T$ & 6.4 $\times$ 10$^{17}$  & $-1.0$ & $38400 \cdot R$ & \cite{book:1990:park}\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol 
+\item[{b}] $\rm M_1=N,~O$
+\item[~] $\rm M_2=N_2,~O_2,~NO$
+\item[~] $\rm M_3= N,~O,~NO$
+\item[~] $\rm M_4=N_2,O_2$
+\item[{c}] See Ref.\ \cite{jtht:1991:candler}
+\end{tablenotes}
+\label{tab:park}
+\end{threeparttable}
+\end{center}
+\end{table}
+%
+
+
+
+
+
+
+
+
+%
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Boyd (2007) 5-species high-temperature air model.}
+\begin{tabular}{cccccccc} 
+\toprule
+No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole~\tnote{(a)} & Ref.\\ 
+~   & ~                   & Control. Temp.   & Control. Temp.\tnote{(c)} &~ & ~ & ~ & ~\\
+\midrule
+1 & $\rm N_2 + M_1 \rightleftarrows N + N + M_1$ & $\sqrt{T T_{\rm v}}$ & $T$ & 3.0 $\times$ 10$^{22}$  & $-1.6$ & $113200 \cdot R$ & \cite{book:1990:park}\\
+
+2 & $\rm N_2 + M_2 \rightleftarrows N + N + M_2$ & $\sqrt{T T_{\rm v}}$ & $T$ & 7.0 $\times$ 10$^{21}$  & $-1.6$ & $113200 \cdot R$ & \cite{book:1990:park}\\
+
+
+3 & $\rm O_2 + M_1 \rightleftarrows O + O + M_1$ & $\sqrt{T T_{\rm v}}$ & $T$ & 1.0 $\times$ 10$^{22}$  & $-1.5$ & $59500 \cdot R$ & \cite{book:1990:park}\\
+
+4 & $\rm O_2 + M_2 \rightleftarrows O + O + M_2$ & $\sqrt{T T_{\rm v}}$ & $T$ & 2.0 $\times$ 10$^{21}$  & $-1.5$ & $59500 \cdot R$ & \cite{book:1990:park}\\
+
+5 & $\rm NO + M_3 \rightleftarrows N + O + M_3$ & $\sqrt{T T_{\rm v}}$ & $T$ & 1.1 $\times$ 10$^{17}$  & 0.0 & $75500 \cdot R$ & \cite{book:1990:park}\\
+
+6 & $\rm NO + M_4 \rightleftarrows N + O + M_4$ & $\sqrt{T T_{\rm v}}$ & $T$ & 5.0 $\times$ 10$^{15}$  & 0.0 & $75500 \cdot R$ & \cite{book:1990:park}\\
+
+
+
+7 & $\rm NO + O \rightleftarrows N + O_2 $ & $T$ & $T$ & 8.4 $\times$ 10$^{12}$  & 0.0 & $19400 \cdot R$ & \cite{jcp:1997:bose}\\
+
+8 & $\rm N_2 + O \rightleftarrows NO + N $ & $T$ & $T$ & 5.7 $\times$ 10$^{12}$  & $0.42$ & $42938 \cdot R$ & \cite{jcp:1996:bose}\\
+
+
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol 
+\item[{b}] $\rm M_1=N,~O$
+\item[~] $\rm M_2=N_2,~O_2,~NO$
+\item[~] $\rm M_3= N,~O,~NO$
+\item[~] $\rm M_4=N_2,O_2$
+\item[{c}] See Ref.\ \cite{jtht:1991:candler}
+\end{tablenotes}
+\label{tab:parkcandlerboyd}
+\end{threeparttable}
+\end{center}
+\end{table}
+%
+
+
+
+
+
+%
+\begin{table}[t]
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Lenard high-temperature air chemical reactions.\tnote{a,b}}
+    \label{tab:lenard}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}lll}
+    \toprule
+    No.&Reaction & Rate Coefficient  & Refs. \\
+    \midrule
+    1  & $\rm O_2 + O_2  \rightarrow O+O+O_2$  
+       &  $2.3\cdot 10^{19} \cdot {\cal A}^{-1}\cdot T^{-1}\cdot \exp(-59400/T)$~cm$^3$/s
+       & \cite{misc:1964:lenard} \\
+    2  & $\rm O_2 + O  \rightarrow O+O+O$  
+       &  $8.5\cdot 10^{19}\cdot {\cal A}^{-1}\cdot T^{-1}\cdot \exp(-59400/T)$~cm$^3$/s
+       & \cite{misc:1964:lenard} \\
+    3  & $\rm O_2 + M_1  \rightarrow O+O+M_1$ 
+       &  $3.0\cdot 10^{18}\cdot {\cal A}^{-1}\cdot T^{-1}\cdot \exp(-59400/T)$~cm$^3$/s
+       & \cite{misc:1964:lenard} \\
+    4  & $\rm N_2 + N_2  \rightarrow N+N+N_2$ 
+       &  $3.8\cdot 10^{19}\cdot {\cal A}^{-1}\cdot T^{-1}\cdot \exp(-113200/T)$~cm$^3$/s
+       & \cite{misc:1964:lenard} \\
+    5  & $\rm N_2 + N  \rightarrow N+N+N$ 
+       &  $1.3\cdot 10^{20}\cdot {\cal A}^{-1}\cdot T^{-1}\cdot \exp(-113200/T)$~cm$^3$/s
+       & \cite{misc:1964:lenard} \\
+    6  & $\rm N_2 + M_2  \rightarrow N+N+M_2$ 
+       &  $1.9\cdot 10^{19}\cdot {\cal A}^{-1}\cdot T^{-1}\cdot \exp(-113200/T)$~cm$^3$/s
+       & \cite{misc:1964:lenard} \\
+    7  & $\rm NO + M_3  \rightarrow N+O+M_3$ 
+       &  $2.4\cdot 10^{17}\cdot {\cal A}^{-1}\cdot T^{-0.5}\cdot \exp(-75500/T)$~cm$^3$/s
+       & \cite{misc:1964:lenard} \\
+    8  & $\rm O + N_2  \rightarrow N+NO$ 
+       &  $6.8\cdot 10^{13}\cdot {\cal A}^{-1}\cdot  \exp(-37750/T)$~cm$^3$/s
+       & \cite{misc:1964:lenard} \\
+    9  & $\rm O + NO  \rightarrow N+O_2$ 
+       &  $4.3\cdot 10^{7}\cdot {\cal A}^{-1}\cdot T^{1.5}\cdot \exp(-19100/T)$~cm$^3$/s
+       & \cite{misc:1964:lenard} \\
+    10  & $\rm O+O+O_2 \rightarrow O_2 + O_2 $  
+       &  $1.9\cdot 10^{16}\cdot {\cal A}^{-2}\cdot T^{-1/2} $~cm$^6$/s
+       & \cite{misc:1964:lenard} \\
+    11  & $\rm O+O+O  \rightarrow O_2 + O$  
+       &  $7.1\cdot 10^{16}\cdot {\cal A}^{-2}\cdot T^{-1/2} $~cm$^6$/s
+       & \cite{misc:1964:lenard} \\
+    12  & $\rm O+O+M_1  \rightarrow O_2 + M_1$ 
+       &  $2.5\cdot 10^{15}\cdot {\cal A}^{-2}\cdot T^{-1/2} $~cm$^6$/s
+       & \cite{misc:1964:lenard} \\
+    13  & $\rm N+N+N_2  \rightarrow N_2 + N_2$ 
+       &  $2\cdot 10^{18}\cdot {\cal A}^{-2}\cdot T^{-1} $~cm$^6$/s
+       & \cite{misc:1964:lenard} \\
+    14  & $\rm N+N+N  \rightarrow N_2 + N$ 
+       &  $7\cdot 10^{18}\cdot {\cal A}^{-2}\cdot T^{-1} $~cm$^6$/s
+       & \cite{misc:1964:lenard} \\
+    15  & $\rm N+N+M_2  \rightarrow N_2 + M_2$ 
+       &  $10^{18}\cdot {\cal A}^{-2}\cdot T^{-1} $~cm$^6$/s
+       & \cite{misc:1964:lenard} \\
+    16  & $\rm N+O+M_3  \rightarrow NO + M_3$ 
+       &  $6\cdot 10^{16}\cdot {\cal A}^{-2}\cdot T^{-0.5} $~cm$^6$/s
+       & \cite{misc:1964:lenard} \\
+    17  & $\rm  N+NO \rightarrow O + N_2$ 
+       &  $1.5\cdot 10^{13} \cdot {\cal A}^{-1} $~cm$^3$/s
+       & \cite{misc:1964:lenard} \\
+    18  & $\rm N+O_2 \rightarrow O + NO $ 
+       &  $1.8\cdot 10^{8} \cdot {\cal A}^{-1} \cdot T^{1.5} \exp(-3020/T)$~cm$^3$/s
+       & \cite{misc:1964:lenard} \\
+    \bottomrule
+    \end{tabular*}
+\begin{tablenotes}
+\item[{a}] Notation and units: ${\cal A}$ is Avogadro's number set to $6.02214 \times 10^{23}$ mol$^{-1}$;  $T_{\rm e}$ is the electron temperature in Kelvin; $T$ is the neutrals temperature in Kelvin.
+\item[{1}] $\rm M_1=N,~N_2,~NO$
+\item[{2}] $\rm M_2=O,~O_2,~NO$
+\item[{3}] $\rm M_3=O,~O_2,~N,~N_2$
+
+\end{tablenotes}
+   \end{threeparttable}
+\end{table}
+%
+
+
+
+
+
+
+
+
+
+%insert a few newpages here to make sure the refs section follows the tables
+~
+\newpage
+~
+
+
+
+\bibliographystyle{warpdoc}
+\bibliography{all}
+
+
+\end{document}
+
+
+

@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   typedef GRIDG_gl3d_t glgrid_t;
 #endif
 
-#define numbib 44
+#define numbib 45
 #define maxstrlen 4096
 
 typedef char longstr_t[maxstrlen];
@@ -96,7 +96,8 @@ const static longstr_t bibname[numbib]=
    "lenard1964a",
    "park1993a",
    "park1994a",
-   "smith1999a"
+   "smith1999a",
+   "boyd2007a"
   };
 
 const static longstr_t bib[numbib]=
@@ -230,8 +231,10 @@ const static longstr_t bib[numbib]=
    "C Park, JT Howe, and RL Jaffe, \"Review of Chemical-Kinetic Problems of Future NASA Missions, II; Mars Entries,\" Journal of Thermophysics and Heat Transfer, 8:9-12, 1994.",
    
    //smith1999a
-   "G Smith, D Golden, M Frenklach, N Moriarty, B Eiteneer, B Goldenberg, C Bowman, R Hanson, S Song, W Gardiner, V Lissianski, and Q Zhiwei, \"GRIMech 3.0, Chemical Kinetic Mechanism\", 1999."
+   "G Smith, D Golden, M Frenklach, N Moriarty, B Eiteneer, B Goldenberg, C Bowman, R Hanson, S Song, W Gardiner, V Lissianski, and Q Zhiwei, \"GRIMech 3.0, Chemical Kinetic Mechanism\", 1999.",
 
+   //boyd2007a
+   "ID Boyd, \"Modeling of associative ionization reactions in hypersonic rarefied flows,\" Physics of Fluids 19:096102, 2007."
   };
 
 

@@ -3,6 +3,10 @@ echo "Removing proprietary directory .././model/chem/_Air_Plasma_8s_28r_Macheret
 rm -rf .././model/chem/_Air_Plasma_8s_28r_Macheret 
 cp -a _proprietary .././model/chem/_Air_Plasma_8s_28r_Macheret 
 ( printf "current Air_Plasma_8s_28r_Macheret\nEND" ) > .././model/chem/_Air_Plasma_8s_28r_Macheret/.config 
+echo "Removing proprietary directory .././model/chem/_Cs_Air_Plasma_15s"
+rm -rf .././model/chem/_Cs_Air_Plasma_15s 
+cp -a _proprietary .././model/chem/_Cs_Air_Plasma_15s 
+( printf "current Cs_Air_Plasma_15s\nEND" ) > .././model/chem/_Cs_Air_Plasma_15s/.config 
 echo "Removing proprietary directory .././model/chem/_H2_Air_Plasma_13s"
 rm -rf .././model/chem/_H2_Air_Plasma_13s 
 cp -a _proprietary .././model/chem/_H2_Air_Plasma_13s 
@@ -11,18 +15,6 @@ echo "Removing proprietary directory .././model/chem/_H2_Cs_Air_Plasma_22s"
 rm -rf .././model/chem/_H2_Cs_Air_Plasma_22s 
 cp -a _proprietary .././model/chem/_H2_Cs_Air_Plasma_22s 
 ( printf "current H2_Cs_Air_Plasma_22s\nEND" ) > .././model/chem/_H2_Cs_Air_Plasma_22s/.config 
-echo "Removing proprietary directory .././model/chem/_H2_Air_Plasma_14s_47r_Jachimowsky-Macheret"
-rm -rf .././model/chem/_H2_Air_Plasma_14s_47r_Jachimowsky-Macheret 
-cp -a _proprietary .././model/chem/_H2_Air_Plasma_14s_47r_Jachimowsky-Macheret 
-( printf "current H2_Air_Plasma_14s_47r_Jachimowsky-Macheret\nEND" ) > .././model/chem/_H2_Air_Plasma_14s_47r_Jachimowsky-Macheret/.config 
-echo "Removing proprietary directory .././model/chem/_H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret"
-rm -rf .././model/chem/_H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret 
-cp -a _proprietary .././model/chem/_H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret 
-( printf "current H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret\nEND" ) > .././model/chem/_H2_Air_Plasma_18s_78r_Jachimowsky-Dunn-Kang-Macheret/.config 
-echo "Removing proprietary directory .././model/chem/_Cs_Air_Plasma_15s"
-rm -rf .././model/chem/_Cs_Air_Plasma_15s 
-cp -a _proprietary .././model/chem/_Cs_Air_Plasma_15s 
-( printf "current Cs_Air_Plasma_15s\nEND" ) > .././model/chem/_Cs_Air_Plasma_15s/.config 
 echo "Removing proprietary directory .././model/fluid/_Navier-Stokes_plasma"
 rm -rf .././model/fluid/_Navier-Stokes_plasma 
 cp -a _proprietary .././model/fluid/_Navier-Stokes_plasma 
