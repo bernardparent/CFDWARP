@@ -16,7 +16,7 @@
 
 #define NODETYPE_BDRYOUTFLOW 1
 #define nf (ns+nd+1)
-#define totalpostvarfluid (7+nd+ns)
+#define totalpostvarfluid (8+nd+ns)
 #define totalinitvarfluid (nd+ns+2)
 #define hbw_bdry_fluid 2
 // hbw_mem_fluid is the neighbor-nodes bandwidth   on which the node fluid props depend when being resumed

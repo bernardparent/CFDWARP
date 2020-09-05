@@ -157,6 +157,7 @@ void find_post_variable_name_fluid(long varnum, char *varname){
     case nd+ns+10:  sprintf(varname,"epsilon");       break;
     case nd+ns+11:  sprintf(varname,"omega");     break;
     case nd+ns+12:  sprintf(varname,"gamma");     break;
+    case nd+ns+13:  sprintf(varname,"N");     break;
   }
 }
 
@@ -192,6 +193,7 @@ void find_post_variable_value_fluid(np_t *np, long l, gl_t *gl,
       case nd+ns+10:  *varvalue=_eps(np[l],gl);       break;
       case nd+ns+11:  *varvalue=_omega(np[l],gl);     break;
       case nd+ns+12:  *varvalue=_gamma(np[l],gl);     break;
+      case nd+ns+13:  *varvalue=N;     break;
     }
   }
 }

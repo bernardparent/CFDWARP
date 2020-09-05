@@ -43,7 +43,7 @@ static void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
   if (gl->model.fluid.AXISYMMETRIC) {
     x1=np[l].bs->x[1];
     V1=_V(np[l],1);
-    if (x1<1e-15) fatal_error("No node must lie on or below the y=0 axis when AXISYMMETRIC is set to TRUE.");
+    if (fabs(x1)<1e-15) fatal_error("No node must lie on the y=0 axis when AXISYMMETRIC is set to TRUE.");
     for (flux=0; flux<nf; flux++){
       S[flux]=(-1.0/x1)*V1*np[l].bs->U[flux];
     }

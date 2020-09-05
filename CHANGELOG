@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+
+2020 SEP 04a
+  * in model/fluid/_Favre-Reynolds/fluid_post.c, model/fluid/_Favre-Reynolds_Tv/fluid_post.c,
+    model/fluid/_Navier-Stokes/fluid_post.c
+    - added N as a post variable
+  * in model/fluid/_Navier-Stokes*/fluid_source.c
+    - in find_Saxi(), now allows nodes to have a negative y
+  * in model/share/fluid_share.c
+    - in find_Saxi(), now allows nodes to have a negative y
+    - in find_Saxi(), got rid of extra source terms for turbulence modeling derived by J Etele
+  * in bin
+    - added RAM-C-II.wrp
+    
+
 2020 SEP 03a
   * in model/chem
     - added _Air_5s

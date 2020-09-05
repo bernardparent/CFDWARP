@@ -334,19 +334,19 @@ void write_license ( FILE * outputfile ) {
   if (outputfile!=stdout) linewidth=MAX_LINE_WIDTH;
 
   wfprintf(outputfile,"\n");
-  sprintf(linestr,"  Copyright 1998-2020 Bernard Parent.\n"
-                  "  Copyright 2002-2007 Derrick C. Alexander.\n"
-                  "  Copyright 2001-2002 Jason Etele.\n"
-                  "  Copyright 2002 Thomas E. Schwartzentruber.\n"
-                  "  Copyright 2003 Tim Hui.\n"
-                  "  Copyright 2019 Minindu Weerakoon.\n"
-                  "  Copyright 2001 Giovanni Fusina.\n"
-                  "  Copyright 2011 Minha Kim.\n"
-                  "  Copyright 2014 Sathyan Padmanabhan.\n"
-                  "  Copyright 2019-2020 Prasanna T. Rajendran.\n"
-                  "  Copyright 2020 Aaron Trinh.\n"
-                  "  Copyright 2019 Jaehyuk Lee.\n"
-                  "  Copyright 2019 Van Tien Nguyen.\n"
+  sprintf(linestr,"  Copyright 1998-2020 Bernard Parent\n"
+                  "  Copyright 2002-2007 Derrick C. Alexander\n"
+                  "  Copyright 2001-2002 Jason Etele\n"
+                  "  Copyright 2002 Thomas E. Schwartzentruber\n"
+                  "  Copyright 2003 Tim Hui\n"
+                  "  Copyright 2019 Minindu Weerakoon\n"
+                  "  Copyright 2001 Giovanni Fusina\n"
+                  "  Copyright 2011 Minha Kim\n"
+                  "  Copyright 2014 Sathyan Padmanabhan\n"
+                  "  Copyright 2019-2020 Prasanna T. Rajendran\n"
+                  "  Copyright 2020 Aaron Trinh\n"
+                  "  Copyright 2019 Jaehyuk Lee\n"
+                  "  Copyright 2019 Van Tien Nguyen\n"
                   "\n");
   wfprintf(outputfile,"%s\n",strwrpind(linestr, linewidth, -2));
   

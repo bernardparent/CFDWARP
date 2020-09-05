@@ -149,6 +149,7 @@ void find_post_variable_name_fluid(long varnum, char *varname){
     case nd+ns+4:   sprintf(varname,"eta");        break;
     case nd+ns+5:  sprintf(varname,"gamma");     break;
     case nd+ns+6:  sprintf(varname,"kappa");     break;
+    case nd+ns+7:  sprintf(varname,"N");     break;
   }
 }
 
@@ -184,6 +185,7 @@ void find_post_variable_value_fluid(np_t *np, long l, gl_t *gl,
       case nd+ns+4:   *varvalue=_eta(np[l],gl);    break;
       case nd+ns+5:   *varvalue=_gamma(np[l],gl);  break;
       case nd+ns+6:   *varvalue=_kappa(np[l],gl);      break;
+      case nd+ns+7:   *varvalue=N;      break;
     }
   }
 }

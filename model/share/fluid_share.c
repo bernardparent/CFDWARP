@@ -1150,12 +1150,15 @@ void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
   for (flux=0; flux<nf; flux++) S[flux]=0.0e0;
 
   if (gl->model.fluid.AXISYMMETRIC) {
-    x1=np[l].bs->x[1];
-    if (x1<1e-15) fatal_error("No node must lie on or below the y=0 axis when AXISYMMETRIC is set to TRUE.");
-    V1=_V(np[l],1);
-    for (flux=0; flux<nf; flux++){
-      S[flux]=(-1.0/x1)*V1*np[l].bs->U[flux];
-    }
+   x1=np[l].bs->x[1];
+   if (fabs(x1)<1e-15) fatal_error("No node must lie on the y=0 axis when AXISYMMETRIC is set to TRUE.");
+   V1=_V(np[l],1);
+   for (flux=0; flux<nf; flux++){
+     S[flux]=(-1.0/x1)*V1*np[l].bs->U[flux];
+   }
+   // the following terms added by Jason are turned off: they need to be re-derived and their validity
+   // checked when x1 is negative
+   if (FALSE){
     sum1=0.0e0;
     sum2=0.0e0;
     sum3=0.0e0;
@@ -1171,11 +1174,11 @@ void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
     /* species continuity */
     for (species=0; species<ns; species++) {
       for (theta=0; theta<nd; theta++) {
-	lp=_al(gl, l, theta, +1);
-	lm=_al(gl, l, theta, -1);
-	assert_np(np[lp],np[lp].bs->x[1]>0.0e0);
-	assert_np(np[lm],np[lm].bs->x[1]>0.0e0);
-	sum1=sum1+_X(np[l],theta,1)*0.5e0*(+_w(np[lp],species)-_w(np[lm],species));
+        lp=_al(gl, l, theta, +1);
+        lm=_al(gl, l, theta, -1);
+        assert_np(np[lp],np[lp].bs->x[1]>0.0e0);
+        assert_np(np[lm],np[lm].bs->x[1]>0.0e0);
+        sum1=sum1+_X(np[l],theta,1)*0.5e0*(+_w(np[lp],species)-_w(np[lm],species));
       }
     sum7=sum7+_nustar(np,l,gl,species)*_hk_from_T(species,_T(np[l],gl))*sum1;
     S[species]=S[species]+(1.0/x1)*(_nustar(np,l,gl,species)*sum1);
@@ -1197,7 +1200,7 @@ void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
       sum9=sum9+_X(np[l],theta,0)*0.5e0*(+_V(np[lp],0)-_V(np[lm],0));
       sum10=sum10+_X(np[l],theta,1)*0.5e0*(+_T(np[lp],gl)-_T(np[lm],gl));
       for (vartheta=0; vartheta<nd; vartheta++)  {
-	sum11=sum11+_X(np[l],theta,vartheta)*0.5e0*(+_etastar(np,lp,gl)*_V(np[lp],vartheta)*_V(np[lp],1)/_x(np[lp],1)
+	      sum11=sum11+_X(np[l],theta,vartheta)*0.5e0*(+_etastar(np,lp,gl)*_V(np[lp],vartheta)*_V(np[lp],1)/_x(np[lp],1)
 						    -_etastar(np,lm,gl)*_V(np[lm],vartheta)*_V(np[lm],1)/_x(np[lm],1));
       }
       sum12=sum12+_X(np[l],theta,1)*0.5e0*(+_psi(np[lp])-_psi(np[lm]));
@@ -1211,6 +1214,7 @@ void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
       S[fluxtke]=S[fluxtke]+(1.0/x1)*_etakstar(np,l,gl)*sum8;
       S[fluxpsi]=S[fluxpsi]+(1.0/x1)*_etapsistar(np,l,gl)*sum12;
     }
+   }
   }
 }
 #else

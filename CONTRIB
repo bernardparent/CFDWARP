@@ -106,7 +106,7 @@ SCHWARTZENTRUBER, Thomas E.
     on constant Mach number in model/share/fluid_share.c
 
 
-TRINH, AARON
+TRINH, Aaron
 
   - addition of species  Ar, C, C2, CN, NCO, Ar+, C+, C2+, CN+, CO+ in model/thermo/_generic/thermo.c 
   

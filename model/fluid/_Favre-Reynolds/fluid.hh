@@ -18,7 +18,7 @@
 #define fluxtke (ns+nd+1)
 #define fluxpsi (ns+nd+2)
 
-#define totalpostvarfluid (12+nd+ns)
+#define totalpostvarfluid (13+nd+ns)
 #define totalinitvarfluid (nd+ns+4)
 #define hbw_bdry_fluid 2
 // hbw_mem_fluid is the neighbor-nodes bandwidth   on which the node fluid props depend when being resumed

@@ -1,0 +1,499 @@
+{
+  _______________________________________________________________________________________________
+
+                                           C F D W A R P
+
+                                CFD Code for Plasma & Reactive Flow
+  _______________________________________________________________________________________________
+
+  Version                          20sep02a
+  Compiler                         gcc 8.3.0 with OPENMP threads
+  Compiled on                      Sep  3 2020 at 15:19:09
+  Cycle Strategy                   Standard
+  Fluid Relaxation                 Block ADI [1,2]
+  EM Field Relaxation              None
+  Convection Discretization        Reconstruction-Evolution MUSCL with flux FVS [3], FDS [5],
+                                   and primitive interpolation TVD [4], WENO [7], CWENO [9],
+                                   AOWENO [8], and eigenvalue conditioning HARTEN, GNOFFO [10],
+                                   PECLET [11], PASCAL [6], and PARENT positivity-preserving
+                                   filter [12]
+  Temporal Discretization          Steady-State
+  Fluid Model                      Navier-Stokes Multispecies
+  Thermodynamic Model              NASA Glenn Polynomials [13]
+  Chemical Model                   Air 5s Lenard [15], Dunn-Kang [14], Park [16], Boyd
+                                   [boyd2007a]
+  EM Field Model                   None
+  Beam Model                       None
+  Number of Dimensions             2
+  Number of Flux Components        8
+  Number of Species                5
+  Number of Charged Species        0
+  List of Species                  O, N, NO, O2, N2
+  _______________________________________________________________________________________________
+
+  [1]  WR Briley and H McDonald. "On the Structure and Use of Linearized Block Implicit
+       Schemes", Journal of Computational Physics 34:54-73, 1980.
+  [2]  RM Beam and RF Warming. "An Implicit Finite-Difference Algorithm for Hyperbolic Systems
+       in Conservation-Law-Form", Journal of Computational Physics 22:87-110, 1976.
+  [3]  JL Steger and RF Warming. "Flux Vector Splitting of the Inviscid Gasdynamic Equations
+       with Application to Finite-Difference Methods", Journal of Computational Physics 40:263-
+       293, 1981.
+  [4]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume Flux Vector
+       Splittings for the Euler Equations", AIAA Journal 24:1453-1460, 1986.
+  [5]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes", Journal
+       of Computational Physics 43:357-372, 1981.
+  [6]  B Parent. "Positivity-Preserving Dual Time Stepping Schemes for Gas Dynamics", Journal of
+       Computational Physics 361:391-411, 2018.
+  [7]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes", Journal of
+       Computational Physics 126:202-228, 1996.
+  [8]  DS Balsara, S Garain, and CW Shu. "An Efficient Class of WENO schemes with Adaptive
+       Order", Journal of Computational Physics 326:780-804, 2016.
+  [9]  M Dumbser and M Kaser. "Arbitrary High Order Non-oscillatory Finite Volume Schemes on
+       Unstructured Meshes for Linear Hyperbolic Systems", Journal of Computational Physics,
+       221:693-723, 2007.
+  [10] P Gnoffo and  JA White. "Computational Aerothermodynamic Simulation Issues on
+       Unstructured Grids", 37th AIAA Thermophysics Conference, AIAA Paper 2004-2371, 2004.
+  [11] B Parent. "Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows", AIAA
+       Journal, 55:141-152, 2017.
+  [12] B Parent. "Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler
+       Equations", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.
+  [13] BJ McBride, MJ Zehe, and S Gordon. "NASA Glenn Coefficients for Calculating Thermodynamic
+       Properties of Individual Species", NASA TP 2002-211556, 2002.
+  [14] MG Dunn and SW Kang. "Theoretical and Experimental Studies of Reentry Plasmas", NASA CR-
+       2232, 1973.
+  [15] M Lenard. "Ionization of Cesium and Sodium Contaminated Air in the Hypersonic Slender
+       Body Boundary Layer", General Electric Missile and Space Division Technical Report
+       R64SD22, 1964.
+  [16] C Park. "Review of Chemical-Kinetic Problems of Future NASA Missions, I: Earth Entries,"
+       Journal of Thermophysics and Heat Transfer 7:385-398, 1993.
+
+
+}
+
+
+{
+
+REFS:
+
+Akey, N. D., and Cross, A. E., "Radio Blackout Alleviation and Plasma Diagnostic Results from a 25,000 Foot per Second BluntBody Reentry," NASA TN D-5615, Feb. 1970.
+
+Grantham, W. L., "Flight Results of 25,000 Foot per Second Reentry Experiment Using Microwave Reflectometers to Measure
+Plasma Electron Density and Standoff Distance," NASA TN D-6062, Dec. 1970.
+
+Jones, W. L., Jr., and Cross, A. E., "Electrostatic Probe Measurements of Plasma Parameters for Two Reentry Flight Experiments at 25,000 Feet per Second," NASA TN D-6617, Feb. 1972.
+
+GV Candler, RW MacCormack, Computation of Weakly Ionized Hypersonic Flows in Thermochemical Nonequilibrium
+J. THERMOPHYSICS VOL. 5, page 266, 1991.}
+
+
+
+
+mf=1;
+
+
+is=1;  
+im1=round(15*mf/2);
+im2=round(105*mf/2);
+im3=round(145*mf/2); 
+im4=round(235*mf/2); 
+ie=round(250*mf/2); 
+
+if (mod(im3-im2,2)==0,
+ im3=im3+1;
+);
+
+js=1;
+jm=round(100*mf/2);
+je=round(130*mf/2);
+
+
+Rin=0.1524;
+Rout=0.4;
+Rbow=Rin+0.035;
+Rbowstag=Rin+0.03;
+Routstag=0.3;
+H=0.9;
+Lplate=1.15;
+delta=9/180*pi; {wedge angle}
+phi=rad(0);
+Lwake=0.2;
+Hbdry=0.15; {height of boundary layer at the domain exit}
+dxwall=10e-6/mf;
+
+dywall=70e-6/mf;
+
+
+dtheta=0.1/180*pi;
+
+
+
+Grid(
+  Size(is,js, ie,je);
+
+  for (i,im2,im3,
+    theta=-(pi/2-delta)+(i-im2)/(im3-im2)*(pi-2*delta);
+    fact=abs(theta/(pi/2-delta))^3;
+    Rbowx=Rbow*fact+Rbowstag*(1-fact); 
+    Routx=Rout*fact+Routstag*(1-fact); 
+    Point(i,js, -Rin*cos(theta),Rin*sin(theta));  
+    Point(i,jm, -Rbowx*cos(theta),Rbow*sin(theta));  
+    Point(i,je, -Routx*cos(theta),Rout*sin(theta));  
+  );
+
+  Join(im2,js,im3,jm,j,FE,0.5,dxwall,1);
+  Join(im2,jm,im3,je,j,GE,0.5,1,1);
+
+  Point(im4,js, Lplate*cos(delta), Lplate*sin(delta)+Rin);
+  Point(im4,jm, Lplate*cos(delta), Lplate*sin(delta)+Rin+Hbdry);
+  Point(im4,je, Lplate*cos(delta), Lplate*sin(delta)+Rin+H);
+  Join(im4,js,im4,jm, j, FE,0.2,dywall,1.0);
+  Join(im4,jm,im4,je, j, GE,0.9,1.0,1.0);
+
+
+  Point(im1,js, Lplate*cos(delta), -Lplate*sin(delta)-Rin);
+  Point(im1,jm, Lplate*cos(delta), -Lplate*sin(delta)-Rin-Hbdry);
+  Point(im1,je, Lplate*cos(delta), -Lplate*sin(delta)-Rin-H);
+  Join(im1,js,im1,jm, j, FE,0.2,dywall,1.0);
+  Join(im1,jm,im1,je, j, GE,0.9,1.0,1.0);
+
+  
+  Join(im3,js,im4,je, i, GE,0.2,1,1);
+  Join(im1,js,im2,je, i, EG,0.8,1,1);
+  
+  
+
+  Point(ie,js,Lplate*cos(delta)+Lwake*cos(delta-phi),Lplate*sin(delta)-Lwake*sin(phi-delta));
+  Point(ie,jm,Lplate*cos(delta)+Lwake*cos(delta-phi),Lplate*sin(delta)-Lwake*sin(phi-delta)+Hbdry*2);
+  Point(ie,je,Lplate*cos(delta)+Lwake*cos(delta-phi),(Lplate+Lwake)*sin(delta)+H);
+  Join(ie,js,ie,jm, j, FE,0.2,dywall*2,1.0);
+  Join(ie,jm,ie,je, j, GE,0.9,1.0,1.0);
+
+  Join(im4,js,ie,je, i, GE, 0.5,1.0,1.0);
+
+
+
+  Point(is,js,Lplate*cos(delta)+Lwake*cos(delta-phi),-Lplate*sin(delta)+Lwake*sin(phi-delta));
+  Point(is,jm,Lplate*cos(delta)+Lwake*cos(delta-phi),-Lplate*sin(delta)+Lwake*sin(phi-delta)-Hbdry*2);
+  Point(is,je,Lplate*cos(delta)+Lwake*cos(delta-phi),-(Lplate+Lwake)*sin(delta)-H);
+  Join(is,js,is,jm, j, FE,0.2,dywall*2,1.0);
+  Join(is,jm,is,je, j, GE,0.9,1.0,1.0);
+
+  Join(is,js,im1,je, i, EG, 0.5,1.0,1.0);
+
+
+);
+
+
+
+
+Bdry(
+  NavierStokes(
+    {
+    _________________________________________________________________________________________
+
+    Boundary Condition Type           ID  Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC             0   Inflow, supersonic
+    BDRY_INFLOWSUBSONIC1              7   Inflow, subsonic, Tstag, Pstag fixed, 1o
+    BDRY_INFLOWSUBSONICMASSFLOWFIXED1 g   Inflow, subsonic, Pstag, Massflow/Area fixed, 1o
+    BDRY_OUTFLOWSUPERSONIC1           1   Outflow, supersonic, 1o
+    BDRY_OUTFLOWSUBSONIC1             4   Outflow, subsonic, P fixed, 1o
+    BDRY_OUTFLOWSUBSONICMFIXED1       f   Outflow, subsonic, M fixed, 1o
+    BDRY_SYMMETRICAL2                 e   Symmetrical, 2o
+    BDRY_SYMMETRICAL1                 9   Symmetrical, 1o
+    BDRY_WALLTFIXED1                  3   Wall, T specified, param Twall
+    BDRY_WALLADIABATIC1               6   Wall, Adiabatic
+    BDRY_SLIPWALL1                    c   Slip wall, Adiabatic, 1o
+    BDRY_FREESTREAM1                  2   Freestream, 1o, params Vx,Vy, P, T
+    _________________________________________________________________________________________
+    }
+
+    All(BDRY_WALLTFIXED1);
+    Plane("i",is,BDRY_OUTFLOWSUPERSONIC1);
+    Plane("i",ie,BDRY_OUTFLOWSUPERSONIC1);
+    Twall=1000.0; {K}
+    Plane("j",js,BDRY_WALLTFIXED1,Twall);
+    Plane("j",je,BDRY_INFLOWSUPERSONIC,Twall);
+    Region(is,js,  im1,js,  BDRY_SLIPWALL1);
+    Region(im4,js,  ie,js,  BDRY_SLIPWALL1);
+    {
+    Cut(is,js,  ie,je);
+    Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
+    Link(i1,j1,  i2,j2);
+    }
+  );
+  FavreReynoldsTv(
+    {
+    _________________________________________________________________________________________
+
+    Boundary Condition Type           ID  Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC             0   Inflow, supersonic
+    BDRY_INFLOWSUBSONIC1              7   Inflow, subsonic, Tstag, Pstag fixed, 1o
+    BDRY_INFLOWSUBSONICMASSFLOWFIXED1 g   Inflow, subsonic, Pstag, Massflow/Area fixed, 1o
+    BDRY_OUTFLOWSUPERSONIC1           1   Outflow, supersonic, 1o
+    BDRY_OUTFLOWSUBSONIC1             4   Outflow, subsonic, P fixed, 1o
+    BDRY_OUTFLOWSUBSONICMFIXED1       f   Outflow, subsonic, M fixed, 1o
+    BDRY_SYMMETRICAL2                 e   Symmetrical, 2o
+    BDRY_SYMMETRICAL1                 9   Symmetrical, 1o
+    BDRY_WALLTFIXED1                  3   Wall, T specified, 1o, param Twall
+    BDRY_WALLADIABATIC1               6   Wall, Adiabatic, 1o
+    BDRY_SLIPWALL1                    c   Slip wall, Adiabatic, 1o
+    BDRY_FREESTREAM1                  2   Freestream, 1o, params Vx,Vy, P, T
+    _________________________________________________________________________________________
+    }
+    All(BDRY_WALLTFIXED1);
+    Plane("i",is,BDRY_OUTFLOWSUPERSONIC1);
+    Plane("i",ie,BDRY_OUTFLOWSUPERSONIC1);
+    Twall=1000.0; {K}
+    Plane("j",js,BDRY_WALLTFIXED1,Twall);
+    Plane("j",je,BDRY_INFLOWSUPERSONIC,Twall);
+    Region(is,js,  im1,js,  BDRY_SLIPWALL1);
+    Region(im4,js,  ie,js,  BDRY_SLIPWALL1);
+    {
+    Cut(is,js,  ie,je);
+    Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
+    Link(i1,j1,  i2,j2);
+    }
+  );
+);
+ 
+ 
+Model(
+  FavreReynoldsTv(
+    TURBMODEL=TURBMODEL_KOMEGA2008;
+    DILATDISSIP=DILATDISSIP_WILCOX;
+    RAPCOMP=NO;
+    TURBSOURCE=NO;
+    N2VIBMODEL=N2VIBMODEL_MACHERET;
+    TEMODEL=TEMODEL_TVEQUILIBRIUM;
+    SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL=TRUE;
+    REACTING=YES;
+    Prt=0.9e0;
+    Sct=1.0e0;
+    ADD_ETA_TO_ETAT_WITHIN_QK=NO;  {say NO for standard kinetic energy transport model}
+    kdiv=1.0e-50;   {m2/s2}
+    psidiv=0.1e-3;  {1/s}
+    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
+    Tmin=1.0e1;     Tmax=22.0e3;    {K}
+    Tvmin=Tmin;     Tvmax=Tmax;    {K}
+    Twmin=Tmin;     Twmax=Tmax;    {K}
+    kmin=1.0e-10;   kmax=9.9e99;   {m2/s2}
+    psimin=1e-10;   psimax=9.9e99; {1/s}
+    wmin=1.0e-50;                  {min mass fraction allowed in the domain}
+    AXISYMMETRIC=YES;
+  );
+  NavierStokes(
+    DIFFUSION=YES;
+    REACTING=YES;
+    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
+    Tmin=1.0e1;     Tmax=25.0e3;    {K}
+    Twmin=Tmin;     Twmax=Tmax;    {K}
+    wmin=1.0e-50;
+    AXISYMMETRIC=YES;
+  );
+  Air5s(
+    CHEMMODEL=CHEMMODEL_PARK1993;
+  );
+  AirPlasma11s(
+    CHEMMODEL=CHEMMODEL_PARK1993;
+    TOWNSENDIONIZATION=FALSE; {include reactions function of EoverN}
+    TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
+  );
+);
+
+
+Init(
+  FavreReynoldsTv(
+    {
+    _______________________________________________________________________________________
+
+    Initial Condition Type       Parameters
+    _______________________________________________________________________________________
+
+    INIT_TYPE1                   V[1]..V[nd],  T,  rho, w[1]..w[ns],     k, psi, Tv
+    INIT_TYPE2                   M[1]..M[nd],  P,  T,   w[1]..w[ns],     k, psi, Tv
+    INIT_TYPE3                   M[1]..M[nd],  Re, T,   w[1]..w[ns],     k, psi, Tv
+    INIT_TYPE4                   Mmag, angles, P,  T,   w[1]..w[ns],     k, psi, Tv
+    INIT_TYPE5                   V[1]..V[nd],  P,  T,   w[1]..w[ns],     k, psi, Tv
+    INIT_TYPE6                   V[1]..V[nd],  P,  T,   chi[1]..chi[ns], k, psi, Tv
+    _______________________________________________________________________________________
+
+    (a) In the freestream set psi to 110*q_infty for the k-omega models.
+    (b) In the freestream make sure that 1E-5*q_infty^2/ReL<k<0.1*q_infty^2/ReL.
+    }
+    Species("O2", "N2", "default");
+    w_O2=0.235;
+    w_N2=0.765;
+    w_default=1e-30;
+    Re=1.95e4/Rin;
+    T=247;
+    Tv=T;
+    k=1e-6;
+    psi=1000;
+    Minf=23.9;
+    All(INIT_TYPE3,Minf,0,Re,T,w_O2,w_N2,w_default,k,psi,Tv);
+    {
+    Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default,k,psi,Tv);
+    Region(is,js,  ie,je, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default,k,psi,Tv);
+    }
+  );
+  NavierStokes(
+    {
+    _______________________________________________________________________________________
+
+    Initial Condition Type       Parameters
+    _______________________________________________________________________________________
+
+    INIT_TYPE1                   V[1]..V[nd],  T,  rho, w[1]..w[ns]
+    INIT_TYPE2                   M[1]..M[nd],  P,  T,   w[1]..w[ns]
+    INIT_TYPE3                   M[1]..M[nd],  Re, T,   w[1]..w[ns]
+    INIT_TYPE4                   Mmag, angles, P,  T,   w[1]..w[ns]
+    INIT_TYPE5                   V[1]..V[nd],  P,  T,   w[1]..w[ns]
+    INIT_TYPE6                   V[1]..V[nd],  P,  T,   chi[1]..chi[ns]
+    _______________________________________________________________________________________
+
+    }
+    Species("O2", "N2", "default");
+    w_O2=0.235;
+    w_N2=0.765;
+    w_default=1e-30;
+    Re=1.95e4/Rin;
+    T=247;
+    Minf=23.9;
+    All(INIT_TYPE3,Minf,0,Re,T,w_O2,w_N2,w_default);
+    {
+    Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default);
+    Region(is,js,  ie,je, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default);
+    }
+  );
+);
+
+
+Disc(
+  FavreReynoldsTv(
+    zetaA1=0.3e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  NavierStokes(
+    zetaA1=0.3e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+    POSFILTER=POSFILTER_PARENT;
+    POSFILTER_numiter=4;
+  );
+);
+
+
+Cycle(
+  FavreReynoldsTv(
+    xiverge=1e-3;  {residual convergence threshold}
+    rhoref=0.1;    {reference density in kg/m3}
+    Tref=300.0;    {reference temperature in K}
+    Tvref=5000.0;  {reference vibrational temperature in K}
+    kref=1e4;      {reference turbulence kinetic energy in m2/s2}
+    psiref=1e8;    {reference specific dissipation rate of the TKE in 1/s for TURBMODEL_KOMEGA*
+                    reference dissipation rate of the TKE in m2/s3 for TURBMODEL_KEPSILON}
+    aref=sqrt(1.4*287*Tref);  {reference sound speed in m/s}
+    for (spec,1,numspec,
+      Uref[spec]=rhoref;
+    );
+    for (dim,1,numdim,
+      Uref[numspec+dim]=rhoref*aref;
+    );
+    Uref[numspec+numdim+1]=rhoref*aref*aref;
+    Uref[numspec+numdim+2]=rhoref*kref;  
+    Uref[numspec+numdim+3]=rhoref*psiref;  
+    Uref[numspec+numdim+4]=rhoref*700.0*Tvref;  
+  );
+  NavierStokes(
+    xiverge=1e-3;  {residual convergence threshold}
+    rhoref=1.0;  {reference density in kg/m3}
+    aref=300.0;  {reference sound speed in m/s}
+    for (spec,1,numspec,
+      Uref[spec]=rhoref;
+    );
+    for (dim,1,numdim,
+      Uref[numspec+dim]=rhoref*aref;
+    );
+    Uref[numspec+numdim+1]=rhoref*aref*aref;
+  );
+  SteadyState(
+    if (mod(iter,50)==0,
+      WriteDataFile(outputfilename);
+    );
+    sigma1=0.1;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
+    if (iter==1,
+      CFL=0.01;
+    );
+    CFL=min(CFL*1.02,1.2);
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,clipinfo);
+  );
+);
+
+
+Post(
+  xstation[1]=0.1; {m}
+  xstation[2]=0.2; {m}
+  xstation[3]=0.3; {m}
+  numsteps=300;
+  qmin=1.0; {m/s, as small a value as possible}
+  Pback_min=400; {Pa}
+  Pback_max=40000; {Pa}
+  Aback=1.0; {m2/m}
+  for (cnt,1,3,
+    XSTATION_Set(xstation[cnt]);
+    Pback=XSTATION_Pback(Aback, Pback_min, Pback_max, numsteps, qmin);
+    Fpot=XSTATION_Fpot(Pback, numsteps, qmin);
+    mdot=XSTATION_mdot();
+    Tstag=XSTATION_Tstag();
+    Pstag=XSTATION_Pstag(numsteps);
+    Pstar=XSTATION_Pstar();
+    T=XSTATION_T();
+    q=XSTATION_q();
+    rho=XSTATION_rho();
+    htstar=XSTATION_htstar();
+    fprintf(postfilename,"x      = %E m\n"
+           "Pback  = %E Pa\n"
+           "Fpot   = %E Ns/kg\n"
+           "mdot   = %E kg/ms\n"
+           "htstar = %E J/kg\n"
+           "Tstag  = %E K\n"
+           "Pstag  = %E Pa\n"
+           "Pstar  = %E Pa\n"
+           "T      = %E K\n"
+           "q      = %E m/s\n"
+           "rho    = %E kg/m3\n\n"
+           ,xstation[cnt],Pback,Fpot,mdot,htstar,Tstag,Pstag,Pstar,T,q,rho);
+  );
+  fprintf(postfilename,"\n");
+  for (dim,1,2,
+    Area[dim]=_Area(is,js, ie,je, dim,BDRY_WALLTFIXED1);
+    Fshear[dim]=_Fshear(is,js, ie,je, dim,BDRY_WALLTFIXED1);
+    Fpressure[dim]=_Fpressure(is,js, ie,je, dim,BDRY_WALLTFIXED1);
+  );
+  fprintf(postfilename,"Fshear    = (%+E,%+E) N/m\n",Fshear[1],Fshear[2]);
+  fprintf(postfilename,"Fpressure = (%+E,%+E) N/m\n",Fpressure[1],Fpressure[2]);
+  fprintf(postfilename,"Qheat     = %+E W/m\n",_Qheat(is,js, ie,je, BDRY_WALLTFIXED1));
+  fprintf(postfilename,"metotal   = %+E J/m\n",_metotal(is,js, ie,je));
+  fprintf(postfilename,"m         = %+E J/m\n",_m(is,js, ie,je));
+  fprintf(postfilename,"\n");
+  {
+  POSTGRIDONLY=FALSE;
+  WritePostFile(is,js, ie,je, "post.01", "tecplot", POSTGRIDONLY);
+  }
+);
