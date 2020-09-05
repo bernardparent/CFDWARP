@@ -1,0 +1,3 @@
+#!MC 1410
+$!AlterData 
+  Equation = '{N_e-}={chi_e-}*{N}'

@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 SEP 05a
+  * in model/chem/_Cs_Air_Plasma_15s/
+    - separated the Lenard reactions into several groups (negative ions, cesium reactions, and 
+      other high temperature air reactions)
+    - added the Park 1993 model as a substitute to the Lenard 1964 high temperature air
+      model
+      
 
 2020 SEP 04a
   * in model/fluid/_Favre-Reynolds/fluid_post.c, model/fluid/_Favre-Reynolds_Tv/fluid_post.c,

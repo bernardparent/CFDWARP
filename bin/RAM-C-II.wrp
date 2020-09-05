@@ -98,6 +98,7 @@ im3=round(145*mf/2);
 im4=round(235*mf/2); 
 ie=round(250*mf/2); 
 
+{make sure no grid line falls on the axis of symmetry}
 if (mod(im3-im2,2)==0,
  im3=im3+1;
 );
@@ -277,7 +278,7 @@ Model(
     kdiv=1.0e-50;   {m2/s2}
     psidiv=0.1e-3;  {1/s}
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
-    Tmin=1.0e1;     Tmax=22.0e3;    {K}
+    Tmin=1.0e1;     Tmax=40.0e3;    {K}
     Tvmin=Tmin;     Tvmax=Tmax;    {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     kmin=1.0e-10;   kmax=9.9e99;   {m2/s2}
@@ -294,11 +295,15 @@ Model(
     wmin=1.0e-50;
     AXISYMMETRIC=YES;
   );
-  Air5s(
-    CHEMMODEL=CHEMMODEL_PARK1993;
-  );
   AirPlasma11s(
-    CHEMMODEL=CHEMMODEL_PARK1993;
+    CHEMMODEL=CHEMMODEL_BOYD2007;
+    TOWNSENDIONIZATION=FALSE; {include reactions function of EoverN}
+    TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
+  );
+  CsAirPlasma15s(
+    CHEMMODEL=CHEMMODEL_LENARD1964;
+    CESIUMREACTIONS=FALSE; {include reactions function of Cs}
+    NEGATIVEIONREACTIONS=TRUE; {include reactions function of O- and O2-}
     TOWNSENDIONIZATION=FALSE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
   );
@@ -328,12 +333,16 @@ Init(
     w_O2=0.235;
     w_N2=0.765;
     w_default=1e-30;
-    Re=1.95e4/Rin;
     T=247;
     Tv=T;
     k=1e-6;
     psi=1000;
+    {case 1}
     Minf=23.9;
+    Re=1.95e4/Rin;
+    {case 3}
+    Minf=28.3;
+    Re=1.59e3/Rin;
     All(INIT_TYPE3,Minf,0,Re,T,w_O2,w_N2,w_default,k,psi,Tv);
     {
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default,k,psi,Tv);
@@ -360,9 +369,14 @@ Init(
     w_O2=0.235;
     w_N2=0.765;
     w_default=1e-30;
-    Re=1.95e4/Rin;
     T=247;
+    {case 1}
     Minf=23.9;
+    Re=1.95e4/Rin;
+    {case 3}
+    Minf=28.3;
+    Re=1.59e3/Rin;
+
     All(INIT_TYPE3,Minf,0,Re,T,w_O2,w_N2,w_default);
     {
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default);
@@ -437,7 +451,7 @@ Cycle(
     if (iter==1,
       CFL=0.01;
     );
-    CFL=min(CFL*1.02,1.2);
+    CFL=min(CFL*1.02,2.2);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
