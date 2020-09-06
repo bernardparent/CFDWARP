@@ -48,7 +48,7 @@ void write_model_fluid_template(FILE **controlfile){
     "    DIFFUSION=YES;\n"
     "    REACTING=YES;\n"
     "    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}\n"
-    "    Tmin=1.0e1;     Tmax=6.0e3;    {K}\n"
+    "    Tmin=1.0e1;     Tmax=26.0e3;    {K}\n"
     "    Twmin=Tmin;     Twmax=Tmax;    {K}\n"
     "    wmin=1.0e-50;\n"
 #ifdef _2D

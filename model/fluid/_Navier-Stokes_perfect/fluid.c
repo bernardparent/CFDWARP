@@ -52,7 +52,7 @@ void write_model_fluid_template(FILE **controlfile){
     "    eta=2e-5;       {kg/ms}\n"
     "    kappa=0.03;     {W/mK}\n"
     "    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}\n"
-    "    Tmin=1.0e1;     Tmax=6.0e3;    {K}\n"
+    "    Tmin=1.0e1;     Tmax=26.0e3;    {K}\n"
 #ifdef _2D
     "    AXISYMMETRIC=FALSE;\n"
 #endif

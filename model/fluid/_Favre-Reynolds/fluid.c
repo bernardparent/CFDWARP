@@ -57,7 +57,7 @@ void write_model_fluid_template(FILE **controlfile){
     "    kdiv=1.0e-50;    {m2/s2}\n"
     "    psidiv=0.1e-3;   {1/s}\n"
     "    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}\n"
-    "    Tmin=1.0e1;     Tmax=6.0e3;    {K}\n"
+    "    Tmin=1.0e1;     Tmax=26.0e3;    {K}\n"
     "    Twmin=Tmin;     Twmax=Tmax;    {K}\n"
     "    kmin=1.0e-10;   kmax=9.9e99;   {m2/s2}\n"
     "    psimin=1e-10;   psimax=9.9e99; {1/s}\n"

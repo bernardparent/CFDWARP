@@ -73,7 +73,7 @@
 
 
 
-mf=2;
+mf=1;
 
 
 is=1;  
@@ -99,9 +99,9 @@ delta=16/180*pi; {wedge angle}
 phi=rad(36);
 Lwake=0.04;
 Hbdry=0.015; {height of boundary layer at the domain exit}
-dxwall=1e-6/mf;
+dxwall=3e-6/mf;
 
-dywall=16e-6/mf;
+dywall=40e-6/mf;
 
 
 
@@ -203,6 +203,16 @@ Bdry(
     Link(i1,j1,  i2,j2);
     }
   );
+  FavreReynoldsTv(
+    All(BDRY_WALLTFIXED1);
+    Plane("i",is,BDRY_OUTFLOWSUPERSONIC1);
+    Plane("i",ie,BDRY_OUTFLOWSUPERSONIC1);
+    Twall=1800.0; {K}
+    Plane("j",js,BDRY_WALLTFIXED1,Twall);
+    Plane("j",je,BDRY_INFLOWSUPERSONIC,Twall);
+    Region(is,js,  im1,js,  BDRY_SLIPWALL1);
+    Region(im4,js,  ie,js,  BDRY_SLIPWALL1);
+  );
 );
  
  
@@ -216,11 +226,34 @@ Model(
     wmin=1.0e-50;
     AXISYMMETRIC=NO;
   );
+  FavreReynoldsTv(
+    TURBMODEL=TURBMODEL_KOMEGA2008;
+    DILATDISSIP=DILATDISSIP_WILCOX;
+    RAPCOMP=NO;
+    TURBSOURCE=NO;
+    N2VIBMODEL=N2VIBMODEL_MACHERET;
+    TEMODEL=TEMODEL_TVEQUILIBRIUM;
+    SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL=TRUE;
+    REACTING=YES;
+    Prt=0.9e0;
+    Sct=1.0e0;
+    ADD_ETA_TO_ETAT_WITHIN_QK=NO;  {say NO for standard kinetic energy transport model}
+    kdiv=1.0e-50;   {m2/s2}
+    psidiv=0.1e-3;  {1/s}
+    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
+    Tmin=1.0e1;     Tmax=15.0e3;    {K}
+    Tvmin=Tmin;     Tvmax=Tmax;    {K}
+    Twmin=Tmin;     Twmax=Tmax;    {K}
+    kmin=1.0e-10;   kmax=9.9e99;   {m2/s2}
+    psimin=1e-10;   psimax=9.9e99; {1/s}
+    wmin=1.0e-50;                  {min mass fraction allowed in the domain}
+    AXISYMMETRIC=NO;
+  );
   Air5s(
     CHEMMODEL=CHEMMODEL_PARK1993;
   );
   AirPlasma11s(
-    CHEMMODEL=CHEMMODEL_DUNNKANG1973;
+    CHEMMODEL=CHEMMODEL_LENARD1964;
     TOWNSENDIONIZATION=FALSE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
   );
@@ -260,11 +293,49 @@ Init(
     Region(is,js,  ie,je, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default);
     }
   );
+  FavreReynoldsTv(
+    {
+    _______________________________________________________________________________________
+
+    Initial Condition Type       Parameters
+    _______________________________________________________________________________________
+
+    INIT_TYPE1                   V[1]..V[nd],  T,  rho, w[1]..w[ns],     k, psi, Tv
+    INIT_TYPE2                   M[1]..M[nd],  P,  T,   w[1]..w[ns],     k, psi, Tv
+    INIT_TYPE3                   M[1]..M[nd],  Re, T,   w[1]..w[ns],     k, psi, Tv
+    INIT_TYPE4                   Mmag, angles, P,  T,   w[1]..w[ns],     k, psi, Tv
+    INIT_TYPE5                   V[1]..V[nd],  P,  T,   w[1]..w[ns],     k, psi, Tv
+    INIT_TYPE6                   V[1]..V[nd],  P,  T,   chi[1]..chi[ns], k, psi, Tv
+    _______________________________________________________________________________________
+
+    (a) In the freestream set psi to 110*q_infty for the k-omega models.
+    (b) In the freestream make sure that 1E-5*q_infty^2/ReL<k<0.1*q_infty^2/ReL.
+    }
+    Pdyn=10000; {Pa}
+    Vx=5270; {m/s}
+    Vy=0; {m/s}
+    rho=Pdyn/(Vx^2+Vy^2);
+    T=240; {K}
+    P=rho*286*T; {Pa}
+    Species("O2", "N2", "default");
+    w_O2=0.235;
+    w_N2=0.765;
+    w_default=1e-30;
+    k=1e-6; {J/kg}
+    psi=110*sqrt(Vx^2+Vy^2); {1/s for TURBMODEL_KOMEGA*}
+    Tv=T; {K}
+    All(INIT_TYPE5,Vx,Vy,P,T,w_O2,w_N2,w_default,k,psi,Tv);
+
+  );
 );
 
 
 Disc(
   NavierStokes(
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.2e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  FavreReynoldsTv(
     zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.2e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
@@ -294,6 +365,26 @@ Cycle(
       Uref[numspec+dim]=rhoref*aref;
     );
     Uref[numspec+numdim+1]=rhoref*aref*aref;
+  );
+  FavreReynoldsTv(
+    xiverge=1e-3;  {residual convergence threshold}
+    rhoref=0.1;    {reference density in kg/m3}
+    Tref=300.0;    {reference temperature in K}
+    Tvref=5000.0;  {reference vibrational temperature in K}
+    kref=1e4;      {reference turbulence kinetic energy in m2/s2}
+    psiref=1e8;    {reference specific dissipation rate of the TKE in 1/s for TURBMODEL_KOMEGA*
+                    reference dissipation rate of the TKE in m2/s3 for TURBMODEL_KEPSILON}
+    aref=sqrt(1.4*287*Tref);  {reference sound speed in m/s}
+    for (spec,1,numspec,
+      Uref[spec]=rhoref;
+    );
+    for (dim,1,numdim,
+      Uref[numspec+dim]=rhoref*aref;
+    );
+    Uref[numspec+numdim+1]=rhoref*aref*aref;
+    Uref[numspec+numdim+2]=rhoref*kref;  
+    Uref[numspec+numdim+3]=rhoref*psiref;  
+    Uref[numspec+numdim+4]=rhoref*700.0*Tvref;  
   );
   SteadyState(
     if (mod(iter,50)==0,

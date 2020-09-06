@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 SEP 05b
+  * in model/fluid/*/fluid.c
+    - in write_model_fluid_template(), changed default Tmax to 26000 K. 
+  * in model/fluid/_Favre-Reynolds_Tv/fluid.c
+    - in write_model_fluid_template(), changed TEMODEL to TEMODEL_TVEQUILIBRIUM
+  * in model/fluid/_*_plasma/fluid.c
+    - in write_model_fluid_template(), changed TEMODEL to TEMODEL_TRANSPORT
+
+
 2020 SEP 05a
   * in model/chem/_Cs_Air_Plasma_15s/
     - separated the Lenard reactions into several groups (negative ions, cesium reactions, and 
