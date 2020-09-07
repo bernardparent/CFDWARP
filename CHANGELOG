@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 SEP 07a
+  * in model/chem
+    - added _H2_Cs_Air_Plasma_15s
+  * in model/chem/_Cs_Air_Plasma_15s/chem.c, model/chem/_H2_Cs_Air_Plasma_22s/lenard1964.c
+    - turned off reaction for Townsend ionization of Cesium function of Te (leads to instabilities)
+  * in model/chem/_H2_Air_Plasma_13s/chem.c
+    - moved chemical reactions from parent2014.c to chem.c
+  
+
 2020 SEP 05b
   * in model/fluid/*/fluid.c
     - in write_model_fluid_template(), changed default Tmax to 26000 K. 
