@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 SEP 08a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Schem(), for _CHEM_WEEE_TWOTEMPERATURE the vibrational temperature is used
+      to determine ee of the electrons created from neutrals
+      
+
 2020 SEP 07a
   * in model/chem
     - added _H2_Cs_Air_Plasma_15s
