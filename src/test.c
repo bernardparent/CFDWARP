@@ -667,6 +667,33 @@ void test_h ( double Tmin, double Tmax, double dT ) {
 
 }
 
+
+void test_hmolar ( double Tmin, double Tmax, double dT ) {
+  double T, h;
+  spec_t w;
+  long spec, spec2;
+  printf ( "\n" );
+  printf ( "Species molar specific enthalpies [J/mole] as function of temperature [K].\n" );
+  printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
+  printf ( "\n" );
+  print_column_species_names ( 12 );
+  T = Tmin;
+  do {
+    wfprintf ( stdout, "%12.5E ", T );
+    for ( spec = 0; spec < ns; spec++ ) {
+      for ( spec2 = 0; spec2 < ns; spec2++ )
+        w[spec2] = 0.0;
+      w[spec] = 1.0;
+      h = _h_from_w_T ( w, T );
+      wfprintf ( stdout, "%+12.5E ", h*_calM(spec) );
+    }
+    wfprintf ( stdout, "\n" );
+    T += dT;
+  } while ( T < Tmax );
+
+}
+
+
 void test_cp ( double Tmin, double Tmax, double dT ) {
   double T, Cp;
   spec_t w;
@@ -905,6 +932,8 @@ int main ( int argc, char **argv ) {
       sscanf ( argv[4], "%lg", &dT );
       if ( strcmp ( "h", argv[1] ) == 0 )
         test_h ( Tmin, Tmax, dT );
+      if ( strcmp ( "hmolar", argv[1] ) == 0 )
+        test_hmolar ( Tmin, Tmax, dT );
       if ( strcmp ( "cp", argv[1] ) == 0 )
         test_cp ( Tmin, Tmax, dT );
       if ( strcmp ( "s", argv[1] ) == 0 )
@@ -983,6 +1012,8 @@ int main ( int argc, char **argv ) {
                           lengthcol2 );
 #ifdef _FLUID_MULTISPECIES
       write_options_row ( stderr, "h", "none", "species specific enthalpy  ./test h 500 2000 2",
+                          linewidth, lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "hmolar", "none", "species molar specific enthalpy  ./test hmolar 500 2000 2",
                           linewidth, lengthcol1, lengthcol2 );
       write_options_row ( stderr, "cp", "none", "species specific heat  ./test cp 500 2000 2",
                           linewidth, lengthcol1, lengthcol2 );

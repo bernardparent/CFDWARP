@@ -223,7 +223,7 @@ Model(
     sigmadiv=1e-6; {S/m}
     etdiv=1e2;     {J/kg}
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
-    Tmin=2.0e2;     Tmax=16.0e3;    {K}
+    Tmin=2.0e1;     Tmax=16.0e3;    {K}
     Tvmin=Tmin;     Tvmax=12.0e3;  {K}
     Temin=Tmin;     Temax=60.0e3;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
@@ -280,7 +280,7 @@ Init(
     k=1e-6;   {J/kg}
     psi=110*sqrt(Vx^2+Vy^2)+1000; {1/s for TURBMODEL_KOMEGA*}
     Tv=T; {K}
-    Te=3000; {K}
+    Te=T; {K}
     chi_eminus=1e-12;
     chi_O2plus=1e-12;
     chi_H2=1.0e-30;
@@ -300,10 +300,10 @@ Init(
     k=1e-6;   {J/kg}
     psi=110*sqrt(Vx^2+Vy^2)+1000; {1/s for TURBMODEL_KOMEGA*}
     Tv=T; {K}
-    Te=3000; {K}
+    Te=T; {K}
     chi_eminus=1e-12;
     chi_O2plus=1e-12;
-    chi_Cs=0.001;
+    chi_Cs=1e-3;
     chi_H2=1.0e0-chi_Cs;
     chi_O2=1.0e-30;
     chi_N2=1.0e-30;
@@ -329,6 +329,9 @@ Init(
     }
     phi=0.0; {V}
     All(INITEMF_TYPE1,phi);
+    Deltaphi=3000;
+    Region(is1,js,  is2,js,INITEMF_TYPE1,-Deltaphi/2);
+    Region(is3,js,  is4,js,INITEMF_TYPE1,Deltaphi/2);
   );
 );
 

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
 Copyright 2020 Bernard Parent
+Copyright 2020 Ajjay Omprakas
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -30,10 +31,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <src/control.h>
 #include "jachimowski1988old.h"
 #include "jachimowski1988.h"
+#include "smith1999.h"
 
 #define CHEMMODEL_NONE 1
 #define CHEMMODEL_JACHIMOWSKI1988OLD 2
 #define CHEMMODEL_JACHIMOWSKI1988 3
+#define CHEMMODEL_SMITH1999 4
 
 
 
@@ -62,6 +65,7 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
     SOAP_add_int_to_vars(codex,"CHEMMODEL_NONE",CHEMMODEL_NONE); 
     SOAP_add_int_to_vars(codex,"CHEMMODEL_JACHIMOWSKI1988OLD",CHEMMODEL_JACHIMOWSKI1988OLD); 
     SOAP_add_int_to_vars(codex,"CHEMMODEL_JACHIMOWSKI1988",CHEMMODEL_JACHIMOWSKI1988); 
+    SOAP_add_int_to_vars(codex,"CHEMMODEL_SMITH1999",CHEMMODEL_SMITH1999); 
     gl->MODEL_CHEM_READ=TRUE;
 
     action_original=codex->action;
@@ -70,9 +74,8 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
     codex->action=action_original;
 
     find_int_var_from_codex(codex,"CHEMMODEL",&gl->model.chem.CHEMMODEL);
-    if (gl->model.chem.CHEMMODEL!=CHEMMODEL_JACHIMOWSKI1988OLD && gl->model.chem.CHEMMODEL!=CHEMMODEL_JACHIMOWSKI1988 
-        && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)
-      SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_JACHIMOWSKI1988OLD or CHEMMODEL_JACHIMOWSKI1988 or CHEMMODEL_NONE.");
+    if (gl->model.chem.CHEMMODEL!=CHEMMODEL_JACHIMOWSKI1988OLD && gl->model.chem.CHEMMODEL!=CHEMMODEL_JACHIMOWSKI1988 && gl->model.chem.CHEMMODEL!=CHEMMODEL_SMITH1999 && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)
+      SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_JACHIMOWSKI1988OLD or CHEMMODEL_JACHIMOWSKI1988 or CHEMMODEL_SMITH1999 or CHEMMODEL_NONE.");
 
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;
@@ -116,6 +119,9 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
     case CHEMMODEL_JACHIMOWSKI1988: 
       find_W_Jachimowski1988 ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
     break;
+    case CHEMMODEL_SMITH1999:
+      find_W_Smith1999 ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
+    break;  
     case CHEMMODEL_NONE: 
       find_W_None ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );    
     break;
@@ -135,6 +141,9 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double 
     case CHEMMODEL_JACHIMOWSKI1988: 
       find_dW_dx_Jachimowski1988 ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
     break;
+    case CHEMMODEL_SMITH1999:
+      find_dW_dx_Smith1999 ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+    break;  
     case CHEMMODEL_NONE: 
       find_dW_dx_None ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
     break;
