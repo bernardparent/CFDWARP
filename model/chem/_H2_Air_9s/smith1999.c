@@ -65,39 +65,35 @@ const static bool REACTION[28]=
   
   #define specEND -1
   
-  const static long specM1[]=
+  const static long specM[]=
   {
-    specH2, specH2O, specEND
+    specH2, specH2O, specN2, specO2, specH, specO, specOH, specHO2, specH2O2, specEND
   };
   
-  const static long specM2[]=
-  {
-     specO2, specH2O, specN2, specEND
-  };
   
   const static double eta1[]=
   {
-    2.40, 15.40
+    2.40, 15.40, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
   };
   const static double eta2[]=
   {
-    2.00, 6.00
+    2.00, 6.00, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
   };
   const static double eta3[]=
   {
-    0.00, 0.00, 0.00
+    1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0
   };
   const static double eta4[]=
   {
-    0.00, 0.00
+    0.00, 0.00, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
   }; 
   const static double eta5[]=
   {
-    0.73, 3.65
+    0.73, 3.65, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
   };    
   const static double eta6[]=
   {
-    2.00, 6.00
+    2.00, 6.00, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
   };       
 
 
@@ -115,14 +111,14 @@ void find_W_Smith1999 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, d
 
   if (REACTION[1])
   {
-    for(k=0; specM1[k]!=specEND ; k++)
-     add_to_W_fwbw_3r2p ( specO, specO, specM1[k], specO2, specM1[k], eta1[k]*1.2E17, -1.0, 0.0, T, X, W);
+    for(k=0; specM[k]!=specEND ; k++)
+     add_to_W_fwbw_3r2p ( specO, specO, specM[k], specO2, specM[k], eta1[k]*1.2E17, -1.0, 0.0, T, X, W);
   }
   
   if (REACTION[2])
   {
-    for(k=0; specM1[k]!=specEND ; k++)
-     add_to_W_fwbw_3r2p ( specO, specH, specM1[k], specOH, specM1[k], eta2[k]*5.0E17, -1.0, 0.0, T, X, W);
+    for(k=0; specM[k]!=specEND ; k++)
+     add_to_W_fwbw_3r2p ( specO, specH, specM[k], specOH, specM[k], eta2[k]*5.0E17, -1.0, 0.0, T, X, W);
   }
   
   if (REACTION[3])
@@ -136,8 +132,8 @@ void find_W_Smith1999 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, d
 
   if (REACTION[6])
   {
-    for(k=0; specM2[k]!=specEND ; k++)
-     add_to_W_fwbw_3r2p ( specH, specO2, specM2[k], specHO2, specM2[k], eta3[k]*2.8E18, -0.862, 0.0, T, X, W);
+    for(k=0; specM[k]!=specEND ; k++)
+     add_to_W_fwbw_3r2p ( specH, specO2, specM[k], specHO2, specM[k], eta3[k]*2.8E18, -0.862, 0.0, T, X, W);
   }
   
   if (REACTION[7])
@@ -154,8 +150,8 @@ void find_W_Smith1999 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, d
 
   if (REACTION[11])
   {
-    for(k=0; specM1[k]!=specEND ; k++)
-     add_to_W_fwbw_3r2p ( specH, specH, specM1[k], specH2, specM1[k], eta4[k]*1.0E18, -1.0, 0.0, T, X, W);
+    for(k=0; specM[k]!=specEND ; k++)
+     add_to_W_fwbw_3r2p ( specH, specH, specM[k], specH2, specM[k], eta4[k]*1.0E18, -1.0, 0.0, T, X, W);
   }
   if (REACTION[12])
     add_to_W_fwbw_3r2p ( specH, specH,
@@ -167,8 +163,8 @@ void find_W_Smith1999 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, d
 
   if (REACTION[14])
   {
-    for(k=0; specM1[k]!=specEND ; k++)
-     add_to_W_fwbw_3r2p ( specH, specOH, specM1[k], specH2O, specM1[k], eta5[k]*2.2E22, -2.0, 0.0, T, X, W);
+    for(k=0; specM[k]!=specEND ; k++)
+     add_to_W_fwbw_3r2p ( specH, specOH, specM[k], specH2O, specM[k], eta5[k]*2.2E22, -2.0, 0.0, T, X, W);
   }
   
   if (REACTION[15])
@@ -188,8 +184,8 @@ void find_W_Smith1999 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, d
 
   if (REACTION[20])
   {
-    for(k=0; specM1[k]!=specEND ; k++)
-     add_to_W_fwbw_3r2p ( specOH, specOH, specM1[k], specH2O2, specM1[k], eta6[k]*7.4E13, -0.371, 0.0, T, X, W);
+    for(k=0; specM[k]!=specEND ; k++)
+     add_to_W_fwbw_3r2p ( specOH, specOH, specM[k], specH2O2, specM[k], eta6[k]*7.4E13, -0.371, 0.0, T, X, W);
   }
   
   if (REACTION[21])
@@ -238,14 +234,14 @@ void find_dW_dx_Smith1999 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double T
 
   if (REACTION[1]) 
   {
-    for(k=0; specM1[k]!=specEND ; k++)
-     add_to_dW_fwbw_3r2p ( specO, specO, specM1[k], specO2, specM1[k], eta1[k]*1.2E17, -1.0, 0.0, T, X, dWdT, dWdrhok );
+    for(k=0; specM[k]!=specEND ; k++)
+     add_to_dW_fwbw_3r2p ( specO, specO, specM[k], specO2, specM[k], eta1[k]*1.2E17, -1.0, 0.0, T, X, dWdT, dWdrhok );
   }
   
   if (REACTION[2]) 
   {
-    for(k=0; specM1[k]!=specEND ; k++)
-     add_to_dW_fwbw_3r2p ( specO, specH, specM1[k], specOH, specM1[k], eta2[k]*5.0E17, -1.0, 0.0, T, X, dWdT, dWdrhok );
+    for(k=0; specM[k]!=specEND ; k++)
+     add_to_dW_fwbw_3r2p ( specO, specH, specM[k], specOH, specM[k], eta2[k]*5.0E17, -1.0, 0.0, T, X, dWdT, dWdrhok );
   } 
   
   if (REACTION[3]) 
@@ -259,8 +255,8 @@ void find_dW_dx_Smith1999 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double T
 
   if (REACTION[6])
   {
-    for(k=0; specM2[k]!=specEND ; k++) 
-     add_to_dW_fwbw_3r2p ( specH, specO2, specM2[k], specHO2, specM2[k], eta3[k]*2.8E18, -0.862, 0.0, T, X, dWdT, dWdrhok );
+    for(k=0; specM[k]!=specEND ; k++) 
+     add_to_dW_fwbw_3r2p ( specH, specO2, specM[k], specHO2, specM[k], eta3[k]*2.8E18, -0.862, 0.0, T, X, dWdT, dWdrhok );
   }
   
   if (REACTION[7]) 
@@ -277,8 +273,8 @@ void find_dW_dx_Smith1999 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double T
 
   if (REACTION[11]) 
   {
-    for(k=0; specM1[k]!=specEND ; k++) 
-     add_to_dW_fwbw_3r2p ( specH, specH, specM1[k], specH2, specM1[k], eta4[k]*1.0E18, -1.0, 0.0, T, X, dWdT, dWdrhok );
+    for(k=0; specM[k]!=specEND ; k++) 
+     add_to_dW_fwbw_3r2p ( specH, specH, specM[k], specH2, specM[k], eta4[k]*1.0E18, -1.0, 0.0, T, X, dWdT, dWdrhok );
   }
   if (REACTION[12]) 
     add_to_dW_fwbw_3r2p ( specH, specH,
@@ -290,8 +286,8 @@ void find_dW_dx_Smith1999 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double T
 
   if (REACTION[14])
   {
-    for(k=0; specM1[k]!=specEND ; k++)  
-    add_to_dW_fwbw_3r2p ( specH, specOH, specM1[k], specH2O, specM1[k], eta5[k]*2.2E22, -2.0, 0.0, T, X, dWdT, dWdrhok );
+    for(k=0; specM[k]!=specEND ; k++)  
+    add_to_dW_fwbw_3r2p ( specH, specOH, specM[k], specH2O, specM[k], eta5[k]*2.2E22, -2.0, 0.0, T, X, dWdT, dWdrhok );
   }
   
   if (REACTION[15]) 
@@ -311,8 +307,8 @@ void find_dW_dx_Smith1999 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double T
 
   if (REACTION[20]) 
   {
-    for(k=0; specM1[k]!=specEND ; k++)
-     add_to_dW_fwbw_3r2p ( specOH, specOH, specM1[k], specH2O2, specM1[k], eta6[k]*7.4E13, -0.371, 0.0, T, X, dWdT, dWdrhok );
+    for(k=0; specM[k]!=specEND ; k++)
+     add_to_dW_fwbw_3r2p ( specOH, specOH, specM[k], specH2O2, specM[k], eta6[k]*7.4E13, -0.371, 0.0, T, X, dWdT, dWdrhok );
   }
   if (REACTION[21]) 
     add_to_dW_fwbw_2r2p ( specOH, specOH, specH2O, specO, 3.57E04, 2.4, -2100.0, T, X, dWdT, dWdrhok );

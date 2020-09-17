@@ -57,7 +57,7 @@ void add_dKstar_dG_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
     find_metrics_at_interface(np, gl, _al(gl,l,theta,-1), _al(gl,l,theta,+0),
                              theta, &metricsm1h);
     for (vartheta=0; vartheta<nd; vartheta++){
-      find_Kstar_interface(np,gl,_al(gl,l,theta,-1),_al(gl,l,theta,+0),metricsm1h,theta,vartheta,Km1h);
+      find_Kstar_interface(np,gl,_al(gl,l,theta,-1),_al(gl,l,theta,+0),metricsm1h,theta,vartheta,Km1h,CYCLELEVEL_RES);
 
       if (theta==vartheta) {
         if (l==ls) find_G(np[_al(gl,l,theta,-1)],gl,Gm1[vartheta]);

@@ -41,15 +41,15 @@
 }
 
 \email{
-  parent@pusan.ac.kr
+  bparent@arizona.edu
 }
 
 \department{
-  Dept. Aerospace Engineering	
+  Aerospace and Mechanical Engineering	
 }
 
 \institution{
-  Pusan National University
+  University of Arizona
 }
 
 \title{
@@ -57,7 +57,7 @@
 }
 
 \date{
-  2005--2015
+  2005--2015, 2020
 }
 
 %\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
@@ -333,7 +333,7 @@ where $\nu_k$ is the mass diffusion coefficient and $w_k$ the mass fraction and 
 The charged species transport equation can be written as:
 %
 \begin{equation}
-  \frac{\partial N_k}{\partial t} + \sum_{i=1}^3 \frac{\partial}{\partial x_i} N_k \vec{V}_i^k = W_k
+  \frac{\partial N_k}{\partial t} + \sum_{i=1}^3 \frac{\partial}{\partial x_i} N_k \vec{V}_i^k = \frac{W_k}{m_k}
 \end{equation}
 %
 where $W_k$ is the rate of particule production for the $k$th species per unit volume due to chemical reactions and where $N_k$ is the number density of species $k$, and $\vec{V}_k$ is the $k$th species velocity including both drift and diffusion.
@@ -1438,9 +1438,6 @@ The first term on the RHS corresponds to:
 %
 \begin{equation}
 \frac{\delta Q}{v \Delta t}= 
-\underbrace{
-  -\sum_{i=1}^{3}\frac{\partial q_i^{\rm e}}{\partial x_i}
-}_{\begin{minipage}{1.7cm}\flushleft \footnotesize heat addition by conduction\end{minipage}}
 -
 \underbrace{
 Q_{\rm e}
@@ -1480,7 +1477,6 @@ Substitute the latter 5 equations in Eq.\ (\ref{eqn:eelectron2}):
 \rho_{\rm e} \frac{\partial h_{\rm e}}{\partial t} + \sum_{j=1}^3 \rho_{\rm e} \vec{V}^{\rm e}_j \frac{\partial h_{\rm e}}{\partial x_j} 
 - \frac{\partial P_{\rm e}}{\partial t} - \sum_{i=1}^3 \vec{V}^{\rm e}_i \frac{\partial P_{\rm e}}{\partial x_i}
 = 
--\sum_{i=1}^{3}\frac{\partial q_i^{\rm e}}{\partial x_i}
 -Q_{\rm e}
 -\sum_{i=1}^3 \vec{F}_i^{\rm e} \left( \vec{V}_i^{{\rm n}-{\rm e}}-\vec{V}_i^{\rm e} \right)
 -h_{\rm e} W_{\rm e} - Q_{\rm ei}
@@ -1499,7 +1495,6 @@ where $W_{\rm e}$ is the mass creation per unit volume per unit time of the elec
  \frac{\partial }{\partial t}\rho_{\rm e} h_{\rm e} + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_{\rm e} \vec{V}^{\rm e}_j h_{\rm e} 
 - \frac{\partial P_{\rm e}}{\partial t} - \sum_{i=1}^3 \vec{V}^{\rm e}_i \frac{\partial P_{\rm e}}{\partial x_i}
 = 
--\sum_{i=1}^{3}\frac{\partial q_i^{\rm e}}{\partial x_i}
 -Q_{{\rm e}}
 -\sum_{i=1}^3 \vec{F}_i^{\rm e} \left( \vec{V}_i^{{\rm n}-{\rm e}}-\vec{V}_i^{\rm e} \right)
 - Q_{\rm ei}
@@ -1517,7 +1512,6 @@ Thus:
  \frac{\partial }{\partial t}\rho_{\rm e} e_{\rm e} + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_{\rm e} \vec{V}^{\rm e}_j h_{\rm e} 
 - \sum_{i=1}^3 \vec{V}^{\rm e}_i \frac{\partial P_{\rm e}}{\partial x_i}
 = 
--\sum_{i=1}^{3}\frac{\partial q_i^{\rm e}}{\partial x_i}
 - Q_{{\rm e}}
 -\sum_{i=1}^3 \vec{F}_i^{\rm e} \left( \vec{V}_i^{{\rm n}-{\rm e}}-\vec{V}_i^{\rm e} \right)
 - Q_{\rm ei}
@@ -1541,7 +1535,6 @@ Add the latter to Eq.\ (\ref{eqn:eelectron4}):
 \begin{equation}
  \frac{\partial }{\partial t}\rho_{\rm e} e_{\rm e} + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_{\rm e} \vec{V}^{\rm e}_j h_{\rm e} 
 = 
--\sum_{i=1}^{3}\frac{\partial q_i^{\rm e}}{\partial x_i}
 - Q_{{\rm e}}
 -\sum_{i=1}^3 \vec{F}_i^{\rm e}  \vec{V}_i^{{\rm n}-{\rm e}} 
 - Q_{\rm ei}
@@ -1553,7 +1546,6 @@ or:
 \begin{equation}
  \frac{\partial }{\partial t}\rho_{\rm e} e_{\rm e} + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_{\rm e} \vec{V}^{\rm e}_j h_{\rm e} 
 = 
--\sum_{i=1}^{3}\frac{\partial q_i^{\rm e}}{\partial x_i}
 - Q_{{\rm e}}
 - \vec{F}^{\rm e}\cdot  \vec{V}^{{\rm n}-{\rm e}} 
 - Q_{\rm ei}
@@ -1574,20 +1566,25 @@ Thus:
 \begin{equation}
  \frac{\partial }{\partial t}\rho_{\rm e} e_{\rm e} + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_{\rm e} \vec{V}^{\rm e}_j h_{\rm e} 
 = 
--\sum_{i=1}^{3}\frac{\partial q_i^{\rm e}}{\partial x_i}
 - Q_{{\rm e}}
 - \vec{F}^{\rm e}\cdot  \vec{V}^{{\rm n}-{\rm e}} 
 - Q_{\rm ei}
 +   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
 \end{equation}
 %  
-But recall that $Q_{\rm e}$ was defined as the heat added by the electrons to the neutrals including energy lost/gained through creation and destruction of the electrons through chemical reactions. As well recall that $\vec{F}^{\rm e}\cdot  \vec{V}^{{\rm n}-{\rm e}}$ corresponds to the work done by the electrons on the neutrals through collision forces. Thus, we can say that:
+But recall that $Q_{\rm e}$ was defined as the heat added by the electrons to the neutrals including energy lost/gained through creation and destruction of the electrons through chemical reactions and that that $\vec{F}^{\rm e}\cdot  \vec{V}^{{\rm n}-{\rm e}}$ corresponds to the work done by the electrons on the neutrals through collision forces.  Thus, we can say that:
 %
 \begin{equation}
-Q_{{\rm e}}
-+ \vec{F}^{\rm e}\cdot  \vec{V}^{{\rm n}-{\rm e}}=\underbrace{-W_{\rm e} e_{\rm e}}_{\begin{minipage}{3cm} \footnotesize \flushleft energy lost to neutrals due to destruction of electrons through chemical reactions\end{minipage}}
-+
-\underbrace{Q_{\rm e-n} }_{\begin{minipage}{3cm} \footnotesize \flushleft energy lost to neutrals by heat dissipation and work done through collisions\end{minipage}}
+Q_{{\rm e}} + \vec{F}^{\rm e}\cdot  \vec{V}^{{\rm n}-{\rm e}}
+=\underbrace{-W_{\rm e} e_{\rm e}}_{\begin{minipage}{3cm} \footnotesize \flushleft energy lost to neutrals due to destruction of electrons through chemical reactions\end{minipage}}
++ Q_{\rm e-n}
+\end{equation}
+%
+Thus the physical definition of  $Q_{\rm e-n}$ is:
+%
+\begin{equation}
+Q_{\rm e-n} \equiv \vec{F}^{\rm e}\cdot  \vec{V}^{{\rm n}-{\rm e}} + \textrm{heat dissipated by electrons to neutrals}
+\label{eqn:Qen_definition}
 \end{equation}
 %
 Thus:
@@ -1595,32 +1592,24 @@ Thus:
 \begin{equation}
  \frac{\partial }{\partial t}\rho_{\rm e} e_{\rm e} + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_{\rm e} \vec{V}^{\rm e}_j h_{\rm e} 
 = 
--\sum_{i=1}^{3}\frac{\partial q_i^{\rm e}}{\partial x_i}
 + W_{\rm e} e_{\rm e}
 - Q_{\rm e-n}
 +   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
 - Q_{\rm ei}
 \end{equation}
 %  
-We can rewrite the heat conduction through Fourier's law as:
-%
-\begin{equation}
-  q_i^{\rm e}=-\kappa_{\rm e} \frac{\partial T_{\rm e}}{\partial x_i}
-\end{equation}
-%
 Then, the electron energy transport becomes:
 %
 \begin{equation}
 \frameeqn{
  \frac{\partial }{\partial t}\rho_{\rm e} e_{\rm e} + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_{\rm e} \vec{V}^{\rm e}_j h_{\rm e} 
--\sum_{i=1}^{3}\frac{\partial }{\partial x_i}\kappa_{\rm e}\frac{\partial T_{\rm e}}{\partial x_i}
 = 
  W_{\rm e} e_{\rm e}
 +   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
 - Q_{\rm e-n}
 - Q_{\rm ei}
 }
-\label{eqn:eenergy}
+\label{eqn:eelectron5}
 \end{equation}
 %  
 In the latter, the electron internal energy $e_{\rm e}$ and enthalpy $h_{\rm e}$ do \emph{not} include the heat of formation and are simply equal to:
@@ -1634,27 +1623,192 @@ In the latter, the electron internal energy $e_{\rm e}$ and enthalpy $h_{\rm e}$
   h_{\rm e}=\frac{5}{2} R_{\rm e} T_{\rm e}
 \end{equation}
 %
-with $R_{\rm e}$ the electron gas constant equal to $k_{\rm B}/m_{\rm e}$ with $m_{\rm e}$ the mass of one electron. Meanwhile, the electron thermal conductivity is equal to:
+with $R_{\rm e}$ the electron gas constant equal to $k_{\rm B}/m_{\rm e}$ with $m_{\rm e}$ the mass of one electron. 
+
+We can write the electron energy transport in non-conservative form through the use of the electron mass conservation equation:
 %
 \begin{equation}
-\kappa_{\rm e} = \frac{5 k_{\rm B}^2 N_{\rm e} \mu_{\rm e} T_{\rm e}}{2 |C_{\rm e}|} 
+\frac{\partial N_{\rm e}}{\partial t} + \sum_j^3 \frac{\partial N_{\rm e} \vec{V}^{\rm e}_j}{\partial x_j} = \frac{W_{\rm e}}{m_{\rm e}}
+\end{equation}
+%
+Multiply by $m_{\rm e}$ and rearrange:
+%
+\begin{equation}
+\frac{\partial \rho_{\rm e}}{\partial t} + \sum_j^3 \frac{\partial \rho_{\rm e} \vec{V}^{\rm e}_j}{\partial x_j} =  W_{\rm e}
+\end{equation}
+%
+Multiply all terms by $h_{\rm e}$:
+%
+\begin{equation}
+h_{\rm e} \frac{\partial \rho_{\rm e}}{\partial t} + \sum_j^3 h_{\rm e}  \frac{\partial \rho_{\rm e} \vec{V}^{\rm e}_j}{\partial x_j} =  W_{\rm e} h_{\rm e} 
+\end{equation}
+%
+Keep the latter on hold. Expand the derivatives in Eq.\ (\ref{eqn:eelectron5}):
+%
+\begin{equation}
+ \rho_{\rm e} \frac{\partial }{\partial t} e_{\rm e} 
+ + e_{\rm e}\frac{\partial }{\partial t}\rho_{\rm e}   
+ + \sum_{j=1}^3  h_{\rm e} \frac{\partial }{\partial x_j} \rho_{\rm e} \vec{V}^{\rm e}_j  
+ + \sum_{j=1}^3  \rho_{\rm e} \vec{V}^{\rm e}_j \frac{\partial }{\partial x_j}  h_{\rm e} 
+= 
+ W_{\rm e} e_{\rm e}
++   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
+- Q_{\rm e-n}
+- Q_{\rm ei}
+\end{equation}
+%  
+Substract the former from the latter to obtain a second form of the electron energy transport equation (with no loss in generality):
+%
+\begin{equation}
+\frameeqn{
+ \rho_{\rm e} \frac{\partial }{\partial t} e_{\rm e} 
+ - R_{\rm e} T_{\rm e} \frac{\partial \rho_{\rm e}}{\partial t}
+ + \sum_{j=1}^3  \rho_{\rm e} \vec{V}^{\rm e}_j \frac{\partial }{\partial x_j}  h_{\rm e} 
+= 
+-W_{\rm e} R_{\rm e} T_{\rm e}
++   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
+- Q_{\rm e-n}
+- Q_{\rm ei}
+}
+\label{eqn:eelectron6}
+\end{equation}
+%  
+
+
+We can write the electron energy transport equation in yet another form. First recall the charged species velocity Eq.\ (\ref{eqn:Vcharged}) for the electrons:
+%
+\begin{equation}
+  \vec{V}^{\rm e}=\vec{V}^{\rm n} - \mu_{\rm e} \vec{E}^{\rm e} -\frac{\mu_{\rm e}}{|C_{\rm e}| N_{\rm e}}\nabla P_{\rm e}
+\end{equation}
+% 
+or,
+%
+\begin{equation}
+  \vec{V}^{\rm e}_j=\vec{V}^{\rm n}_j - \mu_{\rm e} \vec{E}^{\rm e}_j -\frac{\mu_{\rm e}}{|C_{\rm e}| N_{\rm e}} \frac{\partial P_{\rm e}}{\partial x_j} 
+\end{equation}
+% 
+Expand the electron pressure:
+%
+\begin{equation}
+  \vec{V}^{\rm e}_j=\vec{V}^{\rm n}_j - \mu_{\rm e} \vec{E}^{\rm e}_j 
+    -\frac{\mu_{\rm e} k_{\rm B}}{|C_{\rm e}| } \frac{  \partial T_{\rm e}}{\partial x_j} 
+    -\frac{\mu_{\rm e} k_{\rm B} T_{\rm e}}{|C_{\rm e}| N_{\rm e}} \frac{\partial N_{\rm e}  }{\partial x_j} 
+\end{equation}
+% 
+Multiply by $\rho_{\rm e} h_{\rm e}$:
+%
+\begin{equation}
+  \rho_{\rm e} h_{\rm e} \vec{V}^{\rm e}_j
+  = \rho_{\rm e} h_{\rm e} \vec{V}^{\rm n}_j 
+  - \rho_{\rm e} h_{\rm e} \mu_{\rm e} \vec{E}^{\rm e}_j 
+  -\frac{\rho_{\rm e} h_{\rm e} \mu_{\rm e} k_{\rm B}}{|C_{\rm e}| } \frac{  \partial T_{\rm e}}{\partial x_j} 
+  -\frac{\rho_{\rm e} h_{\rm e} \mu_{\rm e} k_{\rm B} T_{\rm e}}{|C_{\rm e}| N_{\rm e}} \frac{\partial N_{\rm e}  }{\partial x_j} 
+\end{equation}
+% 
+But $\rho_{\rm e}=N_{\rm e} m_{\rm e}$:
+%
+\begin{equation}
+  \rho_{\rm e} h_{\rm e} \vec{V}^{\rm e}_j
+  = \rho_{\rm e} h_{\rm e} \vec{V}^{\rm n}_j 
+  - \rho_{\rm e} h_{\rm e} \mu_{\rm e} \vec{E}^{\rm e}_j 
+  -\frac{N_{\rm e} m_{\rm e} h_{\rm e} \mu_{\rm e} k_{\rm B}}{|C_{\rm e}| } \frac{  \partial T_{\rm e}}{\partial x_j} 
+  -\frac{ m_{\rm e} h_{\rm e} \mu_{\rm e} k_{\rm B} T_{\rm e}}{|C_{\rm e}| } \frac{\partial N_{\rm e}  }{\partial x_j} 
+\end{equation}
+% 
+But $h_{\rm e}=\frac{5}{2}\frac{k_{\rm B}}{m_{\rm e}} T_{\rm e}$:
+%
+\begin{equation}
+  \rho_{\rm e} h_{\rm e} \vec{V}^{\rm e}_j
+  = \rho_{\rm e} h_{\rm e} \vec{V}^{\rm n}_j 
+  - \rho_{\rm e} h_{\rm e} \mu_{\rm e} \vec{E}^{\rm e}_j 
+  -\frac{5 N_{\rm e} k_{\rm B}^2 T_{\rm e} \mu_{\rm e} }{2 |C_{\rm e}| } \frac{  \partial T_{\rm e}}{\partial x_j} 
+  -\frac{5 k_{\rm B}^2 T_{\rm e}^2 \mu_{\rm e}}{2 |C_{\rm e}| } \frac{\partial N_{\rm e}  }{\partial x_j} 
+\end{equation}
+% 
+Substitute the latter in the electron energy transport (\ref{eqn:eelectron5}) and reformat to obtain a third form of the electron energy transport (with no loss in generality):
+%
+\begin{equation}
+\frameeqn{
+\begin{array}{l}\mfd
+ \frac{\partial }{\partial t}\rho_{\rm e} e_{\rm e} 
++ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_{\rm e} \left(\vec{V}^{\rm n}_j - \mu_{\rm e} \vec{E}^{\rm e}_j\right) h_{\rm e} 
+-\sum_{i=1}^{3}\frac{\partial }{\partial x_i}\left(\kappa_{\rm e}\frac{\partial T_{\rm e}}{\partial x_i}\right)
+-\sum_{i=1}^{3}\frac{\partial }{\partial x_i}\left(\frac{\kappa_{\rm e} T_{\rm e}}{\rho_{\rm e} } \frac{\partial \rho_{\rm e}}{\partial x_i}\right)\\ \mfd
+= 
+ W_{\rm e} e_{\rm e}
++   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
+- Q_{\rm e-n}
+- Q_{\rm ei}
+\end{array}
+}
+\label{eqn:eenergy}
+\end{equation}
+%  
+where the electron thermal conductivity is defined as:
+%
+\begin{equation}
+\kappa_{\rm e} \equiv \frac{5 k_{\rm B}^2 N_{\rm e} \mu_{\rm e} T_{\rm e}}{2 |C_{\rm e}|} 
 \end{equation}
 %
 
-Also, we can write the heat lossed to the neutrals due to heat dissipation and collisions as in Ref.\ \cite[page 34]{book:1991:raizer}:
+
+Recall the definition of $Q_{\rm e-n}$ in Eq.\ (\ref{eqn:Qen_definition}):
 %
 \begin{equation}
-  Q_{\rm e-n} = \frac{3 N_{\rm e} k_{\rm B} T_{\rm e}  |C_{\rm e}| \zeta_{\rm e}}{2 m_{\rm e}\mu_{\rm e}}
+Q_{\rm e-n} \equiv \vec{F}^{\rm e}\cdot  \vec{V}^{{\rm n}-{\rm e}} + \textrm{heat dissipated by electrons to neutrals}
 \end{equation}
 %
+The collision force between the electrons and the neutrals corresponds to (see momentum equation for the charged species):
+%
+\begin{equation}
+\vec{F}^{\rm e} = \frac{|C_{\rm e}|N_{\rm e}}{\mu_{\rm e}} \left(\vec{V}^{\rm e} - \vec{V}^{\rm n} \right)
+\end{equation}
+%
+Thus:
+%
+\begin{equation}
+Q_{\rm e-n} = \frac{|C_{\rm e}|N_{\rm e}}{\mu_{\rm e}} \left(\vec{V}^{\rm e} - \vec{V}^{\rm n} \right) \cdot  \vec{V}^{{\rm n}-{\rm e}} + \textrm{heat dissipated by electrons to neutrals}
+\end{equation}
+%
+where the heat dissipated to the neutrals by the electrons would have a similar form as the first term on the RHS but involving random motion of electrons with respect to the bulk. We can lump the two terms into one and assume that the mean electron velocity with respect to the bulk (the thermal velocity, $\overline{q_{\rm e}}$) is in the same order of magnitude as the electron bulk velocity $\vec{V}^{\rm e}$. We further assume that either the bulk or thermal electron velocity is much greater than the neutrals velocity and that the velocity of the collision $\vec{V}^{\rm e}$ is approximately the electron velocity (a good assumption because electrons move quantum mechanically and don't bounce off heavy particules but go through them when interacting with them). Then, we obtain:
+%
+\begin{equation}
+Q_{\rm e-n} \propto \frac{|C_{\rm e}|N_{\rm e}}{\mu_{\rm e}} \overline{q_{\rm e}}^2 
+\end{equation}
+%
+But from the definition of the electron temperature,
+%
+\begin{equation}
+T_{\rm e} \equiv \frac{m_{\rm e}\overline{q_{\rm e}^2}}{3 k_{\rm B} }
+\end{equation}
+%
+Noting that $\overline{q_{\rm e}^2}\propto \overline{q_{\rm e}}^2$:
+%
+\begin{equation}
+ \overline{q_{\rm e}}^2 \propto \frac{3 k_{\rm B} T_{\rm e}}{m_{\rm e}} 
+\end{equation}
+%
+Substitute in $Q_{\rm en}$ expression:
+%
+\begin{equation}
+Q_{\rm e-n} \propto \frac{3 k_{\rm B} T_{\rm e} |C_{\rm e}|N_{\rm e}}{m_{\rm e} \mu_{\rm e}}  
+\end{equation}
+%
+Introduce a proportionality constant to obtain an approximate expression for the heat lost to the neutrals due to heat dissipation and collisions:
+%
+\begin{equation}
+  Q_{\rm e-n} \approx \frac{3 N_{\rm e} k_{\rm B} T_{\rm e}  |C_{\rm e}| \zeta_{\rm e}}{2 m_{\rm e}\mu_{\rm e}}
+\end{equation}
+%
+Such is the same expression as found in Ref.\ \cite[page 34]{book:1991:raizer}. 
 But, it should be noted that the main thermal relaxation mechanism between electrons and air molecules is through the nitrogen vibrational energy modes (more than one order of magnitude greater than the translational energy modes). Thus, the loss or gain of energy of the electrons is set here to be proportional to the difference between the  electron  temperature and the nitrogen vibrational temperature as follows:
 %
 \begin{equation}
-  Q_{\rm e-n} = \frac{3 N_{\rm e} k_{\rm B} (T_{\rm e}-T_{\rm v})  |C_{\rm e}| \zeta_{\rm e}}{2 m_{\rm e}\mu_{\rm e}}
+  Q_{\rm e-n} \approx \frac{3 N_{\rm e} k_{\rm B} (T_{\rm e}-T_{\rm v})  |C_{\rm e}| \zeta_{\rm e}}{2 m_{\rm e}\mu_{\rm e}}
 \label{eqn:Qen}
 \end{equation}
 %
-where  the electron energy loss function $\zeta_{\rm e}$ a term function of the effective electric field which can be determined as in Ref.\ \cite{misc:1995:boeuf} so that the electron energy equation yields the correct equilibrium condition (by setting to zero the sum of  all terms within the energy equation that do not become zero in the local approximation at equilibrium). A polynomial giving $\zeta_{\rm e}$ as a function of the electron temperature is given in Table \ref{tab:xicoefficients} below. 
+Although the derivation of $Q_{\rm e-n}$ is not exact and involves several assumptions, it can be calibrated by letting the proportionality constant $\zeta_{\rm e}$ vary as a function of electron temperature. Such $\zeta_{\rm e}$ is referred to as the electron energy loss function. The electron energy loss function $\zeta_{\rm e}$ can be determined as in Ref.\ \cite{misc:1995:boeuf} so that the electron energy equation yields the correct equilibrium condition (by setting to zero the sum of  all terms within the energy equation that do not become zero in the local approximation at equilibrium). A polynomial giving $\zeta_{\rm e}$ as a function of the electron temperature is given in Table \ref{tab:xicoefficients} below. 
 
 
 
@@ -2015,7 +2169,6 @@ Thus Eq.\ (\ref{eqn:zetae2}) can yield $\zeta_{\rm e}$ function of the electron 
 
 
 Note that the electron loss function is determined assuming a uniform plasma where there is no electron pressure gradient. It is not clear if the experiments used to determine the electron loss function involved significant pressure gradients. If so, it may be preferable to replace   $\vec{E}\cdot \vec{V}^{\rm e}$ in Eq.\ (\ref{eqn:eenergy})  by $\mu_{\rm e} N_{\rm e} |C_{\rm e}| \vec{E}^2$. 
-
 
 
 

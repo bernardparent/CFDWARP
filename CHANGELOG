@@ -7,6 +7,38 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 SEP 17a
+  * in cycle/res/_generic/res.c
+    - added CYCLELEVEL_RES to find_Kstar_interface() call
+  * in cycle/share/ts_share.c
+    - added CYCLELEVEL_TS to find_Kstar_interface() call
+  * in model/emfield/*/emfield.c
+    - in write_model_emfield_template(), changed Te_buffer=0.0; to Te_buffer=300.0;
+  * in model/fluid/*/fluid.c
+    - added CYCLELEVEL parameter to find_Kstar_interface()
+  * in src/post.c
+    - added CYCLELEVEL_RES to find_Kstar_interface() call
+  * in src/common.h
+    - added definitions for CYCLELEVEL_RES and CYCLELEVEL_TS
+  * in model/fluid/_*_plasma/fluid.c
+    - in find_Kstar_interface(), made changes to electron thermal diffusion coefficient: is now
+      only added for CYCLELEVEL_TS not CYCLELEVEL_RES
+  * in model/fluid/_*_plasma/fluid_plasma.c
+    - in find_Dstar(), now calls find_Ve_from_J() instead of find_Ve_from_Je()
+    - in find_Dstarplus() and find_Dstarminus(), now also conditions electron energy not just the 
+      charged species continuity equations
+  * in model/fluid/_*_plasma/fluid_source.c
+    - in find_dSe_dU_transport(), removed the line that set to zero the non-diagonal elements
+      of dSedU
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - changed the section "Derivation of the Electron Energy Transport Equations" and added
+      derivation of the thermal conductivity terms and when and when not they should be included
+  * in model/chem/_H2_Air_9s/smith1999.c
+    - updated the third body efficiencies
+  * in model/chem/_H2_Air_9s/doc/report.tex
+    - updated the third body efficiencies
+  
+
 2020 SEP 11a
   * in model/chem/_H2_Air_9s/chem.c
     - added smith1999 model from Ajjay Omprakas

@@ -75,9 +75,7 @@ void find_Y2star_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, 
 void find_metrics_at_interface(np_t *np, gl_t *gl, long lL, long lR,
                               long theta, metrics_t *metrics);
 
-void find_Kstar(np_t *np, long l, gl_t *gl, metrics_t metrics, long theta, long vartheta, sqmat_t K);
-
-void find_Kstar_interface(np_t *np, gl_t *gl, long lL, long lR, metrics_t metrics, long theta, long vartheta, sqmat_t K);
+void find_Kstar_interface(np_t *np, gl_t *gl, long lL, long lR, metrics_t metrics, long theta, long vartheta, sqmat_t K, int CYCLELEVEL);
 
 void find_Ustar(np_t np, gl_t *gl, flux_t Ustar);
 

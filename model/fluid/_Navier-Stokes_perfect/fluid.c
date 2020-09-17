@@ -479,7 +479,7 @@ void find_dG_dUstar(np_t np, gl_t *gl, sqmat_t B){
 
 
 
-void find_Kstar_interface(np_t *np, gl_t *gl, long lL, long lR, metrics_t metrics, long theta, long vartheta, sqmat_t K){
+void find_Kstar_interface(np_t *np, gl_t *gl, long lL, long lR, metrics_t metrics, long theta, long vartheta, sqmat_t K, int CYCLELEVEL){
   long dim,dim2,row,col;
   double Omega,alpha,sum;
   double beta[nd][nd];

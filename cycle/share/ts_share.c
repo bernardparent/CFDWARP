@@ -44,7 +44,7 @@ void find_Kstar_dG_dUstar_interface(np_t *np, gl_t *gl, long theta, long l, sqma
   find_dG_dUstar(np[lp0],gl,Bp0);
   find_dG_dUstar(np[lp1],gl,Bp1);
 
-  find_Kstar_interface(np,gl,lp0,lp1,metricsp1h,theta,theta,Kp1h);
+  find_Kstar_interface(np,gl,lp0,lp1,metricsp1h,theta,theta,Kp1h,CYCLELEVEL_TS);
  
   multiply_matrix_and_matrix(Kp1h,Bp0,B);
   multiply_matrix_and_matrix(Kp1h,Bp1,C);
@@ -92,8 +92,8 @@ void add_Kstar_dG_dUstar_to_TDMA(np_t *np, gl_t *gl, long theta, long l, double 
   find_dG_dUstar(np[lp0],gl,Bp0);
   find_dG_dUstar(np[lm1],gl,Bm1);
 
-  find_Kstar_interface(np,gl,lm1,lp0,metricsm1h,theta,theta,Km1h);
-  find_Kstar_interface(np,gl,lp0,lp1,metricsp1h,theta,theta,Kp1h);
+  find_Kstar_interface(np,gl,lm1,lp0,metricsm1h,theta,theta,Km1h,CYCLELEVEL_TS);
+  find_Kstar_interface(np,gl,lp0,lp1,metricsp1h,theta,theta,Kp1h,CYCLELEVEL_TS);
   //make_matrix_positive(Km1h);
   //make_matrix_positive(Kp1h);
   multiply_matrix_and_matrix(Kp1h,Bp0,B1);
