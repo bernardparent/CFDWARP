@@ -88,7 +88,7 @@ J. THERMOPHYSICS VOL. 5, page 266, 1991.}
 
 
 
-mf=1;
+mf=2;
 
 
 is=1;  
@@ -341,8 +341,8 @@ Init(
     Minf=23.9;
     Re=1.95e4/Rin;
     {case 3}
-    Minf=28.3;
-    Re=1.59e3/Rin;
+    {Minf=28.3;
+    Re=1.59e3/Rin;}
     All(INIT_TYPE3,Minf,0,Re,T,w_O2,w_N2,w_default,k,psi,Tv);
     {
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default,k,psi,Tv);

@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 SEP 21a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - in find_post_variable_name_fluid(), and find_post_variable_value_fluid(), added post variables
+      Qen and EdotJe
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - added _Te_min() and _Te_smooth()
+    - in _Techem(), now calls _Te_min() and _Te_smooth(), but with the same functionality as before
+  * in model/chem/_H2_Air_9s/doc/report.tex
+    - added validation cases
+    
+
 2020 SEP 17a
   * in cycle/res/_generic/res.c
     - added CYCLELEVEL_RES to find_Kstar_interface() call
