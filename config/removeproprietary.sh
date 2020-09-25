@@ -3,6 +3,10 @@ echo "Removing proprietary directory .././model/chem/_Air_Plasma_8s_28r_Macheret
 rm -rf .././model/chem/_Air_Plasma_8s_28r_Macheret 
 cp -a _proprietary .././model/chem/_Air_Plasma_8s_28r_Macheret 
 ( printf "current Air_Plasma_8s_28r_Macheret\nEND" ) > .././model/chem/_Air_Plasma_8s_28r_Macheret/.config 
+echo "Removing proprietary directory .././model/chem/_Cs_Air_Plasma_11s"
+rm -rf .././model/chem/_Cs_Air_Plasma_11s 
+cp -a _proprietary .././model/chem/_Cs_Air_Plasma_11s 
+( printf "current Cs_Air_Plasma_11s\nEND" ) > .././model/chem/_Cs_Air_Plasma_11s/.config 
 echo "Removing proprietary directory .././model/chem/_Cs_Air_Plasma_15s"
 rm -rf .././model/chem/_Cs_Air_Plasma_15s 
 cp -a _proprietary .././model/chem/_Cs_Air_Plasma_15s 
@@ -35,6 +39,10 @@ echo "Removing proprietary directory .././model/emfield/_Epotential"
 rm -rf .././model/emfield/_Epotential 
 cp -a _proprietary .././model/emfield/_Epotential 
 ( printf "current Epotential\nEND" ) > .././model/emfield/_Epotential/.config 
+echo "Removing proprietary directory .././model/emfield/_Epotential-Te"
+rm -rf .././model/emfield/_Epotential-Te 
+cp -a _proprietary .././model/emfield/_Epotential-Te 
+( printf "current Epotential-Te\nEND" ) > .././model/emfield/_Epotential-Te/.config 
 echo "Removing proprietary directory .././model/emfield/_Epotential-Bfixed"
 rm -rf .././model/emfield/_Epotential-Bfixed 
 cp -a _proprietary .././model/emfield/_Epotential-Bfixed 

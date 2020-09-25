@@ -13,7 +13,7 @@
 \usepackage{graphicx}
 \usepackage{rotating}
 \usepackage{bm}
-\usepackage{subcaption}
+\usepackage{caption}
 
 
 %%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -190,7 +190,7 @@ abstract
 
 \clearpage 
 \section{Problem Setup for calculating the Induction time}
-The geometry chosen here to calculate the induction time of Hydrogen - Air mixture whose chemistry model is obtained from GRI-Mech 3.0 \cite{GRImech} is a square geometry. The domain has an adiabatic and slip condition for all four walls. The initial condition for fluid inside the domain is Hydrogen - air mixture at 1 atm Pressure and with an equivalence ratio set to one. Nine different cases were tested with fixed initial Temperature ranging from 900 K to 2500 K. In this problem set up the property of fluid will only vary in time, and not on x or y direction. The induction time for the Hydrogen - Air mixture using GRI-Mech 3.0 reaction mechanism is calculated by advancing the solution in time to check the following condition, Case-1 is when the \textit{induction time is defined the time taken for the temperature to go up by $5\%$ from the initial value}, and Case-2 is when the \textit{induction time is defined as the time taken for the temperature to go up by $50\%$ from the initial value}. The induction time for Hydrogen - Air mixture using Jachimowsky's reaction mechanism \cite{nasa:1988:jachimowski} is calculated using the same above method. The induction time calculated for Hydrogen - Air using GRI-Mech 3.0 and Jachimowsky reaction mechanism is compared with the experimental data of Craig \cite{AFAPL:1966:craig} and experimental data of Fujimoto \& Suzuki \cite{fujimoto1967memoirs}. Comparison of induction time of Hydrogen - Air mixture using GRI-Mech 3.0 reaction mechanism, Jachimowsky reaction mechanism, Craig experimental data and Fujimoto \& Suzuki experimental data is shown in Fig.\ \ref{fig:Induction_time_comparison} .
+The geometry chosen here to calculate the induction time of Hydrogen - Air mixture whose chemistry model is obtained from GRI-Mech 3.0 \cite{GRImech} is a square geometry. The domain has an adiabatic and with slip condition for all four walls. The initial condition for fluid inside the domain is Hydrogen - air mixture at 1 atm Pressure and with an equivalence ration set to one. Nine different cases were tested with fixed initial Temperature ranging from 900 K to 2500 K. In this problem set up the property of fluid will only vary in time, and not on x or y direction. The induction time for the Hydrogen - Air mixture using GRI-Mech 3.0 reaction mechanism is calculated by advancing the solution in time to check the following condition, Case-1 is when the \textit{induction time is the time taken for the temperature to go up by $5\%$ from the initial value}, and Case-2 is when the \textit{induction time is the time taken for the temperature to go up by $50\%$ from the initial value}. The induction time for Hydrogen - Air mixture using Jachimowsky's reaction mechanism \cite{nasa:1988:jachimowski} is calculated using the same above method. The induction time calculated for Hydrogen - Air using GRI-Mech 3.0 and Jachimowsky reaction mechanism is compared with the experimental data of Craig \cite{AFAPL:1966:craig} and experimental data of Fujimoto \& Suzuki \cite{fujimoto1967memoirs}. Comparison of induction time of Hydrogen - Air mixture using GRI-Mech 3.0 reaction mechanism, Jachimowsky reaction mechanism, Craig experimental data and Fujimoto \& Suzuki experimental data is shown in Fig.\ \ref{fig:Induction_time_comparison} .
 
 \begin{figure}[!t]
 \centering     %%% not \center
@@ -206,12 +206,6 @@ The geometry chosen here to calculate the induction time of Hydrogen - Air mixtu
 
 
 %insert a few newpages here to make sure the refs section follows the tables
-~
-\newpage
-~
-\newpage
-~
-\newpage
 ~
 \newpage
 

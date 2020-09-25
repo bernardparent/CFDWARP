@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 SEP 24a
+  * in model/chem/
+    - added _Cs_Air_Plasma_11s
+  * in model/emfield
+    - added _Epotential-Te
+  * in model/chem/_H2_Air_9s/doc/report.tex
+    - fixed compilation bug originating from wrong package loaded
+     
+
 2020 SEP 21a
   * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
     - in find_post_variable_name_fluid(), and find_post_variable_value_fluid(), added post variables
