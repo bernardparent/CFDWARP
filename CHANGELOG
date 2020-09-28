@@ -7,6 +7,26 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 SEP 28a
+  * in model/thermo/_generic/thermo.c
+    - added function _ionizationpotential()
+  * in model/share/chem_share.c
+    - added functions add_to_Qei() and add_to_dQei()
+  * in model/chem/_*Plasma*/chem.c
+    - rewrote find_Qei() and find_dQei_dx() as function  of add_to_Qei() and add_to_dQei()
+  * in model/emfield/_Epotential-Te/emfield.c
+    - in add_dUstar_to_U_emfield(), added Temin and Temax limits
+    - in find_Sstar_emfield(), changed Te=_Te(np[l]); to Te=_Te_EMF(np[l],gl);
+    - in write_model_emfield_template() and read_model_emfield_actions(), added Temin and Temax
+  * in model/chem/_H2_Air_Plasma_13s/
+    - added smith1999.c module
+  * in model/chem/_H2_Air_Plasma_*/
+    - upgraded Townsend ionization of hydrogen to polynomial function of EoverN instead of
+      expression based on Te (as in Mentez's paper)
+  * in model/chem/
+    - deleted _H2_Cs_Air_Plasma_22s/
+
+
 2020 SEP 24a
   * in model/chem/
     - added _Cs_Air_Plasma_11s

@@ -19,10 +19,6 @@ echo "Removing proprietary directory .././model/chem/_H2_Cs_Air_Plasma_15s"
 rm -rf .././model/chem/_H2_Cs_Air_Plasma_15s 
 cp -a _proprietary .././model/chem/_H2_Cs_Air_Plasma_15s 
 ( printf "current H2_Cs_Air_Plasma_15s\nEND" ) > .././model/chem/_H2_Cs_Air_Plasma_15s/.config 
-echo "Removing proprietary directory .././model/chem/_H2_Cs_Air_Plasma_22s"
-rm -rf .././model/chem/_H2_Cs_Air_Plasma_22s 
-cp -a _proprietary .././model/chem/_H2_Cs_Air_Plasma_22s 
-( printf "current H2_Cs_Air_Plasma_22s\nEND" ) > .././model/chem/_H2_Cs_Air_Plasma_22s/.config 
 echo "Removing proprietary directory .././model/fluid/_Navier-Stokes_plasma"
 rm -rf .././model/fluid/_Navier-Stokes_plasma 
 cp -a _proprietary .././model/fluid/_Navier-Stokes_plasma 

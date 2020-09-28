@@ -22,7 +22,6 @@ cleanall:
 	( cd _H2_Air_13s ; make cleanall )
 	( cd _H2_Air_Plasma_13s ; make cleanall )
 	( cd _H2_Cs_Air_Plasma_15s ; make cleanall )
-	( cd _H2_Cs_Air_Plasma_22s ; make cleanall )
 	( cd _C3H8_Air_16s_23r_Kundu ; make cleanall )
 	( cd _C12H23_Air_16s_23r_Kundu ; make cleanall )
 	( cd _CH4_Air_20s_52r_Yungster ; make cleanall )
