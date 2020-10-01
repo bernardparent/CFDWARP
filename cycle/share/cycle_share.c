@@ -2185,21 +2185,6 @@ void update_prim_emfield_mem_in_zone_4(np_t *np, gl_t *gl, long theta, long ls, 
 
 
 
-void update_Te_local_in_zone_1(np_t *np, gl_t *gl, long theta, long ls, long le){
-  long l;
-  for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
-    if (is_node_valid(np[l],TYPELEVEL_FLUID)){
-      update_Te_local(np, gl, l);
-    }
-  }
-}
-
-
-void update_Te_local_in_zone(np_t *np, gl_t *gl, zone_t zone){
-  sweep_with_1D_segments(np,gl,zone,&update_Te_local_in_zone_1,SWEEPTYPE_I, TYPELEVEL_FLUID,&is_node_valid,SEGMENTWORK_HEAVY,GRIDLEVEL_ONE);
-}
-
-
 void update_prim_emfield_mem_in_zone(np_t *np, gl_t *gl, zone_t zone){
   sweep_with_1D_segments(np,gl,zone,&update_prim_emfield_mem_in_zone_1,SWEEPTYPE_I, TYPELEVEL_EMFIELD,&is_node_valid,SEGMENTWORK_LIGHT,GRIDLEVEL_ONE);
   sweep_with_1D_segments(np,gl,zone,&update_prim_emfield_mem_in_zone_2,SWEEPTYPE_I, TYPELEVEL_EMFIELD,&is_node_valid,SEGMENTWORK_LIGHT,GRIDLEVEL_ONE);

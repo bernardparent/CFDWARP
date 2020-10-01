@@ -3862,7 +3862,7 @@ double _zetae_from_Te(double Te){
     k[6]=+1.1197905E-28;
   }
 
-  Te=max(0.0,Te);
+  Te=max(300.0,Te);
   Te=min(60000.0,Te);
   Tepower[0]=1.0;
   Tepower[1]=Te;
@@ -3897,7 +3897,7 @@ double _dzetae_dTe_from_Te(double Te){
     k[6]=+1.1197905E-28;
   }
 
-  Te=max(0.0,Te);
+  Te=max(300.0,Te);
   Te=min(60000.0,Te);
   Tepower[0]=0.0;
   Tepower[1]=1.0;

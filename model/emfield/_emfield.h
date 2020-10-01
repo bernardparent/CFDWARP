@@ -42,6 +42,8 @@
 
   double _phi(np_t np, gl_t *gl);
 
+  double _Te_EMF(np_t np, gl_t *gl);
+
 #ifdef UNSTEADY
   double _phim1(np_t np, gl_t *gl);
 #endif

@@ -106,7 +106,7 @@ js=1;
 js1=round(40*mf);
 je=js1+round(20*mf);
 
-dwall=15e-6;
+dwall=15e-6/mf;
 
 Grid(
   Size(is,js, ie,je);
@@ -248,11 +248,7 @@ Model(
   );
   H2AirPlasma13s(
     COMBUSTIONMODEL=COMBUSTIONMODEL_JACHIMOWSKI1988;
-    IONIZATIONMODEL=IONIZATIONMODEL_PARENT2014;
-  );
-  H2CsAirPlasma22s(
-    COMBUSTIONMODEL=COMBUSTIONMODEL_JACHIMOWSKI1988;
-    IONIZATIONMODEL=IONIZATIONMODEL_LENARD1964;
+    IONIZATIONMODEL=IONIZATIONMODEL_EXP;
   );
 );
 
@@ -281,7 +277,7 @@ Init(
     Vx=3100; {m/s}
     Vy=0; {m/s}
     P=44000; {Pa}
-    T=1150; {K}
+    T=1150*0.8; {K}
     k=1e-6;   {J/kg}
     psi=110*sqrt(Vx^2+Vy^2)+1000; {1/s for TURBMODEL_KOMEGA*}
     Tv=T; {K}
@@ -301,7 +297,7 @@ Init(
     Vx=5700; {m/s}
     Vy=0; {m/s}
     P=P; {Pa}
-    T=200; {K}
+    T=200*0.8; {K}
     k=1e-6;   {J/kg}
     psi=110*sqrt(Vx^2+Vy^2)+1000; {1/s for TURBMODEL_KOMEGA*}
     Tv=T; {K}
@@ -432,7 +428,7 @@ Cycle(
   
   SteadyState(
     if (mod(iter,50)==0,
-      WriteDataFile(outputfilename);
+      WriteDataFile(outputfilename".0"iter);
     );
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
@@ -444,13 +440,10 @@ Cycle(
     ,{else}
       if (iter<1000,
         CFLmax=1.8;
-        sigma1=0.0;
       ,{else}
         CFLmax=2.8;
-        sigma1=0.0;
       );
     );
-    system("date");
     if (iter<3000,
       Model(FavreReynoldsPlasma(REACTING=NO;););
     ,{else}
@@ -467,18 +460,22 @@ Cycle(
   );
 
   DualTimeStepping(
-    Vpp=6500; {peak to peak voltage difference applied between electrodes}
-    number_of_periods=12;
+    Vpp=24000; {peak to peak voltage difference applied between electrodes}
+    number_of_periods=10;
     period=50e-6; {time of one period}
-    time_within_period=time-period*floor(time/period);
-    dischargeduration=5e-6; {time spent in discharge in seconds}
+    time_within_period=time-(period*floor((time+10e-15)/period));
+    dischargeduration=6e-7; {time spent in discharge in seconds}
     dt_discharge=dischargeduration/(20*mf);   {physical time step in seconds}
-    dt_nodischarge=period/(15*mf);
-    itermax_discharge=60;
+    dt_nodischarge=(period-dischargeduration)/(15*mf);
+    itermax_discharge=30;
     itermax_nodischarge=20;
     tmax=period*number_of_periods;    {simulation time span in seconds}
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
+    if (iter==1,
+      CFL=0.1;
+    );
+    CFL=min(CFL*1.5,0.6);
     if (time_within_period<dischargeduration/2,
       Deltaphi=max(0,time_within_period/(0.5*dischargeduration)*Vpp);
     ,{else}
@@ -486,17 +483,9 @@ Cycle(
     );
     
     if (time_within_period<dischargeduration,
-      if (iter==1,
-        CFL=0.03;
-      );
-      CFL=min(CFL*1.5,2.2);
       dt=dt_discharge;
       itermax=itermax_discharge;
     ,{else}
-      if (iter==1,
-        CFL=0.5;
-      );
-      CFL=min(CFL*1.5,3.0);
       time_within_next_period=time+dt_nodischarge-period*floor((time+dt_nodischarge)/period);
       if (time_within_next_period<dischargeduration,
         dt=dt_nodischarge-time_within_next_period;
@@ -513,23 +502,19 @@ Cycle(
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
     Lc=10;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,600); 
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,600); 
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,600); 
-    {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
-    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
+    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,1500); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %E %E %E %E %E %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
-           j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
+           j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,time_within_period,period,time,dt_discharge,dt_nodischarge,clipinfo);
     if (iter>itermax,
       IncreaseTimeLevel();
-      WriteDataFile(outputfilename"."round(time/min(dt_discharge,dt_nodischarge)));
+      WriteDataFile(outputfilename"."100000 + round(time/min(dt_discharge,dt_nodischarge)));
       printf("dt=%E time=%Es\n",dt,time);
       if (time>tmax-0.1*dt,
         exit(EXIT_SUCCESS);
       );
     );
   );
-
 
 );
 

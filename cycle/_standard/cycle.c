@@ -212,7 +212,6 @@ void runtime_actions_cycle_specific(char *actionname, char **argum, SOAP_codex_t
       gl->RESIDUAL_ALTERED_EMFIELD=FALSE;
     }
     update_prim_emfield_mem_in_zone(np,gl,_zone_intersection(gl->domain_all,_zone_expansion(gl->domain,max(hbw_resplasma_fluid,hbw_mem_emfield)))); 
-    //update_Te_local_in_zone(np,gl,gl->domain); //????
     find_residual_emfield(np, gl, gl->domain);
     find_ximax_emfield(np, gl, gl->domain);
     update_U_emfield(np, gl, gl->domain);

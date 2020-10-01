@@ -7,6 +7,23 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 SEP 30a
+  * in cycle/share/cycle_share.c
+    - removed update_Te_local_in_zone_1()
+    - removed update_Te_local_in_zone()
+  * in cycle/_multizone/cycle.c and cycle/_standard/cycle.c
+    - in runtime_actions_cycle_specific(), deleted commented //update_Te_local_in_zone()
+  * in model/thermo/_generic/thermo.c
+    - in _zetae_from_Te() and _dzetae_dTe_from_Te() set minimum temperature to 300 K
+  * in model/fluid/_drift-diffusion/fluid.c and model/fluid/_*plasma*/fluid.c
+    - removed update_Te_local()
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c and model/fluid/_Navier-Stokes_plasma/fluid.c
+    - added code for TEMODEL_TRANSPORTEMF
+  * in model/emfield/_Epotential-Te/emfield.c
+    - in find_Fstar_interface_emfield(), changed dTeEMFdXj-dTedXj to dTeEMFdXj-0.2*dTedXj
+    - in find_Fstar_interface_emfield(), added second-order accuracy 
+    
+  
 2020 SEP 28a
   * in model/thermo/_generic/thermo.c
     - added function _ionizationpotential()
