@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 OCT 01a
+  * in model/chem/_H2_Air_Plasma_13s/chem.c and model/chem/_H2_Cs_Air_Plasma_15s/chem.c
+    - changed the EXPIONIZATIONREACTION[6] to the curve fit from BOLSIG+ instead of the expression
+      from Mendez
+  * in model/chem/_H2_Cs_Air_Plasma_15s/doc/report.tex and model/chem/_H2_Air_Plasma_13s/doc/report.tex
+    - changed the hydrogen townsend ionization to curve fit from BOLSIG+ instead of the expression 
+      from Mendez
+  * in model/emfield/_Epotential/emfield.c and model/emfield/_Epotential-Bfixed/emfield.c
+    - added function _Te_EMF() which returns 0
+  * in model/fluid/_*_plasma/fluid.c
+    - in find_Kstar_interface(), changed K[fluxee][fluxee] so that the residual part is 0.25
+      and the timestepping part is 1.25 times the thermal diffusion
+      
+
 2020 SEP 30a
   * in cycle/share/cycle_share.c
     - removed update_Te_local_in_zone_1()
