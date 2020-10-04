@@ -643,6 +643,9 @@ void read_data_file(input_t input, np_t *np, gl_t *gl){
   long flux;
 #endif
  
+  long spec;
+  gl->nsinit=ns;
+  for (spec=0; spec<ns; spec++) gl->initspecies[spec]=spec;
   
   if (input.READDATAFILE) {
     if (input.ASCII) {
@@ -1084,7 +1087,6 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
     fflush(stdout);
 //    if (mod(cntzone,numsubzone/100+1)==0) wfprintf(stdout,".");
   }
-
 
 #ifdef OPENMPTHREADS
   #pragma omp parallel for private(i,j,k,cnt) schedule(static) 

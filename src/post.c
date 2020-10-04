@@ -577,7 +577,7 @@ static void interpolate_between_nodes(np_t *np, long lA, long lB, gl_t *gl, doub
 
 
 void create_domain_of_cuts_along_x(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut, double *xcut, long numcut){
-  long icut,i,j,k,dim;
+  long icut,i,j,k,dim,spec;
   double fact,x;
   zone_t zone;
   dim_t xl,xc;
@@ -606,6 +606,8 @@ void create_domain_of_cuts_along_x(np_t *np, gl_t *gl, np_t **npcut, gl_t *glcut
   glcut->domain=gl->domain_all;
   glcut->domain.is=1;
   glcut->domain.ie=numcut;
+  glcut->nsinit=ns;
+  for (spec=0; spec<ns; spec++) glcut->initspecies[spec]=spec;
 
   init_data_structure_and_create_nodes(npcut, glcut, glcut->domain, glcut->domain);
   update_node_type(*npcut,glcut,TYPELEVEL_FLUID,NODETYPE_UNUSED,glcut->domain);

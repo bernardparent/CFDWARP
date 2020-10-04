@@ -7,6 +7,22 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 OCT 04a
+  * in model/emfield/_Epotential-Te/emfield.c
+    - in find_linearization_coefficients_inner_node_emfield_OHMBASED(), multiplied the linearization
+      coefficients of the thermal diffusion by 1.25
+    - in find_Fstar_interface_emfield(), changed dTeEMFdXj-0.2*dTedXj to 1.25*dTeEMFdXj-dTedXj to
+      yield the same discretization stencil as in model/fluid/_*Plasma*/fluid.c
+  * in model/emfield/_Epotential-Te/emfield.hh
+    - fixed a bug: defaultinitvartypeemfield should be 1 not 2
+  * in model/share/chem_share.c
+    - commented out add_to_dQei() when speceminus is not defined
+  * in src/data.c
+    - in read_data_file(), added initialization of gl->nsinit and gl->initspecies
+  * in src/post.c
+    - in create_domain_of_cuts_along_x(), added initialization of gl->nsinit and gl->initspecies
+    
+
 2020 OCT 01a
   * in model/chem/_H2_Air_Plasma_13s/chem.c and model/chem/_H2_Cs_Air_Plasma_15s/chem.c
     - changed the EXPIONIZATIONREACTION[6] to the curve fit from BOLSIG+ instead of the expression

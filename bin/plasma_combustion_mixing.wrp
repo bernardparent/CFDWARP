@@ -93,7 +93,7 @@ ys0=0.0009; {end of hydrogen injection}
 ys1=0.0018; {end of arc influence}
 ye=0.02; {end of domain}
 
-mf=1.0;
+mf=4.0;
 
 is=1;
 is1=round(65*mf);
@@ -210,7 +210,7 @@ Model(
     RAPCOMP=NO;
     MHDTURB=NO;
     TURBSOURCE=YES;
-    TEMODEL=TEMODEL_TRANSPORT;
+    TEMODEL=TEMODEL_LOCAL;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=NO;
     REACTING=YES;
@@ -390,7 +390,7 @@ Cycle(
                            near cathode}
     relaxNi_bdry=1.0;     {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.2;     {the electron density relaxation factor at the boundary }
-    relaxTe=0.25;          {the electron temperature relaxation factor }
+    relaxTe=0.8;          {the electron temperature relaxation factor }
     rhoref=0.1;           {reference density in kg/m3}
     Tref=300.0;           {reference temperature in K}
     Teref=20000.0;        {reference electron temperature in K}
@@ -449,26 +449,27 @@ Cycle(
     ,{else}
       Model(FavreReynoldsPlasma(REACTING=YES;););
     );    
+    system("date");
     CFL=min(CFL*1.15,CFLmax);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     Lc=3e3;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.3; {relaxation factor forced on the update of the emfield variables}
-    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,1000); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,200); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
   );
 
   DualTimeStepping(
-    Vpp=8000; {peak to peak voltage difference applied between electrodes}
+    Vpp=9000; {peak to peak voltage difference applied between electrodes}
     number_of_periods=10;
     period=50e-6; {time of one period}
     time_within_period=time-(period*floor((time+10e-15)/period));
     dischargeduration=6e-7; {time spent in discharge in seconds}
     dt_discharge=dischargeduration/(20*mf);   {physical time step in seconds}
     dt_nodischarge=(period-dischargeduration)/(15*mf);
-    itermax_discharge=50;
-    itermax_nodischarge=30;
+    itermax_discharge=150;
+    itermax_nodischarge=50;
     tmax=period*number_of_periods;    {simulation time span in seconds}
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
@@ -502,8 +503,8 @@ Cycle(
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
     Lc=10;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,400); 
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,400); 
+    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,200); 
+    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,200); 
     
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %E %E %E %E %E %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,

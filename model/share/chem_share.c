@@ -1457,6 +1457,7 @@ double _dkfdT_Arrhenius(long numreactant, double A, double n, double E, double T
 }
 
 
+#ifdef speceminus
 /* add contributions to Qei coming from one electron impact chemical reaction
  * spec is the neutral molecule the electrons impact
  * kf is the reaction rate in cm3/s
@@ -1486,3 +1487,5 @@ void add_to_dQei(long spec, double kf, double dkfdTe, spec_t rhok, spec_t dQeidr
   dQeidrhok[spec] += kf *1e-6* _ionizationpotential(spec) * rhok[speceminus] / _calM ( speceminus )  / _calM ( spec ) * sqr(calA);
   dQeidrhok[speceminus] += kf *1e-6* _ionizationpotential(spec) / _calM ( speceminus ) * rhok[spec] / _calM ( spec ) * sqr(calA);
 }
+
+#endif
