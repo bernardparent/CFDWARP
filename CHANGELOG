@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 OCT 11a
+  * in model/chem
+    - added _H2_Air_Plasma_18s
+  * in model/emfield/_Epotential-Te/emfield.c
+    - in find_Sstar_emfield(), made Te set to _Te(np[l]) instead of _Te_EMF(np[l],gl)
+
+
 2020 OCT 04a
   * in model/emfield/_Epotential-Te/emfield.c
     - in find_linearization_coefficients_inner_node_emfield_OHMBASED(), multiplied the linearization
