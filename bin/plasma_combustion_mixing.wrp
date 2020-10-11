@@ -93,7 +93,7 @@ ys0=0.0009; {end of hydrogen injection}
 ys1=0.0018; {end of arc influence}
 ye=0.02; {end of domain}
 
-mf=4.0;
+mf=1.0;
 
 is=1;
 is1=round(65*mf);
@@ -247,6 +247,10 @@ Model(
     SetElectroMotiveForce(is,js, ie,je, 0.0{V/m},0.0{V/m}, 1e99{max power in W/m3});
   );
   H2AirPlasma13s(
+    COMBUSTIONMODEL=COMBUSTIONMODEL_JACHIMOWSKI1988;
+    IONIZATIONMODEL=IONIZATIONMODEL_EXP;
+  );
+  H2AirPlasma18s(
     COMBUSTIONMODEL=COMBUSTIONMODEL_JACHIMOWSKI1988;
     IONIZATIONMODEL=IONIZATIONMODEL_EXP;
   );

@@ -164,6 +164,7 @@ if [ -f "$filecheck" ]; then
     exit 1
   fi
   echo 'Committing and pushing files to github..'
+  git remote set-url origin git@github.com:bernardparent/CFDWARP
   git add -A .
   git commit -a -m "$1" 
   git tag -d $1 > /dev/null 2>&1

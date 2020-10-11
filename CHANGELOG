@@ -6,6 +6,11 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2020 OCT 11b
+   * in tools/gitnewversion_public.sh
+     - added line "git remote set-url origin git@github.com:bernardparent/TEXCLASS" so that
+       no password is asked for when pushing to git if a ssh key has been uploaded to github
+  
 
 2020 OCT 11a
   * in model/chem
