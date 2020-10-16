@@ -6,6 +6,16 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2020 OCT 16a
+   * in lib/soap/eg/calc.c
+     - in main(), added kB, me, and e to the scientific constants
+   * in model/share/emfield_share.c
+     - in _E_dot_Je_over_mueNe(), now finds Je using find_Ve_from_J() instead of 
+       find_Jk_from_Jk_at_interfaces()
+   * in tools/inlet.c
+     - added Pdyn and T3 as flags
+     
+
 2020 OCT 11b
    * in tools/gitnewversion_public.sh
      - added line "git remote set-url origin git@github.com:bernardparent/TEXCLASS" so that

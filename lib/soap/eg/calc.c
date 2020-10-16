@@ -48,6 +48,11 @@ int main ( int argc, char **argv ) {
       SOAP_strins ( "writeln(", &code, 0 );
     }
     SOAP_strins ( ");", &code, ( long ) strlen ( code ) );
+    // add some physical constants in SI units
+    SOAP_add_to_vars(&codex, "kB", "1.380649E-23");
+    SOAP_add_to_vars(&codex, "me", "9.10938356E-31");
+    SOAP_add_to_vars(&codex, "e", "1.60217662E-19");
+
     SOAP_process_code ( code, &codex, SOAP_VARS_KEEP_ALL );
     SOAP_free_codex ( &codex );
     return ( EXIT_SUCCESS );
