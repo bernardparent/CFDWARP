@@ -3798,6 +3798,41 @@ double _dmukN_dTk_from_Tk_EkoverN(double Tk, double Ekstar, long k){
           dmuN_dT=0.0;
         }
       break;
+      case SMAP_Arplus:
+        if (0.85*1.00E23/sqrt(Tk)<0.85*2.50E12/sqrt(Ekstar)){
+          dmuN_dT=-0.5*0.85*1.00E23*pow(Tk,-1.5);
+        } else {
+          dmuN_dT=0.0;
+        }
+      break;
+      case SMAP_Cplus:
+        if (1.55*1.00E23/sqrt(Tk)<1.55*2.50E12/sqrt(Ekstar)){
+          dmuN_dT=-0.5*1.55*1.00E23*pow(Tk,-1.5);
+        } else {
+          dmuN_dT=0.0;
+        }
+      break;
+      case SMAP_C2plus:
+        if (1.10*1.00E23/sqrt(Tk)<1.10*2.50E12/sqrt(Ekstar)){
+          dmuN_dT=-0.5*1.10*1.00E23*pow(Tk,-1.5);
+        } else {
+          dmuN_dT=0.0;
+        }
+      break;
+      case SMAP_CNplus:
+        if (1.06*1.00E23/sqrt(Tk)<1.06*2.50E12/sqrt(Ekstar)){
+          dmuN_dT=-0.5*1.06*1.00E23*pow(Tk,-1.5);
+        } else {
+          dmuN_dT=0.0;
+        }
+      break;
+      case SMAP_COplus:
+        if (1.02*1.00E23/sqrt(Tk)<1.02*2.50E12/sqrt(Ekstar)){
+          dmuN_dT=-0.5*1.02*1.00E23*pow(Tk,-1.5);
+        } else {
+          dmuN_dT=0.0;
+        }
+      break;
       default:
         fatal_error("dmukN_dTk_from_Tk_EkoverN can't be found for species %ld",k);
     }

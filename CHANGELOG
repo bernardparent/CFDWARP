@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 NOV 01b
+  * in model/thermo/_generic/thermo.c
+    - in _dmukN_dTk_from_Tk_EkoverN(), added species Ar+, C+, C2+, CN+, CO+
+    
+
 2020 NOV 01a
   * in config/config.c
     - added mpicc.mpich and mpicc.openmpi to the list of compilers
