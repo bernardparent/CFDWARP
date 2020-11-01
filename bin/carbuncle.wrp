@@ -19,7 +19,7 @@ CFLref=1.0;
 
 meshtype=2; {set to 1 for gridline on axis of symmetry ; 
              set to 2 for no gridline on axis of symmetry ;}
-meshfact=2.0;
+meshfact=20.0;
 sizefact=1.0;
 
 
@@ -306,7 +306,7 @@ Cycle(
     );
    );
   SteadyState(
-    if (mod(iter,50)==0,
+    if (mod(iter,500)==0,
       WriteDataFile(outputfilename);
     );
     sigma1=0.1;   {exponent of maximum pseudotime step in all dimensions}
@@ -316,6 +316,7 @@ Cycle(
       CFL=0.05;
     );
     CFL=min(CFL*1.006,CFLref);
+    system("date");
     UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,

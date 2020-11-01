@@ -203,12 +203,41 @@ mpiexec -np 4 ./warp -r control.wrp -i data.01 -o data.02
 
 The latter shares the work and memory on four processes that will be 
 distributed on one machine or on several machines depending on how MPI was 
-configured on your server. To run the code on several nodes, enter the IP 
-addresses of each node in the file ``hosts'' (one IP address per line)
-and run CFDWARP as follows:
+configured on your server. To run the code on several nodes, run CFDWARP as follows:
 
-mpiexec -f hosts -np 4 ./warp -r control.wrp -i data.01 -o data.02
+mpiexec.mpich --hostfile hosts -np 4 ./warp -r control.wrp -i data.01 -o data.02
        
+where each line of the file ``hosts'' has the IP number of the node:
+
+192.168.1.20 
+192.168.1.21 
+192.168.1.22 
+192.168.1.23 
+192.168.1.24
+192.168.1.25
+192.168.1.26
+192.168.1.27
+192.168.1.28
+192.168.1.29
+
+Or, if using OPENMPI instead of MPICH, run the code as follows:
+
+mpiexec.openmpi --hostfile hosts -np 30 ./warp -r control.wrp -i data.01 -o data.02
+
+where each line of the file ``hosts'' has the IP number of the node 
+followed by the maximum number of processes as follows:
+
+192.168.1.20 slots=3
+192.168.1.21 slots=3
+192.168.1.22 slots=3
+192.168.1.23 slots=3
+192.168.1.24 slots=3
+192.168.1.25 slots=3
+192.168.1.26 slots=3
+192.168.1.27 slots=3
+192.168.1.28 slots=3
+192.168.1.29 slots=3
+
 
 
 13. RUN CFDWARP WITH OPENMP THREADS

@@ -6,20 +6,42 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2020 NOV 01a
+  * in config/config.c
+    - added mpicc.mpich and mpicc.openmpi to the list of compilers
+  * in model/chem/_H2_Cs_Air_Plasma_15s/chem.c
+    - in find_Qei() and find_dQei_dx(), added cesium contribution
+  * in model/chem
+    - added _C12H23_Cs_Air_Plasma_21s
+    
+
+2020 OCT 24a
+  * in model/chem/_H2_Cs_Air_Plasma_15s/chem.c
+    - added SMITH1999 H2-Air option
+    - changed IONIZATIONREACTION[7] with updated Townsend ionization rates for Cesium
+  * in model/chem/_H2_Cs_Air_Plasma_15s/doc/report.tex
+    - changed Townsend ionization of Cesium from Lenard to BOLSIG+
+  * in USAGE
+    - added instructions on how to use openMPI
+  * in tools/inlet.c 
+    - added U1, U2, U3 to the output
+
+
 2020 OCT 16a
-   * in lib/soap/eg/calc.c
-     - in main(), added kB, me, and e to the scientific constants
-   * in model/share/emfield_share.c
-     - in _E_dot_Je_over_mueNe(), now finds Je using find_Ve_from_J() instead of 
-       find_Jk_from_Jk_at_interfaces()
-   * in tools/inlet.c
-     - added Pdyn and T3 as flags
+  * in lib/soap/eg/calc.c
+    - in main(), added kB, me, and e to the scientific constants
+  * in model/share/emfield_share.c
+    - in _E_dot_Je_over_mueNe(), now finds Je using find_Ve_from_J() instead of 
+      find_Jk_from_Jk_at_interfaces()
+  * in tools/inlet.c
+    - added Pdyn and T3 as flags
      
 
 2020 OCT 11b
-   * in tools/gitnewversion_public.sh
-     - added line "git remote set-url origin git@github.com:bernardparent/TEXCLASS" so that
-       no password is asked for when pushing to git if a ssh key has been uploaded to github
+  * in tools/gitnewversion_public.sh
+    - added line "git remote set-url origin git@github.com:bernardparent/TEXCLASS" so that
+      no password is asked for when pushing to git if a ssh key has been uploaded to github
   
 
 2020 OCT 11a

@@ -1,89 +1,9 @@
-{
-  _______________________________________________________________________________________________
-
-                                           C F D W A R P
-
-                                CFD Code for Plasma & Reactive Flow
-  _______________________________________________________________________________________________
-
-  Version                          19oct02a
-  Compiler                         gcc 8.3.0 with OPENMP threads
-  Compiled on                      Oct  8 2019 at 14:57:34
-  Cycle Strategy                   Standard
-  Fluid Relaxation                 Block DDADI [2,1]
-  EM Field Relaxation              Implicit schemes based on approximate factorization including
-                                   ADI [4], DDADI [2,1], and IMAF [3]
-  Convection Discretization        Reconstruction-Evolution MUSCL with flux FVS [5], FDS [7],
-                                   and primitive interpolation TVD [6], WENO [9], CWENO [11],
-                                   AOWENO [10], and eigenvalue conditioning HARTEN, GNOFFO
-                                   [12], PECLET [13], PASCAL [8], and PARENT positivity-
-                                   preserving filter [14]
-  Temporal Discretization          Positivity-Preserving Cross-Difference Formula [8]
-  Fluid Model                      Favre-Reynolds with drift-diffusion plasma model [15]
-  Thermodynamic Model              NASA Glenn Polynomials [16]
-  Chemical Model                   H2 Air Plasma 18 species 78 reactions Jachimowsky-Dunn-Kang-
-                                   Macheret [17,18,15]
-  EM Field Model                   Electric field potential [19]
-  Beam Model                       None
-  Number of Dimensions             2
-  Number of Flux Components        26
-  Number of Species                19
-  Number of Charged Species        8
-  List of Species                  e-, O2-, O2+, N2+, O+, N+, NO+, H2+, N, H2, O2, H, O, OH,
-                                   H2O, HO2, H2O2, NO, N2
-  _______________________________________________________________________________________________
-
-  [1]  RW MacCormack. "A New Implicit Algorithm for Fluid Flow", 13th Computational Fluid
-       Dynamics Conference, AIAA Paper 97-2100, 1997.
-  [2]  J Bardina and CK Lombard. "Three Dimensional Hypersonic Flow Simulations with the CSCM
-       Implicit Upwind Navier-Stokes Method", Proceedings of the 8th Computational Fluid
-       Dynamics Conference, AIAA Paper 87-1114, 1987.
-  [3]  RW MacCormack. "Iterative Modified Approximate Factorization", Computers and Fluids
-       30:917-925, 2001.
-  [4]  DW Peaceman and HH Rachford. "The Numerical Solution of Parabolic and Elliptic
-       Differential Equations", J. Soc. Ind. Appl. Math. 3:28-41, 1955.
-  [5]  JL Steger and RF Warming. "Flux Vector Splitting of the Inviscid Gasdynamic Equations
-       with Application to Finite-Difference Methods", Journal of Computational Physics 40:263-
-       293, 1981.
-  [6]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume Flux Vector
-       Splittings for the Euler Equations", AIAA Journal 24:1453-1460, 1986.
-  [7]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes", Journal
-       of Computational Physics 43:357-372, 1981.
-  [8]  B Parent. "Positivity-Preserving Dual Time Stepping Schemes for Gas Dynamics", Journal of
-       Computational Physics 361:391-411, 2018.
-  [9]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes", Journal of
-       Computational Physics 126:202-228, 1996.
-  [10] DS Balsara, S Garain, and CW Shu. "An Efficient Class of WENO schemes with Adaptive
-       Order", Journal of Computational Physics 326:780-804, 2016.
-  [11] M Dumbser and M Kaser. "Arbitrary High Order Non-oscillatory Finite Volume Schemes on
-       Unstructured Meshes for Linear Hyperbolic Systems", Journal of Computational Physics,
-       221:693-723, 2007.
-  [12] P Gnoffo and  JA White. "Computational Aerothermodynamic Simulation Issues on
-       Unstructured Grids", 37th AIAA Thermophysics Conference, AIAA Paper 2004-2371, 2004.
-  [13] B Parent. "Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows", AIAA
-       Journal, 55:141-152, 2017.
-  [14] B Parent. "Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler
-       Equations", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.
-  [15] B Parent, MN Shneider, and SO Macheret. "Detailed Modeling of Plasmas for Computational
-       Aerodynamics", AIAA Journal, 54:898-911, 2016.
-  [16] BJ McBride, MJ Zehe, and S Gordon. "NASA Glenn Coefficients for Calculating Thermodynamic
-       Properties of Individual Species", NASA TP 2002-211556, 2002.
-  [17] CJ Jachimowsky. "An Analytical Study of the Hydrogen-Air Reaction Mechanism With
-       Application To Scramjet Combustion", NASA TP-2791, 1988.
-  [18] MG Dunn and SW Kang. "Theoretical and Experimental Studies of Reentry Plasmas", NASA CR-
-       2232, 1973.
-  [19] B Parent, SO Macheret, and MN Shneider. "Electron and Ion Transport Equations in
-       Computational Weakly-Ionized Plasmadynamics", Journal of Computational Physics 259:51-
-       69, 2014.
-
-
-}
  
 {obtained for a scramjet flight Mach number of 6 using a dynamic pressure of 30000 Pa in standard US atmosphere after 2 oblique shocks}
-Vx=1388;
-T=900;  {K}
-P=46854; {Pa}
-chi_H2=0.2;   
+Vx=1275;
+T=1050;  {K}
+P=61925; {Pa}
+chi_C12H23=2/23*0.2;   
 chi_Cs=0.001; 
   
 
@@ -252,8 +172,8 @@ Model(
     SetSolidConductivity(is,js, ie,je, 0.0 {S/m});
     SetElectroMotiveForce(is,js, ie,je, 0.0{V/m},0.0{V/m}, 1e99{max power in W/m3});
   );
-  H2CsAirPlasma15s(
-    COMBUSTIONMODEL=COMBUSTIONMODEL_JACHIMOWSKI1988;
+  C12H23CsAirPlasma21s(
+    COMBUSTIONMODEL=COMBUSTIONMODEL_KUNDU1999;
   );
 );
 
@@ -278,7 +198,7 @@ Init(
     (b) In the freestream make sure that 1E-5*q_infty^2/ReL<k<0.1*q_infty^2/ReL.
     }
     
-     Species("e-","O2+","H2","O2","N2","Cs","default");
+     Species("e-","O2+","C12H23","O2","N2","Cs","default");
    
         {AIR STREAM  }
 
@@ -289,10 +209,10 @@ Init(
     Te=T; {K}
     chi_eminus=1e-12;
     chi_O2plus=1e-12;
-    chi_O2=0.21*(1-chi_H2-chi_Cs);
-    chi_N2=0.79*(1-chi_H2-chi_Cs);
+    chi_O2=0.21*(1-chi_C12H23-chi_Cs);
+    chi_N2=0.79*(1-chi_C12H23-chi_Cs);
     chi_default=1.0e-30;
-    All(INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2plus,chi_H2,chi_O2,chi_N2,chi_Cs,chi_default,k,psi,Tv,Te);
+    All(INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2plus,chi_C12H23,chi_O2,chi_N2,chi_Cs,chi_default,k,psi,Tv,Te);
 
     
      {JET STREAM}
@@ -305,11 +225,11 @@ Init(
     Te=T; {K}
     chi_eminus=1e-12;
     chi_O2plus=1e-12;
-    chi_O2=0.21*(1-chi_H2-chi_Cs);
-    chi_N2=0.79*(1-chi_H2-chi_Cs);
+    chi_O2=0.21*(1-chi_C12H23-chi_Cs);
+    chi_N2=0.79*(1-chi_C12H23-chi_Cs);
     chi_default=1.0e-30;
 
-    Region(is,js,  ie,js1, INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2plus,chi_H2,chi_O2,chi_N2,chi_Cs,chi_default,k,psi,Tv,Te);
+    Region(is,js,  ie,js1, INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2plus,chi_C12H23,chi_O2,chi_N2,chi_Cs,chi_default,k,psi,Tv,Te);
 
     
   );
@@ -433,7 +353,7 @@ Cycle(
     if (iter==1,
       CFL=0.00001;
     );
-    if (iter<250,
+    if (iter<250*mf,
       CFLmax=0.8;
     ,{else}
       if (iter<1000,
@@ -442,17 +362,17 @@ Cycle(
         CFLmax=1.0;
       );
     );
-    if (iter<3000,
+    if (iter<3000*mf,
       Model(FavreReynoldsPlasma(REACTING=YES;););
     ,{else}
       Model(FavreReynoldsPlasma(REACTING=YES;););
     );    
-    system("date");
+    {system("date");}
     CFL=min(CFL*1.15,CFLmax);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     Lc=3e3;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.3; {relaxation factor forced on the update of the emfield variables}
-    if (iter>2000*mf,
+    if (iter>4000*mf,
       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,600); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
     );
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
@@ -461,7 +381,7 @@ Cycle(
   );
 
   DualTimeStepping(
-    Vpp=6000; {peak to peak voltage difference applied between electrodes}
+    Vpp=10000; {peak to peak voltage difference applied between electrodes}
     number_of_periods=10;
     period=50e-6; {time of one period}
     time_within_period=time-(period*floor((time+10e-15)/period));
@@ -483,7 +403,9 @@ Cycle(
     ,{else}
       Deltaphi=max(0,Vpp-(time_within_period-dischargeduration/2)/(0.5*dischargeduration)*Vpp);
     );
-    
+    if (time>dischargeduration/2,
+      Deltaphi=Vpp/2;
+    );
     if (time_within_period<dischargeduration,
       dt=dt_discharge;
       itermax=itermax_discharge;

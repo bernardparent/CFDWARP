@@ -99,13 +99,16 @@ int main ( int argc, char **argv ) {
              "M1            : %E\n"
              "M2            : %E\n"
              "M3            : %E\n"
+             "U1 [m/s]      : %E\n"
+             "U2 [m/s]      : %E\n"
+             "U3 [m/s]      : %E\n"
              "P1 [Pa]       : %E\n"
              "P2 [Pa]       : %E\n" 
              "P3 [Pa]       : %E\n" 
              "T1 [K]        : %E\n" 
              "T2 [K]        : %E\n" 
              "T3 [K]        : %E\n" ,
-             altitude, Ms, mdot, W1, W2, W3, M1, M2, M3, P1, P2, P3, T1, T2, T3 );
+             altitude, Ms, mdot, W1, W2, W3, M1, M2, M3, U1, U2, U3, P1, P2, P3, T1, T2, T3 );
   }
 
   return ( 0 );

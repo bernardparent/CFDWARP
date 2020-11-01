@@ -49,7 +49,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CO_CCC 2
 #define CO_ICC 3
 #define CO_MPICC 4
-#define CO_num 5
+#define CO_MPICC_MPICH 5
+#define CO_MPICC_OPENMPI 6
+#define CO_num 7
 
 
 #define mod(a,b) ((((a)%(b))+(b))%(b))
@@ -60,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   #define THREADTYPE_max 2
 #endif
 static char CO_str[CO_num][20]=
-  {"cc","gcc","ccc","icc","mpicc"};
+  {"cc","gcc","ccc","icc","mpicc","mpicc.mpich","mpicc.openmpi"};
 
 typedef unsigned char bool;
 
@@ -745,12 +747,12 @@ static void output_makefileheader(FILE *scriptfile_applyconfig, long nd, long nu
   } else {
     fprintf(scriptfile_applyconfig,"  printf \"CFLAGS = -O%ld",numopt);
   }
-  if (COMPILER==CO_GCC || COMPILER==CO_ICC || COMPILER==CO_MPICC) fprintf(scriptfile_applyconfig, " -Wall -funroll-all-loops -Wfatal-errors");
+  if (COMPILER==CO_GCC || COMPILER==CO_ICC || COMPILER==CO_MPICC || COMPILER==CO_MPICC_MPICH || COMPILER==CO_MPICC_OPENMPI) fprintf(scriptfile_applyconfig, " -Wall -funroll-all-loops -Wfatal-errors");
   if (COMPILER==CO_CCC) fprintf(scriptfile_applyconfig, " -ieee");
-  if (COMPILER==CO_MPICC) fprintf(scriptfile_applyconfig, " -DDISTMPI");
+  if (COMPILER==CO_MPICC || COMPILER==CO_MPICC_MPICH || COMPILER==CO_MPICC_OPENMPI) fprintf(scriptfile_applyconfig, " -DDISTMPI");
   if (PROFIL) fprintf(scriptfile_applyconfig," -pg");
   if (DEBUGGER) fprintf(scriptfile_applyconfig," -g");
-  if (DEBUGGER && (COMPILER==CO_GCC || COMPILER==CO_MPICC)) fprintf(scriptfile_applyconfig," -fno-omit-frame-pointer"); 
+  if (DEBUGGER && (COMPILER==CO_GCC || COMPILER==CO_MPICC || COMPILER==CO_MPICC_MPICH || COMPILER==CO_MPICC_OPENMPI)) fprintf(scriptfile_applyconfig," -fno-omit-frame-pointer"); 
   if (!DEBUG) fprintf(scriptfile_applyconfig," -DNDEBUG");
 #ifdef PROPRIETARY
   fprintf(scriptfile_applyconfig," -DPROPRIETARY");
@@ -795,7 +797,7 @@ static void output_makefileheader(FILE *scriptfile_applyconfig, long nd, long nu
   }
   if (STATIC) fprintf(scriptfile_applyconfig," -static");
   if (DEBUGGER) fprintf(scriptfile_applyconfig," -g");
-  if (DEBUGGER && (COMPILER==CO_GCC || COMPILER==CO_MPICC)) fprintf(scriptfile_applyconfig," -fno-omit-frame-pointer"); 
+  if (DEBUGGER && (COMPILER==CO_GCC || COMPILER==CO_MPICC || COMPILER==CO_MPICC_MPICH || COMPILER==CO_MPICC_OPENMPI)) fprintf(scriptfile_applyconfig," -fno-omit-frame-pointer"); 
   if (PROFIL) fprintf(scriptfile_applyconfig," -pg");
   if (!DEBUG) fprintf(scriptfile_applyconfig," -DNDEBUG");
 #ifdef PROPRIETARY
