@@ -108,15 +108,14 @@ double _ev_from_T(double T);
 
 double _dev_dTv_from_Tv(double T);
 
-double _dmueN_dTe_from_Te(double Te);
+void find_dmue_from_rhok_Te(spec_t rhok, double Te, double *dmuedTe, spec_t dmuedrhok);
 
-double _mueN_from_Te(double Te);
+double _mue_from_rhok_Te(spec_t rhok, double Te);
 
-double _dmukN_dTk_from_Tk_EkoverN(double Tk, double Ekstar, long k);
+void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok);
 
-
-/* find the mobility of species k using the species temperature Tk and electric field in the species reference frame Ek (N is the total number density of the plasma, Tk the species temperature and Ek the electric field in the species frame)*/ 
-double _muk_from_N_Tk_Ek(double N, double Tk, double Ek, long k);
+/* find the mobility of species k using the species temperature Tk and electric field in the species reference frame Ek (rhok is the partial densities, Tk the species temperature and Ek the electric field in the species frame)*/ 
+double _muk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k);
 
 double _zetav_from_Te(double Te);
 

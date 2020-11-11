@@ -7,6 +7,28 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 NOV 10a
+  * in bin/MHD_generator_cesium.wrp
+    - updated the control file so that it can be used with any chemical solver
+  * in lib/gridg/eg
+    - updated the gridg files that were outdated
+  * in model/emfield/_Epotential*/emfield.c
+    - changed the call to _muk_from_rhok_Tk_Ek()
+    - changed the call to _mue_from_rhok_Te()
+  * in model/thermo/_generic/thermo.c
+    - in find_nuk_eta_kappa(), changed the calls to _muk_from_rhok_Tk_Ek() 
+    - added _mue_from_rhok_Te()
+    - added find_dmue_from_rhok_Te()
+    - changed the call of _muk_from_N_Tk_Ek() to _muk_from_rhok_Tk_Ek()
+    - changed the call of _dmukN_dTk_from_Tk_EkoverN() to find_dmuk_from_rhok_Tk_Ek()
+  * in model/fluid/_*_plasma/fluid_source.c
+    - changed the call to _mue_from_rhok_Te()
+    - in find_dSe_dU_transport(), added call to find_dmue_from_rhok_Te() and changed some
+      partial derivatives within the Jacobian
+    - in find_dSemfield_dU(), added call to find_dmuk_from_rhok_Tk_Ek() and changed some
+      partial derivatives within the Jacobian
+    
+
 2020 NOV 01b
   * in model/thermo/_generic/thermo.c
     - in _dmukN_dTk_from_Tk_EkoverN(), added species Ar+, C+, C2+, CN+, CO+

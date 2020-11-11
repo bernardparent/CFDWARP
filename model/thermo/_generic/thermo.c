@@ -3234,7 +3234,7 @@ double _Omega22(double T, double eps){
 void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
                    spec_t nuk, double *eta, double *kappa){
   long spec,k,l;
-  spec_t etak,kappak,chik;
+  spec_t etak,kappak,chik,rhok;
   double P,etamix,kappamix,Nn;
   double chiden,sum;
   double calD[ns][ns];
@@ -3322,6 +3322,8 @@ void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
     }
   }
   
+  for (spec=0; spec<ns; spec++) rhok[spec]=rho*w[spec];
+  
   for (k=0; k<ns; k++){
     switch (speciestype[k]){
       case SPECIES_NEUTRAL:
@@ -3340,10 +3342,10 @@ void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
    * such will not be used by the fluid modules when solving the drift-diffusion model
    */
       case SPECIES_IONPLUS:
-        nuk[k]=_muk_from_N_Tk_Ek(Nn, T,  0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
+        nuk[k]=_muk_from_rhok_Tk_Ek(rhok, T,  0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
       break;
       case SPECIES_IONMINUS:
-        nuk[k]=_muk_from_N_Tk_Ek(Nn, T,  0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
+        nuk[k]=_muk_from_rhok_Tk_Ek(rhok, T,  0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
       break;
       case SPECIES_ELECTRON:
         nuk[k]=0.0;
@@ -3626,24 +3628,76 @@ double _dsk_dT_from_T_equilibrium(long spec, double T){
 }
 
 
-/* product of electron mobility and number density as a function of electron temperature */
-double _mueN_from_Te(double Te){
-  double mueN;
+/* electron mobility as a function of electron temperature and mass densities*/
+double _mue_from_rhok_Te(spec_t rhok, double Te){
+  double muen,Nn,Ni,mue,muei;
+  long spec;
   Te=max(Te,300.0);
-  mueN=3.74E19*exp(33.5/sqrt(log(Te)));
-  return(mueN);
+  Nn=0.0;
+  for (spec=ncs; spec<ns; spec++){
+    Nn+=rhok[spec]/_m(spec);
+  }
+  Nn=max(1e0,Nn);
+  Ni=0.0;
+  for (spec=0; spec<ncs; spec++){
+    if (speciestype[spec]==SPECIES_IONPLUS) Ni+=rhok[spec]/_m(spec);
+  }
+  Ni=max(1e0,Ni);
+  muen=3.74E19*exp(33.5/sqrt(log(Te)))/Nn;
+  muei=1.342e16*pow(Te,1.5)/Ni;
+  mue=1.0/(1.0/muen+1.0/muei);
+  return(mue);
 }
 
 
-double _dmueN_dTe_from_Te(double Te){
-  double logTe,dmueNdTe;
+void find_dmue_from_rhok_Te(spec_t rhok, double Te, double *dmuedTe, spec_t dmuedrhok){
+  double logTe,dmuendTe;
+  double Nn,Ni,muen,kmuei,muei,dmuendNn,dmueidTe,dmueidNi,dmuedmuen,dmuedmuei;
+  spec_t dmuendrhok,dmueidrhok;
+  long spec;
   if (Te>300.0){
+    Nn=0.0;
+    for (spec=ncs; spec<ns; spec++){
+      Nn+=rhok[spec]/_m(spec);
+    }
+    Nn=max(1e0,Nn);
+    Ni=0.0;
+    for (spec=0; spec<ncs; spec++){
+      if (speciestype[spec]==SPECIES_IONPLUS) Ni+=rhok[spec]/_m(spec);
+    }
+    Ni=max(1e0,Ni);
+//  muei=1e16*pow(Te,1.5)/Ni;
+    muen=3.74E19*exp(33.5/sqrt(log(Te)))/Nn;
+    kmuei=1.342e16;
+    muei=kmuei/Ni*pow(Te,1.5);
+//    mue=1.0/(1.0/muen+1.0/muei);
+
+    
     logTe=log(Te);
-    dmueNdTe=-6.2645E20*exp(33.5/sqrt(logTe))/(Te*pow(logTe,1.5e0));
+    dmuendTe=-6.2645E20*exp(33.5/sqrt(logTe))/(Te*pow(logTe,1.5e0))/Nn;
+    dmuendNn=-3.74E19*exp(33.5/sqrt(logTe))/sqr(Nn);
+    for (spec=0; spec<ns; spec++){
+      dmuendrhok[spec]=0.0;
+      if (spec>=ncs) dmuendrhok[spec]=dmuendNn*1.0/_m(spec);
+    }
+
+    dmueidTe=kmuei/Ni*1.5*pow(Te,0.5);
+    dmueidNi=-kmuei/sqr(Ni)*pow(Te,1.5);
+    for (spec=0; spec<ns; spec++){
+      dmueidrhok[spec]=0.0;
+      if (speciestype[spec]==SPECIES_IONPLUS) dmueidrhok[spec]=dmueidNi*1.0/_m(spec);
+    }
+    
+ 
+
+    dmuedmuen=1.0/sqr(muen)/sqr(1.0/muen+1.0/muei);
+    dmuedmuei=1.0/sqr(muei)/sqr(1.0/muen+1.0/muei);
+    *dmuedTe=dmuendTe*dmuedmuen+dmueidTe*dmuedmuei;
+    for (spec=0; spec<ns; spec++) dmuedrhok[spec]=dmuendrhok[spec]*dmuedmuen+dmueidrhok[spec]*dmuedmuei;
   } else {
-    dmueNdTe=0.0;
+    *dmuedTe=0.0;
+    for (spec=0; spec<ns; spec++) dmuedrhok[spec]=0.0;
   }
-  return(dmueNdTe);
 }
 
 
@@ -3656,19 +3710,22 @@ double _dmueN_dTe_from_Te(double Te){
    
   H2+, Cs+, N+, O+, O- are approximated using Fig. 8 in THE MOBILITIES OF SMALL IONS THE ATMOSPHERE AND THEIR RELATIONSHIP by E. UNGETHUM, Aerosol Science, 1974, Vol. 5, pp. 25 37. 
 */ 
-double _muk_from_N_Tk_Ek(double N, double Tk, double Ek, long k){
-  double mu,Estar;
+double _muk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k){
+  double mu,Estar,N;
+  long spec;
   mu=0.0;
+  N=0.0;
+  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   Estar=Ek/N;
 #ifdef speceminus
   if (CHEM_NEUTRAL && k==speceminus){
     /* electrons */
-    mu=_mueN_from_Te(Tk)/N;
+    mu=_mue_from_rhok_Te(rhok,Tk);
   } else {
 #endif
     switch (smap[k]){
       case SMAP_eminus:
-        mu=_mueN_from_Te(Tk)/N;
+        mu=_mue_from_rhok_Te(rhok,Tk);
       break;
       case SMAP_O2plus:
         mu=1.0/N*min(1.18E23/sqrt(Tk),3.61E12/sqrt(Estar));
@@ -3722,127 +3779,94 @@ double _muk_from_N_Tk_Ek(double N, double Tk, double Ek, long k){
 }
 
 
-double _dmukN_dTk_from_Tk_EkoverN(double Tk, double Ekstar, long k){
-  double dmuN_dT;
-  dmuN_dT=0.0;
+/* the mobility corresponds to mui=min(A*Ti^n,B*Estar^m)/N */
+void find_dmui(spec_t rhok, double A, double Ti, double n, double B, double Estar, double m,   double *dmuidTi, spec_t dmuidrhok){
+  long spec;
+  double N,term1,term2;
+  N=0.0;
+  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
+  term1=A*pow(Ti,n);
+  term2=B*pow(Estar,m);
+  if (term1<term2){
+  	*dmuidTi=term1*n/Ti/N;
+    for (spec=0; spec<ns; spec++) dmuidrhok[spec]=term1;
+  } else {
+  	*dmuidTi=0.0;
+    for (spec=0; spec<ns; spec++) dmuidrhok[spec]=term2;
+  }
+  for (spec=0; spec<ns; spec++) dmuidrhok[spec]*=-1.0/(N*N)/_m(spec);
+
+}
+
+void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok){
+  double N,Ekstar;
+  long spec;
+  N=0.0;
+  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
+  Ekstar=Ek/N;
 #ifdef speceminus
   if (CHEM_NEUTRAL && k==speceminus){
     /* electrons */
-    dmuN_dT=_dmueN_dTe_from_Te(Tk);
+    find_dmue_from_rhok_Te(rhok, Tk, dmukdTk, dmukdrhok);
   } else {
 #endif
+    for (spec=0; spec<ns; spec++) dmukdrhok[spec]=0.0;
     switch (smap[k]){
       case SMAP_eminus:
-        dmuN_dT=_dmueN_dTe_from_Te(Tk);
+        find_dmue_from_rhok_Te(rhok, Tk, dmukdTk, dmukdrhok);
       break;
       case SMAP_O2plus:
-        if (1.18E23/sqrt(Tk)<3.61E12/sqrt(Ekstar)){
-          dmuN_dT=-0.5*1.18E23*pow(Tk,-1.5);
-        } else {
-          dmuN_dT=0.0;
-        }
+        find_dmui(rhok, 1.18e23, Tk, -0.5, 3.61E12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
       break;
       case SMAP_Oplus:
-        if (1.18E23/sqrt(Tk)<3.61E12/sqrt(Ekstar)){
-          dmuN_dT=-0.5*1.4*1.18E23*pow(Tk,-1.5);
-        } else {
-          dmuN_dT=0.0;
-        }
+        find_dmui(rhok, 1.4*1.18e23, Tk, -0.5, 1.4*3.61E12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
       break;
       case SMAP_N2plus:
-        if (0.75E23/sqrt(Tk)<2.03E12/sqrt(Ekstar)){
-          dmuN_dT=-0.5*0.75E23*pow(Tk,-1.5);
-        } else {
-          dmuN_dT=0.0;
-        }
+        find_dmui(rhok, 0.75e23, Tk, -0.5, 2.03E12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
       break;
       case SMAP_Nplus:
-        if (0.75E23/sqrt(Tk)<2.03E12/sqrt(Ekstar)){
-          dmuN_dT=-0.5*1.4*0.75E23*pow(Tk,-1.5);
-        } else {
-          dmuN_dT=0.0;
-        }
+        find_dmui(rhok, 1.4*0.75e23, Tk, -0.5, 1.4*2.03E12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
       break;
       case SMAP_O2minus:
-        if (0.97E23/sqrt(Tk)<3.56E19*pow(Ekstar,-0.1)){
-          dmuN_dT=-0.5*0.97E23*pow(Tk,-1.5);
-        } else {
-          dmuN_dT=0.0;
-        }
+        find_dmui(rhok, 0.97e23, Tk, -0.5, 3.56e19, Ekstar, -0.1,   dmukdTk, dmukdrhok);
       break;
       case SMAP_Ominus:
-        if (0.97E23/sqrt(Tk)<3.56E19*pow(Ekstar,-0.1)){
-          dmuN_dT=-0.5*1.4*0.97E23*pow(Tk,-1.5);
-        } else {
-          dmuN_dT=0.0;
-        }
+        find_dmui(rhok, 1.4*0.97e23, Tk, -0.5, 1.4*3.56e19, Ekstar, -0.1,   dmukdTk, dmukdrhok);
       break;
       case SMAP_NOplus:
-        if (1.62E23/sqrt(Tk)<4.47E12/sqrt(Ekstar)){
-          dmuN_dT=-0.5*1.62E23*pow(Tk,-1.5);
-        } else {
-          dmuN_dT=0.0;
-        }
+        find_dmui(rhok, 1.62e23, Tk, -0.5, 4.47e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
       break;
       case SMAP_H2plus:
-        if (4.0*1.00E23/sqrt(Tk)<4.0*2.50E12/sqrt(Ekstar)){
-          dmuN_dT=-0.5*4.0*1.00E23*pow(Tk,-1.5);
-        } else {
-          dmuN_dT=0.0;
-        }
+        find_dmui(rhok, 4.0*1e23, Tk, -0.5, 4.0*2.5e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
       break;
       case SMAP_Csplus:
-        if (3.0/8.0*1.00E23/sqrt(Tk)<3.0/8.0*2.50E12/sqrt(Ekstar)){
-          dmuN_dT=-0.5*3.0/8.0*1.00E23*pow(Tk,-1.5);
-        } else {
-          dmuN_dT=0.0;
-        }
+        find_dmui(rhok, 3.0/8.0*1e23, Tk, -0.5, 3.0/8.0*2.5e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
       break;
       case SMAP_Arplus:
-        if (0.85*1.00E23/sqrt(Tk)<0.85*2.50E12/sqrt(Ekstar)){
-          dmuN_dT=-0.5*0.85*1.00E23*pow(Tk,-1.5);
-        } else {
-          dmuN_dT=0.0;
-        }
+        find_dmui(rhok, 0.85*1e23, Tk, -0.5, 0.85*2.5e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
       break;
       case SMAP_Cplus:
-        if (1.55*1.00E23/sqrt(Tk)<1.55*2.50E12/sqrt(Ekstar)){
-          dmuN_dT=-0.5*1.55*1.00E23*pow(Tk,-1.5);
-        } else {
-          dmuN_dT=0.0;
-        }
+        find_dmui(rhok, 1.55*1e23, Tk, -0.5, 1.55*2.5e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
       break;
       case SMAP_C2plus:
-        if (1.10*1.00E23/sqrt(Tk)<1.10*2.50E12/sqrt(Ekstar)){
-          dmuN_dT=-0.5*1.10*1.00E23*pow(Tk,-1.5);
-        } else {
-          dmuN_dT=0.0;
-        }
+        find_dmui(rhok, 1.1*1e23, Tk, -0.5, 1.1*2.5e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
       break;
       case SMAP_CNplus:
-        if (1.06*1.00E23/sqrt(Tk)<1.06*2.50E12/sqrt(Ekstar)){
-          dmuN_dT=-0.5*1.06*1.00E23*pow(Tk,-1.5);
-        } else {
-          dmuN_dT=0.0;
-        }
+        find_dmui(rhok, 1.06*1e23, Tk, -0.5, 1.06*2.5e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
       break;
       case SMAP_COplus:
-        if (1.02*1.00E23/sqrt(Tk)<1.02*2.50E12/sqrt(Ekstar)){
-          dmuN_dT=-0.5*1.02*1.00E23*pow(Tk,-1.5);
-        } else {
-          dmuN_dT=0.0;
-        }
+        find_dmui(rhok, 1.02*1e23, Tk, -0.5, 1.02*2.5e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
       break;
       default:
-        fatal_error("dmukN_dTk_from_Tk_EkoverN can't be found for species %ld",k);
+        fatal_error("find_dmuk_from_rhok_Tk_Ek can't be found for species %ld",k);
     }
 #ifdef speceminus
   }
 #endif
-  return(dmuN_dT);
 
 
 }
+
 
 
 

@@ -2,11 +2,11 @@ i1=1; i2=40;
 j1=1; j2=30;
 dwall=0.001;
 
-Grid2D(
-  Size     ( i1,j1, i2,j1 );
-  Corners  ( i1,j1, 0,0, i2,j2, 1,1);
-  Block    ( i1,j1, i2,j1, FE,0.5, dwall,1, NO,0.5, 1,1 );
-  Block    ( i1,j2, i2,j2, FE,0.5, dwall,1, NO,0.5, 1,1 );
+Grid(
+  Size     ( i1,j1, i2,j2 );
+  Corners  ( i1,j1,i2,j2, 0,0,  1,1);
+  JoinCorners    ( i1,j1, i2,j1, FE,0.5, dwall,1, NO,0.5, 1,1 );
+  JoinCorners    ( i1,j2, i2,j2, FE,0.5, dwall,1, NO,0.5, 1,1 );
   Equation ( i1,j1, i2,j1, y, y=0.1*sin(x*20));
   Join     ( i1,j1, i2,j2, j, FE, 0.7, dwall,1);
 );
