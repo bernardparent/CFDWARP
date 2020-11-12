@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 NOV 12a
+  * in model/chem/_Cs_Air_Plasma_11s/chem.c and model/chem/_Cs_Air_Plasma_15s/chem.c
+    - turned back on the cesium townsend ionization function of Te
+    - added cesium townsend ionization function of Estar
+  * in model/chem/_Cs_Air_Plasma_11s/doc/report.tex and model/chem/_Cs_Air_Plasma_15s/doc/report.tex
+    - added cesium townsend ionization function of Estar
+  * in model/thermo/_generic/thermo.c
+    - in _mue_from_rhok_Te() and find_dmue_from_rhok_Te(), changed  muei=1.342e16*pow(Te,1.5)/Ni; 
+      to muei=1.061e16*pow(Te,1.5)/Ni;
+  * in model/thermo/doc/report.tex
+    - added references to where muei is obtained and adjusted electron mobility in the table
+      where it is listed to include both electron-ion and electron-neutral collisions
+      
+
 2020 NOV 10a
   * in bin/MHD_generator_cesium.wrp
     - updated the control file so that it can be used with any chemical solver

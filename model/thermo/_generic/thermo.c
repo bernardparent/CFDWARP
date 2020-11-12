@@ -3644,7 +3644,7 @@ double _mue_from_rhok_Te(spec_t rhok, double Te){
   }
   Ni=max(1e0,Ni);
   muen=3.74E19*exp(33.5/sqrt(log(Te)))/Nn;
-  muei=1.342e16*pow(Te,1.5)/Ni;
+  muei=1.061e16*pow(Te,1.5)/Ni;
   mue=1.0/(1.0/muen+1.0/muei);
   return(mue);
 }
@@ -3668,7 +3668,7 @@ void find_dmue_from_rhok_Te(spec_t rhok, double Te, double *dmuedTe, spec_t dmue
     Ni=max(1e0,Ni);
 //  muei=1e16*pow(Te,1.5)/Ni;
     muen=3.74E19*exp(33.5/sqrt(log(Te)))/Nn;
-    kmuei=1.342e16;
+    kmuei=1.061e16;
     muei=kmuei/Ni*pow(Te,1.5);
 //    mue=1.0/(1.0/muen+1.0/muei);
 

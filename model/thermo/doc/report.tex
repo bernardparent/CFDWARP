@@ -416,19 +416,20 @@ K for $T$ and $m^2/s$ for $\cal D$.
     \fontsizetable
     \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}ll}
     \toprule
-    Charged species & Mobility, $\rm m^2\cdot V^{-1}\cdot s^{-1}$  & Reference\\
+    Species & Mobility, $\rm m^2\cdot V^{-1}\cdot s^{-1}$  & Reference\\
     \midrule
     Air$^+$         & $N^{-1} \cdot {\rm min}\left(0.84\cdot 10^{23}\cdot T^{-0.5},~~2.35 \cdot 10^{12}\cdot \left(E^\star\right)^{-0.5}\right)$  & \cite{misc:1968:sinnott}\tnote{b}\alb
     N$_2^+$         & $N^{-1} \cdot {\rm min}\left(0.75\cdot 10^{23}\cdot T^{-0.5},~~2.03 \cdot 10^{12}\cdot \left(E^\star\right)^{-0.5}\right)$  & \cite{misc:1968:sinnott}\alb
     O$_2^+$         & $N^{-1} \cdot {\rm min}\left(1.18\cdot 10^{23}\cdot T^{-0.5},~~3.61 \cdot 10^{12}\cdot\left(E^\star\right)^{-0.5}\right)$  & \cite{misc:1968:sinnott}\alb
     O$_2^-$         & $N^{-1} \cdot {\rm min}\left(0.97 \cdot 10^{23}\cdot T^{-0.5},~~3.56 \cdot 10^{19} \cdot \left(E^\star\right)^{-0.1}\right)$  & \cite{misc:1983:gosho}\alb
-    e$^-$         & $N^{-1} \cdot 3.74\cdot 10^{19} \cdot {\rm exp}\left(33.5 \cdot \left({\rm ln}\, T_{\rm e} \right)^{-0.5}\right)$  & \cite[Ch.\ 21]{book:1997:grigoriev}\tnote{c}\\
+    e$^-$         & ${\rm avgharm}\left( N_{\rm n}^{-1} \cdot 3.74\cdot 10^{19} \cdot {\rm exp}\left(33.5 \cdot \left({\rm ln}\, T_{\rm e} \right)^{-0.5}\right) ~,~~N_{\rm i}^{-1} \cdot 1.061 \cdot 10^{16} \cdot T_{\rm e}^{1.5}  \right)$  & \cite[Ch.\ 21]{book:1997:grigoriev},\cite[pp.\ 180-181]{book:1984:chen}\tnote{c,d}\\
     \bottomrule
     \end{tabular*}
     \begin{tablenotes}
-      \item[a] Notation and units:  $T_{\rm e}$ is in Kelvin; $T$ is in Kelvin; $N$ is the total number density of the plasma in 1/m$^3$; $E^\star$ is the reduced effective electric field  ($E^\star \equiv |\vec{E}|/N$) in units of V$\cdot$m$^2$.
+      \item[a] Notation and units:  $T_{\rm e}$ is in Kelvin; $T$ is in Kelvin; $N$ is the total number density of the plasma in 1/m$^3$; $N_{\rm i}$ is the sum of the positive ion number densities in 1/m$^3$;  $N_{\rm n}$ is the sum of the neutral species number densities  in 1/m$^3$;  $E^\star$ is the reduced effective electric field  ($E^\star \equiv |\vec{E}|/N$) in units of V$\cdot$m$^2$.
       \item[b] The ``air ion'' mobility is obtained from the N$_2^+$ and O$_2^+$ ion mobilities assuming a N$_2^+$:O$_2^+$ ratio of 4:1. 
-      \item[c] The expression approximates the data given in Chapter 21 of Ref.\ \cite{book:1997:grigoriev}; The equation can be used in the range $1000~{\rm K} \le T_{\rm e} \le 57900 ~{\rm K}$ with a relative error on the mobility not exceeding 20\%. In the range $287~{\rm K} \le T_{\rm e} < 1000~{\rm K}$, the relative error is less than 30\%.
+      \item[c] The expression for the electron-neutral collisions approximates the data given in Chapter 21 of Ref.\ \cite{book:1997:grigoriev}; The equation can be used in the range $1000~{\rm K} \le T_{\rm e} \le 57900 ~{\rm K}$ with a relative error on the mobility not exceeding 20\%. In the range $287~{\rm K} \le T_{\rm e} < 1000~{\rm K}$, the relative error is less than 30\%. 
+      \item[d] The function avgharm($a$,$b$) returns the harmonic average of the two arguments as follows $1/(a^{-1}+b^{-1})$.
     \end{tablenotes}
    \end{threeparttable}
 \end{table*}
@@ -436,7 +437,34 @@ K for $T$ and $m^2/s$ for $\cal D$.
 
 
 
-The mobilities of the various charged species are taken from Table \ref{tab:mobilities} while the fraction of the Joule heating that is consumed in the excitation of the vibration levels of the nitrogen molecule, $\zeta_{\rm v}$,  is as specified in Table \ref{table:etavcoefficients}.
+The mobilities of the various charged species are taken from Table \ref{tab:mobilities}. Note that when the ionization fraction exceeds 0.001 or so, the electron mobility needs to be corrected to account for electron-ion collisions as follows:
+%
+\begin{equation}
+\mu_{\rm e}=\frac{1}{\frac{1}{\mu_{\rm en}}+\frac{1}{\mu_{\rm ei}}}
+\end{equation}
+%
+with the electron mobility with respect to ions is set to (see \cite[page 180--181]{book:1984:chen}):
+%
+\begin{equation}
+\mu_{\rm ei} = \frac{9}{4\pi\sqrt{3}} \frac{(4\pi\epsilon_0)^2 (k_{\rm B}T_{\rm e})^{1.5}}{m_{\rm e}^{0.5} e^3 N_{\rm i} \ln \Lambda}
+\end{equation}
+%
+where $e$ is the elementary charge, $N_{\rm i}$ the positive ion number density (sum of all positive ions), $m_{\rm e}$ the electron mass, and $\ln \Lambda$ varies between 5 and 8 depending on the type of ion. Setting $\ln \Lambda$ to 6.3, we obtain:
+%
+\begin{equation}
+\mu_{\rm ei}= \frac{1.061 \times 10^{16}}{\rm m\cdot K^{1.5}\cdot V \cdot s} \frac{T_{\rm e}^{1.5}}{N_{\rm i}}
+\end{equation}
+%
+Also, we can fit a polynomial through the experimental data outlined in in Chapter 21 of Ref.\ \cite{book:1997:grigoriev} to find $\mu_{\rm en}$ in units of $\rm m^2\cdot V^{-1}\cdot s^{-1}$:
+%
+\begin{equation}
+\mu_{\rm en}=N_{\rm n}^{-1} \cdot 3.74\cdot 10^{19} \cdot {\rm exp}\left(33.5 \cdot \left({\rm ln}\, T_{\rm e} \right)^{-0.5}\right)
+\end{equation}
+%
+where $N_{\rm n}$ is the number density of the neutrals in $m^{-3}$ and $T_{\rm e}$ is the electron temperature in K.
+The latter equation can be used in the range $1000~{\rm K} \le T_{\rm e} \le 57900 ~{\rm K}$ with a relative error on the mobility not exceeding 20\%. In the range $287~{\rm K} \le T_{\rm e} < 1000~{\rm K}$, the relative error is less than 30\%. 
+
+Also, the fraction of the Joule heating that is consumed in the excitation of the vibration levels of the nitrogen molecule, $\zeta_{\rm v}$,  is as specified in Table \ref{table:etavcoefficients}.
 
 
 
