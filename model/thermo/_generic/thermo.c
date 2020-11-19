@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <soap.h>
 
 #define T_accuracy 1.0e-12
-  #define ns_c 54
+  #define ns_c 56
 
 #define RN2 296.8E0
 #define Thetav 3353.0E0
@@ -117,7 +117,9 @@ const static speciesname_t speciesname[ns_c]=
    "CN+",
    "CO+",
    "HNO",
-   "NO2"
+   "NO2",
+   "H+",
+   "CH2"
   };
 
 
@@ -176,7 +178,9 @@ const static long numatoms[ns_c]=
    2,  /*CN+*/
    2,  /*CO+*/
    3,  /*HNO*/
-   3   /*NO2*/
+   3,  /*NO2*/
+   1,  /* H+ */
+   3,  /* CH2 */
   }; 
 
 
@@ -263,6 +267,8 @@ const static double Peps[ns_c]=
    91.7,        /*CO+*/  /* !! unknown value: fixed to the one of CO */
    116.7,        /*HNO*/
    200.0,        /*NO2*/
+   37.0,        /* H+ */ /* !! unknown value: fixed to the one of H */
+   144.0         /* CH2 */
   };
 
 const static double Psig[ns_c]=
@@ -321,6 +327,8 @@ const static double Psig[ns_c]=
    0.3690E+0,   /*CO+* !! fixed to the one of CO */  
    0.3492E+0,   /*HNO*/
    0.2500E+0,   /*NO2*/
+   0.2708E+0,   /* H+  !! fixed to the one of H */ 
+   0.3800E+0,   /* CH2 */
   };
 
 
@@ -388,6 +396,8 @@ const static double calM[ns_c]=
    28.10045E-3,    /*CO+*/
    31.01400E-3,    /*HNO*/
    46.00550E-3,    /*NO2*/
+   1.00739E-3,     /* H+ */
+   14.02658E-3,    /* CH2 */
   };
   
 
@@ -448,6 +458,8 @@ const static long ck[ns_c]=
    +1, /*CO+*/
    0,  /*HNO*/
    0,  /*NO2*/
+   1,  /* H+ */
+   0,  /* CH2 */
   };
   
   
@@ -2600,6 +2612,102 @@ const static double Pa[ns_c][3][11]=
         2.502497403e+04,
        -4.305130040e+01
       }
+    },
+
+/* species H+
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +298.15e0,        /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+        0.000000000E+00,
+        0.000000000E+00, 
+        2.500000000E+00,
+        0.000000000E+00,
+        0.000000000E+00,
+        0.000000000E+00,
+        0.000000000E+00,
+        1.840214877E+05,
+        -1.140646644E+00
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+        0.000000000E+00,
+        0.000000000E+00,
+        2.500000000E+00,
+        0.000000000E+00,
+        0.000000000E+00,
+        0.000000000E+00,
+        0.000000000E+00,
+        1.840214877E+05,
+        -1.140646644E+00
+      },
+      {
+       +6000.0e0,        /* Tmin [K] */
+       +20000.0e0,       /* Tmax [K] */
+        0.000000000E+00,
+        0.000000000E+00,
+        2.500000000E+00,
+        0.000000000E+00,
+        0.000000000E+00,
+        0.000000000E+00,
+        0.000000000E+00,
+        1.597615494E+04,
+        -1.139013868E+00
+      }
+    },
+
+/* species CH2
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +200.0e0,        /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+        3.218921730E+04,
+       -2.877601815E+02,
+        4.203583820E+00,
+        3.455405960E-03,
+       -6.746193340E-06,
+        7.654571640E-09,
+       -2.870328419E-12,
+        4.733624710E+04,
+       -2.143628603E+00
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +(6000.0e0-dTrangemin),        /* Tmax [K] */
+        2.550418031E+06,
+       -7.971625390E+03,
+        1.228924487E+01,
+       -1.699122922E-03,
+        2.991728605E-07,
+       -2.767007492E-11,
+        1.051341740E-15,
+        9.642216890E+04,
+       -6.094739910E+01
+      },
+      {
+       +(6000.0e0-dTrangemin),        /* Tmin [K] */
+       +6000.0e0,       /* Tmax [K] */
+        2.550418031E+06,
+       -7.971625390E+03,
+        1.228924487E+01,
+       -1.699122922E-03,
+        2.991728605E-07,
+       -2.767007492E-11,
+        1.051341740E-15,
+        9.642216890E+04,
+       -6.094739910E+01
+      }
     }
    
   };
@@ -3711,7 +3819,7 @@ void find_dmue_from_rhok_Te(spec_t rhok, double Te, double *dmuedTe, spec_t dmue
   H2+, Cs+, N+, O+, O- are approximated using Fig. 8 in THE MOBILITIES OF SMALL IONS THE ATMOSPHERE AND THEIR RELATIONSHIP by E. UNGETHUM, Aerosol Science, 1974, Vol. 5, pp. 25 37. 
 */ 
 double _muk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k){
-  double mu,Estar,N;
+  double fact,mu,Estar,N;
   long spec;
   mu=0.0;
   N=0.0;
@@ -3748,29 +3856,9 @@ double _muk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k){
       case SMAP_NOplus:
         mu=1.0/N*min(1.62E23/sqrt(Tk),4.47E12/sqrt(Estar));
       break;
-      case SMAP_H2plus:
-        mu=1.0/N*min(4.0*1.00E23/sqrt(Tk),4.0*2.50E12/sqrt(Estar)); //based on Air+ with mass adjustment
-      break;
-      case SMAP_Csplus:
-        mu=1.0/N*min(3.0/8.0*1.00E23/sqrt(Tk),3.0/8.0*2.50E12/sqrt(Estar)); //based on Air+ with mass adjustment
-      break;
-      case SMAP_Arplus:
-        mu=1.0/N*min(0.85*1.00E23/sqrt(Tk),0.85*2.50E12/sqrt(Estar)); //based on Air+ with mass adjustment
-      break;
-      case SMAP_Cplus:
-        mu=1.0/N*min(1.55*1.00E23/sqrt(Tk),1.55*2.50E12/sqrt(Estar)); //based on Air+ with mass adjustment
-      break;
-      case SMAP_C2plus:
-        mu=1.0/N*min(1.10*1.00E23/sqrt(Tk),1.10*2.50E12/sqrt(Estar)); //based on Air+ with mass adjustment
-      break;
-      case SMAP_CNplus:
-        mu=1.0/N*min(1.06*1.00E23/sqrt(Tk),1.06*2.50E12/sqrt(Estar)); //based on Air+ with mass adjustment
-      break;
-      case SMAP_COplus:
-        mu=1.0/N*min(1.02*1.00E23/sqrt(Tk),1.02*2.50E12/sqrt(Estar)); //based on Air+ with mass adjustment
-      break;
       default:
-        fatal_error("Mobility can't be found for species %ld",k);
+        fact=sqrt(28.96E-3/_calM(k)); 
+        mu=1.0/N*min(fact*1.00E23/sqrt(Tk),fact*2.50E12/sqrt(Estar)); //based on Air+ with mass adjustment
     }
 #ifdef speceminus
   }
@@ -3799,7 +3887,7 @@ void find_dmui(spec_t rhok, double A, double Ti, double n, double B, double Esta
 }
 
 void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok){
-  double N,Ekstar;
+  double N,Ekstar,fact;
   long spec;
   N=0.0;
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
@@ -3836,29 +3924,9 @@ void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double
       case SMAP_NOplus:
         find_dmui(rhok, 1.62e23, Tk, -0.5, 4.47e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
       break;
-      case SMAP_H2plus:
-        find_dmui(rhok, 4.0*1e23, Tk, -0.5, 4.0*2.5e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
-      break;
-      case SMAP_Csplus:
-        find_dmui(rhok, 3.0/8.0*1e23, Tk, -0.5, 3.0/8.0*2.5e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
-      break;
-      case SMAP_Arplus:
-        find_dmui(rhok, 0.85*1e23, Tk, -0.5, 0.85*2.5e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
-      break;
-      case SMAP_Cplus:
-        find_dmui(rhok, 1.55*1e23, Tk, -0.5, 1.55*2.5e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
-      break;
-      case SMAP_C2plus:
-        find_dmui(rhok, 1.1*1e23, Tk, -0.5, 1.1*2.5e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
-      break;
-      case SMAP_CNplus:
-        find_dmui(rhok, 1.06*1e23, Tk, -0.5, 1.06*2.5e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
-      break;
-      case SMAP_COplus:
-        find_dmui(rhok, 1.02*1e23, Tk, -0.5, 1.02*2.5e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
-      break;
       default:
-        fatal_error("find_dmuk_from_rhok_Tk_Ek can't be found for species %ld",k);
+        fact=sqrt(28.96E-3/_calM(k)); 
+        find_dmui(rhok, fact*1e23, Tk, -0.5, fact*2.5e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
     }
 #ifdef speceminus
   }

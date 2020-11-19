@@ -79,7 +79,7 @@
 }
 
 
-mf=1.4; 
+mf=1.0; 
 
 
 is=1;
@@ -186,6 +186,10 @@ Model(
   );
   CsAirPlasma15s(
     CHEMMODEL=CHEMMODEL_LENARD1964;
+    CESIUMREACTIONS=TRUE; {include reactions function of Cs}
+    NEGATIVEIONREACTIONS=TRUE; {include reactions function of O- and O2-}
+    TOWNSENDIONIZATION=TRUE; {include reactions function of EoverN}
+    TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
   );
   CsAirPlasma11s(
     CHEMMODEL=CHEMMODEL_LENARD1964;
@@ -228,17 +232,18 @@ Init(
     _______________________________________________________________________________________
 
     }
-    Vx=2500; {m/s}
+    Vx=1200; {m/s}
     Vy=0; {m/s}
     P=70000; {Pa}
-    T=6400; {K}
+    T=2400; {K}
     Tv=T; {K}
     Te=T; {K}
+
     Species("e-","O2+","O2","N2","Cs","default");
     chi_eminus=1e-12;
     chi_O2plus=1e-12;
     chi_default=1.0e-30;
-    chi_Cs=1e-1;
+    chi_Cs=1e-5;
     chi_O2=0.21*(1-chi_Cs);
     chi_N2=0.79*(1-chi_Cs);
     All(INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2plus,chi_O2,chi_N2,chi_Cs,chi_default,Tv,Te);
@@ -260,7 +265,7 @@ Init(
     }
     phi=0.0; {V}
     phi_bot=0.0;
-    phi_top=0.0;
+    phi_top=2000.0;
     All(INITEMF_TYPE1,phi);
     Region(is,js,  ie,js,INITEMF_TYPE1,phi_bot);
     Region(is,je,  ie,je,INITEMF_TYPE1,phi_top);
@@ -351,6 +356,28 @@ Cycle(
     Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
   SteadyState(
+    if (mod(iter,50)==0,
+      WriteDataFile(outputfilename);
+    );
+    sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
+    if (iter==1,
+      CFL=0.01;
+    );
+    CFL=min(CFL*1.05,0.6);
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
+    Lc=0.2;      {characteristic length scale in meters used to solve the emfield equation}
+    relaxEMF=1.0; {relaxation factor forced on the update of the emfield variables}
+    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,800); 
+    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,800); 
+    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,800); 
+    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,800); 
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
+  );
+
+  SteadyStateOld(
     if (iter<2,
       Model(NavierStokesPlasma(TEMODEL=TEMODEL_TEQUILIBRIUM;););
     ,{else}

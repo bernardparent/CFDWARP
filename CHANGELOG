@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 NOV 18a
+  * in model/thermo/_generic/thermo.c
+    - added two species: H+ and CH2
+    - in _muk_from_rhok_Tk_Ek(), changed mobilities of H2+, Cs+, Ar+, C+, C2+, CN+, CO+ to
+      mu=1.0/N*min(fact*1.00E23/sqrt(Tk),fact*2.50E12/sqrt(Estar)); with fact=sqrt(28.96E-3/_calM(k))
+    - in find_dmuk_from_rhok_Tk_Ek(), changed dmui of H2+, Cs+, Ar+, C+, C2+, CN+, CO+ to
+      find_dmui(rhok, fact*1e23, Tk, -0.5, fact*2.5e12, Ekstar, -0.5,   dmukdTk, dmukdrhok);
+  * in model/chem
+    - added _H2_He_CH4_Plasma_13s
+     
+
 2020 NOV 12a
   * in model/chem/_Cs_Air_Plasma_11s/chem.c and model/chem/_Cs_Air_Plasma_15s/chem.c
     - turned back on the cesium townsend ionization function of Te
