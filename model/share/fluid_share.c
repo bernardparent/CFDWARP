@@ -2428,6 +2428,17 @@ void find_init_number_density_templates(char **specstr1, char **specstr2){
     );  
     strcpy(*specstr2, ",N_CO2,N_default");
   #endif
+  #if (defined(specH2) && defined(specHe) && !defined(specN2) && !defined(specO2))
+    strcpy(*specstr1,
+    "    Species(\"H2\", \"He\", \"CH4\", \"default\");\n"
+    "    N=1e25;         {1/m3} \n"
+    "    N_H2=N*0.7994;   {1/m3}\n"
+    "    N_He=N*0.187;   {1/m3}\n"
+    "    N_CH4=N*0.0136; {1/m3}\n"
+    "    N_default=1e9;  {1/m3}\n"
+    );  
+    strcpy(*specstr2, ",N_H2,N_He,N_CH4,N_default");
+  #endif
   if (ns==1){
     specname=(char *)malloc(sizeof(char));
     find_species_variable_name(0, &specname);

@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <soap.h>
 
 #define T_accuracy 1.0e-12
-  #define ns_c 56
+  #define ns_c 57
 
 #define RN2 296.8E0
 #define Thetav 3353.0E0
@@ -119,7 +119,8 @@ const static speciesname_t speciesname[ns_c]=
    "HNO",
    "NO2",
    "H+",
-   "CH2"
+   "CH2",
+   "He+"
   };
 
 
@@ -181,6 +182,7 @@ const static long numatoms[ns_c]=
    3,  /*NO2*/
    1,  /* H+ */
    3,  /* CH2 */
+   1,  /* He+ */
   }; 
 
 
@@ -268,7 +270,8 @@ const static double Peps[ns_c]=
    116.7,        /*HNO*/
    200.0,        /*NO2*/
    37.0,        /* H+ */ /* !! unknown value: fixed to the one of H */
-   144.0         /* CH2 */
+   144.0,         /* CH2 */
+   10.22,         /* He+  !! unknown value: fixed to the one of He*/
   };
 
 const static double Psig[ns_c]=
@@ -329,6 +332,7 @@ const static double Psig[ns_c]=
    0.2500E+0,   /*NO2*/
    0.2708E+0,   /* H+  !! fixed to the one of H */ 
    0.3800E+0,   /* CH2 */
+   0.2551E+0,   /* He+ !! fixed to the one of He */
   };
 
 
@@ -398,6 +402,7 @@ const static double calM[ns_c]=
    46.00550E-3,    /*NO2*/
    1.00739E-3,     /* H+ */
    14.02658E-3,    /* CH2 */
+   4.00205e-3,    /* He+ */
   };
   
 
@@ -460,6 +465,7 @@ const static long ck[ns_c]=
    0,  /*NO2*/
    1,  /* H+ */
    0,  /* CH2 */
+   1,  /* He+ */
   };
   
   
@@ -2708,7 +2714,56 @@ const static double Pa[ns_c][3][11]=
         9.642216890E+04,
        -6.094739910E+01
       }
+    },
+   
+/* species He+
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +298.15e0,        /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       0.000000000E+00,
+       0.000000000E+00,
+       2.500000000E+00,
+       0.000000000E+00,
+       0.000000000E+00,
+       0.000000000E+00,
+       0.000000000E+00,
+       2.853233739E+05,
+       1.621665557E+00
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+        0.000000000E+00,
+        0.000000000E+00,
+        2.500000000E+00,
+        0.000000000E+00,
+        0.000000000E+00,
+        0.000000000E+00,
+        0.000000000E+00,
+        2.853233739E+05,
+        1.621665557E+00
+      },
+      {
+       +6000.0e0,        /* Tmin [K] */
+       +20000.0e0,       /* Tmax [K] */
+        0.000000000E+00,
+        0.000000000E+00,
+        2.500000000E+00,
+        0.000000000E+00,
+        0.000000000E+00,
+        0.000000000E+00,
+        0.000000000E+00,
+        2.853233739E+05,
+        1.621665557E+00
+      }
     }
+   
    
   };
 

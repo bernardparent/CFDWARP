@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 NOV 24a
+  * in model/chem/_H2_He_CH4_Plasma_13s/chem.hh
+    - changed H2plus for Heplus
+  * in model/fluid/_drift-diffusion/fluid.c
+    - in write_model_fluid_template(), changed Nkmax from 1e19 to 1e40;
+  * in model/share/fluid_share.c
+    - in find_init_number_density_templates(), added initial conditions for Neptune atmosphere
+  * in model/thermo/_generic/thermo.c
+    - added He+ species
+  * in src/init.c
+    - in reorder_initvar_species(), fixed a bug: when the number of species specified with the
+      Species() command within Init() was equal to ns, the function would set the species ordering
+      to the default and not to the ordering specified in Species()
+      
+
 2020 NOV 18a
   * in model/thermo/_generic/thermo.c
     - added two species: H+ and CH2

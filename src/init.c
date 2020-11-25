@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define INITSPECIES_DEFAULT -1
 
 static void reorder_initvar_species(gl_t *gl, initvar_t initvar, long specstart){
-  long flux,spec,specinit;
+  long flux,spec,specinit,specinitmax;
   spec_t N;
   if (gl->nsinit!=ns){
     // move values up to make space for missing species
@@ -44,19 +44,23 @@ static void reorder_initvar_species(gl_t *gl, initvar_t initvar, long specstart)
     } 
     // set all densities to the default
     for (spec=0; spec<ns; spec++) N[spec]=initvar[specstart+gl->nsinit-1];
-    
-    // set the given densities
-    for (specinit=0; specinit<gl->nsinit-1; specinit++){
-      assert(gl->initspecies[specinit]<ns);
-      assert(gl->initspecies[specinit]>=0);
-      N[gl->initspecies[specinit]]=initvar[specstart+specinit];
-    }
-    
-    //put the densities back into initvar
-    for (spec=0; spec<ns; spec++){
-      initvar[specstart+spec]=N[spec];
-    }
+    specinitmax=gl->nsinit-1;
+  } else {
+    specinitmax=gl->nsinit;
   }
+    
+  // set the given densities
+  for (specinit=0; specinit<specinitmax; specinit++){
+    assert(gl->initspecies[specinit]<ns);
+    assert(gl->initspecies[specinit]>=0);
+    N[gl->initspecies[specinit]]=initvar[specstart+specinit];
+  }
+    
+  //put the densities back into initvar
+  for (spec=0; spec<ns; spec++){
+    initvar[specstart+spec]=N[spec];
+  }
+  
 }
 
 
