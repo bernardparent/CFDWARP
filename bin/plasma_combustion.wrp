@@ -98,7 +98,7 @@ ys0=0.0009; {end of jet}
 ys1=0.0018; {end of arc influence}
 ye=0.02; {end of domain}
 
-mf=2.0;
+mf=1.0;
 
 mf2=mf*2;
 

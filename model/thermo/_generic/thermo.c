@@ -44,7 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // make sure dTrangemin>dToverlap
 #define dTrangemin 100.0e0
 // maximum temperature in Kelvin used to determine the viscosity, thermal conductivity, and mass diffusion coefficients
-#define MAX_T_FOR_NUK_ETA_KAPPA_POLYNOMIALS 12000.0  
+#define MAX_T_FOR_NUK_ETA_KAPPA_POLYNOMIALS 6000.0  
+#define INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA TRUE
 
 typedef char speciesname_t[ns_c];
 
@@ -3398,7 +3399,7 @@ void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
                    spec_t nuk, double *eta, double *kappa){
   long spec,k,l;
   spec_t etak,kappak,chik,rhok;
-  double P,etamix,kappamix,Nn;
+  double P,etamix,kappamix;
   double chiden,sum;
   double calD[ns][ns];
   double nuwsum,wsum;
@@ -3410,7 +3411,7 @@ void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
     if (w[spec]<1.0E-12) w[spec]=1.0E-9;
   }
   for (spec=0; spec<ns; spec++){
-    if (speciestype[spec]==SPECIES_NEUTRAL) { /* don't add the charged species */
+    if (speciestype[spec]==SPECIES_NEUTRAL || INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA) { 
       assert((Psig[smap[spec]]*Psig[smap[spec]]*_Omega22(T,Peps[smap[spec]]))!=0.0e0);
       assert((calM[smap[spec]]*T)>=0.0e0);
       etak[spec]=8.44107E-7*sqrt(calM[smap[spec]]*T)/(Psig[smap[spec]]*Psig[smap[spec]]
@@ -3433,23 +3434,23 @@ void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
   }
   chiden=0.0e0;
   for (spec=0; spec<ns; spec++){
-    if (speciestype[spec]==SPECIES_NEUTRAL) { /* don't add the charged species */
+    if (speciestype[spec]==SPECIES_NEUTRAL || INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA) { 
       chiden=chiden+w[spec]/calM[smap[spec]];
     }
   }
   assert(chiden!=0.0e0);
   for (spec=0; spec<ns; spec++){
-    if (speciestype[spec]==SPECIES_NEUTRAL) { /* don't add the charged species */
+    if (speciestype[spec]==SPECIES_NEUTRAL || INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA) { 
       chik[spec]=w[spec]/calM[smap[spec]]/chiden;
     }
   }
   etamix=0.0e0;
   kappamix=0.0e0;
   for (k=0; k<ns; k++){
-    if (speciestype[k]==SPECIES_NEUTRAL) { /* don't add the charged species */
+    if (speciestype[k]==SPECIES_NEUTRAL || INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA) { 
       sum=0.0e0;
       for (l=0; l<ns; l++){
-        if (l!=k && speciestype[l]==SPECIES_NEUTRAL) { /* don't add the charged species */
+        if (l!=k && (speciestype[l]==SPECIES_NEUTRAL || INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA)) { 
           assert(etak[l]!=0.0e0);
           assert((1.0e0+calM[smap[k]]/calM[smap[l]])*8.0e0>0.0e0);
           assert((etak[k]/etak[l])>0.0e0);
@@ -3465,7 +3466,7 @@ void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
   }
   for (k=0; k<ns; k++){
     for (l=0; l<ns; l++){
-      if (speciestype[k]==SPECIES_NEUTRAL && speciestype[l]==SPECIES_NEUTRAL) { /* don't add the charged species */
+      if ((speciestype[k]==SPECIES_NEUTRAL && speciestype[l]==SPECIES_NEUTRAL) || INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA) { 
         assert(Peps[smap[k]]*Peps[smap[l]]>0.0e0);
         assert((P*_Omega11(T,sqrt(Peps[smap[k]]*Peps[smap[l]]))
                *(Psig[smap[k]]+Psig[smap[l]])*(Psig[smap[k]]+Psig[smap[l]]))!=0.0e0);
@@ -3478,12 +3479,6 @@ void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
   }
   *eta=etamix;
   *kappa=kappamix;
-  Nn=0.0;
-  for (spec=0; spec<ns; spec++){
-    if (speciestype[spec]==SPECIES_NEUTRAL) { 
-      Nn+=w[spec]*rho/_calM(spec)*calA;
-    }
-  }
   
   for (spec=0; spec<ns; spec++) rhok[spec]=rho*w[spec];
   
@@ -3492,7 +3487,7 @@ void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
       case SPECIES_NEUTRAL:
         sum=0.0e0;
         for (l=0; l<ns; l++){
-          if (l!=k && speciestype[l]==SPECIES_NEUTRAL) { /* don't add the charged species */
+          if (l!=k && (speciestype[l]==SPECIES_NEUTRAL || INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA)) { 
             assert(calD[k][l]!=0.0e0);
             sum=sum+chik[l]/calD[k][l];
           }

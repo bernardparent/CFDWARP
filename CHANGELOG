@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 NOV 27a
+  * in model/chem/_H2_He_CH4_Plasma_13s/chem.hh
+    - added N2 as the last species
+  * in model/thermo/_generic/thermo.c
+    - in find_nuk_eta_kappa(), now include the charged species in the determination of eta and kappa
+    - changed MAX_T_FOR_NUK_ETA_KAPPA_POLYNOMIALS from 12000.0 to 6000.0
+    
+
 2020 NOV 24a
   * in model/chem/_H2_He_CH4_Plasma_13s/chem.hh
     - changed H2plus for Heplus
