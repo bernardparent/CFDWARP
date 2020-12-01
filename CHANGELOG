@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 DEC 01a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - in find_post_variable_value_fluid(), added Weee post variable
+  * in model/thermo/_generic/thermo.c
+    - fixed 2 bugs: the enthalpy polynomials for C+ and H+ were not correctly input in one interval
+    
+
 2020 NOV 27a
   * in model/chem/_H2_He_CH4_Plasma_13s/chem.hh
     - added N2 as the last species
