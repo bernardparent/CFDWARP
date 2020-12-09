@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 DEC 08a
+  * in lib/exm/exm.c
+    - added EXM_f_from_line()
+    - added EXM_f_from_monotonespline()
+  * in lib/soap/soap.c
+    - in functions_builtin(), added code for Interpolate built-in action
+    
+
 2020 DEC 01a
   * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
     - in find_post_variable_value_fluid(), added Weee post variable

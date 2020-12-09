@@ -189,9 +189,13 @@ void EXM_numerical_integration_vector(void(*FUNCT)(void *, double, EXM_vec3D_t v
                         long METHOD, long n, double x1, double x2, long *error,
                         EXM_vec3D_t sumvector);
 
+double EXM_f_from_line(long N, double *x, double *f, double thisx);
+
 void EXM_find_spline(long N, double *x, double *f, double *b);
 
 double EXM_f_from_spline(long N, double *x, double *f, double *b, double thisx);
+
+double EXM_f_from_monotonespline(long N, double *x, double *f, double thisx);
 
 /* insert str1 into str2 at the position pos; returns *str2
    make sure *str2 has enough memory allocated */

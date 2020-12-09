@@ -1483,7 +1483,6 @@ double EXM_numerical_integration(double(*FUNCT)(void *, double), void *arg_ptr,
 }
 
 
-
 /* numerically integrate the function FUNCT(x) between
    x=x1 and x=x2, returning the value of the integral */
 void EXM_numerical_integration_vector(void(*FUNCT)(void *, double, EXM_vec3D_t vector), void *arg_ptr,
@@ -1523,6 +1522,26 @@ void EXM_numerical_integration_vector(void(*FUNCT)(void *, double, EXM_vec3D_t v
     (*FUNCT)(arg_ptr,x2,f3);
     for (dim=0; dim<3; dim++) sum[dim]+=dx*(27.0/24.0*f2[dim]+9.0/24.0*f3[dim]);
   }
+}
+
+
+/* returns f at thisx given x,f at each data point */
+double EXM_f_from_line(long N, double *x, double *f, double thisx){
+  long i;
+  double thisf,dxi;
+  if (N<2) EXM_fatal_error("Number of data points supplied for linear interpolation must be at least 2.");
+  /* first find i that is such that x[i]<=thisx<=x[i+1] */
+  i=-1;
+  do {
+    i++;
+  } while(i<(N-1) && !(x[i]<=thisx && x[i+1]>=thisx));
+  if (i>=N-1){
+    EXM_fatal_error("Couldn't find an interval for x=%E in EXM_f_from_spline.",thisx);
+  }
+  assert(i<N-1);
+  dxi=x[i+1]-x[i];
+  thisf=f[i]+((f[i+1]-f[i])/dxi)*(thisx-x[i]);
+  return(thisf);
 }
 
 
@@ -1568,6 +1587,7 @@ void EXM_find_spline(long N, double *x, double *f, double *b){
     assert(pdma[n].val[2]!=0.0);
     b[n]=pdma[n].val[5]/pdma[n].val[2];
   }
+  free(pdma);
 }
 
 
@@ -1590,6 +1610,55 @@ double EXM_f_from_spline(long N, double *x, double *f, double *b, double thisx){
   ci=(f[i+1]-f[i])/dxi-b[i]*dxi-(b[i+1]-b[i])/3.0*dxi;
   di=f[i];
   thisf=ai*(thisx-x[i])*(thisx-x[i])*(thisx-x[i])+bi*(thisx-x[i])*(thisx-x[i])+ci*(thisx-x[i])+di;
+  return(thisf);
+}
+
+/* returns f at thisx given x,f,b at each data point */
+double EXM_f_from_monotonespline(long N, double *x, double *f, double thisx){
+  long i;
+  double thisf,dx,t,deltam1,deltap0,deltap1,mp0,mp1,alpha,beta,tau;
+  mp0=mp1=0.0; //to avoid compiler warning
+  /* first find i that is such that x[i]<=thisx<=x[i+1] */
+  i=-1;
+  do {
+    i++;
+  } while(i<(N-1) && !(x[i]<=thisx && x[i+1]>=thisx));
+  if (i>=N-1){
+    EXM_fatal_error("Couldn't find an interval for x=%E in EXM_f_from_spline.",thisx);
+  }
+  assert(i<N-1);
+  dx=x[i+1]-x[i];
+  t=(thisx-x[i])/dx;
+  deltap0=(f[i+1]-f[i])/dx;
+  if(i>=1 && i<=N-3) {
+    deltam1=(f[i]-f[i-1])/(x[i]-x[i-1]); 
+    mp0=0.5*(deltam1+deltap0); 
+    if(deltam1*deltap0<0.0) mp0=0.0; 
+    deltap1=(f[i+2]-f[i+1])/(x[i+2]-x[i+1]); 
+    mp1=0.5*(deltap0+deltap1); 
+    if(deltap0*deltap1<0.0) mp1=0.0;
+  }
+  else if (i==0) {
+    deltap1=(f[i+2]-f[i+1])/(x[i+2]-x[i+1]);
+    mp0=deltap0;
+    mp1=0.5*(deltap0+deltap1); 
+    if(deltap0*deltap1<0.0) mp1=0.0; 
+  }
+  else if (i==N-2) {
+    deltam1=(f[i]-f[i-1])/(x[i]-x[i-1]); 
+    mp0=0.5*(deltam1+deltap0); 
+    if(deltam1*deltap0<0.0) mp0=0.0; 
+    mp1=deltap0;
+  }
+  else EXM_fatal_error("Input to EXM_f_from_monotonespline() out of range.");
+  alpha=mp0/deltap0;
+  beta=mp1/deltap0;
+  if(alpha*alpha+beta*beta>9.0) {
+    tau=3.0/sqrt(alpha*alpha+beta*beta);
+    mp0=tau*alpha*deltap0;
+    mp1=tau*beta*deltap0;
+  }
+  thisf=f[i]*(2.0*t*t*t-3.0*t*t+1)+dx*mp0*(t*t*t-2.0*t*t+t)+f[i+1]*(-2.0*t*t*t+3.0*t*t)+dx*mp1*(t*t*t-t*t);
   return(thisf);
 }
 

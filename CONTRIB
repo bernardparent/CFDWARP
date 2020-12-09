@@ -97,6 +97,10 @@ RAJENDRAN, Prasanna T.
 
   - Speed improvement of function exchange_U() in cycle_share.c through MPI_Buffer
 
+  - addition of Interpolate action within soap.c
+  
+  - addtion of monotone spline algorithm in exm.c
+  
 
 SCHWARTZENTRUBER, Thomas E.
 

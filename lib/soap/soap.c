@@ -68,6 +68,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define NOT  28
 #define NEQ  29
 
+#define INTERPOLATE_LINEAR 1
+#define INTERPOLATE_CUBICSPLINE 2
+#define INTERPOLATE_CUBICSPLINEMONOTONE 3
+
+
 #define maxnumlen 30
 /* 30 chars are enough to store 15 significant numbers */
 
@@ -685,6 +690,12 @@ static void functions_builtin(char *function, char **argum,
   double tmp,returnval;
   long functionnum,numargum,cnt;
   int eos=EOS;
+    long N,Nmax,n;
+    int interptype;
+    double *f,*b,*x;
+    double thisx;
+    char *expr;
+
   functionnum=0;
   if (strcmp(function,"rad")==0) functionnum=1;
   if (strcmp(function,"deg")==0) functionnum=2;
@@ -789,9 +800,6 @@ static void functions_builtin(char *function, char **argum,
   }
 
   if (strcmp(function,"spline")==0) {
-    long N,n;
-    double *f,*b,*x;
-    double thisx;
 
     N=SOAP_number_argums(*argum);
     if (mod(N-1,2)!=0) SOAP_fatal_error(codex,"Number of arguments within spline must be an odd number.");
@@ -825,6 +833,69 @@ static void functions_builtin(char *function, char **argum,
     free(x);
     free(b);
     free(f);
+  }
+
+  if (strcmp(function,"Interpolate")==0) {
+
+    N=SOAP_number_argums(*argum);
+    if (mod(N,2)!=0) SOAP_fatal_error(codex,"Number of arguments to Interpolate must be an even number.");
+    N=N/2-1;
+
+    Nmax=9223372036854775807/sizeof(double);
+    if (N>=Nmax) SOAP_fatal_error(codex,"N can not be greater than %ld in Interpolate function part of functions_builtin in soap.c",Nmax);
+    // this line is needed to remove compilation error
+    N=min(9223372036854775807/sizeof(double),N);
+    
+    x=(double *)malloc(N*sizeof(double));
+    f=(double *)malloc(N*sizeof(double));
+
+    expr=(char *)malloc(sizeof(char));
+    SOAP_get_argum_straight(codex,&expr, *argum, 0);
+    if (strcmp(expr,"INTERPOLATE_LINEAR")==0) interptype=INTERPOLATE_LINEAR;
+    else if (strcmp(expr,"INTERPOLATE_CUBICSPLINE")==0) interptype=INTERPOLATE_CUBICSPLINE;
+    else if (strcmp(expr,"INTERPOLATE_CUBICSPLINEMONOTONE")==0) interptype=INTERPOLATE_CUBICSPLINEMONOTONE;
+    else SOAP_fatal_error(codex,"%s is not a supported interpolation method. Please input INTERPOLATE_LINEAR, INTERPOLATE_CUBICSPLINE or INTERPOLATE_CUBICSPLINEMONOTONE as the first argument to Interpolate.",expr);
+
+  
+    for (n=0; n<N; n++) {
+      SOAP_substitute_argum(argum, n*2+1, codex);    
+      x[n]=SOAP_get_argum_double(codex, *argum, n*2+1);
+      SOAP_substitute_argum(argum, n*2+2, codex);    
+      f[n]=SOAP_get_argum_double(codex, *argum, n*2+2);
+    }
+    /* check if data points are valid (x[n+1]>x[n]) */
+    for (n=0; n<N-1; n++){
+      if (x[n+1]<=x[n]) SOAP_fatal_error(codex, "Data points supplied to Interpolate must be such that x[i+1]>x[i]."); 
+    }
+
+    SOAP_substitute_argum(argum, N*2+1, codex);
+    thisx=SOAP_get_argum_double(codex, *argum, N*2+1);
+    /* check if point is out of range */
+    if (thisx<x[0] || thisx>x[N-1]) SOAP_fatal_error(codex, "Ensure that x lies between x[0] and x[N].");
+
+    switch(interptype){
+      case INTERPOLATE_LINEAR: //linear interpolation
+        *returnstr=(char *)realloc(*returnstr,maxnumlen*sizeof(char));
+        sprintf(*returnstr,DOUBLEFORMAT,EXM_f_from_line(N, x, f, thisx));
+        break;
+      case INTERPOLATE_CUBICSPLINE: //cubic spline interpolation
+        b=(double *)malloc(N*sizeof(double));
+        EXM_find_spline(N, x, f, b);
+        *returnstr=(char *)realloc(*returnstr,maxnumlen*sizeof(char));
+        sprintf(*returnstr,DOUBLEFORMAT,EXM_f_from_spline(N, x, f, b, thisx));
+        free(b);
+        break;
+      case INTERPOLATE_CUBICSPLINEMONOTONE: //monotone cubic spline interpolation
+        *returnstr=(char *)realloc(*returnstr,maxnumlen*sizeof(char));
+        sprintf(*returnstr,DOUBLEFORMAT,EXM_f_from_monotonespline(N, x, f, thisx));
+        break;
+      default:
+        SOAP_fatal_error(codex,"Invalid choice for interptype in functions_builtin() part of soap.c");
+    }
+    free(x);
+    free(f);
+    free(expr);
+    
   }
 
 }
