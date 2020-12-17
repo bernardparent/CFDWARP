@@ -48,7 +48,7 @@
 }
 
 
- Mx=17;
+ Mx=34;
 My=0.0;
 P=300/Mx^2*16^2;
 T=240;
@@ -64,7 +64,7 @@ CFLref=1.0;
 
 meshtype=1; {set to 1 for gridline on axis of symmetry ; 
              set to 2 for no gridline on axis of symmetry ;}
-meshfact=12.0;
+meshfact=2.0;
 sizefact=0.02;
 
 dwall=30e-6/meshfact;
@@ -167,7 +167,7 @@ Model(
     AXISYMMETRIC=NO; {set to YES to solve axisymmetric problems in 2D}
   );
   AirPlasma11s(
-    CHEMMODEL=CHEMMODEL_DUNNKANG1973;
+    CHEMMODEL=CHEMMODEL_PARK1993;
     TOWNSENDIONIZATION=FALSE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
   );
@@ -253,7 +253,7 @@ Cycle(
     Uref[14]=rhoref*aref*aref;  
   );
   MultizoneSteady(
-    if (mod(iter,50)==0,
+    if (mod(iter,150)==0,
       WriteDataFile(outputfilename);
     );
     sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
@@ -271,7 +271,7 @@ Cycle(
            j_ximax,numzones_updated,numzones_total,clipinfo);
   );
   SteadyState(
-    if (mod(iter,50)==0,
+    if (mod(iter,150)==0,
       WriteDataFile(outputfilename);
     );
     sigma1=0.2;   {exponent of maximum pseudotime step in all dimensions}

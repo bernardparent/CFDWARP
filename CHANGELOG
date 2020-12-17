@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 DEC 16a
+  * in bin
+    - added HOSTS12.mpich
+    - added HOSTS2.mpich
+  * modified
+    - bin/MHD_generator_cesium.wrp
+    - bin/MHD_generator.wrp
+    
+
 2020 DEC 08a
   * in lib/exm/exm.c
     - added EXM_f_from_line()
