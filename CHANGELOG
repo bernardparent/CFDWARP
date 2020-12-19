@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 DEC 19a
+  * in model/chem/_Cs_Air_Plasma_11s/chem.c and model/chem/_Cs_Air_Plasma_15s/chem.c
+    - changed default value of TOWNSENDIONIZATION to TRUE
+  * in model/emfield/_Epotential-Bfixed/emfield.c
+    - in find_DeltaVk_from_mu(), got rid of setting DeltaVk to zero at the boundary and near 
+      boundary nodes
+    - in read_model_emfield_actions(), got rid of setting B to zero at the boundary and near
+      boundary nodes
+      
+
 2020 DEC 16a
   * in bin
     - added HOSTS12.mpich
