@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 DEC 21a
+  * in model/fluid/_*_plasma/fluid_plasma.c 
+    - in find_Dstar(), set Dstar to zero at the boundary nodes (fluid type)
+  * in model/share/emfield_share.c
+    - in find_Ve_from_J(), when the node is a boundary node, set Ve to electron velocity at 
+      nearest inner node 
+  * in src/common.c
+    - in find_l_of_nearest_inner_node(), renamed nodetype for TYPELEVEL
+    
+
 2020 DEC 19a
   * in model/chem/_Cs_Air_Plasma_11s/chem.c and model/chem/_Cs_Air_Plasma_15s/chem.c
     - changed default value of TOWNSENDIONIZATION to TRUE

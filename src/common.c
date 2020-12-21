@@ -280,24 +280,24 @@ long _al_link(np_t *np, gl_t *gl, long llink, long lbdry, long offset, int TYPEL
 
 
 /* find the node number of the nearest inner node from node l */
-bool find_l_of_nearest_inner_node(np_t *np, gl_t *gl, long l, int nodetype, long *linner){
+bool find_l_of_nearest_inner_node(np_t *np, gl_t *gl, long l, int TYPELEVEL, long *linner){
   bool FOUND;
   long dim,dim2;
 
   FOUND=FALSE;
   /* first check if l is an inner node */
-  if (is_node_inner(np[l],nodetype)) {
+  if (is_node_inner(np[l],TYPELEVEL)) {
     *linner=l;
     FOUND=TRUE;
   }
   /* second check if the nodes opposite the faces are inner */
   if (!FOUND){
     for (dim=0; dim<nd; dim++){
-      if (is_node_inner(np[_al(gl,l,dim,+1)],nodetype) && !FOUND){
+      if (is_node_inner(np[_al(gl,l,dim,+1)],TYPELEVEL) && !FOUND){
         *linner=_al(gl,l,dim,+1);
         FOUND=TRUE;
       }
-      if (is_node_inner(np[_al(gl,l,dim,-1)],nodetype) && !FOUND){
+      if (is_node_inner(np[_al(gl,l,dim,-1)],TYPELEVEL) && !FOUND){
         *linner=_al(gl,l,dim,-1);
         FOUND=TRUE;
       }
@@ -308,19 +308,19 @@ bool find_l_of_nearest_inner_node(np_t *np, gl_t *gl, long l, int nodetype, long
     for (dim=0; dim<nd; dim++){
       for (dim2=0; dim2<nd; dim2++){
         if (dim2!=dim){
-          if (is_node_inner(np[_all(gl,l,dim,+1,dim2,+1)],nodetype) && !FOUND){
+          if (is_node_inner(np[_all(gl,l,dim,+1,dim2,+1)],TYPELEVEL) && !FOUND){
             *linner=_all(gl,l,dim,+1,dim2,+1);
             FOUND=TRUE;
           }
-          if (is_node_inner(np[_all(gl,l,dim,+1,dim2,-1)],nodetype) && !FOUND){
+          if (is_node_inner(np[_all(gl,l,dim,+1,dim2,-1)],TYPELEVEL) && !FOUND){
             *linner=_all(gl,l,dim,+1,dim2,-1);
             FOUND=TRUE;
           }
-          if (is_node_inner(np[_all(gl,l,dim,-1,dim2,+1)],nodetype) && !FOUND){
+          if (is_node_inner(np[_all(gl,l,dim,-1,dim2,+1)],TYPELEVEL) && !FOUND){
             *linner=_all(gl,l,dim,-1,dim2,+1);
             FOUND=TRUE;
           }
-          if (is_node_inner(np[_all(gl,l,dim,-1,dim2,-1)],nodetype) && !FOUND){
+          if (is_node_inner(np[_all(gl,l,dim,-1,dim2,-1)],TYPELEVEL) && !FOUND){
             *linner=_all(gl,l,dim,-1,dim2,-1);
             FOUND=TRUE;
           }

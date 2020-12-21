@@ -518,7 +518,7 @@ long _l_plus_two(long l, gl_t *gl, long theta);
 
 long _l_minus_two(long l, gl_t *gl, long theta);
 
-bool find_l_of_nearest_inner_node(np_t *np, gl_t *gl, long l, int nodetype, long *linner);
+bool find_l_of_nearest_inner_node(np_t *np, gl_t *gl, long l, int TYPELEVEL, long *linner);
 
 long _nodes_from_bdry(np_t *np, gl_t *gl, long l, long theta, int TYPELEVEL);
 
