@@ -56,8 +56,6 @@ double _rho_from_w_P_T(spec_t w, double P, double T);
 
 double _s_from_w_T(spec_t w, double T);
 
-double _dTskdT_from_T(long spec, double T);
-
 double _sk_from_T(long spec, double T);
 
 double _sk_from_T_equilibrium(long spec, double T);

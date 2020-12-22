@@ -766,6 +766,51 @@ void test_dsdT ( double Tmin, double Tmax, double dT ) {
 
 }
 
+
+void test_s_equilibrium ( double Tmin, double Tmax, double dT ) {
+  double T, s;
+  long spec;
+  printf ( "\n" );
+  printf ( "Species specific entropies in equilibrium [J/kgK] as function of temperature [K].\n" );
+  printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
+  printf ( "\n" );
+  print_column_species_names ( 12 );
+  T = Tmin;
+  do {
+    wfprintf ( stdout, "%12.5E ", T );
+    for ( spec = 0; spec < ns; spec++ ) {
+      s = _sk_from_T_equilibrium ( spec, T );
+      wfprintf ( stdout, "%+12.5E ", s );
+    }
+    wfprintf ( stdout, "\n" );
+    T += dT;
+  } while ( T < Tmax );
+
+}
+
+void test_dsdT_equilibrium ( double Tmin, double Tmax, double dT ) {
+  double T, dsdT;
+  long spec;
+  printf ( "\n" );
+  printf ( "Species dsdT in equilibrium [J/(kg K^2)] as function of temperature [K]. \n" );
+  printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
+  printf ( "\n" );
+  print_column_species_names ( 12 );
+  T = Tmin;
+  do {
+    wfprintf ( stdout, "%12.5E ", T );
+    for ( spec = 0; spec < ns; spec++ ) {
+      dsdT = _dsk_dT_from_T_equilibrium ( spec, T );
+
+      wfprintf ( stdout, "%+12.5E ", dsdT );
+    }
+    wfprintf ( stdout, "\n" );
+    T += dT;
+  } while ( T < Tmax );
+
+}
+
+
 int chkarg ( int argc, char **argv, char *arg ) {
   int cnt, tmp;
   tmp = 0;
@@ -940,6 +985,10 @@ int main ( int argc, char **argv ) {
         test_s ( Tmin, Tmax, dT );
       if ( strcmp ( "dsdT", argv[1] ) == 0 )
         test_dsdT ( Tmin, Tmax, dT );
+      if ( strcmp ( "s_equil", argv[1] ) == 0 )
+        test_s_equilibrium ( Tmin, Tmax, dT );
+      if ( strcmp ( "dsdT_equil", argv[1] ) == 0 )
+        test_dsdT_equilibrium ( Tmin, Tmax, dT );
     } else {
 #endif
       write_hline ( stderr, linewidth, 2 );
@@ -1021,6 +1070,11 @@ int main ( int argc, char **argv ) {
                           linewidth, lengthcol1, lengthcol2 );
       write_options_row ( stderr, "dsdT", "none", 
                           "species dsdT derivative  ./test dsdT 500 2000 2", linewidth, lengthcol1,
+                          lengthcol2 );
+      write_options_row ( stderr, "s_equil", "none", "species specific entropy in equilibrium ./test s_equil 500 2000 2",
+                          linewidth, lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "dsdT_equil", "none", 
+                          "species equilibrium dsdT derivative ./test dsdT_equil 500 2000 2", linewidth, lengthcol1,
                           lengthcol2 );
 #endif
       write_hline ( stderr, linewidth, 2 );

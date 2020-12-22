@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 DEC 22a
+  * in cycle/resconv/_MUSCL/resconv.c
+    - in  write_disc_resconv_template(), changed the defaults to EIGENVALCOND_PECLET and
+      POSFILTER_NONE
+  * in model/thermo/_generic/thermo.c
+    - in _hk_from_T(), fixed a bug when _FLUID_EENERGY && spec==speceminus: the enthalpy of the
+      electrons should be _he_from_Te(T) and not _he_from_Te(T+dTplus)
+    - in _dsk_dT_from_T() and _dsk_dT_from_T_equilibrium(), fixed a bug that occurred for all 
+      species when the temperature was higher than the maximum temperature of the NASA Glenn 
+      enthalpy polynomials (20000 K for most)
+  * in src/test.c
+    - added test_s_equilibrium() and test_dsdT_equilibrium()
+    - in main(), added calls to test_s_equilibrium() and test_dsdT_equilibrium()
+
+
 2020 DEC 21a
   * in model/fluid/_*_plasma/fluid_plasma.c 
     - in find_Dstar(), set Dstar to zero at the boundary nodes (fluid type)

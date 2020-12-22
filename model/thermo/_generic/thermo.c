@@ -3015,7 +3015,7 @@ double _hk_from_T(long spec, double T){
 #endif
 #ifdef speceminus
   if (_FLUID_EENERGY && spec==speceminus) {
-    tmp-=_he_from_Te(T+dTplus);
+    tmp-=_he_from_Te(T);
   }
 #endif
   if (fabs(dTplus)>1e-20){
@@ -3737,7 +3737,7 @@ double _dsk_dT_from_T(long spec, double T){
   }			       
 
 
-  if (dTplus!=0.0) tmp+=_cpk_from_T(spec, T)/(T+dTplus);
+  if (dTplus!=0.0) tmp+=_cpk_from_T(spec, T)/(T+dTplus)*(-dTplus/T);
 #ifdef specN2
   if (_FLUID_N2VIBMODEL && spec==specN2) {
     if (T+dTplus>Tvlim) { /* if T+dTplus<Tvlim, the following won't affect tmp */
@@ -3780,7 +3780,7 @@ double _dsk_dT_from_T_equilibrium(long spec, double T){
   }			       
 
 
-  if (dTplus!=0.0) tmp+=_cpk_from_T_equilibrium(spec, T)/(T+dTplus);
+  if (dTplus!=0.0) tmp+=_cpk_from_T_equilibrium(spec, T)/(T+dTplus)*(-dTplus/T);
 
   return(tmp);
 }
