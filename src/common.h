@@ -658,4 +658,6 @@ double distance2_between_nodes(np_t *np, gl_t *gl, long l1, long l2);
 
 void write_options_row ( FILE * outputfile, char *col1, char *col2, char *col3, int linewidth, int lengthcol1, int lengthcol2 );
 
+double _smooth(np_t *np, gl_t *gl, long l, int TYPELEVEL, double(*FUNCT)(np_t));
+
 #endif /* _COMMON_H */

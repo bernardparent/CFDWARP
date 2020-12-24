@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 DEC 23a
+  * in src/common.c
+    - added function _smooth()
+  * in model/fluid/_*_plasma/fluid_source.c
+    - in find_Se() and find_dSe_dU_transport(), now find Tv using _smooth() instead of directly
+      at the node
+      
+
 2020 DEC 22a
   * in cycle/resconv/_MUSCL/resconv.c
     - in  write_disc_resconv_template(), changed the defaults to EIGENVALCOND_PECLET and
