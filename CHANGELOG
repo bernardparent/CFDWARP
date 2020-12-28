@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 DEC 27a
+  * in model/chem/_Cs_Air_Plasma_*s/chem.c
+    - in find_Qei() and find_dQei_dx(), added missing definition and initialization of R
+  * in model/share/fluid_share.c
+    - in write_disc_fluid_template(), changed betag[spec]=-0.5; to betag[spec]=-0.01;
+    
+
 2020 DEC 26a
   * in model/chem/_Cs_Air_Plasma_11s/chem.c and model/chem/_Cs_Air_Plasma_15s/chem.c
     - in find_Qei() and find_dQei_dx() added contributions from CESIUMREACTION[1]

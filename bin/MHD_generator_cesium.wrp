@@ -291,7 +291,7 @@ Disc(
         betaa[spec]=0.0;
       );
       if (SPECIESTYPE[spec]==SPECIESTYPE_IONMINUS,
-        betag[spec]=-0.5;
+        betag[spec]=-0.01;
         betaa[spec]=0.5;
       );
       if (SPECIESTYPE[spec]==SPECIESTYPE_ELECTRON,
@@ -369,7 +369,7 @@ Cycle(
     );
     
     
-    CFL=min(CFL*1.05,0.5);
+    CFL=min(CFL*1.05,0.4);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     if (iter>500,
       Lc=1e99;      {characteristic length scale in meters used to solve the emfield equation}

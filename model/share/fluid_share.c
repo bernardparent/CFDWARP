@@ -72,7 +72,7 @@ void write_disc_fluid_template(FILE **controlfile){
     "        betaa[spec]=0.0;\n"
     "      );\n"
     "      if (SPECIESTYPE[spec]==SPECIESTYPE_IONMINUS,\n"
-    "        betag[spec]=-0.5;\n"
+    "        betag[spec]=-0.01;\n"
     "        betaa[spec]=0.5;\n"
     "      );\n"
     "      if (SPECIESTYPE[spec]==SPECIESTYPE_ELECTRON,\n"
