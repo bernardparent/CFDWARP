@@ -221,6 +221,7 @@ long _i_all(long l_all, gl_t *gl, long dim){
 
 long _al(gl_t *gl, long l, long theta, long offset) {
   long ii;
+  assert(theta<nd);
   ii=l+offset;
 #ifdef _2D
   if (theta==0) ii=l+offset*(gl->domain_lim.je-gl->domain_lim.js+1);
@@ -248,9 +249,19 @@ long _al_check(gl_t *gl, long l, long theta, long offset) {
 
 long _all(gl_t *gl, long l, long theta1, long offset1, long theta2, long offset2) {
   long ii;
-  double ltmp;
+  long ltmp;
   ltmp=_al(gl, l, theta1, offset1);
   ii=_al(gl, ltmp, theta2, offset2);
+  return(ii);
+}
+
+
+long _alll(gl_t *gl, long l, long theta1, long offset1, long theta2, long offset2, long theta3, long offset3) {
+  long ii;
+  long ltmp,ltmp2;
+  ltmp=_al(gl, l, theta1, offset1);
+  ltmp2=_al(gl, ltmp, theta2, offset2);
+  ii=_al(gl, ltmp2, theta3, offset3);
   return(ii);
 }
 
@@ -290,7 +301,7 @@ bool find_l_of_nearest_inner_node(np_t *np, gl_t *gl, long l, int TYPELEVEL, lon
     *linner=l;
     FOUND=TRUE;
   }
-  /* second check if the nodes opposite the faces are inner */
+  /* second check if the nodes opposite the faces are inner (1D) */
   if (!FOUND){
     for (dim=0; dim<nd; dim++){
       if (is_node_inner(np[_al(gl,l,dim,+1)],TYPELEVEL) && !FOUND){
@@ -303,7 +314,7 @@ bool find_l_of_nearest_inner_node(np_t *np, gl_t *gl, long l, int TYPELEVEL, lon
       }
     }
   }
-  /* third check if the corner nodes are inner */
+  /* third check if the boundary node is along a edge (2D) */
   if (!FOUND){
     for (dim=0; dim<nd; dim++){
       for (dim2=0; dim2<nd; dim2++){
@@ -328,6 +339,44 @@ bool find_l_of_nearest_inner_node(np_t *np, gl_t *gl, long l, int TYPELEVEL, lon
       }
     }
   }
+
+#ifdef _3D
+  /* fourth check if the boundary node is in a 3D corner */
+  if (!FOUND){
+    if (is_node_inner(np[_alll(gl,l,0,+1,1,+1,2,+1)],TYPELEVEL) && !FOUND){
+      *linner=_alll(gl,l,0,+1,1,+1,2,+1);
+      FOUND=TRUE;
+    }
+    if (is_node_inner(np[_alll(gl,l,0,+1,1,+1,2,-1)],TYPELEVEL) && !FOUND){
+      *linner=_alll(gl,l,0,+1,1,+1,2,-1);
+      FOUND=TRUE;
+    }
+    if (is_node_inner(np[_alll(gl,l,0,+1,1,-1,2,+1)],TYPELEVEL) && !FOUND){
+      *linner=_alll(gl,l,0,+1,1,-1,2,+1);
+      FOUND=TRUE;
+    }
+    if (is_node_inner(np[_alll(gl,l,0,+1,1,-1,2,-1)],TYPELEVEL) && !FOUND){
+      *linner=_alll(gl,l,0,+1,1,-1,2,-1);
+      FOUND=TRUE;
+    }
+    if (is_node_inner(np[_alll(gl,l,0,-1,1,+1,2,+1)],TYPELEVEL) && !FOUND){
+      *linner=_alll(gl,l,0,-1,1,+1,2,+1);
+      FOUND=TRUE;
+    }
+    if (is_node_inner(np[_alll(gl,l,0,-1,1,+1,2,-1)],TYPELEVEL) && !FOUND){
+      *linner=_alll(gl,l,0,-1,1,+1,2,-1);
+      FOUND=TRUE;
+    }
+    if (is_node_inner(np[_alll(gl,l,0,-1,1,-1,2,+1)],TYPELEVEL) && !FOUND){
+      *linner=_alll(gl,l,0,-1,1,-1,2,+1);
+      FOUND=TRUE;
+    }
+    if (is_node_inner(np[_alll(gl,l,0,-1,1,-1,2,-1)],TYPELEVEL) && !FOUND){
+      *linner=_alll(gl,l,0,-1,1,-1,2,-1);
+      FOUND=TRUE;
+    }
+  }
+#endif
   return(FOUND);
 }
 

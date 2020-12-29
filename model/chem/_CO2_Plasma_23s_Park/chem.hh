@@ -1,4 +1,4 @@
-#define _CHEM_CSAIRPLASMA
+#define _CHEM_CO2PLASMA23S
 #define _CHEM_METHOD "CO2 Plasma 23s Park [park1994a]"
 #define _CHEM_PLASMA
 

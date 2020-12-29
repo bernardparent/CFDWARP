@@ -265,6 +265,8 @@ void find_emfield_force(np_t *np, gl_t *gl, long l, dim_t Femfield);
 
 double _E_dot_J(np_t *np, gl_t *gl, long l);
 
+double _E_dot_J_recast(np_t *np, gl_t *gl, long l);
+
 double _Qbeam(np_t np, gl_t *gl);
 
 void find_Gamma(np_t *np, gl_t *gl, long l, sqmat_t Gamma);

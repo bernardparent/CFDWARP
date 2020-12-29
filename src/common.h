@@ -508,6 +508,8 @@ long _al_check(gl_t *gl, long l, long theta, long offset);
 
 long _all(gl_t *gl, long l, long theta1, long offset1, long theta2, long offset2);
 
+long _alll(gl_t *gl, long l, long theta1, long offset1, long theta2, long offset2, long theta3, long offset3);
+
 long _al_link(np_t *np, gl_t *gl, long llink, long lbdry, long offset, int TYPELEVEL);
 
 long _l_plus_one(long l, gl_t *gl, long theta);

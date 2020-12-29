@@ -7,6 +7,30 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2020 DEC 29a
+  * in model/emfield/_Epotential-Bfixed/emfield.c
+    - changed maxiterEk from 1000 to 2000
+    - took away constant EFIELD_SPECIES_FRAME and incorporated it within the control file
+    - commented function _Ekmag() because it is not used any more
+    - in find_Ek_muk_mem(), implemented a faster and more robust algorithm to find the local 
+      electric field which tries various relaxation factors (instead of only one as before) before 
+      quitting 
+    - in find_Ek_muk_mem_nonlocal(), fixed a mistake: 
+      Tk=max(Tk,_T(np[l],gl)+gl->model.emfield.Te_buffer) should be 
+      Tk=max(Tk,gl->model.emfield.Te_buffer)
+  * in model/share/emfield_share.c
+    - in find_Ve_from_J(), added a call to fatal_error in case no inner node can be found near a 
+      boundary node
+  * in src/common.c
+    - in _al(), added an assert to verify that theta is less than nd
+    - in _all(), fixed a bug: ltmp should have a type of long not double
+    - added function _alll()
+    - in find_l_of_nearest_inner_node(), added a fourth check to find an inner node in case the bdry
+      node is in a 3D corner
+  * in model/chem/_CO2_Plasma_23s_Park/chem.hh
+    - renamed #define _CHEM_CSAIRPLASMA to #define _CHEM_CO2PLASMA23S
+
+
 2020 DEC 27a
   * in model/chem/_Cs_Air_Plasma_*s/chem.c
     - in find_Qei() and find_dQei_dx(), added missing definition and initialization of R
