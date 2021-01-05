@@ -7,6 +7,26 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 JAN 04a
+  * in src/test.c
+    - in test_s(), test_cp(), test_hmolar(), test_h(), initialized the species mass fractions
+      to 1e-10 instead of 0
+    - added test_eta(), test_kappa(), test_Pr()
+  * in src/control.c
+    - in write_license(), changed the copyright year to 1998-2021
+  * in model/thermo/_generic/thermo.c
+    - got rid of MAX_T_FOR_NUK_ETA_KAPPA_POLYNOMIALS=6000.0 and replaced with TSTAR_MAX=100.0
+    - in _Omega11() and _Omega22(), limited Tstar to TSTAR_MAX
+    - in find_nuk_eta_kappa(), got rid of T limit to MAX_T_FOR_NUK_ETA_KAPPA_POLYNOMIALS
+    - in find_nuk_eta_kappa() commented line "if (w[spec]<1.0E-12) w[spec]=1.0E-9;"
+  * in model/emfield/_Epotential*/emfield.c
+    - commented out _Tk_smooth()
+    - in _mu_mem(), now calls _smooth2(0 instead of _Tk_smooth
+  * in src/common.c
+    - in _smooth(), added a fatal_error in case node l is not an inner node
+    - added function _smooth2()
+    
+
 2020 DEC 29a
   * in model/emfield/_Epotential-Bfixed/emfield.c
     - changed maxiterEk from 1000 to 2000

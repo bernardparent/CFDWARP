@@ -43,8 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // minimum range of temperature within one set to cpk, hk polynomial
 // make sure dTrangemin>dToverlap
 #define dTrangemin 100.0e0
-// maximum temperature in Kelvin used to determine the viscosity, thermal conductivity, and mass diffusion coefficients
-#define MAX_T_FOR_NUK_ETA_KAPPA_POLYNOMIALS 6000.0  
+// maximum reduced temperature (T/Peps) used to determine the viscosity, thermal conductivity, and mass diffusion coefficients with Leonard Jones potentials
+#define TSTAR_MAX 100.0
 #define INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA TRUE
 
 typedef char speciesname_t[ns_c];
@@ -3341,6 +3341,7 @@ double _Omega11(double T, double eps){
 
   assert(eps!=0.0e0);
   Tstar=T/eps;
+  Tstar=min(TSTAR_MAX,Tstar);
   index=2;
   if (Tstar<10.0e0) index=1;
   if (Tstar<5.0e0) index=0;
@@ -3374,6 +3375,7 @@ double _Omega22(double T, double eps){
   Omega11=_Omega11(T,eps);
   assert(eps!=0.0e0);
   Tstar=T/eps;
+  Tstar=min(TSTAR_MAX,Tstar);
   index=2;
   if (Tstar<10.0e0) index=1;
   if (Tstar<5.0e0) index=0;
@@ -3405,11 +3407,11 @@ void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
   double nuwsum,wsum;
 
   // first make sure the temperature is not out of polynomial bounds
-  T=min(T,MAX_T_FOR_NUK_ETA_KAPPA_POLYNOMIALS);
   P=_P_from_w_rho_T(w,rho,T);
-  for (spec=0; spec<ns; spec++){
+  assert(P!=0.0);
+/*  for (spec=0; spec<ns; spec++){
     if (w[spec]<1.0E-12) w[spec]=1.0E-9;
-  }
+  } */
   for (spec=0; spec<ns; spec++){
     if (speciestype[spec]==SPECIES_NEUTRAL || INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA) { 
       assert((Psig[smap[spec]]*Psig[smap[spec]]*_Omega22(T,Peps[smap[spec]]))!=0.0e0);
@@ -3468,6 +3470,8 @@ void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
     for (l=0; l<ns; l++){
       if ((speciestype[k]==SPECIES_NEUTRAL && speciestype[l]==SPECIES_NEUTRAL) || INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA) { 
         assert(Peps[smap[k]]*Peps[smap[l]]>0.0e0);
+        assert(P!=0.0e0);
+        assert(_Omega11(T,sqrt(Peps[smap[k]]*Peps[smap[l]])));
         assert((P*_Omega11(T,sqrt(Peps[smap[k]]*Peps[smap[l]]))
                *(Psig[smap[k]]+Psig[smap[l]])*(Psig[smap[k]]+Psig[smap[l]]))!=0.0e0);
         assert(T*T*T*(1.0e0/calM[smap[l]]+1.0e0/calM[smap[k]])>0.0e0);

@@ -172,8 +172,8 @@ Model(
     emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
     sigmadiv=1e-10; {S/m}
     etdiv=1e-1;     {J/kg}
-    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
-    Tmin=1.0e1;     Tmax=12.0e3;    {K}
+    Pmin=100;    Pmax=9.9e99;   {Pa}
+    Tmin=250;     Tmax=12.0e3;    {K}
     Tvmin=Tmin;     Tvmax=12.0e3;  {K}
     Temin=Tmin;     Temax=60.0e3;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
@@ -204,6 +204,7 @@ Model(
                        set to as little a value as possible}
     Jmax=200000000.0;     {the maximum current density in A/m2 expected in the domain; this will affect only
                        the Townsend ionization rates; make sure Jmax > sigma*Emag in the converged solution.}
+    EFIELD_SPECIES_FRAME=TRUE;
     SetRelativePermittivity(is,js, ie,je, 1.0 );
     SetSolidConductivity(is,js, ie,je, 0.0 {S/m});
     SetElectroMotiveForce(is,js, ie,je, 0.0{V/m},0.0{V/m}, 1e99{max power in W/m3});

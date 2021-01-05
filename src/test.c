@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2001-2002 Bernard Parent
+Copyright 2001-2002, 2016-2021 Bernard Parent
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -656,7 +656,10 @@ void test_h ( double Tmin, double Tmax, double dT ) {
     wfprintf ( stdout, "%12.5E ", T );
     for ( spec = 0; spec < ns; spec++ ) {
       for ( spec2 = 0; spec2 < ns; spec2++ )
-        w[spec2] = 0.0;
+        w[spec2] = 1e-10;
+#ifdef speceminus
+      w[speceminus]=1e-20;
+#endif
       w[spec] = 1.0;
       h = _h_from_w_T ( w, T );
       wfprintf ( stdout, "%+12.5E ", h );
@@ -682,7 +685,10 @@ void test_hmolar ( double Tmin, double Tmax, double dT ) {
     wfprintf ( stdout, "%12.5E ", T );
     for ( spec = 0; spec < ns; spec++ ) {
       for ( spec2 = 0; spec2 < ns; spec2++ )
-        w[spec2] = 0.0;
+        w[spec2] = 1e-10;
+#ifdef speceminus
+      w[speceminus]=1e-20;
+#endif
       w[spec] = 1.0;
       h = _h_from_w_T ( w, T );
       wfprintf ( stdout, "%+12.5E ", h*_calM(spec) );
@@ -708,7 +714,10 @@ void test_cp ( double Tmin, double Tmax, double dT ) {
     wfprintf ( stdout, "%12.5E ", T );
     for ( spec = 0; spec < ns; spec++ ) {
       for ( spec2 = 0; spec2 < ns; spec2++ )
-        w[spec2] = 0.0;
+        w[spec2] = 1e-10;
+#ifdef speceminus
+      w[speceminus]=1e-20;
+#endif
       w[spec] = 1.0;
       Cp = _cp_from_w_T ( w, T );
       wfprintf ( stdout, "%+12.5E ", Cp );
@@ -733,7 +742,10 @@ void test_s ( double Tmin, double Tmax, double dT ) {
     wfprintf ( stdout, "%12.5E ", T );
     for ( spec = 0; spec < ns; spec++ ) {
       for ( spec2 = 0; spec2 < ns; spec2++ )
-        w[spec2] = 0.0;
+        w[spec2] = 1e-10;
+#ifdef speceminus
+      w[speceminus]=1e-20;
+#endif
       w[spec] = 1.0;
       s = _s_from_w_T ( w, T );
       wfprintf ( stdout, "%+12.5E ", s );
@@ -743,6 +755,7 @@ void test_s ( double Tmin, double Tmax, double dT ) {
   } while ( T < Tmax );
 
 }
+
 
 void test_dsdT ( double Tmin, double Tmax, double dT ) {
   double T, dsdT;
@@ -788,6 +801,7 @@ void test_s_equilibrium ( double Tmin, double Tmax, double dT ) {
 
 }
 
+
 void test_dsdT_equilibrium ( double Tmin, double Tmax, double dT ) {
   double T, dsdT;
   long spec;
@@ -811,6 +825,104 @@ void test_dsdT_equilibrium ( double Tmin, double Tmax, double dT ) {
 }
 
 
+void test_eta ( double Tmin, double Tmax, double dT ) {
+  double T, eta, kappa, Te, rho;
+  spec_t w;
+  long spec, spec2;
+  spec_t nuk;
+  printf ( "\n" );
+  printf ( "Species viscosities [kg/ms] as function of temperature [K].\n" );
+  printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
+  printf ( "\n" );
+  print_column_species_names ( 12 );
+  T = Tmin;
+  do {
+    wfprintf ( stdout, "%12.5E ", T );
+    for ( spec = 0; spec < ns; spec++ ) {
+      for ( spec2 = 0; spec2 < ns; spec2++ )
+        w[spec2] = 1e-10;
+#ifdef speceminus
+      w[speceminus]=1e-20;
+#endif
+      w[spec] = 1.0;
+      Te=T;
+      rho=10.0; //value of rho doesn't affect viscosities
+      find_nuk_eta_kappa(w, rho, T, Te, nuk, &eta, &kappa);
+      wfprintf ( stdout, "%+12.5E ", eta );
+    }
+    wfprintf ( stdout, "\n" );
+    T += dT;
+  } while ( T < Tmax );
+
+}
+
+
+void test_kappa ( double Tmin, double Tmax, double dT ) {
+  double T, eta, kappa, Te, rho;
+  spec_t w;
+  long spec, spec2;
+  spec_t nuk;
+  printf ( "\n" );
+  printf ( "Species thermal conductivities [W/mK] as function of temperature [K].\n" );
+  printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
+  printf ( "\n" );
+  print_column_species_names ( 12 );
+  T = Tmin;
+  do {
+    wfprintf ( stdout, "%12.5E ", T );
+    for ( spec = 0; spec < ns; spec++ ) {
+      for ( spec2 = 0; spec2 < ns; spec2++ )
+        w[spec2] = 1e-10;
+#ifdef speceminus
+      w[speceminus]=1e-20;
+#endif
+      w[spec] = 1.0;
+      Te=T;
+      rho=10.0; //value of rho doesn't affect viscosities
+      find_nuk_eta_kappa(w, rho, T, Te, nuk, &eta, &kappa);
+      wfprintf ( stdout, "%+12.5E ", kappa );
+    }
+    wfprintf ( stdout, "\n" );
+    T += dT;
+  } while ( T < Tmax );
+
+}
+
+
+void test_Pr ( double Tmin, double Tmax, double dT ) {
+  double T, eta, kappa, Te, rho, cp;
+  spec_t w;
+  long spec, spec2;
+  spec_t nuk;
+  printf ( "\n" );
+  printf ( "Species Prandtl number as function of temperature [K].\n" );
+  printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
+  printf ( "\n" );
+  print_column_species_names ( 12 );
+  T = Tmin;
+  do {
+    wfprintf ( stdout, "%12.5E ", T );
+    for ( spec = 0; spec < ns; spec++ ) {
+      for ( spec2 = 0; spec2 < ns; spec2++ )
+        w[spec2] = 1e-10;
+#ifdef speceminus
+      w[speceminus]=1e-20;
+#endif
+      w[spec] = 1.0;
+      Te=T;
+      rho=10.0; //value of rho doesn't affect viscosities
+      find_nuk_eta_kappa(w, rho, T, Te, nuk, &eta, &kappa);
+      cp=_cpk_from_T_equilibrium(spec, T);
+
+      wfprintf ( stdout, "%+12.5E ", eta*cp/kappa );
+    }
+    wfprintf ( stdout, "\n" );
+    T += dT;
+  } while ( T < Tmax );
+
+}
+
+
 int chkarg ( int argc, char **argv, char *arg ) {
   int cnt, tmp;
   tmp = 0;
@@ -821,6 +933,7 @@ int chkarg ( int argc, char **argv, char *arg ) {
   }
   return ( tmp );
 }
+
 
 int main ( int argc, char **argv ) {
   np_t npL, npR;
@@ -983,6 +1096,12 @@ int main ( int argc, char **argv ) {
         test_cp ( Tmin, Tmax, dT );
       if ( strcmp ( "s", argv[1] ) == 0 )
         test_s ( Tmin, Tmax, dT );
+      if ( strcmp ( "eta", argv[1] ) == 0 )
+        test_eta ( Tmin, Tmax, dT );
+      if ( strcmp ( "kappa", argv[1] ) == 0 )
+        test_kappa ( Tmin, Tmax, dT );
+      if ( strcmp ( "Pr", argv[1] ) == 0 )
+        test_Pr ( Tmin, Tmax, dT );
       if ( strcmp ( "dsdT", argv[1] ) == 0 )
         test_dsdT ( Tmin, Tmax, dT );
       if ( strcmp ( "s_equil", argv[1] ) == 0 )
@@ -1076,6 +1195,12 @@ int main ( int argc, char **argv ) {
       write_options_row ( stderr, "dsdT_equil", "none", 
                           "species equilibrium dsdT derivative ./test dsdT_equil 500 2000 2", linewidth, lengthcol1,
                           lengthcol2 );
+      write_options_row ( stderr, "eta", "none", "species viscosity  ./test eta 500 2000 2",
+                          linewidth, lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "kappa", "none", "species thermal conductivity  ./test kappa 500 2000 2",
+                          linewidth, lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "Pr", "none", "species Prandtl number  ./test Pr 500 2000 2",
+                          linewidth, lengthcol1, lengthcol2 );
 #endif
       write_hline ( stderr, linewidth, 2 );
 

@@ -662,4 +662,6 @@ void write_options_row ( FILE * outputfile, char *col1, char *col2, char *col3, 
 
 double _smooth(np_t *np, gl_t *gl, long l, int TYPELEVEL, double(*FUNCT)(np_t));
 
+double _smooth2(np_t *np, gl_t *gl, long l, int TYPELEVEL, double(*FUNCT)(np_t *, gl_t *, long));
+
 #endif /* _COMMON_H */

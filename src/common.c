@@ -2204,7 +2204,7 @@ double _smooth(np_t *np, gl_t *gl, long l, int TYPELEVEL, double(*FUNCT)(np_t)){
 #ifdef _3D
   long lm1,lp1;
 #endif
-  assert(is_node_inner(np[l],TYPELEVEL));
+  if (!is_node_inner(np[l],TYPELEVEL)) fatal_error("When calling _smooth(), the node l must be an inner node.");
   lp0=l;
   fm1=0.25*(*FUNCT)(np[_all(gl,lp0,1,-1,0,-1)])+0.25*(*FUNCT)(np[_all(gl,lp0,1,-1,0,+1)])+0.5*(*FUNCT)(np[_all(gl,lp0,1,-1,0,+0)]);    
   fp0=0.25*(*FUNCT)(np[_all(gl,lp0,1,+0,0,-1)])+0.25*(*FUNCT)(np[_all(gl,lp0,1,+0,0,+1)])+0.5*(*FUNCT)(np[_all(gl,lp0,1,+0,0,+0)]);    
@@ -2226,6 +2226,38 @@ double _smooth(np_t *np, gl_t *gl, long l, int TYPELEVEL, double(*FUNCT)(np_t)){
 #endif  
   return(0.25*gm1+0.5*gp0+0.25*gp1);
 }
+
+
+double _smooth2(np_t *np, gl_t *gl, long l, int TYPELEVEL, double(*FUNCT)(np_t *, gl_t *, long)){
+  double fp1,fp0,fm1;
+  double gp0,gp1,gm1;
+  long lp0;
+#ifdef _3D
+  long lm1,lp1;
+#endif
+  if (!is_node_inner(np[l],TYPELEVEL)) fatal_error("When calling _smooth2(), the node l must be an inner node.");
+  lp0=l;
+  fm1=0.25*(*FUNCT)(np,gl,_all(gl,lp0,1,-1,0,-1))+0.25*(*FUNCT)(np,gl,_all(gl,lp0,1,-1,0,+1))+0.5*(*FUNCT)(np,gl,_all(gl,lp0,1,-1,0,+0));    
+  fp0=0.25*(*FUNCT)(np,gl,_all(gl,lp0,1,+0,0,-1))+0.25*(*FUNCT)(np,gl,_all(gl,lp0,1,+0,0,+1))+0.5*(*FUNCT)(np,gl,_all(gl,lp0,1,+0,0,+0));    
+  fp1=0.25*(*FUNCT)(np,gl,_all(gl,lp0,1,+1,0,-1))+0.25*(*FUNCT)(np,gl,_all(gl,lp0,1,+1,0,+1))+0.5*(*FUNCT)(np,gl,_all(gl,lp0,1,+1,0,+0));
+  gp0=0.25*fm1+0.5*fp0+0.25*fp1;    
+  gm1=gp0;
+  gp1=gp0;
+#ifdef _3D
+  lm1=_al(gl,l,2,-1);
+  fm1=0.25*(*FUNCT)(np,gl,_all(gl,lm1,1,-1,0,-1))+0.25*(*FUNCT)(np,gl,_all(gl,lm1,1,-1,0,+1))+0.5*(*FUNCT)(np,gl,_all(gl,lm1,1,-1,0,+0));    
+  fp0=0.25*(*FUNCT)(np,gl,_all(gl,lm1,1,+0,0,-1))+0.25*(*FUNCT)(np,gl,_all(gl,lm1,1,+0,0,+1))+0.5*(*FUNCT)(np,gl,_all(gl,lm1,1,+0,0,+0));    
+  fp1=0.25*(*FUNCT)(np,gl,_all(gl,lm1,1,+1,0,-1))+0.25*(*FUNCT)(np,gl,_all(gl,lm1,1,+1,0,+1))+0.5*(*FUNCT)(np,gl,_all(gl,lm1,1,+1,0,+0));    
+  gm1=0.25*fm1+0.5*fp0+0.25*fp1;
+  lp1=_al(gl,l,2,+1);
+  fm1=0.25*(*FUNCT)(np,gl,_all(gl,lp1,1,-1,0,-1))+0.25*(*FUNCT)(np,gl,_all(gl,lp1,1,-1,0,+1))+0.5*(*FUNCT)(np,gl,_all(gl,lp1,1,-1,0,+0));    
+  fp0=0.25*(*FUNCT)(np,gl,_all(gl,lp1,1,+0,0,-1))+0.25*(*FUNCT)(np,gl,_all(gl,lp1,1,+0,0,+1))+0.5*(*FUNCT)(np,gl,_all(gl,lp1,1,+0,0,+0));    
+  fp1=0.25*(*FUNCT)(np,gl,_all(gl,lp1,1,+1,0,-1))+0.25*(*FUNCT)(np,gl,_all(gl,lp1,1,+1,0,+1))+0.5*(*FUNCT)(np,gl,_all(gl,lp1,1,+1,0,+0));    
+  gp1=0.25*fm1+0.5*fp0+0.25*fp1;
+#endif  
+  return(0.25*gm1+0.5*gp0+0.25*gp1);
+}
+
 
 
 
