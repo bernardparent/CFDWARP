@@ -93,7 +93,7 @@ ys0=0.0009; {end of hydrogen injection}
 ys1=0.0018; {end of arc influence}
 ye=0.02; {end of domain}
 
-mf=1.0;
+mf=3.0;
 
 is=1;
 is1=round(65*mf);
@@ -210,7 +210,7 @@ Model(
     RAPCOMP=NO;
     MHDTURB=NO;
     TURBSOURCE=YES;
-    TEMODEL=TEMODEL_LOCAL;
+    TEMODEL=TEMODEL_TRANSPORT;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=NO;
     REACTING=YES;
@@ -224,7 +224,7 @@ Model(
     etdiv=1e2;     {J/kg}
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
     Tmin=2.0e2;     Tmax=16.0e3;    {K}
-    Tvmin=Tmin;     Tvmax=12.0e3;  {K}
+    Tvmin=Tmin;     Tvmax=Tmax;  {K}
     Temin=Tmin;     Temax=60.0e3;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     kmin=1.0e-10;   kmax=9.9e99;   {m2/s2}
@@ -480,7 +480,7 @@ Cycle(
     if (iter==1,
       CFL=0.1;
     );
-    CFL=min(CFL*1.5,1.8);
+    CFL=min(CFL*1.5,1.0);
     if (time_within_period<dischargeduration/2,
       Deltaphi=max(0,time_within_period/(0.5*dischargeduration)*Vpp);
     ,{else}

@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 JAN 07a
+  * in lib/soap/soap.c
+    - in functions_builtin(), got rid of the spline function 
+    - in functions_builtin(), renamed "Interpolate" to "interpolate"
+  * in lib/soap/doc/report.tex
+    - deleted spline function and renamed Interpolate to interpolate  
+
+
 2021 JAN 06a
   * in lib/soap/doc/report.tex
     - added description of function Interpolate

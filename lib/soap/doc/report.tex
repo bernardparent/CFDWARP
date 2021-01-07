@@ -325,8 +325,7 @@ are shown in table \ref{table:functions}.
         \verb|mod|   & $x_1,x_2$          & the modulo of the integer division $x_1/x_2$ \\
         \verb|krodelta|& $x_1,x_2$            & the kronecker delta of $x_1$ and $x_2$\\
         \verb|defined|& $x$               & returns true if variable x is defined \\
-        \verb|spline|& $x_1,y_1,...,x_n,y_n,x$               & returns cubic spline interpolated value at $x$\\
-        \verb|Interpolate|& $\textrm{INTERPOLATE\_TYPE},x_1,y_1,...,x_n,y_n,x$               & returns interpolated value $y$ for given $x$, based on the \newline interpolation type argument INTERPOLATE\_TYPE (INTERPOLATE\_LINEAR for linear, INTERPOLATE\_CUBICSPLINE for cubic spline, and INTERPOLATE\_CUBICSPLINEMONOTONE for monotone cubic spline interpolation)\\
+        \verb|interpolate|& $\textrm{INTERPOLATE\_TYPE},x_1,y_1,...,x_n,y_n,x$               & returns interpolated value $y$ for given $x$ where $x_1\leq x \leq x_n$, based on the interpolation type argument INTERPOLATE\_TYPE (INTERPOLATE\_LINEAR for linear, INTERPOLATE\_CUBICSPLINE for cubic spline, and INTERPOLATE\_CUBICSPLINEMONOTONE for monotone cubic spline interpolation)\\
       \bottomrule
     \end{tabular}
     \label{table:functions}
