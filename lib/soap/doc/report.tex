@@ -300,7 +300,7 @@ are shown in table \ref{table:functions}.
 \begin{center}
   \begin{threeparttable}
     \tablecaption{SOAP built-in functions.}
-    \begin{tabular}{lll}
+    \begin{tabular}{ll p{6.5cm}}
       \toprule
         Function & Argument               & Return value\\
       \midrule
@@ -326,6 +326,7 @@ are shown in table \ref{table:functions}.
         \verb|krodelta|& $x_1,x_2$            & the kronecker delta of $x_1$ and $x_2$\\
         \verb|defined|& $x$               & returns true if variable x is defined \\
         \verb|spline|& $x_1,y_1,...,x_n,y_n,x$               & returns cubic spline interpolated value at $x$\\
+        \verb|Interpolate|& $\textrm{INTERPOLATE\_TYPE},x_1,y_1,...,x_n,y_n,x$               & returns interpolated value $y$ for given $x$, based on the \newline interpolation type argument INTERPOLATE\_TYPE (INTERPOLATE\_LINEAR for linear, INTERPOLATE\_CUBICSPLINE for cubic spline, and INTERPOLATE\_CUBICSPLINEMONOTONE for monotone cubic spline interpolation)\\
       \bottomrule
     \end{tabular}
     \label{table:functions}

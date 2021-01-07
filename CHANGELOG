@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 JAN 06a
+  * in lib/soap/doc/report.tex
+    - added description of function Interpolate
+    
+
 2021 JAN 04a
   * in src/test.c
     - in test_s(), test_cp(), test_hmolar(), test_h(), initialized the species mass fractions
