@@ -190,6 +190,7 @@ Model(
     TOWNSENDIONIZATION=TRUE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
     Teminchem=300.0; {K}
+    CESIUMIONIZATIONMODEL=CESIUMIONIZATIONMODEL_LENARD1964; 
   );
   CsAirPlasma15s(
     CHEMMODEL=CHEMMODEL_LENARD1964;
@@ -372,7 +373,7 @@ Cycle(
     
     CFL=min(CFL*1.05,0.4);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
-    if (iter>500,
+    if (iter>1500,
       Lc=1e99;      {characteristic length scale in meters used to solve the emfield equation}
       relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,400); 

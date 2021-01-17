@@ -664,4 +664,6 @@ double _smooth(np_t *np, gl_t *gl, long l, int TYPELEVEL, double(*FUNCT)(np_t));
 
 double _smooth2(np_t *np, gl_t *gl, long l, int TYPELEVEL, double(*FUNCT)(np_t *, gl_t *, long));
 
+void output_backtrace(void);
+
 #endif /* _COMMON_H */

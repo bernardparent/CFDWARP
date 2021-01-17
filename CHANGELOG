@@ -7,6 +7,26 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 JAN 16a
+  * in cycle/share/cycle_share.c
+    - in update_linked_nodes(), fixed a bug: _al(gl,i,j,k) should be _ai(gl,i,j,k)
+  * in cycle/tsemf/_AF/tsemf.c
+    - replaced in a few locations _al(gl,l,dim,+0) by l
+    - added assert(dim<nd) in a few locations
+  * in model/chem/_Cs_Air_Plasma_11s/chem.c
+    - added option  CESIUMIONIZATIONMODEL within write_model_chem_template(),
+      read_model_chem_actions(), add_dW_dx_Cesium(), add_W_Cesium(): now the ionization due to
+      electron impact (and its backward reaction) can be set to either Lenard (1964) 
+      or Andrienko (2021)
+  * in model/chem/_Cs_Air_Plasma_11s/doc/report.tex
+    - added the Andrienko (2021) cesium ionization and recombination reactions
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - in read_model_fluid_actions(), changed "1" for TEMODEL_CONSTANT, "2" for TEMODEL_TEQUILIBRIUM,
+      etc
+  * in src/common.c, added the function output_backtrace() but left it commented so that it does
+    not lead to compilation problems on non-Linux systems
+  
+
 2021 JAN 07a
   * in lib/soap/soap.c
     - in functions_builtin(), got rid of the spline function 

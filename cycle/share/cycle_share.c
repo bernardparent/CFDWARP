@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 1998-2018 Bernard Parent
+Copyright 1998-2018,2021 Bernard Parent
 Copyright 2020 Minindu Weerakoon
 Copyright 2001 Giovanni Fusina
 Copyright 2002 Thomas E. Schwartzentruber
@@ -482,7 +482,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
 
 
   for_ijk(zone,is,js,ks,ie,je,ke){
-        np[_al(gl,i,j,k)].numlinkmusclvars=0;
+        np[_ai(gl,i,j,k)].numlinkmusclvars=0;
   }  
 
   /* first send the packets */
