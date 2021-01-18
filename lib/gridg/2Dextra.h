@@ -2,7 +2,6 @@
 #define _2DEXTRA_H
 
 #include "gridg.h"
-#include <assert.h>
 
 
 

@@ -757,8 +757,8 @@ void find_metrics_on_all_nodes(np_t *np, gl_t *gl, zone_t zone){
         }
   }
 
-  find_zone_intersection(_zone_expansion(zone,+1),gl->domain_lim,&newzone);
-  for_ijk(newzone,is,js,ks,ie,je,ke){
+  /* find the metrics at all valid interfaces within domain_lim and store them in RAM */
+  for_ijk(_zone_expansion(gl->domain_lim,-1),is,js,ks,ie,je,ke){
         for (dim=0; dim<nd; dim++){
           l=_ai(gl,i,j,k);
           if (is_node_valid(np[l],TYPELEVEL) && is_node_valid(np[_al(gl,l,dim,+1)],TYPELEVEL)){
@@ -766,6 +766,7 @@ void find_metrics_on_all_nodes(np_t *np, gl_t *gl, zone_t zone){
           }
         }
   }
+
 
   /* then do the boundary nodes */
   /* note: we should use BDRYMETRICS_CENTERED instead of BDRYMETRICS_NORMAL on symmetry planes

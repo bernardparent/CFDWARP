@@ -2,7 +2,6 @@
 #define _3DBASE_H
 
 #include "gridg.h"
-#include <assert.h>
 
 void Size3D(GRIDG_gl3d_t *gl, GRIDG_xyzgrid_t **xyzgrid,
             long is, long js, long ks, long ie, long je, long ke);

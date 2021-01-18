@@ -2260,21 +2260,3 @@ double _smooth2(np_t *np, gl_t *gl, long l, int TYPELEVEL, double(*FUNCT)(np_t *
 
 
 
-/* uncomment the latter to perform a backtrace;
- * make sure to compile and link your code with debugging symbols (-g flag)
- * make sure to link your code with the -rdynamic flag
- * leave this function commented because it is not ANSI C compliant
-*/
-/* 
-#include <execinfo.h>
-
-void output_backtrace(void) {
-  void* callstack[128];
-  int i, frames = backtrace(callstack, 128);
-  char** strs = backtrace_symbols(callstack, frames);
-  for (i = 0; i < frames; ++i) {
-    printf("%s\n", strs[i]);
-  }
-  free(strs);
-}
-*/

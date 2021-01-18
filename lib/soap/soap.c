@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include <time.h>
 #include <string.h>
-#include <assert.h>
+#include <exm.h>
 #include <stdarg.h>
 #ifdef DISTMPI
   #include "mpi.h"

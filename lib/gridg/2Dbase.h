@@ -2,7 +2,6 @@
 #define _2DBASE_H
 
 #include "gridg.h"
-#include <assert.h>
 
 void Size2D(GRIDG_gl2d_t *gl, GRIDG_xygrid_t **xygrid,
             long is, long js, long ie, long je);

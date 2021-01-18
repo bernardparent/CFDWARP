@@ -245,5 +245,16 @@ double minmod3(double x, double y, double z);
 
 double maxmag(double x, double y);
 
+void output_backtrace(void);
+
+
+#ifndef NDEBUG
+  #define assert_str(x) #x
+  #define assert(x) if (!(x)) { printf("Assertion failed: (%s), function %s, file %s, line %d.\n", assert_str(x), __PRETTY_FUNCTION__, __FILE__, __LINE__); output_backtrace(); abort(); }
+#else
+  #define __ASSERT_VOID_CAST (void)
+  #define assert(x)		(__ASSERT_VOID_CAST (0))
+#endif
+
 
 #endif /* _EXM_H */

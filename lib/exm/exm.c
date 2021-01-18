@@ -32,7 +32,6 @@ Functions that can be used with CFDWARP or any other code
 
 */
 
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -2023,4 +2022,34 @@ double maxmag(double x, double y){
   return(ret);
 }
 
+
+
+#ifdef linux
+
+
+
+#include <execinfo.h>
+
+/* perform a backtrace on linux systems;
+ * make sure to compile and link your code with debugging symbols (-g flag)
+ * make sure to link your code with the -rdynamic flag
+ * leave this function commented because it is not ANSI C compliant
+*/
+void output_backtrace(void) {
+  void* callstack[128];
+  int i, frames = backtrace(callstack, 128);
+  char** strs = backtrace_symbols(callstack, frames);
+  for (i = 0; i < frames; ++i) {
+    printf("%s\n", strs[i]);
+  }
+  free(strs);
+}
+
+#else
+
+void output_backtrace(void) {
+  printf("No backtrace available. Use a linux OS to find backtrace.\n");
+}
+
+#endif
 

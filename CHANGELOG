@@ -7,6 +7,25 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 JAN 18a
+  * in config/config.c
+    - in output_makefileheader() added -rdynamic flag when using debugging symbols and gcc or mpicc
+  * in lib/exm/exm.c
+    - added output_backtrace() when linux is defined
+  * in lib/gridg/*.h and src/common.h
+    - removed the include assert.h
+  * in lib/soap/soap.c
+    - removed the include assert.h
+    - added the include exm.h
+  * in src/common.c
+    - removed backtrace() function
+  * in src/control.c
+    - in find_metrics_on_all_nodes(), fixed a bug: the metrics at the interface were not properly
+      stored in RAM for all interfaces with MPI, and this lead to the current density not being 
+      determined properly on some nodes when using MPI. Note that this bug only occurred when using
+      MPI and using a emfield module other than none.
+      
+
 2021 JAN 16a
   * in cycle/share/cycle_share.c
     - in update_linked_nodes(), fixed a bug: _al(gl,i,j,k) should be _ai(gl,i,j,k)

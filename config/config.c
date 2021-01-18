@@ -797,7 +797,7 @@ static void output_makefileheader(FILE *scriptfile_applyconfig, long nd, long nu
   }
   if (STATIC) fprintf(scriptfile_applyconfig," -static");
   if (DEBUGGER) fprintf(scriptfile_applyconfig," -g");
-  if (DEBUGGER && (COMPILER==CO_GCC || COMPILER==CO_MPICC || COMPILER==CO_MPICC_MPICH || COMPILER==CO_MPICC_OPENMPI)) fprintf(scriptfile_applyconfig," -fno-omit-frame-pointer"); 
+  if (DEBUGGER && (COMPILER==CO_GCC || COMPILER==CO_MPICC || COMPILER==CO_MPICC_MPICH || COMPILER==CO_MPICC_OPENMPI)) fprintf(scriptfile_applyconfig," -fno-omit-frame-pointer -rdynamic"); 
   if (PROFIL) fprintf(scriptfile_applyconfig," -pg");
   if (!DEBUG) fprintf(scriptfile_applyconfig," -DNDEBUG");
 #ifdef PROPRIETARY

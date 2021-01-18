@@ -2,7 +2,6 @@
 #define _1DBASE_H
 
 #include "gridg.h"
-#include <assert.h>
 
 void Size1D(GRIDG_gl1d_t *gl, GRIDG_xgrid_t **xgrid,
             long is, long ie);

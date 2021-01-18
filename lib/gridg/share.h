@@ -2,7 +2,6 @@
 #define _SHARE_H
 
 #include "gridg.h"
-#include <assert.h>
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>

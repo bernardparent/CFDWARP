@@ -2,6 +2,8 @@
 #define _COMMON_H
 
 
+
+
 #if (defined(POSIXTHREADS) || defined(ZONETHREADS))
   #define PTHREADS
 #endif
@@ -159,7 +161,6 @@
 #include <stdlib.h>
 #include <exm.h>
 #include <gridg.h>
-#include <assert.h>
 #include <memdebug.h>
 #include <string.h>
 #include <pthread.h>
@@ -664,6 +665,5 @@ double _smooth(np_t *np, gl_t *gl, long l, int TYPELEVEL, double(*FUNCT)(np_t));
 
 double _smooth2(np_t *np, gl_t *gl, long l, int TYPELEVEL, double(*FUNCT)(np_t *, gl_t *, long));
 
-void output_backtrace(void);
 
 #endif /* _COMMON_H */
