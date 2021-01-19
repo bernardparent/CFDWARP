@@ -1347,6 +1347,12 @@ void read_control(char *control_filename, input_t input, bool CYCLEMODULE, bool 
 #else
   add_int_to_codex(&codex,"UNSTEADY",   FALSE);
 #endif
+#ifdef EMFIELD
+  add_int_to_codex(&codex,"EMFIELD",   TRUE);
+#else
+  add_int_to_codex(&codex,"EMFIELD",   FALSE);
+#endif
+
   add_string_to_codex(&codex,"domain.is",   "UNDEFINED");
   add_string_to_codex(&codex,"domain.ie",   "UNDEFINED");
 #ifdef _2DL

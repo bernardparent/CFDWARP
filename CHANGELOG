@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+
+2021 JAN 19b
+  * in src/control.c
+    - in read_control(), added "EMFIELD" variable to control file variables
+  * in model/fluid/_*_plasma/fluid.c and model/fluid/_drift-diffusion/fluid.c
+    - in write_model_fluid_template(), changed Temin=Tmin; to Temin=300.0;
+  * in bin/RAM-C-II.wrp
+    - made modifications so that SteadyState() can be read either by emfield or non-emfield
+      solvers
+
+
 2021 JAN 19a
   * in src/control.c
     - in find_metrics_on_all_nodes(), deleted the variable newzone (not needed anymore)

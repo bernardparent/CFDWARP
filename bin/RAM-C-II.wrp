@@ -386,12 +386,12 @@ Model(
     AXISYMMETRIC=YES;
   );
   NavierStokesPlasma(
-    TEMODEL=TEMODEL_TVEQUILIBRIUM;
+    TEMODEL=TEMODEL_TRANSPORT;
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=YES;
     REACTING=YES;
-    emfieldworkheatfact=0.0;   {factor multiplying the emfield work and heat source terms}
+    emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
     sigmadiv=1e-10; {S/m}
     etdiv=1e-1;     {J/kg}
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
@@ -401,13 +401,13 @@ Model(
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain for neutrals}
     chiimin=1e-30;  chiimax=1.0;    {min and max ion molar fraction}
-    chiemin=1e-20;  chiemax=1.0;    {min and max electron molar fraction}
+    chiemin=1e-12;  chiemax=1.0;    {min and max electron molar fraction}
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
     gamma=0.1e0;    {secondary emission coefficient}
-    AXISYMMETRIC=NO;
+    AXISYMMETRIC=YES;
   );
   AirPlasma11s(
-    CHEMMODEL=CHEMMODEL_DUNNKANG1973;
+    CHEMMODEL=CHEMMODEL_BOYD2007;
     TOWNSENDIONIZATION=FALSE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
   );
@@ -554,8 +554,8 @@ Disc(
         betaa[spec]=0.5;
       );
       if (SPECIESTYPE[spec]==SPECIESTYPE_ELECTRON,
-        betag[spec]=-0.00001;
-        betaa[spec]=0.99;
+        betag[spec]=-0.001;
+        betaa[spec]=0.999;
       );
     );
   );
@@ -618,7 +618,7 @@ Cycle(
                            near cathode}
     relaxNi_bdry=1.0;     {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.2;     {the electron density relaxation factor at the boundary }
-    relaxTe=1.0;          {the electron temperature relaxation factor }
+    relaxTe=0.8;          {the electron temperature relaxation factor }
     rhoref=1;           {reference density in kg/m3}
     Tref=300.0;           {reference temperature in K}
     Teref=20000.0;        {reference electron temperature in K}
@@ -649,22 +649,7 @@ Cycle(
     Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
   SteadyState(
-    if (mod(iter,500)==0,
-      WriteDataFile(outputfilename);
-    );
-    sigma1=0.1;   {exponent of maximum pseudotime step in all dimensions}
-    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
-    if (iter==1,
-      CFL=0.01;
-    );
-    CFL=min(CFL*1.02,2.2);
-    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
-    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
-           CFL,iter,effiter_U,ximax,i_ximax,
-           j_ximax,clipinfo);
-  );
-  SteadyStateNew(
-    if (mod(iter,50)==0,
+    if (mod(iter,200)==0,
       WriteDataFile(outputfilename);
     );
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
@@ -672,21 +657,30 @@ Cycle(
     if (iter==1,
       CFL=0.01;
     );
-    if (iter<3000,
+    if (iter<2000,
       CFLmax=1.0;
     ,{else}
-      CFLmax=2.0;
+      CFLmax=6.0;
     );
     CFL=min(CFL*1.03,CFLmax);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
-    Lc=1e99;      {characteristic length scale in meters used to solve the emfield equation}
-    relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
-{  UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,4); 
-    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,300); }
-    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,40); 
-    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
-           CFL,iter,effiter_U,ximax,i_ximax,
-           j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
+    if (EMFIELD,
+      if (iter<2000,
+        Cycle(NavierStokesPlasma(relaxTe=0.1;););
+      ,{else}
+        Cycle(NavierStokesPlasma(relaxTe=0.8;););
+      );
+      Lc=1e99;      {characteristic length scale in meters used to solve the emfield equation}
+      relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
+      UpdateEMField(Lc,relaxEMF,TSEMF_SOR,20); 
+      printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
+             CFL,iter,effiter_U,ximax,i_ximax,
+             j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
+    ,{else}
+      printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
+             CFL,iter,effiter_U,ximax,i_ximax,
+             j_ximax,clipinfo);
+    );
   );
 
 );
