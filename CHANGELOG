@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 JAN 19a
+  * in src/control.c
+    - in find_metrics_on_all_nodes(), deleted the variable newzone (not needed anymore)
+  * in model/chem/_Air_Plasma_11s/dunnkang1973.c
+    - made reactions with electrons in reactants function of Te not of T
+  
+
 2021 JAN 18a
   * in config/config.c
     - in output_makefileheader() added -rdynamic flag when using debugging symbols and gcc or mpicc
