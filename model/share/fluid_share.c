@@ -873,7 +873,8 @@ double _Qk(np_t *np, long l, gl_t *gl){
   } 
 
 #ifdef _2D
-  if (gl->model.fluid.AXISYMMETRIC) {
+  // these additional axisymmetric terms were derived by Jason Etele and are turned off for now
+  if (gl->model.fluid.AXISYMMETRIC && FALSE) {
     sum=0.0e0;
     for (theta=0; theta<nd; theta++) {
       for (vartheta=0; vartheta<nd; vartheta++) {
@@ -888,66 +889,6 @@ double _Qk(np_t *np, long l, gl_t *gl){
 }
 
 
-/* old _Qk function (used prior to july 2015) 
-   - is written function of beta, which is the same as the standard form, but harder to read 
-     with little to no advantage in computing speed
-*/
-double _Qk_old(np_t *np, long l, gl_t *gl){
-  long i,j;
-  double sum,Qk;
-#ifdef _2DL
-  long theta,vartheta;
-#endif
-  long row,col,dim;
-  dim2_t beta;
-
-  Qk=0.0e0;
-  for (theta=0; theta<nd; theta++){
-    for (vartheta=0; vartheta<nd; vartheta++){
-      sum=0.0e0;
-      for (dim=0; dim<nd; dim++){
-        sum=sum+_X(np[l],theta,dim)*_X(np[l],vartheta,dim);
-      }
-      for (row=0; row<nd; row++){
-        beta[row][row]=(sum+1.0e0/3.0e0*_X(np[l],theta,row)
-                                    *_X(np[l],vartheta,row));
-        for (col=0; col<nd; col++){
-          if (col!=row) {
-            beta[row][col]=(_X(np[l],vartheta,row)*_X(np[l],theta,col)
-               -2.0e0/3.0e0*_X(np[l],theta,row)*_X(np[l],vartheta,col));
-          }
-        }
-      }
-      Qk=Qk-2.0e0/3.0e0*_rho(np[l])*_k(np[l])*_X(np[l],theta,vartheta)*
-            0.5e0*(_V(np[_al(gl,l,theta,+1)],vartheta)
-                  -_V(np[_al(gl,l,theta,-1)],vartheta));
-      for (i=0; i<nd; i++){
-        for (j=0; j<nd; j++){
-           Qk=Qk+_etastar(np,l,gl)*beta[i][j]*
-              0.5e0*(_V(np[_al(gl,l,theta,+1)],i)
-                    -_V(np[_al(gl,l,theta,-1)],i))*
-              0.5e0*(_V(np[_al(gl,l,vartheta,+1)],j)
-                    -_V(np[_al(gl,l,vartheta,-1)],j));
-        }
-      }
-    }
-  }
-
-
-#ifdef _2D
-  if (gl->model.fluid.AXISYMMETRIC) {
-    sum=0.0e0;
-    for (theta=0; theta<nd; theta++) {
-      for (vartheta=0; vartheta<nd; vartheta++) {
-        sum+=_X(np[l],theta,vartheta)*0.5*(_V(np[_al(gl,l,vartheta,+1)],vartheta)
-                                          -_V(np[_al(gl,l,vartheta,-1)],vartheta));
-      }
-    }
-    Qk-=2.0e0/3.0e0*_etat(np,l,gl)*_V(np[l],1)/_x(np[l],1)*sum;
-  }
-#endif
-  return(Qk);
-}
 
 
 double _chiw(np_t *np, long l, gl_t *gl){
@@ -1142,7 +1083,7 @@ void find_Stcomp(np_t *np, gl_t *gl, long l, flux_t St){
 #ifdef _2D
 /* this subroutine is by Jason Etele; the derivation of the terms
    can be found in the doc subdirectory */
-void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
+void find_Saxi_FavreReynolds(np_t *np, gl_t *gl, long l, flux_t S){
   long flux,species,theta,vartheta,lp,lm;
   double x1, V1;
   double sum1,sum2,sum3,sum4,sum5,sum6,sum7,sum8,sum9,sum10,sum11,sum12;
@@ -1218,7 +1159,7 @@ void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
   }
 }
 #else
-void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
+void find_Saxi_FavreReynolds(np_t *np, gl_t *gl, long l, flux_t S){
   long flux;
   for (flux=0; flux<nf; flux++){
     S[flux]=0.0e0;
@@ -1340,25 +1281,6 @@ void find_dStcomp_dU(np_t *np, gl_t *gl, long l, sqmat_t dStcompdU){
 }
 
 
-#ifdef _2D
-void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
-  long row,col;
-  for (row=0; row<nf; row++){
-    for (col=0; col<nf; col++){
-      dS_dU[row][col]=0.0e0;
-    }
-  }
-}
-#else
-void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
-  long row,col;
-  for (row=0; row<nf; row++){
-    for (col=0; col<nf; col++){
-      dS_dU[row][col]=0.0e0;
-    }
-  }
-}
-#endif
 
 #endif
 
@@ -2453,3 +2375,104 @@ void find_init_number_density_templates(char **specstr1, char **specstr2){
   free(chargedstr2);
   free(chargedstr3);
 }
+
+
+
+
+
+
+#ifdef _2D
+
+void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
+  long flux;
+  double x1;
+  dim_t Vn;
+#ifdef _FLUID_PLASMA
+  long spec;
+  EXM_vec3D_t Vk,Ve;
+#endif
+
+  for (flux=0; flux<nf; flux++) S[flux]=0.0e0;
+
+  if (gl->model.fluid.AXISYMMETRIC) {
+    x1=np[l].bs->x[1];
+    find_V(np[l],Vn);
+    if (fabs(x1)<1e-15) fatal_error("No node must lie on the y=0 axis when AXISYMMETRIC is set to TRUE.");
+    for (flux=0; flux<nf; flux++){
+      S[flux]=(-1.0/x1)*Vn[1]*np[l].bs->U[flux];
+    }
+#ifdef _FLUID_PLASMA
+    for (spec=0; spec<ncs; spec++){
+      find_Vk(np, gl, l, spec, Vk);
+      //S[spec]=(-1.0/x1)*Vk[1]*np[l].bs->U[spec];
+    }
+    find_Ve_from_J(np, gl, l, Ve);
+    //S[speceminus]=(-1.0/x1)*Ve[1]*np[l].bs->U[speceminus];
+#endif
+#if _FLUID_EENERGY
+    find_Ve_from_J(np, gl, l, Ve);
+    //S[fluxee]=(-1.0/x1)*Ve[1]*np[l].bs->U[fluxee];
+#endif
+  }
+}
+
+
+void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
+  long row,col;
+  long flux;
+  double x1;
+  dim_t Vn;
+#ifdef _FLUID_PLASMA
+  long spec;
+  EXM_vec3D_t Vk,Ve;
+#endif
+
+  for (row=0; row<nf; row++){
+    for (col=0; col<nf; col++){
+      dS_dU[row][col]=0.0e0;
+    }
+  }
+
+  if (gl->model.fluid.AXISYMMETRIC) {
+    x1=np[l].bs->x[1];
+    find_V(np[l],Vn);
+    if (fabs(x1)<1e-15) fatal_error("No node must lie on the y=0 axis when AXISYMMETRIC is set to TRUE.");
+    for (flux=0; flux<nf; flux++){
+      dS_dU[flux][flux]=min(0.0,(-1.0/x1)*Vn[1]);
+    }
+#ifdef _FLUID_PLASMA
+    for (spec=0; spec<ncs; spec++){
+      find_Vk(np, gl, l, spec, Vk);
+      //dS_dU[spec][spec]=min(0.0,(-1.0/x1)*Vk[1]);
+    }
+    find_Ve_from_J(np, gl, l, Ve);
+    //dS_dU[speceminus][speceminus]=min(0.0,(-1.0/x1)*Ve[1]);
+#endif
+#if _FLUID_EENERGY
+    find_Ve_from_J(np, gl, l, Ve);
+    //dS_dU[fluxee][fluxee]=min(0.0,(-1.0/x1)*Ve[1]);
+#endif
+  }
+
+
+}
+
+#else
+
+void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
+  long flux;
+  for (flux=0; flux<nf; flux++){
+    S[flux]=0.0e0;
+  }
+}
+
+
+void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
+  long row,col;
+  for (row=0; row<nf; row++){
+    for (col=0; col<nf; col++){
+      dS_dU[row][col]=0.0e0;
+    }
+  }
+}
+#endif

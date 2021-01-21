@@ -420,6 +420,7 @@ Model(
     SetRelativePermittivity(is,js, ie,je, 1.0 );
     SetSolidConductivity(is,js, ie,je, 0.0 {S/m});
     SetElectroMotiveForce(is,js, ie,je, 0.0{V/m},0.0{V/m}, 1e99{max power in W/m3});
+    AXISYMMETRIC=YES;
   );
 );
 
@@ -660,7 +661,7 @@ Cycle(
     if (iter<2000,
       CFLmax=1.0;
     ,{else}
-      CFLmax=6.0;
+      CFLmax=4.0;
     );
     CFL=min(CFL*1.03,CFLmax);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
@@ -668,7 +669,7 @@ Cycle(
       if (iter<2000,
         Cycle(NavierStokesPlasma(relaxTe=0.1;););
       ,{else}
-        Cycle(NavierStokesPlasma(relaxTe=0.8;););
+        Cycle(NavierStokesPlasma(relaxTe=0.5;););
       );
       Lc=1e99;      {characteristic length scale in meters used to solve the emfield equation}
       relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}

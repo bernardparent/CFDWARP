@@ -43,6 +43,10 @@ void find_w_V_P_T_bdry_symmetrical(np_t *np, gl_t *gl,  long lA, long lB, long l
 #endif
 
 
+
+
+
+
 #if _FLUID_N2VIBMODEL
 double _kappav (np_t *np, long l, gl_t *gl);
 #endif
@@ -93,13 +97,10 @@ void find_Stnorm(np_t *np, gl_t *gl, long l, flux_t St);
 
 void find_Stcomp(np_t *np, gl_t *gl, long l, flux_t St);
 
-void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S);
-
 void find_dStnorm_dU(np_t *np, gl_t *gl, long l, sqmat_t dStnormdU);
 
 void find_dStcomp_dU(np_t *np, gl_t *gl, long l, sqmat_t dStcompdU);
 
-void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU);
 
 #endif
 
@@ -156,6 +157,12 @@ void find_init_mass_fraction_templates(char **specstr1, char **specstr2);
 void find_init_molar_fraction_templates(char **specstr1, char **specstr2);
 
 void find_init_number_density_templates(char **specstr1, char **specstr2);
+
+
+
+void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S);
+
+void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU);
 
 
 #endif /* _FLUID_SHARE_H */

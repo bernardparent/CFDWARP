@@ -33,30 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/_model.h>
 
 
-#ifdef _2D
-static void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
-  long flux;
-  double x1, V1;
-
-  for (flux=0; flux<nf; flux++) S[flux]=0.0e0;
-
-  if (gl->model.fluid.AXISYMMETRIC) {
-    x1=np[l].bs->x[1];
-    V1=_V(np[l],1);
-    if (fabs(x1)<1e-15) fatal_error("No node must lie on the y=0 axis when AXISYMMETRIC is set to TRUE.");
-    for (flux=0; flux<nf; flux++){
-      S[flux]=(-1.0/x1)*V1*np[l].bs->U[flux];
-    }
-  }
-}
-#else
-static void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
-  long flux;
-  for (flux=0; flux<nf; flux++){
-    S[flux]=0.0e0;
-  }
-}
-#endif
 
 
 static void find_Schem(np_t *np, gl_t *gl, long l, flux_t S){
@@ -89,25 +65,6 @@ void find_Sstar(np_t *np, gl_t *gl, long l, flux_t S){
 }
 
 
-#ifdef _2D
-static void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
-  long row,col;
-  for (row=0; row<nf; row++){
-    for (col=0; col<nf; col++){
-      dS_dU[row][col]=0.0e0;
-    }
-  }
-}
-#else
-static void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
-  long row,col;
-  for (row=0; row<nf; row++){
-    for (col=0; col<nf; col++){
-      dS_dU[row][col]=0.0e0;
-    }
-  }
-}
-#endif
 
 
 static void find_dSchem_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){

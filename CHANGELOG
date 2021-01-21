@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 JAN 21a
+  * in model/emfield/_Epotential*/emfield.c
+    - read_model_emfield_actions(), write_model_emfield_template(), added AXISYMMETRIC flag
+    - in find_Sstar_emfield(), added axisymmetric source terms
+  * in model/fluid/_Navier-Stokes/fluid_source.c and model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - deleted find_Saxi() and find_dSaxi_dU()
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Vk(), added an assert(spec<ncs)
+  * in model/share/fluid_share.c
+    - in _Qk(), turned off the axisymmetric contributions by Jason Etele
+    - deleted _Qk_old()
+    - renamed find_Saxi() to find_Saxi_FavreReynolds()
+    - added find_Saxi() and find_dSaxi_dU() to be used by all fluid modules
+    
 
 2021 JAN 19b
   * in src/control.c
