@@ -131,7 +131,7 @@ dtheta=0.1/180*pi;
 
 
 
-CASE=1;
+CASE=2;
 
 if (CASE==1,
     Minf=23.9;
@@ -407,7 +407,7 @@ Model(
     AXISYMMETRIC=YES;
   );
   AirPlasma11s(
-    CHEMMODEL=CHEMMODEL_BOYD2007;
+    CHEMMODEL=CHEMMODEL_DUNNKANG1973;
     TOWNSENDIONIZATION=FALSE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
   );

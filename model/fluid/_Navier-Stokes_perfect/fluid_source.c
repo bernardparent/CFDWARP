@@ -27,33 +27,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fluid_source.h"
 #include <model/metrics/_metrics.h>
 #include <model/_model.h>
+#include <model/share/fluid_share.h>
 
 
-
-#ifdef _2D
-static void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
-  long flux;
-  double x1, V1;
-
-  for (flux=0; flux<nf; flux++) S[flux]=0.0e0;
-
-  if (gl->model.fluid.AXISYMMETRIC) {
-    x1=np[l].bs->x[1];
-    V1=_V(np[l],1);
-    if (fabs(x1)<1e-15) fatal_error("No node must lie on the y=0 axis when AXISYMMETRIC is set to TRUE.");
-    for (flux=0; flux<nf; flux++){
-      S[flux]=(-1.0/x1)*V1*np[l].bs->U[flux];
-    }
-  }
-}
-#else
-static void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
-  long flux;
-  for (flux=0; flux<nf; flux++){
-    S[flux]=0.0e0;
-  }
-}
-#endif
 
 
 
@@ -81,47 +57,6 @@ void test_dSchem_dU(np_t *np, gl_t *gl, long l){
 }
 
 
-#ifdef _2D
-static void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
-  long row,col,flux;
-  double x1,V1,rho;
-  for (row=0; row<nf; row++){
-    for (col=0; col<nf; col++){
-      dS_dU[row][col]=0.0e0;
-    }
-  }
-  if (gl->model.fluid.AXISYMMETRIC) {
-    x1=np[l].bs->x[1];
-    V1=_V(np[l],1);
-    rho=_rho(np[l]);
-    assert(x1!=0.0);
-    /* recall S[flux]=(-1.0/x1)*(rhov)/(rho)*U[flux] */
-    /* wrt U */
-    for (flux=0; flux<nf; flux++){
-      dS_dU[flux][flux]+=(-1.0/x1)*V1;
-    }
-    /* wrt rho */
-    for (row=0; row<nf; row++){
-      dS_dU[row][0]+=(1.0/x1)*V1/rho*np[l].bs->U[row];
-    }
-    /* wrt rhoV1 */
-    for (row=0; row<nf; row++){
-      dS_dU[row][2]+=-(1.0/x1)/rho*np[l].bs->U[row];
-    }
-
-  }
-
-}
-#else
-static void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
-  long row,col;
-  for (row=0; row<nf; row++){
-    for (col=0; col<nf; col++){
-      dS_dU[row][col]=0.0e0;
-    }
-  }
-}
-#endif
 
 
 void find_dSstar_dUstar(np_t *np, gl_t *gl, long l, sqmat_t dSstar_dUstar){

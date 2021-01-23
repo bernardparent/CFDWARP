@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/metrics/_metrics.h>
 #include <model/chem/_chem.h>
 #include <model/share/chem_share.h>
+#include <model/share/fluid_share.h>
 #include <model/emfield/_emfield.h>
 #include <model/thermo/_thermo.h>
 #include <model/_model.h>

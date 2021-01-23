@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 JAN 22a
+  * in model/chem/_Air_Plasma_11s/dunnkang1973.c and model/chem/_Air_Plasma_11s/doc/report.tex
+    - modified the Dunn-Kang model: backward reactions are now explicitly written as in the 
+      original paper instead of using the equilibrium constant
+  * in model/fluid/_Navier-Stokes/fluid_source.c
+    - added missing  #include fluid_share.h
+  * in model/fluid/_Navier-Stokes_perfect/fluid_source.c
+    - removed functions find_Saxi() and find_dSaxi_dU()
+    - added missing  #include fluid_share.h
+  * in model/fluid/_drift-diffusion/fluid.c
+    - in write_model_fluid_template() and read_model_fluid_actions(), added code to read 
+      AXISYMMETRIC from control file
+    - in find_Sstar() and find_dSstar_dUstar(), added calls to find_Saxi and find_dSaxi_dU
+
+
 2021 JAN 21a
   * in model/emfield/_Epotential*/emfield.c
     - read_model_emfield_actions(), write_model_emfield_template(), added AXISYMMETRIC flag
