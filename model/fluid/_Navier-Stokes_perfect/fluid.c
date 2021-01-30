@@ -39,6 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   #error The Navier-Stokes_perfect module can not be compiled with a chemical model that has more than 1 species. 
 #endif
 
+#define ETAMODEL_CONSTANT 1
+#define ETAMODEL_SUTHERLAND 2
+
 static bool _FLUIDPRIMMEM(np_t np){
   return(np.FLUIDPRIMMEM);
 }
@@ -49,8 +52,11 @@ void write_model_fluid_template(FILE **controlfile){
     "  %s(\n"
     "    gamma=1.4;\n"
     "    R=286.0;        {J/kgK }\n"
-    "    eta=2e-5;       {kg/ms}\n"
-    "    kappa=0.03;     {W/mK}\n"
+    "    ETAMODEL=ETAMODEL_SUTHERLAND;     \n"
+    "    eta_ref=1.716e-5;       {kg/ms}\n"
+    "    eta_ref_T=273.15;       {K}\n"
+    "    eta_C=110.4;       {K}\n"
+    "    Pr=0.71;     \n"
     "    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}\n"
     "    Tmin=1.0e1;     Tmax=26.0e3;    {K}\n"
 #ifdef _2D
@@ -185,6 +191,9 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
 
     if (((readcontrolarg_t *)codex->action_args)->VERBOSE) wfprintf(stdout,"%s..",_FLUID_ACTIONNAME);
 
+    SOAP_add_int_to_vars(codex,"ETAMODEL_CONSTANT",ETAMODEL_CONSTANT);
+    SOAP_add_int_to_vars(codex,"ETAMODEL_SUTHERLAND",ETAMODEL_SUTHERLAND);
+
     if (!gl->CONTROL_READ){
       gl->MODEL_FLUID_READ=TRUE;
       for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
@@ -201,8 +210,11 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
 
     find_double_var_from_codex(codex,"gamma",&gl->model.fluid.gamma);
     find_double_var_from_codex(codex,"R",&gl->model.fluid.R);
-    find_double_var_from_codex(codex,"eta",&gl->model.fluid.eta);
-    find_double_var_from_codex(codex,"kappa",&gl->model.fluid.kappa);
+    find_int_var_from_codex(codex,"ETAMODEL",&gl->model.fluid.ETAMODEL);
+    find_double_var_from_codex(codex,"eta_ref",&gl->model.fluid.eta_ref);
+    find_double_var_from_codex(codex,"eta_ref_T",&gl->model.fluid.eta_ref_T);
+    find_double_var_from_codex(codex,"eta_C",&gl->model.fluid.eta_C);
+    find_double_var_from_codex(codex,"Pr",&gl->model.fluid.Pr);
     find_double_var_from_codex(codex,"Pmin",&gl->model.fluid.Pmin);
     find_double_var_from_codex(codex,"Pmax",&gl->model.fluid.Pmax);
     find_double_var_from_codex(codex,"Tmin",&gl->model.fluid.Tmin);
@@ -512,13 +524,13 @@ void find_Kstar_interface(np_t *np, gl_t *gl, long lL, long lR, metrics_t metric
     
     for (dim=0; dim<nd; dim++){
       for (dim2=0; dim2<nd; dim2++){
-        K[1+dim][1+dim2]=gl->model.fluid.eta*beta[dim][dim2];
+        K[1+dim][1+dim2]=avg(_eta(np[lL],gl),_eta(np[lR],gl))*beta[dim][dim2];
         K[1+nd][1+dim2]=K[1+nd][1+dim2]+
-           gl->model.fluid.eta*beta[dim][dim2]*avg(_V(np[lL],dim),_V(np[lR],dim));
+           avg(_eta(np[lL],gl),_eta(np[lR],gl))*beta[dim][dim2]*avg(_V(np[lL],dim),_V(np[lR],dim));
       }
     }
     
-    K[1+nd][1+nd]=gl->model.fluid.kappa*alpha;
+    K[1+nd][1+nd]=avg(_kappa(np[lL],gl),_kappa(np[lR],gl))*alpha;
     
 
 }
@@ -724,6 +736,35 @@ void add_dUstar_to_U(np_t *np, long l, gl_t *gl, flux_t dUstar){
     np[l].bs->U[flux]=np[l].bs->U[flux]+dUstar[flux]/Omega;
   }
   find_prim_fluid(np,l,gl);
+}
+
+double _kappa(np_t np,gl_t *gl) {
+  double Pr=gl->model.fluid.Pr;
+  double Cp=gl->model.fluid.gamma*gl->model.fluid.R/(gl->model.fluid.gamma-1.0);
+
+  return(_eta_from_T(_T(np,gl),gl)*Cp/Pr);
+}
+
+double _eta_from_T(double T,gl_t *gl) {
+  double mu_0=gl->model.fluid.eta_ref;
+  double C=gl->model.fluid.eta_C;
+  double T_0=gl->model.fluid.eta_ref_T;
+
+  switch (gl->model.fluid.ETAMODEL){
+    case ETAMODEL_CONSTANT:
+      return(mu_0);
+      break;
+    case ETAMODEL_SUTHERLAND:
+      return(mu_0*(T_0+C)/(T+C)*sqrt(T*T*T/(T_0*T_0*T_0)));
+      break;
+    default:
+      fatal_error("Given ETAMODEL is not a valid choice for viscosity model. Input either ETAMODEL_CONSTANT or ETAMODEL_SUTHERLAND.");
+      return(-1); //to avoid compiler warning
+  }
+}
+
+double _eta(np_t np,gl_t *gl) {
+  return(_eta_from_T(_T(np,gl),gl));
 }
 
 

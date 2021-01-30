@@ -1279,7 +1279,7 @@ void find_jacvars(np_t np, gl_t *gl, metrics_t metrics, long theta, jacvars_t *j
     jacvars->V[dim]=_V(np,dim);
   }
   jacvars->a2=gl->model.fluid.gamma*gl->model.fluid.R*_T(np,gl);
-  jacvars->eta=gl->model.fluid.eta;
+  jacvars->eta=_eta(np,gl);
   jacvars->gamma=gl->model.fluid.gamma;
 
   set_jacvars_eigenconditioning_constants(gl,jacvars);
@@ -1374,7 +1374,7 @@ void find_jacvars_from_musclvars(flux_t musclvars, metrics_t metrics, gl_t *gl, 
     jacvars->V[dim]=musclvars[1+dim];
   }
   jacvars->a2=gl->model.fluid.gamma*gl->model.fluid.R*T;
-  jacvars->eta=gl->model.fluid.eta;
+  jacvars->eta=_eta_from_T(T,gl);
   jacvars->gamma=gl->model.fluid.gamma;
 
   set_jacvars_eigenconditioning_constants(gl,jacvars);
@@ -1422,7 +1422,7 @@ void find_jacvars_from_U(flux_t U, metrics_t metrics, gl_t *gl, long theta, jacv
   T=eint/gl->model.fluid.R*(gl->model.fluid.gamma-1.0);
 
   jacvars->a2=gl->model.fluid.gamma*gl->model.fluid.R*T;
-  jacvars->eta=gl->model.fluid.eta;
+  jacvars->eta=_eta_from_T(T,gl);
   jacvars->gamma=gl->model.fluid.gamma;
 
   set_jacvars_eigenconditioning_constants(gl,jacvars);

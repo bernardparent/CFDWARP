@@ -14,7 +14,7 @@
 
 #define NODETYPE_BDRYOUTFLOW 1
 #define nf (2+nd)
-#define totalpostvarfluid (4+nd*2)
+#define totalpostvarfluid (6+nd*2)
 #define totalinitvarfluid (nd+2)
 #define hbw_bdry_fluid 3
 // hbw_mem_fluid is the neighbor-nodes bandwidth   on which the node fluid props depend when being resumed
@@ -45,7 +45,9 @@ typedef struct {
 typedef struct {
   double zetaA1,zetaA3,zetaA2;
   double Pmin,Pmax,Tmin,Tmax;
-  double gamma,R,eta,kappa;
+  double gamma,R;
+  int ETAMODEL;
+  double eta_model,eta_ref,eta_ref_T,eta_C,Pr;
   bool AXISYMMETRIC;
 } gl_model_fluid_t;
 

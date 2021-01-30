@@ -48,7 +48,7 @@
 }
 
 
- Mx=34;
+ Mx=10;
 My=0.0;
 P=300/Mx^2*16^2;
 T=240;
@@ -56,7 +56,7 @@ Twall=2000;
 
 
 
-CFLref=1.0;
+CFLref=2.0;
 
 
 
@@ -167,7 +167,7 @@ Model(
     AXISYMMETRIC=NO; {set to YES to solve axisymmetric problems in 2D}
   );
   AirPlasma11s(
-    CHEMMODEL=CHEMMODEL_PARK1993;
+    CHEMMODEL=CHEMMODEL_DUNNKANG1973;
     TOWNSENDIONIZATION=FALSE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
   );
@@ -280,7 +280,6 @@ Cycle(
     if (iter==1,
       CFL=0.01;
     );
-    system("date");
     CFL=min(CFL*1.03,CFLref);
     UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",

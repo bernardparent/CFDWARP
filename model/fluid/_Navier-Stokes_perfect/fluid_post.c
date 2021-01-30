@@ -139,6 +139,8 @@ void find_post_variable_name_fluid(long varnum, char *varname){
     case 2*nd+1:   sprintf(varname,"P");         break;
     case 2*nd+2:   sprintf(varname,"T");         break;
     case 2*nd+3:   sprintf(varname,"a");         break;
+    case 2*nd+4:   sprintf(varname,"eta");         break;
+    case 2*nd+5:   sprintf(varname,"kappa");         break;
   }
 }
 
@@ -160,6 +162,8 @@ void find_post_variable_value_fluid(np_t *np, long l, gl_t *gl,
       case 2*nd+1:   *varvalue=_P(np[l],gl);       break;
       case 2*nd+2:   *varvalue=_T(np[l],gl);       break;
       case 2*nd+3:   *varvalue=_a(np[l],gl);       break;
+      case 2*nd+4:   *varvalue=_eta(np[l],gl);       break;
+      case 2*nd+5:   *varvalue=_kappa(np[l],gl);       break;
     }
   }
 }

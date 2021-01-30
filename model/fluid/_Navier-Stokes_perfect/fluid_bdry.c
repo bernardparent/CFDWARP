@@ -46,6 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BDRY_FREESTREAM1 9
 #define BDRY_WALLTFIXED2 10
 #define BDRY_WALLADIABATIC2 11
+#if defined(UNSTEADY)
+#define BDRY_INFLOWFLUCTUATING 12
+#endif
 
 #define SYMMETRY_TOTAL_ENTHALPY_CONSERVED FALSE
 
@@ -71,6 +74,9 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    BDRY_INFLOWSUBSONIC1       %c     Subsonic Inflow 1o (Constant Tstag, Pstag at inflow)\n"
     "    BDRY_OUTFLOWSUBSONIC1      %c     Subsonic Outflow 1o (Constant P at outflow)\n"
     "    BDRY_FREESTREAM1           %c     Freestream, 1o, params Vx,Vy,"if3DL("Vz,")" P, T\n"
+#if defined(UNSTEADY)
+    "    BDRY_INFLOWFLUCTUATING     %c     Inflow, supersonic, spatio-temporally varying,\n                                     params N_modes, "if3DL("beta, ")"omega, "if3DL("ifoblique, ")"phi_baseflow,\n                                     Re_phi_shapefunction,Im_phi_shapefunction...\n                                     where phi∈{Vx,Vy,"if3DL("Vz,")"rho,T}\n"
+#endif
     "    _________________________________________________________________________________________\n"
     "    }\n"
     "    All(BDRY_OUTFLOWSUPERSONIC1);\n"
@@ -87,12 +93,23 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    Cut(is" if2DL(",js") if3DL(",ks") ",  ie" if2DL(",je") if3DL(",ke") ");\n"
     "    Region(is" if2DL(",js") if3DL(",ks") ",  ie" if2DL(",je") if3DL(",ke") ",  BDRY_INFLOWSUPERSONIC);\n"
     "    Link(i1" if2DL(",j1") if3DL(",k1") ",  i2" if2DL(",j2") if3DL(",k2") ");\n"
+#if defined(UNSTEADY)
+#ifdef _3D
+    "    Param(is,js,ks,  ie,je,ke,  BDRY_INFLOWFLUCTUATING, N_modes{number of disturbance modes},\n    beta{spanwise wavenumber}, omega{angular frequency of disturbance},\n    ifoblique{0 for 2D wave and 1 for 3D oblique wave}, Vx_baseflow,Re_Vx_shapefunction,\n    Im_Vx_shapefunction, Vy_baseflow,Re_Vy_shapefunction,Im_Vy_shapefunction, Vz_baseflow,\n    Re_Vz_shapefunction,Im_Vz_shapefunction, rho_baseflow,Re_rho_shapefunction,\n    Im_rho_shapefunction, T_baseflow,Re_T_shapefunction,Im_T_shapefunction); {N_modes sets of\n    beta...Im_T_shapefunction to be input}\n"
+#endif
+#ifdef _2D
+    "    Param(is,js,  ie,je,  BDRY_INFLOWFLUCTUATING, N_modes{number of disturbance modes},\n    omega{angular frequency of disturbance}, Vx_baseflow,Re_Vx_shapefunction,\n    Im_Vx_shapefunction, Vy_baseflow, Re_Vy_shapefunction,Im_Vy_shapefunction,\n    rho_baseflow,Re_rho_shapefunction,Im_rho_shapefunction, T_baseflow,Re_T_shapefunction,\n    Im_T_shapefunction); {N_modes sets of omega...Im_T_shapefunction to be input}\n"
+#endif
+#endif
     "    }\n"
     "  );\n",_bdry_ID(BDRY_INFLOWSUPERSONIC),_bdry_ID(BDRY_OUTFLOWSUPERSONIC1),
              _bdry_ID(BDRY_SYMMETRICAL1),_bdry_ID(BDRY_SYMMETRICAL2),_bdry_ID(BDRY_SYMMETRICAL3),
              _bdry_ID(BDRY_WALLTFIXED1),_bdry_ID(BDRY_WALLTFIXED2),_bdry_ID(BDRY_WALLADIABATIC1),
              _bdry_ID(BDRY_WALLADIABATIC2),_bdry_ID(BDRY_INFLOWSUBSONIC1),
              _bdry_ID(BDRY_OUTFLOWSUBSONIC1),_bdry_ID(BDRY_FREESTREAM1)
+#if defined(UNSTEADY)
+             ,_bdry_ID(BDRY_INFLOWFLUCTUATING)
+#endif
   );
 }
 
@@ -110,6 +127,9 @@ void add_bdry_types_fluid_to_codex(SOAP_codex_t *codex){
   add_int_to_codex(codex,"BDRY_INFLOWSUBSONIC1",   BDRY_INFLOWSUBSONIC1);
   add_int_to_codex(codex,"BDRY_OUTFLOWSUBSONIC1",   BDRY_OUTFLOWSUBSONIC1);
   add_int_to_codex(codex,"BDRY_FREESTREAM1",   BDRY_FREESTREAM1);
+#if defined(UNSTEADY)
+  add_int_to_codex(codex,"BDRY_INFLOWFLUCTUATING",   BDRY_INFLOWFLUCTUATING);
+#endif
 }
 
 
@@ -140,6 +160,117 @@ static void update_bdry_inflow(np_t *np, gl_t *gl, long lA, long lB, long lC, lo
   //printf("---%E  %E  %E  %E\n",P,T,V[0],V[1]);
   find_U_2(np, lA, gl, V, P, T);
 }
+
+
+#if defined(UNSTEADY)
+#ifdef _3D
+void find_V_P_T_bdry_fluctuating(np_t *np, gl_t *gl, long lA, long lB, long lC,dim_t V, double *P, double *T){// refer doi:10.1063/5.0005431 oblique wave generation method
+  
+  double beta,freq;//beta is wavenumber in the z-direction, freq is angular frequency
+  long N_dist,N; //number of disturbance modes of the form given by Linear Stability Theory/Parabolized Stability Equations analyses
+  double avg_u,Re_u,Im_u,avg_v,Re_v,Im_v,avg_w,Re_w,Im_w,avg_rho,Re_rho,Im_rho,avg_T,Re_T,Im_T;
+  double unew=0.0,vnew=0.0,wnew=0.0,rhonew=0.0,Tnew=0.0;
+  int ifoblique;
+  N_dist=_bdry_param(np,gl,lA,0,TYPELEVEL_FLUID_WORK);
+  
+  for(N=0;N<N_dist;N++) {
+    beta=_bdry_param(np,gl,lA,(N*18)+1,TYPELEVEL_FLUID_WORK);
+    freq=_bdry_param(np,gl,lA,(N*18)+2,TYPELEVEL_FLUID_WORK);
+    ifoblique=_bdry_param(np,gl,lA,(N*18)+3,TYPELEVEL_FLUID_WORK);
+    avg_u=_bdry_param(np,gl,lA,(N*18)+4,TYPELEVEL_FLUID_WORK);
+    Re_u=_bdry_param(np,gl,lA,(N*18)+5,TYPELEVEL_FLUID_WORK);
+    Im_u=_bdry_param(np,gl,lA,(N*18)+6,TYPELEVEL_FLUID_WORK);
+    avg_v=_bdry_param(np,gl,lA,(N*18)+7,TYPELEVEL_FLUID_WORK);
+    Re_v=_bdry_param(np,gl,lA,(N*18)+8,TYPELEVEL_FLUID_WORK);
+    Im_v=_bdry_param(np,gl,lA,(N*18)+9,TYPELEVEL_FLUID_WORK);
+    avg_w=_bdry_param(np,gl,lA,(N*18)+10,TYPELEVEL_FLUID_WORK);
+    Re_w=_bdry_param(np,gl,lA,(N*18)+11,TYPELEVEL_FLUID_WORK);
+    Im_w=_bdry_param(np,gl,lA,(N*18)+12,TYPELEVEL_FLUID_WORK);
+    avg_rho=_bdry_param(np,gl,lA,(N*18)+13,TYPELEVEL_FLUID_WORK);
+    Re_rho=_bdry_param(np,gl,lA,(N*18)+14,TYPELEVEL_FLUID_WORK);
+    Im_rho=_bdry_param(np,gl,lA,(N*18)+15,TYPELEVEL_FLUID_WORK);
+    avg_T=_bdry_param(np,gl,lA,(N*18)+16,TYPELEVEL_FLUID_WORK);
+    Re_T=_bdry_param(np,gl,lA,(N*18)+17,TYPELEVEL_FLUID_WORK);
+    Im_T=_bdry_param(np,gl,lA,(N*18)+18,TYPELEVEL_FLUID_WORK);
+
+    if(ifoblique==1){
+      unew+=(Re_u*cos(beta*_x(np[lA],nd-1)-freq*gl->time)-Im_u*sin(beta*_x(np[lA],nd-1)-freq*gl->time)+Re_u*cos(-beta*_x(np[lA],nd-1)-freq*gl->time)-Im_u*sin(-beta*_x(np[lA],nd-1)-freq*gl->time));
+      vnew+=(Re_v*cos(beta*_x(np[lA],nd-1)-freq*gl->time)-Im_v*sin(beta*_x(np[lA],nd-1)-freq*gl->time)+Re_v*cos(-beta*_x(np[lA],nd-1)-freq*gl->time)-Im_v*sin(-beta*_x(np[lA],nd-1)-freq*gl->time));
+      wnew+=(Re_w*cos(beta*_x(np[lA],nd-1)-freq*gl->time)-Im_w*sin(beta*_x(np[lA],nd-1)-freq*gl->time)-Re_w*cos(-beta*_x(np[lA],nd-1)-freq*gl->time)+Im_w*sin(-beta*_x(np[lA],nd-1)-freq*gl->time));
+      Tnew+=(Re_T*cos(beta*_x(np[lA],nd-1)-freq*gl->time)-Im_T*sin(beta*_x(np[lA],nd-1)-freq*gl->time)+Re_T*cos(-beta*_x(np[lA],nd-1)-freq*gl->time)-Im_T*sin(-beta*_x(np[lA],nd-1)-freq*gl->time));
+      rhonew+=(Re_rho*cos(beta*_x(np[lA],nd-1)-freq*gl->time)-Im_rho*sin(beta*_x(np[lA],nd-1)-freq*gl->time)+Re_rho*cos(-beta*_x(np[lA],nd-1)-freq*gl->time)-Im_rho*sin(-beta*_x(np[lA],nd-1)-freq*gl->time));
+    }else if(ifoblique==0){
+      unew+=(Re_u*cos(beta*_x(np[lA],nd-1)-freq*gl->time)-Im_u*sin(beta*_x(np[lA],nd-1)-freq*gl->time));
+      vnew+=(Re_v*cos(beta*_x(np[lA],nd-1)-freq*gl->time)-Im_v*sin(beta*_x(np[lA],nd-1)-freq*gl->time));
+      wnew+=(Re_w*cos(beta*_x(np[lA],nd-1)-freq*gl->time)-Im_w*sin(beta*_x(np[lA],nd-1)-freq*gl->time));
+      Tnew+=(Re_T*cos(beta*_x(np[lA],nd-1)-freq*gl->time)-Im_T*sin(beta*_x(np[lA],nd-1)-freq*gl->time));
+      rhonew+=(Re_rho*cos(beta*_x(np[lA],nd-1)-freq*gl->time)-Im_rho*sin(beta*_x(np[lA],nd-1)-freq*gl->time));
+    }else fatal_error("ifoblique must be set to integer 1 or 0.");
+    unew+=avg_u;
+    vnew+=avg_v;
+    wnew+=avg_w;
+    Tnew+=avg_T;
+    rhonew+=avg_rho;
+  }
+  *P=rhonew*gl->model.fluid.R*Tnew;
+  *T=Tnew;
+  V[0]=unew;
+  V[1]=vnew;
+  V[2]=wnew;
+}
+#endif
+#ifdef _2D
+void find_V_P_T_bdry_fluctuating(np_t *np, gl_t *gl, long lA, long lB, long lC,dim_t V, double *P, double *T){// refer doi:10.1063/5.0005431 oblique wave generation method
+  
+  double freq; //angular frequency
+  long N_dist,N; //number of disturbance modes of form given by Linear Stability Theory/Parabolized Stability Equations analyses
+  double avg_u,Re_u,Im_u,avg_v,Re_v,Im_v,avg_rho,Re_rho,Im_rho,avg_T,Re_T,Im_T;
+  double unew=0.0,vnew=0.0,rhonew=0.0,Tnew=0.0;
+
+  N_dist=_bdry_param(np,gl,lA,0,TYPELEVEL_FLUID_WORK);
+  
+  for(N=0;N<N_dist;N++) {
+    freq=_bdry_param(np,gl,lA,(N*13)+1,TYPELEVEL_FLUID_WORK);
+    avg_u=_bdry_param(np,gl,lA,(N*13)+2,TYPELEVEL_FLUID_WORK);
+    Re_u=_bdry_param(np,gl,lA,(N*13)+3,TYPELEVEL_FLUID_WORK);
+    Im_u=_bdry_param(np,gl,lA,(N*13)+4,TYPELEVEL_FLUID_WORK);
+    avg_v=_bdry_param(np,gl,lA,(N*13)+5,TYPELEVEL_FLUID_WORK);
+    Re_v=_bdry_param(np,gl,lA,(N*13)+6,TYPELEVEL_FLUID_WORK);
+    Im_v=_bdry_param(np,gl,lA,(N*13)+7,TYPELEVEL_FLUID_WORK);
+    avg_rho=_bdry_param(np,gl,lA,(N*13)+8,TYPELEVEL_FLUID_WORK);
+    Re_rho=_bdry_param(np,gl,lA,(N*13)+9,TYPELEVEL_FLUID_WORK);
+    Im_rho=_bdry_param(np,gl,lA,(N*13)+10,TYPELEVEL_FLUID_WORK);
+    avg_T=_bdry_param(np,gl,lA,(N*13)+11,TYPELEVEL_FLUID_WORK);
+    Re_T=_bdry_param(np,gl,lA,(N*13)+12,TYPELEVEL_FLUID_WORK);
+    Im_T=_bdry_param(np,gl,lA,(N*13)+13,TYPELEVEL_FLUID_WORK);
+
+    unew+=(Re_u*cos(-freq*gl->time)-Im_u*sin(-freq*gl->time));
+    vnew+=(Re_v*cos(-freq*gl->time)-Im_v*sin(-freq*gl->time));
+    Tnew+=(Re_T*cos(-freq*gl->time)-Im_T*sin(-freq*gl->time));
+    rhonew+=(Re_rho*cos(-freq*gl->time)-Im_rho*sin(-freq*gl->time));
+    unew+=avg_u;
+    vnew+=avg_v;
+    Tnew+=avg_T;
+    rhonew+=avg_rho;
+  }
+  
+  *P=rhonew*gl->model.fluid.R*Tnew;
+  *T=Tnew;
+  V[0]=unew;
+  V[1]=vnew;
+}
+#endif
+
+static void update_bdry_inflow_fluctuating(np_t *np, gl_t *gl, long lA, long lB, long lC){
+  double P,T;
+  dim_t V;
+
+  assert_np(np[lA],is_node_resumed(np[lA]));
+  find_V_P_T_bdry_fluctuating(np, gl, lA, lB, lC, V, &P, &T);
+  //printf("---%E  %E  %E  %E\n",P,T,V[0],V[1]);
+  find_U_2(np, lA, gl, V, P, T);
+}
+#endif
 
 
 static void update_bdry_outflow(np_t *np, gl_t *gl, long lA, long lB, long lC, long theta, long thetasgn,
@@ -324,6 +455,12 @@ void update_bdry_fluid(np_t *np, gl_t *gl, long lA, long lB, long lC, long lD, l
     case BDRY_INFLOWSUPERSONIC:
       update_bdry_inflow(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND);
     break;
+
+    #if defined(UNSTEADY)
+    case BDRY_INFLOWFLUCTUATING:
+      update_bdry_inflow_fluctuating(np, gl, lA, lB, lC);
+    break;
+    #endif
 
     case BDRY_OUTFLOWSUPERSONIC1:
       update_bdry_outflow(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);

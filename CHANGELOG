@@ -7,6 +7,28 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 JAN 29a
+  * in bin
+    - updated Starikovskii.wrp
+  * in model/emfield/_*/emfield.c
+    - in write_model_emfield_template(), added a newline after AXISYMMETRIC=NO;
+  * in model/fluid/_Navier-Stokes_perfect/fluid.c
+    - in read_model_fluid_actions(), added new variables ETAMODEL, eta_ref, eta_ref_T, eta_C, Pr
+      and removed kappa
+    - in find_Kstar_interface(), now takes average of eta and kappa at interface
+    - added function _kappa(), _eta_from_T(), _eta()
+  * in model/fluid/_Navier-Stokes_perfect/fluid_bdry.c
+    - in write_bdry_fluid_template(), added BDRY_INFLOWFLUCTUATING
+    - added find_V_P_T_bdry_fluctuating(), update_bdry_inflow_fluctuating()
+  * in model/fluid/_Navier-Stokes_perfect/fluid_conv.c
+    - in find_jacvars(), now finds jacvars->eta from _eta(np,gl) and not from gl->model.fluid.eta
+    - in find_jacvars_from_musclvars() and find_jacvars_from_U(), now finds jacvars->eta from
+      _eta_from_T(T,gl) and not from gl->model.fluid.eta
+  * in model/fluid/_Navier-Stokes_perfect/fluid_post.c
+    - in find_post_variable_name_fluid() and find_post_variable_value_fluid(), added kappa and eta
+      to post variables
+      
+
 2021 JAN 22a
   * in model/chem/_Air_Plasma_11s/dunnkang1973.c and model/chem/_Air_Plasma_11s/doc/report.tex
     - modified the Dunn-Kang model: backward reactions are now explicitly written as in the 

@@ -41,5 +41,6 @@
 
   void reformat_P(gl_t *gl, double *P, char *suffix, bool *flag);
 
+  double _eta_from_T(double T, gl_t *gl);
 
 #endif
