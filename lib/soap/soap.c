@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
 Copyright 1998-1999 Bernard Parent
-Copyright 2020      Prasanna Thoguluva Rajendran
+Copyright 2020-2021 Prasanna Thoguluva Rajendran
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -1560,8 +1560,9 @@ static void BA_for(char **argum, SOAP_codex_t *codex){
 
 static void BA_for_parallel(char **argum, SOAP_codex_t *codex){
   char *cntstr,*loopcode,*cntstr2;
-  long cnts,cnte,cnt,cntvar,numvars,cnttmp;
-  SOAP_codex_t *codexcopy;
+  long cnts,cnte,cnt,cntvar,numvars,cnttmp,varnum;
+  SOAP_codex_t *codexcopy,*codexoriginal;
+  bool FOUNDMATCH;
 
   if (SOAP_number_argums(*argum)!=4)
   SOAP_fatal_error(codex,"the for_parallel() command needs 4 arguments: "
@@ -1579,7 +1580,11 @@ static void BA_for_parallel(char **argum, SOAP_codex_t *codex){
     cnte=cnts;
     cnts=cnttmp;
   }
-  codexcopy=(SOAP_codex_t *)malloc((cnte-cnts+2)*sizeof(SOAP_codex_t));
+  codexcopy=(SOAP_codex_t *)malloc((cnte-cnts+1)*sizeof(SOAP_codex_t));
+  codexoriginal=(SOAP_codex_t *)malloc(sizeof(SOAP_codex_t));
+  SOAP_copy_codex(codex, codexoriginal);
+  codexoriginal->vars=NULL;
+  SOAP_copy_all_vars(codex->vars, &codexoriginal->vars);
 #ifdef OPENMPTHREADS
 #pragma omp parallel for private(cnt,cntstr2,cntstr,loopcode) schedule(dynamic) 
 #endif
@@ -1603,11 +1608,28 @@ static void BA_for_parallel(char **argum, SOAP_codex_t *codex){
   for (cnt=cnts; cnt<=cnte; cnt++){
     SOAP_count_all_vars(&(codexcopy[cnt-cnts]), &numvars);
     for (cntvar=0; cntvar<numvars; cntvar++){
-      SOAP_add_to_vars(codex, (codexcopy[cnt-cnts]).vars[cntvar].name, (codexcopy[cnt-cnts]).vars[cntvar].value);
+      varnum=0;
+      FOUNDMATCH=FALSE;
+      while (codexoriginal->vars[varnum].name!=NULL) {
+        if (strcmp(codexoriginal->vars[varnum].name,(codexcopy[cnt-cnts]).vars[cntvar].name)==0) {
+          FOUNDMATCH=TRUE;
+          if(strcmp(codexoriginal->vars[varnum].value,(codexcopy[cnt-cnts]).vars[cntvar].value)!=0) {
+            SOAP_add_to_vars(codex, (codexcopy[cnt-cnts]).vars[cntvar].name, (codexcopy[cnt-cnts]).vars[cntvar].value);
+          }
+        }
+        varnum++;
+      }
+      if (!FOUNDMATCH) {
+        SOAP_add_to_vars(codex, (codexcopy[cnt-cnts]).vars[cntvar].name, (codexcopy[cnt-cnts]).vars[cntvar].value);
+      }
     }
     SOAP_free_all_vars(((codexcopy[cnt-cnts]).vars));
     SOAP_free_codex(&(codexcopy[cnt-cnts]));
   }
+  SOAP_free_all_vars(codexoriginal->vars);
+  SOAP_free_codex(codexoriginal);
+  free(codexcopy);
+  free(codexoriginal);
 }
 
 

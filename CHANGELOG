@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 FEB 02a
+  * in lib/soap/soap.c
+    - in BA_for_parallel(), fixed a bug that caused the incorrect update of variables when using 
+      the for_parallel built-in action
+
+
 2021 JAN 29a
   * in bin
     - updated Starikovskii.wrp

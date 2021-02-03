@@ -101,6 +101,12 @@ RAJENDRAN, Prasanna T.
   
   - addtion of monotone spline algorithm in exm.c
   
+  - addition of fluctuating inflow BC in model/fluid/_Navier_Stokes_perfect
+
+  - addition of Sutherland's law for the viscosity in model/fluid/_Navier_Stokes_perfect
+  
+  - in lib/soap/soap.c, fixed a bug in BA_for_parallel()
+  
 
 SCHWARTZENTRUBER, Thomas E.
 
