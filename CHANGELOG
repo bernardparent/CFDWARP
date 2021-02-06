@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 FEB 05a
+  * in model/emfield/doc/Electrodynamics/report.tex
+    - improved document
+  * in model/emfield/_*/emfield.c
+    - in read_model_emfield_actions(), now read in AXISYMMETRIC only is _2D is defined
+  * in model/emfield/_*/emfield.hh
+    - in gl_model_emfield_t, AXISYMMETRIC is defined only if _2D is defined
+    
+  
 2021 FEB 04a
   * in model/emfield/doc/
     - added directory Electrodynamics
