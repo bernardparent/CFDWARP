@@ -110,7 +110,7 @@ void add_dKstar_dG_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
 
 #ifdef _FLUID_PLASMA
 
-void add_dDstarU_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
+void add_dDstarU_residual_FVS(long theta, long ls, long le, np_t *np, gl_t *gl){
   long l,flux;
   flux_t tmpm1h,DUstarplusm1,DUstarminusp0,DUstarplusp0,DUstarplusm2,DUstarminusm1,DUstarminusp1;
   flux_t Ustarm1,Ustarp0,Ustarm2,Ustarp1;
@@ -165,6 +165,71 @@ void add_dDstarU_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
   }
 
 
+}
+
+
+void find_U2(np_t np, gl_t *gl, flux_t U){
+  long flux;
+  for (flux=0; flux<nf; flux++)
+    U[flux]=np.bs->U[flux];
+}
+
+
+
+void add_dDstarU_residual_FDS(long theta, long ls, long le, np_t *np, gl_t *gl){
+  long l,flux;
+  flux_t tmpm1h;
+  flux_t Um1,Up0,Um2,Up1;
+  flux_t Dstarm1h;
+  double weightp0,UL,UR;
+
+    /*  FDS discretization of d(Dstar*Ustar)/dX */
+  for (l=ls; l!=_l_plus_one(_l_plus_one(le,gl,theta),gl,theta); l=_l_plus_one(l,gl,theta)){
+    find_Dstar_interface(np, gl, _al(gl,l,theta,-1), theta, Dstarm1h);
+    find_U2(np[_al(gl,l,theta,-1)], gl, Um1);
+    find_U2(np[_al(gl,l,theta,+0)], gl, Up0);
+    if (DUSTAR_SECONDORDER && !is_node_bdry(np[_al(gl,l,theta,-1)],TYPELEVEL_FLUID_WORK) ) {
+      find_U2(np[_al(gl,l,theta,-2)], gl, Um2);
+    }
+    if (DUSTAR_SECONDORDER && !is_node_bdry(np[_al(gl,l,theta,+0)],TYPELEVEL_FLUID_WORK) ) {
+      find_U2(np[_al(gl,l,theta,+1)], gl, Up1);
+    }
+    
+
+    for (flux=0; flux<nf; flux++){
+      UL=Um1[flux];
+      UR=Up0[flux];
+      if (DUSTAR_SECONDORDER && !is_node_bdry(np[_al(gl,l,theta,-1)],TYPELEVEL_FLUID_WORK) ) {
+        UL=_f_TVD2(Um2[flux],Um1[flux],Up0[flux],LIMITER_MINMOD);
+      }
+      if (DUSTAR_SECONDORDER && !is_node_bdry(np[_al(gl,l,theta,+0)],TYPELEVEL_FLUID_WORK) ) {
+        UR=_f_TVD2(Up1[flux],Up0[flux],Um1[flux],LIMITER_MINMOD);
+      }
+      tmpm1h[flux]=0.5*Dstarm1h[flux]*(UL+UR) - 0.5*(fabs(Dstarm1h[flux]))*(UR-UL); 
+    }
+
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
+    weightp0=1.0-gl->cycle.restime.weightm1_trapezoidal_default;
+#else
+    weightp0=1.0;
+#endif
+    for (flux=0; flux<nf; flux++){
+      if (l!=_l_plus_one(le,gl,theta)) np[l].wk->Res[flux]-=weightp0*tmpm1h[flux];
+      if (l!=ls) np[_al(gl,l,theta,-1)].wk->Res[flux]+=weightp0*tmpm1h[flux];
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
+      if (l!=_l_plus_one(le,gl,theta)) np[l].bs->trapezoidalm1_next[flux]-=(1.0-weightp0)*tmpm1h[flux];
+      if (l!=ls) np[_al(gl,l,theta,-1)].bs->trapezoidalm1_next[flux]+=(1.0-weightp0)*tmpm1h[flux];
+#endif
+    }
+
+  }
+
+
+}
+
+
+void add_dDstarU_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
+  add_dDstarU_residual_FDS(theta, ls, le, np, gl);
 }
 
 

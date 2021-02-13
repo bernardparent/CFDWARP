@@ -81,6 +81,10 @@ void find_Ustar(np_t np, gl_t *gl, flux_t Ustar);
 
 void find_Sstar(np_t *np, gl_t *gl, long l, flux_t S);
 
+void find_Dstar_interface(np_t *np, gl_t *gl, long lL, long theta, flux_t Dstar);
+
+void find_DstarAbs_interface(np_t *np, gl_t *gl, long lL, long theta, flux_t Dstar);
+
 void find_Dstar(np_t *np, gl_t *gl, long l, long theta, sqmat_t Dstar);
 
 void find_Dstarplus(np_t *np, gl_t *gl, long l, long theta, sqmat_t Dstarplus);

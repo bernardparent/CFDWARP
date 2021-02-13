@@ -760,6 +760,11 @@ double _limiter_TVD(double r, int LIMITER){
 
    switch (LIMITER){
 
+     /* first order accurate */
+     case LIMITER_FIRSTORDER:
+		   phizero=0.0;
+     break;
+
      /* standard minmod limiter, Roe 1986 */
      case LIMITER_MINMOD:
 		   phizero=max(0.0,min(1.0,r));

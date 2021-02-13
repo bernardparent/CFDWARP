@@ -7,6 +7,39 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 FEB 12a
+  * in cycle/res/_generic/res.c
+    - renamed add_dDstarU_residual() to add_dDstarU_residual_FVS()
+    - added add_dDstarU_residual_FDS()
+    - added add_dDstarU_residual() which calls add_dDstarU_residual_FDS()
+  * in cycle/share/res_share.c
+    - in _limiter_TVD(), added LIMITER_FIRSTORDER
+  * in cycle/share/ts_share.c
+    - renamed find_Dstar_interface() to find_DstarUstar_jacobians_FVS()
+    - added find_DstarUstar_jacobians_FDS()
+    - added find_DstarUstar_jacobians()
+    - in add_Dstar_to_TDMA_check() and find_TDMA_jacobians_conservative(), now calls
+      find_DstarUstar_jacobians() instead of find_Dstar_interface()
+  * in model/emfield/_Epotential-Te/emfield.c
+    - in add_dUstar_to_U_emfield(), added the addition of Temin_EMF and Temax_EMF to the clipped
+      variables
+    - in find_Ve_drift_at_interface(), took away thermal diffusion contribution to electron velocity
+    - in find_linearization_coefficients_inner_node_emfield_OHMBASED(), set the e thermal diffusion
+      coefficients to 2 times their normal value instead of 1.25 times
+    - in find_Fstar_interface_emfield(), added to Fstar the full electron thermal diffusion terms
+    - in find_Fstar_interface_emfield(), changed the limiter from VANLEER to MINMOD in determining
+      TeL and TeR
+  * in model/fluid/_*_plasma/fluid.c
+    - in find_Kstar_interface(), changed the electron thermal diffusion coefficients to 2 times
+      the normal value for CYCLELEVEL_TS (up from 1.25) and to the normal value for CYCLELEVEL_RES
+      (up from 0.25)
+  * in model/fluid/_*_plasma/fluid_plasma.c
+    - added _DeltaVkstar_interface()
+    - added find_Dstar_interface()
+  * in model/fluid/_Favre-Reynolds_plasma/fluid_plasma.c
+    - in find_Dstar(), changed find_Ve_from_Je(np, gl, l, Ve); to find_Ve_from_J(np, gl, l, Ve);
+
+
 2021 FEB 05a
   * in model/emfield/doc/Electrodynamics/report.tex
     - improved document

@@ -115,7 +115,7 @@ void add_Kstar_dG_dUstar_to_TDMA(np_t *np, gl_t *gl, long theta, long l, double 
 #ifdef _FLUID_PLASMA
 
 
-void find_Dstar_interface(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
+void find_DstarUstar_jacobians_FVS(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
   sqmat_t Dstarplusp0, Dstarminusp1;
   long lp0,lp1,row,col;
   
@@ -134,12 +134,34 @@ void find_Dstar_interface(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqm
 }
 
 
+void find_DstarUstar_jacobians_FDS(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
+  flux_t Dstar;
+  long flux,row,col;
+  for (row=0; row<nf; row++){
+    for (col=0; col<nf; col++){
+      B[row][col]=0.0;
+      C[row][col]=0.0;
+    }
+  }
+  find_Dstar_interface(np, gl, l, theta, Dstar);
+  for (flux=0; flux<nf; flux++){
+    B[flux][flux]=0.5*(Dstar[flux]+fabs(Dstar[flux]))/_Omega(np[l],gl);
+    C[flux][flux]=0.5*(Dstar[flux]-fabs(Dstar[flux]))/_Omega(np[_al(gl,l,theta,+1)],gl);
+  }
+}
+
+
+
+void find_DstarUstar_jacobians(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
+  find_DstarUstar_jacobians_FDS(np, gl, theta, l, B, C);
+}
+
 void add_Dstar_to_TDMA_check(np_t *np, gl_t *gl, long theta, long l, sqmat_t A, sqmat_t B, sqmat_t C){
   sqmat_t Bp1h,Cp1h,Am1h,Bm1h;
   long row,col;
 
-  find_Dstar_interface(np, gl, theta, l, Bp1h, Cp1h);
-  find_Dstar_interface(np, gl, theta, _al(gl,l,theta,-1), Am1h, Bm1h);
+  find_DstarUstar_jacobians(np, gl, theta, l, Bp1h, Cp1h);
+  find_DstarUstar_jacobians(np, gl, theta, _al(gl,l,theta,-1), Am1h, Bm1h);
 
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
@@ -693,7 +715,7 @@ void find_TDMA_jacobians_conservative(np_t *np, gl_t *gl, long theta, long l, sq
   }
 
 #ifdef _FLUID_PLASMA
-  find_Dstar_interface(np, gl, theta, l, B1, C1);
+  find_DstarUstar_jacobians(np, gl, theta, l, B1, C1);
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
       B[row][col]+=weightp0_default*B1[row][col];
