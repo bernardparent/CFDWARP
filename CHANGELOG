@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 FEB 12b
+  * in model/fluid/_*_plasma/fluid_plasma.c
+    - in _DeltaVkstar_interface(), changed arith average to minmod
+    
+
 2021 FEB 12a
   * in cycle/res/_generic/res.c
     - renamed add_dDstarU_residual() to add_dDstarU_residual_FVS()
