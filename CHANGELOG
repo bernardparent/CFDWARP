@@ -7,6 +7,25 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 FEB 15a
+  * in cycle/res/_generic/res.c
+    - in add_dDstarU_residual_FDS(), changed TVD limiter to FIRSTORDER
+    - in add_dDstarU_residual(), now calls add_dDstarU_residual_FVS
+  * in cycle/share/ts_share.c
+    - in find_DstarUstar_jacobians(), now calls find_DstarUstar_jacobians_FVS()
+  * renamed
+    - _dTedXj_interface -> _dTedXj_interface_upwind
+    - _dTedXj -> _dTedXj_interface
+  * in model/fluid/_*_plasma/fluid_plasma.c    
+    - in find_Dstar(), added code to take away thermal diffusion from electron velocity
+  * in model/fluid/_Navier-Stokes_plasma/fluid_plasma.c  
+    - in find_Dstar_interface(), made minor modifications to averaging of mu and Ve at interface
+  * in model/fluid/_drift-diffusion/fluid.c
+    - added find_Dstar_interface() 
+  * in model/share/emfield_share.c
+    - added _dTedXj()
+    
+
 2021 FEB 12b
   * in model/fluid/_*_plasma/fluid_plasma.c
     - in _DeltaVkstar_interface(), changed arith average to minmod

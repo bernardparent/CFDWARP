@@ -200,10 +200,10 @@ void add_dDstarU_residual_FDS(long theta, long ls, long le, np_t *np, gl_t *gl){
       UL=Um1[flux];
       UR=Up0[flux];
       if (DUSTAR_SECONDORDER && !is_node_bdry(np[_al(gl,l,theta,-1)],TYPELEVEL_FLUID_WORK) ) {
-        UL=_f_TVD2(Um2[flux],Um1[flux],Up0[flux],LIMITER_MINMOD);
+        UL=_f_TVD2(Um2[flux],Um1[flux],Up0[flux],LIMITER_FIRSTORDER);
       }
       if (DUSTAR_SECONDORDER && !is_node_bdry(np[_al(gl,l,theta,+0)],TYPELEVEL_FLUID_WORK) ) {
-        UR=_f_TVD2(Up1[flux],Up0[flux],Um1[flux],LIMITER_MINMOD);
+        UR=_f_TVD2(Up1[flux],Up0[flux],Um1[flux],LIMITER_FIRSTORDER);
       }
       tmpm1h[flux]=0.5*Dstarm1h[flux]*(UL+UR) - 0.5*(fabs(Dstarm1h[flux]))*(UR-UL); 
     }
@@ -229,7 +229,7 @@ void add_dDstarU_residual_FDS(long theta, long ls, long le, np_t *np, gl_t *gl){
 
 
 void add_dDstarU_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
-  add_dDstarU_residual_FDS(theta, ls, le, np, gl);
+  add_dDstarU_residual_FVS(theta, ls, le, np, gl);
 }
 
 

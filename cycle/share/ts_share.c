@@ -153,7 +153,7 @@ void find_DstarUstar_jacobians_FDS(np_t *np, gl_t *gl, long theta, long l, sqmat
 
 
 void find_DstarUstar_jacobians(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
-  find_DstarUstar_jacobians_FDS(np, gl, theta, l, B, C);
+  find_DstarUstar_jacobians_FVS(np, gl, theta, l, B, C);
 }
 
 void add_Dstar_to_TDMA_check(np_t *np, gl_t *gl, long theta, long l, sqmat_t A, sqmat_t B, sqmat_t C){

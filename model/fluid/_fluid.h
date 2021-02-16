@@ -125,6 +125,9 @@
 
 #ifdef _FLUID_PLASMA
   void find_alpha(np_t *np, gl_t *gl, long l, spec2_t alpha);
+
+  double _Te(np_t np);
+
 #endif
 
 #endif
