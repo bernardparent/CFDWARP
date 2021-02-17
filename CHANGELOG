@@ -7,6 +7,31 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 FEB 17a
+  * renamed
+    - find_Dstarplus() -> find_Dstarmatplus()
+    - find_Dstarminus() -> find_Dstarmatminus()
+    - find_Dstar() -> find_Dstarmat()
+  * in cycle/res/_generic/res.c
+    - renamed add_dDstarU_residual_FVS()  to add_dDstarmatU_residual_FVS() 
+    - added new add_dDstarU_residual_FVS() where Dstar is a vector not a matrix and with metricsint
+      given as a parameter to find_Dstar
+  * in cycle/share/ts_share.c
+    - renamed find_DstarUstar_jacobians_FVS() to find_DstarmatUstar_jacobians_FVS()
+    - added new find_DstarUstar_jacobians_FVS() where Dstar is a vector not a matrix and with metricsint
+      given as a parameter to find_Dstar
+  * in model/fluid/_Favre-Reynolds_plasma/fluid_plasma.c
+    - implemented new find_Dstar*() functions and erased previous ones
+  * in model/fluid/_Navier-Stokes_plasma/fluid_plasma.c
+    - added new find_Dstar(), find_Dstarplus(), and find_Dstarminus() which accept metricsint as an
+      argument
+  * in model/fluid/_drift-diffusion/fluid.c
+    - added new find_Dstar(), find_Dstarplus(), and find_Dstarminus() which accept metricsint as an
+      argument
+  * in model/share/emfield_share.c
+    - in _dTedXj(), now calls _Tk() instead of _Te()
+
+
 2021 FEB 15a
   * in cycle/res/_generic/res.c
     - in add_dDstarU_residual_FDS(), changed TVD limiter to FIRSTORDER

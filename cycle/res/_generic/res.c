@@ -110,7 +110,7 @@ void add_dKstar_dG_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
 
 #ifdef _FLUID_PLASMA
 
-void add_dDstarU_residual_FVS(long theta, long ls, long le, np_t *np, gl_t *gl){
+void add_dDstarmatU_residual_FVS(long theta, long ls, long le, np_t *np, gl_t *gl){
   long l,flux;
   flux_t tmpm1h,DUstarplusm1,DUstarminusp0,DUstarplusp0,DUstarplusm2,DUstarminusm1,DUstarminusp1;
   flux_t Ustarm1,Ustarp0,Ustarm2,Ustarp1;
@@ -119,8 +119,8 @@ void add_dDstarU_residual_FVS(long theta, long ls, long le, np_t *np, gl_t *gl){
 
     /*  FVS-TVD discretization of d(Dstar*Ustar)/dX */
   for (l=ls; l!=_l_plus_one(_l_plus_one(le,gl,theta),gl,theta); l=_l_plus_one(l,gl,theta)){
-    find_Dstarplus(np, gl, _al(gl,l,theta,-1), theta, Dstarplusm1);
-    find_Dstarminus(np, gl, l, theta, Dstarminusp0);
+    find_Dstarmatplus(np, gl, _al(gl,l,theta,-1), theta, Dstarplusm1);
+    find_Dstarmatminus(np, gl, l, theta, Dstarminusp0);
     find_Ustar(np[_al(gl,l,theta,-1)], gl, Ustarm1);
     find_Ustar(np[_al(gl,l,theta,+0)], gl, Ustarp0);
     multiply_matrix_and_vector(Dstarplusm1,Ustarm1,DUstarplusm1);
@@ -130,10 +130,10 @@ void add_dDstarU_residual_FVS(long theta, long ls, long le, np_t *np, gl_t *gl){
       tmpm1h[flux]=DUstarplusm1[flux]+DUstarminusp0[flux]; 
     }
     if (DUSTAR_SECONDORDER && !is_node_bdry(np[_al(gl,l,theta,-1)],TYPELEVEL_FLUID_WORK) && !is_node_bdry(np[_al(gl,l,theta,+0)],TYPELEVEL_FLUID_WORK)) {
-      find_Dstarplus(np, gl, _al(gl,l,theta,+0), theta, Dstarplusp0);
-      find_Dstarplus(np, gl, _al(gl,l,theta,-2), theta, Dstarplusm2);
-      find_Dstarminus(np, gl, _al(gl,l,theta,-1), theta, Dstarminusm1);
-      find_Dstarminus(np, gl, _al(gl,l,theta,+1), theta, Dstarminusp1);
+      find_Dstarmatplus(np, gl, _al(gl,l,theta,+0), theta, Dstarplusp0);
+      find_Dstarmatplus(np, gl, _al(gl,l,theta,-2), theta, Dstarplusm2);
+      find_Dstarmatminus(np, gl, _al(gl,l,theta,-1), theta, Dstarminusm1);
+      find_Dstarmatminus(np, gl, _al(gl,l,theta,+1), theta, Dstarminusp1);
       find_Ustar(np[_al(gl,l,theta,-2)], gl, Ustarm2);
       find_Ustar(np[_al(gl,l,theta,+1)], gl, Ustarp1);
       multiply_matrix_and_vector(Dstarplusp0,Ustarp0,DUstarplusp0);
@@ -166,6 +166,71 @@ void add_dDstarU_residual_FVS(long theta, long ls, long le, np_t *np, gl_t *gl){
 
 
 }
+
+
+void add_dDstarU_residual_FVS(long theta, long ls, long le, np_t *np, gl_t *gl){
+  long l,flux;
+  flux_t tmpm1h,DUstarplusm1,DUstarminusp0,DUstarplusp0,DUstarplusm2,DUstarminusm1,DUstarminusp1;
+  flux_t Ustarm1,Ustarp0,Ustarm2,Ustarp1;
+  flux_t Dstarplusm1,Dstarminusp0,Dstarplusp0,Dstarplusm2,Dstarminusm1,Dstarminusp1;
+  double weightp0;
+  metrics_t metrics;
+
+    /*  FVS-TVD discretization of d(Dstar*Ustar)/dX */
+  for (l=ls; l!=_l_plus_one(_l_plus_one(le,gl,theta),gl,theta); l=_l_plus_one(l,gl,theta)){
+    find_metrics_at_interface( np,gl,_al(gl,l,theta,-1),l,theta, &metrics);
+    find_Dstarplus(np, gl, _al(gl,l,theta,-1), theta, metrics, Dstarplusm1);
+    find_Dstarminus(np, gl, l, theta, metrics, Dstarminusp0);
+    find_Ustar(np[_al(gl,l,theta,-1)], gl, Ustarm1);
+    find_Ustar(np[_al(gl,l,theta,+0)], gl, Ustarp0);
+    for (flux=0; flux<nf; flux++){
+      DUstarplusm1[flux]=Dstarplusm1[flux]*Ustarm1[flux];
+      DUstarminusp0[flux]=Dstarminusp0[flux]*Ustarp0[flux];
+    }
+
+    for (flux=0; flux<nf; flux++){
+      tmpm1h[flux]=DUstarplusm1[flux]+DUstarminusp0[flux]; 
+    }
+    if (DUSTAR_SECONDORDER && !is_node_bdry(np[_al(gl,l,theta,-1)],TYPELEVEL_FLUID_WORK) && !is_node_bdry(np[_al(gl,l,theta,+0)],TYPELEVEL_FLUID_WORK)) {
+      find_Dstarplus(np, gl, _al(gl,l,theta,+0), theta, metrics, Dstarplusp0);
+      find_Dstarplus(np, gl, _al(gl,l,theta,-2), theta, metrics, Dstarplusm2);
+      find_Dstarminus(np, gl, _al(gl,l,theta,-1), theta, metrics, Dstarminusm1);
+      find_Dstarminus(np, gl, _al(gl,l,theta,+1), theta, metrics, Dstarminusp1);
+      find_Ustar(np[_al(gl,l,theta,-2)], gl, Ustarm2);
+      find_Ustar(np[_al(gl,l,theta,+1)], gl, Ustarp1);
+      for (flux=0; flux<nf; flux++){
+        DUstarplusp0[flux]=Dstarplusp0[flux]*Ustarp0[flux];
+        DUstarplusm2[flux]=Dstarplusm2[flux]*Ustarm2[flux];
+        DUstarminusm1[flux]=Dstarminusm1[flux]*Ustarm1[flux];
+        DUstarminusp1[flux]=Dstarminusp1[flux]*Ustarp1[flux];
+      }
+
+      for (flux=0; flux<nf; flux++) {
+        tmpm1h[flux]+=0.5*_limiter_TVD((DUstarplusp0[flux]-DUstarplusm1[flux])/notzero(DUstarplusm1[flux]-DUstarplusm2[flux],1e-99),TVDLIMITER)*(DUstarplusm1[flux]-DUstarplusm2[flux])
+                     +0.5*_limiter_TVD((DUstarminusm1[flux]-DUstarminusp0[flux])/notzero(DUstarminusp0[flux]-DUstarminusp1[flux],1e-99),TVDLIMITER)*(DUstarminusp0[flux]-DUstarminusp1[flux]);
+      }            
+
+    }
+
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
+    weightp0=1.0-gl->cycle.restime.weightm1_trapezoidal_default;
+#else
+    weightp0=1.0;
+#endif
+    for (flux=0; flux<nf; flux++){
+      if (l!=_l_plus_one(le,gl,theta)) np[l].wk->Res[flux]-=weightp0*tmpm1h[flux];
+      if (l!=ls) np[_al(gl,l,theta,-1)].wk->Res[flux]+=weightp0*tmpm1h[flux];
+#ifdef _RESTIME_TRAPEZOIDAL_RESIDUAL
+      if (l!=_l_plus_one(le,gl,theta)) np[l].bs->trapezoidalm1_next[flux]-=(1.0-weightp0)*tmpm1h[flux];
+      if (l!=ls) np[_al(gl,l,theta,-1)].bs->trapezoidalm1_next[flux]+=(1.0-weightp0)*tmpm1h[flux];
+#endif
+    }
+
+  }
+
+
+}
+
 
 
 void find_U2(np_t np, gl_t *gl, flux_t U){
@@ -230,6 +295,7 @@ void add_dDstarU_residual_FDS(long theta, long ls, long le, np_t *np, gl_t *gl){
 
 void add_dDstarU_residual(long theta, long ls, long le, np_t *np, gl_t *gl){
   add_dDstarU_residual_FVS(theta, ls, le, np, gl);
+  //add_dDstarmatU_residual_FVS(theta, ls, le, np, gl);
 }
 
 

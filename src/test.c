@@ -190,7 +190,7 @@ void test_dH2_dUstar ( np_t * np, gl_t * gl, long l ) {
 }
 
 
-void test_Dstar ( np_t * np, gl_t * gl, long l ) {
+void test_Dstarmat ( np_t * np, gl_t * gl, long l ) {
   sqmat_t Dstar, Dstarplus, Dstarminus, Dstarsum, Dstartest;
   flux_t Ustar, DstartesttimesUstar, DstartimesUstar;
   long theta, flux;
@@ -203,10 +203,10 @@ void test_Dstar ( np_t * np, gl_t * gl, long l ) {
   printf ( ".\n\n" );
 
   theta = 0;
-  find_Dstarplus ( np, gl, l, theta, Dstarplus );
-  find_Dstarminus ( np, gl, l, theta, Dstarminus );
-  find_Dstar_test ( np, gl, l, theta, Dstartest );
-  find_Dstar ( np, gl, l, theta, Dstar );
+  find_Dstarmatplus ( np, gl, l, theta, Dstarplus );
+  find_Dstarmatminus ( np, gl, l, theta, Dstarminus );
+  find_Dstarmat_test ( np, gl, l, theta, Dstartest );
+  find_Dstarmat ( np, gl, l, theta, Dstar );
   find_Ustar ( np[l], gl, Ustar );
 
   add_two_matrices ( Dstarminus, Dstarplus, Dstarsum );
@@ -1051,8 +1051,8 @@ int main ( int argc, char **argv ) {
         test_dH1_dUstar ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
       if ( strcmp ( "dH2dUstar", argv[cnt] ) == 0 )
         test_dH2_dUstar ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
-      if ( strcmp ( "Dstar", argv[cnt] ) == 0 )
-        test_Dstar ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
+      if ( strcmp ( "Dstarmat", argv[cnt] ) == 0 )
+        test_Dstarmat ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
 #endif
       if ( strcmp ( "dZdU", argv[cnt] ) == 0 )
         test_dZU_dU ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
@@ -1138,8 +1138,8 @@ int main ( int argc, char **argv ) {
       write_options_row ( stderr, "dH2dUstar", "none", 
                           "dH2/dUstar Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" dH2dUstar", linewidth,
                           lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "Dstar", "none", 
-                          "Dstar plus/minus matrices  ./test -r test.wrp -node 10 10"if3D(" 10")" Dstar", linewidth,
+      write_options_row ( stderr, "Dstarmat", "none", 
+                          "Dstar plus/minus matrices  ./test -r test.wrp -node 10 10"if3D(" 10")" Dstarmat", linewidth,
                           lengthcol1, lengthcol2 );
 #endif
       write_options_row ( stderr, "dZdU", "none", 

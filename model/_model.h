@@ -85,15 +85,22 @@ void find_Dstar_interface(np_t *np, gl_t *gl, long lL, long theta, flux_t Dstar)
 
 void find_DstarAbs_interface(np_t *np, gl_t *gl, long lL, long theta, flux_t Dstar);
 
-void find_Dstar(np_t *np, gl_t *gl, long l, long theta, sqmat_t Dstar);
+void find_Dstarmat(np_t *np, gl_t *gl, long l, long theta, sqmat_t Dstar);
 
-void find_Dstarplus(np_t *np, gl_t *gl, long l, long theta, sqmat_t Dstarplus);
+void find_Dstarmatplus(np_t *np, gl_t *gl, long l, long theta, sqmat_t Dstarplus);
 
-void find_Dstarminus(np_t *np, gl_t *gl, long l, long theta, sqmat_t Dstarminus);
+void find_Dstarmatminus(np_t *np, gl_t *gl, long l, long theta, sqmat_t Dstarminus);
+
+void find_Dstar(np_t *np, gl_t *gl, long l, long theta, metrics_t metricsint, flux_t Dstar);
+
+void find_Dstarminus(np_t *np, gl_t *gl, long l, long theta, metrics_t metricsint, flux_t Dstarminus);
+
+void find_Dstarplus(np_t *np, gl_t *gl, long l, long theta, metrics_t metricsint, flux_t Dstarplus);
+
 
 void find_D2star_interface(np_t *np, gl_t *gl, long l, long theta, flux_t Dstar);
 
-void find_Dstar_test(np_t *np, gl_t *gl, long l, long theta, sqmat_t Dstar);
+void find_Dstarmat_test(np_t *np, gl_t *gl, long l, long theta, sqmat_t Dstar);
 
 void find_Z(np_t *np, gl_t *gl, long l, sqmat_t Z);
 

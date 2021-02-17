@@ -115,20 +115,44 @@ void add_Kstar_dG_dUstar_to_TDMA(np_t *np, gl_t *gl, long theta, long l, double 
 #ifdef _FLUID_PLASMA
 
 
-void find_DstarUstar_jacobians_FVS(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
+void find_DstarmatUstar_jacobians_FVS(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
   sqmat_t Dstarplusp0, Dstarminusp1;
   long lp0,lp1,row,col;
   
 
   lp0=_al(gl,l,theta,+0);
   lp1=_al(gl,l,theta,+1);
-  find_Dstarplus(np, gl, lp0, theta, Dstarplusp0);
-  find_Dstarminus(np, gl, lp1, theta, Dstarminusp1);
+  find_Dstarmatplus(np, gl, lp0, theta, Dstarplusp0);
+  find_Dstarmatminus(np, gl, lp1, theta, Dstarminusp1);
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
       B[row][col]=+Dstarplusp0[row][col];
       C[row][col]=+Dstarminusp1[row][col];
     }
+  }
+
+}
+
+
+void find_DstarUstar_jacobians_FVS(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
+  flux_t Dstarplusp0, Dstarminusp1;
+  long lp0,lp1,row,col;
+  metrics_t metrics;
+
+  for (row=0; row<nf; row++){
+    for (col=0; col<nf; col++){
+      B[row][col]=0.0;
+      C[row][col]=0.0;
+    }
+  }
+  lp0=_al(gl,l,theta,+0);
+  lp1=_al(gl,l,theta,+1);
+  find_metrics_at_interface( np,gl,lp0,lp1,theta, &metrics);
+  find_Dstarplus(np, gl, lp0, theta, metrics, Dstarplusp0);
+  find_Dstarminus(np, gl, lp1, theta, metrics, Dstarminusp1);
+  for (row=0; row<nf; row++){
+    B[row][row]=+Dstarplusp0[row];
+    C[row][row]=+Dstarminusp1[row];
   }
 
 }
@@ -153,6 +177,7 @@ void find_DstarUstar_jacobians_FDS(np_t *np, gl_t *gl, long theta, long l, sqmat
 
 
 void find_DstarUstar_jacobians(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
+  //find_DstarmatUstar_jacobians_FVS(np, gl, theta, l, B, C);
   find_DstarUstar_jacobians_FVS(np, gl, theta, l, B, C);
 }
 
@@ -184,10 +209,10 @@ void add_Dstar_to_TDMA(np_t *np, gl_t *gl, long theta, long l, double fact, sqma
   lp0=_al(gl,l,theta,+0);
   lp1=_al(gl,l,theta,+1);
 
-  find_Dstarplus(np, gl, lm1, theta, Dstarplusm1);
-  find_Dstarplus(np, gl, lp0, theta, Dstarplusp0);
-  find_Dstarminus(np, gl, lp0, theta, Dstarminusp0);
-  find_Dstarminus(np, gl, lp1, theta, Dstarminusp1);
+  find_Dstarmatplus(np, gl, lm1, theta, Dstarplusm1);
+  find_Dstarmatplus(np, gl, lp0, theta, Dstarplusp0);
+  find_Dstarmatminus(np, gl, lp0, theta, Dstarminusp0);
+  find_Dstarmatminus(np, gl, lp1, theta, Dstarminusp1);
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
       A[row][col]+=-fact*Dstarplusm1[row][col];
