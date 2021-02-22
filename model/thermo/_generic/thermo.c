@@ -3454,7 +3454,7 @@ double _kappa_from_w_T(spec_t w, double T){
     if (speciestype[k]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_KAPPA) { 
       sum=0.0e0;
       for (l=0; l<ns; l++){
-        if (l!=k && (speciestype[l]==SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_KAPPA)) { 
+        if (l!=k && (speciestype[l]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_KAPPA)) { 
           assert(etak[l]!=0.0e0);
           assert((1.0e0+calM[smap[k]]/calM[smap[l]])*8.0e0>0.0e0);
           assert((etak[k]/etak[l])>0.0e0);
@@ -3598,7 +3598,7 @@ double _eta_from_w_T(spec_t w, double T){
     if (speciestype[k]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_ETA) { 
       sum=0.0e0;
       for (l=0; l<ns; l++){
-        if (l!=k && (speciestype[l]==SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_ETA)) { 
+        if (l!=k && (speciestype[l]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_ETA)) { 
           assert(etak[l]!=0.0e0);
           assert((1.0e0+calM[smap[k]]/calM[smap[l]])*8.0e0>0.0e0);
           assert((etak[k]/etak[l])>0.0e0);

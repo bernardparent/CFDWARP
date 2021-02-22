@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 FEB 22a
+  * in model/thermo/_generic/thermo.c
+    - in _kappa_from_w_T() and _eta_from_w_T(), fixed a bug introduced in 21feb21a related
+      to including the electron species
+      
+
 2021 FEB 21c
   * in model/chem/_CO2_Plasma_23s_Park/chem.c
     - fixed a bug: reaction 13 used N instead of X as a parameter

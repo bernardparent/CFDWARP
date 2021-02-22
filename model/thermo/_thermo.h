@@ -70,6 +70,8 @@ double _T_from_w_rho_P(spec_t w, double rho, double P);
 
 double _kappak_from_T(long spec, double T);
 
+double _etak_from_T(long spec, double T);
+
 double _kappa_from_w_T(spec_t w, double T);
 
 double _kappan_from_w_T(spec_t w, double T);
