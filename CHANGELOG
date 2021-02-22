@@ -7,6 +7,24 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 FEB 21b
+  * in src/common.h
+    - in gl_t, added boolean variable OUTPUTBINARYMPI
+  * in src/data.c
+    - added header unistd.h
+    - added functions _ai_mpidatafile(),read_data_file_mpi(),write_data_file_mpi() to implement 
+      parallel I/O file format WARPMPBFORMAT010
+    - modified functions write_data_file(),read_data_file() to implement parallel I/O file format 
+      WARPMPBFORMAT010
+  * in src/data.h
+    - in input_t, added boolean variables BINARYMPI,M1,MM1,M2,MM2,M3,MM3
+  * in src/main.c
+    - renamed -im1,-im2,-im3 flags to -i1,-i2,-i3
+    - added code to implement parallel I/O fileformat to be used via -im and -om flags
+    - repurposed -im1,-im2,-im3 flags to read time level minus 1, time level minus 2 and time 
+      level minus 3 data of type BINARYMPI
+    
+
 2021 FEB 21a
   * in model/fluid/_*_plasma/fluid.c
     - in _kappa() and find_prim_fluid_mem(), now calls _kappah() to include only the heavy species

@@ -202,7 +202,7 @@ typedef struct {
   long numsubiter_pc,subiter_pc;
 #endif
   char *output_filename, *post_filename;
-  bool CONVERGED,OUTPUTASCII,OUTPUTINTERPOLATION;
+  bool CONVERGED,OUTPUTBINARYMPI,OUTPUTASCII,OUTPUTINTERPOLATION;
   int PRECONDITIONER;
   double effiter_U,effiter_R,ximax,xiave,CFL,sigma1,sigma2,dtau;
 #ifdef EMFIELD

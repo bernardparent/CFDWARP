@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <src/data.h>
 #include <model/_model.h>
 #include <cycle/_cycle.h>
+#include <unistd.h>
 
 #define dt_steady 1.0e99
 
@@ -39,6 +40,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #define MIN_NUMSUBZONE_PER_THREAD 3
+
+long _ai_mpidatafile(gl_t *gl, long i, long j, long k) {
+  long ii;
+  ii=(i-gl->domain_all.is);
+  if2DL(
+    ii=ii*(gl->domain_all.je-gl->domain_all.js+1)+(j-gl->domain_all.js);
+    if3DL(ii=ii*(gl->domain_all.ke-gl->domain_all.ks+1)+(k-gl->domain_all.ks);)
+  )
+  return(ii);
+}
+
 
 void find_NODEVALID_on_domain_all(np_t *np, gl_t *gl, int TYPELEVEL, bool *NODEVALID){
   long i,j,k;
@@ -356,6 +368,245 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
 }
 
 
+void read_data_file_mpi(char *filename, np_t *np, gl_t *gl, long level){
+  FILE *datafile;
+  char data_format_str[100];
+  long i,j,k,flux,cnt,tmp1,tmp2,tmp3;
+  double CFLmem;
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL
+  flux_t Res;
+  bool NORES=FALSE;
+  long NOREScount=0;
+#endif
+#ifndef UNSTEADY
+  double tmp_double;
+#endif
+  bool FORMAT010;
+  flux_t U;
+#ifdef EMFIELD
+  double Lcmem;
+  fluxemfield_t Uemfield;
+#endif
+#ifdef DISTMPI
+  int rank,numproc,fd;
+  long offset=0;
+  zone_t domain;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &numproc);
+  MPI_Barrier(MPI_COMM_WORLD);
+#endif
+
+  CFLmem=gl->CFL;
+#ifdef EMFIELD
+  Lcmem=gl->Lc;
+#endif
+
+  datafile = fopen(filename, "r");
+  if (datafile==NULL)
+    fatal_error("Having problems opening datafile %s.",filename);
+  for (cnt=0; cnt<16; cnt++) {
+    if (fscanf(datafile,"%c",&(data_format_str[cnt]))!=1) fatal_error("Problem with fscanf in read_data_file_mpi().");
+  }
+  data_format_str[16]=EOS;
+  wfprintf(stdout,"Reading data file %s ",filename);
+  if (level!=0) wfprintf(stdout,"to time level minus %ld ",level);
+  FORMAT010=FALSE;
+  if (strcmp("WARPMPBFORMAT010",data_format_str)==0) {
+    wfprintf(stdout,"in CFDWARP binary (MPI) format 010..");
+    FORMAT010=TRUE;
+  }
+
+  if (FORMAT010) {
+    if (level==0) {
+      if (fscanf(datafile," windowis=%ld windowie=%ld iter=%ld effiter_U=%lg effiter_R=%lg CFL=%lg",
+             &(gl->window.is),&(gl->window.ie),
+             &(gl->iter),&(gl->effiter_U),&(gl->effiter_R),&(gl->CFL))!=6) fatal_error("Problem with fscanf in read_data_file_mpi().");
+      if (fscanf(datafile," nd=%ld ns=%ld nf=%ld",
+             &tmp1,&tmp2,
+             &tmp3)!=3) fatal_error("Problem with fscanf in read_data_file_mpi().");
+      if (tmp1!=nd) fatal_error("Data file has %ld dimensions but CFDWARP is compiled with %ld dimensions.",tmp1,nd);
+      if (tmp2!=ns) fatal_error("Data file has %ld species but CFDWARP is compiled with %ld species.",tmp2,ns);
+      if (tmp3!=nf) fatal_error("Data file has %ld fluxes but CFDWARP is compiled with %ld fluxes.",tmp3,nf);
+      if (fscanf(datafile," is=%ld ie=%ld",
+             &tmp1,&tmp2)!=2) fatal_error("Problem with fscanf in read_data_file_mpi().");
+      if ((tmp2-tmp1)!=(gl->domain_all.ie-gl->domain_all.is)) fatal_error("Data file has %ld grid lines along i but the control file specifies %ld grid lines.",tmp2-tmp1,(gl->domain_all.ie-gl->domain_all.is));
+#ifdef _2DL
+      if (fscanf(datafile," js=%ld je=%ld",
+             &tmp1,&tmp2)!=2) fatal_error("Problem with fscanf in read_data_file_mpi().");
+      if ((tmp2-tmp1)!=(gl->domain_all.je-gl->domain_all.js)) fatal_error("Data file has %ld grid lines along j but the control file specifies %ld grid lines.",tmp2-tmp1,(gl->domain_all.je-gl->domain_all.js));
+#endif
+#ifdef _3DL
+      if (fscanf(datafile," ks=%ld ke=%ld",
+             &tmp1,&tmp2)!=2) fatal_error("Problem with fscanf in read_data_file_mpi().");
+      if ((tmp2-tmp1)!=(gl->domain_all.ke-gl->domain_all.js)) fatal_error("Data file has %ld grid lines along k but the control file specifies %ld grid lines.",tmp2-tmp1,(gl->domain_all.ke-gl->domain_all.ks));
+#endif
+
+#if defined(UNSTEADY)
+      if (fscanf(datafile," time=%lg",&(gl->time))!=1) fatal_error("Problem reading time variable within fscanf in read_data_file_mpi().");
+#else
+      if (fscanf(datafile," time=%lg",&tmp_double)!=1) fatal_error("Problem reading time variable within fscanf in read_data_file_mpi().");
+#endif
+
+
+#ifdef UNSTEADY
+      if (fscanf(datafile," dt=%lg",&(gl->dt))!=1) fatal_error("Problem reading dt variable within fscanf in read_data_file_mpi().");
+#else
+      if (fscanf(datafile," dt=%lg",&tmp_double)!=1) fatal_error("Problem reading dt variable within fscanf in read_data_file_mpi().");
+#endif
+
+
+#ifdef EMFIELD
+      if (fscanf(datafile," Lc=%lg effiter_U_emfield=%lg effiter_R_emfield=%lg",&(gl->Lc),&(gl->effiter_U_emfield),&(gl->effiter_R_emfield))!=3) fatal_error("Problem reading EMFIELD variables within fscanf in read_data_file_mpi().");
+#endif
+
+
+      if (fscanf(datafile,"%*[^\n]")!=0) fatal_error("Problem with fscanf in read_data_file_mpi().");
+
+
+    } else {
+      if (fscanf(datafile," %*[^\n]")!=0) fatal_error("Problem with fscanf in read_data_file_mpi().");
+    }
+    fgetc(datafile);
+  }
+
+  if (!FORMAT010){
+    fatal_error("Data file format invalid.");
+  }
+#ifdef DISTMPI
+  fd=fileno(datafile);
+  if(level==0) offset=ftell(datafile);
+  domain=_zone_intersection(gl->domain_all,gl->domain_lim);
+#endif
+
+  wfprintf(stdout,"fluid.");
+  wfprintf(stdout,".");
+
+#ifdef DISTMPI
+  for_ijk(domain,is,js,ks,ie,je,ke){
+    if(pread(fd,U,sizeof(flux_t),_ai_mpidatafile(gl,i,j,k)*sizeof(flux_t)+offset)==-1)
+      fatal_error("Could not read all data properly.");
+    for (flux=0; flux<nf; flux++){
+      if (level==0) np[_ai(gl,i,j,k)].bs->U[flux]=U[flux];
+#ifdef UNSTEADY
+      if (level==1) np[_ai(gl,i,j,k)].bs->Um1[flux]=U[flux];
+      #if _RESTIME_BW > 2
+        if (level==2) np[_ai(gl,i,j,k)].bs->Um2[flux]=U[flux];
+      #endif
+      #if _RESTIME_BW > 3
+        if (level==3) np[_ai(gl,i,j,k)].bs->Um3[flux]=U[flux];
+      #endif
+#endif
+    }
+    np[_ai(gl,i,j,k)].INIT_FLUID=TRUE;
+  }
+  offset+=((gl->domain_all.ie-gl->domain_all.is+1)*(gl->domain_all.je-gl->domain_all.js+1)*(gl->domain_all.ke-gl->domain_all.ks+1)*sizeof(flux_t));
+#else
+  for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
+    if (fread(U, sizeof(flux_t), 1, datafile)!=1)
+      fatal_error("Could not read all data properly.");
+    for (flux=0; flux<nf; flux++){
+      if (level==0) np[_ai(gl,i,j,k)].bs->U[flux]=U[flux];
+#ifdef UNSTEADY
+      if (level==1) np[_ai(gl,i,j,k)].bs->Um1[flux]=U[flux];
+      #if _RESTIME_BW > 2
+        if (level==2) np[_ai(gl,i,j,k)].bs->Um2[flux]=U[flux];
+      #endif
+      #if _RESTIME_BW > 3
+        if (level==3) np[_ai(gl,i,j,k)].bs->Um3[flux]=U[flux];
+      #endif
+#endif
+    }
+    np[_ai(gl,i,j,k)].INIT_FLUID=TRUE;
+  }
+#endif
+
+
+#ifdef EMFIELD
+  wfprintf(stdout,"emfield.");
+  wfprintf(stdout,".");
+#ifdef DISTMPI
+  for_ijk(domain,is,js,ks,ie,je,ke){
+    if(pread(fd,Uemfield,sizeof(fluxemfield_t),_ai_mpidatafile(gl,i,j,k)*sizeof(fluxemfield_t)+offset)==-1)
+      fatal_error("Could not read all data properly.");
+    for (flux=0; flux<nfe; flux++) {
+      if (level==0) np[_ai(gl,i,j,k)].bs->Uemfield[flux]=Uemfield[flux];
+#ifdef UNSTEADY
+      if (level==1) np[_ai(gl,i,j,k)].bs->Uemfieldm1[flux]=Uemfield[flux];
+#endif
+    }
+    np[_ai(gl,i,j,k)].INIT_EMFIELD=TRUE;
+  }
+  offset+=((gl->domain_all.ie-gl->domain_all.is+1)*(gl->domain_all.je-gl->domain_all.js+1)*(gl->domain_all.ke-gl->domain_all.ks+1)*sizeof(fluxemfield_t));
+#else
+  for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
+    if (fread(Uemfield, sizeof(fluxemfield_t), 1, datafile)!=1)
+      fatal_error("Could not read all data properly.");
+    for (flux=0; flux<nfe; flux++) {
+      if (level==0) np[_ai(gl,i,j,k)].bs->Uemfield[flux]=Uemfield[flux];
+#ifdef UNSTEADY
+      if (level==1) np[_ai(gl,i,j,k)].bs->Uemfieldm1[flux]=Uemfield[flux];
+#endif
+    }
+    np[_ai(gl,i,j,k)].INIT_EMFIELD=TRUE;
+  }
+#endif
+#endif
+
+
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL
+  wfprintf(stdout,"trap.");
+  wfprintf(stdout,".");
+#ifdef DISTMPI
+  for_ijk(domain,is,js,ks,ie,je,ke){
+    if(pread(fd,Res,sizeof(flux_t),_ai_mpidatafile(gl,i,j,k)*sizeof(flux_t)+offset)==-1){
+      printf("failed to read value at %ld,%ld,%ld;",i,j,k);
+      NORES=TRUE;
+      NOREScount++;
+    }
+    for (flux=0; flux<nf; flux++) {
+      if (!NORES) np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux]=Res[flux];
+      else if (NORES) np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux]=0.0;
+    }
+    NORES=FALSE;
+  }
+#else
+  for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
+    if (fread(Res, sizeof(flux_t), 1, datafile)!=1){
+      NORES=TRUE;
+      NOREScount++;
+    }
+    for (flux=0; flux<nf; flux++) {
+      if (!NORES) np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux]=Res[flux];
+      else if (NORES) np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux]=0.0;
+    }
+    NORES=FALSE;
+  }
+#endif
+  if(NOREScount>0) wfprintf(stdout,"WARNING: The residual at the previous time step could not be found within the data file %s. The residual has been set to zero..",filename);
+#endif
+
+  fclose(datafile);
+
+  wfprintf(stdout,"done;\n");
+  if (level!=0) gl->CFL=CFLmem;
+#ifdef EMFIELD
+  if (level!=0) gl->Lc=Lcmem;
+#endif
+#ifdef DISTMPI
+  MPI_Barrier(MPI_COMM_WORLD);
+  if (rank!=0) {
+    gl->effiter_U=0.0;
+    gl->effiter_R=0.0;
+    #ifdef EMFIELD
+    gl->effiter_U_emfield=0.0;
+    gl->effiter_R_emfield=0.0;
+    #endif
+  }
+#endif
+
+}
+
+
 void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATYPE){
   FILE *datafile;
   long i,j,k;
@@ -394,7 +645,7 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
                           *sizeof(bool));
 
 
- 
+
   effiter_U=gl->effiter_U;
   effiter_R=gl->effiter_R;
 #ifdef EMFIELD
@@ -443,13 +694,13 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
 #if defined(UNSTEADY)
   wfprintf(datafile," time=%E",gl->time);
 #else
-  wfprintf(datafile," time=%E",0.0); 
+  wfprintf(datafile," time=%E",0.0);
 #endif
 
 #ifdef UNSTEADY
   wfprintf(datafile," dt=%E",gl->dt);
 #else
-  wfprintf(datafile," dt=%E",dt_steady); 
+  wfprintf(datafile," dt=%E",dt_steady);
 #endif
 
 #ifdef EMFIELD
@@ -602,6 +853,168 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
 }
 
 
+void write_data_file_mpi(char *filename, np_t *np, gl_t *gl){
+  FILE *datafile;
+  long i,j,k;
+  flux_t *fluxtmp;
+#ifdef EMFIELD
+  double effiter_U_emfield,effiter_R_emfield;
+#endif
+  long flux;
+  double effiter_U,effiter_R;
+#ifdef DISTMPI
+  zone_t domain;
+  int rank,fd;
+#endif
+#ifdef DISTMPI
+  long offset=0;
+#endif
+#ifdef EMFIELD
+  assert(nf>=nfe);
+#endif
+  fluxtmp=(flux_t *)malloc((gl->domain_lim_all.ie-gl->domain_lim_all.is+1)
+#ifdef _2DL
+                          *(gl->domain_lim_all.je-gl->domain_lim_all.js+1)
+#endif
+#ifdef _3DL
+                          *(gl->domain_lim_all.ke-gl->domain_lim_all.ks+1)
+#endif
+                          *sizeof(flux_t));
+ 
+  effiter_U=gl->effiter_U;
+  effiter_R=gl->effiter_R;
+#ifdef EMFIELD
+  effiter_U_emfield=gl->effiter_U_emfield;
+  effiter_R_emfield=gl->effiter_R_emfield;
+#endif
+#ifdef DISTMPI
+  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Allreduce(&gl->effiter_U, &effiter_U, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce(&gl->effiter_R, &effiter_R, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+#ifdef EMFIELD
+  MPI_Allreduce(&gl->effiter_U_emfield, &effiter_U_emfield, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce(&gl->effiter_R_emfield, &effiter_R_emfield, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+#endif
+#endif
+
+
+  datafile = wfopen(filename, "w");
+  wfprintf(stdout,"Writing to CFDWARP binary (MPI)");
+  wfprintf(datafile,"WARPMPBFORMAT010");
+  wfprintf(stdout," data file %s..",filename);
+  wfprintf(datafile," windowis=%ld windowie=%ld iter=%ld effiter_U=%E effiter_R=%E CFL=%E",
+           gl->window.is,gl->window.ie,gl->iter,effiter_U,effiter_R,gl->CFL);
+  wfprintf(datafile," nd=%ld ns=%ld nf=%ld",nd,ns,nf);
+  wfprintf(datafile," is=%ld ie=%ld",gl->domain_all.is,gl->domain_all.ie);
+#ifdef _2DL
+  wfprintf(datafile," js=%ld je=%ld",gl->domain_all.js,gl->domain_all.je);
+#endif
+#ifdef _3DL
+  wfprintf(datafile," ks=%ld ke=%ld",gl->domain_all.ks,gl->domain_all.ke);
+#endif
+
+#if defined(UNSTEADY)
+  wfprintf(datafile," time=%E",gl->time);
+#else
+  wfprintf(datafile," time=%E",0.0); 
+#endif
+
+#ifdef UNSTEADY
+  wfprintf(datafile," dt=%E",gl->dt);
+#else
+  wfprintf(datafile," dt=%E",dt_steady); 
+#endif
+
+#ifdef EMFIELD
+  wfprintf(datafile," Lc=%E effiter_U_emfield=%E effiter_R_emfield=%E",gl->Lc,effiter_U_emfield,effiter_R_emfield);
+#endif
+
+  wfprintf(datafile,"\n");
+#ifdef DISTMPI
+  if(rank==0) {
+    fseek(datafile,0,SEEK_END);
+    offset=ftell(datafile);
+  }
+  MPI_Bcast(&offset,1,MPI_LONG,0,MPI_COMM_WORLD);
+#endif
+
+
+#ifdef DISTMPI
+  wfclose(datafile);
+  do {datafile = fopen(filename, "rb+");} while(datafile==NULL);
+  domain=_domain_from_rank(rank,gl);
+#else
+  for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
+    for (flux=0; flux<nf; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->U[flux];
+  }
+#endif
+
+#ifdef DISTMPI
+  fd=fileno(datafile);
+  for_ijk(domain,is,js,ks,ie,je,ke){
+    for (flux=0; flux<nf; flux++) fluxtmp[_ai(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->U[flux];
+    pwrite(fd,fluxtmp[_ai(gl,i,j,k)],sizeof(flux_t),_ai_mpidatafile(gl,i,j,k)*sizeof(flux_t)+offset);
+  }
+  offset+=((gl->domain_all.ie-gl->domain_all.is+1)*(gl->domain_all.je-gl->domain_all.js+1)*(gl->domain_all.ke-gl->domain_all.ks+1)*sizeof(flux_t));
+#else
+  for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
+    wfwrite(fluxtmp[_ai_all(gl,i,j,k)], sizeof(flux_t), 1, datafile);
+  }
+#endif
+
+
+#ifdef EMFIELD
+#ifndef DISTMPI
+  for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
+    for (flux=0; flux<nfe; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->Uemfield[flux];
+  }
+#endif
+
+#ifdef DISTMPI
+  for_ijk(domain,is,js,ks,ie,je,ke){
+    for (flux=0; flux<nfe; flux++) fluxtmp[_ai(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->Uemfield[flux];
+    pwrite(fd,fluxtmp[_ai(gl,i,j,k)],sizeof(fluxemfield_t),_ai_mpidatafile(gl,i,j,k)*sizeof(fluxemfield_t)+offset);
+  }
+  offset+=((gl->domain_all.ie-gl->domain_all.is+1)*(gl->domain_all.je-gl->domain_all.js+1)*(gl->domain_all.ke-gl->domain_all.ks+1)*sizeof(fluxemfield_t));
+#else
+  for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
+    wfwrite(fluxtmp[_ai_all(gl,i,j,k)], sizeof(fluxemfield_t), 1, datafile);
+  }
+#endif
+#endif
+
+
+
+#ifdef _RESTIME_STORAGE_TRAPEZOIDAL
+#ifndef DISTMPI
+  for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
+    for (flux=0; flux<nf; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux];
+  }
+#endif
+
+#ifdef DISTMPI
+  for_ijk(domain,is,js,ks,ie,je,ke){
+    for (flux=0; flux<nf; flux++) fluxtmp[_ai(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux];
+    pwrite(fd,fluxtmp[_ai(gl,i,j,k)],sizeof(flux_t),_ai_mpidatafile(gl,i,j,k)*sizeof(flux_t)+offset);
+  }
+#else
+  for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
+    wfwrite(fluxtmp[_ai_all(gl,i,j,k)], sizeof(flux_t), 1, datafile);
+  }
+#endif
+#endif
+
+#ifdef DISTMPI
+  fclose(datafile);
+#else
+  wfclose(datafile);
+#endif
+  wfprintf(stdout,"done.\n");
+  free(fluxtmp);
+}
+
+
 void write_data_file(np_t *np, gl_t *gl){
   char *tmp_filename,*tmp_filename2;
 #ifdef DISTMPI
@@ -624,12 +1037,15 @@ void write_data_file(np_t *np, gl_t *gl){
 #endif
   if (gl->OUTPUTASCII) {
     write_data_file_binary_ascii(gl->output_filename, np, gl, DATATYPE_ASCII);
-  } else {
-    if (gl->OUTPUTINTERPOLATION){
-      write_data_file_interpolation(gl->output_filename, np, gl);
-    } else {
-      write_data_file_binary_ascii(gl->output_filename, np, gl, DATATYPE_BINARY);
-    }
+  }
+  else if (gl->OUTPUTINTERPOLATION){
+    write_data_file_interpolation(gl->output_filename, np, gl);
+  }
+  else if (gl->OUTPUTBINARYMPI){
+    write_data_file_mpi(gl->output_filename, np, gl);
+  }
+  else {
+    write_data_file_binary_ascii(gl->output_filename, np, gl, DATATYPE_BINARY);
   }
   free(tmp_filename);
   free(tmp_filename2);
@@ -650,12 +1066,15 @@ void read_data_file(input_t input, np_t *np, gl_t *gl){
   if (input.READDATAFILE) {
     if (input.ASCII) {
       read_data_file_binary_ascii(input.name, np, gl, 0, DATATYPE_ASCII);
-    } else {
-      if (input.INTERPOLATION){
-        read_data_file_interpolation(input.name, np, gl);
-      } else {
-        read_data_file_binary_ascii(input.name, np, gl, 0, DATATYPE_BINARY);
-      }
+    }
+    else if (input.INTERPOLATION){
+      read_data_file_interpolation(input.name, np, gl);
+    }
+    else if (input.BINARYMPI) {
+      read_data_file_mpi(input.name, np, gl, 0);
+    }
+    else {
+      read_data_file_binary_ascii(input.name, np, gl, 0, DATATYPE_BINARY);
     }
     gl->iter=max(gl->iter,1);
     gl->INIT_FLUID_READ=TRUE;
@@ -672,13 +1091,15 @@ void read_data_file(input_t input, np_t *np, gl_t *gl){
           }
 #endif
     }
-    if (input.M1) read_data_file_binary_ascii(input.name_m1, np, gl, 1, DATATYPE_BINARY);
+      if (input.MM1) read_data_file_mpi(input.name_m1, np, gl, 1);
+      if (input.M1) read_data_file_binary_ascii(input.name_m1, np, gl, 1, DATATYPE_BINARY);
 #if _RESTIME_BW > 2  
       for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
             for (flux=0; flux<nf; flux++){
               (np)[_ai(gl,i,j,k)].bs->Um2[flux]=(np)[_ai(gl,i,j,k)].bs->Um1[flux];
             }
       }
+      if (input.MM2) read_data_file_binary_mpi(input.name_m2, np, gl, 2);
       if (input.M2) read_data_file_binary_ascii(input.name_m2, np, gl, 2, DATATYPE_BINARY);
 #endif
 #if _RESTIME_BW > 3 
@@ -687,7 +1108,8 @@ void read_data_file(input_t input, np_t *np, gl_t *gl){
               (np)[_ai(gl,i,j,k)].bs->Um3[flux]=(np)[_ai(gl,i,j,k)].bs->Um2[flux];
             }
       }
-      if (input.M3) read_data_file_binary_ascii(input.name_m3, np, gl, 3, DATATYPE_BINARY);
+      if (input.BINARYMPI) read_data_file_mpi(input.name_m3, np, gl, 3);
+      else read_data_file_binary_ascii(input.name_m3, np, gl, 3, DATATYPE_BINARY);
 #endif
 #endif
 

@@ -65,17 +65,28 @@ void write_options ( FILE * outputfile ) {
 #endif
   write_options_row ( outputfile, "-h", "none", "List command line options", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-i", "string", "Input binary data file", line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-im", "string", "Input binary (MPI) data file", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-ia", "string", "Input ascii data file", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-ii", "string", "Input interpolation data file", line_width, LENGTH_COL1, LENGTH_COL2 );
 #ifdef UNSTEADY
-  write_options_row ( outputfile, "-im1", "string", "Input time level minus 1 binary data file",
+  write_options_row ( outputfile, "-i1", "string", "Input time level minus 1 binary data file",
                       line_width, LENGTH_COL1, LENGTH_COL2 );
 #if _RESTIME_BW > 2
-  write_options_row ( outputfile, "-im2", "string", "Input time level minus 2 binary data file",
+  write_options_row ( outputfile, "-i2", "string", "Input time level minus 2 binary data file",
                       line_width, LENGTH_COL1, LENGTH_COL2 );
 #endif
 #if _RESTIME_BW > 3
-  write_options_row ( outputfile, "-im3", "string", "Input time level minus 3 binary data file",
+  write_options_row ( outputfile, "-i3", "string", "Input time level minus 3 binary data file",
+                      line_width, LENGTH_COL1, LENGTH_COL2 );
+#endif
+  write_options_row ( outputfile, "-im1", "string", "Input time level minus 1 binary (MPI) data file",
+                      line_width, LENGTH_COL1, LENGTH_COL2 );
+#if _RESTIME_BW > 2
+  write_options_row ( outputfile, "-im2", "string", "Input time level minus 2 binary (MPI) data file",
+                      line_width, LENGTH_COL1, LENGTH_COL2 );
+#endif
+#if _RESTIME_BW > 3
+  write_options_row ( outputfile, "-im3", "string", "Input time level minus 3 binary (MPI) data file",
                       line_width, LENGTH_COL1, LENGTH_COL2 );
 #endif
 #endif
@@ -95,6 +106,7 @@ void write_options ( FILE * outputfile ) {
 #endif
   write_options_row ( outputfile, "-nvr", "none", "No vars resetting at end of cycle module", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-o", "string", "Output binary data file", line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-om", "string", "Output binary (MPI) data file", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-oa", "string", "Output ascii data file", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-oi", "string", "Output interpolation data file", line_width, LENGTH_COL1, LENGTH_COL2 );
   sprintf(tmpstr,"%d int",nd+1);
@@ -151,7 +163,7 @@ int main ( int argc, char **argv ) {
   double *xcut;
   long i, j, k, node_i, node_j, node_k, node_bw, numcut;
   char *control_filename, *post_filename, *postprocessor;
-  bool INPUTBINARY, FOUNDCUT, WRITECONTROL, QUICK, OUTPUTBINARY, OUTPUTNODETYPE, OUTPUTPOSTMODULE, CYCLEMODULE,
+  bool INPUTBINARY, FOUNDCUT, WRITECONTROL, QUICK, OUTPUTBINARY, OUTPUTBINARYMPI, OUTPUTNODETYPE, OUTPUTPOSTMODULE, CYCLEMODULE,
     READCONTROL, OUTPUTPOST, OUTPUTASCII, OUTPUTINTERPOLATION, GRIDONLY, RESETITERCOUNT, OUTPUTRESIDUAL;
   input_t input;
   int *argint;
@@ -174,20 +186,25 @@ int main ( int argc, char **argv ) {
   input.READDATAFILE = FALSE;
 #ifdef UNSTEADY
   input.M1 = FALSE;
+  input.MM1 = FALSE;
   input.name_m1 = NULL;
 #if _RESTIME_BW > 2
   input.M2 = FALSE;
+  input.MM2 = FALSE;
   input.name_m2 = NULL;
 #endif
 #if _RESTIME_BW > 3
   input.M3 = FALSE;
+  input.MM3 = FALSE;
   input.name_m3 = NULL;
 #endif
 #endif //UNSTEADY
+  input.BINARYMPI = FALSE;
   input.ASCII = FALSE;
   input.INTERPOLATION = FALSE;
   INPUTBINARY=FALSE;
   OUTPUTBINARY = FALSE;
+  OUTPUTBINARYMPI = FALSE;
   OUTPUTASCII = FALSE;
   OUTPUTINTERPOLATION = FALSE;
   OUTPUTPOST = FALSE;
@@ -261,6 +278,10 @@ int main ( int argc, char **argv ) {
     INPUTBINARY=TRUE;
     input.READDATAFILE = TRUE;
   }
+  if ( process_flag_string ( argc, argv, "-im", &input.name ) ) {
+    input.BINARYMPI=TRUE;
+    input.READDATAFILE = TRUE;
+  }
   if ( process_flag_string ( argc, argv, "-ia", &input.name ) ) {
     input.ASCII = TRUE;
     input.READDATAFILE = TRUE;
@@ -269,10 +290,13 @@ int main ( int argc, char **argv ) {
     input.INTERPOLATION = TRUE;
     input.READDATAFILE = TRUE;
   }
-  if (INPUTBINARY+input.ASCII+input.INTERPOLATION>1) fatal_error("CFDWARP can not input more than one data file.");
+  if (INPUTBINARY+input.BINARYMPI+input.ASCII+input.INTERPOLATION>1) fatal_error("CFDWARP can not input more than one data file.");
 
   if ( process_flag_string ( argc, argv, "-o", &gl.output_filename ) )
     OUTPUTBINARY = TRUE;
+  if ( process_flag_string ( argc, argv, "-om", &gl.output_filename ) )
+    OUTPUTBINARYMPI = TRUE;
+  gl.OUTPUTBINARYMPI=OUTPUTBINARYMPI;
   if ( process_flag_string ( argc, argv, "-oa", &gl.output_filename ) )
     OUTPUTASCII = TRUE;
   gl.OUTPUTASCII = OUTPUTASCII;
@@ -309,21 +333,30 @@ int main ( int argc, char **argv ) {
     OUTPUTPOSTMODULE = TRUE;
   else
     OUTPUTPOSTMODULE = FALSE;
-  if (OUTPUTBINARY+OUTPUTASCII+OUTPUTINTERPOLATION+OUTPUTPOST+OUTPUTNODETYPE+OUTPUTPOSTMODULE>1) fatal_error("CFDWARP can not output more than one file. Use only one flag within the -o family.");
+  if (OUTPUTBINARY+OUTPUTBINARYMPI+OUTPUTASCII+OUTPUTINTERPOLATION+OUTPUTPOST+OUTPUTNODETYPE+OUTPUTPOSTMODULE>1) fatal_error("CFDWARP can not output more than one file. Use only one flag within the -o family.");
 
-  if (!OUTPUTBINARY && !OUTPUTASCII && !OUTPUTINTERPOLATION && !OUTPUTPOST && !WRITECONTROL && !OUTPUTNODETYPE && !OUTPUTRESIDUAL && !OUTPUTPOSTMODULE) 
-    fatal_error("When the -r flag is specified, CFDWARP must be called with either the '-o', '-oa', '-oi', '-on', '-op', '-opg', '-opm', or '-or' flag.");
+  if (!OUTPUTBINARY && !OUTPUTBINARYMPI && !OUTPUTASCII && !OUTPUTINTERPOLATION && !OUTPUTPOST && !WRITECONTROL && !OUTPUTNODETYPE && !OUTPUTRESIDUAL && !OUTPUTPOSTMODULE) 
+    fatal_error("When the -r flag is specified, CFDWARP must be called with either the '-o', '-om', '-oa', '-oi', '-on', '-op', '-opg', '-opm', or '-or' flag.");
 
 #ifdef UNSTEADY
-  if ( process_flag_string ( argc, argv, "-im1", &input.name_m1 ) )
+  if ( process_flag_string ( argc, argv, "-i1", &input.name_m1 ) )
     input.M1 = TRUE;
+  if ( process_flag_string ( argc, argv, "-im1", &input.name_m1 ) )
+    input.MM1 = TRUE;
+  if (input.M1+input.MM1>1) fatal_error("CFDWARP cannot be called with both -i1 and -im1 flag. Use either -i1 or -im1 at a time.");
 #if _RESTIME_BW > 2
-  if ( process_flag_string ( argc, argv, "-im2", &input.name_m2 ) )
+  if ( process_flag_string ( argc, argv, "-i2", &input.name_m2 ) )
     input.M2 = TRUE;
+  if ( process_flag_string ( argc, argv, "-im2", &input.name_m2 ) )
+    input.MM2 = TRUE;
+  if (input.M2+input.MM2>1) fatal_error("CFDWARP cannot be called with both -i2 and -im2 flag. Use either -i2 or -im2 at a time.");
 #endif
 #if _RESTIME_BW > 3
-  if ( process_flag_string ( argc, argv, "-im3", &input.name_m3 ) )
+  if ( process_flag_string ( argc, argv, "-i3", &input.name_m3 ) )
     input.M3 = TRUE;
+  if ( process_flag_string ( argc, argv, "-im3", &input.name_m3 ) )
+    input.MM3 = TRUE;
+  if (input.M3+input.MM3>1) fatal_error("CFDWARP cannot be called with both -i3 and -im3 flag. Use either -i3 or -im3 at a time.");
 #endif
 #endif //UNSTEADY
 
@@ -373,7 +406,7 @@ int main ( int argc, char **argv ) {
 
 
   if ( READCONTROL
-       && ( OUTPUTPOST || OUTPUTBINARY || OUTPUTASCII || OUTPUTINTERPOLATION || OUTPUTNODETYPE || OUTPUTPOSTMODULE
+       && ( OUTPUTPOST || OUTPUTBINARY || OUTPUTBINARYMPI || OUTPUTASCII || OUTPUTINTERPOLATION || OUTPUTNODETYPE || OUTPUTPOSTMODULE
             || OUTPUTRESIDUAL ) ) {
 
     if ( !OUTPUTPOST )
@@ -404,7 +437,7 @@ int main ( int argc, char **argv ) {
 
     } else {
 
-      if ( OUTPUTBINARY || OUTPUTASCII || OUTPUTINTERPOLATION )
+      if ( OUTPUTBINARY || OUTPUTBINARYMPI || OUTPUTASCII || OUTPUTINTERPOLATION )
         write_data_file ( np, &gl );
       if ( OUTPUTNODETYPE ) {
         wfprintf ( stdout, "\n\nFLUID NODE TYPES:" );
