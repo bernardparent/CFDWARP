@@ -45,7 +45,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define dTrangemin 100.0e0
 // maximum reduced temperature (T/Peps) used to determine the viscosity, thermal conductivity, and mass diffusion coefficients with Leonard Jones potentials
 #define TSTAR_MAX 100.0
-#define INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA TRUE
+#define INCLUDE_ELECTRONS_IN_ETA FALSE
+#define INCLUDE_ELECTRONS_IN_NU FALSE
+#define INCLUDE_ELECTRONS_IN_KAPPA FALSE
+
 
 typedef char speciesname_t[ns_c];
 
@@ -3397,62 +3400,205 @@ double _Omega22(double T, double eps){
 }
 
 
-void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
-                   spec_t nuk, double *eta, double *kappa){
-  long spec,k,l;
-  spec_t etak,kappak,chik,rhok;
-  double P,etamix,kappamix;
-  double chiden,sum;
-  double calD[ns][ns];
-  double nuwsum,wsum;
-
-  // first make sure the temperature is not out of polynomial bounds
-  P=_P_from_w_rho_T(w,rho,T);
-  assert(P!=0.0);
-/*  for (spec=0; spec<ns; spec++){
-    if (w[spec]<1.0E-12) w[spec]=1.0E-9;
-  } */
-  for (spec=0; spec<ns; spec++){
-    if (speciestype[spec]==SPECIES_NEUTRAL || INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA) { 
-      assert((Psig[smap[spec]]*Psig[smap[spec]]*_Omega22(T,Peps[smap[spec]]))!=0.0e0);
-      assert((calM[smap[spec]]*T)>=0.0e0);
-      etak[spec]=8.44107E-7*sqrt(calM[smap[spec]]*T)/(Psig[smap[spec]]*Psig[smap[spec]]
-                        *_Omega22(T,Peps[smap[spec]]));
+double _etak_from_T(long spec, double T){
+  double etak;
+  assert((Psig[smap[spec]]*Psig[smap[spec]]*_Omega22(T,Peps[smap[spec]]))!=0.0e0);
+  assert((calM[smap[spec]]*T)>=0.0e0);
+  etak=8.44107E-7*sqrt(calM[smap[spec]]*T)/(Psig[smap[spec]]*Psig[smap[spec]]
+            *_Omega22(T,Peps[smap[spec]]));
 #ifndef NDEBUG
-      if (!(etak[spec]>0.0)){
-        wfprintf(stderr,"\n  _Omega22(T,Peps[smap[spec]])=%E\n",_Omega22(T,Peps[smap[spec]])); 
-        wfprintf(stderr,"  sqrt(calM[smap[spec]]*T)=%E\n",sqrt(calM[smap[spec]]*T));
-        fatal_error("  Problem computing etak in find_nuk_eta_kappa().");
-      }
+  if (!(etak>0.0)){
+    wfprintf(stderr,"\n  _Omega22(T,Peps[smap[spec]])=%E\n",_Omega22(T,Peps[smap[spec]])); 
+    wfprintf(stderr,"  sqrt(calM[smap[spec]]*T)=%E\n",sqrt(calM[smap[spec]]*T));
+    fatal_error("  Problem computing etak in find_nuk_eta_kappa().");
+  }
 #endif
-      assert(etak[spec]>0.0);
-      if (numatoms[smap[spec]]>1) {
-        kappak[spec]=15.0e0/4.0e0*calR/calM[smap[spec]]*etak[spec]*
+  assert(etak>0.0);
+  return(etak);
+}
+
+
+double _kappak_from_T(long spec, double T){
+  double etak,kappak;
+  etak=_etak_from_T(spec,T);
+  if (numatoms[smap[spec]]>1) {
+    kappak=15.0e0/4.0e0*calR/calM[smap[spec]]*etak*
                   (0.115e0+0.354e0*calM[smap[spec]]*_cpk_from_T(spec,T)/calR);
-      } else {
-        kappak[spec]=15.0e0/4.0e0*calR/calM[smap[spec]]*etak[spec];
-      }
-    }
-  }
-  chiden=0.0e0;
+  } else {
+    kappak=15.0e0/4.0e0*calR/calM[smap[spec]]*etak;
+  }  
+  return(kappak);
+}
+
+
+double _kappa_from_w_T(spec_t w, double T){
+  long spec,k,l;
+  spec_t kappak,chik,etak;
+  double chisum,kappamix,sum;
+  
   for (spec=0; spec<ns; spec++){
-    if (speciestype[spec]==SPECIES_NEUTRAL || INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA) { 
-      chiden=chiden+w[spec]/calM[smap[spec]];
-    }
+    kappak[spec]=_kappak_from_T(spec,T); 
+    etak[spec]=_etak_from_T(spec,T);
   }
-  assert(chiden!=0.0e0);
+  chisum=0.0e0;
   for (spec=0; spec<ns; spec++){
-    if (speciestype[spec]==SPECIES_NEUTRAL || INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA) { 
-      chik[spec]=w[spec]/calM[smap[spec]]/chiden;
-    }
+    if (speciestype[spec]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_KAPPA) 
+      chisum+=w[spec]/calM[smap[spec]];
   }
-  etamix=0.0e0;
+  assert(chisum!=0.0e0);
+  for (spec=0; spec<ns; spec++){
+    chik[spec]=w[spec]/calM[smap[spec]]/chisum;
+  }
   kappamix=0.0e0;
   for (k=0; k<ns; k++){
-    if (speciestype[k]==SPECIES_NEUTRAL || INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA) { 
+    if (speciestype[k]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_KAPPA) { 
       sum=0.0e0;
       for (l=0; l<ns; l++){
-        if (l!=k && (speciestype[l]==SPECIES_NEUTRAL || INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA)) { 
+        if (l!=k && (speciestype[l]==SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_KAPPA)) { 
+          assert(etak[l]!=0.0e0);
+          assert((1.0e0+calM[smap[k]]/calM[smap[l]])*8.0e0>0.0e0);
+          assert((etak[k]/etak[l])>0.0e0);
+          sum=sum+chik[l]/sqrt((1.0e0+calM[smap[k]]/calM[smap[l]])*8.0e0)*
+                pow(1.0e0+sqrt(etak[k]/etak[l])*pow(calM[smap[l]]/calM[smap[k]],0.25e0),2.0e0);
+        }
+      }	
+      assert((chik[k]+1.0654e0*sum)!=0.0e0);
+      kappamix=kappamix+chik[k]*kappak[k]/(chik[k]+1.0654e0*sum);
+    }
+  }
+
+    
+  return(kappamix);                   
+}
+
+
+/* find kappa for the neutral species only */
+double _kappan_from_w_T(spec_t w, double T){
+  long spec,k,l;
+  spec_t etak,kappak,chik;
+  double chisum,kappamix,sum,sum2;
+  
+  for (spec=0; spec<ns; spec++){
+    kappak[spec]=_kappak_from_T(spec,T); 
+    etak[spec]=_etak_from_T(spec,T);
+  }
+  chisum=0.0e0;
+  for (spec=0; spec<ns; spec++){
+    if (speciestype[spec]==SPECIES_NEUTRAL) 
+      chisum+=w[spec]/calM[smap[spec]];
+  }
+  assert(chisum!=0.0e0);
+  for (spec=0; spec<ns; spec++){
+    chik[spec]=w[spec]/calM[smap[spec]]/chisum;
+  }
+  kappamix=0.0e0;
+  for (k=0; k<ns; k++){
+    if (speciestype[k]==SPECIES_NEUTRAL) { 
+      sum=0.0e0;
+      for (l=0; l<ns; l++){
+        if (l!=k && (speciestype[l]==SPECIES_NEUTRAL)) { 
+          assert(etak[l]!=0.0e0);
+          assert((1.0e0+calM[smap[k]]/calM[smap[l]])*8.0e0>0.0e0);
+          assert((etak[k]/etak[l])>0.0e0);
+          sum=sum+chik[l]/sqrt((1.0e0+calM[smap[k]]/calM[smap[l]])*8.0e0)*
+                pow(1.0e0+sqrt(etak[k]/etak[l])*pow(calM[smap[l]]/calM[smap[k]],0.25e0),2.0e0);
+        }
+      }	
+      assert((chik[k]+1.0654e0*sum)!=0.0e0);
+      kappamix=kappamix+chik[k]*kappak[k]/(chik[k]+1.0654e0*sum);
+    }
+  }
+
+
+  /* make an adjustment to *kappa when charged species are not included */
+  sum=0.0;
+  sum2=0.0;
+  for (k=0; k<ns; k++){
+    if (speciestype[k]==SPECIES_NEUTRAL) { 
+      sum+=w[k]/_calM(k);
+    }    
+    sum2+=w[k]/_calM(k);
+  }
+  return(kappamix*sum/sum2);
+}
+
+
+/* find kappa for the heavy species only (excluding electrons) */
+double _kappah_from_w_T(spec_t w, double T){
+  long spec,k,l;
+  spec_t etak,kappak,chik;
+  double chisum,kappamix,sum,sum2;
+  
+  for (spec=0; spec<ns; spec++){
+    kappak[spec]=_kappak_from_T(spec,T); 
+    etak[spec]=_etak_from_T(spec,T);
+  }
+  chisum=0.0e0;
+  for (spec=0; spec<ns; spec++){
+    if (speciestype[spec]!=SPECIES_ELECTRON) 
+      chisum+=w[spec]/calM[smap[spec]];
+  }
+  assert(chisum!=0.0e0);
+  for (spec=0; spec<ns; spec++){
+    chik[spec]=w[spec]/calM[smap[spec]]/chisum;
+  }
+  kappamix=0.0e0;
+  for (k=0; k<ns; k++){
+    if (speciestype[k]!=SPECIES_ELECTRON) { 
+      sum=0.0e0;
+      for (l=0; l<ns; l++){
+        if (l!=k && (speciestype[l]!=SPECIES_ELECTRON)) { 
+          assert(etak[l]!=0.0e0);
+          assert((1.0e0+calM[smap[k]]/calM[smap[l]])*8.0e0>0.0e0);
+          assert((etak[k]/etak[l])>0.0e0);
+          sum=sum+chik[l]/sqrt((1.0e0+calM[smap[k]]/calM[smap[l]])*8.0e0)*
+                pow(1.0e0+sqrt(etak[k]/etak[l])*pow(calM[smap[l]]/calM[smap[k]],0.25e0),2.0e0);
+        }
+      }	
+      assert((chik[k]+1.0654e0*sum)!=0.0e0);
+      kappamix=kappamix+chik[k]*kappak[k]/(chik[k]+1.0654e0*sum);
+    }
+  }
+
+
+  /* make an adjustment to *kappa when electrons are not included */
+  sum=0.0;
+  sum2=0.0;
+  for (k=0; k<ns; k++){
+    if (speciestype[k]!=SPECIES_ELECTRON) { 
+      sum+=w[k]/_calM(k);
+    }    
+    sum2+=w[k]/_calM(k);
+  }
+  return(kappamix*sum/sum2);
+}
+
+
+
+
+double _eta_from_w_T(spec_t w, double T){
+  long spec,k,l;
+  spec_t etak,chik;
+  double chisum,etamix,sum;
+  
+  for (spec=0; spec<ns; spec++){
+    etak[spec]=_etak_from_T(spec,T);
+  }
+  chisum=0.0e0;
+  for (spec=0; spec<ns; spec++){
+    if (speciestype[spec]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_ETA) 
+      chisum+=w[spec]/calM[smap[spec]];
+  }
+  assert(chisum!=0.0e0);
+  for (spec=0; spec<ns; spec++){
+    chik[spec]=w[spec]/calM[smap[spec]]/chisum;
+  }
+  etamix=0.0e0;
+  for (k=0; k<ns; k++){
+    if (speciestype[k]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_ETA) { 
+      sum=0.0e0;
+      for (l=0; l<ns; l++){
+        if (l!=k && (speciestype[l]==SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_ETA)) { 
           assert(etak[l]!=0.0e0);
           assert((1.0e0+calM[smap[k]]/calM[smap[l]])*8.0e0>0.0e0);
           assert((etak[k]/etak[l])>0.0e0);
@@ -3461,14 +3607,40 @@ void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
         }
       }	
       assert((chik[k]+sum)!=0.0e0);
-      etamix=etamix+chik[k]*etak[k]/(chik[k]+sum);
-      assert((chik[k]+1.0654e0*sum)!=0.0e0);
-      kappamix=kappamix+chik[k]*kappak[k]/(chik[k]+1.0654e0*sum);
+      etamix+=chik[k]*etak[k]/(chik[k]+sum);
     }
   }
+  return(etamix);
+
+}
+
+
+void find_nuk_from_w_rho_T_Te(spec_t w, double rho, double T, double Te, spec_t nuk){
+  long spec,k,l;
+  spec_t chik,rhok;
+  double P;
+  double chisum,sum;
+  double calD[ns][ns];
+  double nuwsum,wsum;
+  
+  // first make sure the temperature is not out of polynomial bounds
+  P=_P_from_w_rho_T(w,rho,T);
+  assert(P!=0.0);
+  for (spec=0; spec<ns; spec++) rhok[spec]=rho*w[spec];
+
+  chisum=0.0e0;
+  for (spec=0; spec<ns; spec++){
+    if (speciestype[spec]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_NU) 
+      chisum+=w[spec]/calM[smap[spec]];
+  }
+  assert(chisum!=0.0e0);
+  for (spec=0; spec<ns; spec++){
+    chik[spec]=w[spec]/calM[smap[spec]]/chisum;
+  }
+  
   for (k=0; k<ns; k++){
     for (l=0; l<ns; l++){
-      if ((speciestype[k]==SPECIES_NEUTRAL && speciestype[l]==SPECIES_NEUTRAL) || INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA) { 
+      if ((speciestype[k]!=SPECIES_ELECTRON && speciestype[l]!=SPECIES_ELECTRON) || INCLUDE_ELECTRONS_IN_NU) { 
         assert(Peps[smap[k]]*Peps[smap[l]]>0.0e0);
         assert(P!=0.0e0);
         assert(_Omega11(T,sqrt(Peps[smap[k]]*Peps[smap[l]])));
@@ -3481,17 +3653,14 @@ void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
       }
     }
   }
-  *eta=etamix;
-  *kappa=kappamix;
   
-  for (spec=0; spec<ns; spec++) rhok[spec]=rho*w[spec];
   
   for (k=0; k<ns; k++){
     switch (speciestype[k]){
       case SPECIES_NEUTRAL:
         sum=0.0e0;
         for (l=0; l<ns; l++){
-          if (l!=k && (speciestype[l]==SPECIES_NEUTRAL || INCLUDE_CHARGED_SPECIES_IN_ETA_KAPPA)) { 
+          if (l!=k && (speciestype[l]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_NU)) { 
             assert(calD[k][l]!=0.0e0);
             sum=sum+chik[l]/calD[k][l];
           }
@@ -3532,6 +3701,22 @@ void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
   }
   nuk[speceminus]=nuwsum/wsum;
 #endif
+  
+}
+
+
+
+void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
+                   spec_t nuk, double *eta, double *kappa){
+
+/*  for (spec=0; spec<ns; spec++){
+    if (w[spec]<1.0E-12) w[spec]=1.0E-9;
+  } */
+  
+  *eta=_eta_from_w_T(w, T);
+  *kappa=_kappa_from_w_T(w, T);
+  find_nuk_from_w_rho_T_Te(w, rho, T, Te, nuk);  
+  
 }
 
 

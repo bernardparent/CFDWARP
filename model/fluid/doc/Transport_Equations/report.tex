@@ -1160,9 +1160,6 @@ Then, the first term on the RHS corresponds to the heat addition per unit time p
 %
 \begin{equation}
 \frac{\delta Q}{v \Delta t}= 
-\underbrace{
-  -\sum_{i=1}^{3}\frac{\partial q_i^k}{\partial x_i}
-}_{\begin{minipage}{1.7cm}\flushleft \footnotesize heat addition by conduction\end{minipage}}
 -
 \underbrace{
 Q_k
@@ -1204,7 +1201,6 @@ Substitute the latter 5 equations in Eq.\ (\ref{eqn:echarged2}):
 - \frac{\partial P_k}{\partial t} - \sum_{i=1}^3 \vec{V}^k_i \frac{\partial P_k}{\partial x_i}
 \alb\mfd
 = 
--\sum_{i=1}^{3}\frac{\partial q_i^k}{\partial x_i}
 -Q_{k}
 -\sum_{i=1}^3 \vec{F}_i^k \left( \vec{V}_i^{{\rm n}-k}-\vec{V}_i^k \right)
 -h_k W_k - h_k^\circ W_k
@@ -1226,7 +1222,6 @@ where $W_k$ is the mass creation per unit volume per unit time of species $k$ du
 - \frac{\partial P_k}{\partial t} - \sum_{i=1}^3 \vec{V}^k_i \frac{\partial P_k}{\partial x_i}
 \alb\mfd
 = 
--\sum_{i=1}^{3}\frac{\partial q_i^k}{\partial x_i}
 -Q_{k}
 -\sum_{i=1}^3 \vec{F}_i^k \left( \vec{V}_i^{{\rm n}-k}-\vec{V}_i^k \right)
 - h_k^\circ W_k
@@ -1245,7 +1240,6 @@ Thus:
  \frac{\partial }{\partial t}\rho_k e_k + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_k \vec{V}^k_j h_k 
 - \sum_{i=1}^3 \vec{V}^k_i \frac{\partial P_k}{\partial x_i}
 = 
--\sum_{i=1}^{3}\frac{\partial q_i^k}{\partial x_i}
 - Q_{k}
 -\sum_{i=1}^3 \vec{F}_i^k \left( \vec{V}_i^{{\rm n}-k}-\vec{V}_i^k \right)
 - h_k^\circ W_k
@@ -1265,7 +1259,6 @@ Substract the latter from the former:
  \frac{\partial }{\partial t}\rho_k (e_k+h_k^\circ) + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_k \vec{V}^k_j (h_k+h_k^\circ) 
 - \sum_{i=1}^3 \vec{V}^k_i \frac{\partial P_k}{\partial x_i}
 \alb\mfd= 
--\sum_{i=1}^{3}\frac{\partial q_i^k}{\partial x_i}
 - Q_{k}
 -\sum_{i=1}^3 \vec{F}_i^k \left( \vec{V}_i^{{\rm n}-k}-\vec{V}_i^k \right)
 \end{array}
@@ -1289,7 +1282,6 @@ Add the latter to Eq.\ (\ref{eqn:echarged4}):
 \begin{equation}
  \frac{\partial }{\partial t}\rho_k (e_k+h_k^\circ) + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_k \vec{V}^k_j (h_k+h_k^\circ) 
 = 
--\sum_{i=1}^{3}\frac{\partial q_i^k}{\partial x_i}
 - Q_{k}
 -\sum_{i=1}^3 \vec{F}_i^k \vec{V}_i^{{\rm n}-k} 
 +\sum_{i=1}^3 \vec{V}_i^k C_k N_k \vec{E}^k_i
@@ -1315,8 +1307,7 @@ Substitute the latter in the former:
 \frameeqn{
 \begin{array}{l}\mfd
  \frac{\partial }{\partial t}\rho_k (e_k+h_k^\circ) + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_k \vec{V}^k_j (h_k+h_k^\circ) 
-\alb\mfd= 
--\sum_{i=1}^{3}\frac{\partial q_i^k}{\partial x_i}
+= 
 - Q_{k}
 -\sum_{i=1}^3 \vec{F}_i^k \vec{V}_i^{{\rm n}-k} 
 + C_k N_k \sum_{i=1}^3 \vec{V}^k_i \vec{E}_i
@@ -1326,7 +1317,55 @@ Substitute the latter in the former:
 \end{equation}
 %  
 
-
+We can write the charged species energy transport equation in another form. First recall the charged species velocity Eq.\ (\ref{eqn:Vcharged}):
+%
+\begin{equation}
+  \vec{V}^{k}=\vec{V}^{\rm n} - \mu_{k} \vec{E}^{k} -\frac{\mu_{k}}{|C_{k}| N_{k}}\nabla P_{k}
+\end{equation}
+% 
+or,
+%
+\begin{equation}
+  \vec{V}^{k}_j=\vec{V}^{\rm n}_j - \mu_{\rm e} \vec{E}^{k}_j -\frac{\mu_{k}}{|C_{k}| N_{k}} \frac{\partial P_{k}}{\partial x_j} 
+\end{equation}
+% 
+Expand the electron pressure:
+%
+\begin{equation}
+  \vec{V}^{k}_j=\vec{V}^{\rm n}_j - \mu_{k} \vec{E}^{k}_j 
+    -\frac{\mu_{k} k_{\rm B}}{|C_{k}| } \frac{  \partial T_{k}}{\partial x_j} 
+    -\frac{\mu_{k} k_{\rm B} T_{k}}{|C_{k}| N_{k}} \frac{\partial N_{k}  }{\partial x_j} 
+\end{equation}
+% 
+Multiply by $\rho_{k} (h_{k}+h_k^\circ)$:
+%
+\begin{equation}
+  \rho_{k} (h_{k}+h_k^\circ) \vec{V}^{k}_j
+  = \rho_{k} (h_{k}+h_k^\circ)\left( \vec{V}^{\rm n}_j 
+  - \mu_{k} \vec{E}^{k}_j \right)
+  -\frac{\rho_{k} (h_{k}+h_k^\circ) \mu_{k} k_{\rm B}}{|C_{k}| } \frac{  \partial T_{k}}{\partial x_j} 
+  -\frac{\rho_{k} (h_{k}+h_k^\circ) \mu_{k} k_{\rm B} T_{k}}{|C_{k}| N_{k}} \frac{\partial N_{k}  }{\partial x_j} 
+\end{equation}
+%
+Define the thermal conductivity of the $k$th charged species as:
+%
+\begin{equation}
+\kappa_k \equiv \frac{\rho_{k} {h}_{k} \mu_{k} k_{\rm B}}{|C_{k}| }
+\end{equation}
+%
+We can rewrite the former as:
+%
+\begin{equation}
+\frameeqn{
+  \rho_{k} (h_{k}+h_k^\circ) \vec{V}^{k}_j
+  = \rho_{k} (h_{k}+h_k^\circ)\left( \vec{V}^{\rm n}_j 
+  - \mu_{k} \vec{E}^{k}_j \right)
+  -\left( \frac{ h_k^\circ }{h_k }\kappa_k \right)\frac{  \partial T_{k}}{\partial x_j} 
+  -\kappa_k \frac{  \partial T_{k}}{\partial x_j} 
+  -\frac{\rho_{k} (h_{k}+h_k^\circ) \mu_{k} k_{\rm B} T_{k}}{|C_{k}| N_{k}} \frac{\partial N_{k}  }{\partial x_j} 
+}
+\end{equation}
+%
 
 
 

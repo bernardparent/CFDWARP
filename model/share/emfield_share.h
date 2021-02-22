@@ -33,6 +33,8 @@
 
   void find_Vk(np_t *np, gl_t *gl, long l, long spec, EXM_vec3D_t Vk);
 
+  double _dTkdXj(np_t *np, gl_t *gl, long l, long theta, long spec);
+
   double _dTedXj(np_t *np, gl_t *gl, long l, long theta);
 
   double _dTedXj_interface_upwind(np_t *np, gl_t *gl, metrics_t metrics, long l, long i, long j);

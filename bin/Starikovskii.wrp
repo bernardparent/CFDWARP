@@ -201,7 +201,7 @@ Bdry(
  
 Model(
   NavierStokesPlasma(
-    TEMODEL=TEMODEL_LOCAL;
+    TEMODEL=TEMODEL_TRANSPORT;
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=YES;
@@ -373,7 +373,7 @@ Cycle(
                            near cathode when PRECONDITIONER is set to PRECON_LOCALTIMESTEPPLASMA} 
     relaxNi_bdry=0.8;     {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.1;     {the electron density relaxation factor at the boundary }
-    relaxTe=0.1;{0.5}          {the electron temperature relaxation factor }
+    relaxTe=0.5;{0.5}          {the electron temperature relaxation factor }
     rhoref=0.1;           {reference density in kg/m3}
     Tref=300.0;           {reference temperature in K}
     Teref=20000.0;        {reference electron temperature in K}
@@ -457,7 +457,7 @@ Cycle(
       
     );
 }
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,400);
+    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,100);
     UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,2);
     
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",

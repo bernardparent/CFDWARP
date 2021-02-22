@@ -7,6 +7,40 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 FEB 21a
+  * in model/fluid/_*_plasma/fluid.c
+    - in _kappa() and find_prim_fluid_mem(), now calls _kappah() to include only the heavy species
+    - added _kappai()
+    - in find_Kstar_interface(), added kappai to kappa for Kstar[fluxet][fluxet]
+  * in model/fluid/_*_plasma/fluid_plasma.c
+    - in find_Dstar(), took away the charged species thermal diffusion from the velocity
+      (now added to find_Kstar_interface)
+  * in model/fluid/_Favre-Reynolds_plasma/fluid_post.c
+    - added kappae and kappav to the post variables
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - added kappai to the post variables
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - in the charged species energy transport equation section, made changes and took away thermal
+      diffusion (already included within pressure gradients)
+  * in model/share/emfield_share.c
+    - added _dTkdXj()
+  * in model/thermo/_generic/thermo.c
+    - added _etak_from_T()
+    - added _kappak_from_T()
+    - added _kappan_from_w_T(), _kappa_from_w_T(), _kappaw_from_w_T()
+    - added _eta_from_w_T()
+    - added find_nuk_from_w_rho_T_Te()
+    - rewrote find_nuk_eta_kappa() so that it calls _kappa_from_w_T(), _eta_from_w_T(), 
+      find_nuk_from_w_rho_T_Te()
+    - electrons are now excluded when finding kappa, eta, and nu for the mixture  
+
+      
+2021 FEB 18a
+  * in model/thermo/_generic/thermo.c
+    - in find_nuk_eta_kappa(), took away contributions of charged species to thermal conductivity
+      kappa because such are already accounted for through the enthalpies
+    
+
 2021 FEB 17a
   * renamed
     - find_Dstarplus() -> find_Dstarmatplus()

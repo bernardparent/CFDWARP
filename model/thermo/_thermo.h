@@ -68,6 +68,19 @@ double _T_from_rhok_P(spec_t rhok, double P);
 
 double _T_from_w_rho_P(spec_t w, double rho, double P);
 
+double _kappak_from_T(long spec, double T);
+
+double _kappa_from_w_T(spec_t w, double T);
+
+double _kappan_from_w_T(spec_t w, double T);
+
+double _kappah_from_w_T(spec_t w, double T);
+
+double _eta_from_w_T(spec_t w, double T);
+
+void find_nuk_from_w_rho_T_Te(spec_t w, double rho, double T, double Te, spec_t nuk);
+
+
 void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
                    spec_t nuk, double *eta, double *kappa);
 		     
