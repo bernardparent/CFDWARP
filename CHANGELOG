@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 FEB 21c
+  * in model/chem/_CO2_Plasma_23s_Park/chem.c
+    - fixed a bug: reaction 13 used N instead of X as a parameter
+    
+
 2021 FEB 21b
   * in src/common.h
     - in gl_t, added boolean variable OUTPUTBINARYMPI

@@ -196,7 +196,7 @@ void find_W (gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar
       add_to_W_fwbw_2r3p (specNO, specM5[k], specN, specO, specM5[k], 1.1e17, 0.00, 75500.0*R, Ta, X, W);   
   
   if (REACTION[13])
-    add_to_W_fwbw_2r3p (specCO2, specAr, specCO, specO, specAr, 6.9e20, -1.50, 63275.0*R, Ta, N, W);
+    add_to_W_fwbw_2r3p (specCO2, specAr, specCO, specO, specAr, 6.9e20, -1.50, 63275.0*R, Ta, X, W);
   
   if (REACTION[14])
     for (k = 0; specM3[k]!=specEND; k++)
@@ -380,7 +380,7 @@ void find_dW_dx (gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double T
       add_to_dW_fwbw_2r3p (specNO, specM5[k], specN, specO, specM5[k], 1.1e17, 0.00, 75500.0*R, Ta, X, dWdTa, dWdrhok);
   
   if (REACTION[13])
-    add_to_dW_fwbw_2r3p (specCO2, specAr, specCO, specO, specAr, 6.9e20, -1.50, 63275.0*R, Ta, N, dWdTa, dWdrhok);
+    add_to_dW_fwbw_2r3p (specCO2, specAr, specCO, specO, specAr, 6.9e20, -1.50, 63275.0*R, Ta, X, dWdTa, dWdrhok);
   
   if (REACTION[14])
     for (k = 0; specM3[k]!=specEND; k++)
