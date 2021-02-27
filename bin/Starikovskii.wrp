@@ -8,59 +8,17 @@ iterfact=0.6;
 
 CFLfact=0.8;
 
-{
-CFLfact=1.6; PRECON_LOCALTIMESTEPPING
-
- meshlevel=4, out.ml4tf1.110;  me_added: 6.58e-2;  Tmax=7853K;  
-
- meshlevel=3, out.ml3tf2.156;   me_added: 6.03e-2;  Tmax=7320K;
- meshlevel=3, out.ml3tf1.78;   me_added: 6.22e-2;  Tmax=7978K;
-
- meshlevel=2, out.ml2tf4.220;   me_added: 5.79e-2;  Tmax=7103K;
- meshlevel=2, out.ml2tf2.110;   me_added: 5.50e-2;  Tmax=6577K;
- meshlevel=2, out.ml2tf1.55;   me_added: 5.78e-2;  Tmax=7086K;
-
-
- meshlevel=1, out.ml1tf8.312;   me_added: 5.32e-2;  Tmax=4657K;
- meshlevel=1, out.ml1tf4.156;   me_added: 4.87e-2;  Tmax=4699K;
- meshlevel=1, out.ml1tf2.78;    me_added: 4.73e-2;  Tmax=4802K;
- meshlevel=1, out.ml1tf1.39;   me_added: 5.06e-2;  Tmax=5474K;
-
-
-CFLfact1.0; PRECON_LOCALEIGENVALUE
- meshlevel=1, out.ml1tf8.312;   me_added: 5.31e-2;  Tmax=4660K;
- meshlevel=1, out.ml1tf4.156;   me_added: 5.15e-2;  Tmax=4913K;
- meshlevel=1, out.ml1tf2.78;    me_added: 5.05e-2;  Tmax=5108K;
- meshlevel=1, out.ml1tf1.39;    me_added: 4.85e-2;  Tmax=5186K;
-
-
-CFLfact1.0; PRECON_LOCALTIMESTEP
- meshlevel=1, iter=3, tf=2, out.ml1tf2iter3.78;   me_added: 5.35e-2;  Tmax=4950K;
- meshlevel=1, iter=1, tf=2, out.ml1tf2iter3.78;   me_added: 5.07e-2;  Tmax=5131K;
-
-
-CFLfact0.8; PRECON_LOCALTIMESTEP
- meshlevel=1, iter=6, tf=1, out.ml1tf1iter6.39;   me_added: 5.15e-2;  Tmax=4337K;
- meshlevel=1, iter=2, tf=1, out.ml1tf1iter2.39;   me_added: 5.13e-2;  Tmax=5195K;
- meshlevel=1, iter=1, tf=1, out.ml1tf1iter1.39;   me_added: 5.01e-2;  Tmax=5376K;
-
- meshlevel=1, iter=8, tf=2, out.ml1tf2iter2.78;   me_added: 5.414e-2;  Tmax=4400K;
- meshlevel=1, iter=4, tf=2, out.ml1tf2iter2.78;   me_added: 5.395e-2;  Tmax=4450K;
- meshlevel=1, iter=2, tf=2, out.ml1tf2iter2.78;   me_added: 5.34e-2;  Tmax=4987K;
- meshlevel=1, iter=1, tf=2, out.ml1tf2iter1.78;   me_added: 5.20e-2;  Tmax=5267K;
-
-}
 
 dphimax=14000;
 itermax=iterfact*140/sqrt(CFLfact/1.6);
 EMFsubiter=1300;
 
 is1=1;
-is2=round(mf*28); {start of exposed electrode}
+is2=round(max(34,mf*28)); {start of exposed electrode}
 is3=is2+round(mf*65);
 is4=is3+round(mf*150); {start of embedded electrode}
 is5=is4+round(mf*600); {end of embedded electrode}
-is6=is5+round(mf*36);
+is6=is5+round(max(34,mf*36));
 is=is1;
 ie=is6;
 
@@ -70,7 +28,7 @@ js2=1;
 js3=js2+round(mf*13); {exposed electrode is between js3 and js4}
 js4=js3+round(mf*9);  {start of plasma/gas}
 js5=js4+round(mf*33*6*1.25);
-js6=js5+round(mf*50);
+js6=js5+round(max(50,mf*50));
 js=js2;
 je=js6;
 
@@ -201,7 +159,7 @@ Bdry(
  
 Model(
   NavierStokesPlasma(
-    TEMODEL=TEMODEL_TRANSPORT;
+    TEMODEL=TEMODEL_LOCAL;
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=YES;
@@ -220,6 +178,11 @@ Model(
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
     gamma=0.05e0;    {secondary emission coefficient}
     AXISYMMETRIC=NO;
+  );
+  AirPlasma11s(
+    CHEMMODEL=CHEMMODEL_DUNNKANG1973;
+    TOWNSENDIONIZATION=TRUE; {include reactions function of EoverN}
+    TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
   );
   Epotential(
     Te_buffer=300.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,T+Te_buffer);  
@@ -373,7 +336,7 @@ Cycle(
                            near cathode when PRECONDITIONER is set to PRECON_LOCALTIMESTEPPLASMA} 
     relaxNi_bdry=0.8;     {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.1;     {the electron density relaxation factor at the boundary }
-    relaxTe=0.5;{0.5}          {the electron temperature relaxation factor }
+    relaxTe=0.1;{0.5}          {the electron temperature relaxation factor }
     rhoref=0.1;           {reference density in kg/m3}
     Tref=300.0;           {reference temperature in K}
     Teref=20000.0;        {reference electron temperature in K}
@@ -457,8 +420,8 @@ Cycle(
       
     );
 }
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,100);
     UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,2);
+    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,300);
     
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
