@@ -392,8 +392,8 @@ static void read_config_file(type_str dirname, type_str current, type_str messag
     if (strcmp(str1,"option")==0) (*numoption)++;
 #ifdef EXPERIMENTAL
     if (strcmp(str1,"optionX")==0) (*numoption)++;  //experimental module
-    if (strcmp(str1,"optionPX")==0) (*numoption)++;  //experimental and proprietary module
 #endif
+    if (strcmp(str1,"optionPX")==0) (*numoption)++;  //experimental and proprietary module
     if (strcmp(str1,"optionP")==0) (*numoption)++;  //proprietary module
     if (strcmp(str1,"branch")==0) (*numbranch)++;
   }
@@ -424,12 +424,12 @@ static void read_config_file(type_str dirname, type_str current, type_str messag
       strcpy((*option)[cntoption],str2);
       cntoption++;
     }
+#endif
     if (strcmp(str1,"optionPX")==0) {
       strcpy((*optioncomment)[cntoption],"[PROPRIETARY] [EXPERIMENTAL]");
       strcpy((*option)[cntoption],str2);
       cntoption++;
     }
-#endif
     if (strcmp(str1,"optionP")==0) {
       strcpy((*optioncomment)[cntoption],"[PROPRIETARY]");
       strcpy((*option)[cntoption],str2);

@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 FEB 27c
+  * in config/config.c
+    - in read_config_file(), made changes so that the options that are both EXPERIMENTAL
+      and PROPRIETARY are not hidden when doing make config or make configp
+      
+
+2021 FEB 27b
+  * in bin
+    - updated Starikovskii.wrp
+    
+
 2021 FEB 27a
   * in model/fluid/_Favre-Reynolds_plasma/fluid.h
     - added _kappae()
