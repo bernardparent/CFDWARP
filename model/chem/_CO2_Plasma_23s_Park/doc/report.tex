@@ -103,71 +103,71 @@ abstract
 \begin{center}
 \begin{threeparttable}
 \tablecaption{Park's Forward-Backward High-Temperature Mars Atmosphere Chemical Reactions \cite{jtht:1994:park}.}
-\begin{tabular}{cccccc} 
+\begin{tabular}{ccccccc} 
 \toprule
-\multicolumn{2}{c}{Reaction} & $T$, $\textrm{K}$ & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole \\ 
+\multicolumn{2}{c}{Reaction} & Forward Control. Temp. & Backward Control. Temp. & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole \\ 
 \midrule
 
-Dissociation reactions \\
+\\
 
-(1) & $\rm C_2 + M_1 \rightleftarrows C + C + M_1$ \tnote{1} & $T_a$ & 3.7 $\times$ 10$^{14}$  & 0.00 & 69,900$\cdot \rm R$ \tnote{7} \\
-(2) & $\rm N_2 + M_2 \rightleftarrows N + N + M_2$ \tnote{2} & $T_a$ & 7.0 $\times$ 10$^{21}$  & -1.60 & 69,900$\cdot \rm R$ \\
-(3) & $\rm N_2 + M_3 \rightleftarrows N + N + M_3$ \tnote{3} & $T_a$ & 3.0 $\times$ 10$^{22}$  & -1.60 & 113,200$\cdot \rm R$ \\
-(4) & $\rm N_2 + e^- \rightleftarrows N + N + e^-$ & $T_a$ & 1.2 $\times$ 10$^{25}$  & -1.60 & 113,200$\cdot \rm R$ \\
-(5) & $\rm O_2 + M_2 \rightleftarrows O + O + M_2$ \tnote{2} & $T_a$ & 2.0 $\times$ 10$^{21}$  & -1.50 & 59,750$\cdot \rm R$ \\
-(6) & $\rm O_2 + M_3 \rightleftarrows O + O + M_3$ \tnote{3} & $T_a$ & 1.0 $\times$ 10$^{22}$  & -1.50 & 59,750$\cdot \rm R$ \\
-(7) & $\rm CN + M_1 \rightleftarrows C + N + M_1$ \tnote{1} & $T_a$ & 2.5 $\times$ 10$^{14}$  & 0.00 & 71,000$\cdot \rm R$ \\
-(8) & $\rm CO + Ar \rightleftarrows C + O + Ar$ & $T_a$ & 2.3 $\times$ 10$^{19}$  & -1.00 & 129,000$\cdot \rm R$ \\
-(9) & $\rm CO + M_2 \rightleftarrows C + O + M_2$ \tnote{2} & $T_a$ & 3.4 $\times$ 10$^{20}$  & -1.00 & 129,000$\cdot \rm R$ \\
-(10) & $\rm CO + M_3 \rightleftarrows C + O + M_3$ \tnote{3} & $T_a$ & 2.3 $\times$ 10$^{20}$  & -1.00 & 129,000$\cdot \rm R$ \\
-(11) & $\rm NO + M_4 \rightleftarrows N + O + M_4$ \tnote{4} & $T_a$ & 5.0 $\times$ 10$^{15}$  & 0.00 & 75,500$\cdot \rm R$ \\
-(12) & $\rm NO + M_5 \rightleftarrows N + O + M_5$ \tnote{5} & $T_a$ & 1.1 $\times$ 10$^{17}$  & 0.00 & 75,500$\cdot \rm R$ \\
-(13) & $\rm CO_2 + Ar \rightleftarrows CO + O + Ar$ & $T_a$ & 6.9 $\times$ 10$^{20}$  & -1.50 & 63,275$\cdot \rm R$ \\
-(14) & $\rm CO_2 + M_3 \rightleftarrows CO + O + M_3$ \tnote{3} & $T_a$ & 1.4 $\times$ 10$^{22}$  & -1.00 & 63,275$\cdot \rm R$ \\
-(15) & $\rm CO_2 + M_6 \rightleftarrows CO + O + M_6$ \tnote{6} & $T_a$ & 6.9 $\times$ 10$^{21}$  & -1.00 & 63,275$\cdot \rm R$ \\
-(16) & $\rm NCO + M_1 \rightleftarrows CO + N + M_1$ \tnote{1} & $T_a$ & 6.3 $\times$ 10$^{16}$  & -0.50 & 24,000$\cdot \rm R$ \\
+(1) & $\rm C_2 + M_1 \rightleftarrows C + C + M_1$ \tnote{1} & $\sqrt{TT_{v}}$ & $T$ & 3.7 $\times$ 10$^{14}$  & 0.00 & 69,900$\cdot \rm R$ \tnote{7} \\
+(2) & $\rm N_2 + M_2 \rightleftarrows N + N + M_2$ \tnote{2} & $\sqrt{TT_{v}}$ & $T$ & 7.0 $\times$ 10$^{21}$  & -1.60 & 69,900$\cdot \rm R$ \\
+(3) & $\rm N_2 + M_3 \rightleftarrows N + N + M_3$ \tnote{3} & $\sqrt{TT_{v}}$ & $T$ & 3.0 $\times$ 10$^{22}$  & -1.60 & 113,200$\cdot \rm R$ \\
+(4) & $\rm N_2 + e^- \rightleftarrows N + N + e^-$ & $\sqrt{T_{e}T_{v}}$ & $\sqrt{TT_{e}}$ & 1.2 $\times$ 10$^{25}$  & -1.60 & 113,200$\cdot \rm R$ \\
+(5) & $\rm O_2 + M_2 \rightleftarrows O + O + M_2$ \tnote{2} & $\sqrt{TT_{v}}$ & $T$ & 2.0 $\times$ 10$^{21}$  & -1.50 & 59,750$\cdot \rm R$ \\
+(6) & $\rm O_2 + M_3 \rightleftarrows O + O + M_3$ \tnote{3} & $\sqrt{TT_{v}}$ & $T$ & 1.0 $\times$ 10$^{22}$  & -1.50 & 59,750$\cdot \rm R$ \\
+(7) & $\rm CN + M_1 \rightleftarrows C + N + M_1$ \tnote{1} & $\sqrt{TT_{v}}$ & $T$ & 2.5 $\times$ 10$^{14}$  & 0.00 & 71,000$\cdot \rm R$ \\
+(8) & $\rm CO + Ar \rightleftarrows C + O + Ar$ & $T$ & $T$ & 2.3 $\times$ 10$^{19}$  & -1.00 & 129,000$\cdot \rm R$ \\
+(9) & $\rm CO + M_2 \rightleftarrows C + O + M_2$ \tnote{2} & $\sqrt{TT_{v}}$ & $T$ & 3.4 $\times$ 10$^{20}$  & -1.00 & 129,000$\cdot \rm R$ \\
+(10) & $\rm CO + M_3 \rightleftarrows C + O + M_3$ \tnote{3} & $\sqrt{TT_{v}}$ & $T$ & 2.3 $\times$ 10$^{20}$  & -1.00 & 129,000$\cdot \rm R$ \\
+(11) & $\rm NO + M_4 \rightleftarrows N + O + M_4$ \tnote{4} & $\sqrt{TT_{v}}$ & $T$ & 5.0 $\times$ 10$^{15}$  & 0.00 & 75,500$\cdot \rm R$ \\
+(12) & $\rm NO + M_5 \rightleftarrows N + O + M_5$ \tnote{5} & $\sqrt{TT_{v}}$ & $T$ & 1.1 $\times$ 10$^{17}$  & 0.00 & 75,500$\cdot \rm R$ \\
+(13) & $\rm CO_2 + Ar \rightleftarrows CO + O + Ar$ & $T$ & $T$ & 6.9 $\times$ 10$^{20}$  & -1.50 & 63,275$\cdot \rm R$ \\
+(14) & $\rm CO_2 + M_3 \rightleftarrows CO + O + M_3$ \tnote{3} & $\sqrt{TT_{v}}$ & $T$ & 1.4 $\times$ 10$^{22}$  & -1.00 & 63,275$\cdot \rm R$ \\
+(15) & $\rm CO_2 + M_6 \rightleftarrows CO + O + M_6$ \tnote{6} & $\sqrt{TT_{v}}$ & $T$ & 6.9 $\times$ 10$^{21}$  & -1.00 & 63,275$\cdot \rm R$ \\
+(16) & $\rm NCO + M_1 \rightleftarrows CO + N + M_1$ \tnote{1} & $\sqrt{TT_{v}}$ & $T$ & 6.3 $\times$ 10$^{16}$  & -0.50 & 24,000$\cdot \rm R$ \\
 
-Neutral exchange reactions \\
 
-(17) & $\rm NO + O \rightleftarrows N + O_2 $ & $T_{tr}$ & 8.4 $\times$ 10$^{12}$  & 0.00 & 19,450$\cdot \rm R$ \\
-(18) & $\rm N_2 + O \rightleftarrows NO + N $ & $T_{tr}$ & 6.4 $\times$ 10$^{17}$  & -1.00 & 38,370$\cdot \rm R$ \\
-(19) & $\rm CO + O \rightleftarrows C + O_2 $ & $T_{tr}$ & 3.9 $\times$ 10$^{13}$  & -0.18 & 69,200$\cdot \rm R$ \\
-(20) & $\rm CO + C \rightleftarrows C_2 + O $ & $T_{tr}$ & 2.0 $\times$ 10$^{17}$  & -1.00 & 58,000$\cdot \rm R$ \\
-(21) & $\rm CO + N \rightleftarrows CN + O $ & $T_{tr}$ & 1.0 $\times$ 10$^{14}$  & 0.00 & 38,600$\cdot \rm R$ \\
-(22) & $\rm N_2 + C \rightleftarrows CN + N $ & $T_{tr}$ & 1.1 $\times$ 10$^{14}$  & -0.11 & 23,200$\cdot \rm R$ \\
-(23) & $\rm CN + O \rightleftarrows NO + C $ & $T_{tr}$ & 1.6 $\times$ 10$^{13}$  & 0.10 & 14,600$\cdot \rm R$ \\
-(24) & $\rm CN + C \rightleftarrows C_2 + N $ & $T_{tr}$ & 5.0 $\times$ 10$^{13}$  & 0.00 & 13,000$\cdot \rm R$ \\
-(25) & $\rm CO_2 + O \rightleftarrows O_2 + CO $ & $T_{tr}$ & 2.1 $\times$ 10$^{13}$  & 0.00 & 27,800$\cdot \rm R$ \\
-(26) & $\rm CN + O_2 \rightleftarrows NCO + O $ & $T_{tr}$ & 6.6 $\times$ 10$^{12}$  & 0.00 & -200$\cdot \rm R$ \\
-(27) & $\rm CN + CO_2 \rightleftarrows NCO + CO $ & $T_{tr}$ & 4.0 $\times$ 10$^{14}$  & 0.00 & 19,200$\cdot \rm R$ \\
-(28) & $\rm CN + NO \rightleftarrows NCO + N $ & $T_{tr}$ & 1.0 $\times$ 10$^{14}$  & 0.00 & 21,200$\cdot \rm R$ \\
-(29) & $\rm CO + NO \rightleftarrows NCO + O $ & $T_{tr}$ & 3.8 $\times$ 10$^{17}$  & -0.873 & 51,600$\cdot \rm R$ \\
-(30) & $\rm CN + CO \rightleftarrows NCO + C $ & $T_{tr}$ & 1.5 $\times$ 10$^{16}$  & -0.487 & 65,800$\cdot \rm R$ \\
 
-Associative ionization reactions \\
+(17) & $\rm NO + O \rightleftarrows N + O_2 $ & $T$ & $T$ & 8.4 $\times$ 10$^{12}$  & 0.00 & 19,450$\cdot \rm R$ \\
+(18) & $\rm N_2 + O \rightleftarrows NO + N $ & $T$ & $T$ & 6.4 $\times$ 10$^{17}$  & -1.00 & 38,370$\cdot \rm R$ \\
+(19) & $\rm CO + O \rightleftarrows C + O_2 $ & $T$ & $T$ & 3.9 $\times$ 10$^{13}$  & -0.18 & 69,200$\cdot \rm R$ \\
+(20) & $\rm CO + C \rightleftarrows C_2 + O $ & $T$ & $T$ & 2.0 $\times$ 10$^{17}$  & -1.00 & 58,000$\cdot \rm R$ \\
+(21) & $\rm CO + N \rightleftarrows CN + O $ & $T$ & $T$ & 1.0 $\times$ 10$^{14}$  & 0.00 & 38,600$\cdot \rm R$ \\
+(22) & $\rm N_2 + C \rightleftarrows CN + N $ & $T$ & $T$ & 1.1 $\times$ 10$^{14}$  & -0.11 & 23,200$\cdot \rm R$ \\
+(23) & $\rm CN + O \rightleftarrows NO + C $ & $T$ & $T$ & 1.6 $\times$ 10$^{13}$  & 0.10 & 14,600$\cdot \rm R$ \\
+(24) & $\rm CN + C \rightleftarrows C_2 + N $ & $T$ & $T$ & 5.0 $\times$ 10$^{13}$  & 0.00 & 13,000$\cdot \rm R$ \\
+(25) & $\rm CO_2 + O \rightleftarrows O_2 + CO $ & $T$ & $T$ & 2.1 $\times$ 10$^{13}$  & 0.00 & 27,800$\cdot \rm R$ \\
+(26) & $\rm CN + O_2 \rightleftarrows NCO + O $ & $T$ & $T$ & 6.6 $\times$ 10$^{12}$  & 0.00 & -200$\cdot \rm R$ \\
+(27) & $\rm CN + CO_2 \rightleftarrows NCO + CO $ & $T$ & $T$ & 4.0 $\times$ 10$^{14}$  & 0.00 & 19,200$\cdot \rm R$ \\
+(28) & $\rm CN + NO \rightleftarrows NCO + N $ & $T$ & $T$ & 1.0 $\times$ 10$^{14}$  & 0.00 & 21,200$\cdot \rm R$ \\
+(29) & $\rm CO + NO \rightleftarrows NCO + O $ & $T$ & $T$ & 3.8 $\times$ 10$^{17}$  & -0.873 & 51,600$\cdot \rm R$ \\
+(30) & $\rm CN + CO \rightleftarrows NCO + C $ & $T$ & $T$ & 1.5 $\times$ 10$^{16}$  & -0.487 & 65,800$\cdot \rm R$ \\
 
-(31) & $\rm N + O \rightleftarrows NO^+ + e^- $ & $T_{tr}$ & 8.8 $\times$ 10$^{8}$  & 1.00 & 31,900$\cdot \rm R$ \\
-(32) & $\rm O + O \rightleftarrows O^+_2 + e^- $ & $T_{tr}$ & 7.1 $\times$ 10$^{2}$  & 2.70 & 80,600$\cdot \rm R$ \\
-(33) & $\rm C + O \rightleftarrows CO^+ + e^- $ & $T_{tr}$ & 8.8 $\times$ 10$^{8}$  & 1.00 & 33,100$\cdot \rm R$\\
 
-Charge exchange reactions \\
 
-(34) & $\rm NO^+ + C \rightleftarrows NO + C^+ $ & $T_{tr}$ & 1.0 $\times$ 10$^{13}$  & 0.00 & 23,200$\cdot \rm R$ \\
-(35) & $\rm O^+_2 + O \rightleftarrows O^+ + O_2 $ & $T_{tr}$ & 4.0 $\times$ 10$^{12}$  & -0.09 & 18,000$\cdot \rm R$ \\
-(36) & $\rm NO^+ + N \rightleftarrows O^+ + N_2 $ & $T_{tr}$ & 3.4 $\times$ 10$^{13}$  & -1.08 & 12,800$\cdot \rm R$ \\
-(37) & $\rm NO^+ + O \rightleftarrows O^+_2 + N $ & $T_{tr}$ & 7.2 $\times$ 10$^{12}$  & 0.29 & 48,600$\cdot \rm R$ \\
-(38) & $\rm CO + C^+ \rightleftarrows CO^+ + C $ & $T_{tr}$ & 1.0 $\times$ 10$^{13}$  & 0.00 & 31,400$\cdot \rm R$ \\
-(39) & $\rm O_2 + C^+ \rightleftarrows O^+_2+ C $ & $T_{tr}$ & 1.0 $\times$ 10$^{13}$  & 0.00 & 9,400$\cdot \rm R$ \\
+(31) & $\rm N + O \rightleftarrows NO^+ + e^- $ & $T$ & $\sqrt{T_{v}T_{e}}$ & 8.8 $\times$ 10$^{8}$  & 1.00 & 31,900$\cdot \rm R$ \\
+(32) & $\rm O + O \rightleftarrows O^+_2 + e^- $ & $T$ & $\sqrt{T_{v}T_{e}}$ & 7.1 $\times$ 10$^{2}$  & 2.70 & 80,600$\cdot \rm R$ \\
+(33) & $\rm C + O \rightleftarrows CO^+ + e^- $ & $T$ & $\sqrt{T_{v}T_{e}}$ & 8.8 $\times$ 10$^{8}$  & 1.00 & 33,100$\cdot \rm R$\\
 
-Electron-impact ionization reactions \\
 
-(40) & $\rm C + e^- \rightleftarrows C^+ + e^- + e^- $ & $T_v$ & 3.9 $\times$ 10$^{33}$  & -3.78 & 130,700$\cdot \rm R$ \\
-(41) & $\rm O + e^- \rightleftarrows O^+ + e^- + e^- $ & $T_v$ & 3.9 $\times$ 10$^{33}$  & -3.78 & 158,500$\cdot \rm R$ \\
 
-Radiative recombination reactions \\
+(34) & $\rm NO^+ + C \rightleftarrows NO + C^+ $ & $T$ & $T$ & 1.0 $\times$ 10$^{13}$  & 0.00 & 23,200$\cdot \rm R$ \\
+(35) & $\rm O^+_2 + O \rightleftarrows O^+ + O_2 $ & $T$ & $T$ & 4.0 $\times$ 10$^{12}$  & -0.09 & 18,000$\cdot \rm R$ \\
+(36) & $\rm NO^+ + N \rightleftarrows O^+ + N_2 $ & $T$ & $T$ & 3.4 $\times$ 10$^{13}$  & -1.08 & 12,800$\cdot \rm R$ \\
+(37) & $\rm NO^+ + O \rightleftarrows O^+_2 + N $ & $T$ & $T$ & 7.2 $\times$ 10$^{12}$  & 0.29 & 48,600$\cdot \rm R$ \\
+(38) & $\rm CO + C^+ \rightleftarrows CO^+ + C $ & $T$ & $T$ & 1.0 $\times$ 10$^{13}$  & 0.00 & 31,400$\cdot \rm R$ \\
+(39) & $\rm O_2 + C^+ \rightleftarrows O^+_2+ C $ & $T$ & $T$ & 1.0 $\times$ 10$^{13}$  & 0.00 & 9,400$\cdot \rm R$ \\
 
-(42) & $\rm O^+ + e^- \rightleftarrows O + hv $ & $T_v$ & 1.07 $\times$ 10$^{11}$  & -0.52 & 0 \\
-(43) & $\rm C^+ + e^- \rightleftarrows C + hv $ & $T_v$ & 2.02 $\times$ 10$^{11}$  & -0.46 & 0 \\
+
+
+(40) & $\rm C + e^- \rightleftarrows C^+ + e^- + e^- $ & $T_e$ & $T_e$ & 3.9 $\times$ 10$^{33}$  & -3.78 & 130,700$\cdot \rm R$ \\
+(41) & $\rm O + e^- \rightleftarrows O^+ + e^- + e^- $ & $T_e$ & $T_e$ & 3.9 $\times$ 10$^{33}$  & -3.78 & 158,500$\cdot \rm R$ \\
+
+
+
+(42) & $\rm O^+ + e^- \rightleftarrows O + hv $ & $T_e$ & $\textemdash$ & 1.07 $\times$ 10$^{11}$  & -0.52 & 0 \\
+(43) & $\rm C^+ + e^- \rightleftarrows C + hv $ & $T_e$ & $\textemdash$ & 2.02 $\times$ 10$^{11}$  & -0.46 & 0 \\
 
 
 \bottomrule

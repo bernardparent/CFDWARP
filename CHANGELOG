@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 MAR 07a
+  * in model/chem/_CO2_Plasma_23s_Park/chem.c
+    - made modifications to the reactions so that the backward and forward temperatures 
+  * in model/chem/_CO2_Plasma_23s_Park/doc/report.tex
+    - made modifications to the reactions so that the backward and forward temperatures 
+      
+
 2021 FEB 27c
   * in config/config.c
     - in read_config_file(), made changes so that the options that are both EXPERIMENTAL
