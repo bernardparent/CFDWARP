@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 MAR 11a
+  * in model/chem/_H2_He_CH4_Plasma_13s
+    - added doc directory
+  * in model/chem/_H2_He_CH4_Plasma_13s/chem.c
+    - implemented Chris Johnston's Neptune atmosphere model
+  * in model/share/fluid_share.c
+    - in find_Saxi(), added the effective pressure to the total energy flux axisymmetric source
+      as it should be
+      
+
 2021 MAR 07a
   * in model/chem/_CO2_Plasma_23s_Park/chem.c
     - made modifications to the reactions so that the backward and forward temperatures 

@@ -2401,6 +2401,7 @@ void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
     for (flux=0; flux<nf; flux++){
       S[flux]=(-1.0/x1)*Vn[1]*np[l].bs->U[flux];
     }
+    S[fluxet]+=(-1.0/x1)*Vn[1]*_Pstar(np[l],gl);
 #ifdef _FLUID_PLASMA
     for (spec=0; spec<ncs; spec++){
       find_Vk(np, gl, l, spec, Vk);
