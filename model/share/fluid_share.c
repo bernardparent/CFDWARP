@@ -2383,6 +2383,9 @@ void find_init_number_density_templates(char **specstr1, char **specstr2){
 
 #ifdef _2D
 
+/* see page 15 in "A new parabolized Navier-Stokes code for chemically reacting flow fields"
+by Dinesh Kumble Prabhu, Iowa State University
+*/
 void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
   long flux;
   double x1;

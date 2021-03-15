@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 MAR 15a
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - added a fourth reaction to the Townsend reactions e- + NO -> 2 e- + NO+
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - added a fourth reaction to the Townsend reactions e- + NO -> 2 e- + NO+
+  * 
+
+
 2021 MAR 11a
   * in model/chem/_H2_He_CH4_Plasma_13s
     - added doc directory

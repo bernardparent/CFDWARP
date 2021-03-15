@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2018 Bernard Parent
+Copyright 2018,2021 Bernard Parent
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -43,12 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define Estarmin 1e-40
 
 /* set all reactions to true except for testing purposes */
-const static bool TOWNSENDREACTION[4]=
+const static bool TOWNSENDREACTION[5]=
   {
    TRUE, /* reaction 0 */
    TRUE, /* reaction 1 */
    TRUE, /* reaction 2 */
    TRUE, /* reaction 3 */
+   TRUE, /* reaction 4 */
   };
 
 
@@ -105,10 +106,15 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
 
 void add_W_Townsend ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
   double N[ns];
-  double theta;
+  double theta,R;
   long k;
+  spec_t X;
   double Estar_from_Te,Te_from_Estar;
   
+  R=1.9872;
+  for ( k = 0; k < ns; k++ ) {
+    X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
+  }
   
   find_EoverN_from_Te(Te, &Estar_from_Te);
   //if (Estar_from_Te>Estar) Estar=Estar_from_Te;   //??? needs to be verified
@@ -133,6 +139,9 @@ void add_W_Townsend ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, dou
   if (TOWNSENDREACTION[3])
       add_to_W_2r3p ( specNO, speceminus,   specNOplus, speceminus, speceminus,   exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), N, W);
 
+  if (TOWNSENDREACTION[4]) 
+      add_to_W_fwbw_2r3p ( specNO, speceminus,   specNOplus, speceminus, speceminus, 2.5e34, -3.78, 168600.0*R, Te, X, W );
+  
 }
 
 
@@ -141,9 +150,13 @@ void add_dW_dx_Townsend ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te,
                   double Estar, double Qbeam, spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, 
                   spec_t dWdTv, spec_t dWdQbeam ) {
   long k;  
-  spec_t N;
-  double theta,kf,dkfdTe,dkfdT,dkfdTv,Te_from_Estar;
+  spec_t N,X;
+  double R,theta,kf,dkfdTe,dkfdT,dkfdTv,Te_from_Estar;
   
+  R=1.9872;
+  for ( k = 0; k < ns; k++ ) {
+    X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
+  }
   
 
   /* find properties needed by add_to_dW* functions in proper units */
@@ -180,6 +193,11 @@ void add_dW_dx_Townsend ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te,
     dkfdTv=0.0;
     add_to_dW_2r3p ( specNO, speceminus,   specNOplus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
+
+  if (TOWNSENDREACTION[4]){
+    add_to_dW_fwbw_2r3p ( specNO, speceminus,   specNOplus, speceminus, speceminus, 2.5e34, -3.78, 168600.0*R, Te, X, dWdTe, dWdrhok );
+  }
+
 
 }
 
