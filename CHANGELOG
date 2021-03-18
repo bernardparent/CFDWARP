@@ -7,12 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 MAR 17a
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - in add_W_Townsend() and add_dW_dx_Townsend(), changed the chemical reaction for 
+      NO+ + 2e-  ->  NO + e-  to the one specified in Dunn-Kang (1973)
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - in the table "Additional Townsend Ionization and recombination rates for NO, O2.."
+      changed the chemical reaction for  NO+ + 2e-  ->  NO + e-  to the one specified in 
+      Dunn-Kang (1973)
+
+
 2021 MAR 15a
   * in model/chem/_Air_Plasma_11s/chem.c
     - added a fourth reaction to the Townsend reactions e- + NO -> 2 e- + NO+
   * in model/chem/_Air_Plasma_11s/doc/report.tex
     - added a fourth reaction to the Townsend reactions e- + NO -> 2 e- + NO+
-  * 
 
 
 2021 MAR 11a

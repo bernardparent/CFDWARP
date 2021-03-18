@@ -140,7 +140,7 @@ void add_W_Townsend ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, dou
       add_to_W_2r3p ( specNO, speceminus,   specNOplus, speceminus, speceminus,   exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), N, W);
 
   if (TOWNSENDREACTION[4]) 
-      add_to_W_fwbw_2r3p ( specNO, speceminus,   specNOplus, speceminus, speceminus, 2.5e34, -3.78, 168600.0*R, Te, X, W );
+      add_to_W_fw_3r2p ( specNOplus, speceminus, speceminus,   specNO, speceminus, 2.2e40, -4.5, 0.0*R, Te, X, W );
   
 }
 
@@ -195,7 +195,7 @@ void add_dW_dx_Townsend ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te,
   }
 
   if (TOWNSENDREACTION[4]){
-    add_to_dW_fwbw_2r3p ( specNO, speceminus,   specNOplus, speceminus, speceminus, 2.5e34, -3.78, 168600.0*R, Te, X, dWdTe, dWdrhok );
+    add_to_dW_fw_3r2p ( specNOplus, speceminus, speceminus,   specNO, speceminus, 2.2e40, -4.5, 0.0*R, Te, X, dWdTe, dWdrhok );
   }
 
 
