@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 MAR 19a
+  * in model/chem/_CO2_Plasma_23s_Park/chem.c
+    - in find_dW_dx(), fixed a bug in reactions 40 and 41 where dWdTv should be dWdTe
+    
+
 2021 MAR 17a
   * in model/chem/_Air_Plasma_11s/chem.c
     - in add_W_Townsend() and add_dW_dx_Townsend(), changed the chemical reaction for 

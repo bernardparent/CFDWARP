@@ -546,10 +546,10 @@ void find_dW_dx (gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double T
     add_to_dW_fwbw_2r2p (specO2, specCplus, specO2plus, specC, 1.0e13, 0.00, 9400.0*R, T, X, dWdT, dWdrhok);
     
   if (REACTION[40])
-    add_to_dW_fwbw_2r3p (specC, speceminus, specCplus, speceminus, speceminus, 3.9e33, -3.78, 130700.0*R, Te, X, dWdTv, dWdrhok);
+    add_to_dW_fwbw_2r3p (specC, speceminus, specCplus, speceminus, speceminus, 3.9e33, -3.78, 130700.0*R, Te, X, dWdTe, dWdrhok);
     
   if (REACTION[41])
-    add_to_dW_fwbw_2r3p (specO, speceminus, specOplus, speceminus, speceminus, 3.9e33, -3.78, 158500.0*R, Te, X, dWdTv, dWdrhok);
+    add_to_dW_fwbw_2r3p (specO, speceminus, specOplus, speceminus, speceminus, 3.9e33, -3.78, 158500.0*R, Te, X, dWdTe, dWdrhok);
 
   if (REACTION[42]) {
     kf=_kf_Arrhenius(2, 1.07e11, -0.52, 0.0, Te);
