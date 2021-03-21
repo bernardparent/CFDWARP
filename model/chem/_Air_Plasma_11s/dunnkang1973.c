@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/thermo/_thermo.h>
 #include <model/share/chem_share.h>
 
+#define TEMAX_TOWNSEND 60000.0
 
 const static bool REACTION[27]=
   {
@@ -137,12 +138,12 @@ void find_W_DunnKang1973 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv
   }
 
   if (REACTION[8]) {
-    add_to_W_fw_2r3p ( specO, speceminus, specOplus, speceminus, speceminus, 3.6E31, -2.91, 158000.0*R, Te, X, W );
+    add_to_W_fw_2r3p ( specO, speceminus, specOplus, speceminus, speceminus, 3.6E31, -2.91, 158000.0*R, min(TEMAX_TOWNSEND,Te), X, W );
     add_to_W_fw_3r2p ( specOplus, speceminus, speceminus, specO, speceminus, 2.2E40, -4.5, 0.0, Te, X, W );
   }
 
   if (REACTION[9]){
-    add_to_W_fw_2r3p ( specN, speceminus, specNplus, speceminus, speceminus, 1.1E32, -3.14, 169000.0*R, Te, X, W );
+    add_to_W_fw_2r3p ( specN, speceminus, specNplus, speceminus, speceminus, 1.1E32, -3.14, 169000.0*R, min(TEMAX_TOWNSEND,Te), X, W );
     add_to_W_fw_3r2p ( specNplus, speceminus, speceminus, specN, speceminus, 2.2E40, -4.50, 0.0*R, Te, X, W );
   }
 
@@ -302,12 +303,12 @@ void find_dW_dx_DunnKang1973 ( gl_t *gl, spec_t rhok, spec_t mu, double T, doubl
   }
 
   if (REACTION[8]) {
-    add_to_dW_fw_2r3p ( specO, speceminus, specOplus, speceminus, speceminus, 3.6E31, -2.91, 158000.0*R, Te, X, dWdTe, dWdrhok );
+    add_to_dW_fw_2r3p ( specO, speceminus, specOplus, speceminus, speceminus, 3.6E31, -2.91, 158000.0*R, min(TEMAX_TOWNSEND,Te), X, dWdTe, dWdrhok );
     add_to_dW_fw_3r2p ( specOplus, speceminus, speceminus, specO, speceminus, 2.2E40, -4.5, 0.0, Te, X, dWdTe, dWdrhok );
   }
 
   if (REACTION[9]){
-    add_to_dW_fw_2r3p ( specN, speceminus, specNplus, speceminus, speceminus, 1.1E32, -3.14, 169000.0*R, Te, X, dWdTe, dWdrhok );
+    add_to_dW_fw_2r3p ( specN, speceminus, specNplus, speceminus, speceminus, 1.1E32, -3.14, 169000.0*R, min(TEMAX_TOWNSEND,Te), X, dWdTe, dWdrhok );
     add_to_dW_fw_3r2p ( specNplus, speceminus, speceminus, specN, speceminus, 2.2E40, -4.50, 0.0*R, Te, X, dWdTe, dWdrhok );
   }
 
@@ -399,5 +400,27 @@ void find_dW_dx_DunnKang1973 ( gl_t *gl, spec_t rhok, spec_t mu, double T, doubl
   }
 
 
+
+}
+
+
+void find_Qei_DunnKang1973(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
+
+    Te=min(TEMAX_TOWNSEND,Te);
+    if (REACTION[8]) 
+      add_to_Qei(specO, 3.6e31/sqr(calA)*pow(Te,-2.91)*exp(-158000.0/Te), rhok, Qei);
+    if (REACTION[9]) 
+      add_to_Qei(specN, 1.1e32/sqr(calA)*pow(Te,-3.14)*exp(-169000.0/Te), rhok, Qei);
+ 
+}
+
+
+
+void find_dQei_dx_DunnKang1973(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
+    Te=min(TEMAX_TOWNSEND,Te);
+    if (REACTION[8]) 
+      add_to_dQei(specO, 3.6e31/sqr(calA)*pow(Te,-2.91)*exp(-158000.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
+    if (REACTION[9]) 
+      add_to_dQei(specN, 1.1e32/sqr(calA)*pow(Te,-3.14)*exp(-169000.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
 
 }

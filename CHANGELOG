@@ -7,6 +7,27 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 MAR 21a
+  * in src/common.h
+    - added dim_t Esmoothedmem to npbs_t
+  * in model/thermo/_generic/thermo.c
+    - in _ionizationpotential(), added the ionization energies of species O and N
+  * in model/share/emfield_share.c
+    - in _E_dot_Je_over_mueNe(), now calls find_E_smoothed() instead of find_E()
+  * in model/emfield/_*/emfield.c
+    - added find_E_smoothed() which returns Esmoothedmem
+    - in find_prim_emfield_mem_1(), added code to find Esmoothedmem
+  * in model/chem/_Air_Plasma_11s/dunnkang1973.c
+    - implemented clipping of Te so that it doesn't not exceed 60000 K when determining the 
+      electron impact ionization reactions
+    - added find_Qei_DunnKang1973() and find_dQei_dx_DunnKang1973()
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - added TOWNSENDREACTION[5] and TOWNSENDREACTION[6] for Townsend ionization of N and O function
+      of the reduced electric field
+    - in find_Qei(), added call to find_Qei_DunnKang1973()
+    - in find_dQei_dx(), added call to find_dQei_dx_DunnKang1973()
+     
+
 2021 MAR 19a
   * in model/chem/_CO2_Plasma_23s_Park/chem.c
     - in find_dW_dx(), fixed a bug in reactions 40 and 41 where dWdTv should be dWdTe

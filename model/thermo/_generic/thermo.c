@@ -4394,10 +4394,10 @@ void find_dTe_dEoverN_from_EoverN(double Estar, double *dTedEstar){
 
 
 /* ionization potential in Joule of species k
- * the ionization potential is the energy needed to liberate one electron from one molecule 
+ * the ionization potential of species M is the energy needed to liberate one electron from one particule 
  * in the following reaction: e- + M -> e- + e- + M+
  * This can be found by subtracting hmolar of products from the hmolar of the reactants
- * hmolar for all species can be found using src/test 
+ * hmolar and dividing by the avogadro number; hmolar for all species can be found using src/test 
  * */
 double _ionizationpotential(long k){
   double ionizationenergy;
@@ -4416,6 +4416,12 @@ double _ionizationpotential(long k){
     break;
     case SMAP_Cs:
       ionizationenergy=6.445e-19;
+    break;
+    case SMAP_O:
+      ionizationenergy=2.181e-18;
+    break;
+    case SMAP_N:
+      ionizationenergy=2.330e-18;
     break;
     default:
       ionizationenergy=0.0;

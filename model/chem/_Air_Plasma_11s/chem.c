@@ -43,13 +43,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define Estarmin 1e-40
 
 /* set all reactions to true except for testing purposes */
-const static bool TOWNSENDREACTION[5]=
+const static bool TOWNSENDREACTION[7]=
   {
    TRUE, /* reaction 0 */
    TRUE, /* reaction 1 */
    TRUE, /* reaction 2 */
    TRUE, /* reaction 3 */
    TRUE, /* reaction 4 */
+   TRUE, /* reaction 5 */
+   TRUE, /* reaction 6 */
   };
 
 
@@ -141,6 +143,12 @@ void add_W_Townsend ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, dou
 
   if (TOWNSENDREACTION[4]) 
       add_to_W_fw_3r2p ( specNOplus, speceminus, speceminus,   specNO, speceminus, 2.2e40, -4.5, 0.0*R, Te, X, W );
+
+  if (TOWNSENDREACTION[5])
+      add_to_W_2r3p ( specN, speceminus,   specNplus, speceminus, speceminus,   exp ( -0.0105809 * sqr ( theta ) - 2.40411e-75 * pow ( theta, 46.0 ) ), N, W);
+
+  if (TOWNSENDREACTION[6])
+      add_to_W_2r3p ( specO, speceminus,   specOplus, speceminus, speceminus,   exp ( -0.0102785 * sqr ( theta ) - 2.42260e-75 * pow ( theta, 46.0 ) ), N, W);
   
 }
 
@@ -170,7 +178,7 @@ void add_dW_dx_Townsend ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te,
   Te_from_Estar=max(300.0,Te_from_Estar); 
 
 
-  if (TOWNSENDREACTION[1]) {
+  if (TOWNSENDREACTION[1] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
     kf=exp ( -0.0105809 * sqr ( theta ) - 2.40411e-75 * pow ( theta, 46.0 ) );
     dkfdTe = 0.0;
     dkfdT=0.0;
@@ -178,7 +186,7 @@ void add_dW_dx_Townsend ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te,
     add_to_dW_2r3p ( specN2, speceminus,   specN2plus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
   
-  if (TOWNSENDREACTION[2]) {
+  if (TOWNSENDREACTION[2] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
     kf=exp ( -0.0102785 * sqr ( theta ) - 2.42260e-75 * pow ( theta, 46.0 ) );
     dkfdTe = 0.0;
     dkfdT=0.0;
@@ -186,7 +194,7 @@ void add_dW_dx_Townsend ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te,
     add_to_dW_2r3p ( specO2, speceminus,   specO2plus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
-  if (TOWNSENDREACTION[3]){
+  if (TOWNSENDREACTION[3] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT){
     kf=exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) );
     dkfdTe = 0.0;
     dkfdT=0.0;
@@ -196,6 +204,22 @@ void add_dW_dx_Townsend ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te,
 
   if (TOWNSENDREACTION[4]){
     add_to_dW_fw_3r2p ( specNOplus, speceminus, speceminus,   specNO, speceminus, 2.2e40, -4.5, 0.0*R, Te, X, dWdTe, dWdrhok );
+  }
+
+  if (TOWNSENDREACTION[5] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
+    kf=exp ( -0.0105809 * sqr ( theta ) - 2.40411e-75 * pow ( theta, 46.0 ) );
+    dkfdTe = 0.0;
+    dkfdT=0.0;
+    dkfdTv=0.0;
+    add_to_dW_2r3p ( specN, speceminus,   specNplus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+  }
+  
+  if (TOWNSENDREACTION[6] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
+    kf=exp ( -0.0102785 * sqr ( theta ) - 2.42260e-75 * pow ( theta, 46.0 ) );
+    dkfdTe = 0.0;
+    dkfdT=0.0;
+    dkfdTv=0.0;
+    add_to_dW_2r3p ( specO, speceminus,   specOplus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
 
@@ -278,8 +302,7 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double 
     default:
       fatal_error("Problem with CHEMMODEL in find_W() within chem.c");
   }
-  if (gl->model.chem.TOWNSENDIONIZATION && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT 
-      && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  
+  if (gl->model.chem.TOWNSENDIONIZATION  && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  
     add_dW_dx_Townsend ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
 
 }
@@ -292,6 +315,27 @@ void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
   double theta;
   
   *Qei=0.0;  
+
+  switch (gl->model.chem.CHEMMODEL){
+    case CHEMMODEL_DUNNKANG1973: 
+      find_Qei_DunnKang1973 ( gl, rhok, Estar, Te, Qei );
+    break;
+    case CHEMMODEL_PARK1993: 
+//      find_Qei_Park1993 ( gl, rhok, Estar, Te, Qei );
+    break;
+    case CHEMMODEL_BOYD2007: 
+//      find_Qei_Boyd2007 ( gl, rhok, Estar, Te, Qei );
+    break;
+    case CHEMMODEL_LENARD1964: 
+//      find_Qei_Lenard1964 ( gl, rhok, Estar, Te, Qei );
+    break;
+    case CHEMMODEL_NONE: 
+      *Qei=0.0;
+    break;
+    default:
+      fatal_error("Problem with CHEMMODEL in find_Qei() within chem.c");
+  }
+
   theta=log(Estar);
 
   if (gl->model.chem.TOWNSENDIONIZATION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
@@ -301,6 +345,10 @@ void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
       add_to_Qei(specO2, exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), rhok, Qei);
     if (TOWNSENDREACTION[3]) 
       add_to_Qei(specNO, exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), rhok, Qei);
+    if (TOWNSENDREACTION[5]) 
+      add_to_Qei(specN, exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), rhok, Qei);
+    if (TOWNSENDREACTION[6]) 
+      add_to_Qei(specO, exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), rhok, Qei);
   }
 }
 
@@ -311,6 +359,29 @@ void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrh
   
   for (spec=0; spec<ns; spec++) dQeidrhok[spec]=0.0;
   *dQeidTe=0.0;  
+  
+  switch (gl->model.chem.CHEMMODEL){
+    case CHEMMODEL_DUNNKANG1973: 
+      find_dQei_dx_DunnKang1973 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+    break;
+    case CHEMMODEL_PARK1993: 
+      //find_dQei_dx_Park1993 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+    break;
+    case CHEMMODEL_BOYD2007: 
+      //find_dQei_dx_Boyd2007 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+    break;
+    case CHEMMODEL_LENARD1964: 
+     // find_dQei_dx_Lenard1964 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+    break;
+    case CHEMMODEL_NONE: 
+      *dQeidTe=0.0;
+    break;
+    default:
+      fatal_error("Problem with CHEMMODEL in find_Qei() within chem.c");
+  }
+  
+  
+  
   theta=log(Estar);
 
   if (gl->model.chem.TOWNSENDIONIZATION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
@@ -320,6 +391,10 @@ void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrh
       add_to_dQei(specO2, exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
     if (TOWNSENDREACTION[3]) 
       add_to_dQei(specNO, exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), 0.0, rhok, dQeidrhok, dQeidTe);
+    if (TOWNSENDREACTION[5]) 
+      add_to_dQei(specN, exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
+    if (TOWNSENDREACTION[6]) 
+      add_to_dQei(specO, exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
   }
 }
 

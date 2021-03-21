@@ -52,6 +52,8 @@
 
   double _Eemag_smoothed(np_t *np, gl_t *gl, long l);
 
+  void find_E_smoothed(np_t *np, gl_t *gl, long l, dim_t E);
+
   bool is_node_bdry_dielectric(np_t np);
 
   void find_DeltaVk_from_mu(np_t *np, gl_t *gl, long l, long spec, double mu, EXM_vec3D_t DeltaVk);

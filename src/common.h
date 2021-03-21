@@ -352,6 +352,7 @@ typedef struct {
    double sigmasolid,epsilonr;
    chargedspec_t mumem;
    double sigmamem,Eemagmem,Eemagsmoothedmem;
+   dim_t Esmoothedmem;
 #endif
 #ifdef _EMFIELD_EPOTENTIAL
    EXM_vec3D_t E;
@@ -360,6 +361,7 @@ typedef struct {
    double sigmasolid,epsilonr;
    chargedspec_t mumem;
    double sigmamem,Eemagsmoothedmem;
+   dim_t Esmoothedmem;
 #endif
 #ifdef _BEAM_EBEAM_FIXED
    double Qbeam;
