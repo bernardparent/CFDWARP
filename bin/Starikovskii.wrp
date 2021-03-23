@@ -4,7 +4,7 @@
 meshlevel=1;
 
 mf=(1.41)^(-4+meshlevel); {1.0/1.41, 1.0, 1.41, 2.0, 2.82}
-tf=2; {the time step factor: the higher, the more time steps to cover the discharge}
+tf=1; {the time step factor: the higher, the more time steps to cover the discharge}
 iterfact=0.6;
 
 CFLfact=1.0;
@@ -159,7 +159,7 @@ Bdry(
  
 Model(
   NavierStokesPlasma(
-    TEMODEL=TEMODEL_LOCAL;
+    TEMODEL=TEMODEL_TRANSPORT;
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=YES;
@@ -180,7 +180,7 @@ Model(
     AXISYMMETRIC=NO;
   );
   AirPlasma11s(
-    CHEMMODEL=CHEMMODEL_DUNNKANG1973;
+    CHEMMODEL=CHEMMODEL_BOYD2007;
     TOWNSENDIONIZATION=TRUE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
   );
@@ -336,7 +336,7 @@ Cycle(
                            near cathode when PRECONDITIONER is set to PRECON_LOCALTIMESTEPPLASMA} 
     relaxNi_bdry=0.8;     {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.1;     {the electron density relaxation factor at the boundary }
-    relaxTe=1.0;{0.5}          {the electron temperature relaxation factor }
+    relaxTe=0.5;{0.5}          {the electron temperature relaxation factor }
     rhoref=0.1;           {reference density in kg/m3}
     Tref=300.0;           {reference temperature in K}
     Teref=20000.0;        {reference electron temperature in K}
@@ -411,11 +411,11 @@ Cycle(
       Model(Epotential(SetSolidConductivity(is2,js3,  is4,js4, 0 {S/m});););     
     );
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP2,sigma1,sigma2,dt);
-    system("date");
     Lc=1e99;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
     UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,2);
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,300);
+    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,60);
+    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,60);
     
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,

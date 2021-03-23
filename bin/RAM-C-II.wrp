@@ -134,27 +134,47 @@ dtheta=0.1/180*pi;
 
 
 
-CASE=2;
+CASE=0;
+
+if (CASE==0,
+    Minf=23.3;
+    Re=103060/Rin;
+    Vinf=7677;
+    Pinf=75;
+    Tinf=268;
+    {altitude: 51 km}
+);
+
 
 if (CASE==1,
     Minf=23.9;
     Re=1.95e4/Rin;
+    Vinf=7677;
+    Pinf=20;
+    Tinf=256;
     {altitude: 61 km}
 );
 
 if (CASE==2,
     Minf=25.9;
     Re=6.28e3/Rin;
+    Vinf=7677;
+    Pinf=4.84;
+    Tinf=218;
     {altitude: 71 km}
 );
    
 if (CASE==3,
     Minf=28.3;
     Re=1.59e3/Rin;
+    Vinf=7677;
+    Pinf=0.894;
+    Tinf=182;
     {altitude: 81 km}
 );
 
 T=7650^2/(1.4*286*Minf^2);
+T=Tinf;
 Tv=T;
 Te=T;
 
@@ -389,7 +409,7 @@ Model(
     AXISYMMETRIC=YES;
   );
   NavierStokesPlasma(
-    TEMODEL=TEMODEL_TRANSPORT;
+    TEMODEL=TEMODEL_TVEQUILIBRIUM;
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=YES;
@@ -508,7 +528,9 @@ Init(
     w_O2=0.235;
     w_N2=0.765;
     w_default=1e-30;
-    All(INIT_TYPE3,Minf,0,Re,T,w_O2,w_N2,w_default,Tv,Te);
+{    All(INIT_TYPE3,Minf,0,Re,T,w_O2,w_N2,w_default,Tv,Te);}
+    All(INIT_TYPE5,Vinf,0,Pinf,Tinf,w_O2,w_N2,w_default,Tv,Te);
+
     {
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE6,Vx,Vy,P,T,chi_O2,chi_N2,chi_eminus,chi_default,Tv,Te);
     Region(is,js,  ie,je, INIT_TYPE6,Vx,Vy,P,T,chi_O2,chi_N2,chi_eminus,chi_default,Tv,Te);

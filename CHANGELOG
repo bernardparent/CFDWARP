@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 MAR 23a
+  * in read_data_file(), fixed a few bugs related to read_data_file_mpi when BDF is the chosen
+    time stepping method
+
+
 2021 MAR 21a
   * in src/common.h
     - added dim_t Esmoothedmem to npbs_t

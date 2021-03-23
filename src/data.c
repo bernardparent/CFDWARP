@@ -1099,7 +1099,7 @@ void read_data_file(input_t input, np_t *np, gl_t *gl){
               (np)[_ai(gl,i,j,k)].bs->Um2[flux]=(np)[_ai(gl,i,j,k)].bs->Um1[flux];
             }
       }
-      if (input.MM2) read_data_file_binary_mpi(input.name_m2, np, gl, 2);
+      if (input.MM2) read_data_file_mpi(input.name_m2, np, gl, 2);
       if (input.M2) read_data_file_binary_ascii(input.name_m2, np, gl, 2, DATATYPE_BINARY);
 #endif
 #if _RESTIME_BW > 3 
@@ -1108,8 +1108,8 @@ void read_data_file(input_t input, np_t *np, gl_t *gl){
               (np)[_ai(gl,i,j,k)].bs->Um3[flux]=(np)[_ai(gl,i,j,k)].bs->Um2[flux];
             }
       }
-      if (input.BINARYMPI) read_data_file_mpi(input.name_m3, np, gl, 3);
-      else read_data_file_binary_ascii(input.name_m3, np, gl, 3, DATATYPE_BINARY);
+      if (input.MM3) read_data_file_mpi(input.name_m3, np, gl, 3);
+      if (input.M3) read_data_file_binary_ascii(input.name_m3, np, gl, 3, DATATYPE_BINARY);
 #endif
 #endif
 
