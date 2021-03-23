@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define Estarmin 1e-40
 
 /* set all reactions to true except for testing purposes */
-const static bool TOWNSENDREACTION[7]=
+const static bool ADDITIONALREACTION[7]=
   {
    TRUE, /* reaction 0 */
    TRUE, /* reaction 1 */
@@ -59,8 +59,8 @@ void write_model_chem_template(FILE **controlfile){
   wfprintf(*controlfile,
     "  %s(\n"
     "    CHEMMODEL=CHEMMODEL_DUNNKANG1973;\n"
-    "    TOWNSENDIONIZATION=FALSE; {include reactions function of EoverN}\n"
-    "    TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}\n"
+    "    ADDITIONALREACTION=FALSE; {include reactions function of EoverN}\n"
+    "    TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE generally}\n"
     "  );\n"
   ,_CHEM_ACTIONNAME);
 }
@@ -96,7 +96,7 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
         && gl->model.chem.CHEMMODEL!=CHEMMODEL_BOYD2007 && gl->model.chem.CHEMMODEL!=CHEMMODEL_LENARD1964
         && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)
       SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_DUNNKANG1973 or CHEMMODEL_NONE or CHEMMODEL_BOYD2007 or CHEMMODEL_PARK1993 or CHEMMODEL_LENARD1964.");
-    find_bool_var_from_codex(codex,"TOWNSENDIONIZATION",&gl->model.chem.TOWNSENDIONIZATION);
+    find_bool_var_from_codex(codex,"ADDITIONALREACTION",&gl->model.chem.ADDITIONALREACTION);
     find_bool_var_from_codex(codex,"TOWNSENDIONIZATIONIMPLICIT",&gl->model.chem.TOWNSENDIONIZATIONIMPLICIT);
 
     SOAP_clean_added_vars(codex,numvarsinit);
@@ -106,7 +106,7 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
 
 
 
-void add_W_Townsend ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
+void add_W_Additional ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
   double N[ns];
   double theta,R;
   long k;
@@ -132,29 +132,29 @@ void add_W_Townsend ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, dou
 
 
     
-  if (TOWNSENDREACTION[1])
+  if (ADDITIONALREACTION[1])
       add_to_W_2r3p ( specN2, speceminus,   specN2plus, speceminus, speceminus,   exp ( -0.0105809 * sqr ( theta ) - 2.40411e-75 * pow ( theta, 46.0 ) ), N, W);
 
-  if (TOWNSENDREACTION[2])
+  if (ADDITIONALREACTION[2])
       add_to_W_2r3p ( specO2, speceminus,   specO2plus, speceminus, speceminus,   exp ( -0.0102785 * sqr ( theta ) - 2.42260e-75 * pow ( theta, 46.0 ) ), N, W);
 
-  if (TOWNSENDREACTION[3])
+  if (ADDITIONALREACTION[3])
       add_to_W_2r3p ( specNO, speceminus,   specNOplus, speceminus, speceminus,   exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), N, W);
 
-  if (TOWNSENDREACTION[4]) 
+  if (ADDITIONALREACTION[4]) 
       add_to_W_fw_3r2p ( specNOplus, speceminus, speceminus,   specNO, speceminus, 2.2e40, -4.5, 0.0*R, Te, X, W );
 
-  if (TOWNSENDREACTION[5])
-      add_to_W_2r3p ( specN, speceminus,   specNplus, speceminus, speceminus,   exp ( -0.0105809 * sqr ( theta ) - 2.40411e-75 * pow ( theta, 46.0 ) ), N, W);
+  if (ADDITIONALREACTION[5])
+      add_to_W_2r3p ( specN, speceminus,   specNplus, speceminus, speceminus,   exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), N, W);
 
-  if (TOWNSENDREACTION[6])
-      add_to_W_2r3p ( specO, speceminus,   specOplus, speceminus, speceminus,   exp ( -0.0102785 * sqr ( theta ) - 2.42260e-75 * pow ( theta, 46.0 ) ), N, W);
+  if (ADDITIONALREACTION[6])
+      add_to_W_2r3p ( specO, speceminus,   specOplus, speceminus, speceminus,   exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), N, W);
   
 }
 
 
 
-void add_dW_dx_Townsend ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, 
+void add_dW_dx_Additional ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, 
                   double Estar, double Qbeam, spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, 
                   spec_t dWdTv, spec_t dWdQbeam ) {
   long k;  
@@ -178,7 +178,7 @@ void add_dW_dx_Townsend ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te,
   Te_from_Estar=max(300.0,Te_from_Estar); 
 
 
-  if (TOWNSENDREACTION[1] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
+  if (ADDITIONALREACTION[1] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
     kf=exp ( -0.0105809 * sqr ( theta ) - 2.40411e-75 * pow ( theta, 46.0 ) );
     dkfdTe = 0.0;
     dkfdT=0.0;
@@ -186,7 +186,7 @@ void add_dW_dx_Townsend ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te,
     add_to_dW_2r3p ( specN2, speceminus,   specN2plus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
   
-  if (TOWNSENDREACTION[2] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
+  if (ADDITIONALREACTION[2] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
     kf=exp ( -0.0102785 * sqr ( theta ) - 2.42260e-75 * pow ( theta, 46.0 ) );
     dkfdTe = 0.0;
     dkfdT=0.0;
@@ -194,7 +194,7 @@ void add_dW_dx_Townsend ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te,
     add_to_dW_2r3p ( specO2, speceminus,   specO2plus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
-  if (TOWNSENDREACTION[3] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT){
+  if (ADDITIONALREACTION[3] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT){
     kf=exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) );
     dkfdTe = 0.0;
     dkfdT=0.0;
@@ -202,20 +202,20 @@ void add_dW_dx_Townsend ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te,
     add_to_dW_2r3p ( specNO, speceminus,   specNOplus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
-  if (TOWNSENDREACTION[4]){
+  if (ADDITIONALREACTION[4]){
     add_to_dW_fw_3r2p ( specNOplus, speceminus, speceminus,   specNO, speceminus, 2.2e40, -4.5, 0.0*R, Te, X, dWdTe, dWdrhok );
   }
 
-  if (TOWNSENDREACTION[5] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
-    kf=exp ( -0.0105809 * sqr ( theta ) - 2.40411e-75 * pow ( theta, 46.0 ) );
+  if (ADDITIONALREACTION[5] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
+    kf=exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0));
     dkfdTe = 0.0;
     dkfdT=0.0;
     dkfdTv=0.0;
     add_to_dW_2r3p ( specN, speceminus,   specNplus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
   
-  if (TOWNSENDREACTION[6] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
-    kf=exp ( -0.0102785 * sqr ( theta ) - 2.42260e-75 * pow ( theta, 46.0 ) );
+  if (ADDITIONALREACTION[6] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
+    kf=exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0));
     dkfdTe = 0.0;
     dkfdT=0.0;
     dkfdTv=0.0;
@@ -275,8 +275,8 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
     default:
       fatal_error("Problem with CHEMMODEL in find_W() within chem.c");
   }
-  if (gl->model.chem.TOWNSENDIONIZATION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  
-    add_W_Townsend ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
+  if (gl->model.chem.ADDITIONALREACTION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  
+    add_W_Additional ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
 }
 
 
@@ -302,8 +302,8 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double 
     default:
       fatal_error("Problem with CHEMMODEL in find_W() within chem.c");
   }
-  if (gl->model.chem.TOWNSENDIONIZATION  && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  
-    add_dW_dx_Townsend ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+  if (gl->model.chem.ADDITIONALREACTION  && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  
+    add_dW_dx_Additional ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
 
 }
 
@@ -321,13 +321,13 @@ void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
       find_Qei_DunnKang1973 ( gl, rhok, Estar, Te, Qei );
     break;
     case CHEMMODEL_PARK1993: 
-//      find_Qei_Park1993 ( gl, rhok, Estar, Te, Qei );
+      find_Qei_Park1993 ( gl, rhok, Estar, Te, Qei );
     break;
     case CHEMMODEL_BOYD2007: 
-//      find_Qei_Boyd2007 ( gl, rhok, Estar, Te, Qei );
+      find_Qei_Boyd2007 ( gl, rhok, Estar, Te, Qei );
     break;
     case CHEMMODEL_LENARD1964: 
-//      find_Qei_Lenard1964 ( gl, rhok, Estar, Te, Qei );
+      find_Qei_Lenard1964 ( gl, rhok, Estar, Te, Qei );
     break;
     case CHEMMODEL_NONE: 
       *Qei=0.0;
@@ -338,17 +338,17 @@ void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
 
   theta=log(Estar);
 
-  if (gl->model.chem.TOWNSENDIONIZATION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
-    if (TOWNSENDREACTION[1]) 
+  if (gl->model.chem.ADDITIONALREACTION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
+    if (ADDITIONALREACTION[1]) 
       add_to_Qei(specN2, exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), rhok, Qei);
-    if (TOWNSENDREACTION[2]) 
+    if (ADDITIONALREACTION[2]) 
       add_to_Qei(specO2, exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), rhok, Qei);
-    if (TOWNSENDREACTION[3]) 
+    if (ADDITIONALREACTION[3]) 
       add_to_Qei(specNO, exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), rhok, Qei);
-    if (TOWNSENDREACTION[5]) 
-      add_to_Qei(specN, exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), rhok, Qei);
-    if (TOWNSENDREACTION[6]) 
-      add_to_Qei(specO, exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), rhok, Qei);
+    if (ADDITIONALREACTION[5]) 
+      add_to_Qei(specN, exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), rhok, Qei);
+    if (ADDITIONALREACTION[6]) 
+      add_to_Qei(specO, exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), rhok, Qei);
   }
 }
 
@@ -365,13 +365,13 @@ void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrh
       find_dQei_dx_DunnKang1973 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
     break;
     case CHEMMODEL_PARK1993: 
-      //find_dQei_dx_Park1993 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+      find_dQei_dx_Park1993 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
     break;
     case CHEMMODEL_BOYD2007: 
-      //find_dQei_dx_Boyd2007 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+      find_dQei_dx_Boyd2007 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
     break;
     case CHEMMODEL_LENARD1964: 
-     // find_dQei_dx_Lenard1964 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+      find_dQei_dx_Lenard1964 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
     break;
     case CHEMMODEL_NONE: 
       *dQeidTe=0.0;
@@ -384,17 +384,17 @@ void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrh
   
   theta=log(Estar);
 
-  if (gl->model.chem.TOWNSENDIONIZATION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
-    if (TOWNSENDREACTION[1]) 
+  if (gl->model.chem.ADDITIONALREACTION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
+    if (ADDITIONALREACTION[1]) 
       add_to_dQei(specN2, exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
-    if (TOWNSENDREACTION[2]) 
+    if (ADDITIONALREACTION[2]) 
       add_to_dQei(specO2, exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
-    if (TOWNSENDREACTION[3]) 
+    if (ADDITIONALREACTION[3]) 
       add_to_dQei(specNO, exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), 0.0, rhok, dQeidrhok, dQeidTe);
-    if (TOWNSENDREACTION[5]) 
-      add_to_dQei(specN, exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
-    if (TOWNSENDREACTION[6]) 
-      add_to_dQei(specO, exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
+    if (ADDITIONALREACTION[5]) 
+      add_to_dQei(specN, exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), 0.0, rhok, dQeidrhok, dQeidTe);
+    if (ADDITIONALREACTION[6]) 
+      add_to_dQei(specO, exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), 0.0, rhok, dQeidrhok, dQeidTe);
   }
 }
 

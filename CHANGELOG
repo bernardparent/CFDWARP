@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 MAR 23b
+  * in model/chem/_Air_Plasma_11s/boyd2007.c, park1993.c, lenard1964.c
+    - added find_Qei_*() and find_dQei_dx_*()
+  * in model/chem/_Air_Plasma_11s/dunnkang1973.c
+    - in find_Qei_DunnKang1973() and find_dQei_dx_DunnKang1973(), fixed a typo: 3.6e31/sqr(calA)
+      should be 3.6e31/calA and 1.1e32/sqr(calA) should be 1.1e32/calA
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - renamed TOWNSENDIONIZATION to ADDITIONALREACTION
+    - changed the rates for ADDITIONALREACTION[5]  and ADDITIONALREACTION[6] using BOLSIG+
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - changed the rates for the 5th and 6th additional reaction using BOLSIG+
+    
+
 2021 MAR 23a
   * in read_data_file(), fixed a few bugs related to read_data_file_mpi when BDF is the chosen
     time stepping method

@@ -393,3 +393,16 @@ void find_We_Lenard1964 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
   if (REACTION[20])
     *We_destroy+=_kf_Arrhenius(2, 2e19, -1.0, 0.0, Te)*N[speceminus]*N[specNOplus]/ calA * _calM(speceminus) * 1.0e6;
 }
+
+
+void find_Qei_Lenard1964(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
+  *Qei=0.0;
+}
+
+
+
+void find_dQei_dx_Lenard1964(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
+  long spec;
+  for (spec=0; spec<ns; spec++) dQeidrhok[spec]=0.0;
+  *dQeidTe=0.0;
+}
