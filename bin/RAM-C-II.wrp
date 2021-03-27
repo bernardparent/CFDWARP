@@ -423,16 +423,17 @@ Model(
     Temin=240;     Temax=60.0e3;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain for neutrals}
-    chiimin=1e-30;  chiimax=1.0;    {min and max ion molar fraction}
-    chiemin=1e-12;  chiemax=1.0;    {min and max electron molar fraction}
+    chiimin=1e-12;  chiimax=1.0;    {min and max ion molar fraction}
+    chiemin=1e-11;  chiemax=1.0;    {min and max electron molar fraction}
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
     gamma=0.1e0;    {secondary emission coefficient}
     AXISYMMETRIC=YES;
   );
   AirPlasma11s(
     CHEMMODEL=CHEMMODEL_DUNNKANG1973;
-    TOWNSENDIONIZATION=TRUE; {include reactions function of EoverN}
+    ADDITIONALREACTION=TRUE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
+    QEISOURCETERMS=FALSE;
   );
   Epotential(
     Te_buffer=300.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,Te_buffer);  
@@ -689,6 +690,14 @@ Cycle(
       CFLmax=4.0;
     );
     CFL=min(CFL*1.03,CFLmax);
+    if (iter>5000*mf,
+      Model(
+        NavierStokesPlasma(
+          chiemin=1e-15;
+          chiimin=1e-16;
+        );
+      );
+    );
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     if (EMFIELD,
       if (iter<2000,

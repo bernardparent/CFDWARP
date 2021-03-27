@@ -87,7 +87,7 @@
 }
 
 
-Bz=0.5; {Tesla}
+Bz=0.1; {Tesla}
 mf=2.0; 
 
 CASE=1;
@@ -205,21 +205,21 @@ Model(
     Temin=300;     Temax=60e3;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-20;                  {min mass fraction allowed in the domain for neutrals}
-    chiimin=1e-7;  chiimax=1.0;    {min and max ion molar fraction}
-    chiemin=1e-8;  chiemax=1.0;    {min and max electron molar fraction}
+    chiimin=1e-12;  chiimax=1.0;    {min and max ion molar fraction}
+    chiemin=1e-11;  chiemax=1.0;    {min and max electron molar fraction}
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
     gamma=10.0e0;    {secondary emission coefficient}
     AXISYMMETRIC=NO;
   );
   AirPlasma11s(
     CHEMMODEL=CHEMMODEL_DUNNKANG1973;
-    TOWNSENDIONIZATION=TRUE; {include reactions function of EoverN}
+    ADDITIONALREACTION=FALSE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
   );
   EpotentialBfixed(
     EFIELD_SPECIES_FRAME=TRUE;
     AXISYMMETRIC=NO;
-    Te_buffer=1000.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,Te_buffer);  
+    Te_buffer=300.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,Te_buffer);  
                        needed to prevent convergence hangs where |E| becomes close to 0;
                        set to as little a value as possible}
     Jmax=1e11;     {the maximum current density in A/m2 expected in the domain; this will affect only
@@ -427,7 +427,7 @@ Cycle(
   );
   EpotentialBfixed(
     xiverge_emfield=1e-2; {residual convergence threshold for the potential equation}
-    relaxEk=0.5; {relaxation factor for E in species frame}
+    relaxEk=0.3; {relaxation factor for E in species frame}
     sigmaref=3e-6; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
     Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );

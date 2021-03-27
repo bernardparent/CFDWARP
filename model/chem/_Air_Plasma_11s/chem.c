@@ -61,6 +61,7 @@ void write_model_chem_template(FILE **controlfile){
     "    CHEMMODEL=CHEMMODEL_DUNNKANG1973;\n"
     "    ADDITIONALREACTION=FALSE; {include reactions function of EoverN}\n"
     "    TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE generally}\n"
+    "    QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}\n"
     "  );\n"
   ,_CHEM_ACTIONNAME);
 }
@@ -98,6 +99,7 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
       SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_DUNNKANG1973 or CHEMMODEL_NONE or CHEMMODEL_BOYD2007 or CHEMMODEL_PARK1993 or CHEMMODEL_LENARD1964.");
     find_bool_var_from_codex(codex,"ADDITIONALREACTION",&gl->model.chem.ADDITIONALREACTION);
     find_bool_var_from_codex(codex,"TOWNSENDIONIZATIONIMPLICIT",&gl->model.chem.TOWNSENDIONIZATIONIMPLICIT);
+    find_bool_var_from_codex(codex,"QEISOURCETERMS",&gl->model.chem.QEISOURCETERMS);
 
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;
@@ -315,41 +317,42 @@ void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
   double theta;
   
   *Qei=0.0;  
+  if (gl->model.chem.QEISOURCETERMS){
+    switch (gl->model.chem.CHEMMODEL){
+      case CHEMMODEL_DUNNKANG1973: 
+        find_Qei_DunnKang1973 ( gl, rhok, Estar, Te, Qei );
+      break;
+      case CHEMMODEL_PARK1993: 
+        find_Qei_Park1993 ( gl, rhok, Estar, Te, Qei );
+      break;
+      case CHEMMODEL_BOYD2007: 
+        find_Qei_Boyd2007 ( gl, rhok, Estar, Te, Qei );
+      break;
+      case CHEMMODEL_LENARD1964: 
+        find_Qei_Lenard1964 ( gl, rhok, Estar, Te, Qei );
+      break;
+      case CHEMMODEL_NONE: 
+        *Qei=0.0;
+      break;
+      default:
+        fatal_error("Problem with CHEMMODEL in find_Qei() within chem.c");
+    }
 
-  switch (gl->model.chem.CHEMMODEL){
-    case CHEMMODEL_DUNNKANG1973: 
-      find_Qei_DunnKang1973 ( gl, rhok, Estar, Te, Qei );
-    break;
-    case CHEMMODEL_PARK1993: 
-      find_Qei_Park1993 ( gl, rhok, Estar, Te, Qei );
-    break;
-    case CHEMMODEL_BOYD2007: 
-      find_Qei_Boyd2007 ( gl, rhok, Estar, Te, Qei );
-    break;
-    case CHEMMODEL_LENARD1964: 
-      find_Qei_Lenard1964 ( gl, rhok, Estar, Te, Qei );
-    break;
-    case CHEMMODEL_NONE: 
-      *Qei=0.0;
-    break;
-    default:
-      fatal_error("Problem with CHEMMODEL in find_Qei() within chem.c");
-  }
+    theta=log(Estar);
 
-  theta=log(Estar);
-
-  if (gl->model.chem.ADDITIONALREACTION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
-    if (ADDITIONALREACTION[1]) 
-      add_to_Qei(specN2, exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), rhok, Qei);
-    if (ADDITIONALREACTION[2]) 
-      add_to_Qei(specO2, exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), rhok, Qei);
-    if (ADDITIONALREACTION[3]) 
-      add_to_Qei(specNO, exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), rhok, Qei);
-    if (ADDITIONALREACTION[5]) 
-      add_to_Qei(specN, exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), rhok, Qei);
-    if (ADDITIONALREACTION[6]) 
-      add_to_Qei(specO, exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), rhok, Qei);
-  }
+    if (gl->model.chem.ADDITIONALREACTION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
+      if (ADDITIONALREACTION[1]) 
+        add_to_Qei(specN2, exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), rhok, Qei);
+      if (ADDITIONALREACTION[2]) 
+        add_to_Qei(specO2, exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), rhok, Qei);
+      if (ADDITIONALREACTION[3]) 
+        add_to_Qei(specNO, exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), rhok, Qei);
+      if (ADDITIONALREACTION[5]) 
+        add_to_Qei(specN, exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), rhok, Qei);
+      if (ADDITIONALREACTION[6]) 
+        add_to_Qei(specO, exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), rhok, Qei);
+    }
+  } 
 }
 
 
@@ -360,41 +363,43 @@ void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrh
   for (spec=0; spec<ns; spec++) dQeidrhok[spec]=0.0;
   *dQeidTe=0.0;  
   
-  switch (gl->model.chem.CHEMMODEL){
-    case CHEMMODEL_DUNNKANG1973: 
-      find_dQei_dx_DunnKang1973 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
-    break;
-    case CHEMMODEL_PARK1993: 
-      find_dQei_dx_Park1993 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
-    break;
-    case CHEMMODEL_BOYD2007: 
-      find_dQei_dx_Boyd2007 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
-    break;
-    case CHEMMODEL_LENARD1964: 
-      find_dQei_dx_Lenard1964 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
-    break;
-    case CHEMMODEL_NONE: 
-      *dQeidTe=0.0;
-    break;
-    default:
-      fatal_error("Problem with CHEMMODEL in find_Qei() within chem.c");
-  }
+  if (gl->model.chem.QEISOURCETERMS){
+    switch (gl->model.chem.CHEMMODEL){
+      case CHEMMODEL_DUNNKANG1973: 
+        find_dQei_dx_DunnKang1973 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+      break;
+      case CHEMMODEL_PARK1993: 
+        find_dQei_dx_Park1993 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+      break;
+      case CHEMMODEL_BOYD2007: 
+        find_dQei_dx_Boyd2007 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+      break;
+      case CHEMMODEL_LENARD1964: 
+        find_dQei_dx_Lenard1964 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+      break;
+      case CHEMMODEL_NONE: 
+        *dQeidTe=0.0;
+      break;
+      default:
+        fatal_error("Problem with CHEMMODEL in find_Qei() within chem.c");
+    }
   
   
   
-  theta=log(Estar);
+    theta=log(Estar);
 
-  if (gl->model.chem.ADDITIONALREACTION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
-    if (ADDITIONALREACTION[1]) 
-      add_to_dQei(specN2, exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
-    if (ADDITIONALREACTION[2]) 
-      add_to_dQei(specO2, exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
-    if (ADDITIONALREACTION[3]) 
-      add_to_dQei(specNO, exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), 0.0, rhok, dQeidrhok, dQeidTe);
-    if (ADDITIONALREACTION[5]) 
+    if (gl->model.chem.ADDITIONALREACTION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
+      if (ADDITIONALREACTION[1]) 
+        add_to_dQei(specN2, exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
+      if (ADDITIONALREACTION[2]) 
+        add_to_dQei(specO2, exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
+      if (ADDITIONALREACTION[3]) 
+        add_to_dQei(specNO, exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), 0.0, rhok, dQeidrhok, dQeidTe);
+      if (ADDITIONALREACTION[5]) 
       add_to_dQei(specN, exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), 0.0, rhok, dQeidrhok, dQeidTe);
-    if (ADDITIONALREACTION[6]) 
+      if (ADDITIONALREACTION[6]) 
       add_to_dQei(specO, exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), 0.0, rhok, dQeidrhok, dQeidTe);
+    }
   }
 }
 

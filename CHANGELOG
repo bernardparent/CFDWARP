@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 MAR 27a
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - added QEISOURCETERMS within the variables to read in Model(AirPlasma11s(););
+  * in find_Qei() and find_dQei_dx()
+    - set Qei to 0 if QEISOURCETERMS is set to FALSE
+    
+
 2021 MAR 23b
   * in model/chem/_Air_Plasma_11s/boyd2007.c, park1993.c, lenard1964.c
     - added find_Qei_*() and find_dQei_dx_*()

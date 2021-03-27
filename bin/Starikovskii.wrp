@@ -181,7 +181,7 @@ Model(
   );
   AirPlasma11s(
     CHEMMODEL=CHEMMODEL_BOYD2007;
-    TOWNSENDIONIZATION=TRUE; {include reactions function of EoverN}
+    ADDITIONALREACTION=TRUE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
   );
   Epotential(

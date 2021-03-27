@@ -70,5 +70,6 @@ typedef struct {
   int CHEMMODEL;
   bool ADDITIONALREACTION;
   bool TOWNSENDIONIZATIONIMPLICIT;
+  bool QEISOURCETERMS;
 } gl_model_chem_t;
 
