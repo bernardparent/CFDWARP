@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 APR 05a
+  * in cycle/share/cycle_share.c
+    - added header <src/post.h>
+    - in runtime_actions(), added code to enable Post() to be called from Cycle()
+  * in cycle/share/cycle_share.h
+    - added function prototype for runtime_actions()
+  * in src/post.c
+    - added header <cycle/share/cycle_share.h>
+    - in read_post_actions(), added condition to read postfilename only when -opm flag is used
+    - in read_post(), removed line which prevented Post() to be executed with more than one MPI process
+    - in read_post(), added condition to prevent newline to be printed when Post() is called within Cycle() 
+
+
 2021 MAR 27a
   * in model/chem/_Air_Plasma_11s/chem.c
     - added QEISOURCETERMS within the variables to read in Model(AirPlasma11s(););

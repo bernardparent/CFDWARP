@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <src/post.h>
 #include <cycle/_cycle.h>
+#include <cycle/share/cycle_share.h>
 #include <src/bdry.h>
 
 
@@ -2176,7 +2177,7 @@ static void read_post_actions(char *action, char **argum, SOAP_codex_t *codex){
   filename=(char *)malloc(sizeof(char));
   postprocessor=(char *)malloc(sizeof(char));
 
-  add_string_to_codex(codex, "postfilename", gl->post_filename);
+  if (&gl->post_filename!=NULL) add_string_to_codex(codex, "postfilename", gl->post_filename);
   if (strcmp(action,"XSTATION_Set")==0) {
 #ifdef DISTMPI
     MPI_Barrier(MPI_COMM_WORLD);
@@ -2243,9 +2244,8 @@ void read_post(char *argum, SOAP_codex_t *codex){
   int rank;
   MPI_Barrier(MPI_COMM_WORLD);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  if (rank!=0) fatal_error("Post module can only be executed with one MPI process. Try -np 1.");    
 #endif
-  wfprintf(stdout,"\n");
+  if (codex->action!=&runtime_actions) wfprintf(stdout,"\n");
   codex->action=&read_post_actions;
   codex->function=&read_post_functions;
   ((readcontrolarg_t *)codex->action_args)->domain_post=((readcontrolarg_t *)codex->action_args)->gl->domain_all;

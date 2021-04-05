@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <src/common.h>
 #include <src/bdry.h>
 #include <src/init.h>
+#include <src/post.h>
 #include <cycle/ts/_ts.h>
 #include <cycle/tsemf/_tsemf.h>
 #include <cycle/_cycle.h>
@@ -1003,6 +1004,11 @@ void runtime_actions(char *actionname, char **argum, SOAP_codex_t *codex){
   }
   if (strcmp(actionname,"Cycle")==0) {
     read_cycle(*argum, codex);
+    codex->action=&runtime_actions;
+    codex->ACTIONPROCESSED=TRUE;
+  }
+  if (strcmp(actionname,"Post")==0) {
+    read_post(*argum, codex);
     codex->action=&runtime_actions;
     codex->ACTIONPROCESSED=TRUE;
   }

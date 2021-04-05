@@ -121,6 +121,8 @@ void find_dtau(np_t *np, gl_t *gl, long l, flux_t dtau);
 
 void read_cycle_actions(char *actionname, char **argum, SOAP_codex_t *codex);
 
+void runtime_actions(char *actionname, char **argum, SOAP_codex_t *codex);
+
 #ifdef UNSTEADY
 void increase_time_level(np_t *np, gl_t *gl);
 #endif
