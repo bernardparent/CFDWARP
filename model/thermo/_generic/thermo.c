@@ -4176,7 +4176,6 @@ void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double
 
 
 
-
 /* fraction of electron joule heating that is consumed in nitrogen vibrational energy */ 
 double _zetav_from_Te(double Te){
   double etav;

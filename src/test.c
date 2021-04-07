@@ -926,6 +926,53 @@ void test_Pr ( double Tmin, double Tmax, double dT ) {
 }
 
 
+
+#ifdef _FLUID_PLASMA
+double _rhok (np_t np, long spec);
+double _Tk(np_t *np, gl_t *gl, long l, long spec);
+void find_Ek(np_t *np, gl_t *gl, long l, long spec, EXM_vec3D_t Ek);
+
+void test_dmuk ( np_t * np, gl_t * gl, long l ) {
+  
+  double Tk,Ekmag,dmukdTk,dmukdTk_numerical,dmukdrhok_numerical;
+  long spec,spec2,spec3;
+  EXM_vec3D_t Ek;
+  spec_t rhok,rhok2,dmukdrhok;
+  
+  printf ( "\n" );
+  printf
+    ( "dmuk jacobian should be equal to numerically determined one when -DTEST compile flag is set.\n" );
+  printf ( "The jacobian is determined at node " );
+  printf_ijk_position_of_node_l ( gl, l );
+  printf ( ".\n\n" );
+  for (spec=0; spec<ns; spec++) {
+    rhok[spec]=_rhok(np[l],spec);
+  }
+
+  for (spec2=-1; spec2<ns; spec2++){
+    if (spec2==-1) printf("dmukdTk:\n"); else printf("dmukdrhok[%ld]:\n",spec2);
+    for (spec=0; spec<ns; spec++){
+      Tk=_Tk(np,gl,l,spec);
+      find_Ek(np,gl,l,spec,Ek);
+      Ekmag=EXM_vector_magnitude(Ek);
+      find_dmuk_from_rhok_Tk_Ek(rhok, Tk, Ekmag, spec, &dmukdTk, dmukdrhok);
+      if (spec2==-1) {
+        dmukdTk_numerical=_muk_from_rhok_Tk_Ek(rhok, Tk+1.0, Ekmag, spec)-_muk_from_rhok_Tk_Ek(rhok, Tk, Ekmag, spec);
+        printf("%E  %E \n",dmukdTk,dmukdTk_numerical);
+      } else {
+        for (spec3=0; spec3<ns; spec3++) rhok2[spec3]=rhok[spec3];
+        rhok2[spec2]*=1.0001;
+        dmukdrhok_numerical=(_muk_from_rhok_Tk_Ek(rhok2, Tk, Ekmag, spec)-_muk_from_rhok_Tk_Ek(rhok, Tk, Ekmag, spec))/(0.0001*rhok2[spec2]);
+        printf("%E  %E \n",dmukdrhok[spec2],dmukdrhok_numerical);
+      
+      }
+    }
+    printf("\n\n");
+  }
+}
+#endif
+
+
 int chkarg ( int argc, char **argv, char *arg ) {
   int cnt, tmp;
   tmp = 0;
@@ -1083,6 +1130,10 @@ int main ( int argc, char **argv ) {
         test_dUstar_dUprime ( npArray, lL, &gl );
       if ( strcmp ( "jacvars", argv[cnt] ) == 0 )
         test_jacvars ( npArray, &gl, lL, theta );
+#ifdef _FLUID_PLASMA
+      if ( strcmp ( "dmuk", argv[cnt] ) == 0 )
+        test_dmuk ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
+#endif
     }
 
   } else {
@@ -1203,6 +1254,10 @@ int main ( int argc, char **argv ) {
       write_options_row ( stderr, "kappa", "none", "species thermal conductivity  ./test kappa 500 2000 2",
                           linewidth, lengthcol1, lengthcol2 );
       write_options_row ( stderr, "Pr", "none", "species Prandtl number  ./test Pr 500 2000 2",
+                          linewidth, lengthcol1, lengthcol2 );
+#endif
+#ifdef _FLUID_PLASMA
+      write_options_row ( stderr, "dmuk", "none", "mobility jacobians  ./test -r test.wrp -node 10 10"if3D(" 10")" jacvars",
                           linewidth, lengthcol1, lengthcol2 );
 #endif
       write_hline ( stderr, linewidth, 2 );

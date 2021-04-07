@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 APR 06a
+  * in model/share/emfield_share.c
+    - in _E_dot_J(), changed find_E(np[l],gl,E); to find_E_smoothed(np[l],gl,E);
+  * in src/test.c
+    - added test_dmuk()
+  * in model/fluid/_*_plasma/fluid_plasma.c
+    - added _mu_test()
+    - in find_H1() and find_H2(), added call to _mu_test instead of _mu when TEST is defined
+    - in find_dH1_dUstar() and find_dH2_dUstar(), updated the Jacobian terms present only
+      when TEST is defined
+  * in model/fluid/_*_plasma/fluid_source.c
+    - in find_Semfield(), now calls _E_dot_J() instead of the minmod between _E_dot_J() and
+      _E_dot_J_recast()
+      
+
 2021 APR 05a
   * in cycle/share/cycle_share.c
     - added header <src/post.h>
