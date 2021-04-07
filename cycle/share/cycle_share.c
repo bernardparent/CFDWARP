@@ -4,6 +4,7 @@ Copyright 1998-2018,2021 Bernard Parent
 Copyright 2020 Minindu Weerakoon
 Copyright 2001 Giovanni Fusina
 Copyright 2002 Thomas E. Schwartzentruber
+Copyright 2021 Prasanna Thoguluva Rajendran
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:

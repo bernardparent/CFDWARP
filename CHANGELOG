@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 APR 06b
+  * in src/post.c
+    - in read_post_actions() function, fixed incorrect condition for updating postfilename due
+      to incorrect reference to filename pointer address instead of filename pointer
+    
+
 2021 APR 06a
   * in model/share/emfield_share.c
     - in _E_dot_J(), changed find_E(np[l],gl,E); to find_E_smoothed(np[l],gl,E);

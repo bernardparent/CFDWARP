@@ -3,6 +3,7 @@
 Copyright 2001-2006 Bernard Parent
 Copyright 2001-2002 Derrick Alexander
 Copyright 2019 Van Tien Nguyen
+Copyright 2021 Prasanna Thoguluva Rajendran
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -2177,7 +2178,7 @@ static void read_post_actions(char *action, char **argum, SOAP_codex_t *codex){
   filename=(char *)malloc(sizeof(char));
   postprocessor=(char *)malloc(sizeof(char));
 
-  if (&gl->post_filename!=NULL) add_string_to_codex(codex, "postfilename", gl->post_filename);
+  if (gl->post_filename!=NULL) add_string_to_codex(codex, "postfilename", gl->post_filename);
   if (strcmp(action,"XSTATION_Set")==0) {
 #ifdef DISTMPI
     MPI_Barrier(MPI_COMM_WORLD);
