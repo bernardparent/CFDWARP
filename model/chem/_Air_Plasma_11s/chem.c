@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
 Copyright 2018,2021 Bernard Parent
+Copyright 2021 Prasanna Thoguluva Rajendran
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -32,12 +33,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "park1993.h"
 #include "boyd2007.h"
 #include "lenard1964.h"
+#include "farbar2013.h"
 
 #define CHEMMODEL_NONE 1
 #define CHEMMODEL_DUNNKANG1973 2
 #define CHEMMODEL_PARK1993 3
 #define CHEMMODEL_BOYD2007 4
 #define CHEMMODEL_LENARD1964 5
+#define CHEMMODEL_FARBAR2013 6
 
 
 #define Estarmin 1e-40
@@ -84,7 +87,8 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
     SOAP_add_int_to_vars(codex,"CHEMMODEL_DUNNKANG1973",CHEMMODEL_DUNNKANG1973); 
     SOAP_add_int_to_vars(codex,"CHEMMODEL_PARK1993",CHEMMODEL_PARK1993); 
     SOAP_add_int_to_vars(codex,"CHEMMODEL_BOYD2007",CHEMMODEL_BOYD2007); 
-    SOAP_add_int_to_vars(codex,"CHEMMODEL_LENARD1964",CHEMMODEL_LENARD1964); 
+    SOAP_add_int_to_vars(codex,"CHEMMODEL_LENARD1964",CHEMMODEL_LENARD1964);
+    SOAP_add_int_to_vars(codex,"CHEMMODEL_FARBAR2013",CHEMMODEL_FARBAR2013);
     gl->MODEL_CHEM_READ=TRUE;
 
     action_original=codex->action;
@@ -95,8 +99,8 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
     find_int_var_from_codex(codex,"CHEMMODEL",&gl->model.chem.CHEMMODEL);
     if (gl->model.chem.CHEMMODEL!=CHEMMODEL_DUNNKANG1973 && gl->model.chem.CHEMMODEL!=CHEMMODEL_PARK1993 
         && gl->model.chem.CHEMMODEL!=CHEMMODEL_BOYD2007 && gl->model.chem.CHEMMODEL!=CHEMMODEL_LENARD1964
-        && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)
-      SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_DUNNKANG1973 or CHEMMODEL_NONE or CHEMMODEL_BOYD2007 or CHEMMODEL_PARK1993 or CHEMMODEL_LENARD1964.");
+        && gl->model.chem.CHEMMODEL!=CHEMMODEL_FARBAR2013 && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)
+      SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_DUNNKANG1973 or CHEMMODEL_NONE or CHEMMODEL_BOYD2007 or CHEMMODEL_PARK1993 or CHEMMODEL_LENARD1964 or CHEMMODEL_FARBAR2013.");
     find_bool_var_from_codex(codex,"ADDITIONALREACTION",&gl->model.chem.ADDITIONALREACTION);
     find_bool_var_from_codex(codex,"TOWNSENDIONIZATIONIMPLICIT",&gl->model.chem.TOWNSENDIONIZATIONIMPLICIT);
     find_bool_var_from_codex(codex,"QEISOURCETERMS",&gl->model.chem.QEISOURCETERMS);
@@ -271,6 +275,9 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
     case CHEMMODEL_LENARD1964: 
       find_W_Lenard1964 ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
     break;
+    case CHEMMODEL_FARBAR2013: 
+      find_W_Farbar2013 ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
+    break;
     case CHEMMODEL_NONE: 
       find_W_None ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );    
     break;
@@ -297,6 +304,9 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double 
     break;
     case CHEMMODEL_LENARD1964: 
       find_dW_dx_Lenard1964 ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+    break;
+    case CHEMMODEL_FARBAR2013: 
+      find_dW_dx_Farbar2013 ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
     break;
     case CHEMMODEL_NONE: 
       find_dW_dx_None ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
@@ -330,6 +340,9 @@ void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
       break;
       case CHEMMODEL_LENARD1964: 
         find_Qei_Lenard1964 ( gl, rhok, Estar, Te, Qei );
+      break;
+      case CHEMMODEL_FARBAR2013: 
+        find_Qei_Farbar2013 ( gl, rhok, Estar, Te, Qei );
       break;
       case CHEMMODEL_NONE: 
         *Qei=0.0;
@@ -376,6 +389,9 @@ void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrh
       break;
       case CHEMMODEL_LENARD1964: 
         find_dQei_dx_Lenard1964 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+      break;
+      case CHEMMODEL_FARBAR2013: 
+        find_dQei_dx_Farbar2013 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
       break;
       case CHEMMODEL_NONE: 
         *dQeidTe=0.0;

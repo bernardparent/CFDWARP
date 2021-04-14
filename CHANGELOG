@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 APR 13a
+  * in src/control.c
+    - added reference farbar2013a
+  * in model/chem/_Air_Plasma_11s/chem.hh
+    - added reference farbar2013a
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - added modifications for the Farbar model
+  * in model/chem/_Air_Plasma_11s/
+    - added farbar2013.c and farbar2013.h and made relevant modifications to Makefile
+  * in model/chem/_Air_Plasma_11s/doc/
+    - added the Farbar model to report.tex and corresponding reference to all.bib
+    
+    
 2021 APR 06b
   * in src/post.c
     - in read_post_actions() function, fixed incorrect condition for updating postfilename due

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
 Copyright 1999-2015 Bernard Parent
+Copyright 2021 Prasanna Thoguluva Rajendran
 
 All rights reserved.
 
@@ -46,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   typedef GRIDG_gl3d_t glgrid_t;
 #endif
 
-#define numbib 45
+#define numbib 46
 #define maxstrlen 4096
 
 typedef char longstr_t[maxstrlen];
@@ -97,7 +98,8 @@ const static longstr_t bibname[numbib]=
    "park1993a",
    "park1994a",
    "smith1999a",
-   "boyd2007a"
+   "boyd2007a",
+   "farbar2013a"
   };
 
 const static longstr_t bib[numbib]=
@@ -234,7 +236,10 @@ const static longstr_t bib[numbib]=
    "G Smith, D Golden, M Frenklach, N Moriarty, B Eiteneer, B Goldenberg, C Bowman, R Hanson, S Song, W Gardiner, V Lissianski, and Q Zhiwei, \"GRIMech 3.0, Chemical Kinetic Mechanism\", 1999.",
 
    //boyd2007a
-   "ID Boyd, \"Modeling of associative ionization reactions in hypersonic rarefied flows,\" Physics of Fluids 19:096102, 2007."
+   "ID Boyd, \"Modeling of associative ionization reactions in hypersonic rarefied flows,\" Physics of Fluids 19:096102, 2007.",
+
+   //farbar2013a
+   "E Farbar, ID Boyd, and A Martin. \"Numerical Prediction of Hypersonic Flowfields Including Effects of Electron Translational Nonequilibrium,\" Journal of Thermophysics and Heat Transfer, 24:593-606, 2013."
   };
 
 

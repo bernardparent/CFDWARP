@@ -107,6 +107,8 @@ RAJENDRAN, Prasanna T.
   
   - in lib/soap/soap.c, fixed a bug in BA_for_parallel()
   
+  - addition of model/chem/_Air_Plasma_11s/farbar2013.c
+  
 
 SCHWARTZENTRUBER, Thomas E.
 

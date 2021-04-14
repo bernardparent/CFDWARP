@@ -9,6 +9,8 @@
 \usepackage{scalefnt}
 \usepackage{bm}
 \usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{multirow}
 
 %%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\alb}{\vspace{0.2cm}\\} % array line break
@@ -411,6 +413,54 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 
 
 
+%
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Farbar (2013) 11-species high-temperature air model.}
+\begin{tabular}{cccccccccc} 
+\toprule
+\multirow{2}{*}{No.} & \multirow{2}{*}{Reaction\tnote{(b)}} & Forward & Backward   & \multirow{2}{*}{$A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$} & \multirow{2}{*}{$n$} & \multirow{2}{*}{$E$, cal/mole~\tnote{(a)}} & \multirow{2}{*}{Refs.}\\
+ & & Control. Temp. & Control. Temp.&  &  &  & \\ 
+\midrule
+1 & $\rm N_2 + M_2 \rightleftarrows N + N + M_2$ & $T^{0.67} T_{\rm v}^{0.33}$ & $T$ & 7.0 $\times$ 10$^{21}$  & $-1.6$ & $113200 \cdot R$ & \cite{book:1990:park,jtht:2013:farbar}\\
+2 & $\rm N_2 + M_1 \rightleftarrows N + N + M_1$ & $T^{0.67} T_{\rm v}^{0.33}$ & $T$ & 3.0 $\times$ 10$^{22}$  & $-1.6$ & $113200 \cdot R$ & \cite{book:1990:park,jtht:2013:farbar}\\
+3 & $\rm N_2 + e^- \rightleftarrows N + N + e^-$ & $\sqrt{T_{\rm v} T_{\rm e}}$ & $\sqrt{T T_{\rm e}}$ & 3.0 $\times$ 10$^{24}$  & $-1.6$ & $113200 \cdot R$ & \cite{book:1990:park}\\
+4 & $\rm O_2 + M_2 \rightleftarrows O + O + M_2$ & $T^{0.67} T_{\rm v}^{0.33}$ & $T$ & 2.0 $\times$ 10$^{21}$  & $-1.5$ & $59500 \cdot R$ & \cite{book:1990:park,jtht:2013:farbar}\\
+5 & $\rm O_2 + M_1 \rightleftarrows O + O + M_1$ & $T^{0.67} T_{\rm v}^{0.33}$ & $T$ & 1.0 $\times$ 10$^{22}$  & $-1.5$ & $59500 \cdot R$ & \cite{book:1990:park,jtht:2013:farbar}\\
+6 & $\rm NO + M_2 \rightleftarrows N + O + M_2$ & $T^{0.67} T_{\rm v}^{0.33}$ & $T$ & 5.0 $\times$ 10$^{15}$  & 0.0 & $75500 \cdot R$ & \cite{book:1990:park,jtht:2013:farbar}\\
+7 & $\rm NO + M_1 \rightleftarrows N + O + M_1$ & $T^{0.67} T_{\rm v}^{0.33}$ & $T$ & 1.1 $\times$ 10$^{17}$  & 0.0 & $75500 \cdot R$ & \cite{book:1990:park,jtht:2013:farbar}\\
+8 & $\rm N_2 + O \rightleftarrows NO + N $ & $T$ & $T$ & 6.4 $\times$ 10$^{17}$  & $-1.0$ & $38370 \cdot R$ & \cite{jcp:1996:bose}\\
+9 & $\rm NO + O \rightleftarrows N + O_2 $ & $T$ & $T$ & 8.4 $\times$ 10$^{12}$  & 0.0 & $19450 \cdot R$ & \cite{book:1990:park}\\
+10 & $\rm N + e^- \rightleftarrows N^+ + e^- + e^- $ & $T_{\rm e}$ & $T_{\rm e}$ & 2.5 $\times$ 10$^{34}$  & $-3.82$ & $168600 \cdot R$ & \cite{book:1990:park}\\
+11 & $\rm O + e^- \rightleftarrows O^+ + e^- + e^- $ & $T_{\rm e}$ & $T_{\rm e}$ & 3.9 $\times$ 10$^{33}$  & $-3.78$ & $158500 \cdot R$ & \cite{book:1990:park}\\
+12 & $\rm N + O \rightleftarrows NO^+ + e^- $ & $T$ & $\sqrt{T_{\rm v} T_{\rm e}}$ & 5.3 $\times$ 10$^{12}$  & 0.0 & $31900 \cdot R$ & \cite{pf:2007:boyd}\\
+13 & $\rm O + O \rightleftarrows O_2^+ + e^- $ & $T$ & $\sqrt{T_{\rm v} T_{\rm e}}$ & 1.1 $\times$ 10$^{13}$  & 0.0 & $80600 \cdot R$ & \cite{pf:2007:boyd}\\
+14 & $\rm N + N \rightleftarrows N_2^+ + e^- $ & $T$ & $\sqrt{T_{\rm v} T_{\rm e}}$ & 2.0 $\times$ 10$^{13}$  & 0.0 & $67500 \cdot R$ & \cite{pf:2007:boyd}\\
+15 & $\rm O^+ + N_2 \rightleftarrows N_2^+ + O $ & $T$ & $T$ & 9.1 $\times$ 10$^{11}$  & 0.36 & $22800 \cdot R$ & \cite{book:1990:park}\\
+16 & $\rm O^+ + NO \rightleftarrows N^+ + O_2 $ & $T$ & $T$ & 1.4 $\times$ 10$^{5}$  & 1.90 & $15300 \cdot R$ & \cite{book:1990:park,jtht:2013:farbar}\\
+17 & $\rm NO^+ + O_2 \rightleftarrows O_2^+ + NO $ & $T$ & $T$ & 2.4 $\times$ 10$^{13}$  & 0.41 & $32600 \cdot R$ & \cite{book:1990:park}\\
+18 & $\rm NO^+ + N \rightleftarrows N_2^+ + O $ & $T$ & $T$ & 7.2 $\times$ 10$^{13}$  & 0.00 & $35500 \cdot R$ & \cite{book:1990:park}\\
+19 & $\rm NO^+ + O \rightleftarrows N^+ + O_2 $ & $T$ & $T$ & 1.0 $\times$ 10$^{12}$  & 0.5 & $77200 \cdot R$ & \cite{book:1990:park}\\
+20 & $\rm O_2^+ + N \rightleftarrows N^+ + O_2 $ & $T$ & $T$ & 8.7 $\times$ 10$^{13}$  & 0.14 & $28600 \cdot R$ & \cite{book:1990:park}\\
+21 & $\rm O_2^+ + N_2 \rightleftarrows N_2^+ + O_2 $ & $T$ & $T$ & 9.9 $\times$ 10$^{12}$  & 0.00 & $40700 \cdot R$ & \cite{book:1990:park}\\
+22 & $\rm NO^+ + N \rightleftarrows O^+ + N_2 $ & $T$ & $T$ & 3.4 $\times$ 10$^{13}$  & $-1.08$ & $12800 \cdot R$ & \cite{book:1990:park}\\
+23 & $\rm NO^+ + O \rightleftarrows O_2^+ + N $ & $T$ & $T$ & 7.2 $\times$ 10$^{12}$  & 0.29 & $48600 \cdot R$ & \cite{book:1990:park}\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol 
+\item[{b}] $\rm M_1=N,~O,~N^+,~O^+$
+\item[~] $\rm M_2=N_2,~O_2,~NO,~N_2^+,~O_2^+,~NO^+$
+\end{tablenotes}
+\label{tab:farbar}
+\end{threeparttable}
+\end{center}
+\end{table}
+%
+
+
 
 
 
@@ -464,7 +514,8 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 \newpage
 ~
 \newpage
-
+~
+\newpage
 
 
 \bibliographystyle{warpdoc}
