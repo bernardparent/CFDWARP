@@ -1,0 +1,240 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{bm}
+\usepackage{amsmath}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\efficiency}{\eta}
+\newcommand{\ordi}{{\rm d}}
+\newcommand{\unitvecdiff}[2]{\overline{\vec{#1} - \vec{#2}}}
+%\let\vec\bf
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\rhos}{\rho}
+\newcommand{\Cv}{{C_{\rm v}}}
+\newcommand{\Cp}{{C_{\rm p}}}
+\newcommand{\Sct}{{{\rm Sc}_{\rm T}}}
+\newcommand{\Prt}{{{\rm Pr}_{\rm T}}}
+\newcommand{\nd}{{{n}_{\rm d}}}
+\newcommand{\ns}{{{n}_{\rm s}}}
+\newcommand{\nn}{{{n}_{\rm n}}}
+\newcommand{\nr}{{{n}_{\rm r}}}
+\newcommand{\ndm}{{\bar{n}_{\rm d}}}
+\newcommand{\nsm}{{\bar{n}_{\rm s}}}
+\newcommand{\turb}{_{\rm T}}
+\newcommand{\mut}{{\mu\turb}}
+\newcommand{\mfa}{\scriptscriptstyle}
+\newcommand{\mfb}{\scriptstyle}
+\newcommand{\mfc}{\textstyle}
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\hlinex}{\vspace{-0.34cm}~~\\ \hline \vspace{-0.31cm}~~\\}
+\newcommand{\hlinextop}{\vspace{-0.46cm}~~\\ \hline \hline \vspace{-0.32cm}~~\\}
+\newcommand{\hlinexbot}{\vspace{-0.37cm}~~\\ \hline \hline \vspace{-0.50cm}~~\\}
+\newcommand{\tablespacing}{\vspace{-0.4cm}}
+\newcommand{\fontxfig}{\footnotesize\scalefont{0.918}}
+\newcommand{\fontgnu}{\footnotesize\scalefont{0.896}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{0.9}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\author{
+  Bernard Parent 
+}
+
+\email{
+  bernparent@gmail.com
+}
+
+\department{
+  Mechanical and Aerospace Engineering
+}
+
+\institution{
+  Princeton University
+}
+
+\title{Macheret Low Temperature Air Plasma Kinetics 
+}
+
+\date{
+  January 2005
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+%  \tableofcontents
+%  \makenomenclature
+%  \listoftables
+%%  \listoffigures
+
+
+
+%\section{Chemical Models in Arrhenius Form}
+
+
+
+
+
+%
+\begin{table}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Macheret 8-species 28-reactions air plasma chemical model.\tnote{a}}
+    \label{tab:macheret}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}lll}
+    \toprule
+    No.&Reaction & Rate Coefficient  & Refs. \\
+    \midrule
+    1a  & $\rm e^- + N_2   \rightarrow N_2^+ + e^- + e^-$  
+       &  ${\rm exp}(-0.0105809\cdot {\rm ln}^2 E^\star - 2.40411\cdot 10^{-75} \cdot {\rm ln}^{46}E^\star)$~cm$^3$/s
+       & \cite{jcp:2014:parent} \\
+    1b  & $\rm e^- + O_2   \rightarrow O_2^+ + e^- + e^-$  
+       &  ${\rm exp}(-0.0102785\cdot {\rm ln}^2 E^\star - 2.42260\cdot 10^{-75} \cdot {\rm ln}^{46}E^\star)$~cm$^3$/s
+       & \cite{jcp:2014:parent} \\
+    2a & $\rm e^-+O_2^+ \rightarrow O + O$  
+       & $2.0 \cdot 10^{-7} \cdot (300/T_{\rm e})^{0.7}  $ cm$^3$/s
+       & \cite{misc:1997:aleksandrov}\\
+    2b & $\rm e^-+N_2^+ \rightarrow N + N$  
+       & $2.8 \cdot 10^{-7} \cdot (300/T_{\rm e})^{0.5}  $ cm$^3$/s 
+       & \cite{misc:1992:kossyi}\\
+    3a & $\rm O_2^{-}+N_2^{+} \rightarrow O_2 + N_2$ 
+       & $2.0 \cdot 10^{-7} \cdot (300/T)^{0.5}$ cm$^3$/s
+       & \cite{misc:1992:kossyi}\\
+    3b & $\rm O_2^{-}+O_2^{+} \rightarrow O_2 + O_2$ 
+       & $2.0 \cdot 10^{-7} \cdot (300/T)^{0.5}$ cm$^3$/s
+       & \cite{misc:1992:kossyi}\\
+    4a & $\rm O_2^{-}+N_2^{+} + N_2\rightarrow O_2 + N_2 +N_2$ 
+       & $2.0 \cdot 10^{-25} \cdot (300/T)^{2.5}$ cm$^6$/s  
+       & \cite{misc:1992:kossyi}\\
+    4b & $\rm O_2^{-}+O_2^{+} + N_2\rightarrow O_2 + O_2 +N_2$ 
+       & $2.0 \cdot 10^{-25} \cdot (300/T)^{2.5}$ cm$^6$/s  
+       & \cite{misc:1992:kossyi}\\
+    4c & $\rm O_2^{-}+N_2^{+} + O_2\rightarrow O_2 + N_2 +O_2$ 
+       & $2.0 \cdot 10^{-25} \cdot (300/T)^{2.5}$ cm$^6$/s  
+       & \cite{misc:1992:kossyi}\\
+    4d & $\rm O_2^{-}+O_2^{+} + O_2\rightarrow O_2 + O_2 +O_2$ 
+       & $2.0 \cdot 10^{-25} \cdot (300/T)^{2.5}$ cm$^6$/s  
+       & \cite{misc:1992:kossyi}\\
+    5a & $\rm e^- + O_2 +O_2 \rightarrow O_2^- + O_2$  
+       &  $1.4 \cdot 10^{-29} \cdot \left( {300}/{T_{\rm e}}\right)\cdot  \exp \left( {-600}/{T}\right)$
+       & \cite{misc:1992:kossyi}\\
+    ~  &   
+       & ~~~$\cdot \exp \left( {700 \cdot (T_{\rm e}-T)}/{(T_{\rm e} T)}  \right)$ cm$^6$/s
+       & ~\\
+    5b & $\rm e^- + O_2 + N_2 \rightarrow O_2^- + N_2$  
+       & $1.07 \cdot 10^{-31} \cdot \left( {300}/{T_{\rm e}} \right)^2 \cdot \exp \left( {-70}/{T}\right)$          
+       & \cite{misc:1992:kossyi}\\
+    ~  &   
+       & ~~~$\cdot \exp \left( {1500 \cdot (T_{\rm e}-T)}/({T_{\rm e} T})  \right)$ cm$^6$/s 
+       & ~\\
+    6  & $\rm O_2^- + O_2 \rightarrow e^- + O_2 + O_2$  
+       & $8.6 \cdot 10^{-10} \cdot \exp \left( {-6030}/{T}\right)
+               \left(1-\exp \left( {-1570}/{T} \right)  \right)$ cm$^3$/s
+       & \cite{book:1997:bazelyan}, Ch.\ 2\\
+    7a  & $\rm O_2 \rightarrow e^- + O_2^+$   
+       & $2.0 \cdot 10^{17} \cdot Q_{\rm b}^\star$ 1/s 
+       & \cite{book:1982:bychkov}\\
+    7b  & $\rm N_2 \rightarrow e^- + N_2^+$   
+       & $1.8 \cdot 10^{17} \cdot Q_{\rm b}^\star$ 1/s 
+       & \cite{book:1982:bychkov}\\
+    8a  & $\rm O_2 + O_2 \rightarrow 2 O + O_2$   
+       & $3.7 \cdot 10^{-8} \cdot \exp(-59380/T) (1-\exp(-2240/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    8b  & $\rm O_2 + N_2 \rightarrow 2 O + N_2$   
+       & $9.3 \cdot 10^{-9} \cdot \exp(-59380/T) (1-\exp(-2240/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    8c  & $\rm O_2 + O \rightarrow 3 O$   
+       & $1.3 \cdot 10^{-7} \cdot \exp(-59380/T) (1-\exp(-2240/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    8d  & $\rm N_2 + O_2 \rightarrow 2 N + O_2$   
+       & $5.0 \cdot 10^{-8} \cdot \exp(-113200/T) (1-\exp(-3354/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    8e  & $\rm N_2 + N_2 \rightarrow 2 N + N_2$   
+       & $5.0 \cdot 10^{-8} \cdot \exp(-113200/T) (1-\exp(-3354/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    8f  & $\rm N_2 + O \rightarrow 2 N + O$   
+       & $1.1 \cdot 10^{-7} \cdot \exp(-113200/T) (1-\exp(-3354/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9a  & $\rm O + O + O_2 \rightarrow 2 O_2$   
+       & $2.45 \cdot 10^{-31} \cdot T^{-0.63}$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9b  & $\rm O + O + N_2 \rightarrow O_2+N_2$   
+       & $2.76 \cdot 10^{-34} \cdot \exp(720/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9c  & $\rm O + O + O \rightarrow O_2+O$   
+       & $8.8 \cdot 10^{-31} \cdot T^{-0.63}$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9d  & $\rm N + N + O_2 \rightarrow N_2 + O_2$   
+       & $8.27 \cdot 10^{-34} \cdot \exp(500/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9e  & $\rm N + N + N_2 \rightarrow 2 N_2$   
+       & $8.27 \cdot 10^{-34} \cdot \exp(500/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9f  & $\rm N + N + O \rightarrow N_2 + O$   
+       & $8.27 \cdot 10^{-34} \cdot \exp(500/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    9g  & $\rm N + N + N \rightarrow N_2 + N $   
+       & $8.27 \cdot 10^{-34} \cdot \exp(500/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    \bottomrule
+    \end{tabular*}
+\begin{tablenotes}
+\item[{a}] Notation and units: $E^\star$ is the reduced effective electric field in the electron reference frame ($E^\star\equiv|\vec{E}+\vec{V}^{\rm e}\times \vec{B}|/N$) in units of V$\cdot$m$^2$; $T_{\rm e}$ is the electron temperature in Kelvin; $T$ is the neutrals temperature in Kelvin; $Q^\star_{\rm b}$ is the ratio in Watts between the electron beam power per unit volume $Q_{\rm b}$ and the total number density of the plasma $N$  ($Q^\star_{\rm b}\equiv Q_{\rm b}/N$).
+\item[{4}] $\rm M_4=O,~O_2,~N,~N_2,~NO$
+\item[{6}] $\rm M_6=O_2,~N_2,~NO$
+\end{tablenotes}
+   \end{threeparttable}
+\end{table}
+%
+
+
+
+
+
+
+
+
+
+
+
+
+\bibliographystyle{warpdoc}
+\bibliography{all}
+
+
+\end{document}
+
+
+

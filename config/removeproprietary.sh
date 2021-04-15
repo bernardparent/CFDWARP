@@ -1,8 +1,4 @@
 #!/bin/sh
-echo "Removing proprietary directory .././model/chem/_Air_Plasma_8s_28r_Macheret"
-rm -rf .././model/chem/_Air_Plasma_8s_28r_Macheret 
-cp -a _proprietary .././model/chem/_Air_Plasma_8s_28r_Macheret 
-( printf "current Air_Plasma_8s_28r_Macheret\nEND" ) > .././model/chem/_Air_Plasma_8s_28r_Macheret/.config 
 echo "Removing proprietary directory .././model/chem/_C12H23_Cs_Air_Plasma_21s"
 rm -rf .././model/chem/_C12H23_Cs_Air_Plasma_21s 
 cp -a _proprietary .././model/chem/_C12H23_Cs_Air_Plasma_21s 

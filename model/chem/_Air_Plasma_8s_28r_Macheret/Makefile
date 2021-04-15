@@ -1,33 +1,29 @@
-SHELL = /bin/sh
-CFLAGS = -c
-CC = cc -Wall
-L = cc
-LFLAGS = -lm
+include ../../../.makefile-header
 
+LFLAGSLOCAL =  
+CCFLAGSLOCAL = $(CFLAGSCFD) -I../../../lib/include -I../../../.
 
 ####### Files
 
-HEADERS =
-SOURCES =   proprietary.c
-OBJECTS =   proprietary.o
-TARGETS =   proprietary
+HEADERS =   chem.h 
+SOURCES =   chem.c 
+OBJECTS =   chem.o 
+TARGETS  = ../_chem.a
+
 
 ####### Build rules
 
-default:
-	make all
+all: src 
 
-all: src
+src: $(OBJECTS) 
 
-src:
-	$(CC) $(CFLAGS) proprietary.c
-	$(L) proprietary.o $(LFLAGS) -o proprietary
-
-clean:
-	rm -f *.o core $(TARGETS)
+arc: 
+	( rm -f $(TARGETS) ; ar cqs $(TARGETS) *.o )                        
 
 cleanall:
-	rm -f *.o core $(TARGETS)
+	( cd doc ; make clean )
+	( make clean )
 
+	
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.

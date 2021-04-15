@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+
+2021 APR 15b
+  * updated config/removeproprietary.sh through make config
+  
+
 2021 APR 15a
   * in model/chem/.config
     - made the Air_Plasma_8s_28r_Macheret option non proprietary
