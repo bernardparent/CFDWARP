@@ -7,6 +7,10 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 JUN 09a
+  * in model/emfield/doc/Electrodynamics/report.tex
+    - added Lorenz condition and electrodynamic potential
+
 
 2021 APR 15b
   * updated config/removeproprietary.sh through make config

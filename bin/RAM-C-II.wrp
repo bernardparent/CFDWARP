@@ -83,16 +83,13 @@ Plasma Electron Density and Standoff Distance," NASA TN D-6062, Dec. 1970.
 Jones, W. L., Jr., and Cross, A. E., "Electrostatic Probe Measurements of Plasma Parameters for Two Reentry Flight Experiments at 25,000 Feet per Second," NASA TN D-6617, Feb. 1972.
 
 GV Candler, RW MacCormack, Computation of Weakly Ionized Hypersonic Flows in Thermochemical Nonequilibrium
-J. THERMOPHYSICS VOL. 5, page 266, 1991.
-
-P Sawicki, RS Chaudhry, and ID Boyd, Influence of Chemical Kinetics Models on Plasma Generation in Hypersonic Flight, AIAA Paper 2021-0057, 2021.
-}
+J. THERMOPHYSICS VOL. 5, page 266, 1991.}
 
 
 
 
 
-mf=1;
+mf=2;
 
 
 is=1;  
@@ -134,47 +131,27 @@ dtheta=0.1/180*pi;
 
 
 
-CASE=0;
-
-if (CASE==0,
-    Minf=23.3;
-    Re=103060/Rin;
-    Vinf=7677;
-    Pinf=75;
-    Tinf=268;
-    {altitude: 51 km}
-);
-
+CASE=1;
 
 if (CASE==1,
     Minf=23.9;
     Re=1.95e4/Rin;
-    Vinf=7677;
-    Pinf=20;
-    Tinf=256;
     {altitude: 61 km}
 );
 
 if (CASE==2,
     Minf=25.9;
     Re=6.28e3/Rin;
-    Vinf=7677;
-    Pinf=4.84;
-    Tinf=218;
     {altitude: 71 km}
 );
    
 if (CASE==3,
     Minf=28.3;
     Re=1.59e3/Rin;
-    Vinf=7677;
-    Pinf=0.894;
-    Tinf=182;
     {altitude: 81 km}
 );
 
 T=7650^2/(1.4*286*Minf^2);
-T=Tinf;
 Tv=T;
 Te=T;
 
@@ -199,16 +176,16 @@ Grid(
   Join(im2,js,im3,jm,j,FE,0.5,dxwall,1);
   Join(im2,jm,im3,je,j,GE,0.5,1,1);
 
-  Point(im4,js, Lplate*cos(delta), Lplate*sin(delta)+Rin);
-  Point(im4,jm, Lplate*cos(delta), Lplate*sin(delta)+Rin+Hbdry);
-  Point(im4,je, Lplate*cos(delta), Lplate*sin(delta)+Rin+H);
+  Point(im4,js, Lplate*cos(delta)-Rin*cos(pi/2-delta), Lplate*sin(delta)+Rin*sin(pi/2-delta));
+  Point(im4,jm, Lplate*cos(delta)-Rin*cos(pi/2-delta), Lplate*sin(delta)+Rin*sin(pi/2-delta)+Hbdry);
+  Point(im4,je, Lplate*cos(delta)-Rin*cos(pi/2-delta), Lplate*sin(delta)+Rin*sin(pi/2-delta)+H);
   Join(im4,js,im4,jm, j, FE,0.2,dywall,1.0);
   Join(im4,jm,im4,je, j, GE,0.9,1.0,1.0);
 
 
-  Point(im1,js, Lplate*cos(delta), -Lplate*sin(delta)-Rin);
-  Point(im1,jm, Lplate*cos(delta), -Lplate*sin(delta)-Rin-Hbdry);
-  Point(im1,je, Lplate*cos(delta), -Lplate*sin(delta)-Rin-H);
+  Point(im1,js, Lplate*cos(delta)-Rin*cos(pi/2-delta), -Lplate*sin(delta)-Rin*sin(pi/2-delta));
+  Point(im1,jm, Lplate*cos(delta)-Rin*cos(pi/2-delta), -Lplate*sin(delta)-Rin*sin(pi/2-delta)-Hbdry);
+  Point(im1,je, Lplate*cos(delta)-Rin*cos(pi/2-delta), -Lplate*sin(delta)-Rin*sin(pi/2-delta)-H);
   Join(im1,js,im1,jm, j, FE,0.2,dywall,1.0);
   Join(im1,jm,im1,je, j, GE,0.9,1.0,1.0);
 
@@ -218,9 +195,9 @@ Grid(
   
   
 
-  Point(ie,js,Lplate*cos(delta)+Lwake*cos(delta-phi),Lplate*sin(delta)-Lwake*sin(phi-delta));
-  Point(ie,jm,Lplate*cos(delta)+Lwake*cos(delta-phi),Lplate*sin(delta)-Lwake*sin(phi-delta)+Hbdry*2);
-  Point(ie,je,Lplate*cos(delta)+Lwake*cos(delta-phi),(Lplate+Lwake)*sin(delta)+H);
+  Point(ie,js,Lplate*cos(delta)-Rin*cos(pi/2-delta)+Lwake*cos(delta-phi),Lplate*sin(delta)-Lwake*sin(phi-delta));
+  Point(ie,jm,Lplate*cos(delta)-Rin*cos(pi/2-delta)+Lwake*cos(delta-phi),Lplate*sin(delta)-Lwake*sin(phi-delta)+Hbdry*2);
+  Point(ie,je,Lplate*cos(delta)-Rin*cos(pi/2-delta)+Lwake*cos(delta-phi),(Lplate+Lwake)*sin(delta)+H);
   Join(ie,js,ie,jm, j, FE,0.2,dywall*2,1.0);
   Join(ie,jm,ie,je, j, GE,0.9,1.0,1.0);
 
@@ -228,9 +205,9 @@ Grid(
 
 
 
-  Point(is,js,Lplate*cos(delta)+Lwake*cos(delta-phi),-Lplate*sin(delta)+Lwake*sin(phi-delta));
-  Point(is,jm,Lplate*cos(delta)+Lwake*cos(delta-phi),-Lplate*sin(delta)+Lwake*sin(phi-delta)-Hbdry*2);
-  Point(is,je,Lplate*cos(delta)+Lwake*cos(delta-phi),-(Lplate+Lwake)*sin(delta)-H);
+  Point(is,js,Lplate*cos(delta)-Rin*cos(pi/2-delta)+Lwake*cos(delta-phi),-Lplate*sin(delta)+Lwake*sin(phi-delta));
+  Point(is,jm,Lplate*cos(delta)-Rin*cos(pi/2-delta)+Lwake*cos(delta-phi),-Lplate*sin(delta)+Lwake*sin(phi-delta)-Hbdry*2);
+  Point(is,je,Lplate*cos(delta)-Rin*cos(pi/2-delta)+Lwake*cos(delta-phi),-(Lplate+Lwake)*sin(delta)-H);
   Join(is,js,is,jm, j, FE,0.2,dywall*2,1.0);
   Join(is,jm,is,je, j, GE,0.9,1.0,1.0);
 
@@ -409,7 +386,7 @@ Model(
     AXISYMMETRIC=YES;
   );
   NavierStokesPlasma(
-    TEMODEL=TEMODEL_TVEQUILIBRIUM;
+    TEMODEL=TEMODEL_TRANSPORT;
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=YES;
@@ -423,17 +400,17 @@ Model(
     Temin=240;     Temax=60.0e3;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain for neutrals}
-    chiimin=1e-12;  chiimax=1.0;    {min and max ion molar fraction}
-    chiemin=1e-11;  chiemax=1.0;    {min and max electron molar fraction}
+    chiimin=1e-30;  chiimax=1.0;    {min and max ion molar fraction}
+    chiemin=1e-12;  chiemax=1.0;    {min and max electron molar fraction}
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
     gamma=0.1e0;    {secondary emission coefficient}
     AXISYMMETRIC=YES;
   );
   AirPlasma11s(
     CHEMMODEL=CHEMMODEL_DUNNKANG1973;
-    ADDITIONALREACTION=TRUE; {include reactions function of EoverN}
-    TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
-    QEISOURCETERMS=FALSE;
+    ADDITIONALREACTION=FALSE; {include reactions function of EoverN}
+    TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE generally}
+    QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}
   );
   Epotential(
     Te_buffer=300.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,Te_buffer);  
@@ -529,9 +506,7 @@ Init(
     w_O2=0.235;
     w_N2=0.765;
     w_default=1e-30;
-{    All(INIT_TYPE3,Minf,0,Re,T,w_O2,w_N2,w_default,Tv,Te);}
-    All(INIT_TYPE5,Vinf,0,Pinf,Tinf,w_O2,w_N2,w_default,Tv,Te);
-
+    All(INIT_TYPE3,Minf,0,Re,T,w_O2,w_N2,w_default,Tv,Te);
     {
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE6,Vx,Vy,P,T,chi_O2,chi_N2,chi_eminus,chi_default,Tv,Te);
     Region(is,js,  ie,je, INIT_TYPE6,Vx,Vy,P,T,chi_O2,chi_N2,chi_eminus,chi_default,Tv,Te);
@@ -676,7 +651,8 @@ Cycle(
     Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
   SteadyState(
-    if (mod(iter,200)==0,
+    Post();
+    if (mod(iter,1167)==0,
       WriteDataFile(outputfilename);
     );
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
@@ -690,14 +666,6 @@ Cycle(
       CFLmax=4.0;
     );
     CFL=min(CFL*1.03,CFLmax);
-    if (iter>5000*mf,
-      Model(
-        NavierStokesPlasma(
-          chiemin=1e-15;
-          chiimin=1e-16;
-        );
-      );
-    );
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     if (EMFIELD,
       if (iter<2000,
@@ -708,6 +676,8 @@ Cycle(
       Lc=1e99;      {characteristic length scale in meters used to solve the emfield equation}
       relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,20); 
+      UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,2);
+      {if(iter==6,exit(EXIT_SUCCESS););}
       printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
              CFL,iter,effiter_U,ximax,i_ximax,
              j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);

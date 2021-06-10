@@ -1,0 +1,540 @@
+{
+  _______________________________________________________________________________________________
+
+                                           C F D W A R P
+
+                                CFD Code for Plasma & Reactive Flow
+  _______________________________________________________________________________________________
+
+  Version                          19oct02a
+  Compiler                         gcc 8.3.0 with OPENMP threads
+  Compiled on                      Oct  8 2019 at 14:57:34
+  Cycle Strategy                   Standard
+  Fluid Relaxation                 Block DDADI [2,1]
+  EM Field Relaxation              Implicit schemes based on approximate factorization including
+                                   ADI [4], DDADI [2,1], and IMAF [3]
+  Convection Discretization        Reconstruction-Evolution MUSCL with flux FVS [5], FDS [7],
+                                   and primitive interpolation TVD [6], WENO [9], CWENO [11],
+                                   AOWENO [10], and eigenvalue conditioning HARTEN, GNOFFO
+                                   [12], PECLET [13], PASCAL [8], and PARENT positivity-
+                                   preserving filter [14]
+  Temporal Discretization          Positivity-Preserving Cross-Difference Formula [8]
+  Fluid Model                      Favre-Reynolds with drift-diffusion plasma model [15]
+  Thermodynamic Model              NASA Glenn Polynomials [16]
+  Chemical Model                   H2 Air Plasma 18 species 78 reactions Jachimowsky-Dunn-Kang-
+                                   Macheret [17,18,15]
+  EM Field Model                   Electric field potential [19]
+  Beam Model                       None
+  Number of Dimensions             2
+  Number of Flux Components        26
+  Number of Species                19
+  Number of Charged Species        8
+  List of Species                  e-, O2-, O2+, N2+, O+, N+, NO+, H2+, N, H2, O2, H, O, OH,
+                                   H2O, HO2, H2O2, NO, N2
+  _______________________________________________________________________________________________
+
+  [1]  RW MacCormack. "A New Implicit Algorithm for Fluid Flow", 13th Computational Fluid
+       Dynamics Conference, AIAA Paper 97-2100, 1997.
+  [2]  J Bardina and CK Lombard. "Three Dimensional Hypersonic Flow Simulations with the CSCM
+       Implicit Upwind Navier-Stokes Method", Proceedings of the 8th Computational Fluid
+       Dynamics Conference, AIAA Paper 87-1114, 1987.
+  [3]  RW MacCormack. "Iterative Modified Approximate Factorization", Computers and Fluids
+       30:917-925, 2001.
+  [4]  DW Peaceman and HH Rachford. "The Numerical Solution of Parabolic and Elliptic
+       Differential Equations", J. Soc. Ind. Appl. Math. 3:28-41, 1955.
+  [5]  JL Steger and RF Warming. "Flux Vector Splitting of the Inviscid Gasdynamic Equations
+       with Application to Finite-Difference Methods", Journal of Computational Physics 40:263-
+       293, 1981.
+  [6]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume Flux Vector
+       Splittings for the Euler Equations", AIAA Journal 24:1453-1460, 1986.
+  [7]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes", Journal
+       of Computational Physics 43:357-372, 1981.
+  [8]  B Parent. "Positivity-Preserving Dual Time Stepping Schemes for Gas Dynamics", Journal of
+       Computational Physics 361:391-411, 2018.
+  [9]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes", Journal of
+       Computational Physics 126:202-228, 1996.
+  [10] DS Balsara, S Garain, and CW Shu. "An Efficient Class of WENO schemes with Adaptive
+       Order", Journal of Computational Physics 326:780-804, 2016.
+  [11] M Dumbser and M Kaser. "Arbitrary High Order Non-oscillatory Finite Volume Schemes on
+       Unstructured Meshes for Linear Hyperbolic Systems", Journal of Computational Physics,
+       221:693-723, 2007.
+  [12] P Gnoffo and  JA White. "Computational Aerothermodynamic Simulation Issues on
+       Unstructured Grids", 37th AIAA Thermophysics Conference, AIAA Paper 2004-2371, 2004.
+  [13] B Parent. "Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows", AIAA
+       Journal, 55:141-152, 2017.
+  [14] B Parent. "Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler
+       Equations", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.
+  [15] B Parent, MN Shneider, and SO Macheret. "Detailed Modeling of Plasmas for Computational
+       Aerodynamics", AIAA Journal, 54:898-911, 2016.
+  [16] BJ McBride, MJ Zehe, and S Gordon. "NASA Glenn Coefficients for Calculating Thermodynamic
+       Properties of Individual Species", NASA TP 2002-211556, 2002.
+  [17] CJ Jachimowsky. "An Analytical Study of the Hydrogen-Air Reaction Mechanism With
+       Application To Scramjet Combustion", NASA TP-2791, 1988.
+  [18] MG Dunn and SW Kang. "Theoretical and Experimental Studies of Reentry Plasmas", NASA CR-
+       2232, 1973.
+  [19] B Parent, SO Macheret, and MN Shneider. "Electron and Ion Transport Equations in
+       Computational Weakly-Ionized Plasmadynamics", Journal of Computational Physics 259:51-
+       69, 2014.
+
+
+}
+ 
+{obtained for a scramjet flight Mach number of 6 using a dynamic pressure of 30000 Pa in standard US atmosphere after 2 oblique shocks}
+Vx=1388;
+T=900;  {K}
+P=46854; {Pa}
+chi_H2=0.2;    
+maxvoltage=15000; {Voltage difference between electrodes}
+maxpower=130000; {Watt per meter depth}
+
+xs=0;
+xs1=0.22; {start of first electrode}
+xs2=0.223; {end of first electrode}
+xs3=0.23; {start of second electrode}
+xs4=0.233; {end of second electrode}
+xe=0.25+0.06; {end of domain}
+
+ys=-0.002; {start of external circuit}
+ys1=-0.001; {middle of external circuit}
+ys2=0;  {start of fluid domain}
+ys3=0.0018; {end of arc influence}
+ye=0.02; {end of domain}
+
+mf=1;
+mf2=1;
+
+is=1;
+is1=round(65*mf);
+is2=is1+round(70*mf*mf2);
+is3=is2+round(170*mf*mf2);
+is4=is3+round(70*mf*mf2);
+ie=is4+round(55*mf);
+
+js=1;
+js1=round(15*mf);
+js2=js1+round(15*mf);
+js3=js2+round(115*mf);
+je=js3+round(20*mf);
+
+dwall=15e-6/mf;
+
+Grid(
+  Size(is,js, ie,je);
+
+  { grid the first electrode}
+  Corners(is1,js2,is2,js3,xs1,ys2,xs2,ys3);
+  JoinCorners(is1,js2, is2,js3,  EE,0.5e0,1.0e0,1.0e0,  FE,0.5e0,dwall,1.0e0);
+
+  { grid the second electrode}
+  Corners(is3,js2,is4,js3,xs3,ys2,xs4,ys3);
+  JoinCorners(is3,js2, is4,js3,  EE,0.5e0,1.0e0,1.0e0,  FE,0.5e0,dwall,1.0e0);
+
+  {join the first and second electrodes}
+  Join(is2,js2,is3,js3,i,GG,0.5,1,1);
+
+  {Join the domain entrance to the first electrode}
+  Corners(is,js2,is,js3,xs,ys2,xs,ys3);
+  Join(is,js2,is,js3,j,FF,0.5,dwall,dwall*3);
+  Join(is,js2,is1,js3,i,fg,0.5,dwall*3,1);
+
+  {Join the second electrode to the domain exit}
+  Corners(ie,js2,ie,js3,xe,ys2,xe,ys3);
+  Join(ie,js2,ie,js3,j,FE,0.5,dwall,1.0);
+  Join(is4,js2,ie,js3,i,GE,0.25,1.0,1.0);
+
+  {Join the bottom to the top of the domain}
+  Copy(is,js3,ie,js3,is,je);
+  Translate(is,je,ie,je,0,ye-ys3);
+  Join(is,js3,ie,je,j,GE,0.5,1,1);
+ 
+  {grid the external circuit below the domain}
+  Copy(is,js2,ie,js2, is,js1);
+  Translate(is,js1,ie,js1,0,ys1);
+  Join(is,js1,ie,js2, j, EE,0.5,1,1);
+
+  Copy(is,js2,ie,js2, is,js);
+  Translate(is,js,ie,js,0,ys);
+  Join(is,js,ie,js1, j, EE, 0.5,1,1);
+);
+
+Bdry(
+  FavreReynoldsPlasma(
+    {
+    _________________________________________________________________________________________
+
+    Boundary Condition Type            ID  Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC              0   Inflow, supersonic, 1o
+    BDRY_INFLOWSUBSONIC1               7   Inflow, subsonic, Tstag, Pstag fixed, 1o
+    BDRY_INFLOWSUBSONICMASSFLOWFIXED1  g   Inflow, subsonic, Pstag, Massflow/Area fixed, 1o
+    BDRY_OUTFLOWSUPERSONIC1            1   Outflow, supersonic, 1o
+    BDRY_OUTFLOWSUBSONIC1              4   Outflow, subsonic, P fixed, 1o
+    BDRY_OUTFLOWSUBSONICMFIXED1        f   Outflow, subsonic, M fixed, 1o
+    BDRY_SYMMETRICAL2                  e   Symmetrical, 2o
+    BDRY_SYMMETRICAL1                  9   Symmetrical, 1o
+    BDRY_WALLTFIXED1                   3   Wall, T specified, 1o
+    BDRY_WALLADIABATIC1                6   Wall, Adiabatic, 1o
+    BDRY_SLIPWALL1                     c   Slip wall, Adiabatic, 1o
+    BDRY_FREESTREAM1                   2   Freestream, 1o, params Vx,Vy, P, T
+    _________________________________________________________________________________________
+    }
+    Twall=3000.0;
+    All(BDRY_WALLADIABATIC1);
+    Cut(is,js,ie,js2);
+    Plane("i",is,BDRY_INFLOWSUPERSONIC);
+    Plane("i",ie,BDRY_OUTFLOWSUPERSONIC1);
+    Plane("j",js2,BDRY_WALLTFIXED1,Twall);
+    Plane("j",je,BDRY_OUTFLOWSUPERSONIC1);
+
+
+    {
+    Cut(is,js,  ie,je);
+    Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
+    Link(i1,j1,  i2,j2);
+    Param(is,js,  ie,je,  BDRY_FREESTREAM1, Vx,Vy,P,T);
+    }
+  );
+  Epotential(
+    {
+    _________________________________________________________________________________________
+
+    EMField Bdry Condition Type   ID   Description
+    _________________________________________________________________________________________
+
+    BDRYEMF_ELECTRODE             0    Electrode, phi fixed
+    BDRYEMF_DIELECTRIC            2    Dielectric, no conduction current through
+    BDRYEMF_EXTRAPOLATED1         1    Extrapolated, similar to outflow
+    _________________________________________________________________________________________
+
+    }
+    Cut(is,js,is1,js2);
+    Cut(is4,js,ie,js2);
+    Cut(is2,js1,is3,js2);
+    All(BDRYEMF_DIELECTRIC);
+    if(UNSTEADY,
+      Region(is1,js,is1,js2,BDRYEMF_ELECTRODE);
+      Region(is4,js,is4,js2,BDRYEMF_ELECTRODE);
+    );
+    {
+    Cut(is,js,  ie,je);
+    Region(is,js,  ie,je,  BDRYEMF_ELECTRODE);
+    Link(i1,j1,  i2,j2);
+    }
+  );
+);
+ 
+ 
+Model(
+  FavreReynoldsPlasma(
+    TURBMODEL=TURBMODEL_KOMEGA2008;
+    DILATDISSIP=DILATDISSIP_WILCOX;
+    RAPCOMP=NO;
+    MHDTURB=NO;
+    TURBSOURCE=YES;
+    TEMODEL=TEMODEL_LOCAL;
+    N2VIBMODEL=N2VIBMODEL_MACHERET;
+    N2VIBJOULEHEATING=NO;
+    REACTING=YES;
+    emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
+    Prt=0.9e0;
+    Sct=1.0e0;
+    ADD_ETA_TO_ETAT_WITHIN_QK=NO;  {say NO for standard kinetic energy transport model}
+    kdiv=1.0e-50;   {m2/s2}
+    psidiv=0.1e-3;  {1/s}
+    sigmadiv=1e-6; {S/m}
+    etdiv=1e2;     {J/kg}
+    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
+    Tmin=2.0e2;     Tmax=25.0e3;    {K}
+    Tvmin=Tmin;     Tvmax=12.0e3;  {K}
+    Temin=Tmin;     Temax=60.0e3;  {K}
+    Twmin=Tmin;     Twmax=Tmax;    {K}
+    kmin=1.0e-10;   kmax=9.9e99;   {m2/s2}
+    psimin=1e-10;   psimax=9.9e99; {1/s}
+    wmin=1.0e-50;                  {min mass fraction allowed in the domain for neutrals}
+    chiimin=1e-30;  chiimax=1.0;    {min and max ion molar fraction}
+    chiemin=1e-12;  chiemax=1.0;    {min and max electron molar fraction}
+    Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
+    gamma=0.1e0;    {secondary emission coefficient}
+    AXISYMMETRIC=NO;
+  );
+  Epotential(
+    Te_buffer=300.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,T+Te_buffer);  
+                       needed to prevent convergence hangs where |E| becomes close to 0;
+                       set to as little a value as possible}
+    Jmax=200000000.0;     {the maximum current density in A/m2 expected in the domain; this will affect only
+                       the Townsend ionization rates; make sure Jmax > sigma*Emag in the converged solution.}
+    SetRelativePermittivity(is,js, ie,je, 1.0 );
+    SetSolidConductivity(is,js, ie,je, 1000 {S/m});
+    if (UNSTEADY,
+      SetSolidConductivity(is2,js, is3,js2, 1e-5 {S/m});
+    ,{else}
+      SetElectroMotiveForce(is2,js,is3,js1, maxvoltage/(xs3-xs2){V/m},0.0{V/m}, maxpower/(xs3-xs2)/(ys1-ys){max power in W/m3});
+    );
+    AXISYMMETRIC=NO;    
+  );
+  H2AirPlasma13s(
+    COMBUSTIONMODEL=COMBUSTIONMODEL_SMITH1999;
+    IONIZATIONMODEL=IONIZATIONMODEL_EXP;
+  );
+  H2AirPlasma18s(
+    COMBUSTIONMODEL=COMBUSTIONMODEL_JACHIMOWSKI1988;
+    IONIZATIONMODEL=IONIZATIONMODEL_EXP;
+  );
+);
+
+
+Init(
+  FavreReynoldsPlasma(
+    {
+    _______________________________________________________________________________________
+
+    Initial Condition Type       Parameters
+    _______________________________________________________________________________________
+
+    INIT_TYPE1                   V[1]..V[nd],  T,  rho, w[1]..w[ns],     k, psi, Tv, Te
+    INIT_TYPE2                   M[1]..M[nd],  P,  T,   w[1]..w[ns],     k, psi, Tv, Te
+    INIT_TYPE3                   M[1]..M[nd],  Re, T,   w[1]..w[ns],     k, psi, Tv, Te
+    INIT_TYPE4                   Mmag, angles, P,  T,   w[1]..w[ns],     k, psi, Tv, Te
+    INIT_TYPE5                   V[1]..V[nd],  P,  T,   w[1]..w[ns],     k, psi, Tv, Te
+    INIT_TYPE6                   V[1]..V[nd],  P,  T,   chi[1]..chi[ns], k, psi, Tv, Te
+    _______________________________________________________________________________________
+
+    (a) In the freestream set psi to 110*q_infty for the k-omega models.
+    (b) In the freestream make sure that 1E-5*q_infty^2/ReL<k<0.1*q_infty^2/ReL.
+    }
+    
+     Species("e-","O2+","H2","O2","N2","default");
+   
+
+    Vy=0; {m/s}
+    k=1e-6;   {J/kg}
+    psi=110*sqrt(Vx^2+Vy^2)+1000; {1/s for TURBMODEL_KOMEGA*}
+    Tv=T; {K}
+    Te=T; {K}
+    chi_eminus=1e-12;
+    chi_O2plus=1e-12;
+    chi_O2=0.21*(1-chi_H2);
+    chi_N2=0.79*(1-chi_H2);
+    chi_default=1.0e-30;
+    All(INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2plus,chi_H2,chi_O2,chi_N2,chi_default,k,psi,Tv,Te);
+
+        
+  );
+  Epotential(
+    {
+    _______________________________________________________________________________________
+
+    EMField Initial Condition Type         Parameters
+    _______________________________________________________________________________________
+
+    INITEMF_TYPE1                          phi
+    _______________________________________________________________________________________
+
+    }
+    phi=0.0; {V}
+    All(INITEMF_TYPE1,phi);
+  );
+);
+
+
+Disc(
+  FavreReynoldsPlasma(
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.3e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
+    for (spec,1,numspec,
+      if (SPECIESTYPE[spec]==SPECIESTYPE_IONPLUS,
+        betag[spec]=1.0;
+        betaa[spec]=0.0;
+      );
+      if (SPECIESTYPE[spec]==SPECIESTYPE_IONMINUS,
+        betag[spec]=-0.5;
+        betaa[spec]=0.5;
+      );
+      if (SPECIESTYPE[spec]==SPECIESTYPE_ELECTRON,
+        betag[spec]=-0.001;
+        betaa[spec]=0.999;
+      );
+    );
+  );
+  Epotential(
+    POTENTIAL=POTENTIAL_OHMBASED;
+    Ediv=10.0;        {a small positive number in V/m, needed to prevent a division by zero when
+                       discretizing the electron pressure gradients within the potential equation}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
+    POSFILTER=POSFILTER_PARENT;
+    POSFILTER_numiter=4;
+  );
+  CDFplus(
+    for(flux,1,numflux,
+      if (flux<=numspec+numdim+1,
+        xi[flux]=0.5;
+      );
+      if (flux>numspec+numdim+1,
+        xi[flux]=0.25;
+      );
+    );
+  );
+
+);
+
+
+Cycle(
+  FavreReynoldsPlasma(
+    xiverge=1e-3;         {residual convergence threshold}
+    zetaGammai=1.0;       {factor multiplying the pseudotime step of the ion species transport equations} 
+    zetaGammae=1.0;       {factor multiplying the pseudotime step of the electron species transport equations
+                           near cathode}
+    relaxNi_bdry=1.0;     {the ion density relaxation factor at the boundary }
+    relaxNe_bdry=0.2;     {the electron density relaxation factor at the boundary }
+    relaxTe=0.8;          {the electron temperature relaxation factor }
+    rhoref=0.1;           {reference density in kg/m3}
+    Tref=300.0;           {reference temperature in K}
+    Teref=20000.0;        {reference electron temperature in K}
+    Tvref=5000.0;         {reference vibrational temperature in K}
+    kref=1e4;             {reference turbulence kinetic energy in m2/s2}
+    psiref=1e8;           {reference specific dissipation rate of the TKE in 1/s for TURBMODEL_KOMEGA*
+                           reference dissipation rate of the TKE in m2/s3 if for TURBMODEL_KEPSILON}
+    aref=sqrt(1.4*287*Tref);  {reference sound speed in m/s}
+    wion=1e-7;            {average ion mass fraction}
+    for (spec,1,numspec,
+      if (SPECIESTYPE[spec]==SPECIESTYPE_IONPLUS || SPECIESTYPE[spec]==SPECIESTYPE_IONMINUS,
+        Uref[spec]=wion*rhoref;
+      );
+      if (SPECIESTYPE[spec]==SPECIESTYPE_NEUTRAL,
+        Uref[spec]=rhoref;
+      );
+      if (SPECIESTYPE[spec]==SPECIESTYPE_ELECTRON,
+        Uref[spec]=wion*1.8e-5*rhoref;
+      );
+    );
+    for (dim,1,numdim,
+      Uref[numspec+dim]=rhoref*aref;
+    );
+    Uref[numspec+numdim+1]=rhoref*aref*aref;
+    Uref[numspec+numdim+2]=rhoref*kref;
+    Uref[numspec+numdim+3]=rhoref*psiref;
+    Uref[numspec+numdim+4]=rhoref*700.0*Tvref;
+    Uref[numspec+numdim+5]=rhoref*wion*414*Teref;
+  );
+  Epotential(
+    xiverge_emfield=1e-2; {residual convergence threshold for the potential equation}
+    sigmaref=0.001; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
+    Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
+  );
+  
+  SteadyState(
+    if (mod(iter,100)==0,
+      WriteDataFile(outputfilename);
+    );
+    sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
+    if (iter==1,
+      CFL=0.01;
+    );
+    CFLmax=1.0;
+    {system("date");}
+    CFL=min(CFL*1.02,CFLmax);
+    
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
+    Lc=3e3;      {characteristic length scale in meters used to solve the emfield equation}
+    relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
+    UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,10);  
+    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,100);  
+    {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
+  );
+
+  DualTimeStepping(
+    Vpp=12000 * 0.75 - (12000 * 0.75 * 0.50); {peak to peak voltage difference applied between electrodes}
+    number_of_periods=15;
+    period=50e-6; {time of one period}
+    time_within_period=time-(period*floor((time+10e-15)/period));
+    dischargeduration=6e-7; {time spent in discharge in seconds}
+    dt_discharge=dischargeduration/(20*mf);   {physical time step in seconds}
+    dt_nodischarge=(period-dischargeduration)/(15*mf);
+    itermax_discharge=150;
+    itermax_nodischarge=50;
+    tmax=period*number_of_periods;    {simulation time span in seconds}
+    sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
+    
+    if (time_within_period<dischargeduration,
+    if (iter==1,
+      CFL=0.001;
+    );
+    {system("date");}
+    CFL=min(CFL*1.05,1.0);
+    ,{else}
+    if (iter==1,
+      CFL=0.03;
+    );
+    {system("date");}
+    CFL=min(CFL*1.08,1.0);
+    );
+    
+    if (time_within_period<dischargeduration/2,
+      Deltaphi=max(0,time_within_period/(0.5*dischargeduration)*Vpp);
+    ,{else}
+      Deltaphi=max(0,Vpp-(time_within_period-dischargeduration/2)/(0.5*dischargeduration)*Vpp);
+    );
+    
+
+    
+    if (time_within_period<dischargeduration,
+      dt=dt_discharge;
+      itermax=itermax_discharge;
+    ,{else}
+      if((time+dt_nodischarge)-(period*floor((time+dt_nodischarge)/period))<dt_nodischarge,
+        dt=period*floor((time+dt_nodischarge)/period)-time;
+        ,{else}
+        dt=dt_nodischarge;
+        );
+      itermax=itermax_nodischarge;
+      );    
+    
+    
+    Init(Epotential(
+      Region(is1,js,  is1,js2,INITEMF_TYPE1,-Deltaphi/2);
+      Region(is4,js,  is4,js2,INITEMF_TYPE1,Deltaphi/2);
+    ););
+    printf("%ldV ",round(Deltaphi));
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
+    Lc=10;      {characteristic length scale in meters used to solve the emfield equation}
+    relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
+  
+    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,200); 
+    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,200); 
+  
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %E %E %E %E %E %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,time_within_period,period,time,dt_discharge,dt_nodischarge,clipinfo);
+
+    if (iter>itermax,
+      IncreaseTimeLevel();
+      WriteDataFile(outputfilename"."100000 + round(time/min(dt_discharge,dt_nodischarge)));
+      printf("dt=%E time=%Es\n",dt,time);
+      if (time>tmax-0.1*dt,
+        exit(EXIT_SUCCESS);
+      );
+    );    
+    
+  );
+
+);
+
+
+Post(
+fprintf(postfilename, "%E",_EdotJ(is,js, ie,je));
+);
