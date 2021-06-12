@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 JUN 12a
+  * in model/chem/_Air_Plasma_11s/dunnkang1973.c
+    - reaction 10 had the wrong rate: this has been fixed
+  * in model/chem/_Air_Plasma_11s
+    - added parent2021.c
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - added parent2021 model
+    - fixed rate of reaction 10 of Dunn Kang model
+    
+
 2021 JUN 09a
   * in model/emfield/doc/Electrodynamics/report.tex
     - added Lorenz condition and electrodynamic potential
