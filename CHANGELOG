@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 JUN 16a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - in write_bdry_fluid_template(), added boundary condition BDRY_WALLTFIXEDTHERMIONIC1
+    - added function _Vk_perp_to_bdry() 
+    - in update_bdry_wall(), added parameter THERMIONIC
+    - in update_bdry_wall(), made modifications for thermionic BC 
+    
+
 2021 JUN 12a
   * in model/chem/_Air_Plasma_11s/dunnkang1973.c
     - reaction 10 had the wrong rate: this has been fixed
