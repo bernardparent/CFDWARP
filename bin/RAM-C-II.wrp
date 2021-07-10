@@ -89,7 +89,7 @@ J. THERMOPHYSICS VOL. 5, page 266, 1991.}
 
 
 
-mf=2;
+mf=1;
 
 
 is=1;  
@@ -307,7 +307,9 @@ Bdry(
     BDRY_OUTFLOWSUBSONICMFIXED1        f    Outflow, subsonic, M fixed, 1o
     BDRY_SYMMETRICAL2                  e    Symmetrical, 2o
     BDRY_SYMMETRICAL1                  9    Symmetrical, 1o
-    BDRY_WALLTFIXED1                   3    Wall, T specified, param Twall
+    BDRY_WALLTFIXED1                   3    Wall, T specified; param Twall[K]
+    BDRY_WALLTFIXEDTHERMIONIC1         h    Wall, T specified; param Twall[K], workfunct[eV], Newallmax[1/m3]
+    BDRY_WALLTFIXEDCATALYTIC1          i    Wall, T specified; param Twall[K], _spec(O),_spec(O2),gammaO, ...
     BDRY_WALLADIABATIC1                6    Wall, Adiabatic
     BDRY_SLIPWALL1                     c    Slip wall, Adiabatic, 1o
     BDRY_FREESTREAM1                   5    Freestream, 1o, params Vx,Vy, P, T
@@ -652,7 +654,7 @@ Cycle(
   );
   SteadyState(
     Post();
-    if (mod(iter,1167)==0,
+    if (mod(iter,200)==0,
       WriteDataFile(outputfilename);
     );
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}

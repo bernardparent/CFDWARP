@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 JUL 09a
+  * in model/fluid/_Navier-Stokes/fluid_bdry.c
+    - implemented the BDRY_WALLTFIXEDCATALYTIC1 boundary condition
+  * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - implemented the BDRY_WALLTFIXEDCATALYTIC1 boundary condition
+  * in model/share/fluid_share.c
+    - added the function update_w_at_catalytic_wall()
+  * in src/control.c
+    - in read_control_functions(), added the treatment of the function _spec()
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - added the section "Catalytic Surface Boundary Conditions"
+
+
 2021 JUN 16a
   * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
     - in write_bdry_fluid_template(), added boundary condition BDRY_WALLTFIXEDTHERMIONIC1

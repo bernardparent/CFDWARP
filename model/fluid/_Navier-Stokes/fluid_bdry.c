@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2010-2011,2020 Bernard Parent
+Copyright 2010-2011,2020-2021 Bernard Parent
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BDRY_WALLADIABATIC1 6
 #define BDRY_SLIPWALL1 12
 #define BDRY_FREESTREAM1 2
+#define BDRY_WALLTFIXEDCATALYTIC1 17
 
 
 void write_bdry_fluid_template(FILE **controlfile){
@@ -69,6 +70,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    BDRY_SYMMETRICAL2                 %c   Symmetrical, 2o\n"
     "    BDRY_SYMMETRICAL1                 %c   Symmetrical, 1o\n"
     "    BDRY_WALLTFIXED1                  %c   Wall, T specified, param Twall\n"
+    "    BDRY_WALLTFIXEDCATALYTIC1         %c   Wall, T specified, param Twall, _spec(O),_spec(O2),gammaO, ...\n"
     "    BDRY_WALLADIABATIC1               %c   Wall, Adiabatic\n"
     "    BDRY_SLIPWALL1                    %c   Slip wall, Adiabatic, 1o\n"
     "    BDRY_FREESTREAM1                  %c   Freestream, 1o, params Vx,Vy,"if3DL("Vz,")" P, T\n"
@@ -92,7 +94,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "  );\n",_bdry_ID(BDRY_INFLOWSUPERSONIC),_bdry_ID(BDRY_INFLOWSUBSONIC1),
              _bdry_ID(BDRY_INFLOWSUBSONICMASSFLOWFIXED1),_bdry_ID(BDRY_OUTFLOWSUPERSONIC1),
              _bdry_ID(BDRY_OUTFLOWSUBSONIC1),_bdry_ID(BDRY_OUTFLOWSUBSONICMFIXED1),
-             _bdry_ID(BDRY_SYMMETRICAL2),_bdry_ID(BDRY_SYMMETRICAL1),_bdry_ID(BDRY_WALLTFIXED1),
+             _bdry_ID(BDRY_SYMMETRICAL2),_bdry_ID(BDRY_SYMMETRICAL1),_bdry_ID(BDRY_WALLTFIXED1),_bdry_ID(BDRY_WALLTFIXEDCATALYTIC1),
              _bdry_ID(BDRY_WALLADIABATIC1),_bdry_ID(BDRY_SLIPWALL1),_bdry_ID(BDRY_FREESTREAM1)
   );
 }
@@ -108,6 +110,7 @@ void add_bdry_types_fluid_to_codex(SOAP_codex_t *codex){
   add_int_to_codex(codex,"BDRY_SYMMETRICAL1", BDRY_SYMMETRICAL1  );
   add_int_to_codex(codex,"BDRY_SYMMETRICAL2", BDRY_SYMMETRICAL2  );
   add_int_to_codex(codex,"BDRY_WALLTFIXED1", BDRY_WALLTFIXED1  );
+  add_int_to_codex(codex,"BDRY_WALLTFIXEDCATALYTIC1", BDRY_WALLTFIXEDCATALYTIC1  );
   add_int_to_codex(codex,"BDRY_WALLADIABATIC1",  BDRY_WALLADIABATIC1 );
   add_int_to_codex(codex,"BDRY_SLIPWALL1", BDRY_SLIPWALL1  );
   add_int_to_codex(codex,"BDRY_FREESTREAM1",   BDRY_FREESTREAM1);
@@ -291,7 +294,7 @@ static void update_bdry_freestream(np_t *np, gl_t *gl, long lA, long lB, long lC
 
 static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
                             long theta, long thetasgn,
-                            bool ADIABATIC, bool BDRYDIRECFOUND, int ACCURACY){
+                            bool ADIABATIC, bool CATALYTIC, bool BDRYDIRECFOUND, int ACCURACY){
   spec_t wwall;
   double Twall,Pwall;
   long dim,spec;
@@ -314,6 +317,8 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
   }
   for (spec=0; spec<ncs; spec++) 
     wwall[spec]=0.0;
+
+  if (CATALYTIC) update_w_at_catalytic_wall(np, gl, lA, lB, lC, Twall, Twall, wwall);
   
   reformat_w(gl,wwall,"_bdry",&ref_flag);
 
@@ -345,17 +350,21 @@ void update_bdry_fluid(np_t *np, gl_t *gl, long lA, long lB, long lC, long lD, l
     break;
 
     case BDRY_WALLTFIXED1:
-      update_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, FALSE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
+      update_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, FALSE, FALSE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
+    break;
+
+    case BDRY_WALLTFIXEDCATALYTIC1:
+      update_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, FALSE, TRUE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
+    break;
+
+    case BDRY_WALLADIABATIC1: 
+      update_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, TRUE, FALSE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
     break;
 
     case BDRY_OUTFLOWSUBSONIC1:
       update_bdry_back_pressure(np, gl, lA, lB, lC, theta, ACCURACY_FIRSTORDER);
     break;
 
-    case BDRY_WALLADIABATIC1: 
-      update_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, TRUE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
-    break;
-    
     case BDRY_INFLOWSUBSONIC1:
       update_bdry_inflow_reservoir(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
     break;

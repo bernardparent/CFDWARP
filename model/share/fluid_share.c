@@ -2480,3 +2480,32 @@ void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
   }
 }
 #endif
+
+
+void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, double Twall, double Tewall, spec_t wwall){
+  long dim,specr,specp,numcat,cat;
+  double dwall,gamma;
+  spec_t nuk;
+
+  dwall=0.0;
+  for (dim=0; dim<nd; dim++){
+    dwall=dwall+sqr(np[lB].bs->x[dim]-np[lA].bs->x[dim]);
+  }
+  assert_np(np[lA],dwall>0.0e0);
+  dwall=sqrt(dwall);
+  find_nuk_from_w_rho_T_Te(wwall, _rho(np[lB]), Twall, Tewall, nuk);
+
+  if (mod(np[lA].numbdryparam-1,3)!=0) fatal_error("Wrong number of extra parameters to catalytic boundary condition.");
+  numcat=round((double)(np[lA].numbdryparam-1)/3.0);
+  for (cat=0; cat<numcat; cat++){
+    specr=round(_bdry_param(np,gl,lA,1+cat*3,TYPELEVEL_FLUID_WORK))-1;
+    specp=round(_bdry_param(np,gl,lA,2+cat*3,TYPELEVEL_FLUID_WORK))-1;
+    if (specr==specp) fatal_error("Wrong specification of the catalytic boundary condition. The reactant species can not be the same as the product species in a wall catalytic process.");
+    if (specr<0 || specr>=ns) fatal_error("Wrong specification of the catalytic boundary condition. The reactant species number is not within bounds.");
+    if (specp<0 || specp>=ns) fatal_error("Wrong specification of the catalytic boundary condition. The product species number is not within bounds.");
+    gamma=_bdry_param(np,gl,lA,3+cat*3,TYPELEVEL_FLUID_WORK);
+
+    wwall[specr]=max(0.0,_w(np[lB],specr)-dwall*0.25*wwall[specr]*_rho(np[lB])*sqrt(8.0*calR/_calM(specr)*Twall/pi)/(nuk[specr]/gamma-nuk[specr]));
+    wwall[specp]=_w(np[lB],specp)+_calM(specr)/_calM(specp)*(_w(np[lB],specr)-wwall[specr]);
+  }
+}

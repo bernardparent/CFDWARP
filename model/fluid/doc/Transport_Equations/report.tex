@@ -3266,6 +3266,121 @@ where $\tau_{\rm w}$ is the wall shear stress, $\rho$ the density of the flow at
 The boundary conditions needed to obtain $\vec{U}$ at the surface nodes as outlined in this section can be applied to either electrodes or dielectrics. As well, they remain valid in the presence of a magnetic field following the strategy outlined in Ref.\ \cite{jcp:2015:parent} by setting the magnetic field to zero at the boundary and near-boundary nodes.  
 
 
+
+\section{Catalytic Surface Boundary Conditions}
+
+When a gas interacts with a solid surface, chemical reactions can occur. In air, atomic oxygen and atomic nitrogen can form molecular oxygen and nitrogen at the surface, respectively. The surface boundary condition is governed by the catalytic recombination coefficient $\gamma$ which is defined as:
+%
+\begin{equation}
+\gamma_k \equiv \frac{\dot{m}^{\rm rec}_k}{\dot{m}^{\rm imp}_k}
+\end{equation}
+%
+with $\dot{m}^{\rm imp}_k$ is the mass flux of atoms per unit area impinging the surface while $\dot{m}^{\rm rec}_k$ is the mass flux of atoms impinging the surface that recombine. But, the flux of atoms impinging the surface that recombine corresponds to a flux of atoms that ``disappear''. Thus, this must be equal to the net mass flux of atoms towards the surface. The net flux can be found from Fick's law of diffusion:
+%
+\begin{equation}
+\dot{m}^{\rm rec}_k=\dot{m}^{\rm net}_k = \nu_k \frac{\partial w_k}{\partial \chi}
+\end{equation}
+%
+with $\nu_k$ the mass diffusion coefficient of species $k$ and $\chi$ a coordinate perpendicular to the surface and pointing away from the surface.
+
+The mass flux impinging the surface is the sum of the molecular flux and the diffusion flux (assuming zero convection velocity near the surface):
+%
+\begin{equation}
+  \dot{m}^{\rm imp}_k = \nu_k \frac{\partial w_k}{\partial \chi} + \frac{1}{4} \rho_k \sqrt{\frac{8 R_k T_k}{\pi}}
+\end{equation}
+%
+with $\rho_k$ the partial mass density and $R_k$ the gas constant of species $k$, and $T_k$ the temperature of species $k$.
+
+Substitute the latter two expressions in the former:
+%
+\begin{equation}
+\gamma_k = \frac{\nu_k \frac{\partial w_k}{\partial \chi}}{\nu_k \frac{\partial w_k}{\partial \chi} + \frac{1}{4} \rho_k \sqrt{\frac{8 R_k T_k}{\pi}}}
+\end{equation}
+%
+Isolate the partial derivative at the surface:
+%
+\begin{equation}
+\nu_k  + \frac{1}{4} \rho_k \sqrt{\frac{8 R_k T_k}{\pi}} \left( \frac{\partial w_k}{\partial \chi} \right)^{-1} = \frac{\nu_k }{\gamma_k}
+\end{equation}
+%
+
+%
+\begin{equation}
+\frameeqn{
+ \frac{\partial w_k}{\partial \chi}  = \frac{\frac{1}{4} \rho_k \sqrt{\frac{8 R_k T_k}{\pi}} }{ \frac{\nu_k }{\gamma_k} - \nu_k}
+}
+\end{equation}
+%
+
+Thus, say that the species O becomes O$_2$ at the surface through catalysis. Then the boundary condition for the O mass fraction at the surface would become:
+%
+\begin{equation}
+ \frac{\partial w_{\rm O}}{\partial \chi}  = \frac{\frac{1}{4} \rho_{\rm O} \sqrt{\frac{8 R_{\rm O} T_{\rm O}}{\pi}} }{ \frac{\nu_{\rm O} }{\gamma_{\rm O}} - \nu_{\rm O}}
+\end{equation}
+%
+And the boundary condition for the O$_2$ mass fraction becomes:
+%
+\begin{equation}
+ \frac{\partial w_{\rm O_2}}{\partial \chi}  = -\frac{{\cal M}_{\rm O}}{{\cal M}_{\rm O_2}} \frac{\partial w_{\rm O}}{\partial \chi}
+\end{equation}
+%
+with ${\cal M}_k$ the molecular weight of species $k$.
+
+
+The catalytic recombination coefficients are assumed function of temperature only and are obtained through curve fitting experimental data.  There are several polynomials for the catalytic coefficients for
+the catalysis of atomic oxygen and nitrogen to molecular oxygen and nitrogen. One such model is the CCAT-ACC \cite{nasa:1997:stewart}
+%
+\begin{equation}
+\begin{array}{ll}
+\gamma_{O}=\left\{\begin{array}{ll}
+13.5 e^{-8350 / T_{w}^{*}} & T_{w}^{*} \leq 1359.0 \mathrm{~K} \\
+5.0 \times 10^{-8} e^{18023 / T_{w}^{*}} & T_{w}^{*}>1359.0 \mathrm{~K}
+\end{array}\right. \\
+\gamma_{N}=\left\{\begin{array}{ll}
+4.0 e^{-7625 / T_{w}^{*}} & T_{w}^{*} \leq 1475.0 \mathrm{~K} \\
+6.2 \times 10^{-6} e^{12100 / T_{w}^{*}} & T_{w}^{*}>1475.0 \mathrm{~K}
+\end{array}\right.
+\end{array}
+\end{equation}
+%
+where $T_{w}^{*}$ is calculated as
+%
+\begin{equation}
+T_{w}^{*}=\left\{\begin{array}{ll}
+\min \left(\max \left(1255.0, T_{w}\right), 1659.0\right) & \text { for } \gamma_{O} \\
+\min \left(\max \left(1255.0, T_{w}\right), 1900.0\right) & \text { for } \gamma_{N}
+\end{array}\right.
+\end{equation}
+%
+Another model is the CSiC \cite{nasa:1997:stewart}:
+%
+\begin{equation}
+\begin{array}{l}
+\gamma_{O}=6.415 \times 10^{-4} e^{3498.4 / T_{w}^{*}} \\
+\gamma_{N}=3.993 \times 10^{-4} e^{4402 / T_{w}^{*}}
+\end{array}
+\end{equation}
+%
+where $T_{w}^{*}$ is given as
+%
+\begin{equation}
+T_{w}^{*}=\min \left(\max \left(1100.0, T_{w}\right), 1920.0\right)
+\end{equation}
+%
+Another model is the CSiC-SMEGMA \cite{nasa:1997:stewart}:
+%
+\begin{equation}
+\gamma_{O}=\gamma_{N}=9.593 \times 10^{-5} e^{7002.9 / T_{w}^{*}}
+\end{equation}
+%
+where $T_{w}^{*}$ is given as
+%
+\begin{equation}
+T_{w}^{*}=\min \left(\max \left(1350.0, T_{w}\right), 1920.0\right)
+\end{equation}
+%
+Other models for catalysis of oxygen and nitrogen can be found in \cite{nasa:2020:thompson}.
+
   \bibliographystyle{warpdoc}
   \bibliography{all}
 
