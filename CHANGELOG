@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 JUL 09b
+  * in model/share/fluid_share.c
+    - in update_w_at_catalytic_wall(), added error messages when gamma is not within physically
+      valid bounds
+      
+
 2021 JUL 09a
   * in model/fluid/_Navier-Stokes/fluid_bdry.c
     - implemented the BDRY_WALLTFIXEDCATALYTIC1 boundary condition

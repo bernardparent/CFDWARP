@@ -2504,7 +2504,11 @@ void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, d
     if (specr<0 || specr>=ns) fatal_error("Wrong specification of the catalytic boundary condition. The reactant species number is not within bounds.");
     if (specp<0 || specp>=ns) fatal_error("Wrong specification of the catalytic boundary condition. The product species number is not within bounds.");
     gamma=_bdry_param(np,gl,lA,3+cat*3,TYPELEVEL_FLUID_WORK);
-
+    if (gamma==0.0) fatal_error("The catalytic recombination coefficient can not be set to zero. Set it rather to a very small positive number approaching zero.");
+    if (gamma==1.0) fatal_error("The catalytic recombination coefficient can not be set to 1. Set it rather to a positive number less then and approaching 1.");
+    if (gamma>1.0) fatal_error("The catalytic recombination coefficient can not be set to a value greater than 1.");
+    if (gamma<0.0) fatal_error("The catalytic recombination coefficient can not be set to a value less than 0.");
+    
     wwall[specr]=max(0.0,_w(np[lB],specr)-dwall*0.25*wwall[specr]*_rho(np[lB])*sqrt(8.0*calR/_calM(specr)*Twall/pi)/(nuk[specr]/gamma-nuk[specr]));
     wwall[specp]=_w(np[lB],specp)+_calM(specr)/_calM(specp)*(_w(np[lB],specr)-wwall[specr]);
   }
