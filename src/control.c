@@ -47,8 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   typedef GRIDG_gl3d_t glgrid_t;
 #endif
 
-#define numbib 46
-#define maxstrlen 4096
+#define numbib 47
+#define maxstrlen 10000
 
 typedef char longstr_t[maxstrlen];
 
@@ -99,7 +99,8 @@ const static longstr_t bibname[numbib]=
    "park1994a",
    "smith1999a",
    "boyd2007a",
-   "farbar2013a"
+   "farbar2013a",
+   "parent2007a"
   };
 
 const static longstr_t bib[numbib]=
@@ -239,7 +240,10 @@ const static longstr_t bib[numbib]=
    "ID Boyd, \"Modeling of associative ionization reactions in hypersonic rarefied flows,\" Physics of Fluids 19:096102, 2007.",
 
    //farbar2013a
-   "E Farbar, ID Boyd, and A Martin. \"Numerical Prediction of Hypersonic Flowfields Including Effects of Electron Translational Nonequilibrium,\" Journal of Thermophysics and Heat Transfer, 24:593-606, 2013."
+   "E Farbar, ID Boyd, and A Martin. \"Numerical Prediction of Hypersonic Flowfields Including Effects of Electron Translational Nonequilibrium\", Journal of Thermophysics and Heat Transfer, 24:593-606, 2013.",
+   
+   //parent2007a
+   "B Parent, SO Macheret, MN Shneider and N Harada. \"Numerical Study of an Electron-Beam-Confined Faraday Accelerator\", Journal of Propulsion and Power, 23(5):1023-1032, 2007."
   };
 
 

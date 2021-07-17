@@ -326,81 +326,181 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 
 
 
+%
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Park-Parent (2021) 11-species high-temperature air model.}
+\begin{tabular}{cccccccccc} 
+\toprule
+~&~&\multicolumn{4}{c}{Forward reaction} & \multicolumn{4}{c}{Backward reaction} \\
+ \cmidrule(lr){3-6}\cmidrule(lr){7-10}
+\multicolumn{2}{c}{Reaction} & $T$ & $A$ & $n$ & $E$ & $T$  & $A$ & $n$ & $E$ \\ 
+\midrule
+1 & $\rm N_2 + M_1 \rightleftarrows N + N + M_1$ & $\sqrt{T T_{\rm v}}$  & 3.0 $\cdot$ 10$^{22}$  & $-1.6$ & $113200 \, R$  & $T$ &\multicolumn{3}{c}{Equilibrium constant} \cite{book:1990:park}\\
+
+2 & $\rm N_2 + M_2 \rightleftarrows N + N + M_2$ & $\sqrt{T T_{\rm v}}$  & 7.0 $\cdot$ 10$^{21}$  & $-1.6$ & $113200 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}  \cite{book:1990:park}\\
+
+
+4 & $\rm O_2 + M_1 \rightleftarrows O + O + M_1$ & $\sqrt{T T_{\rm v}}$  & 1.0 $\cdot$ 10$^{22}$  & $-1.5$ & $59500 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant} \cite{book:1990:park}\\
+
+5 & $\rm O_2 + M_2 \rightleftarrows O + O + M_2$ & $\sqrt{T T_{\rm v}}$  & 2.0 $\cdot$ 10$^{21}$  & $-1.5$ & $59500 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant} \cite{book:1990:park}\\
+
+6 & $\rm NO + M_3 \rightleftarrows N + O + M_3$ & $\sqrt{T T_{\rm v}}$  & 1.1 $\cdot$ 10$^{17}$  & 0.0 & $75500 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant} \cite{book:1990:park}\\
+
+7 & $\rm NO + M_4 \rightleftarrows N + O + M_4$ & $\sqrt{T T_{\rm v}}$  & 5.0 $\cdot$ 10$^{15}$  & 0.0 & $75500 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}  \cite{book:1990:park}\\
+
+8 & $\rm NO + O \rightleftarrows N + O_2 $ & $T$  & 8.4 $\cdot$ 10$^{12}$  & 0.0 & $19400 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}  \cite{jcp:1997:bose}\\
+
+9 & $\rm N_2 + O \rightleftarrows NO + N $ & $T$  & 5.7 $\cdot$ 10$^{12}$  & $0.42$ & $42938 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant} \cite{jcp:1996:bose}\\
+
+
+
+
+
+13 & $\rm NO^+ + O \rightleftarrows N^+ + O_2 $ & $T$   & 1.0 $\cdot$ 10$^{12}$  & 0.5 & $77200 \, R$ & $T$& \multicolumn{3}{c}{Equilibrium constant}\cite{book:1990:park}\\
+
+
+
+
+14 & $\rm N^+ + N_2 \rightleftarrows N_2^+ + N $ & $T$   & 1.0 $\cdot$ 10$^{12}$  & 0.5 & $12200 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\cite{book:1990:park}\\
+
+
+
+15 & $\rm O_2^+ + N \rightleftarrows N^+ + O_2 $ & $T$   & 8.7 $\cdot$ 10$^{13}$  & 0.14 & $28600 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\cite{book:1990:park}\\
+
+16 & $\rm O^+ + NO \rightleftarrows N^+ + O_2 $ & $T$  & 1.4 $\cdot$ 10$^{5}$  & 1.90 & $26600 \, R$ & $T$  & \multicolumn{3}{c}{Equilibrium constant}\cite{book:1990:park}\\
+
+
+
+
+
+17 & $\rm O_2^+ + N_2 \rightleftarrows N_2^+ + O_2 $ & $T$   & 9.9 $\cdot$ 10$^{12}$  & 0.00 & $40700 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\cite{book:1990:park}\\
+
+18 & $\rm O_2^+ + O \rightleftarrows O^+ + O_2 $ & $T$   & 4.0 $\cdot$ 10$^{12}$  & $-0.09$ & $18000 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\cite{book:1990:park}\\
+
+19 & $\rm NO^+ + N \rightleftarrows O^+ + N_2 $ & $T$   & 3.4 $\cdot$ 10$^{13}$  & $-1.08$ & $12800 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\cite{book:1990:park}\\
+
+20 & $\rm NO^+ + O_2 \rightleftarrows O_2^+ + NO $ & $T$   & 2.4 $\cdot$ 10$^{13}$  & 0.41 & $32600 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\cite{book:1990:park}\\
+
+21 & $\rm NO^+ + O \rightleftarrows O_2^+ + N $ & $T$   & 7.2 $\cdot$ 10$^{12}$  & 0.29 & $48600 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\cite{book:1990:park}\\
+
+22 & $\rm O^+ + N_2 \rightleftarrows N_2^+ + O $ & $T$  & 9.1 $\cdot$ 10$^{11}$  & 0.36 & $22800 \, R$ & $T$  & \multicolumn{3}{c}{Equilibrium constant}\cite{book:1990:park}\\
+
+23 & $\rm NO^+ + N \rightleftarrows N_2^+ + O $  & $T$  & 7.2 $\cdot$ 10$^{13}$  & 0.00 & $35500 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\cite{book:1990:park}\\
+
+
+
+26 & $\rm O^+ + e^- \rightarrow O + {\it hv} $ & $T_{\rm e}$  & 1.07 $\cdot$ 10$^{11}$  & $-0.52$ & $0$ &  \multicolumn{4}{c}{None}\cite{jtht:1993:park}\\
+27 & $\rm N^+ + e^- \rightarrow N + {\it hv} $ & $T_{\rm e}$  & 1.52 $\cdot$ 10$^{11}$  & $-0.48$ & $0$ &  \multicolumn{4}{c}{None}\cite{jtht:1993:park}\\
+
+
+24 & $\rm O + e^- \rightleftarrows O^+ + e^- + e^- $ & $T_{\rm e}$  & 3.9 $\cdot$ 10$^{33}$  & $-3.78$ & $158500 \, R$ & $T_{\rm e}$ & \multicolumn{3}{c}{Equilibrium constant}\cite{book:1990:park}\\
+
+25 & $\rm N + e^- \rightleftarrows N^+ + e^- + e^- $ & $T_{\rm e}$  & 2.5 $\cdot$ 10$^{34}$  & $-3.82$ & $168600 \, R$ & $T_{\rm e}$ & \multicolumn{3}{c}{Equilibrium constant}\cite{book:1990:park}\\
+
+
+
+3 & $\rm N_2 + e^- \rightleftarrows N + N + e^-$ & $\sqrt{T_{\rm e} T_{\rm v}}$ & 3.0 $\cdot$ 10$^{24}$  & $-1.6$ & $113200 \, R$ & $\sqrt{T T_{\rm e}}$ & \multicolumn{3}{c}{Equilibrium constant} \cite{book:1990:park}\\
+
+10 & $\rm N + O \rightleftarrows NO^+ + e^- $ & $T$  & 5.3 $\cdot$ 10$^{12}$  & 0.0 & $32000 \, R$ & $\sqrt{T_{\rm e} T_{\rm v}}$ & \multicolumn{3}{c}{Equilibrium constant} \cite{pf:2007:boyd}\\
+
+11 & $\rm O + O \rightleftarrows O_2^+ + e^- $ & $T$  & 1.1 $\cdot$ 10$^{13}$  & 0 & $81200 \, R$ & $\sqrt{T_{\rm e} T_{\rm v}}$ & \multicolumn{3}{c}{Equilibrium constant}\cite{pf:2007:boyd}\\
+
+12 & $\rm N + N \rightleftarrows N_2^+ + e^- $ & $T$ & 2.0 $\cdot$ 10$^{13}$  & 0 & $67700 \, R$ & $\sqrt{T_{\rm e} T_{\rm v}}$ &  \multicolumn{3}{c}{Equilibrium constant}\cite{pf:2007:boyd}\\
+
+
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol. $A$ has units of $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$. $E$ has units of cal/mole. The rate is given by $A T^n \exp(-E/RT).$
+\item[{b}] $\rm M_1=N,~NO$;~ $\rm M_2=O,~NO,~O_2$;~ $\rm M_3=O_2,~N_2$;~ $\rm M_4=O,~N,~NO$.
+\item[{c}] The forward rate coefficients for reactions ?,?,? are found using BOLSIG+ \cite{psst:2005:hagelaar,pcpp:1992:morgan}. Other reactions are taken from .. \cite{nasa:1973:dunn}.
+\end{tablenotes}
+\label{tab:parkparent}
+\end{threeparttable}
+\end{center}
+\end{table}
+%
+
+
+
 
 %
 \begin{table}[t]
 \fontsizetable
 \begin{center}
 \begin{threeparttable}
-\tablecaption{Parent (2021) 11-species 29-reaction high-temperature air model.}
-\begin{tabular}{cccccccc} 
+\tablecaption{Dunn-Kang-Parent (2021) 11-species 29-reaction high-temperature air model.}
+\begin{tabular}{cccccccccc} 
 \toprule
-~&~&\multicolumn{3}{c}{Forward rate} & \multicolumn{3}{c}{Backward rate} \\
- \cmidrule(lr){3-5}\cmidrule(lr){6-8}
-\multicolumn{2}{c}{Reaction} & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole  & $A$, $\textrm{cm}^{\rm 3~or~6}\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole  \\ 
+~&~&\multicolumn{4}{c}{Forward reaction} & \multicolumn{4}{c}{Backward reaction} \\
+ \cmidrule(lr){3-6}\cmidrule(lr){7-10}
+\multicolumn{2}{c}{Reaction} & $T$ & $A$ & $n$ & $E$ & $T$  & $A$ & $n$ & $E$ \\ 
 \midrule
-1 & $\rm O_2 + M_1 \rightleftarrows 2O+M_1$ & $3.6 \cdot 10^{18}$  & $-1$    & $59,500 \cdot R$  
-                                          & $3.0 \cdot 10^{15}$  & $-0.5$  & 0\\
-2 & $\rm N_2 + M_2 \rightleftarrows 2N+M_2$ & $1.9 \cdot 10^{17}$ & $-0.5$ & $113,000 \cdot R$ 
-                                          & $1.1 \cdot 10^{16}$  & $-0.5$  & 0\\
-3 & $\rm NO + M_3 \rightleftarrows N+O+M_3$ & $3.9 \cdot 10^{20}$ & $-1.5$ & $75,500\cdot R$ 
-                                          & $1.0 \cdot 10^{20}$  & $-1.5$  & 0\\
-4 & $\rm O + NO \rightleftarrows N+O_2$ & $3.2 \cdot 10^{9}$ & 1 & $19,700 \cdot R$ 
-                                          & $1.3 \cdot 10^{10}$  & $1.0$  & $3,580 \cdot R$\\
-5 & $\rm O + N_2 \rightleftarrows N+NO$ & $7 \cdot 10^{13}$ & 0 & $38,000\cdot R$ 
-                                          & $1.56 \cdot 10^{13}$  & $0$  & 0\\
-6 & $\rm N + N_2 \rightleftarrows 2N+N$ & $4.085 \cdot 10^{22}$ & $-1.5$ & $113,000\cdot R$ 
-                                          & $2.27 \cdot 10^{21}$  & $-1.5$  & 0\\
-7 & $\rm O + N \rightleftarrows NO^{+}+e^{-}$ & $1.4 \cdot 10^{6}$ & $1.5$ & $31,900\cdot R$ 
-                                          & $6.7 \cdot 10^{21}$  & $-1.5$  & 0\\
-8 & $\rm O + e^- \rightleftarrows O^++2e^-$ & 6.37 $\times$ 10$^{16}$ & $0.0029$ & $477,190\cdot R$ 
-                                          & $2.2 \cdot 10^{40}$  & $-4.5$  & 0\\
-9 & $\rm N + e^- \rightleftarrows N^++2e^-$ & 1.06 $\times$ 10$^{18}$ & $-0.2072$ & $629,700\cdot R$ 
-                                          & $2.2 \cdot 10^{40}$  & $-4.5$  & 0\\
-10 & $\rm O_2 + e^- \rightleftarrows O_2^++2e^-$ & 2.33 $\times$ 10$^{16}$ & $0.1166$ & $567,360\cdot R$ 
-                                          & $2.2 \cdot 10^{40}$  & $-4.5$  & 0\\
-11 & $\rm N_2 + e^- \rightleftarrows N_2^++2e^-$ & 1.58 $\times$ 10$^{16}$ & $0.1420$ & $536,330\cdot R$ 
-                                          & $2.2 \cdot 10^{40}$  & $-4.5$  & 0\\
-12 & $\rm NO + e^- \rightleftarrows NO^++2e^-$ & 5.63 $\times$ 10$^{18}$ & $-0.2607$ & $686,030\cdot R$ 
-                                          & $2.2 \cdot 10^{40}$  & $-4.5$  & 0\\
-13 & $\rm O + O \rightleftarrows O_2^{+}+e^-$ & $1.6 \cdot 10^{17}$ & $-0.98$ & $80,800 \cdot R$ 
-                                          & $8.0 \cdot 10^{21}$  & $-1.5$  & 0\\
-14 & $\rm O + O_2^+ \rightleftarrows O_2+O^+$ & $2.92 \cdot 10^{18}$ & $-1.11$ & $28,000\cdot R$ 
-                                          & $7.8 \cdot 10^{11}$  & $0.5$  & 0\\
-15 & $\rm N_2 + N^+ \rightleftarrows N+N_2^{+}$ & $2.02 \cdot 10^{11}$ & 0.81 & $13,000 \cdot R$ 
-                                          & $7.8 \cdot 10^{11}$  & $0.5$  & 0\\
-16 & $\rm N + N \rightleftarrows N_2^{+} + e^-$ & $1.4 \cdot 10^{13}$ & 0 & $67,800\cdot R$ 
-                                          & $1.5 \cdot 10^{22}$  & $-1.5$  & 0\\
-17 & $\rm O_2 + N_2 \rightleftarrows NO + NO^+ + e^-$ & $1.38 \cdot 10^{20}$ & $-1.84$ & $141,000\cdot R$ 
-                                         & $1.0 \cdot 10^{24}$  & $-2.5$  & 0\\
-18 & $\rm NO + N_2 \rightleftarrows N_2 + NO^+ + e^-$ & $2.2 \cdot 10^{15}$ & $-0.35$ & $108,000\cdot R$ 
-                                          & $2.2 \cdot 10^{26}$  & $-2.5$  & 0\\
-19 & $\rm O + NO^+ \rightleftarrows NO + O^+$ & $3.63 \cdot 10^{15}$ & $-0.6$ & $50,800\cdot R$ 
-                                          & $1.5 \cdot 10^{13}$  & $0$  & 0\\
-20 & $\rm N_2 + O^+ \rightleftarrows O + N_2^{+}$ & $3.4 \times 10^{19}$ & $-2$ & $23,000\cdot R$ 
-                                          & $2.48 \cdot 10^{19}$  & $-2.2$  & 0\\
-21 & $\rm N + NO^+ \rightleftarrows NO + N^+$ & $1 \cdot 10^{19}$ & $-0.93$ & $61,000\cdot R$ 
-                                          & $4.8 \cdot 10^{14}$  & $0$  & 0\\
-22 & $\rm O_2 + NO^+ \rightleftarrows NO + O_2^{+}$ & $1.8 \cdot 10^{15}$ & 0.17 & $33,000\cdot R$ 
-                                          & $1.8 \cdot 10^{13}$  & $0.5$  & 0\\
-23 & $\rm O + NO^+ \rightleftarrows O_2 + N^+$ & $1.34 \cdot 10^{13}$ & 0.31 & $77,270\cdot R$ 
-                                          & $1.0 \cdot 10^{14}$  & $0$  & 0\\
-24 & $\rm NO + O_2 \rightleftarrows NO^+ + e^- + O_2$ & $8.8 \cdot 10^{15}$ & $-0.35$ & $108,000\cdot R$ 
-                                          & $8.8 \cdot 10^{26}$  & $-2.5$  & 0\\
-25 & $\rm O_2 + O \rightleftarrows 2O + O$ & $9 \cdot 10^{19}$ & $-1$ & $59,500\cdot R$ 
-                                          & $7.5 \cdot 10^{16}$  & $-0.5$  & 0\\
-26 & $\rm O_2 + O_2 \rightleftarrows 2O + O_2$ & $3.24 \cdot 10^{19}$ & $-1$ & $59,500\cdot R$ 
-                                          & $2.7 \cdot 10^{16}$  & $-0.5$  & 0\\
-27 & $\rm O_2 + N_2 \rightleftarrows 2O + N_2$ & $7.2 \cdot 10^{18}$ & $-1$ & $59,500\cdot R$ 
-                                          & $6.0 \cdot 10^{15}$  & $-0.5$  & 0\\
-28 & $\rm N_2 + N_2 \rightleftarrows 2N + N_2$ & $4.7 \cdot 10^{17}$ & $-0.5$ & $113,000\cdot R$ 
-                                          & $2.72 \cdot 10^{16}$  & $-0.5$  & 0\\
-29 & $\rm NO + M_4 \rightleftarrows N + O + M_4$ & $7.8 \cdot 10^{20}$ & $-1.5$ & $75,500\cdot R$ 
-                                          & $2.0 \cdot 10^{20}$  & $-1.5$  & 0\\
+1 & $\rm O_2 + M_1 \rightleftarrows 2O+M_1$ &$T$ & $3.6 \cdot 10^{18}$  & $-1$    & $59,500 \, R$  
+                                          &$T$  & $3.0 \cdot 10^{15}$  & $-0.5$  & 0\\
+2 & $\rm N_2 + M_2 \rightleftarrows 2N+M_2$ &$T$  & $1.9 \cdot 10^{17}$ & $-0.5$ & $113,000 \, R$ 
+                                          &$T$  & $1.1 \cdot 10^{16}$  & $-0.5$  & 0\\
+3 & $\rm NO + M_3 \rightleftarrows N+O+M_3$ &$T$  & $3.9 \cdot 10^{20}$ & $-1.5$ & $75,500\, R$ 
+                                          &$T$ & $1.0 \cdot 10^{20}$  & $-1.5$  & 0\\
+4 & $\rm O + NO \rightleftarrows N+O_2$ &$T$ & $3.2 \cdot 10^{9}$ & 1 & $19,700 \, R$ 
+                                          &$T$ & $1.3 \cdot 10^{10}$  & $1.0$  & $3,580 \, R$\\
+5 & $\rm O + N_2 \rightleftarrows N+NO$ &$T$ & $7 \cdot 10^{13}$ & 0 & $38,000\, R$ 
+                                          &$T$ & $1.56 \cdot 10^{13}$  & $0$  & 0\\
+6 & $\rm N + N_2 \rightleftarrows 2N+N$ &$T$ & $4.085 \cdot 10^{22}$ & $-1.5$ & $113,000\, R$ 
+                                          &$T$ & $2.27 \cdot 10^{21}$  & $-1.5$  & 0\\
+7 & $\rm O + N \rightleftarrows NO^{+}+e^{-}$ &$T$ & $1.4 \cdot 10^{6}$ & $1.5$ & $31,900\, R$ 
+                                          &$T_{\rm e}$ & $6.7 \cdot 10^{21}$  & $-1.5$  & 0\\
+8 & $\rm O + e^- \rightleftarrows O^++2e^-$ &$T_{\rm e}$ & 6.37 $\cdot$ 10$^{16}$ & $0.0029$ & $477,190\, R$ 
+                                          &$T_{\rm e}$ & $2.2 \cdot 10^{40}$  & $-4.5$  & 0\\
+9 & $\rm N + e^- \rightleftarrows N^++2e^-$ &$T_{\rm e}$ & 1.06 $\cdot$ 10$^{18}$ & $-0.2072$ & $629,700\, R$ 
+                                          &$T_{\rm e}$ & $2.2 \cdot 10^{40}$  & $-4.5$  & 0\\
+10 & $\rm O_2 + e^- \rightleftarrows O_2^++2e^-$ &$T_{\rm e}$ & 2.33 $\cdot$ 10$^{16}$ & $0.1166$ & $567,360\, R$ 
+                                          &$T_{\rm e}$ & $2.2 \cdot 10^{40}$  & $-4.5$  & 0\\
+11 & $\rm N_2 + e^- \rightleftarrows N_2^++2e^-$ &$T_{\rm e}$ & 1.58 $\cdot$ 10$^{16}$ & $0.1420$ & $536,330\, R$ 
+                                          &$T_{\rm e}$ & $2.2 \cdot 10^{40}$  & $-4.5$  & 0\\
+12 & $\rm NO + e^- \rightleftarrows NO^++2e^-$ &$T_{\rm e}$ & 5.63 $\cdot$ 10$^{18}$ & $-0.2607$ & $686,030\, R$ 
+                                          &$T_{\rm e}$ & $2.2 \cdot 10^{40}$  & $-4.5$  & 0\\
+13 & $\rm O + O \rightleftarrows O_2^{+}+e^-$ &$T$ & $1.6 \cdot 10^{17}$ & $-0.98$ & $80,800 \, R$ 
+                                          &$T_{\rm e}$ & $8.0 \cdot 10^{21}$  & $-1.5$  & 0\\
+14 & $\rm O + O_2^+ \rightleftarrows O_2+O^+$ &$T$ & $2.92 \cdot 10^{18}$ & $-1.11$ & $28,000\, R$ 
+                                          &$T$ & $7.8 \cdot 10^{11}$  & $0.5$  & 0\\
+15 & $\rm N_2 + N^+ \rightleftarrows N+N_2^{+}$ &$T$ & $2.02 \cdot 10^{11}$ & 0.81 & $13,000 \, R$ 
+                                          &$T$ & $7.8 \cdot 10^{11}$  & $0.5$  & 0\\
+16 & $\rm N + N \rightleftarrows N_2^{+} + e^-$ &$T$ & $1.4 \cdot 10^{13}$ & 0 & $67,800\, R$ 
+                                          &$T_{\rm e}$ & $1.5 \cdot 10^{22}$  & $-1.5$  & 0\\
+17 & $\rm O_2 + N_2 \rightleftarrows NO + NO^+ + e^-$ &$T$ & $1.38 \cdot 10^{20}$ & $-1.84$ & $141,000\, R$ 
+                                         &$T_{\rm e}$ & $1.0 \cdot 10^{24}$  & $-2.5$  & 0\\
+18 & $\rm NO + N_2 \rightleftarrows N_2 + NO^+ + e^-$ &$T$ & $2.2 \cdot 10^{15}$ & $-0.35$ & $108,000\, R$ 
+                                          &$T_{\rm e}$ & $2.2 \cdot 10^{26}$  & $-2.5$  & 0\\
+19 & $\rm O + NO^+ \rightleftarrows NO + O^+$ &$T$ & $3.63 \cdot 10^{15}$ & $-0.6$ & $50,800\, R$ 
+                                          &$T$ & $1.5 \cdot 10^{13}$  & $0$  & 0\\
+20 & $\rm N_2 + O^+ \rightleftarrows O + N_2^{+}$ &$T$ & $3.4 \times 10^{19}$ & $-2$ & $23,000\, R$ 
+                                          &$T$ & $2.48 \cdot 10^{19}$  & $-2.2$  & 0\\
+21 & $\rm N + NO^+ \rightleftarrows NO + N^+$ &$T$ & $1 \cdot 10^{19}$ & $-0.93$ & $61,000\, R$ 
+                                          &$T$ & $4.8 \cdot 10^{14}$  & $0$  & 0\\
+22 & $\rm O_2 + NO^+ \rightleftarrows NO + O_2^{+}$ &$T$ & $1.8 \cdot 10^{15}$ & 0.17 & $33,000\, R$ 
+                                          &$T$ & $1.8 \cdot 10^{13}$  & $0.5$  & 0\\
+23 & $\rm O + NO^+ \rightleftarrows O_2 + N^+$ &$T$ & $1.34 \cdot 10^{13}$ & 0.31 & $77,270\, R$ 
+                                          &$T$ & $1.0 \cdot 10^{14}$  & $0$  & 0\\
+24 & $\rm NO + O_2 \rightleftarrows NO^+ + e^- + O_2$ &$T$ & $8.8 \cdot 10^{15}$ & $-0.35$ & $108,000\, R$ 
+                                          &$T_{\rm e}$ & $8.8 \cdot 10^{26}$  & $-2.5$  & 0\\
+25 & $\rm O_2 + O \rightleftarrows 2O + O$ &$T$ & $9 \cdot 10^{19}$ & $-1$ & $59,500\, R$ 
+                                          &$T$ & $7.5 \cdot 10^{16}$  & $-0.5$  & 0\\
+26 & $\rm O_2 + O_2 \rightleftarrows 2O + O_2$ &$T$ & $3.24 \cdot 10^{19}$ & $-1$ & $59,500\, R$ 
+                                          &$T$ & $2.7 \cdot 10^{16}$  & $-0.5$  & 0\\
+27 & $\rm O_2 + N_2 \rightleftarrows 2O + N_2$ &$T$ & $7.2 \cdot 10^{18}$ & $-1$ & $59,500\, R$ 
+                                          &$T$ & $6.0 \cdot 10^{15}$  & $-0.5$  & 0\\
+28 & $\rm N_2 + N_2 \rightleftarrows 2N + N_2$ &$T$ & $4.7 \cdot 10^{17}$ & $-0.5$ & $113,000\, R$ 
+                                          &$T$ & $2.72 \cdot 10^{16}$  & $-0.5$  & 0\\
+29 & $\rm NO + M_4 \rightleftarrows N + O + M_4$ &$T$ & $7.8 \cdot 10^{20}$ & $-1.5$ & $75,500\, R$ 
+                                          &$T$ & $2.0 \cdot 10^{20}$  & $-1.5$  & 0\\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol. The rate is given by $A T^n \exp(-E/RT).$
+\item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol. $A$ has units of $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$. $E$ has units of cal/mole. The rate is given by $A T^n \exp(-E/RT).$
 \item[{b}] $\rm M_1=N,~NO$;~ $\rm M_2=O,~NO,~O_2$;~ $\rm M_3=O_2,~N_2$;~ $\rm M_4=O,~N,~NO$.
 \item[{c}] The forward rate coefficients for reactions 8, 9, 10, 11, 12 are found using BOLSIG+ \cite{psst:2005:hagelaar,pcpp:1992:morgan}. Other reactions are taken from Dunn-Kang \cite{nasa:1973:dunn}.
 \end{tablenotes}

@@ -2,6 +2,7 @@
 /*
 Copyright 2018-2020 Bernard Parent
 Copyright 2020 Ajjay Omprakas
+Copyright 2021 Prasanna Thoguluva Rajendran
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -262,26 +263,26 @@ void add_to_dW_3r3p ( int specR1, int specR2, int specR3, int specP1, int specP2
                       double kf, spec_t N, 
                       double dkfdT, double dkfdTv, double dkfdTe, spec2_t dWdrhok, spec_t dWdT, spec_t dWdTv, spec_t dWdTe){
   
-  dWdTe[specR1]-=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specR1) * 1.0e6;
-  dWdTe[specR2]-=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specR2) * 1.0e6;
-  dWdTe[specR3]-=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specR3) * 1.0e6;
-  dWdTe[specP1]+=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specP1) * 1.0e6;
-  dWdTe[specP2]+=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specP2) * 1.0e6;
-  dWdTe[specP3]+=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specP3) * 1.0e6;
+  dWdTe[specR1]-=dkfdTe*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR1) * 1.0e6;
+  dWdTe[specR2]-=dkfdTe*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR2) * 1.0e6;
+  dWdTe[specR3]-=dkfdTe*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR3) * 1.0e6;
+  dWdTe[specP1]+=dkfdTe*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specP1) * 1.0e6;
+  dWdTe[specP2]+=dkfdTe*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specP2) * 1.0e6;
+  dWdTe[specP3]+=dkfdTe*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specP3) * 1.0e6;
   
-  dWdTv[specR1]-=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specR1) * 1.0e6;
-  dWdTv[specR2]-=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specR2) * 1.0e6;
-  dWdTv[specR3]-=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specR3) * 1.0e6;
-  dWdTv[specP1]+=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specP1) * 1.0e6;
-  dWdTv[specP2]+=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specP2) * 1.0e6;
-  dWdTv[specP3]+=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specP3) * 1.0e6;
+  dWdTv[specR1]-=dkfdTv*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR1) * 1.0e6;
+  dWdTv[specR2]-=dkfdTv*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR2) * 1.0e6;
+  dWdTv[specR3]-=dkfdTv*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR3) * 1.0e6;
+  dWdTv[specP1]+=dkfdTv*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specP1) * 1.0e6;
+  dWdTv[specP2]+=dkfdTv*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specP2) * 1.0e6;
+  dWdTv[specP3]+=dkfdTv*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specP3) * 1.0e6;
   
-  dWdT[specR1]-=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specR1) * 1.0e6;
-  dWdT[specR2]-=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specR2) * 1.0e6;
-  dWdT[specR3]-=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specR3) * 1.0e6;
-  dWdT[specP1]+=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specP1) * 1.0e6;
-  dWdT[specP2]+=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specP2) * 1.0e6;
-  dWdT[specP3]+=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specP3) * 1.0e6;
+  dWdT[specR1]-=dkfdT*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR1) * 1.0e6;
+  dWdT[specR2]-=dkfdT*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR2) * 1.0e6;
+  dWdT[specR3]-=dkfdT*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR3) * 1.0e6;
+  dWdT[specP1]+=dkfdT*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specP1) * 1.0e6;
+  dWdT[specP2]+=dkfdT*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specP2) * 1.0e6;
+  dWdT[specP3]+=dkfdT*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specP3) * 1.0e6;
   
   
   dWdrhok[specR1][specR1]-=kf*N[specR2]*N[specR3];
@@ -327,23 +328,23 @@ void add_to_dW_3r2p ( int specR1, int specR2, int specR3, int specP1, int specP2
                       double kf, spec_t N, 
                       double dkfdT, double dkfdTv, double dkfdTe, spec2_t dWdrhok, spec_t dWdT, spec_t dWdTv, spec_t dWdTe){
   
-  dWdTe[specR1]-=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specR1) * 1.0e6;
-  dWdTe[specR2]-=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specR2) * 1.0e6;
-  dWdTe[specR3]-=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specR3) * 1.0e6;
-  dWdTe[specP1]+=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specP1) * 1.0e6;
-  dWdTe[specP2]+=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specP2) * 1.0e6;
+  dWdTe[specR1]-=dkfdTe*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR1) * 1.0e6;
+  dWdTe[specR2]-=dkfdTe*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR2) * 1.0e6;
+  dWdTe[specR3]-=dkfdTe*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR3) * 1.0e6;
+  dWdTe[specP1]+=dkfdTe*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specP1) * 1.0e6;
+  dWdTe[specP2]+=dkfdTe*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specP2) * 1.0e6;
   
-  dWdTv[specR1]-=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specR1) * 1.0e6;
-  dWdTv[specR2]-=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specR2) * 1.0e6;
-  dWdTv[specR3]-=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specR3) * 1.0e6;
-  dWdTv[specP1]+=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specP1) * 1.0e6;
-  dWdTv[specP2]+=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specP2) * 1.0e6;
+  dWdTv[specR1]-=dkfdTv*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR1) * 1.0e6;
+  dWdTv[specR2]-=dkfdTv*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR2) * 1.0e6;
+  dWdTv[specR3]-=dkfdTv*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR3) * 1.0e6;
+  dWdTv[specP1]+=dkfdTv*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specP1) * 1.0e6;
+  dWdTv[specP2]+=dkfdTv*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specP2) * 1.0e6;
   
-  dWdT[specR1]-=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specR1) * 1.0e6;
-  dWdT[specR2]-=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specR2) * 1.0e6;
-  dWdT[specR3]-=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specR3) * 1.0e6;
-  dWdT[specP1]+=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specP1) * 1.0e6;
-  dWdT[specP2]+=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specP2) * 1.0e6;
+  dWdT[specR1]-=dkfdT*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR1) * 1.0e6;
+  dWdT[specR2]-=dkfdT*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR2) * 1.0e6;
+  dWdT[specR3]-=dkfdT*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specR3) * 1.0e6;
+  dWdT[specP1]+=dkfdT*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specP1) * 1.0e6;
+  dWdT[specP2]+=dkfdT*N[specR1]*N[specR2]*N[specR3]/ calA * _calM(specP2) * 1.0e6;
   
   
   dWdrhok[specR1][specR1]-=kf*N[specR2]*N[specR3];

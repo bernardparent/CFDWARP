@@ -70,6 +70,8 @@ OMPRAKAS, Ajjay
   - addition of smith1999 H2-Air chemical model in model/chem/_H2_Air_9s
   
   - addition of add_to_*_*_1r2p to model/share/chem_share.c
+
+  - fixed bug in model/share/chem_share.c within add_to_dW_3r3p() and add_to_dW_3r2p() functions
   
 
 PADMANABHAN, Sathyan 
@@ -109,6 +111,10 @@ RAJENDRAN, Prasanna T.
   
   - addition of model/chem/_Air_Plasma_11s/farbar2013.c
   
+  - addition of model/chem/_Air_Plasma_8s
+  
+  - fixed bug in model/share/chem_share.c within add_to_dW_3r3p() and add_to_dW_3r2p() functions
+
 
 SCHWARTZENTRUBER, Thomas E.
 

@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 JUL 17a
+  * in model/chem/
+    - added the Air Plasma 8 species model and updated the .config and Makefile to include the model
+    - removed the code associated with _Air_Plasma_8s_28r_Macheret since it has been implemented as 
+      one of the modules in the Air Plasma 8 species model
+  * in model/share/chem_share.c
+    - Fixed a bug in add_to_dW_3r3p() and add_to_dW_3r2p() functions: multiplied the number density 
+      of the third reactant for dWdTe, dWdTv and dWdT elements 
+  * in src/control.c
+    - updated the reference for the Air Plasma 8 species Macheret (2007) chemical model 
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - added documentation for Park-Parent chemical model
+    - updated documentation for Park-Dunn-Kang chemical model
+    
+
 2021 JUL 09b
   * in model/share/fluid_share.c
     - in update_w_at_catalytic_wall(), added error messages when gamma is not within physically
