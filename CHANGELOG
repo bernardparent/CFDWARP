@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 JUL 23a
+  * in model/chem/_Air_Plasma_8s/rajendran2022.c
+    - fixed a bug related to the units of the pre-exponential factor of the Townsend ionization reactions
+
+
 2021 JUL 17a
   * in model/chem/
     - added the Air Plasma 8 species model and updated the .config and Makefile to include the model

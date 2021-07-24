@@ -87,11 +87,11 @@ void find_W_Rajendran2022 ( gl_t *gl, spec_t rhok, double T, double Te, double T
   
 
   if (REACTION[1]){
-    add_to_W_fw_2r3p ( specN2, speceminus,   specN2plus, speceminus, speceminus, 2.6291e-8, 0.142, 536330.0*R, Te, X, W);
+    add_to_W_fw_2r3p ( specN2, speceminus,   specN2plus, speceminus, speceminus, 2.6291e-8 * calA, 0.142, 536330.0*R, Te, X, W);
   }
   
   if (REACTION[2]) {
-    add_to_W_fw_2r3p ( specO2, speceminus,   specO2plus, speceminus, speceminus,   3.869e-8, 0.1166, 567360.0*R, Te, X, W);
+    add_to_W_fw_2r3p ( specO2, speceminus,   specO2plus, speceminus, speceminus,   3.869e-8 * calA, 0.1166, 567360.0*R, Te, X, W);
   }
 
   if (REACTION[3]){
@@ -233,11 +233,11 @@ void find_dW_dx_Rajendran2022 ( gl_t *gl, spec_t rhok, spec_t mu, double T, doub
 
 
   if (REACTION[1]){
-    add_to_dW_fw_2r3p ( specN2, speceminus,   specN2plus, speceminus, speceminus, 2.6291e-8, 0.142, 536330.0*R, Te, X, dWdTe, dWdrhok);
+    add_to_dW_fw_2r3p ( specN2, speceminus,   specN2plus, speceminus, speceminus, 2.6291e-8 * calA, 0.142, 536330.0*R, Te, X, dWdTe, dWdrhok);
   }
   
   if (REACTION[2]) {
-    add_to_dW_fw_2r3p ( specO2, speceminus,   specO2plus, speceminus, speceminus,   3.869e-8, 0.1166, 567360.0*R, Te, X, dWdTe, dWdrhok);
+    add_to_dW_fw_2r3p ( specO2, speceminus,   specO2plus, speceminus, speceminus,   3.869e-8 * calA, 0.1166, 567360.0*R, Te, X, dWdTe, dWdrhok);
   }
   
   if (REACTION[3]){
