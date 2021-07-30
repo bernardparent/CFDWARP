@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+
+2021 JUL 29a
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - updated documentation for Dunn-Kang chemical model to indicate whether the translational or 
+      electron temperature is used in the reaction rates.
+
+
 2021 JUL 23a
   * in model/chem/_Air_Plasma_8s/rajendran2022.c
     - fixed a bug related to the units of the pre-exponential factor of the Townsend ionization reactions

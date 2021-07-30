@@ -1,0 +1,11 @@
+#!/usr/local/bin/soap
+Te=2e2; {K}
+Ne=1e10; {cm^-3}
+calA=6.02E23;
+k1b=1.74e-7*Te^(-0.175)*exp(899/Te)*calA;
+k1=6.7e21*Te^(-1.5);
+k2=2.2e40*Te^(-4.5)*Ne;
+
+printf("k1b/k1=%E\n",k1b/k1);
+printf("k1/k2=%E\n",k1/k2);
+printf("k1b/k2=%E\n",k1b/k2);
