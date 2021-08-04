@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/thermo/_thermo.h>
 #include <model/share/chem_share.h>
 
-#define TEMAX_TOWNSEND 60000.0
+#define TEMAX_TOWNSEND 1e99
 
 const static bool REACTION[27]=
   {

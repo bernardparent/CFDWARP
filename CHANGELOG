@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 AUG 03a
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - finalized the documentation of the Parent-Park model with Ajjay's curve fits based on BOLSIG+
+  * in model/chem/_Air_Plasma_11s
+    - added parentpark2021.c and parentpark2021.h
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - added the parentpark2021 model
+  * in model/chem/_Air_Plasma_11s/dunnkang1973.c
+    - changed TEMAX_TOWNSEND from 60000 to 1e99 K
+  * in model/chem/_Air_Plasma_11s/parent2021.c
+    - changed TEMAX_TOWNSEND from 100e6 to 1e99 K
+    
 
 2021 JUL 29a
   * in model/chem/_Air_Plasma_11s/doc/report.tex
