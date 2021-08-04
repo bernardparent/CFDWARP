@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 AUG 04a
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - updated the Parent-Dunn model to include the two-body dissociative recombination rates
+      from Ajjay
+  * in model/chem/_Air_Plasma_11s
+    - added parentdunn2021.c and parentdunn2021.h
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - added calls to parentdunn2021
+    - removed calls to parent2021
+  * in model/chem/_Air_Plasma_11s
+    - removed parent2021.c
+    
+
 2021 AUG 03a
   * in model/chem/_Air_Plasma_11s/doc/report.tex
     - finalized the documentation of the Parent-Park model with Ajjay's curve fits based on BOLSIG+

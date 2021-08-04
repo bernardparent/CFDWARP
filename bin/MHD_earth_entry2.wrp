@@ -87,9 +87,9 @@
 }
 
 
-Bz=0.2; {Tesla}
+Bz=0.4; {Tesla}
 mf=1.0; 
-gamma=1.0e0;    {secondary emission coefficient}
+gamma=0.1e0;    {secondary emission coefficient}
 
 
 is=1;
@@ -194,7 +194,7 @@ Model(
     sigmadiv=1e-10; {S/m}
     etdiv=1e-1;     {J/kg}
     Pmin=1.0e3;    Pmax=9.9e99;   {Pa}
-    Tmin=200;     Tmax=5000e3;    {K}
+    Tmin=200;     Tmax=50000;    {K}
     Tvmin=Tmin;     Tvmax=Tmax;  {K}
     Temin=300;     Temax=5e6;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
@@ -205,7 +205,7 @@ Model(
     AXISYMMETRIC=NO;
   );
   AirPlasma11s(
-    CHEMMODEL=CHEMMODEL_PARENTPARK2021;
+    CHEMMODEL=CHEMMODEL_PARENTDUNN2021;
     ADDITIONALREACTION=FALSE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
     QEISOURCETERMS=TRUE;
@@ -394,11 +394,20 @@ Cycle(
     if (iter==1,
       CFL=0.001;
     );
-    CFL=min(CFL*1.03,0.4);
+    CFL=min(CFL*1.03,0.2);
     
     Model(
       EpotentialBfixed(
-        SetMagneticField(is,js, ie,je, 0{T},0{T},min(1,iter/1000)*Bz{T});
+        SetMagneticField(is,js, ie,je, 0{T},0{T},min(1,iter/1)*Bz{T});
+      );
+      NavierStokesPlasma(
+        if (iter<4000, Temax=6400000;);
+        if (iter<3500, Temax=3200000;);
+        if (iter<3000, Temax=1600000;);
+        if (iter<2500, Temax=800000;);
+        if (iter<2000, Temax=400000;);
+        if (iter<1500, Temax=200000;);
+        if (iter<1000, Temax=100000;);
       );
     );
     
@@ -406,7 +415,7 @@ Cycle(
     Lc=1000e44;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
     if (iter>10,
-       UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,2);
+       UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,3);
        UpdateEMField(Lc,relaxEMF,TSEMF_SOR,20);
     );
 {    UpdateEMField(Lc,relaxEMF,TSEMF_NEWTON);}

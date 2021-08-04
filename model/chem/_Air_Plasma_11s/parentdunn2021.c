@@ -87,7 +87,7 @@ const static long specM4[]=
 
 
 
-void find_W_Parent2021 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
+void find_W_ParentDunn2021 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
   long k;
   spec_t X;
   double R;
@@ -137,7 +137,7 @@ void find_W_Parent2021 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
 
   if (REACTION[7]){
     add_to_W_fw_2r2p ( specO, specN, specNOplus, speceminus, 1.4E6, 1.5, 31900.0*R, T, X, W );
-    add_to_W_fw_2r2p ( specNOplus, speceminus, specO, specN, 6.7e21, -1.5, 0.0, Te, X, W );
+    add_to_W_fw_2r2p ( specNOplus, speceminus, specO, specN, 5.87e17, -0.2998, 100.0*R, Te, X, W );
   }
 
 
@@ -171,7 +171,7 @@ void find_W_Parent2021 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
 
   if (REACTION[13]){
     add_to_W_fw_2r2p ( specO, specO, specO2plus, speceminus, 1.6E17, -0.98, 80800.0*R, T, X, W );
-    add_to_W_fw_2r2p ( specO2plus, speceminus, specO, specO, 8.0E21, -1.50, 0.0, Te, X, W );
+    add_to_W_fw_2r2p ( specO2plus, speceminus, specO, specO, 1.52e18, -0.3411, 881.0*R, Te, X, W );
   }
 
   if (REACTION[14]){
@@ -186,7 +186,7 @@ void find_W_Parent2021 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
 
   if (REACTION[16]){
     add_to_W_fw_2r2p ( specN, specN, specN2plus, speceminus, 1.4e13, 0.0, 67800.0*R, T, X, W );
-    add_to_W_fw_2r2p ( specN2plus, speceminus, specN, specN, 1.5e22, -1.5, 0.0, Te, X, W );
+    add_to_W_fw_2r2p ( specN2plus, speceminus, specN, specN, 4.65e17, -0.2493, 7.0*R, Te, X, W );
   }
 
   if (REACTION[17]){
@@ -259,7 +259,7 @@ void find_W_Parent2021 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
 }
 
 
-void find_dW_dx_Parent2021 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, 
+void find_dW_dx_ParentDunn2021 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, 
                   double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, s;                    /* counters */
@@ -321,7 +321,7 @@ void find_dW_dx_Parent2021 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double 
 
   if (REACTION[7]){
     add_to_dW_fw_2r2p ( specO, specN, specNOplus, speceminus, 1.4E6, 1.5, 31900.0*R, T, X, dWdT, dWdrhok );
-    add_to_dW_fw_2r2p ( specNOplus, speceminus, specO, specN, 6.7e21, -1.5, 0.0, Te, X, dWdTe, dWdrhok );
+    add_to_dW_fw_2r2p ( specNOplus, speceminus, specO, specN, 5.87e17, -0.2998, 100.0*R, Te, X, dWdTe, dWdrhok );
   }
 
 
@@ -352,7 +352,7 @@ void find_dW_dx_Parent2021 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double 
 
   if (REACTION[13]){
     add_to_dW_fw_2r2p ( specO, specO, specO2plus, speceminus, 1.6E17, -0.98, 80800.0*R, T, X, dWdT, dWdrhok );
-    add_to_dW_fw_2r2p ( specO2plus, speceminus, specO, specO, 8.0E21, -1.50, 0.0, Te, X, dWdTe, dWdrhok );
+    add_to_dW_fw_2r2p ( specO2plus, speceminus, specO, specO, 1.52e18, -0.3411, 881.0*R, Te, X, dWdTe, dWdrhok );
   }
 
   if (REACTION[14]){
@@ -367,7 +367,7 @@ void find_dW_dx_Parent2021 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double 
 
   if (REACTION[16]){
     add_to_dW_fw_2r2p ( specN, specN, specN2plus, speceminus, 1.4e13, 0.0, 67800.0*R, T, X, dWdT, dWdrhok );
-    add_to_dW_fw_2r2p ( specN2plus, speceminus, specN, specN, 1.5e22, -1.5, 0.0, Te, X, dWdTe, dWdrhok );
+    add_to_dW_fw_2r2p ( specN2plus, speceminus, specN, specN, 4.65e17, -0.2493, 7.0*R, Te, X, dWdTe, dWdrhok );
   }
 
   if (REACTION[17]){
@@ -442,7 +442,7 @@ void find_dW_dx_Parent2021 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double 
 }
 
 
-void find_Qei_Parent2021(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
+void find_Qei_ParentDunn2021(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
 
     Te=min(TEMAX_TOWNSEND,Te);
     if (REACTION[8]) 
@@ -460,7 +460,7 @@ void find_Qei_Parent2021(gl_t *gl, spec_t rhok, double Estar, double Te, double 
 
 
 
-void find_dQei_dx_Parent2021(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
+void find_dQei_dx_ParentDunn2021(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
     Te=min(TEMAX_TOWNSEND,Te);
     if (REACTION[8]) 
       add_to_dQei(specO, 6.37e16/calA*pow(Te,0.0029)*exp(-477190.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
