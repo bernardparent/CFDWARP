@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 AUG 06a
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - in the parentdunn table, changed the forward reactions 7, 13, and 16 to those in Boyd2007
+  * in model/chem/_Air_Plasma_11s/parentdunn2021.c
+    - changed reactions 7, 13, and 16 (forward rates) to those in Boyd2007
+  * in model/chem
+    - added _Air_Plasma_12s
+    - moved _Air_Plasma_8s_28r_Macheret to old
+    
+
 2021 AUG 04a
   * in model/chem/_Air_Plasma_11s/doc/report.tex
     - updated the Parent-Dunn model to include the two-body dissociative recombination rates
