@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 AUG 08a
+  * in model/chem/_Air_Plasma_11s
+    - added the module parent2021.c
+  * in model/chem/_Air_Plasma_11s/parentpark2021.c
+    - in reactions 10, 11, 12, made the reverse controlling temperature equal to sqrt(Tv*Te) 
+      which follows the logic of the Park model
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - added module parent2021
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - changed the Parent-Park solver to reflect changes to the controlling temperature of the
+      reverse reactions 10, 11, and 12
+    - added the Parent 2021 solver
+    
+
 2021 AUG 06a
   * in model/chem/_Air_Plasma_11s/doc/report.tex
     - in the parentdunn table, changed the forward reactions 7, 13, and 16 to those in Boyd2007
