@@ -87,7 +87,7 @@
 }
 
 
-Bz=0.4; {Tesla}
+Bz=0.3; {Tesla}
 mf=1.0; 
 gamma=0.1e0;    {secondary emission coefficient}
 
@@ -140,7 +140,9 @@ Bdry(
     BDRY_OUTFLOWSUBSONICMFIXED1        f    Outflow, subsonic, M fixed, 1o
     BDRY_SYMMETRICAL2                  e    Symmetrical, 2o
     BDRY_SYMMETRICAL1                  9    Symmetrical, 1o
-    BDRY_WALLTFIXED1                   3    Wall, T specified
+    BDRY_WALLTFIXED1                   3    Wall, T specified; param Twall[K]
+    BDRY_WALLTFIXEDTHERMIONIC1         h    Wall, T specified; param Twall[K], workfunct[eV], Newallmax[1/m3]
+    BDRY_WALLTFIXEDCATALYTIC1          i    Wall, T specified; param Twall[K], _spec(O),_spec(O2),gammaO, ...
     BDRY_WALLADIABATIC1                6    Wall, Adiabatic
     BDRY_SLIPWALL1                     c    Slip wall, Adiabatic, 1o
     BDRY_FREESTREAM1                   5    Freestream, 1o, params Vx,Vy, P, T
@@ -151,6 +153,10 @@ Bdry(
     Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLTFIXED1,BDRY_WALLTFIXED1);
     Plane("j",js,BDRY_WALLTFIXED1,Twall);
     Plane("j",je,BDRY_WALLTFIXED1,Twall);
+{    Newallmax=1e19;
+    workfunct=3.0;
+    Region(is1,js,is2,js,BDRY_WALLTFIXEDTHERMIONIC1,Twall,workfunct,Newallmax);
+}
     {
     Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
@@ -205,7 +211,7 @@ Model(
     AXISYMMETRIC=NO;
   );
   AirPlasma11s(
-    CHEMMODEL=CHEMMODEL_PARENTDUNN2021;
+    CHEMMODEL=CHEMMODEL_PARENT2021;
     ADDITIONALREACTION=FALSE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
     QEISOURCETERMS=TRUE;

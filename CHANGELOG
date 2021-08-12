@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 AUG 11a
+  * in model/chem/_Air_Plasma_11s/parent2021.c
+    - wrote the reactions as function of EXPON_TTV, EXPON_TTE, and EXPON_TVTE which are defined
+      at the beginning of the file. 
+    - The constants EXPON_* are defined such that the reactions are function of only Te or T but
+      this can be changed easily
+      
+
 2021 AUG 08a
   * in model/chem/_Air_Plasma_11s
     - added the module parent2021.c
