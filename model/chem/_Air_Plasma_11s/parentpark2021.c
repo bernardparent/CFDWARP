@@ -26,6 +26,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/thermo/_thermo.h>
 #include <model/share/chem_share.h>
 
+#define EXPON_TTV 1.0
+#define EXPON_TTE 0.0
+#define EXPON_TVTE 0.0
 
 /* set all reactions to true except for testing purposes */
 const static bool REACTION[31]=
@@ -95,9 +98,10 @@ void find_W_ParentPark2021 ( gl_t *gl, spec_t rhok, double T, double Te, double 
 
   /* find properties needed by add_to_W* functions */
   R=1.9872;
-  TTv=sqrt(Tv*T);
-  TTe=sqrt(T*Te);
-  TvTe=sqrt(Tv*Te);
+  TTv=pow(T,EXPON_TTV)*pow(Tv,1.0-EXPON_TTV);
+  TTe=pow(T,EXPON_TTE)*pow(Te,1.0-EXPON_TTE);
+  TvTe=pow(Tv,EXPON_TVTE)*pow(Te,1.0-EXPON_TVTE);
+
   
   for ( k = 0; k < ns; k++ ) {
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
@@ -281,9 +285,9 @@ void find_dW_dx_ParentPark2021 ( gl_t *gl, spec_t rhok, spec_t mu, double T, dou
   }
   
   R=1.9872;
-  TTv=sqrt(T*Tv);
-  TTe=sqrt(T*Te);
-  TvTe=sqrt(Tv*Te);
+  TTv=pow(T,EXPON_TTV)*pow(Tv,1.0-EXPON_TTV);
+  TTe=pow(T,EXPON_TTE)*pow(Te,1.0-EXPON_TTE);
+  TvTe=pow(Tv,EXPON_TVTE)*pow(Te,1.0-EXPON_TVTE);
   /* initialize all derivatives to zero */
   for ( s = 0; s < ns; s++ ) {
     dWdTTv[s] = 0.0;
@@ -466,14 +470,15 @@ void find_dW_dx_ParentPark2021 ( gl_t *gl, spec_t rhok, spec_t mu, double T, dou
 
 
   for (spec=0; spec<ns; spec++){
-    dWdT[spec]+=dWdTTv[spec]*0.5/TTv*Tv;
-    dWdTv[spec]+=dWdTTv[spec]*0.5/TTv*T;
+    dWdT[spec]+=dWdTTv[spec]*EXPON_TTV*TTv/T;
+    dWdTv[spec]+=dWdTTv[spec]*(1.0-EXPON_TTV)*TTv/Tv;
 
-    dWdT[spec]+=dWdTTe[spec]*0.5/TTe*Te;
-    dWdTe[spec]+=dWdTTe[spec]*0.5/TTe*T;
+    dWdT[spec]+=dWdTTe[spec]*EXPON_TTE*TTe/T;
+    dWdTe[spec]+=dWdTTe[spec]*(1.0-EXPON_TTE)*TTe/Te;
 
-    dWdTv[spec]+=dWdTvTe[spec]*0.5/TvTe*Te;
-    dWdTe[spec]+=dWdTvTe[spec]*0.5/TvTe*Tv;
+    dWdTv[spec]+=dWdTvTe[spec]*EXPON_TVTE*TvTe/Tv;
+    dWdTe[spec]+=dWdTvTe[spec]*(1.0-EXPON_TVTE)*TvTe/Te;
+
   }
   
 }

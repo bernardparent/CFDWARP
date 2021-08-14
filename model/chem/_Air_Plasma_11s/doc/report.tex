@@ -329,7 +329,7 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 \fontsizetable
 \begin{center}
 \begin{threeparttable}
-\tablecaption{Parent (2021) 11-species high-temperature air model.}
+\tablecaption{Parent-Park (2021) 11-species high-temperature air model.}
 \begin{tabular}{cccccccccc} 
 \toprule
 ~&~&\multicolumn{4}{c}{Forward reaction} & \multicolumn{4}{c}{Backward reaction} \\
@@ -417,113 +417,12 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 \item[{b}] $\rm M_1=N,~NO$;~ $\rm M_2=O,~NO,~O_2$;~ $\rm M_3=O_2,~N_2$;~ $\rm M_4=O,~N,~NO$.
 \item[{c}] The forward reactions for 10, 11, and 12 are taken from \cite{pf:2007:boyd}. The backward reactions for 10, 11 are found using BOLSIG+ \cite{psst:2005:hagelaar,jgr:1974:walls}. The backward reaction for reaction 12 is found using BOLSIG+ \cite{psst:2005:hagelaar,jap:2021:abdoulanziz}. The backward reactions for 26--30 are taken from \cite{nasa:1973:dunn}. Reaction 8 is taken from \cite{jcp:1997:bose} and reaction 9 from \cite{jcp:1996:bose}. The forward reactions 26--30 are found using BOLSIG+ \cite{psst:2005:hagelaar,pcpp:1992:morgan}. Reactions 24 and 25 are taken from \cite{jtht:1993:park}. Other reactions are taken from \cite{book:1990:park}.
 \end{tablenotes}
-\label{tab:parent}
-\end{threeparttable}
-\end{center}
-\end{table}
-%
-
-
-
-
-%
-\begin{table}[t]
-\fontsizetable
-\begin{center}
-\begin{threeparttable}
-\tablecaption{Parent-Park (2021) 11-species high-temperature air model.}
-\begin{tabular}{cccccccccc} 
-\toprule
-~&~&\multicolumn{4}{c}{Forward reaction} & \multicolumn{4}{c}{Backward reaction} \\
- \cmidrule(lr){3-6}\cmidrule(lr){7-10}
-\multicolumn{2}{c}{Reaction} & $T$ & $A$ & $n$ & $E$ & $T$  & $A$ & $n$ & $E$ \\ 
-\midrule
-1 & $\rm N_2 + M_1 \rightleftarrows N + N + M_1$ & $\sqrt{T T_{\rm v}}$  & 3.0 $\cdot$ 10$^{22}$  & $-1.6$ & $113200 \, R$  & $T$ &\multicolumn{3}{c}{Equilibrium constant} \\
-
-2 & $\rm N_2 + M_2 \rightleftarrows N + N + M_2$ & $\sqrt{T T_{\rm v}}$  & 7.0 $\cdot$ 10$^{21}$  & $-1.6$ & $113200 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}  \\
-
-3 & $\rm N_2 + e^- \rightleftarrows N + N + e^-$ & $\sqrt{T_{\rm e} T_{\rm v}}$ & 3.0 $\cdot$ 10$^{24}$  & $-1.6$ & $113200 \, R$ & $\sqrt{T T_{\rm e}}$ & \multicolumn{3}{c}{Equilibrium constant} \\
-
-4 & $\rm O_2 + M_1 \rightleftarrows O + O + M_1$ & $\sqrt{T T_{\rm v}}$  & 1.0 $\cdot$ 10$^{22}$  & $-1.5$ & $59500 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant} \\
-
-5 & $\rm O_2 + M_2 \rightleftarrows O + O + M_2$ & $\sqrt{T T_{\rm v}}$  & 2.0 $\cdot$ 10$^{21}$  & $-1.5$ & $59500 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant} \\
-
-6 & $\rm NO + M_3 \rightleftarrows N + O + M_3$ & $\sqrt{T T_{\rm v}}$  & 1.1 $\cdot$ 10$^{17}$  & 0.0 & $75500 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant} \\
-
-7 & $\rm NO + M_4 \rightleftarrows N + O + M_4$ & $\sqrt{T T_{\rm v}}$  & 5.0 $\cdot$ 10$^{15}$  & 0.0 & $75500 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}  \\
-
-8 & $\rm NO + O \rightleftarrows N + O_2 $ & $T$  & 8.4 $\cdot$ 10$^{12}$  & 0.0 & $19400 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}  \\
-
-9 & $\rm N_2 + O \rightleftarrows NO + N $ & $T$  & 5.7 $\cdot$ 10$^{12}$  & $0.42$ & $42938 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant} \\
-
-10 & $\rm N + O \rightleftarrows NO^+ + e^- $ & $T$  & 5.3 $\cdot$ 10$^{12}$  & 0.0 & $32000 \, R$ & $\sqrt{T_{\rm e} T_{\rm v}}$ & $5.87 \cdot 10^{17}$ & $-0.2998$ & $100 \, R$ \\
-
-11 & $\rm O + O \rightleftarrows O_2^+ + e^- $ & $T$  & 1.1 $\cdot$ 10$^{13}$  & 0 & $81200 \, R$ & $\sqrt{T_{\rm e} T_{\rm v}}$ & $1.52 \cdot 10^{18}$ & $-0.3411$ & $881\, R$\\
-
-12 & $\rm N + N \rightleftarrows N_2^+ + e^- $ & $T$ & 2.0 $\cdot$ 10$^{13}$  & 0 & $67700 \, R$ & $\sqrt{T_{\rm e} T_{\rm v}}$ &  $4.65 \cdot 10^{17}$ & $-0.2493$ & $7\, R$ \\
-
-
-
-
-13 & $\rm NO^+ + O \rightleftarrows N^+ + O_2 $ & $T$   & 1.0 $\cdot$ 10$^{12}$  & 0.5 & $77200 \, R$ & $T$& \multicolumn{3}{c}{Equilibrium constant}\\
-
-
-
-
-14 & $\rm N^+ + N_2 \rightleftarrows N_2^+ + N $ & $T$   & 1.0 $\cdot$ 10$^{12}$  & 0.5 & $12200 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\\
-
-
-
-15 & $\rm O_2^+ + N \rightleftarrows N^+ + O_2 $ & $T$   & 8.7 $\cdot$ 10$^{13}$  & 0.14 & $28600 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\\
-
-16 & $\rm O^+ + NO \rightleftarrows N^+ + O_2 $ & $T$  & 1.4 $\cdot$ 10$^{5}$  & 1.90 & $26600 \, R$ & $T$  & \multicolumn{3}{c}{Equilibrium constant}\\
-
-
-
-
-
-17 & $\rm O_2^+ + N_2 \rightleftarrows N_2^+ + O_2 $ & $T$   & 9.9 $\cdot$ 10$^{12}$  & 0.00 & $40700 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\\
-
-18 & $\rm O_2^+ + O \rightleftarrows O^+ + O_2 $ & $T$   & 4.0 $\cdot$ 10$^{12}$  & $-0.09$ & $18000 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\\
-
-19 & $\rm NO^+ + N \rightleftarrows O^+ + N_2 $ & $T$   & 3.4 $\cdot$ 10$^{13}$  & $-1.08$ & $12800 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\\
-
-20 & $\rm NO^+ + O_2 \rightleftarrows O_2^+ + NO $ & $T$   & 2.4 $\cdot$ 10$^{13}$  & 0.41 & $32600 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\\
-
-21 & $\rm NO^+ + O \rightleftarrows O_2^+ + N $ & $T$   & 7.2 $\cdot$ 10$^{12}$  & 0.29 & $48600 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\\
-
-22 & $\rm O^+ + N_2 \rightleftarrows N_2^+ + O $ & $T$  & 9.1 $\cdot$ 10$^{11}$  & 0.36 & $22800 \, R$ & $T$  & \multicolumn{3}{c}{Equilibrium constant}\\
-
-23 & $\rm NO^+ + N \rightleftarrows N_2^+ + O $  & $T$  & 7.2 $\cdot$ 10$^{13}$  & 0.00 & $35500 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\\
-
-
-
-24 & $\rm O^+ + e^- \rightarrow O + {\it hv} $ & $T_{\rm e}$  & 1.07 $\cdot$ 10$^{11}$  & $-0.52$ & $0$ &  \multicolumn{4}{c}{None}\\
-25 & $\rm N^+ + e^- \rightarrow N + {\it hv} $ & $T_{\rm e}$  & 1.52 $\cdot$ 10$^{11}$  & $-0.48$ & $0$ &  \multicolumn{4}{c}{None}\\
-
-
-26 & $\rm O + e^- \rightleftarrows O^+ + e^- + e^- $ & $T_{\rm e}$  & 6.37 $\cdot$ 10$^{16}$  & $0.0029$ & $477190 \, R$ & $T_{\rm e}$ & $2.2\cdot 10^{40}$ & $-4.5$ & 0\\
-
-27 & $\rm N + e^- \rightleftarrows N^+ + e^- + e^- $ & $T_{\rm e}$  & 1.06 $\cdot$ 10$^{18}$  & $-0.2072$ & $629700 \, R$ & $T_{\rm e}$ & $2.2\cdot 10^{40}$ & $-4.5$ & 0\\
-
-28 & $\rm O_2 + e^- \rightleftarrows O_2^+ + e^- + e^-$ &$T_{\rm e}$ & 2.33 $\cdot$ 10$^{16}$ & $0.1166$ & $567360\, R$ 
-                                          &$T_{\rm e}$ & $2.2 \cdot 10^{40}$  & $-4.5$  & 0\\
-29 & $\rm N_2 + e^- \rightleftarrows N_2^+ + e^- + e^-$ &$T_{\rm e}$ & 1.58 $\cdot$ 10$^{16}$ & $0.1420$ & $536330\, R$ 
-                                          &$T_{\rm e}$ & $2.2 \cdot 10^{40}$  & $-4.5$  & 0\\
-30 & $\rm NO + e^- \rightleftarrows NO^+ + e^- + e^-$ &$T_{\rm e}$ & 5.63 $\cdot$ 10$^{18}$ & $-0.2607$ & $686030\, R$ 
-                                          &$T_{\rm e}$ & $2.2 \cdot 10^{40}$  & $-4.5$  & 0\\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol. $A$ has units of $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$. $E$ has units of cal/mole. The rate is given by $A T^n \exp(-E/RT).$
-\item[{b}] $\rm M_1=N,~NO$;~ $\rm M_2=O,~NO,~O_2$;~ $\rm M_3=O_2,~N_2$;~ $\rm M_4=O,~N,~NO$.
-\item[{c}] The forward reactions for 10, 11, and 12 are taken from \cite{pf:2007:boyd}. The backward reactions for 10, 11 are found using BOLSIG+ \cite{psst:2005:hagelaar,jgr:1974:walls}. The backward reaction for reaction 12 is found using BOLSIG+ \cite{psst:2005:hagelaar,jap:2021:abdoulanziz}. The backward reactions for 26--30 are taken from \cite{nasa:1973:dunn}. Reaction 8 is taken from \cite{jcp:1997:bose} and reaction 9 from \cite{jcp:1996:bose}. The forward reactions 26--30 are found using BOLSIG+ \cite{psst:2005:hagelaar,pcpp:1992:morgan}. Reactions 24 and 25 are taken from \cite{jtht:1993:park}. Other reactions are taken from \cite{book:1990:park}.
-\end{tablenotes}
 \label{tab:parentpark}
 \end{threeparttable}
 \end{center}
 \end{table}
 %
+
 
 
 

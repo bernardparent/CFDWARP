@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 AUG 13a
+  * moved parent2021.c to parentpark2021.c
+  * in model/chem/_Air_Plasma_11s
+    - removed parent2021.h
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - deleted parent2021 model and updated the parentpark2021 documentation to reflect
+      the new parentpart2021.c code
+       
+
 2021 AUG 11a
   * in model/chem/_Air_Plasma_11s/parent2021.c
     - wrote the reactions as function of EXPON_TTV, EXPON_TTE, and EXPON_TVTE which are defined
