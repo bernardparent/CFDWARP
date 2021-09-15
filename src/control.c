@@ -675,28 +675,6 @@ void read_control_functions(char *functionname, char **argum,
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
     sprintf(*returnstr,"%E",_Omega_DISTMPI_global(*np,gl,i,j,k));
   }
-
-  char *expr,*specname;
-  long spec;
-  bool FOUND;
-  expr=(char *)malloc(sizeof(char));
-  specname=(char *)malloc(sizeof(char));
-  if (strcmp(functionname,"_spec")==0) {
-    SOAP_get_argum_straight(codex, &expr, *argum, 0);
-    FOUND=FALSE;
-    for (spec=0; spec<ns; spec++){
-      find_species_name(spec, &specname);
-      if (strcmp(specname,expr)==0){
-        FOUND=TRUE;
-        *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
-        sprintf(*returnstr,"%ld",spec+1);
-      }
-    }
-    if (!FOUND) fatal_error("Species name \"%s\" specified within _spec() could not be found within the chemical solver.",*argum);
-  }
-  free(expr);
-  free(specname);
-
 }
 
 
@@ -1401,6 +1379,20 @@ void read_control(char *control_filename, input_t input, bool CYCLEMODULE, bool 
     sprintf(str,"SPECIESTYPE[%ld]",spec+1);
     add_int_to_codex(&codex,str,speciestype[spec]);
   }
+  
+  char *specname=(char *)malloc(sizeof(char));
+  for (spec=0; spec<ns; spec++){
+    find_species_name(spec, &specname);
+    specname=(char *)realloc(specname,sizeof(char)*1000);
+    strrep(specname, "+", "plus");
+    strrep(specname, "-", "minus");
+    sprintf(str,"spec%s",specname);
+    strins("spec", specname,  0);
+    add_int_to_codex(&codex,specname,spec+1);
+  }
+  free(specname);
+    
+  
   add_int_to_codex(&codex,"SPECIESTYPE_IONPLUS",   SPECIES_IONPLUS);
   add_int_to_codex(&codex,"SPECIESTYPE_IONMINUS",   SPECIES_IONMINUS);
   add_int_to_codex(&codex,"SPECIESTYPE_ELECTRON",   SPECIES_ELECTRON);

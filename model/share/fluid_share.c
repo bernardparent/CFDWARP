@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/thermo/_thermo.h>
 #include <model/emfield/_emfield.h>
 #include <model/chem/_chem.h>
+#include <model/metrics/_metrics.h>
 #include <cycle/_cycle.h>
 #include <cycle/share/cycle_share.h>
 #include <cycle/share/res_share.h>
@@ -2482,28 +2483,26 @@ void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
 #endif
 
 
-void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, double Twall, double Tewall, spec_t wwall){
-  long dim,specr,specp,numcat,cat;
+#if defined(_FLUID_MULTISPECIES)
+
+void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, double Twall, double Tewall, long paramstart, long paramend, spec_t wwall){
+  long specr,specp,numcat,cat;
   double dwall,gamma;
   spec_t nuk;
 
-  dwall=0.0;
-  for (dim=0; dim<nd; dim++){
-    dwall=dwall+sqr(np[lB].bs->x[dim]-np[lA].bs->x[dim]);
-  }
-  assert_np(np[lA],dwall>0.0e0);
-  dwall=sqrt(dwall);
+  assert(is_node_bdry(np[lA],TYPELEVEL_FLUID_WORK));
+  dwall=_distance_between_near_bdry_node_and_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK);
   find_nuk_from_w_rho_T_Te(wwall, _rho(np[lB]), Twall, Tewall, nuk);
 
-  if (mod(np[lA].numbdryparam-1,3)!=0) fatal_error("Wrong number of extra parameters to catalytic boundary condition.");
-  numcat=round((double)(np[lA].numbdryparam-1)/3.0);
+  if (mod(paramend-paramstart+1,3)!=0) fatal_error("Wrong number of extra parameters to catalytic boundary condition.");
+  numcat=round((double)(paramend-paramstart+1)/3.0);
   for (cat=0; cat<numcat; cat++){
-    specr=round(_bdry_param(np,gl,lA,1+cat*3,TYPELEVEL_FLUID_WORK))-1;
-    specp=round(_bdry_param(np,gl,lA,2+cat*3,TYPELEVEL_FLUID_WORK))-1;
+    specr=round(_bdry_param(np,gl,lA,paramstart+cat*3,TYPELEVEL_FLUID_WORK))-1;
+    specp=round(_bdry_param(np,gl,lA,paramstart+1+cat*3,TYPELEVEL_FLUID_WORK))-1;
     if (specr==specp) fatal_error("Wrong specification of the catalytic boundary condition. The reactant species can not be the same as the product species in a wall catalytic process.");
     if (specr<0 || specr>=ns) fatal_error("Wrong specification of the catalytic boundary condition. The reactant species number is not within bounds.");
     if (specp<0 || specp>=ns) fatal_error("Wrong specification of the catalytic boundary condition. The product species number is not within bounds.");
-    gamma=_bdry_param(np,gl,lA,3+cat*3,TYPELEVEL_FLUID_WORK);
+    gamma=_bdry_param(np,gl,lA,paramstart+2+cat*3,TYPELEVEL_FLUID_WORK);
     if (gamma==0.0) fatal_error("The catalytic recombination coefficient can not be set to zero. Set it rather to a very small positive number approaching zero.");
     if (gamma==1.0) fatal_error("The catalytic recombination coefficient can not be set to 1. Set it rather to a positive number less then and approaching 1.");
     if (gamma>1.0) fatal_error("The catalytic recombination coefficient can not be set to a value greater than 1.");
@@ -2513,3 +2512,47 @@ void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, d
     wwall[specp]=_w(np[lB],specp)+_calM(specr)/_calM(specp)*(_w(np[lB],specr)-wwall[specr]);
   }
 }
+
+
+void update_w_V_at_injection_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, double Twall, double Tewall, 
+                                  long paramstart, long paramend, spec_t wwall, dim_t Vwall){
+  long dim,spec,numinj,inj;
+  double sum,mdot,mdottot,dwall;
+  spec_t nuk;
+  dim_t n;
+  assert(is_node_bdry(np[lA],TYPELEVEL_FLUID_WORK));
+  dwall=_distance_between_near_bdry_node_and_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK);
+
+  find_nuk_from_w_rho_T_Te(wwall, _rho(np[lB]), Twall, Tewall, nuk);
+  //fatal_error("\n param=%ld",np[lA].numbdryparam);
+  
+  if (mod(paramend-paramstart+1,2)!=0) fatal_error("Wrong number of extra parameters to injection boundary condition.");
+  numinj=round((double)(paramend-paramstart)/2.0);
+  // first find the total mdot
+  mdottot=0;
+  for (inj=0; inj<numinj; inj++){
+    mdottot+=_bdry_param(np,gl,lA,paramstart+1+inj*2,TYPELEVEL_FLUID_WORK);
+  }  
+  // second set the mass fractions of the non-injected species
+  for (spec=0; spec<ns; spec++){
+    wwall[spec]=max(0.0,_w(np[lB],spec)-dwall*(_w(np[lB],spec)*mdottot)/nuk[spec]);
+  }
+  // third set the mass fractions of the injected species
+  for (inj=0; inj<numinj; inj++){
+    spec=round(_bdry_param(np,gl,lA,paramstart+inj*2,TYPELEVEL_FLUID_WORK))-1;
+    if (spec<0 || spec>=ns) fatal_error("Wrong specification of the injection boundary condition. The injection species number is not within bounds.");
+    mdot=_bdry_param(np,gl,lA,paramstart+1+inj*2,TYPELEVEL_FLUID_WORK);
+    if (mdot<=0.0) fatal_error("The injection mass flow rate of species %ld can not be set to a value less than or equal to 0.",spec);
+    wwall[spec]=max(0.0,_w(np[lB],spec)-dwall*(_w(np[lB],spec)*mdottot-mdot)/nuk[spec]);
+  }
+  // fourth make sure the mass fractions sum to 1
+  sum=0.0;
+  for (spec=0; spec<ns; spec++) sum+=wwall[spec];
+  for (spec=0; spec<ns; spec++) wwall[spec]/=sum;
+  
+
+  // fifth update Vwall
+  find_unit_vector_normal_to_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK, n);
+  for (dim=0; dim<nd; dim++) Vwall[dim]=n[dim]*mdottot/_rho(np[lB]);
+}
+#endif

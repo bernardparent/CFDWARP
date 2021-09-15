@@ -7,6 +7,27 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 SEP 15a
+  * in model/fluid/_Navier-Stokes/fluid_bdry.c and model/fluid/_Navier-Stokes_plasma/fluid_bdry.c 
+    - added BDRY_WALLTFIXEDINJECTION1
+    - changed the call to update_w_at_catalytic_wall() to include paramstart and paramend
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - added section for wall boundary condition with injection of species
+  * in model/metrics/_generic/metrics.c
+    - added find_unit_vector_normal_to_boundary_plane()
+    - added _distance_between_near_bdry_node_and_boundary_plane()
+  * in model/share/fluid_share.c
+    - in update_w_at_catalytic_wall(), now calls _distance_between_near_bdry_node_and_boundary_plane()
+      instead of calculating the non-normal distance between the near wall node and the wall node
+    - in update_w_at_catalytic_wall(), added the function parameters paramstart and paramend and
+      used the latter when calling _bdry_param()
+    - added update_w_V_at_injection_wall()
+    - made sure that update_w_at_catalytic_wall() is not compiled unless the fluid module has
+      multiple species
+  * in src/control.c
+    - in read_control(), added the constants specO2, specN2, specH2, etc.
+
+
 2021 AUG 13a
   * moved parent2021.c to parentpark2021.c
   * in model/chem/_Air_Plasma_11s

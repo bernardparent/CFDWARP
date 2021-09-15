@@ -1,0 +1,3 @@
+#!MC 1410
+$!AlterData 
+  Equation = '{qx}={kappa}*ddx({T})+{kappav}*ddx({Tv})+{kappae}*ddx({Te})'

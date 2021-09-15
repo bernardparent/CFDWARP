@@ -164,7 +164,10 @@ void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S);
 
 void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU);
 
-void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, double Twall, double Tewall, spec_t wwall);
+void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, double Twall, double Tewall, long paramstart, long paramend, spec_t wwall);
+
+void update_w_V_at_injection_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, double Twall, double Tewall, 
+                                  long paramstart, long paramend, spec_t wwall, dim_t Vwall);
 
 
 #endif /* _FLUID_SHARE_H */

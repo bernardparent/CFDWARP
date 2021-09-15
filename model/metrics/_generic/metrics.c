@@ -354,3 +354,79 @@ void find_metrics_at_node(np_t *np, gl_t *gl, long l,
   }
 }
 
+
+// finds the unit normal vector perpendicular to the boundary surface and pointing towards the fluid
+void find_unit_vector_normal_to_boundary_plane(np_t *np, gl_t *gl, long lA, long lB, long lC, int TYPELEVEL, dim_t n){
+  long nodefound,lA2,lA3,dim,bdrytype;
+  EXM_vec3D_t vecA2,vecA3,vecB,vecnormal;
+  double vecmag;
+  nodefound=1;
+  bdrytype=_node_type(np[lA], TYPELEVEL);
+  assert(is_node_bdry(np[lA], TYPELEVEL));
+  for (dim=0; dim<nd; dim++){
+    if (_node_type(np[_al(gl,lA,dim,+1)], TYPELEVEL)==bdrytype){
+  //    printf(" dim=%ld",dim);
+      switch (nodefound){
+        case 1: lA2=_al(gl,lA,dim,+1); break;
+        case 2: lA3=_al(gl,lA,dim,+1); break;
+        default: fatal_error("Problem in find_unit_vector_normal_to_boundary_plane(): nodefound too high.");
+      }
+      nodefound++;
+    } else {
+      if (_node_type(np[_al(gl,lA,dim,-1)], TYPELEVEL)==bdrytype){
+    //    printf(" dim=%ld",dim);
+        switch (nodefound){
+          case 1: lA2=_al(gl,lC,dim,-1); break;
+          case 2: lA3=_al(gl,lC,dim,-1); break;
+          default: fatal_error("Problem in find_unit_vector_normal_to_boundary_plane(): nodefound too high.");
+        }
+        nodefound++;
+      }
+    }
+  }
+//  fprintf(stderr,"nodefound=%ld\n",nodefound);
+  if (nodefound!=nd) fatal_error("Problem finding the right number of boundary nodes to create a plane in find_unit_normal_vector_to_boundary_plane(); nodefound=%ld.",nodefound);
+  for (dim=0; dim<3; dim++) {
+    if (dim<nd){
+      vecA2[dim]=_x(np[lA2],dim)-_x(np[lA],dim);
+      if (nd==3) vecA3[dim]=_x(np[lA3],dim)-_x(np[lA],dim); 
+      vecB[dim]=_x(np[lB],dim)-_x(np[lA],dim); 
+    } else { 
+      vecA2[dim]=0.0;
+      vecA3[dim]=0.0;
+      vecB[dim]=0.0; 
+    }
+  }
+  if (nd<3) {
+     vecA3[0]=0.0;
+     vecA3[1]=0.0;
+     vecA3[2]=1.0;
+  }
+  EXM_cross_product(vecA2, vecA3, vecnormal);
+  // now normalize the vector
+  vecmag=EXM_vector_magnitude(vecnormal);
+  for (dim=0; dim<3; dim++) vecnormal[dim]/=vecmag;
+  // now make sure the vector points towards node lB
+  if (EXM_dot_product(vecnormal,vecB)<0.0){
+    //reverse the sign of vecnormal
+    for (dim=0; dim<3; dim++) vecnormal[dim]=-vecnormal[dim];
+  }
+  // set n to vecnormal
+  for (dim=0; dim<nd; dim++) n[dim]=vecnormal[dim];
+}
+
+
+double _distance_between_near_bdry_node_and_boundary_plane(np_t *np, gl_t *gl, long lA, long lB, long lC, int TYPELEVEL){
+  double dwall;
+  dim_t n,vecBA;
+  long dim;
+  find_unit_vector_normal_to_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL, n);
+  for (dim=0; dim<nd; dim++){
+    vecBA[dim]=_x(np[lB],dim)-_x(np[lA],dim); 
+  }
+  // multiply BA by n
+  dwall=0.0;
+  for (dim=0; dim<nd; dim++) dwall+=vecBA[dim]*n[dim];
+  if (dwall<=0.0) fatal_error("Problem in _distance_between_near_bdry_node_and_boundary_plane: dwall can not be equal to %E.",dwall);
+  return(dwall);
+}

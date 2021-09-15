@@ -84,10 +84,12 @@ Bdry(
 Model(
  
   NavierStokesPerfect(
-    {gamma=1.4;}      {the specific heat ratio }
+    ETAMODEL=ETAMODEL_SUTHERLAND;     
+    eta_ref=1.716e-5;       {kg/ms}
+    eta_ref_T=273.15;       {K}
+    eta_C=110.4;       {K}
+    Pr=0.71;         
     R=Rgas;        {the gas constant in J/kgK }
-    eta=1e-5;       {the viscosity of the gas in kg/ms }
-    kappa=0.0;     {the thermal conductivity of the gas in W/mK }
     Pmin=1.0e-10;    Pmax=9.9e99;   {min and max pressure allowed in the domain in Pa}
     Tmin=1.0e-20;     Tmax=6.0e3;    {min and max temperature allowed in the domain in K}
     
