@@ -3388,7 +3388,7 @@ Consider a surface through which some species $i$ is injected into the flow. Say
 %
 \begin{equation}
 \frameeqn{
-  \vec{V}_\chi = \frac{\dot{m}^{\rm in}}{\rho}
+  \vec{V}_\chi = \frac{\dot{m}^{\rm in}_{\rm tot}}{\rho}
  }
 \end{equation}
 %
@@ -3397,47 +3397,47 @@ with $\rho$ the gas mixture density, $\chi$ a coordinate perpendicular to the su
 For species that have no mass injection at the surface, the net mass flow must be zero. Thus, the sum of the convective and diffusive mass flow must cancel out:
 %
 \begin{equation}
-  \rho_k \vec{V}_\chi - \nu_k \frac{\partial c_k}{\partial \chi} =0
+  \rho_k \vec{V}_\chi - \nu_k \frac{\partial w_k}{\partial \chi} =0
 \end{equation}
 %
 Isolate the partial derivative:
 %
 \begin{equation}
- \frac{\partial c_k}{\partial \chi}= \frac{\rho_k \vec{V}_\chi}{\nu_k} 
+ \frac{\partial w_k}{\partial \chi}= \frac{\rho_k \vec{V}_\chi}{\nu_k} 
 \end{equation}
 %
-But the velocity perpendicular to the wall is related to $\dot{m}^{\rm in}$:
+But the velocity perpendicular to the wall is related to $\dot{m}^{\rm in}_{\rm tot}$:
 %
 \begin{equation}
- \frac{\partial c_k}{\partial \chi}= \frac{\rho_k \dot{m}^{\rm in}}{\rho \nu_k} 
+ \frac{\partial w_k}{\partial \chi}= \frac{\rho_k \dot{m}^{\rm in}_{\rm tot}}{\rho \nu_k} 
 \end{equation}
 %
 But $\rho_k/\rho$ is the species mass fraction:
 %
 \begin{equation}
 \frameeqn{
- \frac{\partial c_k}{\partial \chi}= \frac{c_k \dot{m}^{\rm in}}{\nu_k} ~~~~~\textrm{for~non-injected~species}
+ \frac{\partial w_k}{\partial \chi}= \frac{w_k \dot{m}^{\rm in}_{\rm tot}}{\nu_k} ~~~~~\textrm{for~non-injected~species}
 }
 \end{equation}
 %
 
-As for the species that are injected at the surface, the net mass flow in the domain must be equal to $\dot{m}_{\rm in}^k$:
+As for the species that are injected at the surface, the net mass flow in the domain must be equal to $\dot{m}^{\rm in}_k$:
 %
 \begin{equation}
-  \rho_k \vec{V}_\chi - \nu_k \frac{\partial c_k}{\partial \chi} =\dot{m}^{\rm in}_k
+  \rho_k \vec{V}_\chi - \nu_k \frac{\partial w_k}{\partial \chi} =\dot{m}^{\rm in}_k
 \end{equation}
 %
-But $\vec{V}_\chi$ is equal to $\dot{m}^{\rm in}/\rho$ and $\rho_k/\rho=c_k$:
+But $\vec{V}_\chi$ is equal to $\dot{m}^{\rm in}/\rho$ and $\rho_k/\rho=w_k$:
 %
 \begin{equation}
-  c_k \dot{m}_{\rm in} - \nu_k \frac{\partial c_k}{\partial \chi} =\dot{m}^{\rm in}_k
+  w_k \dot{m}_{\rm in} - \nu_k \frac{\partial w_k}{\partial \chi} =\dot{m}^{\rm in}_k
 \end{equation}
 %
 Isolate the derivative of the mass fraction at the surface:
 %
 \begin{equation}
 \frameeqn{
-\frac{\partial c_k}{\partial \chi}=  \frac{c_k \dot{m}^{\rm in} - \dot{m}^{\rm in}_k}{ \nu_k }
+\frac{\partial w_k}{\partial \chi}=  \frac{w_k \dot{m}^{\rm in}_{\rm tot} - \dot{m}^{\rm in}_k}{ \nu_k }
 ~~~~~\textrm{for~injected~species}
 }
 \end{equation}
@@ -3445,7 +3445,7 @@ Isolate the derivative of the mass fraction at the surface:
 In the latter, the tal mass flow rate injected per unit area corresponds to the sum of the injected species mass flow rates per unit area:
 %
 \begin{equation}
-  \dot{m}^{\rm in} = \sum_k \dot{m}^{\rm in}_k
+  \dot{m}^{\rm in}_{\rm tot} = \sum_k \dot{m}^{\rm in}_k
 \end{equation}
 %
 

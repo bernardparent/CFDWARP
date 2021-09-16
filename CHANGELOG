@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 SEP 15b
+  * in bin
+    - added rampinjector.wrp
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - fixed some typesetting mistakes in the section on Wall Injection Boundary Conditions
+  * in model/metrics/_generic/metrics.c
+    - in find_unit_vector_normal_to_boundary_plane(), fixed a bug for the 3D version of the algorithm
+    - in find_unit_vector_normal_to_boundary_plane(), added a fatal_error should  lB not be
+      perpendicular to the surface along the generalized coordinates
+
+
 2021 SEP 15a
   * in model/fluid/_Navier-Stokes/fluid_bdry.c and model/fluid/_Navier-Stokes_plasma/fluid_bdry.c 
     - added BDRY_WALLTFIXEDINJECTION1

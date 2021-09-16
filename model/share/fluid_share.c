@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2015-2018,2020 Bernard Parent
+Copyright 2015-2018,2020,2021 Bernard Parent
 Copyright 2001 Jason Etele
 Copyright 2002 Thomas E. Schwartzentruber
 

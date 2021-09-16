@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 1999-2004, 2019 Bernard Parent
+Copyright 1999-2004, 2019, 2021 Bernard Parent
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -357,30 +357,57 @@ void find_metrics_at_node(np_t *np, gl_t *gl, long l,
 
 // finds the unit normal vector perpendicular to the boundary surface and pointing towards the fluid
 void find_unit_vector_normal_to_boundary_plane(np_t *np, gl_t *gl, long lA, long lB, long lC, int TYPELEVEL, dim_t n){
-  long nodefound,lA2,lA3,dim,bdrytype;
+  long theta,nodefound,lA2,lA3,dim,bdrytype,iA,jA,kA,iB,jB,kB;
   EXM_vec3D_t vecA2,vecA3,vecB,vecnormal;
   double vecmag;
   nodefound=1;
   bdrytype=_node_type(np[lA], TYPELEVEL);
   assert(is_node_bdry(np[lA], TYPELEVEL));
+  
+  // first check if lB is perpendicular to the surface along the generalized coordinates (can't deal with a corner node here)
+  find_ijk_from_l(gl, lA, &iA, &jA, &kA);
+  find_ijk_from_l(gl, lB, &iB, &jB, &kB);
+  theta=-1;
+  if (iA==iB){
+    theta=0; 
+  }
+  if (jA==jB){
+    if (theta!=-1) theta=1; else fatal_error("Inner node B is misaligned with boundary node A in find_unit_vector_normal_to_boundary_plane(): iA=%ld jA=%ld kA=%ld iB=%ld jB=%ld kB=%ld \n",iA,jA,kA,iB,jB,kB); 
+  }
+#ifdef _3D
+  if (kA==kB){
+    if (theta!=-1) theta=2; else fatal_error("Inner node B is misaligned with boundary node A in find_unit_vector_normal_to_boundary_plane(): iA=%ld jA=%ld kA=%ld iB=%ld jB=%ld kB=%ld \n",iA,jA,kA,iB,jB,kB); 
+  }
+#endif
+
+  lA2=0; // to prevent compiler warning
+  lA3=0; // to prevent compiler warning
   for (dim=0; dim<nd; dim++){
     if (_node_type(np[_al(gl,lA,dim,+1)], TYPELEVEL)==bdrytype){
-  //    printf(" dim=%ld",dim);
       switch (nodefound){
-        case 1: lA2=_al(gl,lA,dim,+1); break;
-        case 2: lA3=_al(gl,lA,dim,+1); break;
-        default: fatal_error("Problem in find_unit_vector_normal_to_boundary_plane(): nodefound too high.");
+        case 1: 
+          lA2=_al(gl,lA,dim,+1); 
+          nodefound++; 
+        break;
+        case 2: 
+          lA3=_al(gl,lA,dim,+1); 
+          nodefound++; 
+        break;
       }
-      nodefound++;
+      
     } else {
       if (_node_type(np[_al(gl,lA,dim,-1)], TYPELEVEL)==bdrytype){
-    //    printf(" dim=%ld",dim);
         switch (nodefound){
-          case 1: lA2=_al(gl,lC,dim,-1); break;
-          case 2: lA3=_al(gl,lC,dim,-1); break;
-          default: fatal_error("Problem in find_unit_vector_normal_to_boundary_plane(): nodefound too high.");
+          case 1: 
+            lA2=_al(gl,lA,dim,-1); 
+            nodefound++; 
+          break;
+          case 2: 
+            lA3=_al(gl,lA,dim,-1); 
+            nodefound++; 
+          break;
         }
-        nodefound++;
+        
       }
     }
   }
