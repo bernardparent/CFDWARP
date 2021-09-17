@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 SEP 16a
+  * in model/chem/_Cs_Air_Plasma_15s/chem.c
+    - added parentpark2021 option as a air chemical solver
+    - added CESIUMIONIZATIONMODEL option
+    - added CESIUMRECOMBINATIONMODEL option
+  * in model/chem/_Cs_Air_Plasma_15s/doc/report.tex
+    - added park1993 and parentpark2021 models
+    - added various cesium ionization and recombination models
+  * in model/metrics/_generic/metrics.c
+    - in find_unit_vector_normal_to_boundary_plane(), fixed a bug related to inner node B
+      being misaligned with the boundary plane
+      
+
 2021 SEP 15b
   * in bin
     - added rampinjector.wrp

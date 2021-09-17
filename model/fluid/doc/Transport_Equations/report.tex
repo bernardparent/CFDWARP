@@ -3382,9 +3382,12 @@ T_{w}^{*}=\min \left(\max \left(1350.0, T_{w}\right), 1920.0\right)
 Other models for catalysis of oxygen and nitrogen can be found in \cite{nasa:2020:thompson}.
 
 
+
+
+
 \section{Surface Injection Boundary Conditions}
 
-Consider a surface through which some species $i$ is injected into the flow. Say that the total amount of gas injected per surface area is equal to $\dot{m}^{\rm in}$. The bulk gas velocity component perpendicular to the surface must thus be equal to:
+Consider a surface through which some species $i$ is injected into the flow. Say that the total amount of gas injected per surface area is equal to $\dot{m}^{\rm in}_{\rm tot}$. The bulk gas velocity component perpendicular to the surface must thus be equal to:
 %
 \begin{equation}
 \frameeqn{
@@ -3442,7 +3445,7 @@ Isolate the derivative of the mass fraction at the surface:
 }
 \end{equation}
 %
-In the latter, the tal mass flow rate injected per unit area corresponds to the sum of the injected species mass flow rates per unit area:
+In the latter, the total mass flow rate injected per unit area corresponds to the sum of the injected species mass flow rates per unit area:
 %
 \begin{equation}
   \dot{m}^{\rm in}_{\rm tot} = \sum_k \dot{m}^{\rm in}_k
