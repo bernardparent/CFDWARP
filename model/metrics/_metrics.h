@@ -37,7 +37,7 @@ void find_metrics_from_base_level(np_t *np, gl_t *gl, long l, metrics_t *metrics
 
 double _Omega(np_t np, gl_t *gl);
 
-void find_unit_vector_normal_to_boundary_plane(np_t *np, gl_t *gl, long lA, long lB, long lC, int TYPELEVEL, dim_t n);
+bool find_unit_vector_normal_to_boundary_plane(np_t *np, gl_t *gl, long lA, long lB, long lC, int TYPELEVEL, dim_t n);
 
 double _distance_between_near_bdry_node_and_boundary_plane(np_t *np, gl_t *gl, long lA, long lB, long lC, int TYPELEVEL);
 		       

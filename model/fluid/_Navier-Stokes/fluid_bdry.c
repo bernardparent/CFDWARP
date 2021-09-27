@@ -301,9 +301,9 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
                             bool ADIABATIC, bool CATALYTIC, bool INJECTION, bool BDRYDIRECFOUND, int ACCURACY){
   spec_t wwall;
   double Twall,Pwall;
-  long dim,spec;
-  dim_t Vwall;
+  long dim,dim2,spec,specneutral;
   bool ref_flag;
+  dim_t Vwall;
 
   if (ADIABATIC) {
     Twall=_f_symmetry(ACCURACY,_T(np[lB],gl),_T(np[lC],gl));
@@ -317,15 +317,26 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
     Vwall[dim]=0.0e0;
   }
   for (spec=0; spec<ns; spec++){
-    wwall[spec]=_f_symmetry(ACCURACY,_w(np[lB],spec),_w(np[lC],spec));
+//    wwall[spec]=_f_symmetry(ACCURACY,_w(np[lB],spec),_w(np[lC],spec));
+    wwall[spec]=_w(np[lB],spec);
   }
-  for (spec=0; spec<ncs; spec++) 
-    wwall[spec]=0.0;
 
   if (CATALYTIC) update_w_at_catalytic_wall(np, gl, lA, lB, lC, Twall, Twall, 1, np[lA].numbdryparam-1, wwall);
 
   if (INJECTION) update_w_V_at_injection_wall(np, gl, lA, lB, lC, Twall, Twall, 1, np[lA].numbdryparam-1, wwall, Vwall);
   
+  if (!INJECTION ){
+    for (spec=0; spec<ncs; spec++){
+      // set ion and electron densities to zero at the surface
+      wwall[spec]=0.0;
+      // make sure that no net mass flow (due to diffusion) goes through the boundary
+      if (speciestype[spec]==SPECIES_IONPLUS) {
+        if (!find_neutral_spec_from_ion_spec(spec,&specneutral))
+          fatal_error("Couldn't find a neutral species associated with positive ion species %ld.",spec); 
+        wwall[specneutral]=_w_product_at_catalytic_wall(np, gl, lA, lB, lC, theta, thetasgn, spec, specneutral, 1.0);
+      }
+    }
+  }
   reformat_w(gl,wwall,"_bdry",&ref_flag);
 
   find_Pstar_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY, &Pwall);

@@ -7,6 +7,41 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 SEP 26a
+  * in model/fluid/_Navier-Stokes/fluid_bdry.c
+    - in update_bdry_wall(), made w at wall node equal to w at near wall node no matter
+      the order of accuracy specified
+    - in update_bdry_wall() now does not set w of the charged species to zero at injection surface
+    - in update_bdry_wall(), at non injection surfaces added correction to the mass fraction
+      gradient of the neutral species which is the product of a positive ion recombining
+      with electrons through the call to _w_product_at_catalytic_wall()
+  * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - in update_bdry_wall(), made w at wall node equal to w at near wall node no matter
+      the order of accuracy specified
+    - in update_bdry_wall(), at both injection and non injection surfaces added correction
+      to the mass fraction gradient of the neutral species which is the product of a positive 
+      ion recombining with electrons through the call to _w_product_at_catalytic_wall()
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - in find_post_variable_value_fluid(), added 4 new post variables related to cesium 
+      (NOTE: THESE MUST BE DELETED BECAUSE THEY ARE USED FOR TESTING CESIUM INJECTION ONLY)
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - in the section about surface mass injection, started documentation of how to specify
+      the boundary conditions for a non-neutral solver
+  * in model/metrics/_generic/metrics.c
+    - in find_unit_vector_normal_to_boundary_plane(), removed a fatal_error and rather return
+      a FALSE if n couldn't be found
+    - in _distance_between_near_bdry_node_and_boundary_plane(), added fatal_error in case n
+      couldn't be found
+  * in model/share/fluid_share.c
+    - added _w_product_at_catalytic_wall()
+    - in update_w_V_at_injection_wall(), added fatal_error in case n couldn't be found
+  * in model/thermo/_generic/thermo.c
+    - added find_neutral_spec_from_ion_spec()
+    - in find_nuk_from_w_rho_T_Te(), fixed a bug related to the determination of nu for the electrons
+      in the case of a neutral plasma: when the mass fraction of all positive ions was zero,
+      nu for the electrons couldn't be determined and this lead to NaN.
+
+
 2021 SEP 16a
   * in model/chem/_Cs_Air_Plasma_15s/chem.c
     - added parentpark2021 option as a air chemical solver

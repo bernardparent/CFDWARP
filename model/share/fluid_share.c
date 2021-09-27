@@ -2485,6 +2485,60 @@ void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
 
 #if defined(_FLUID_MULTISPECIES)
 
+double _w_product_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, long theta, long thetasgn, long specR, long specP, double factprodreact){
+  double wP;
+  dim_t n;
+  long dim,dim2;
+  double VnormalR,VnormalP,coeffwA;
+  
+  // first find unit normal vector pointing towards fluid
+  if (!find_unit_vector_normal_to_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK, n)){
+    //fatal_error("couldn't find unit vector normal to boundary place in _w_product_at_catalytic_wall");
+    
+    return(_w(np[lB],specP)); 
+  }
+      
+  // idea is to set the flux of specP coming out equal to the flux of specR coming in
+  // first find the flux of spec  due to diffusion as a vector
+  VnormalR=0.0;
+  for (dim=0; dim<nd; dim++) {
+    for (dim2=0; dim2<nd; dim2++){
+      VnormalR-=n[dim2]*_X(np[lB],dim,dim2)*_nu(np[lB],gl,specR)*0.5*(_w(np[_al(gl,lB,dim,+1)],specR)-_w(np[_al(gl,lB,dim,-1)],specR));  
+    }
+  }
+
+#ifdef _FLUID_PLASMA
+  dim_t VionRB;
+  find_Vk(np, gl, lB, specR, VionRB);
+  VnormalR=0.0;
+  for (dim=0; dim<nd; dim++) VnormalR+=_rhok(np[lA],specR)*n[dim]*VionRB[dim];
+#endif
+  
+  // only consider a change to wP if the reactant species is injected in the surface  
+  VnormalR=min(0.0,VnormalR);
+      
+  // but VnormalP must be equal to -VnormalR*factprodreact
+  VnormalP=0.0;
+  coeffwA=0.0;
+  for (dim=0; dim<nd; dim++) {
+    for (dim2=0; dim2<nd; dim2++){
+      if (dim==theta){
+        VnormalP-=factprodreact*thetasgn*n[dim2]*0.5*(_X(np[lB],dim,dim2)*_nu(np[lB],gl,specP)+_X(np[lA],dim,dim2)*_nu(np[lA],gl,specP))*_w(np[lB],specP);
+        coeffwA-=-factprodreact*thetasgn*n[dim2]*0.5*(_X(np[lB],dim,dim2)*_nu(np[lB],gl,specP)+_X(np[lA],dim,dim2)*_nu(np[lA],gl,specP));
+      } else { 
+        VnormalP-=factprodreact*n[dim2]*_X(np[lB],dim,dim2)*_nu(np[lB],gl,specP)*0.5*(_w(np[_al(gl,lB,dim,+1)],specP)-_w(np[_al(gl,lB,dim,-1)],specP));   
+      }
+    }
+  }
+  // idea is that VnormalP+coeffwA*wA=-VnormalR
+  // thus: wA=(-VnormalR-VnormalP)/coeffwA
+  wP=max(0.0,min(1.0,(-VnormalR-VnormalP)/coeffwA));
+  
+  
+  return(wP);
+}
+
+
 void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, double Twall, double Tewall, long paramstart, long paramend, spec_t wwall){
   long specr,specp,numcat,cat;
   double dwall,gamma;
@@ -2493,6 +2547,7 @@ void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, d
   assert(is_node_bdry(np[lA],TYPELEVEL_FLUID_WORK));
   dwall=_distance_between_near_bdry_node_and_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK);
   find_nuk_from_w_rho_T_Te(wwall, _rho(np[lB]), Twall, Tewall, nuk);
+
 
   if (mod(paramend-paramstart+1,3)!=0) fatal_error("Wrong number of extra parameters to catalytic boundary condition.");
   numcat=round((double)(paramend-paramstart+1)/3.0);
@@ -2518,12 +2573,19 @@ void update_w_V_at_injection_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
                                   long paramstart, long paramend, spec_t wwall, dim_t Vwall){
   long dim,spec,numinj,inj;
   double sum,mdot,mdottot,dwall;
-  spec_t nuk;
+  spec_t nuk,nukA,nukB;
   dim_t n;
   assert(is_node_bdry(np[lA],TYPELEVEL_FLUID_WORK));
+
+  if (!find_unit_vector_normal_to_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK, n)){
+    fatal_error("Problem finding unit vector normal to boundary plane in update_w_V_at_injection_wall().");
+  }
   dwall=_distance_between_near_bdry_node_and_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK);
 
-  find_nuk_from_w_rho_T_Te(wwall, _rho(np[lB]), Twall, Tewall, nuk);
+  find_nuk_from_w_rho_T_Te(wwall, _rho(np[lB]), Twall, Tewall, nukB);
+  find_nuk_from_w_rho_T_Te(wwall, _rho(np[lA]), Twall, Tewall, nukA);
+  for (spec=0; spec<ns; spec++) nuk[spec]=0.5*(nukB[spec]+nukA[spec]);
+  
   //fatal_error("\n param=%ld",np[lA].numbdryparam);
   
   if (mod(paramend-paramstart+1,2)!=0) fatal_error("Wrong number of extra parameters to injection boundary condition.");
@@ -2533,10 +2595,15 @@ void update_w_V_at_injection_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
   for (inj=0; inj<numinj; inj++){
     mdottot+=_bdry_param(np,gl,lA,paramstart+1+inj*2,TYPELEVEL_FLUID_WORK);
   }  
+  
+  
+
   // second set the mass fractions of the non-injected species
   for (spec=0; spec<ns; spec++){
     wwall[spec]=max(0.0,_w(np[lB],spec)-dwall*(_w(np[lB],spec)*mdottot)/nuk[spec]);
   }
+
+
   // third set the mass fractions of the injected species
   for (inj=0; inj<numinj; inj++){
     spec=round(_bdry_param(np,gl,lA,paramstart+inj*2,TYPELEVEL_FLUID_WORK))-1;
@@ -2544,15 +2611,14 @@ void update_w_V_at_injection_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
     mdot=_bdry_param(np,gl,lA,paramstart+1+inj*2,TYPELEVEL_FLUID_WORK);
     if (mdot<=0.0) fatal_error("The injection mass flow rate of species %ld can not be set to a value less than or equal to 0.",spec);
     wwall[spec]=max(0.0,_w(np[lB],spec)-dwall*(_w(np[lB],spec)*mdottot-mdot)/nuk[spec]);
+    //printf("%E %E\n",wwall[spec],_w(np[lB],spec));
   }
   // fourth make sure the mass fractions sum to 1
   sum=0.0;
   for (spec=0; spec<ns; spec++) sum+=wwall[spec];
   for (spec=0; spec<ns; spec++) wwall[spec]/=sum;
   
-
   // fifth update Vwall
-  find_unit_vector_normal_to_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK, n);
   for (dim=0; dim<nd; dim++) Vwall[dim]=n[dim]*mdottot/_rho(np[lB]);
 }
 #endif

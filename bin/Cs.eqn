@@ -1,0 +1,5 @@
+#!MC 1410
+$!AlterData 
+  Equation = '{rhoVCs[0]}={V[0]}*{N}*({chi_Cs}+{chi_Cs+})*2.2e-25'
+$!AlterData 
+  Equation = '{rhoVCs[1]}={V[1]}*{N}*({chi_Cs}+{chi_Cs+})*2.2e-25'

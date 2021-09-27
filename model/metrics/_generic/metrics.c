@@ -356,7 +356,7 @@ void find_metrics_at_node(np_t *np, gl_t *gl, long l,
 
 
 // finds the unit normal vector perpendicular to the boundary surface and pointing towards the fluid
-void find_unit_vector_normal_to_boundary_plane(np_t *np, gl_t *gl, long lA, long lB, long lC, int TYPELEVEL, dim_t n){
+bool find_unit_vector_normal_to_boundary_plane(np_t *np, gl_t *gl, long lA, long lB, long lC, int TYPELEVEL, dim_t n){
   long cnt,nodefound,lA2,lA3,dim,bdrytype,iA,jA,kA,iB,jB,kB;
   EXM_vec3D_t vecA2,vecA3,vecB,vecnormal;
   double vecmag;
@@ -410,7 +410,7 @@ void find_unit_vector_normal_to_boundary_plane(np_t *np, gl_t *gl, long lA, long
     }
   }
 //  fprintf(stderr,"nodefound=%ld\n",nodefound);
-  if (nodefound!=nd) fatal_error("Problem finding the right number of boundary nodes to create a plane in find_unit_normal_vector_to_boundary_plane(); nodefound=%ld.",nodefound);
+  if (nodefound!=nd) return(FALSE);
   for (dim=0; dim<3; dim++) {
     if (dim<nd){
       vecA2[dim]=_x(np[lA2],dim)-_x(np[lA],dim);
@@ -438,6 +438,7 @@ void find_unit_vector_normal_to_boundary_plane(np_t *np, gl_t *gl, long lA, long
   }
   // set n to vecnormal
   for (dim=0; dim<nd; dim++) n[dim]=vecnormal[dim];
+  return(TRUE);
 }
 
 
@@ -445,13 +446,17 @@ double _distance_between_near_bdry_node_and_boundary_plane(np_t *np, gl_t *gl, l
   double dwall;
   dim_t n,vecBA;
   long dim;
-  find_unit_vector_normal_to_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL, n);
-  for (dim=0; dim<nd; dim++){
-    vecBA[dim]=_x(np[lB],dim)-_x(np[lA],dim); 
+  if (!find_unit_vector_normal_to_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL, n)){
+    fatal_error("Couldn't find unit vector normal to boundary plane in _distance_between_near_bdry_node_and_boundary_plane.");
+    dwall=0.0;
+  } else {
+    for (dim=0; dim<nd; dim++){
+      vecBA[dim]=_x(np[lB],dim)-_x(np[lA],dim); 
+    }
+    // multiply BA by n
+    dwall=0.0;
+    for (dim=0; dim<nd; dim++) dwall+=vecBA[dim]*n[dim];
+    if (dwall<=0.0) fatal_error("Problem in _distance_between_near_bdry_node_and_boundary_plane: dwall can not be equal to %E.",dwall);
   }
-  // multiply BA by n
-  dwall=0.0;
-  for (dim=0; dim<nd; dim++) dwall+=vecBA[dim]*n[dim];
-  if (dwall<=0.0) fatal_error("Problem in _distance_between_near_bdry_node_and_boundary_plane: dwall can not be equal to %E.",dwall);
   return(dwall);
 }

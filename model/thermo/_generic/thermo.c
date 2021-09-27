@@ -2777,6 +2777,30 @@ void find_species_name(long spec, char **name){
   strcpy(*name,speciesname[smap[spec]]);
 }
 
+
+int find_neutral_spec_from_ion_spec(long specion, long *specneutral){
+  bool FOUND;
+  long spec;
+  char *ionname,*neutralname;
+  ionname=(char *)malloc(sizeof(char));
+  neutralname=(char *)malloc(sizeof(char));
+  find_species_name(specion, &ionname);
+  strrep(ionname, "+", "");
+  FOUND=FALSE;
+  for (spec=ncs; spec<ns; spec++){
+    find_species_name(spec, &neutralname);
+    if (strcmp(ionname,neutralname)==0){
+       if (FOUND) fatal_error("Problem in find_neutral_spec_from_ion_spec().");
+       FOUND=TRUE;
+       *specneutral=spec;
+    }
+  }
+  free(ionname);
+  free(neutralname);
+  return(FOUND);  
+}
+
+
 /* same as find_species_name but replaces '-' by 'minus' and '+' by 'plus' */
 void find_species_variable_name(long spec, char **name){
   long cnt;
@@ -3695,13 +3719,13 @@ void find_nuk_from_w_rho_T_Te(spec_t w, double rho, double T, double Te, spec_t 
   wsum=0.0;
   for (k=0; k<ncs; k++){
     if (speciestype[k]==SPECIES_IONPLUS || speciestype[k]==SPECIES_IONMINUS){
-      nuwsum+=nuk[k]*w[k]; 
-      wsum+=w[k];
+      nuwsum+=nuk[k]*max(1.0e-30,w[k]); 
+      wsum+=max(1.0e-30,w[k]);
     }
   }
-  nuk[speceminus]=nuwsum/wsum;
+  nuk[speceminus]=nuwsum/(1.0e-99+wsum);
 #endif
-  
+
 }
 
 

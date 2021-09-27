@@ -96,6 +96,8 @@ void find_de_drhok_at_constant_T(spec_t rhok, double T, spec_t dedrhok);
 
 void find_species_name(long spec, char **name);
 
+int find_neutral_spec_from_ion_spec(long specion, long *specneutral);
+
 void find_species_variable_name(long spec, char **name);
 
 double _dsk_dT_from_T(long spec, double T);
