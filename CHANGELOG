@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 SEP 28a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - in update_bdry_wall(), rewrote the code related to wwall[specneutral]; this was done
+      for clarity and should not change the model
+      
+
 2021 SEP 26a
   * in model/fluid/_Navier-Stokes/fluid_bdry.c
     - in update_bdry_wall(), made w at wall node equal to w at near wall node no matter

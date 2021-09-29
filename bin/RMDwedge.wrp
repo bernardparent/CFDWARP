@@ -85,7 +85,7 @@ Tinf=240; {K}
 
 
 Twall=1800;
-mdotCs=0.00002; {kg/s per meter depth}
+mdotCs=2e-7; {kg/s per meter depth}
 
 Hplate=0.001; {height of the plate}
 theta=rad(10); {angle of plate wrt horizontal}
@@ -106,7 +106,7 @@ dywall=2e-6/mf;
 is=1;
 im1=round(15*mf);
 im2=round(45*mf);
-ie=round(95*mf);
+ie=round(115*mf);
 js=1;
 jm1=round(15*mf);
 jm2=round(40*mf);
@@ -152,7 +152,7 @@ Grid(
   Point(ie,je, cos(theta)*Lplate, sin(theta)*Lplate+Hflow);
   Join(ie,jm3,ie,jm4, j, FE,0.36,dywall,1.0);
   Join(ie,jm4,ie,je, j, GE,0.9,1.0,1.0);
-  Join(im2,jm3,ie,je, i, GE, 0.3,1.0,1.0);
+  Join(im2,jm3,ie,je, i, GE, 0.6,1.0,1.0);
 
   {grid the bottom plate}
   Point(ie,jm1, cos(theta)*Lplate, -sin(theta)*Lplate-Hbdry);
@@ -160,7 +160,7 @@ Grid(
   Point(ie,js, cos(theta)*Lplate, -sin(theta)*Lplate-Hflow);
   Join(ie,jm1,ie,jm2, j, EF,0.64,1.0,dywall);
   Join(ie,js,ie,jm1, j, EG,0.1,1.0,1.0);
-  Join(im2,js,ie,jm2, i, GE, 0.3,1.0,1.0);
+  Join(im2,js,ie,jm2, i, GE, 0.6,1.0,1.0);
 );
 
 
@@ -227,7 +227,7 @@ Bdry(
     Cut(im2,jm2,  ie,jm3);
     All(BDRY_WALLTFIXED1,Twall);
     Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_INFLOWSUPERSONIC,BDRY_INFLOWSUPERSONIC);
-    {Region(im2,jm2,im2,jm3,BDRY_WALLTFIXEDINJECTION1,Twall,specCs,mdotCs/Hplate);}
+    Region(im2,jm2,im2,jm3,BDRY_WALLTFIXEDINJECTION1,Twall,specCs,mdotCs/Hplate);
     {
     Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
@@ -409,11 +409,11 @@ Disc(
   );
   NavierStokesPlasma(
     zetaA1=0.2e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.2e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
-    zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
+    zetaA2=0.03e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaD=0.0;        {conditions the Dstar eigenvalues for the charged species}
     for (spec,1,numspec,
       if (SPECIESTYPE[spec]==SPECIESTYPE_IONPLUS,
-        betag[spec]=1.0;
+        betag[spec]=0.03;
         betaa[spec]=0.0;
       );
       if (SPECIESTYPE[spec]==SPECIESTYPE_IONMINUS,
@@ -506,9 +506,11 @@ Cycle(
     );
 
       if (EMFIELD,
+        CFLmax=2.5;
         if (iter<1000*mf,
           CFLmax=0.3;
-        ,{else}
+        );
+        if (iter<2000*mf,
           CFLmax=0.8;
         );
       ,{else}
@@ -520,9 +522,9 @@ Cycle(
     if (EMFIELD,
       Lc=3e3;      {characteristic length scale in meters used to solve the emfield equation}
       relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
-      UpdateEMField(Lc,relaxEMF, TSEMF_SOR, round(200)); 
-      UpdateEMField(Lc,relaxEMF, TSEMF_IMAF, round(4)); 
-      {UpdateEMField(Lc,relaxEMF, TSEMF_SOR, round(200));} 
+      UpdateEMField(Lc,relaxEMF, TSEMF_SOR, round(20)); 
+    UpdateEMField(Lc,relaxEMF, TSEMF_IMAF, round(4)); 
+{      UpdateEMField(Lc,relaxEMF, TSEMF_SOR, round(200)); }
       printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
