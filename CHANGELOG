@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 OCT 01a
+  * in cycle/res/_generic/res.c
+    - changed YSTARDH_SECONDORDER to FALSE 
+    - changed TVDLIMITER to LIMITER_MINMOD
+  * in model/chem/_Cs_Air_Plasma_15s/chem.c
+    - in add_dW_dx_Cesium(), fixed a bug: when CESIUMIONIZATIONMODEL was not set to 
+      CESIUMIONIZATIONMODEL_LENARD1964, the linearization of W was not correct
+    - in add_dW_dx_Cesium(), fixed a bug: when CESIUMRECOMBINATIONMODEL was not set to
+      CESIUMRECOMBINATIONMODEL_LENARD1964, the linearization of W was not correct
+      
+
 2021 SEP 28a
   * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
     - in update_bdry_wall(), rewrote the code related to wwall[specneutral]; this was done

@@ -95,7 +95,7 @@ Hflow=0.05; {height of the flow above the plate}
 Hbdry=0.01; {height of boundary layer at the domain exit}
 Lbow=0.0015;
 
-mf=1;
+mf=2;
 
 dxwall=1e-6/mf;
 
@@ -277,8 +277,8 @@ Model(
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     REACTING=YES;
     emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
-    sigmadiv=1e-9; {S/m}
-    etdiv=1e-1;     {J/kg}
+    sigmadiv=1e-12; {S/m}
+    etdiv=1e-3;     {J/kg}
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e1;     Tmax=20.0e3;    {K}
     Tvmin=Tmin;     Tvmax=13.0e3;  {K}
@@ -297,7 +297,7 @@ Model(
     NEGATIVEIONREACTIONS=TRUE; {include reactions function of O- and O2-}
     TOWNSENDIONIZATION=FALSE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
-    CESIUMIONIZATIONMODEL=CESIUMIONIZATIONMODEL_ANDRIENKO2021;
+    CESIUMIONIZATIONMODEL=CESIUMIONIZATIONMODEL_LENARD1964;
     CESIUMRECOMBINATIONMODEL=CESIUMRECOMBINATIONMODEL_LENARD1964;
   );
   Epotential(
@@ -409,11 +409,11 @@ Disc(
   );
   NavierStokesPlasma(
     zetaA1=0.2e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.03e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA2=0.003e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
     zetaD=0.0;        {conditions the Dstar eigenvalues for the charged species}
     for (spec,1,numspec,
       if (SPECIESTYPE[spec]==SPECIESTYPE_IONPLUS,
-        betag[spec]=0.03;
+        betag[spec]=0.3;
         betaa[spec]=0.0;
       );
       if (SPECIESTYPE[spec]==SPECIESTYPE_IONMINUS,
@@ -522,9 +522,11 @@ Cycle(
     if (EMFIELD,
       Lc=3e3;      {characteristic length scale in meters used to solve the emfield equation}
       relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
+      
       UpdateEMField(Lc,relaxEMF, TSEMF_SOR, round(20)); 
-    UpdateEMField(Lc,relaxEMF, TSEMF_IMAF, round(4)); 
-{      UpdateEMField(Lc,relaxEMF, TSEMF_SOR, round(200)); }
+      if (iter<1000*mf, 
+        UpdateEMField(Lc,relaxEMF, TSEMF_IMAF, round(4)); 
+      );
       printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);

@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cycle/share/cycle_share.h>
 
 #define DUSTAR_SECONDORDER TRUE
-#define YSTARDH_SECONDORDER TRUE
+#define YSTARDH_SECONDORDER FALSE
 			
 
 /* set TVDLIMITER to LIMITER_MINMOD for Roe (1986) minmod limiter
@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                      LIMITER_VANLEER for the Van Leer limiter
                      LIMITER_SUPERBEE for most compressive limiter possible
 */
-#define TVDLIMITER LIMITER_VANLEER
+#define TVDLIMITER LIMITER_MINMOD
 
 
 
