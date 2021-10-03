@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 OCT 03a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - got rid of the last 4 post processing variables related to cesium
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - in model/fluid/doc/Transport_Equations/report.tex, cleaned up the text about the
+      surface injection boundary condition
+  * in model/share/fluid_share.c
+    - in write_disc_fluid_template(), set default zetaD to 0.0 instead of 1.0
+     
+
 2021 OCT 01a
   * in cycle/res/_generic/res.c
     - changed YSTARDH_SECONDORDER to FALSE 

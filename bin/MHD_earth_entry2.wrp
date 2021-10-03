@@ -87,9 +87,27 @@
 }
 
 
-Bz=0.3; {Tesla}
+Bz=0.15; {Tesla}
 mf=1.0; 
 gamma=0.1e0;    {secondary emission coefficient}
+Twall=3000;     {wall temperature everywhere}
+Newallmax=1e23; {maximum electron density at the cathode only, 1/m3}
+workfunct=2.7; {work function at the cathode only, eV}
+THERMIONICEMISSION=TRUE;
+{
+            work function   max operating temperature point
+ graphite   4.6 eV          3800 K
+ titanium   3.6 eV          1800 K
+ tungsten with Barium oxyde
+            1.56 eV         1750 K
+ tungsten thoriated [1]
+            2.64 eV         2900 K
+            3.06 eV         3700 K
+
+ [1] An experimental study of thoriated tungsten cathodes operating at different current 
+     intensities in an atmospheric-pressure plasma torch. 
+     J A Sillero et al 2010 J. Phys. D: Appl. Phys. 43 185204
+}
 
 
 is=1;
@@ -148,15 +166,13 @@ Bdry(
     BDRY_FREESTREAM1                   5    Freestream, 1o, params Vx,Vy, P, T
     _________________________________________________________________________________________
     }
-    Twall=3000;
     All(BDRY_WALLTFIXED1,Twall);
     Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLTFIXED1,BDRY_WALLTFIXED1);
     Plane("j",js,BDRY_WALLTFIXED1,Twall);
     Plane("j",je,BDRY_WALLTFIXED1,Twall);
-{    Newallmax=1e19;
-    workfunct=3.0;
-    Region(is1,js,is2,js,BDRY_WALLTFIXEDTHERMIONIC1,Twall,workfunct,Newallmax);
-}
+    if (THERMIONICEMISSION,
+      Region(is1,js,is2,js,BDRY_WALLTFIXEDTHERMIONIC1,Twall,workfunct,Newallmax);
+    );
     {
     Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
@@ -200,7 +216,7 @@ Model(
     sigmadiv=1e-10; {S/m}
     etdiv=1e-1;     {J/kg}
     Pmin=1.0e3;    Pmax=9.9e99;   {Pa}
-    Tmin=200;     Tmax=50000;    {K}
+    Tmin=200;     Tmax=100000;    {K}
     Tvmin=Tmin;     Tvmax=Tmax;  {K}
     Temin=300;     Temax=5e6;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
@@ -211,7 +227,7 @@ Model(
     AXISYMMETRIC=NO;
   );
   AirPlasma11s(
-    CHEMMODEL=CHEMMODEL_PARENT2021;
+    CHEMMODEL=CHEMMODEL_PARENTPARK2021;
     ADDITIONALREACTION=FALSE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
     QEISOURCETERMS=TRUE;
@@ -305,12 +321,12 @@ Init(
 
 Disc(
   NavierStokesPlasma(
-    zetaA1=0.3e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA1=1.0e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
-    zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
+    zetaD=0.0;        {conditions the Dstar eigenvalues for the charged species}
     for (spec,1,numspec,
       if (SPECIESTYPE[spec]==SPECIESTYPE_IONPLUS,
-        betag[spec]=1.0;
+        betag[spec]=0.3;
         betaa[spec]=0.0;
       );
       if (SPECIESTYPE[spec]==SPECIESTYPE_IONMINUS,
@@ -325,7 +341,7 @@ Disc(
   );
   EpotentialBfixed(
     POTENTIAL=POTENTIAL_OHMBASED;
-    Ediv=10.0;        {a small positive number in V/m, needed to prevent a division by zero when
+    Ediv=100.0; {was 10}        {a small positive number in V/m, needed to prevent a division by zero when
                        discretizing the electron pressure gradients within the potential equation}
   );
   MUSCL(
@@ -421,8 +437,8 @@ Cycle(
     Lc=1000e44;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
     if (iter>10,
-       UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,3);
-       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,20);
+       UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,5);
+       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,50);
     );
 {    UpdateEMField(Lc,relaxEMF,TSEMF_NEWTON);}
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
@@ -440,9 +456,9 @@ Cycle(
     );
     CFL=min(CFL*1.15,0.7);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
-    Lc=100e0;      {characteristic length scale in meters used to solve the emfield equation}
+    Lc=100e3;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,35); 
+    UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,40); 
     UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,280); 
     
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",

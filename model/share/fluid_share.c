@@ -62,7 +62,7 @@ void write_disc_fluid_template(FILE **controlfile){
     "    aref=300.0;       {reference speed of sound in m/s used when conditioning Dstar eigenvalues  }\n"
 #endif
 #ifdef _FLUID_PLASMA
-    "    zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}\n"
+    "    zetaD=0.0;        {conditions the Dstar eigenvalues for the charged species}\n"
 #endif
   ,_FLUID_ACTIONNAME);
 #ifdef _FLUID_PLASMA
