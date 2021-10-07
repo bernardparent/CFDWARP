@@ -40,6 +40,8 @@
 
   void find_DeltaVk(np_t *np, gl_t *gl, long l, long spec, EXM_vec3D_t DeltaVk);
 
+  void find_DeltaVk_drift_from_mu(np_t *np, gl_t *gl, long l, long spec, double mu, EXM_vec3D_t DeltaVk);
+
   double _phi(np_t np, gl_t *gl);
 
   double _Te_EMF(np_t np, gl_t *gl);

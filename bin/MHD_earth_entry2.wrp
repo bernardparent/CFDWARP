@@ -91,8 +91,8 @@ Bz=0.15; {Tesla}
 mf=1.0; 
 gamma=0.1e0;    {secondary emission coefficient}
 Twall=3000;     {wall temperature everywhere}
-Newallmax=1e23; {maximum electron density at the cathode only, 1/m3}
-workfunct=2.7; {work function at the cathode only, eV}
+Newallmax=1e22; {maximum electron density at the cathode only, 1/m3}
+workfunct=4.6; {2.7, 4.6, and 1e99 eV}
 THERMIONICEMISSION=TRUE;
 {
             work function   max operating temperature point
@@ -216,9 +216,9 @@ Model(
     sigmadiv=1e-10; {S/m}
     etdiv=1e-1;     {J/kg}
     Pmin=1.0e3;    Pmax=9.9e99;   {Pa}
-    Tmin=200;     Tmax=100000;    {K}
+    Tmin=1000;     Tmax=100000;    {K}
     Tvmin=Tmin;     Tvmax=Tmax;  {K}
-    Temin=300;     Temax=5e6;  {K}
+    Temin=1000;     Temax=5e6;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-9;                  {min mass fraction allowed in the domain for neutrals}
     chiimin=1e-10;  chiimax=1.0;    {min and max ion molar fraction}
@@ -334,14 +334,14 @@ Disc(
         betaa[spec]=0.5;
       );
       if (SPECIESTYPE[spec]==SPECIESTYPE_ELECTRON,
-        betag[spec]=-0.001;
+        betag[spec]=-0.03; {-0.03 works good}
         betaa[spec]=0.999;
       );
     );
   );
   EpotentialBfixed(
     POTENTIAL=POTENTIAL_OHMBASED;
-    Ediv=100.0; {was 10}        {a small positive number in V/m, needed to prevent a division by zero when
+    Ediv=100;        {a small positive number in V/m, needed to prevent a division by zero when
                        discretizing the electron pressure gradients within the potential equation}
   );
   MUSCL(
@@ -375,7 +375,7 @@ Cycle(
     zetaGammae=1.0;       {factor multiplying the pseudotime step of the electron species transport equations
                            near cathode}
     relaxNi_bdry=1.0;     {the ion density relaxation factor at the boundary }
-    relaxNe_bdry=0.2;     {the electron density relaxation factor at the boundary }
+    relaxNe_bdry=0.1;{0.002}     {the electron density relaxation factor at the boundary }
     relaxTe=0.1;          {the electron temperature relaxation factor }
     rhoref=0.1;           {reference density in kg/m3}
     Tref=300.0;           {reference temperature in K}
@@ -416,29 +416,15 @@ Cycle(
     if (iter==1,
       CFL=0.001;
     );
-    CFL=min(CFL*1.03,0.2);
+    CFL=min(CFL*1.03,0.1);
     
-    Model(
-      EpotentialBfixed(
-        SetMagneticField(is,js, ie,je, 0{T},0{T},min(1,iter/1)*Bz{T});
-      );
-      NavierStokesPlasma(
-        if (iter<4000, Temax=6400000;);
-        if (iter<3500, Temax=3200000;);
-        if (iter<3000, Temax=1600000;);
-        if (iter<2500, Temax=800000;);
-        if (iter<2000, Temax=400000;);
-        if (iter<1500, Temax=200000;);
-        if (iter<1000, Temax=100000;);
-      );
-    );
     
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     Lc=1000e44;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
     if (iter>10,
        UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,5);
-       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,50);
+       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,20);
     );
 {    UpdateEMField(Lc,relaxEMF,TSEMF_NEWTON);}
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",

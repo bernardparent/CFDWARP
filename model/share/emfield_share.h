@@ -47,6 +47,8 @@
 
   void find_Vk_from_mu(np_t *np, gl_t *gl, long l, double mu, long spec, EXM_vec3D_t Vk);
 
+  void find_Vk_drift(np_t *np, gl_t *gl, long l, long spec, EXM_vec3D_t Vk);
+
   void find_Vk_at_interface(np_t *np, gl_t *gl, long l, long theta, long spec, EXM_vec3D_t Vk);
 
   void find_Ve_from_J(np_t *np, gl_t *gl, long l, EXM_vec3D_t Ve);

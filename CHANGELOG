@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 OCT 06a
+  * in model/emfield/_Epotential-Bfixed/emfield.c and model/emfield/_Epotential/emfield.c
+    - added find_DeltaVk_drift_from_mu()
+  * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - renamed _Vk_perp_to_bdry() to _Vk_drift_perp_to_bdry()
+    - in _Vk_drift_perp_to_bdry(), now calls find_Vk_drift() and 
+      find_unit_vector_normal_to_boundary_plane()
+  * in model/share/emfield_share.c
+    - added find_Vk_drift()
+  * in bin/MHD_earth_entry2.wrp
+    - made improvements
+    
+
 2021 OCT 03a
   * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
     - got rid of the last 4 post processing variables related to cesium
