@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 OCT 14a
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - in the Parent-Park model, fixed a typo related to the third body lists
+  * in model/share/fluid_share.c
+    - in _w_product_at_catalytic_wall(), fixed a variable definition bug: dim_t VionRB
+      should be EXM_vec3D_t VionRB
+  * in src/common.c
+    - added _smooth3()
+    
+
 2021 OCT 06a
   * in model/emfield/_Epotential-Bfixed/emfield.c and model/emfield/_Epotential/emfield.c
     - added find_DeltaVk_drift_from_mu()

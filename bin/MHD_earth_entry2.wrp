@@ -424,7 +424,7 @@ Cycle(
     relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
     if (iter>10,
        UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,5);
-       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,20);
+       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,100);
     );
 {    UpdateEMField(Lc,relaxEMF,TSEMF_NEWTON);}
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",

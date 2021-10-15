@@ -2508,7 +2508,7 @@ double _w_product_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long l
   }
 
 #ifdef _FLUID_PLASMA
-  dim_t VionRB;
+  EXM_vec3D_t VionRB;
   find_Vk(np, gl, lB, specR, VionRB);
   VnormalR=0.0;
   for (dim=0; dim<nd; dim++) VnormalR+=_rhok(np[lA],specR)*n[dim]*VionRB[dim];
