@@ -6,9 +6,9 @@
                                 CFD Code for Plasma & Reactive Flow
   _______________________________________________________________________________________________
 
-  Version                          20dec08a
-  Compiler                         gcc 8.3.0 with OPENMP threads with distributed memory MPI
-  Compiled on                      Dec 15 2020 at 14:32:44
+  Version                          21sep15b
+  Compiler                         gcc 8.3.0 with OPENMP threads
+  Compiled on                      Sep 16 2021 at 14:16:30
   Cycle Strategy                   Standard
   Fluid Relaxation                 Block DDADI [2,1]
   EM Field Relaxation              Implicit schemes based on approximate factorization including
@@ -21,15 +21,14 @@
   Temporal Discretization          Steady-State
   Fluid Model                      Navier-Stokes with drift-diffusion plasma model [15]
   Thermodynamic Model              NASA Glenn Polynomials [16]
-  Chemical Model                   Air Plasma 11s Dunn-Kang [17], Park [19], Lenard [18], Boyd
-                                   [20]
-  EM Field Model                   Electric field potential and fixed magnetic field [21,22]
+  Chemical Model                   Cesium Air Plasma 15 species  [17,18]
+  EM Field Model                   Electric field potential [19]
   Beam Model                       None
   Number of Dimensions             2
-  Number of Flux Components        16
-  Number of Species                11
-  Number of Charged Species        6
-  List of Species                  e-, O+, N+, O2+, N2+, NO+, O, N, NO, O2, N2
+  Number of Flux Components        20
+  Number of Species                15
+  Number of Charged Species        9
+  List of Species                  e-, O-, O2-, O+, N+, O2+, N2+, NO+, Cs+, Cs, O, N, NO, O2, N2
   _______________________________________________________________________________________________
 
   [1]  RW MacCormack. "A New Implicit Algorithm for Fluid Flow", 13th Computational Fluid
@@ -67,79 +66,101 @@
        Aerodynamics", AIAA Journal, 54:898-911, 2016.
   [16] BJ McBride, MJ Zehe, and S Gordon. "NASA Glenn Coefficients for Calculating Thermodynamic
        Properties of Individual Species", NASA TP 2002-211556, 2002.
-  [17] MG Dunn and SW Kang. "Theoretical and Experimental Studies of Reentry Plasmas", NASA CR-
-       2232, 1973.
-  [18] M Lenard. "Ionization of Cesium and Sodium Contaminated Air in the Hypersonic Slender
+  [17] M Lenard. "Ionization of Cesium and Sodium Contaminated Air in the Hypersonic Slender
        Body Boundary Layer", General Electric Missile and Space Division Technical Report
        R64SD22, 1964.
-  [19] C Park. "Review of Chemical-Kinetic Problems of Future NASA Missions, I: Earth Entries,"
+  [18] C Park. "Review of Chemical-Kinetic Problems of Future NASA Missions, I: Earth Entries,"
        Journal of Thermophysics and Heat Transfer 7:385-398, 1993.
-  [20] ID Boyd, "Modeling of associative ionization reactions in hypersonic rarefied flows,"
-       Physics of Fluids 19:096102, 2007.
-  [21] B Parent, MN Shneider, and SO Macheret. "Generalized Ohm's Law and Potential Equation in
-       Computational Weakly-Ionized Plasmadynamics", Journal of Computational Physics 230:1439-
-       1453, 2011.
-  [22] B Parent, SO Macheret, and MN Shneider. "Modeling Weakly-Ionized Plasmas in Magnetic
-       Field: A New Computationally-Efficient Approach", Journal of Computational Physics
-       300:779-799, 2015.
+  [19] B Parent, SO Macheret, and MN Shneider. "Electron and Ion Transport Equations in
+       Computational Weakly-Ionized Plasmadynamics", Journal of Computational Physics 259:51-
+       69, 2014.
 
 
 }
 
 
-Bz=0.15; {Tesla}
-mf=0.5; 
-gamma=0.1e0;    {secondary emission coefficient}
-Twall=3000;     {wall temperature everywhere}
-workfunct=2.7; {2.7, 4.6, and 1e99 eV}
-THERMIONICEMISSION=TRUE;
-{
-            work function   max operating temperature point
- graphite   4.6 eV          3800 K
- titanium   3.6 eV          1800 K
- tungsten with Barium oxyde
-            1.56 eV         1750 K
- tungsten thoriated [1]
-            2.64 eV         2900 K
-            3.06 eV         3700 K
+Pdyn=50.0E3; {Pa}
+Minf=18;
+Tinf=240; {K}
+workfunct=2.7;
 
- [1] An experimental study of thoriated tungsten cathodes operating at different current 
-     intensities in an atmospheric-pressure plasma torch. 
-     J A Sillero et al 2010 J. Phys. D: Appl. Phys. 43 185204
-}
+Twall=1000;
+Twalltip=3000;
+
+Hplate=0.001; {height of the plate}
+theta=rad(10); {angle of plate wrt horizontal}
+Lplate=0.1;  {length of the plate}
+Linflow=0.01; {length of the inflow before encountering the plate}
+Hflow=0.05; {height of the flow above the plate}
+Hbdry=0.01; {height of boundary layer at the domain exit}
+Lbow=0.0015;
+
+mf=1;
+
+dxwall=0.1e-6/mf;
+
+dywall=2e-6/mf;
+
 
 
 is=1;
-is1=is+round(mf*40); {start of electrode}
-is2=is1+round(mf*20); {end of electrode}
-is3=round(is2+mf*25);
-ie=round(is3+mf*20);
+im1=round(15*mf);
+im2=round(45*mf);
+ie=round(115*mf);
 js=1;
-je=round(mf*100);
+jm1=round(15*mf);
+jm2=round(40*mf);
+jm3=round(70*mf);
+jm4=round(95*mf);
+je=round(110*mf);
 
-L=0.07*10;
-Lbow=0.01;
-H=0.1*10;
-
-dwall=1e-6/mf;
 
 Grid(
   Size(is,js, ie,je);
-  Point(is,js, 0.0e0,0.0e0);
-  Point(is,je, 0.0e0,H);
-  Point(is1,js, L*4/15,0.0e0);
-  Point(is1,je, L*4/15,H);
-  Point(is2,js, L*8/15,0.0e0);
-  Point(is2,je, L*8/15,H);
-  Point(is3,js, L,0.0e0);
-  Point(is3,je, L,H);
-  JoinCorners(is1,js, is2,je,  EE,0.5e0,1.0,1.0e0,  ff,0.3e0,dwall,dwall);
-  JoinCorners(is,js, is1,je,  FG,0.8e0,dwall*5,1.0e0,  ff,0.3e0,dwall,dwall);
-  JoinCorners(is2,js, is3,je,  GE,0.25e0,1.0e0,1.0e0,  ff,0.3e0,dwall,dwall);
-  Point(ie,js, L+0.5*L,0-0.0*L);
-  Point(ie,je, L+0.5*L,H+0.0*L);
-  Join(ie,js,ie,je, j, ff,0.3e0,dwall,dwall);
-  Join(is3,js,ie,je, i, GE,0.6,1.0,1.0);
+  
+
+
+  {grid the zone left of the plate}
+  Corners(im1,jm2,im2,jm3, -Lbow, -Hplate/2, 0, Hplate/2);
+  JoinCorners(im1,jm2, im2,jm3,  EF,0.5e0,1.0e0,dxwall,  FF,0.5e0,dywall,dywall);
+
+
+  {grid the zone left left of the plate}
+  Corners(is,jm2,im1,jm3, -Linflow, -Hplate/2, -Lbow, Hplate/2);
+  JoinCorners(is,jm2, im1,jm3,  EG,0.5e0,1.0e0,1.0,  FF,0.5e0,dywall,dywall);
+
+
+  
+  {grid the zone right of the plate (unused)}
+  Corners(im2,jm2,ie,jm3, 0, -Hplate/2, Lplate, Hplate/2);
+  JoinCorners(im2,jm2,ie,jm3, FE,0.5e0,dxwall,1.0,  FF,0.5e0,dywall,dywall);
+  
+  {grid the region top left of the plate}
+  Copy(is,jm3,im2,jm3, is,je);
+  Translate(is,je,im2,je, 0, Hflow-Hplate/2);
+  Join(is,jm3,im2,je,  j,  GE,0.8e0,1.0e0,1.0e0);
+
+  {grid the region bottom left of the plate}
+  Copy(is,jm2,im2,jm2, is,js);
+  Translate(is,js,im2,js, 0, -Hflow+Hplate/2);
+  Join(is,js,im2,jm2,  j,  EG,0.2e0,1.0e0,1.0e0);
+
+  
+  {grid the top plate}
+  Point(ie,jm3, cos(theta)*Lplate, sin(theta)*Lplate);
+  Point(ie,jm4, cos(theta)*Lplate, sin(theta)*Lplate+Hbdry);
+  Point(ie,je, cos(theta)*Lplate, sin(theta)*Lplate+Hflow);
+  Join(ie,jm3,ie,jm4, j, FE,0.36,dywall,1.0);
+  Join(ie,jm4,ie,je, j, GE,0.9,1.0,1.0);
+  Join(im2,jm3,ie,je, i, GE, 0.6,1.0,1.0);
+
+  {grid the bottom plate}
+  Point(ie,jm1, cos(theta)*Lplate, -sin(theta)*Lplate-Hbdry);
+  Point(ie,jm2, cos(theta)*Lplate, -sin(theta)*Lplate);
+  Point(ie,js, cos(theta)*Lplate, -sin(theta)*Lplate-Hflow);
+  Join(ie,jm1,ie,jm2, j, EF,0.64,1.0,dywall);
+  Join(ie,js,ie,jm1, j, EG,0.1,1.0,1.0);
+  Join(im2,js,ie,jm2, i, GE, 0.6,1.0,1.0);
 );
 
 
@@ -162,20 +183,17 @@ Bdry(
     BDRY_SYMMETRICAL1                  9    Symmetrical, 1o
     BDRY_WALLTFIXED1                   3    Wall, T specified; param Twall[K]
     BDRY_WALLTFIXEDTHERMIONIC1         h    Wall, T specified; param Twall[K], workfunct[eV]
-    BDRY_WALLTFIXEDCATALYTIC1          i    Wall, T specified; param Twall[K], _spec(O),_spec(O2),gammaO, ...
+    BDRY_WALLTFIXEDCATALYTIC1          i    Wall, T specified; param Twall[K], specO,specO2,gammaO, ...
+    BDRY_WALLTFIXEDINJECTION1          j    Wall, T specified; param Twall[K], specCs,mdotCs[kg/m2s]
     BDRY_WALLADIABATIC1                6    Wall, Adiabatic
     BDRY_SLIPWALL1                     c    Slip wall, Adiabatic, 1o
     BDRY_FREESTREAM1                   5    Freestream, 1o, params Vx,Vy, P, T
     _________________________________________________________________________________________
     }
+    Cut(im2,jm2,  ie,jm3);
     All(BDRY_WALLTFIXED1,Twall);
-    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLTFIXED1,BDRY_WALLTFIXED1);
-    Plane("j",js,BDRY_WALLTFIXED1,Twall);
-    Plane("j",je,BDRY_WALLTFIXED1,Twall);
-    if (THERMIONICEMISSION,
-      Region(is1,js,is2,js,BDRY_WALLTFIXEDTHERMIONIC1,Twall,workfunct);
-      Region(is1,je,is2,je,BDRY_WALLTFIXEDTHERMIONIC1,Twall,workfunct);
-    );
+    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_INFLOWSUPERSONIC,BDRY_INFLOWSUPERSONIC);
+    Region(im2,jm2+3,im2,jm3-3,BDRY_WALLTFIXEDTHERMIONIC1,Twalltip,workfunct);
     {
     Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
@@ -183,7 +201,7 @@ Bdry(
     Param(is,js,  ie,je,  BDRY_FREESTREAM1, Vx,Vy,P,T);
     }
   );
-  EpotentialBfixed(
+  Epotential(
     {
     _________________________________________________________________________________________
 
@@ -192,14 +210,16 @@ Bdry(
 
     BDRYEMF_ELECTRODE             0    Electrode, phi fixed
     BDRYEMF_DIELECTRIC            2    Dielectric, no conduction current through
-    BDRYEMF_EXTRAPOLATED1         1    Extrapolated, similar to outflow, 1o
+    BDRYEMF_EXTRAPOLATED1         1    Extrapolated, similar to outflow
     _________________________________________________________________________________________
 
     }
+    Cut(im2,jm2,  ie,jm3);
     All(BDRYEMF_DIELECTRIC);
-    Region(is1,js,  is2,je,  BDRYEMF_ELECTRODE);
+    Region(im2,jm2,im2,jm3,BDRYEMF_ELECTRODE);
+    Region(im2+10*mf,jm2-1,ie,jm3+1,BDRYEMF_ELECTRODE);
+    {Faces(BDRYEMF_ELECTRODE,BDRYEMF_ELECTRODE,  BDRYEMF_DIELECTRIC,BDRYEMF_DIELECTRIC);}
     {
-    Faces(BDRYEMF_ELECTRODE,BDRYEMF_ELECTRODE,  BDRYEMF_DIELECTRIC,BDRYEMF_DIELECTRIC);
     Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRYEMF_ELECTRODE);
     Link(i1,j1,  i2,j2);
@@ -211,45 +231,50 @@ Bdry(
 Model(
   NavierStokesPlasma(
     TEMODEL=TEMODEL_TRANSPORT;
+    N2VIBMODEL=N2VIBMODEL_MACHERET;
+    N2VIBJOULEHEATING=YES;
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
-    N2VIBMODEL=N2VIBMODEL_EQUILIBRIUM;
-    N2VIBJOULEHEATING=NO;
     REACTING=YES;
     emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
-    sigmadiv=1e-10; {S/m}
+    sigmadiv=1e-9; {S/m}
     etdiv=1e-1;     {J/kg}
-    Pmin=1.0e3;    Pmax=9.9e99;   {Pa}
-    Tmin=1000;     Tmax=100000;    {K}
-    Tvmin=Tmin;     Tvmax=Tmax;  {K}
-    Temin=300;     Temax=5e6;  {K}
+    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
+    Tmin=1.0e1;     Tmax=20.0e3;    {K}
+    Tvmin=Tmin;     Tvmax=13.0e3;  {K}
+    Temin=5.0;    Temax=2.5e4;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
-    wmin=1.0e-9;                  {min mass fraction allowed in the domain for neutrals}
-    chiimin=1e-10;  chiimax=1.0;    {min and max ion molar fraction}
-    chiemin=1e-9;  chiemax=1.0;    {min and max electron molar fraction}
-    Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
+    wmin=1.0e-50;                  {min mass fraction allowed in the domain for neutrals}
+    chiimin=1e-30;    chiimax=1.0;    {min and max ion mass fraction}
+    chiemin=1e-13;    chiemax=1.0;    {min and max electron mass fraction}
+    Nminbdry=1e5;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
+    gamma=0.1e0;    {secondary emission coefficient}
     AXISYMMETRIC=NO;
   );
   AirPlasma11s(
     CHEMMODEL=CHEMMODEL_PARENTPARK2021;
     ADDITIONALREACTION=FALSE; {include reactions function of EoverN}
-    TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
-    QEISOURCETERMS=TRUE;
+    TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE generally}
+    QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}
   );
-  EpotentialBfixed(
-    EFIELD_SPECIES_FRAME=TRUE;
-    AXISYMMETRIC=NO;
+  CsAirPlasma15s(
+    AIRCHEMMODEL=AIRCHEMMODEL_PARENTPARK2021;
+    CESIUMREACTIONS=TRUE; {include reactions function of Cs}
+    NEGATIVEIONREACTIONS=TRUE; {include reactions function of O- and O2-}
+    TOWNSENDIONIZATION=FALSE; {include reactions function of EoverN}
+    TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
+    CESIUMIONIZATIONMODEL=CESIUMIONIZATIONMODEL_ANDRIENKO2021;
+    CESIUMRECOMBINATIONMODEL=CESIUMRECOMBINATIONMODEL_LENARD1964;
+  );
+  Epotential(
     Te_buffer=300.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,Te_buffer);  
                        needed to prevent convergence hangs where |E| becomes close to 0;
                        set to as little a value as possible}
-    Jmax=1e11;     {the maximum current density in A/m2 expected in the domain; this will affect only
+    Jmax=20000000.0;     {the maximum current density in A/m2 expected in the domain; this will affect only
                        the Townsend ionization rates; make sure Jmax > sigma*Emag in the converged solution.}
     SetRelativePermittivity(is,js, ie,je, 1.0 );
     SetSolidConductivity(is,js, ie,je, 0.0 {S/m});
     SetElectroMotiveForce(is,js, ie,je, 0.0{V/m},0.0{V/m}, 1e99{max power in W/m3});
-    SetMagneticField(is,js, ie,je, 0{T},0{T},Bz{T});
-    {make sure that (A_x,A_y,A_z) or (B_x,B_y,B_z) do not lie on top of a node }
-    {AddMagnetDipole({A_x}0, {A_y}0, {A_z}0, {B_x}0, {B_y}0.01, {B_z}0, {Bd}1);} {add a dipole with the origin at A, and strength Bd at B}
-    {AddMagnetDipoleRow({A_x}0, {A_y}0, {A_z}0, {B_x}0, {B_y}0.01, {B_z}0, {Bd}1, {numsteps}200);} {add a dipole row starting from A and ending at B, with Bd the flux}
+    AXISYMMETRIC=FALSE;
   );
 );
 
@@ -271,33 +296,22 @@ Init(
     _______________________________________________________________________________________
 
     }
-    Species("e-","O+","N+","O2+","N2+","NO+","O","N","NO","O2","N2");
-
-    Vx=5544; {m/s}
+    T=Tinf;
+    Vx=Minf*sqrt(1.4*287.05*T); {m/s}
     Vy=0; {m/s}
-    P=34832; {Pa}
-    T=7832; {K}
+    rho=2.0*Pdyn/(Vx^2+Vy^2);
+    P=rho*287.05*T; {Pa}
     Tv=T; {K}
     Te=T; {K}
-    chi_eminus=0.00264;
-    chi_Oplus=0.00128;
-    chi_Nplus=0.00115;
-    chi_O2plus=2.14e-13;
-    chi_N2plus=2.27e-5;
-    chi_NOplus=0.0001;
-    chi_O=0.2135;
-    chi_N=0.7644;
-    chi_NO=0.000166;
-    chi_O2=1.51e-6;
-    chi_N2=0.0168;    
-
-    All(INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_Oplus,chi_Nplus,chi_O2plus,chi_N2plus,chi_NOplus,chi_O,chi_N,chi_NO,chi_O2,chi_N2,Tv,Te);
-    {
-    Bdry(BDRY_WALLTFIXED1, INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_Ominus,chi_O2minus,chi_Oplus,chi_Nplus,chi_O2plus,chi_N2plus,chi_NOplus,chi_Csplus,chi_Cs,chi_O,chi_N,chi_NO,chi_O2,chi_N2,Tv,Te);
-    Region(is,js,  ie,je, INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_Ominus,chi_O2minus,chi_Oplus,chi_Nplus,chi_O2plus,chi_N2plus,chi_NOplus,chi_Csplus,chi_Cs,chi_O,chi_N,chi_NO,chi_O2,chi_N2,Tv,Te);
-    }
+    chi_eminus=1e-13;
+    chi_O2plus=1e-13;
+    chi_O2=0.21;
+    chi_N2=0.79;
+    chi_default=1.0e-30;
+    Species("e-","O2+","O2","N2","default");
+    All(INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2plus,chi_O2,chi_N2,chi_default,Tv,Te);
   );
-  EpotentialBfixed(
+  Epotential(
     {
     _______________________________________________________________________________________
 
@@ -309,11 +323,7 @@ Init(
 
     }
     phi=0.0; {V}
-    phi_bot=0.0;
-    phi_top=0.0;
     All(INITEMF_TYPE1,phi);
-    Region(is,js,  ie,js,INITEMF_TYPE1,phi_bot);
-    Region(is,je,  ie,je,INITEMF_TYPE1,phi_top);
     {
     Bdry(BDRYEMF_ELECTRODE, INITEMF_TYPE1,phi);
     Region(is,js,  ie,je,INITEMF_TYPE1,phi);
@@ -324,7 +334,7 @@ Init(
 
 Disc(
   NavierStokesPlasma(
-    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA1=0.5e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
     zetaD=0.0;        {conditions the Dstar eigenvalues for the charged species}
     for (spec,1,numspec,
@@ -333,40 +343,30 @@ Disc(
         betaa[spec]=0.0;
       );
       if (SPECIESTYPE[spec]==SPECIESTYPE_IONMINUS,
-        betag[spec]=-0.5;
+        betag[spec]=-0.01;
         betaa[spec]=0.5;
       );
       if (SPECIESTYPE[spec]==SPECIESTYPE_ELECTRON,
-        betag[spec]=-0.001; {-0.03 works good}
-        betaa[spec]=0.999;
+        betag[spec]=-0.01;
+        betaa[spec]=0.95;
       );
     );
   );
-  EpotentialBfixed(
+  Epotential(
     POTENTIAL=POTENTIAL_OHMBASED;
-    Ediv=10;        {a small positive number in V/m, needed to prevent a division by zero when
+    Ediv=10.0;        {a small positive number in V/m, needed to prevent a division by zero when
                        discretizing the electron pressure gradients within the potential equation}
   );
   MUSCL(
     FLUX=FLUX_FDS;
-    AVERAGING=AVERAGING_ROE;
+    AVERAGING=AVERAGING_ARITH;
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.999;
     INTERPOL=INTERPOL_TVD2_VANLEER;
-    EIGENVALCOND=EIGENVALCOND_PECLET;
+    EIGENVALCOND=EIGENVALCOND_PARENT;
     POSFILTER=POSFILTER_PARENT;
     POSFILTER_numiter=4;
-  );
-  CDFplus(
-    for(flux,1,numflux,
-      if (flux<=numspec+numdim+1,
-        xi[flux]=0.5;
-      );
-      if (flux>numspec+numdim+1,
-        xi[flux]=0.25;
-      );
-    );
   );
 );
 
@@ -378,14 +378,14 @@ Cycle(
     zetaGammae=1.0;       {factor multiplying the pseudotime step of the electron species transport equations
                            near cathode}
     relaxNi_bdry=1.0;     {the ion density relaxation factor at the boundary }
-    relaxNe_bdry=0.1;     {the electron density relaxation factor at the boundary }
-    relaxTe=0.3;          {the electron temperature relaxation factor }
+    relaxNe_bdry=0.3;     {the electron density relaxation factor at the boundary }
+    relaxTe=0.5;          {the electron temperature relaxation factor }
     rhoref=0.1;           {reference density in kg/m3}
     Tref=300.0;           {reference temperature in K}
     Teref=20000.0;        {reference electron temperature in K}
     Tvref=5000.0;         {reference vibrational temperature in K}
-    aref=sqrt(1.4*287*Tref);  {reference sound speed in m/s}
-    wion=1e-1;            {average ion mass fraction}
+    aref=sqrt(1.4*287.05*Tref);  {reference sound speed in m/s}
+    wion=1e-7;            {average ion mass fraction}
     for (spec,1,numspec,
       if (SPECIESTYPE[spec]==SPECIESTYPE_IONPLUS || SPECIESTYPE[spec]==SPECIESTYPE_IONMINUS,
         Uref[spec]=wion*rhoref;
@@ -404,73 +404,90 @@ Cycle(
     Uref[numspec+numdim+2]=rhoref*700.0*Tvref;
     Uref[numspec+numdim+3]=rhoref*wion*414*Teref;
   );
-  EpotentialBfixed(
+  Epotential(
     xiverge_emfield=1e-2; {residual convergence threshold for the potential equation}
-    relaxEk=0.3; {relaxation factor for E in species frame}
     sigmaref=3e-6; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
     Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
   SteadyState(
-    if (mod(iter,100)==0,
+    if (mod(iter,200)==0,
       WriteDataFile(outputfilename);
     );
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
-      CFL=0.001;
+      CFL=0.01;
     );
-    CFL=min(CFL*1.03,0.4);
-    Model(
-      EpotentialBfixed(
-        SetMagneticField(is,js, ie,je, 0,0,min(Bz,Bz*iter/(mf*300))); 
+
+      if (EMFIELD,
+        CFLmax=2.0;
+        if (iter<4000*mf,
+          CFLmax=1.5;
+        );
+        if (iter<2000*mf,
+          CFLmax=1.0;
+        );
+      ,{else}
+        CFLmax=0.8;
       );
-    );
+
+    CFL=min(CFL*1.04,CFLmax);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
-    Lc=1000e44;      {characteristic length scale in meters used to solve the emfield equation}
-    relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
-    if (iter>10,
-       UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,5);
-       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,100);
-    );
-{    UpdateEMField(Lc,relaxEMF,TSEMF_NEWTON);}
-    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
+    if (EMFIELD,
+      Lc=3e30;      {characteristic length scale in meters used to solve the emfield equation}
+      relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
+      
+      UpdateEMField(Lc,relaxEMF, TSEMF_SOR, round(200)); 
+      UpdateEMField(Lc,relaxEMF, TSEMF_IMAF, round(20)); 
+      UpdateEMField(Lc,relaxEMF, TSEMF_SOR, round(200)); 
+      UpdateEMField(Lc,relaxEMF, TSEMF_IMAF, round(20)); 
+      printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
-  );
-
-  DualTimeStepping(
-    tmax=10e-6;    {simulation time span in seconds}
-    dt=tmax/300;   {physical time step in seconds}
-    sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
-    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
-    if (iter==1,
-      CFL=0.1;
-    );
-    CFL=min(CFL*1.15,0.7);
-    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
-    Lc=100e3;      {characteristic length scale in meters used to solve the emfield equation}
-    relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,40); 
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,280); 
-    
-    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
+    ,{else}
+      printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
-           j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
-    if (iter>30,
-      IncreaseTimeLevel();
-      WriteDataFile(outputfilename"."round(time/dt));
-      printf("dt=%E time=%Es\n",dt,time);
-      if (time>tmax-0.1*dt,
-        exit(EXIT_SUCCESS);
-      );
+           j_ximax,clipinfo);
+   
     );
   );
-
-
 );
 
 
 Post(
+  xstation[1]=0.1; {m}
+  xstation[2]=0.2; {m}
+  xstation[3]=0.3; {m}
+  numsteps=300;
+  qmin=1.0; {m/s, as small a value as possible}
+  Pback_min=400; {Pa}
+  Pback_max=40000; {Pa}
+  Aback=1.0; {m2/m}
+  for (cnt,1,3,
+    XSTATION_Set(xstation[cnt]);
+    Pback=XSTATION_Pback(Aback, Pback_min, Pback_max, numsteps, qmin);
+    Fpot=XSTATION_Fpot(Pback, numsteps, qmin);
+    mdot=XSTATION_mdot();
+    Tstag=XSTATION_Tstag();
+    Pstag=XSTATION_Pstag(numsteps);
+    Pstar=XSTATION_Pstar();
+    T=XSTATION_T();
+    q=XSTATION_q();
+    rho=XSTATION_rho();
+    htstar=XSTATION_htstar();
+    fprintf(postfilename,"x      = %E m\n"
+           "Pback  = %E Pa\n"
+           "Fpot   = %E Ns/kg\n"
+           "mdot   = %E kg/ms\n"
+           "htstar = %E J/kg\n"
+           "Tstag  = %E K\n"
+           "Pstag  = %E Pa\n"
+           "Pstar  = %E Pa\n"
+           "T      = %E K\n"
+           "q      = %E m/s\n"
+           "rho    = %E kg/m3\n\n"
+           ,xstation[cnt],Pback,Fpot,mdot,htstar,Tstag,Pstag,Pstar,T,q,rho);
+  );
   fprintf(postfilename,"\n");
   for (dim,1,2,
     Area[dim]=_Area(is,js, ie,je, dim,BDRY_WALLTFIXED1);

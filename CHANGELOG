@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 OCT 28a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - in _Vk_drift_perp_to_bdry(), changed the algorithm so that only nodes perpendicular to
+      the surface are used to determie Vk_drift
+    - added _mu_effective_perpendicular_boundary_plane()
+    - in update_bdry_wall(), changed the way the thermionic electrode BC is applied: now 
+      when the electrode is an anode, the electron flux out of the surface is set to diffusion
+      when the electrode is a cathode, the electron flux out of the surface is set to convection
+  * in bin/MHD_earth_entry2.wrp
+    - made various changes to the grid and cycle code.
+
+
 2021 OCT 14a
   * in model/chem/_Air_Plasma_11s/doc/report.tex
     - in the Parent-Park model, fixed a typo related to the third body lists

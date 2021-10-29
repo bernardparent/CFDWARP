@@ -79,13 +79,13 @@
 }
 
 
-Pdyn=10.0E3; {Pa}
-Minf=18;
+Pdyn=50.0E3; {Pa}
+Minf=6;
 Tinf=240; {K}
 
 
 Twall=1800;
-mdotCs=2e-7; {kg/s per meter depth}
+mdotCs=1e-5; {kg/s per meter depth}
 
 Hplate=0.001; {height of the plate}
 theta=rad(10); {angle of plate wrt horizontal}
@@ -95,7 +95,7 @@ Hflow=0.05; {height of the flow above the plate}
 Hbdry=0.01; {height of boundary layer at the domain exit}
 Lbow=0.0015;
 
-mf=2;
+mf=1;
 
 dxwall=1e-6/mf;
 
@@ -277,12 +277,12 @@ Model(
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     REACTING=YES;
     emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
-    sigmadiv=1e-12; {S/m}
-    etdiv=1e-3;     {J/kg}
+    sigmadiv=1e-9; {S/m}
+    etdiv=1e-1;     {J/kg}
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e1;     Tmax=20.0e3;    {K}
     Tvmin=Tmin;     Tvmax=13.0e3;  {K}
-    Temin=150.0;    Temax=2.5e4;  {K}
+    Temin=5.0;    Temax=2.5e4;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain for neutrals}
     chiimin=1e-30;    chiimax=1.0;    {min and max ion mass fraction}
@@ -297,7 +297,7 @@ Model(
     NEGATIVEIONREACTIONS=TRUE; {include reactions function of O- and O2-}
     TOWNSENDIONIZATION=FALSE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
-    CESIUMIONIZATIONMODEL=CESIUMIONIZATIONMODEL_LENARD1964;
+    CESIUMIONIZATIONMODEL=CESIUMIONIZATIONMODEL_ANDRIENKO2021;
     CESIUMRECOMBINATIONMODEL=CESIUMRECOMBINATIONMODEL_LENARD1964;
   );
   Epotential(
@@ -404,16 +404,16 @@ Init(
 
 Disc(
   NavierStokes(
-    zetaA1=0.2e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA1=5.2e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.2e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   NavierStokesPlasma(
-    zetaA1=0.2e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.003e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaA1=5.2e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.03e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
     zetaD=0.0;        {conditions the Dstar eigenvalues for the charged species}
     for (spec,1,numspec,
       if (SPECIESTYPE[spec]==SPECIESTYPE_IONPLUS,
-        betag[spec]=0.3;
+        betag[spec]=0.03;
         betaa[spec]=0.0;
       );
       if (SPECIESTYPE[spec]==SPECIESTYPE_IONMINUS,
@@ -439,7 +439,7 @@ Disc(
     AOWENO_gammahi=0.999;
     INTERPOL=INTERPOL_TVD2_VANLEER;
     EIGENVALCOND=EIGENVALCOND_PECLET;
-    POSFILTER=POSFILTER_PARENT;
+    POSFILTER=POSFILTER_NONE;
     POSFILTER_numiter=4;
   );
 );
@@ -496,9 +496,34 @@ Cycle(
     Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
   SteadyState(
-    if (mod(iter,100)==0,
+    if(iter==1,
+      Init(
+        NavierStokesPlasma(
+          T=Tinf;
+          Vx=Minf*sqrt(1.4*287.05*T); {m/s}
+    Vy=0; {m/s}
+    rho=2.0*Pdyn/(Vx^2+Vy^2);
+    P=rho*287.05*T; {Pa}
+    Tv=T; {K}
+    Te=T; {K}
+    chi_eminus=1e-13;
+    chi_O2plus=1e-13;
+    chi_O2=0.21;
+    chi_N2=0.79;
+    chi_Cs=1.0e-30;
+    chi_default=1.0e-30;
+    Species("e-","O2+","Cs","O2","N2","default");
+    Region(is,js,is,je,INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2plus,chi_Cs,chi_O2,chi_N2,chi_default,Tv,Te);
+    Region(is,js,ie,js,INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2plus,chi_Cs,chi_O2,chi_N2,chi_default,Tv,Te);
+    Region(is,je,ie,je,INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2plus,chi_Cs,chi_O2,chi_N2,chi_default,Tv,Te);
+        );
+      );
+
+    );
+    if (mod(iter,200)==0,
       WriteDataFile(outputfilename);
     );
+    if(iter==40001,exit(EXIT_SUCCESS););
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
@@ -506,15 +531,15 @@ Cycle(
     );
 
       if (EMFIELD,
-        CFLmax=2.5;
-        if (iter<1000*mf,
-          CFLmax=0.3;
-        );
+        CFLmax=12.0;
         if (iter<2000*mf,
-          CFLmax=0.8;
+          CFLmax=1.0;
+        );
+        if (iter<4000*mf,
+          CFLmax=2.0;
         );
       ,{else}
-        CFLmax=4;
+        CFLmax=0.8;
       );
 
     CFL=min(CFL*1.04,CFLmax);
