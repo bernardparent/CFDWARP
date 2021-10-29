@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2005-2006,2020 Bernard Parent
+Copyright 2005-2006,2020,2021 Bernard Parent
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -44,6 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BDRY_SYMMETRICAL2 14
 #define BDRY_WALLTFIXED1 3
 #define BDRY_WALLADIABATIC1 6
+#define BDRY_WALLTFIXEDCATALYTIC1 17
+#define BDRY_WALLTFIXEDINJECTION1 18
 #define BDRY_SLIPWALL1 12
 #define BDRY_FREESTREAM1 2
 
@@ -67,17 +69,18 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    BDRY_SYMMETRICAL2                 %c   Symmetrical, 2o\n"
     "    BDRY_SYMMETRICAL1                 %c   Symmetrical, 1o\n"
     "    BDRY_WALLTFIXED1                  %c   Wall, T specified, 1o, param Twall\n"
+    "    BDRY_WALLTFIXEDINJECTION1         %c   Wall, T specified, param Twall, specCs,mdotCs[kg/m2s], ...\n"
     "    BDRY_WALLADIABATIC1               %c   Wall, Adiabatic, 1o\n"
     "    BDRY_SLIPWALL1                    %c   Slip wall, Adiabatic, 1o\n"
     "    BDRY_FREESTREAM1                  %c   Freestream, 1o, params Vx,Vy,"if3DL("Vz,")" P, T\n"
     "    _________________________________________________________________________________________\n"
     "    }\n"
-    "    All(BDRY_WALLTFIXED1);\n"
-    "    Plane(\"i\",is,BDRY_INFLOWSUPERSONIC);\n"
-    "    Plane(\"i\",ie,BDRY_OUTFLOWSUPERSONIC1);\n"
+    "    All(BDRY_OUTFLOWSUPERSONIC1);\n"
     "    Twall=300.0; {K}\n"
     "    Plane(\"j\",js,BDRY_WALLTFIXED1,Twall);\n"
     "    Plane(\"j\",je,BDRY_WALLTFIXED1,Twall);\n"
+    "    Plane(\"i\",is,BDRY_INFLOWSUPERSONIC);\n"
+    "    Plane(\"i\",ie,BDRY_OUTFLOWSUPERSONIC1);\n"
 #ifdef _3D
     "    Plane(\"k\",ks,BDRY_SYMMETRICAL2);\n"
     "    Plane(\"k\",ke,BDRY_SYMMETRICAL2);\n"
@@ -91,6 +94,7 @@ void write_bdry_fluid_template(FILE **controlfile){
              _bdry_ID(BDRY_INFLOWSUBSONICMASSFLOWFIXED1),_bdry_ID(BDRY_OUTFLOWSUPERSONIC1),
              _bdry_ID(BDRY_OUTFLOWSUBSONIC1),_bdry_ID(BDRY_OUTFLOWSUBSONICMFIXED1),
              _bdry_ID(BDRY_SYMMETRICAL2),_bdry_ID(BDRY_SYMMETRICAL1),_bdry_ID(BDRY_WALLTFIXED1),
+             _bdry_ID(BDRY_WALLTFIXEDINJECTION1),
              _bdry_ID(BDRY_WALLADIABATIC1),_bdry_ID(BDRY_SLIPWALL1),_bdry_ID(BDRY_FREESTREAM1)
   );
 }
@@ -106,6 +110,7 @@ void add_bdry_types_fluid_to_codex(SOAP_codex_t *codex){
   add_int_to_codex(codex,"BDRY_SYMMETRICAL1", BDRY_SYMMETRICAL1  );
   add_int_to_codex(codex,"BDRY_SYMMETRICAL2", BDRY_SYMMETRICAL2  );
   add_int_to_codex(codex,"BDRY_WALLTFIXED1", BDRY_WALLTFIXED1  );
+  add_int_to_codex(codex,"BDRY_WALLTFIXEDINJECTION1", BDRY_WALLTFIXEDINJECTION1  );
   add_int_to_codex(codex,"BDRY_WALLADIABATIC1",  BDRY_WALLADIABATIC1 );
   add_int_to_codex(codex,"BDRY_SLIPWALL1", BDRY_SLIPWALL1  );
   add_int_to_codex(codex,"BDRY_FREESTREAM1",   BDRY_FREESTREAM1);
@@ -317,10 +322,10 @@ static void update_bdry_freestream(np_t *np, gl_t *gl, long lA, long lB, long lC
 
 static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
                             long theta, long thetasgn,
-                            bool ADIABATIC, bool BDRYDIRECFOUND, int ACCURACY){
+                            bool ADIABATIC, bool INJECTION, bool BDRYDIRECFOUND, int ACCURACY){
   spec_t wwall;
   double kwall,psiwall,Twall,Tvwall,Pwall;
-  long dim,spec;
+  long dim,spec,specneutral;
   dim_t Vwall;
   bool ref_flag;
 
@@ -344,9 +349,20 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
   for (spec=0; spec<ns; spec++){
     wwall[spec]=_f_symmetry(ACCURACY,_w(np[lB],spec),_w(np[lC],spec));
   }
-  if (gl->model.fluid.SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL) {
-    for (spec=0; spec<ncs; spec++)
+
+  if (INJECTION) update_w_V_at_injection_wall(np, gl, lA, lB, lC, Twall, Twall, 1, np[lA].numbdryparam-1, wwall, Vwall);
+
+  if (!INJECTION && gl->model.fluid.SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL ){
+    for (spec=0; spec<ncs; spec++){
+      // set ion and electron densities to zero at the surface
       wwall[spec]=0.0;
+      // make sure that no net mass flow (due to diffusion) goes through the boundary
+      if (speciestype[spec]==SPECIES_IONPLUS) {
+        if (!find_neutral_spec_from_ion_spec(spec,&specneutral))
+          fatal_error("Couldn't find a neutral species associated with positive ion species %ld.",spec); 
+        wwall[specneutral]=_w_product_at_catalytic_wall(np, gl, lA, lB, lC, theta, thetasgn, spec, specneutral, 1.0);
+      }
+    }
   }
 
   reformat_w(gl,wwall,"_bdry",&ref_flag);
@@ -380,16 +396,21 @@ void update_bdry_fluid(np_t *np, gl_t *gl, long lA, long lB, long lC, long lD, l
     break;
 
     case BDRY_WALLTFIXED1:
-      update_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, FALSE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
+      update_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, FALSE, FALSE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
+    break;
+
+    case BDRY_WALLTFIXEDINJECTION1:
+      update_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, FALSE, TRUE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
+    break;
+
+    case BDRY_WALLADIABATIC1: 
+      update_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, TRUE, FALSE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
     break;
 
     case BDRY_OUTFLOWSUBSONIC1:
       update_bdry_back_pressure(np, gl, lA, lB, lC, theta, ACCURACY_FIRSTORDER);
     break;
 
-    case BDRY_WALLADIABATIC1: 
-      update_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, TRUE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
-    break;
         
     case BDRY_INFLOWSUBSONIC1:
       update_bdry_inflow_reservoir(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);

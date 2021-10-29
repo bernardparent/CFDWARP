@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 OCT 28b
+  * in model/fluid/_Favre-Reynolds_Tv/fluid_bdry.c
+    - added BDRY_WALLTFIXEDINJECTION1
+    - in update_bdry_wall(), added code to make sure that surface catalyticity of electrons with
+      ions leads to production of neutrals
+  * in model/fluid/_Navier-Stokes/fluid_bdry.c
+    - in write_bdry_fluid_template(), changed the default template of bdry conditions: need to make
+      sure a wall node is never in a corner
+       
+
 2021 OCT 28a
   * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
     - in _Vk_drift_perp_to_bdry(), changed the algorithm so that only nodes perpendicular to
