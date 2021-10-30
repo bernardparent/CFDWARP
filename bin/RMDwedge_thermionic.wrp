@@ -347,8 +347,8 @@ Disc(
         betaa[spec]=0.5;
       );
       if (SPECIESTYPE[spec]==SPECIESTYPE_ELECTRON,
-        betag[spec]=-0.01;
-        betaa[spec]=0.95;
+        betag[spec]=-0.001;
+        betaa[spec]=0.999;
       );
     );
   );
@@ -364,8 +364,8 @@ Disc(
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.999;
     INTERPOL=INTERPOL_TVD2_VANLEER;
-    EIGENVALCOND=EIGENVALCOND_PARENT;
-    POSFILTER=POSFILTER_PARENT;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
+    POSFILTER=POSFILTER_NONE;
     POSFILTER_numiter=4;
   );
 );

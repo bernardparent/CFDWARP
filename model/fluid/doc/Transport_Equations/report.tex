@@ -3318,13 +3318,12 @@ Thus, say that the species O becomes O$_2$ at the surface through catalysis. The
  \frac{\partial w_{\rm O}}{\partial \chi}  = \frac{\frac{1}{4} \rho_{\rm O} \sqrt{\frac{8 R_{\rm O} T_{\rm O}}{\pi}} }{ \frac{\nu_{\rm O} }{\gamma_{\rm O}} - \nu_{\rm O}}
 \end{equation}
 %
-And the boundary condition for the O$_2$ mass fraction becomes:
+And to ensure no loss or gain of mass at the boundary, the mass fraction gradient of the product species needs to be adjusted. Thus, the boundary condition for the O$_2$ mass fraction becomes:
 %
 \begin{equation}
- \frac{\partial w_{\rm O_2}}{\partial \chi}  = -\frac{{\cal M}_{\rm O}}{{\cal M}_{\rm O_2}} \frac{\partial w_{\rm O}}{\partial \chi}
+ \frac{\partial w_{\rm O_2}}{\partial \chi}  = -\frac{{\nu}_{\rm O}}{{\nu}_{\rm O_2}} \frac{\partial w_{\rm O}}{\partial \chi}
 \end{equation}
 %
-with ${\cal M}_k$ the molecular weight of species $k$.
 
 
 The catalytic recombination coefficients are assumed function of temperature only and are obtained through curve fitting experimental data.  There are several polynomials for the catalytic coefficients for

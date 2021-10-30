@@ -7,6 +7,27 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 OCT 29a
+  * in model/metrics/_generic/metrics.c
+    - in find_unit_vector_normal_to_boundary_plane(), got rid of the fatal_error and replaced
+      with a return(FALSE) in case of not being able to find a boundary plane
+  * in model/share/fluid_share.c
+    - in _w_product_at_catalytic_wall(), added a if condition so that find_Vk is called only if
+      specR is an ion or electron
+    - in update_w_at_catalytic_wall(), now finds wwall[specp] using _w_product_at_catalytic_wall()
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - in the wall catalytic BC, fixed a typo in the equation determining the boundary condition
+      for the product species
+  * in model/fluid/_Favre-Reynolds_Tv/fluid_bdry.c, model/fluid/_Navier-Stokes/fluid_bdry.c,
+    and model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - in update_bdry_wall(), fixed a bug: when adjusting w at the wall so that no mass is lost
+      or created by the catalicity of the electrons and ions, the contribution is now added to 
+      (instead of replacing) the previous contributions 
+  * in ./model/share/fluid_share.c, ./model/fluid/_Navier-Stokes/fluid_bdry.c 
+    and ./model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - changed the parameters to update_w_at_catalytic_wall()
+
+
 2021 OCT 28b
   * in model/fluid/_Favre-Reynolds_Tv/fluid_bdry.c
     - added BDRY_WALLTFIXEDINJECTION1

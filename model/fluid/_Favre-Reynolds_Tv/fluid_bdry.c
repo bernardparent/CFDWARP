@@ -77,10 +77,10 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    }\n"
     "    All(BDRY_OUTFLOWSUPERSONIC1);\n"
     "    Twall=300.0; {K}\n"
-    "    Plane(\"j\",js,BDRY_WALLTFIXED1,Twall);\n"
-    "    Plane(\"j\",je,BDRY_WALLTFIXED1,Twall);\n"
     "    Plane(\"i\",is,BDRY_INFLOWSUPERSONIC);\n"
     "    Plane(\"i\",ie,BDRY_OUTFLOWSUPERSONIC1);\n"
+    "    Plane(\"j\",js,BDRY_WALLTFIXED1,Twall);\n"
+    "    Plane(\"j\",je,BDRY_WALLTFIXED1,Twall);\n"
 #ifdef _3D
     "    Plane(\"k\",ks,BDRY_SYMMETRICAL2);\n"
     "    Plane(\"k\",ke,BDRY_SYMMETRICAL2);\n"
@@ -360,7 +360,7 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
       if (speciestype[spec]==SPECIES_IONPLUS) {
         if (!find_neutral_spec_from_ion_spec(spec,&specneutral))
           fatal_error("Couldn't find a neutral species associated with positive ion species %ld.",spec); 
-        wwall[specneutral]=_w_product_at_catalytic_wall(np, gl, lA, lB, lC, theta, thetasgn, spec, specneutral, 1.0);
+        wwall[specneutral]+=_w_product_at_catalytic_wall(np, gl, lA, lB, lC, theta, thetasgn, spec, specneutral, 1.0)-_w(np[lB],specneutral);
       }
     }
   }

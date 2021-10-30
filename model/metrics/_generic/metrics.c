@@ -375,7 +375,8 @@ bool find_unit_vector_normal_to_boundary_plane(np_t *np, gl_t *gl, long lA, long
   if (kA!=kB) cnt++;
 #endif  
   if (cnt!=1){
-    fatal_error("Inner node B is misaligned with boundary node A in find_unit_vector_normal_to_boundary_plane(): iA=%ld jA=%ld kA=%ld iB=%ld jB=%ld kB=%ld \n",iA,jA,kA,iB,jB,kB); 
+    //fatal_error("Inner node B is misaligned with boundary node A in find_unit_vector_normal_to_boundary_plane(): iA=%ld jA=%ld kA=%ld iB=%ld jB=%ld kB=%ld \n",iA,jA,kA,iB,jB,kB); 
+    return(FALSE);
   }
 
   lA2=0; // to prevent compiler warning

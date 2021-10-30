@@ -87,7 +87,7 @@
 }
 
 
-Bz=0.15; {Tesla}
+Bz=0.12; {Tesla}
 mf=0.5; 
 gamma=0.1e0;    {secondary emission coefficient}
 Twall=3000;     {wall temperature everywhere}
@@ -324,7 +324,7 @@ Init(
 
 Disc(
   NavierStokesPlasma(
-    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA1=0.01e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
     zetaD=0.0;        {conditions the Dstar eigenvalues for the charged species}
     for (spec,1,numspec,
@@ -337,7 +337,7 @@ Disc(
         betaa[spec]=0.5;
       );
       if (SPECIESTYPE[spec]==SPECIESTYPE_ELECTRON,
-        betag[spec]=-0.001; {-0.03 works good}
+        betag[spec]=-0.001; 
         betaa[spec]=0.999;
       );
     );
@@ -419,7 +419,7 @@ Cycle(
     if (iter==1,
       CFL=0.001;
     );
-    CFL=min(CFL*1.03,0.4);
+    CFL=min(CFL*1.03,1.0);
     Model(
       EpotentialBfixed(
         SetMagneticField(is,js, ie,je, 0,0,min(Bz,Bz*iter/(mf*300))); 

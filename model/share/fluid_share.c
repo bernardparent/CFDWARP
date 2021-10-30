@@ -2498,8 +2498,8 @@ double _w_product_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long l
     return(_w(np[lB],specP)); 
   }
       
-  // idea is to set the flux of specP coming out equal to the flux of specR coming in
-  // first find the flux of spec  due to diffusion as a vector
+  // idea is to set the mass flux of specP coming out equal to the mass flux of specR coming in
+  // first find the mass flux of spec  due to diffusion as a vector
   VnormalR=0.0;
   for (dim=0; dim<nd; dim++) {
     for (dim2=0; dim2<nd; dim2++){
@@ -2509,9 +2509,11 @@ double _w_product_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long l
 
 #ifdef _FLUID_PLASMA
   EXM_vec3D_t VionRB;
-  find_Vk(np, gl, lB, specR, VionRB);
-  VnormalR=0.0;
-  for (dim=0; dim<nd; dim++) VnormalR+=_rhok(np[lA],specR)*n[dim]*VionRB[dim];
+  if (specR<ncs){
+    find_Vk(np, gl, lB, specR, VionRB);
+    VnormalR=0.0;
+    for (dim=0; dim<nd; dim++) VnormalR+=_rhok(np[lA],specR)*n[dim]*VionRB[dim];
+  }
 #endif
   
   // only consider a change to wP if the reactant species is injected in the surface  
@@ -2539,7 +2541,7 @@ double _w_product_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long l
 }
 
 
-void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, double Twall, double Tewall, long paramstart, long paramend, spec_t wwall){
+void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, long theta, long thetasgn, double Twall, double Tewall, long paramstart, long paramend, spec_t wwall){
   long specr,specp,numcat,cat;
   double dwall,gamma;
   spec_t nuk;
@@ -2564,7 +2566,9 @@ void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, d
     if (gamma<0.0) fatal_error("The catalytic recombination coefficient can not be set to a value less than 0.");
     
     wwall[specr]=max(0.0,_w(np[lB],specr)-dwall*0.25*wwall[specr]*_rho(np[lB])*sqrt(8.0*calR/_calM(specr)*Twall/pi)/(nuk[specr]/gamma-nuk[specr]));
-    wwall[specp]=_w(np[lB],specp)+_calM(specr)/_calM(specp)*(_w(np[lB],specr)-wwall[specr]);
+    //wwall[specp]=_w(np[lB],specp)+nuk[specr]/nuk[specp]*(_w(np[lB],specr)-wwall[specr]);
+    wwall[specp]=_w_product_at_catalytic_wall(np, gl, lA, lB, lC, theta, thetasgn, specr, specp, 1.0);
+    //printf("%E ",wwall[specr]);
   }
 }
 
