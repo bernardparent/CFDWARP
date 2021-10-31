@@ -352,7 +352,7 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
 
   if (INJECTION) update_w_V_at_injection_wall(np, gl, lA, lB, lC, Twall, Twall, 1, np[lA].numbdryparam-1, wwall, Vwall);
 
-  if (!INJECTION && gl->model.fluid.SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL ){
+  if (gl->model.fluid.SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL ){
     for (spec=0; spec<ncs; spec++){
       // set ion and electron densities to zero at the surface
       wwall[spec]=0.0;

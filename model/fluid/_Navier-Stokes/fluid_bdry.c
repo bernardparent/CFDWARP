@@ -324,18 +324,17 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
   if (CATALYTIC) update_w_at_catalytic_wall(np, gl, lA, lB, lC, theta, thetasgn, Twall, Twall, 1, np[lA].numbdryparam-1, wwall);
   if (INJECTION) update_w_V_at_injection_wall(np, gl, lA, lB, lC, Twall, Twall, 1, np[lA].numbdryparam-1, wwall, Vwall);
   
-  if (!INJECTION ){
-    for (spec=0; spec<ncs; spec++){
-      // set ion and electron densities to zero at the surface
-      wwall[spec]=0.0;
-      // make sure that no net mass flow (due to diffusion) goes through the boundary
-      if (speciestype[spec]==SPECIES_IONPLUS) {
-        if (!find_neutral_spec_from_ion_spec(spec,&specneutral))
-          fatal_error("Couldn't find a neutral species associated with positive ion species %ld.",spec); 
-        wwall[specneutral]+=_w_product_at_catalytic_wall(np, gl, lA, lB, lC, theta, thetasgn, spec, specneutral, 1.0)-_w(np[lB],specneutral);
-      }
+  for (spec=0; spec<ncs; spec++){
+    // set ion and electron densities to zero at the surface
+    wwall[spec]=0.0;
+    // make sure that no net mass flow (due to diffusion) goes through the boundary
+    if (speciestype[spec]==SPECIES_IONPLUS) {
+      if (!find_neutral_spec_from_ion_spec(spec,&specneutral))
+        fatal_error("Couldn't find a neutral species associated with positive ion species %ld.",spec); 
+      wwall[specneutral]+=_w_product_at_catalytic_wall(np, gl, lA, lB, lC, theta, thetasgn, spec, specneutral, 1.0)-_w(np[lB],specneutral);
     }
   }
+
   reformat_w(gl,wwall,"_bdry",&ref_flag);
 
   find_Pstar_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY, &Pwall);

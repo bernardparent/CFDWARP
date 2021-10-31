@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 OCT 30a
+  * in model/fluid/_Navier-Stokes/fluid_bdry.c and model/fluid/_Favre-Reynolds_Tv/fluid_bdry.c
+    - in update_bdry_wall(), now sets charged densities to zero even when INJECTION is TRUE
+    
+
 2021 OCT 29a
   * in model/metrics/_generic/metrics.c
     - in find_unit_vector_normal_to_boundary_plane(), got rid of the fatal_error and replaced
