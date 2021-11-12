@@ -87,8 +87,8 @@
 }
 
 
-Bz=0.12; {Tesla}
-mf=0.5; 
+Bz=0.1; {Tesla}
+mf=1.0; 
 gamma=0.1e0;    {secondary emission coefficient}
 Twall=3000;     {wall temperature everywhere}
 workfunct=2.7; {2.7, 4.6, and 1e99 eV}
@@ -115,13 +115,13 @@ is2=is1+round(mf*20); {end of electrode}
 is3=round(is2+mf*25);
 ie=round(is3+mf*20);
 js=1;
-je=round(mf*100);
+je=round(mf*120);
 
 L=0.07*10;
 Lbow=0.01;
 H=0.1*10;
 
-dwall=1e-6/mf;
+dwall=1e-6/mf/5;
 
 Grid(
   Size(is,js, ie,je);
@@ -168,10 +168,10 @@ Bdry(
     BDRY_FREESTREAM1                   5    Freestream, 1o, params Vx,Vy, P, T
     _________________________________________________________________________________________
     }
-    All(BDRY_WALLTFIXED1,Twall);
+    All(BDRY_WALLTFIXED1,Twall,gamma);
     Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLTFIXED1,BDRY_WALLTFIXED1);
-    Plane("j",js,BDRY_WALLTFIXED1,Twall);
-    Plane("j",je,BDRY_WALLTFIXED1,Twall);
+    Plane("j",js,BDRY_WALLTFIXED1,Twall,gamma);
+    Plane("j",je,BDRY_WALLTFIXED1,Twall,gamma);
     if (THERMIONICEMISSION,
       Region(is1,js,is2,js,BDRY_WALLTFIXEDTHERMIONIC1,Twall,workfunct);
       Region(is1,je,is2,je,BDRY_WALLTFIXEDTHERMIONIC1,Twall,workfunct);

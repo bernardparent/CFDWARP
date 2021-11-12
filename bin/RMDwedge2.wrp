@@ -94,6 +94,7 @@ Linflow=0.01; {length of the inflow before encountering the plate}
 Hflow=0.05; {height of the flow above the plate}
 Hbdry=0.01; {height of boundary layer at the domain exit}
 Lbow=0.0015;
+Lsheath=3e-5;
 
 mf=1;
 
@@ -105,8 +106,9 @@ dywall=2e-6/mf;
 
 is=1;
 im1=round(15*mf);
-im2=round(45*mf);
-ie=round(115*mf);
+im2=round(50*mf);
+im3=round(70*mf);
+ie=round(145*mf);
 js=1;
 jm1=round(15*mf);
 jm2=round(40*mf);
@@ -121,8 +123,10 @@ Grid(
 
 
   {grid the zone left of the plate}
-  Corners(im1,jm2,im2,jm3, -Lbow, -Hplate/2, 0, Hplate/2);
-  JoinCorners(im1,jm2, im2,jm3,  EF,0.5e0,1.0e0,dxwall,  FF,0.5e0,dywall,dywall);
+  Corners(im1,jm2,im3,jm3, -Lbow, -Hplate/2, 0, Hplate/2);
+  Corners(im2,jm2,im3,jm3, -Lsheath, -Hplate/2, 0, Hplate/2);
+  JoinCorners(im2,jm2, im3,jm3,  EF,0.75e0,1.0e0,dxwall,  FF,0.5e0,dywall,dywall);
+  JoinCorners(im1,jm2, im2,jm3,  EG,0.5e0,1.0e0,1.0,  FF,0.5e0,dywall,dywall);
 
 
   {grid the zone left left of the plate}
@@ -132,18 +136,18 @@ Grid(
 
   
   {grid the zone right of the plate (unused)}
-  Corners(im2,jm2,ie,jm3, 0, -Hplate/2, Lplate, Hplate/2);
-  JoinCorners(im2,jm2,ie,jm3, FE,0.5e0,dxwall,1.0,  FF,0.5e0,dywall,dywall);
+  Corners(im3,jm2,ie,jm3, 0, -Hplate/2, Lplate, Hplate/2);
+  JoinCorners(im3,jm2,ie,jm3, FE,0.5e0,dxwall,1.0,  FF,0.5e0,dywall,dywall);
   
   {grid the region top left of the plate}
-  Copy(is,jm3,im2,jm3, is,je);
-  Translate(is,je,im2,je, 0, Hflow-Hplate/2);
-  Join(is,jm3,im2,je,  j,  GE,0.8e0,1.0e0,1.0e0);
+  Copy(is,jm3,im3,jm3, is,je);
+  Translate(is,je,im3,je, 0, Hflow-Hplate/2);
+  Join(is,jm3,im3,je,  j,  GE,0.8e0,1.0e0,1.0e0);
 
   {grid the region bottom left of the plate}
-  Copy(is,jm2,im2,jm2, is,js);
-  Translate(is,js,im2,js, 0, -Hflow+Hplate/2);
-  Join(is,js,im2,jm2,  j,  EG,0.2e0,1.0e0,1.0e0);
+  Copy(is,jm2,im3,jm2, is,js);
+  Translate(is,js,im3,js, 0, -Hflow+Hplate/2);
+  Join(is,js,im3,jm2,  j,  EG,0.2e0,1.0e0,1.0e0);
 
   
   {grid the top plate}
@@ -152,7 +156,7 @@ Grid(
   Point(ie,je, cos(theta)*Lplate, sin(theta)*Lplate+Hflow);
   Join(ie,jm3,ie,jm4, j, FE,0.36,dywall,1.0);
   Join(ie,jm4,ie,je, j, GE,0.9,1.0,1.0);
-  Join(im2,jm3,ie,je, i, GE, 0.6,1.0,1.0);
+  Join(im3,jm3,ie,je, i, GE, 0.6,1.0,1.0);
 
   {grid the bottom plate}
   Point(ie,jm1, cos(theta)*Lplate, -sin(theta)*Lplate-Hbdry);
@@ -160,7 +164,7 @@ Grid(
   Point(ie,js, cos(theta)*Lplate, -sin(theta)*Lplate-Hflow);
   Join(ie,jm1,ie,jm2, j, EF,0.64,1.0,dywall);
   Join(ie,js,ie,jm1, j, EG,0.1,1.0,1.0);
-  Join(im2,js,ie,jm2, i, GE, 0.6,1.0,1.0);
+  Join(im3,js,ie,jm2, i, GE, 0.6,1.0,1.0);
 );
 
 
@@ -188,11 +192,43 @@ Bdry(
     BDRY_FREESTREAM1                  2   Freestream, 1o, params Vx,Vy, P, T
     _________________________________________________________________________________________
     }
-    Cut(im2,jm2,  ie,jm3);
+    Cut(im3,jm2,  ie,jm3);
     All(BDRY_WALLTFIXED1,Twall);
     Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_INFLOWSUPERSONIC,BDRY_INFLOWSUPERSONIC);
-    Region(im2,jm2,im2,jm3,BDRY_WALLTFIXEDINJECTION1,Twall,specCs,mdotCs/Hplate);
-{    Region(im2,jm2+1,im2,jm3-1,BDRY_WALLTFIXEDCATALYTIC1,Twall,specO,specO2,0.1);}
+    Region(im3,jm2,im3,jm3,BDRY_WALLTFIXEDINJECTION1,Twall,specCs,mdotCs/Hplate);
+{    Region(im3,jm2+1,im3,jm3-1,BDRY_WALLTFIXEDCATALYTIC1,Twall,specO,specO2,0.1);}
+    {
+    Cut(is,js,  ie,je);
+    Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
+    Link(i1,j1,  i2,j2);
+    }
+  );
+  FavreReynoldsTv(
+    {
+    _________________________________________________________________________________________
+
+    Boundary Condition Type           ID  Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC             0   Inflow, supersonic
+    BDRY_INFLOWSUBSONIC1              7   Inflow, subsonic, Tstag, Pstag fixed, 1o
+    BDRY_INFLOWSUBSONICMASSFLOWFIXED1 g   Inflow, subsonic, Pstag, Massflow/Area fixed, 1o
+    BDRY_OUTFLOWSUPERSONIC1           1   Outflow, supersonic, 1o
+    BDRY_OUTFLOWSUBSONIC1             4   Outflow, subsonic, P fixed, 1o
+    BDRY_OUTFLOWSUBSONICMFIXED1       f   Outflow, subsonic, M fixed, 1o
+    BDRY_SYMMETRICAL2                 e   Symmetrical, 2o
+    BDRY_SYMMETRICAL1                 9   Symmetrical, 1o
+    BDRY_WALLTFIXED1                  3   Wall, T specified, 1o, param Twall
+    BDRY_WALLTFIXEDINJECTION1         i   Wall, T specified, param Twall, specCs,mdotCs[kg/m2s], ...
+    BDRY_WALLADIABATIC1               6   Wall, Adiabatic, 1o
+    BDRY_SLIPWALL1                    c   Slip wall, Adiabatic, 1o
+    BDRY_FREESTREAM1                  2   Freestream, 1o, params Vx,Vy, P, T
+    _________________________________________________________________________________________
+    }
+    Cut(im3,jm2,  ie,jm3);
+    All(BDRY_WALLTFIXED1,Twall);
+    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_INFLOWSUPERSONIC,BDRY_INFLOWSUPERSONIC);
+    Region(im3,jm2,im3,jm3,BDRY_WALLTFIXEDINJECTION1,Twall,specCs,mdotCs/Hplate);
     {
     Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
@@ -224,10 +260,10 @@ Bdry(
     BDRY_FREESTREAM1                   5    Freestream, 1o, params Vx,Vy, P, T
     _________________________________________________________________________________________
     }
-    Cut(im2,jm2,  ie,jm3);
+    Cut(im3,jm2,  ie,jm3);
     All(BDRY_WALLTFIXED1,Twall);
     Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_INFLOWSUPERSONIC,BDRY_INFLOWSUPERSONIC);
-    Region(im2,jm2,im2,jm3,BDRY_WALLTFIXEDINJECTION1,Twall,specCs,mdotCs/Hplate);
+    Region(im3,jm2,im3,jm3,BDRY_WALLTFIXEDINJECTION1,Twall,specCs,mdotCs/Hplate);
     {
     Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
@@ -248,7 +284,7 @@ Bdry(
     _________________________________________________________________________________________
 
     }
-    Cut(im2,jm2,  ie,jm3);
+    Cut(im3,jm2,  ie,jm3);
     All(BDRYEMF_DIELECTRIC);
     {Faces(BDRYEMF_ELECTRODE,BDRYEMF_ELECTRODE,  BDRYEMF_DIELECTRIC,BDRYEMF_DIELECTRIC);}
     {
@@ -268,6 +304,29 @@ Model(
     Tmin=1.0e1;     Tmax=26.0e3;    {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-50;
+    AXISYMMETRIC=NO;
+  );
+  FavreReynoldsTv(
+    TURBMODEL=TURBMODEL_KOMEGA2008;
+    DILATDISSIP=DILATDISSIP_WILCOX;
+    RAPCOMP=NO;
+    TURBSOURCE=NO;
+    N2VIBMODEL=N2VIBMODEL_MACHERET;
+    TEMODEL=TEMODEL_TVEQUILIBRIUM;
+    SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL=TRUE;
+    REACTING=YES;
+    Prt=0.9e0;
+    Sct=1.0e0;
+    ADD_ETA_TO_ETAT_WITHIN_QK=NO;  {say NO for standard kinetic energy transport model}
+    kdiv=1.0e-50;   {m2/s2}
+    psidiv=0.1e-3;  {1/s}
+    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
+    Tmin=1.0e1;     Tmax=26.0e3;    {K}
+    Tvmin=Tmin;     Tvmax=Tmax;    {K}
+    Twmin=Tmin;     Twmax=Tmax;    {K}
+    kmin=1.0e-10;   kmax=9.9e99;   {m2/s2}
+    psimin=1e-10;   psimax=9.9e99; {1/s}
+    wmin=1.0e-50;                  {min mass fraction allowed in the domain}
     AXISYMMETRIC=NO;
   );
   NavierStokesPlasma(
@@ -294,7 +353,7 @@ Model(
   CsAirPlasma15s(
     AIRCHEMMODEL=AIRCHEMMODEL_PARENTPARK2021;
     CESIUMREACTIONS=TRUE; {include reactions function of Cs}
-    NEGATIVEIONREACTIONS=TRUE; {include reactions function of O- and O2-}
+    NEGATIVEIONREACTIONS=FALSE; {include reactions function of O- and O2-}
     TOWNSENDIONIZATION=FALSE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
     CESIUMIONIZATIONMODEL=CESIUMIONIZATIONMODEL_ANDRIENKO2021;
@@ -347,6 +406,46 @@ Init(
     {
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default);
     Region(is,js,  ie,je, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default);
+    }
+  );
+  FavreReynoldsTv(
+    {
+    _______________________________________________________________________________________
+
+    Initial Condition Type       Parameters
+    _______________________________________________________________________________________
+
+    INIT_TYPE1                   V[1]..V[nd],  T,  rho, w[1]..w[ns],     k, psi, Tv
+    INIT_TYPE2                   M[1]..M[nd],  P,  T,   w[1]..w[ns],     k, psi, Tv
+    INIT_TYPE3                   M[1]..M[nd],  Re, T,   w[1]..w[ns],     k, psi, Tv
+    INIT_TYPE4                   Mmag, angles, P,  T,   w[1]..w[ns],     k, psi, Tv
+    INIT_TYPE5                   V[1]..V[nd],  P,  T,   w[1]..w[ns],     k, psi, Tv
+    INIT_TYPE6                   V[1]..V[nd],  P,  T,   chi[1]..chi[ns], k, psi, Tv
+    _______________________________________________________________________________________
+
+    (a) In the freestream set psi to 110*q_infty for the k-omega models.
+    (b) In the freestream make sure that 1E-5*q_infty^2/ReL<k<0.1*q_infty^2/ReL.
+    }
+    T=Tinf;
+    Vx=Minf*sqrt(1.4*287.05*T); {m/s}
+    Vy=0; {m/s}
+    rho=2.0*Pdyn/(Vx^2+Vy^2);
+    P=rho*287.05*T; {Pa}
+    Tv=T; {K}
+    chi_eminus=1e-13;
+    chi_O2plus=1e-13;
+    chi_O2=0.21;
+    chi_N2=0.79;
+    chi_Cs=1.0e-30;
+    chi_default=1.0e-30;
+    k=1e-30;
+    psi=1e7;
+    Species("e-","O2+","Cs","O2","N2","default");
+    All(INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2plus,chi_Cs,chi_O2,chi_N2,chi_default,k,psi,Tv);
+
+    {
+    Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default,k,psi,Tv);
+    Region(is,js,  ie,je, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default,k,psi,Tv);
     }
   );
   NavierStokesPlasma(
@@ -403,17 +502,21 @@ Init(
 
 
 Disc(
+  FavreReynoldsTv(
+    zetaA1=3.0e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
   NavierStokes(
-    zetaA1=5.2e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA1=3.0e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   NavierStokesPlasma(
-    zetaA1=5.2e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA1=3.0e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
     zetaD=0.0;        {conditions the Dstar eigenvalues for the charged species}
     for (spec,1,numspec,
       if (SPECIESTYPE[spec]==SPECIESTYPE_IONPLUS,
-        betag[spec]=0.04;
+        betag[spec]=0.03;
         betaa[spec]=0.0;
       );
       if (SPECIESTYPE[spec]==SPECIESTYPE_IONMINUS,
@@ -433,7 +536,7 @@ Disc(
   );
   MUSCL(
     FLUX=FLUX_FDS;
-    AVERAGING=AVERAGING_ROE;
+    AVERAGING=AVERAGING_ARITH;
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.999;
@@ -457,6 +560,26 @@ Cycle(
       Uref[numspec+dim]=rhoref*aref;
     );
     Uref[numspec+numdim+1]=rhoref*aref*aref;
+  );
+  FavreReynoldsTv(
+    xiverge=1e-3;  {residual convergence threshold}
+    rhoref=0.1;    {reference density in kg/m3}
+    Tref=300.0;    {reference temperature in K}
+    Tvref=5000.0;  {reference vibrational temperature in K}
+    kref=1e4;      {reference turbulence kinetic energy in m2/s2}
+    psiref=1e8;    {reference specific dissipation rate of the TKE in 1/s for TURBMODEL_KOMEGA*
+                    reference dissipation rate of the TKE in m2/s3 for TURBMODEL_KEPSILON}
+    aref=sqrt(1.4*287*Tref);  {reference sound speed in m/s}
+    for (spec,1,numspec,
+      Uref[spec]=rhoref;
+    );
+    for (dim,1,numdim,
+      Uref[numspec+dim]=rhoref*aref;
+    );
+    Uref[numspec+numdim+1]=rhoref*aref*aref;
+    Uref[numspec+numdim+2]=rhoref*kref;  
+    Uref[numspec+numdim+3]=rhoref*psiref;  
+    Uref[numspec+numdim+4]=rhoref*700.0*Tvref;  
   );
   NavierStokesPlasma(
     xiverge=1e-3;         {residual convergence threshold}
@@ -496,34 +619,9 @@ Cycle(
     Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
   SteadyState(
-    if(iter==1,
-      Init(
-        NavierStokesPlasma(
-          T=Tinf;
-          Vx=Minf*sqrt(1.4*287.05*T); {m/s}
-    Vy=0; {m/s}
-    rho=2.0*Pdyn/(Vx^2+Vy^2);
-    P=rho*287.05*T; {Pa}
-    Tv=T; {K}
-    Te=T; {K}
-    chi_eminus=1e-13;
-    chi_O2plus=1e-13;
-    chi_O2=0.21;
-    chi_N2=0.79;
-    chi_Cs=1.0e-30;
-    chi_default=1.0e-30;
-    Species("e-","O2+","Cs","O2","N2","default");
-    Region(is,js,is,je,INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2plus,chi_Cs,chi_O2,chi_N2,chi_default,Tv,Te);
-    Region(is,js,ie,js,INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2plus,chi_Cs,chi_O2,chi_N2,chi_default,Tv,Te);
-    Region(is,je,ie,je,INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2plus,chi_Cs,chi_O2,chi_N2,chi_default,Tv,Te);
-        );
-      );
-
-    );
     if (mod(iter,200)==0,
       WriteDataFile(outputfilename);
     );
-    if(iter==40001,exit(EXIT_SUCCESS););
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
@@ -531,27 +629,28 @@ Cycle(
     );
 
       if (EMFIELD,
-        CFLmax=5.0;
+        CFLmax=2.0;
+        printf("x");
         if (iter<4000*mf,
-          CFLmax=2.0;
+          CFLmax=0.3;
         );
         if (iter<2000*mf,
-          CFLmax=1.0;
+          CFLmax=0.1;
         );
       ,{else}
-        CFLmax=0.8;
+        CFLmax=1.0;
       );
-
     CFL=min(CFL*1.04,CFLmax);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     if (EMFIELD,
       Lc=3e3;      {characteristic length scale in meters used to solve the emfield equation}
       relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
       
-      UpdateEMField(Lc,relaxEMF, TSEMF_SOR, round(20)); 
       if (iter<1000*mf, 
-        UpdateEMField(Lc,relaxEMF, TSEMF_IMAF, round(4)); 
+        UpdateEMField(Lc,relaxEMF, TSEMF_IMAF, round(25)); 
       );
+      UpdateEMField(Lc,relaxEMF, TSEMF_SOR, round(200)); 
+      UpdateEMField(Lc,relaxEMF, TSEMF_SOR, round(200)); 
       printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);

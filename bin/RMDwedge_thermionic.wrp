@@ -83,8 +83,10 @@ Pdyn=50.0E3; {Pa}
 Minf=18;
 Tinf=240; {K}
 workfunct=2.7;
+gamma=0.1;
+chi_Cs=0.001;
 
-Twall=1000;
+Twall=2000;
 Twalltip=3000;
 
 Hplate=0.001; {height of the plate}
@@ -191,7 +193,7 @@ Bdry(
     _________________________________________________________________________________________
     }
     Cut(im2,jm2,  ie,jm3);
-    All(BDRY_WALLTFIXED1,Twall);
+    All(BDRY_WALLTFIXED1,Twall,gamma);
     Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_INFLOWSUPERSONIC,BDRY_INFLOWSUPERSONIC);
     Region(im2,jm2+3,im2,jm3-3,BDRY_WALLTFIXEDTHERMIONIC1,Twalltip,workfunct);
     {
@@ -305,11 +307,11 @@ Init(
     Te=T; {K}
     chi_eminus=1e-13;
     chi_O2plus=1e-13;
-    chi_O2=0.21;
-    chi_N2=0.79;
+    chi_O2=0.21*(1-chi_Cs);
+    chi_N2=0.79*(1-chi_Cs);
     chi_default=1.0e-30;
-    Species("e-","O2+","O2","N2","default");
-    All(INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2plus,chi_O2,chi_N2,chi_default,Tv,Te);
+    Species("e-","O2+","O2","N2","Cs","default");
+    All(INIT_TYPE6,Vx,Vy,P,T,chi_eminus,chi_O2plus,chi_O2,chi_N2,chi_Cs,chi_default,Tv,Te);
   );
   Epotential(
     {
@@ -334,7 +336,7 @@ Init(
 
 Disc(
   NavierStokesPlasma(
-    zetaA1=0.5e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA1=5.5e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
     zetaD=0.0;        {conditions the Dstar eigenvalues for the charged species}
     for (spec,1,numspec,
@@ -415,6 +417,52 @@ Cycle(
     );
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
+
+    if (iter>=3000*mf,
+      Disc(
+        NavierStokesPlasma(
+          zetaA1=5.5e0;    {conditions the eigenvalue of the A jacobian}
+        );
+        MUSCL(
+          POSFILTER=POSFILTER_NONE;
+        );
+      );    
+      Model(
+        CsAirPlasma15s(
+          NEGATIVEIONREACTIONS=TRUE; {include reactions function of O- and O2-}
+        );
+      );
+    );
+    if (iter<3000*mf && iter>=2000*mf,
+      Disc(
+        NavierStokesPlasma(
+          zetaA1=5.5e0;    {conditions the eigenvalue of the A jacobian}
+        );
+        MUSCL(
+          POSFILTER=POSFILTER_NONE;
+        );
+      );    
+      Model(
+        CsAirPlasma15s(
+          NEGATIVEIONREACTIONS=FALSE; {include reactions function of O- and O2-}
+        );
+      );
+    );
+    if (iter<2000*mf,
+      Disc(
+        NavierStokesPlasma(
+          zetaA1=0.5e0;    {conditions the eigenvalue of the A jacobian}
+        );
+        MUSCL(
+          POSFILTER=POSFILTER_PARENT;
+        );
+      );
+      Model(
+        CsAirPlasma15s(
+          NEGATIVEIONREACTIONS=FALSE; {include reactions function of O- and O2-}
+        );
+      );
+    );
     if (iter==1,
       CFL=0.01;
     );
@@ -422,7 +470,7 @@ Cycle(
       if (EMFIELD,
         CFLmax=2.0;
         if (iter<4000*mf,
-          CFLmax=1.5;
+          CFLmax=1.0;
         );
         if (iter<2000*mf,
           CFLmax=1.0;

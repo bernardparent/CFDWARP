@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 NOV 12a
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - in write_model_fluid_template() and read_model_fluid_actions(), took away reading in
+      gamma (secondary electron emission coefficient at the surface) as a global parameter
+  * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - in write_bdry_fluid_template() and update_bdry_wall() made changes so that gamma is now read
+      as an additional argument to the boundary condition call and not as a global parameter
+    - in update_bdry_wall(), took away secondary electron emission in the case of a thermionic
+      boundary condition
+      
+
 2021 OCT 30a
   * in model/fluid/_Navier-Stokes/fluid_bdry.c and model/fluid/_Favre-Reynolds_Tv/fluid_bdry.c
     - in update_bdry_wall(), now sets charged densities to zero even when INJECTION is TRUE
