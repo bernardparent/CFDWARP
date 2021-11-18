@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 NOV 17a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - in update_bdry_wall(), fixed a bug related to CATALYTIC and INJECTION wall conditions:
+      np[lA].numbdryparam-2 should be np[lA].numbdryparam-1
+      
+
 2021 NOV 12a
   * in model/fluid/_Navier-Stokes_plasma/fluid.c
     - in write_model_fluid_template() and read_model_fluid_actions(), took away reading in

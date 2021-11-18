@@ -78,7 +78,7 @@
 
 }
 
-
+dphi=0;
 Pdyn=50.0E3; {Pa}
 Minf=18;
 Tinf=240; {K}
@@ -219,7 +219,8 @@ Bdry(
     Cut(im2,jm2,  ie,jm3);
     All(BDRYEMF_DIELECTRIC);
     Region(im2,jm2,im2,jm3,BDRYEMF_ELECTRODE);
-    Region(im2+10*mf,jm2-1,ie,jm3+1,BDRYEMF_ELECTRODE);
+    Region(im2+30*mf,jm2-1,ie,jm3+1,BDRYEMF_ELECTRODE);
+    {printf("\n\ndx=%E\n\n",_x(im2+30*mf,jm2-1)-_x(im2,jm2-1));}
     {Faces(BDRYEMF_ELECTRODE,BDRYEMF_ELECTRODE,  BDRYEMF_DIELECTRIC,BDRYEMF_DIELECTRIC);}
     {
     Cut(is,js,  ie,je);
@@ -243,7 +244,7 @@ Model(
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e1;     Tmax=20.0e3;    {K}
     Tvmin=Tmin;     Tvmax=13.0e3;  {K}
-    Temin=5.0;    Temax=2.5e4;  {K}
+    Temin=200.0;    Temax=2.5e4;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain for neutrals}
     chiimin=1e-30;    chiimax=1.0;    {min and max ion mass fraction}
@@ -326,6 +327,7 @@ Init(
     }
     phi=0.0; {V}
     All(INITEMF_TYPE1,phi);
+    Region(im2+1,js,ie,je,INITEMF_TYPE1,dphi);
     {
     Bdry(BDRYEMF_ELECTRODE, INITEMF_TYPE1,phi);
     Region(is,js,  ie,je,INITEMF_TYPE1,phi);
@@ -367,7 +369,7 @@ Disc(
     AOWENO_gammahi=0.999;
     INTERPOL=INTERPOL_TVD2_VANLEER;
     EIGENVALCOND=EIGENVALCOND_PECLET;
-    POSFILTER=POSFILTER_NONE;
+    POSFILTER=POSFILTER_PARENT;
     POSFILTER_numiter=4;
   );
 );
@@ -418,13 +420,13 @@ Cycle(
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
 
-    if (iter>=3000*mf,
+    if (iter>=4000*mf,
       Disc(
         NavierStokesPlasma(
-          zetaA1=5.5e0;    {conditions the eigenvalue of the A jacobian}
+          zetaA1=0.2e0;    {conditions the eigenvalue of the A jacobian}
         );
         MUSCL(
-          POSFILTER=POSFILTER_NONE;
+          POSFILTER=POSFILTER_PARENT;
         );
       );    
       Model(
@@ -433,28 +435,14 @@ Cycle(
         );
       );
     );
-    if (iter<3000*mf && iter>=2000*mf,
-      Disc(
-        NavierStokesPlasma(
-          zetaA1=5.5e0;    {conditions the eigenvalue of the A jacobian}
-        );
-        MUSCL(
-          POSFILTER=POSFILTER_NONE;
-        );
-      );    
-      Model(
-        CsAirPlasma15s(
-          NEGATIVEIONREACTIONS=FALSE; {include reactions function of O- and O2-}
-        );
-      );
-    );
-    if (iter<2000*mf,
+    if (iter<4000*mf,
       Disc(
         NavierStokesPlasma(
           zetaA1=0.5e0;    {conditions the eigenvalue of the A jacobian}
         );
         MUSCL(
           POSFILTER=POSFILTER_PARENT;
+          
         );
       );
       Model(
@@ -467,18 +455,7 @@ Cycle(
       CFL=0.01;
     );
 
-      if (EMFIELD,
-        CFLmax=2.0;
-        if (iter<4000*mf,
-          CFLmax=1.0;
-        );
-        if (iter<2000*mf,
-          CFLmax=1.0;
-        );
-      ,{else}
-        CFLmax=0.8;
-      );
-
+    CFLmax=0.3;
     CFL=min(CFL*1.04,CFLmax);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     if (EMFIELD,

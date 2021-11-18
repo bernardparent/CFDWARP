@@ -82,6 +82,7 @@
 Pdyn=50.0E3; {Pa}
 Minf=6;
 Tinf=240; {K}
+gamma=0.1e0;    {secondary emission coefficient}
 
 
 Twall=1800;
@@ -193,9 +194,9 @@ Bdry(
     _________________________________________________________________________________________
     }
     Cut(im3,jm2,  ie,jm3);
-    All(BDRY_WALLTFIXED1,Twall);
+    All(BDRY_WALLTFIXED1,Twall,gamma);
     Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_INFLOWSUPERSONIC,BDRY_INFLOWSUPERSONIC);
-    Region(im3,jm2,im3,jm3,BDRY_WALLTFIXEDINJECTION1,Twall,specCs,mdotCs/Hplate);
+    Region(im3,jm2,im3,jm3,BDRY_WALLTFIXEDINJECTION1,Twall,gamma,specCs,mdotCs/Hplate);
 {    Region(im3,jm2+1,im3,jm3-1,BDRY_WALLTFIXEDCATALYTIC1,Twall,specO,specO2,0.1);}
     {
     Cut(is,js,  ie,je);
@@ -261,9 +262,9 @@ Bdry(
     _________________________________________________________________________________________
     }
     Cut(im3,jm2,  ie,jm3);
-    All(BDRY_WALLTFIXED1,Twall);
+    All(BDRY_WALLTFIXED1,Twall,gamma);
     Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_INFLOWSUPERSONIC,BDRY_INFLOWSUPERSONIC);
-    Region(im3,jm2,im3,jm3,BDRY_WALLTFIXEDINJECTION1,Twall,specCs,mdotCs/Hplate);
+    Region(im3,jm2,im3,jm3,BDRY_WALLTFIXEDINJECTION1,Twall,gamma,specCs,mdotCs/Hplate);
     {
     Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
@@ -347,7 +348,6 @@ Model(
     chiimin=1e-30;    chiimax=1.0;    {min and max ion mass fraction}
     chiemin=1e-13;    chiemax=1.0;    {min and max electron mass fraction}
     Nminbdry=1e5;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
-    gamma=0.1e0;    {secondary emission coefficient}
     AXISYMMETRIC=NO;
   );
   CsAirPlasma15s(
