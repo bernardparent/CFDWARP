@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2021 DEC 07a
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - added a section on the Thermionic Emission Boundary Condition
+  * in model/metrics/_generic/metrics.c
+    - in _distance_between_near_bdry_node_and_boundary_plane(), added i,j,k position of problematic
+      node before the fatal_error
+  
+
 2021 NOV 17a
   * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
     - in update_bdry_wall(), fixed a bug related to CATALYTIC and INJECTION wall conditions:

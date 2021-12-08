@@ -3453,6 +3453,46 @@ In the latter, the total mass flow rate injected per unit area corresponds to th
 %
 
 
+\section{Thermionic Emission Boundary Condition}
+
+
+The boundary condition for the electron number density at the electrodes with thermionic emission is such that the electron flux emitted from the surface follows Richardson's emission law:
+%
+\begin{equation}
+    J_{\rm emit}= \lambda_R A_0 T_{\rm w}^2 \exp(-W/(k_{\rm B} T_{\rm w})) 
+\end{equation}
+%
+where $T_{\rm w}$ is the wall temperature in Kelvin, $W$ is the work function in eV, $k_{\rm B}$ is the Boltzmann constant, $\lambda_R$ is a material specific constant here set to 0.5 unless otherwise specified, and $A_0$ is a constant set to $1.202\cdot10^6$~A/m$^2$K$^2$. 
+
+First, define $\chi$ as a coordinate perpendicular to the surface and pointing from the surface towards the plasma. 
+
+When the component of the electric field along $\chi$ is negative, the sheath is in the \emph{classical regime} because the electric field entrains the positive ions towards the surface and the electrons  away from the surface. In this regime, electrons emitted from the surface through thermionic emission will be carried into the plasma by the electric field:
+%
+\begin{equation}
+ N_{\rm e} = \frac{J_{\rm emit}}{\mu_{\rm e} |\vec{E}_\chi| e} ~~~~{\rm for~}\vec{E}_\chi<0
+\end{equation}
+%  
+with $e$ the elementary charge and $\mu_{\rm e}$ the electron mobility. 
+
+On the other hand, when the component of the electric field along $\chi$ is positive, the sheath is in the \emph{inverse regime} because the electric field entrains the electrons towards the surface and the positive ions away from the surface. In this regime, the electrons emitted from the surface through thermionic emission will be carried into the plasma through diffusion:
+%
+\begin{equation}
+ J_{\rm emit}= - e D_{\rm e} \frac{\partial N_{\rm e}}{\partial \chi}
+\end{equation}
+%
+with $D_{\rm e}$ the diffusion coefficient of the electrons.
+But the Einstein-Smoluchowski relation yields a relationship between the diffusion coefficient and the mobility as follows: 
+%
+\begin{equation}
+  D_{\rm e}=\frac{\mu_{\rm e} k_{\rm B} T_{\rm e}}{e}
+\end{equation}
+%
+Substituting the latter in the former and isolating the number density gradient at the wall leads to the following relationship:
+%
+\begin{equation}
+ \frac{\partial N_{\rm e}}{\partial \chi} = -\frac{J_{\rm emit}}{\mu_{\rm e} k_{\rm B} T_{\rm e}}~~~~{\rm for~}\vec{E}_\chi>0
+\end{equation}
+%
 
   \bibliographystyle{warpdoc}
   \bibliography{all}
