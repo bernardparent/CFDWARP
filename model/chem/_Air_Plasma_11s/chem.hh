@@ -1,5 +1,5 @@
 #define _CHEM_AIRPLASMA11S
-#define _CHEM_METHOD "Air Plasma 11s Dunn-Kang [dunn1973a], Park [park1993a], Lenard [lenard1964a], Boyd [boyd2007a], Farbar [farbar2013a]"
+#define _CHEM_METHOD "Air Plasma 11s Dunn-Kang [dunn1973a], Park [park1993a], Lenard [lenard1964a], Boyd [boyd2007a], Farbar [farbar2013a], Kim [kim2021a]"
 #define _CHEM_PLASMA
 #define _CHEM_ACTIONNAME "AirPlasma11s"
 #define _CHEM_WEEE_TWOTEMPERATURE

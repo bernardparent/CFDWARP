@@ -73,6 +73,8 @@ OMPRAKAS, Ajjay
 
   - fixed bug in model/share/chem_share.c within add_to_dW_3r3p() and add_to_dW_3r2p() functions
   
+  - added the chemical solver model/chem/_Air_Plasma_11s/kim2021.c
+  
 
 PADMANABHAN, Sathyan 
 
