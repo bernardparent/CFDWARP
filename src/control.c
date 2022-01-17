@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   typedef GRIDG_gl3d_t glgrid_t;
 #endif
 
-#define numbib 47
+#define numbib 48
 #define maxstrlen 10000
 
 typedef char longstr_t[maxstrlen];
@@ -100,7 +100,8 @@ const static longstr_t bibname[numbib]=
    "smith1999a",
    "boyd2007a",
    "farbar2013a",
-   "parent2007a"
+   "parent2007a",
+   "kim2021a"
   };
 
 const static longstr_t bib[numbib]=
@@ -244,6 +245,9 @@ const static longstr_t bib[numbib]=
    
    //parent2007a
    "B Parent, SO Macheret, MN Shneider and N Harada. \"Numerical Study of an Electron-Beam-Confined Faraday Accelerator\", Journal of Propulsion and Power, 23(5):1023-1032, 2007."
+   
+   //kim2021a 
+   "Kim, Jae Gang, and Sung Min Jo. \"Modification of chemical-kinetic parameters for 11-air species in re-entry flows.\" International Journal of Heat and Mass Transfer 169 (2021): 120950."
   };
 
 
