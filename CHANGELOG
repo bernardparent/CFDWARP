@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JAN 22a
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - improved the derivation of the thermal conductivity of the electrons in the presence
+      of a magnetic field (now function of the tensor mobility mutilde, not the mobility mu)
+
+
 2022 JAN 16a
   * in src/control.c
     - added kim2021a citation
