@@ -560,8 +560,8 @@ double _kappav (np_t *np, long l, gl_t *gl) {
   T=_T(np[l],gl);
   find_w(np[l],w);
   cp=_cp_from_w_T(w,T);
-  Pr=_eta(np[l],gl)*cp/_kappa(np[l],gl);
-  kappav=w[specN2]*(_eta(np[l],gl)/Pr)*_dev_dTv_from_Tv(Tv);  
+  Pr=_eta(np,l,gl)*cp/_kappa(np,l,gl);
+  kappav=w[specN2]*(_eta(np,l,gl)/Pr)*_dev_dTv_from_Tv(Tv);  
   return(kappav);
 }
 #endif
@@ -570,22 +570,22 @@ double _kappav (np_t *np, long l, gl_t *gl) {
 #ifdef _FLUID_FAVREREYNOLDS
 
 
-double _ktilde (np_t np, gl_t *gl){
+double _ktilde (np_t *np, long l, gl_t *gl){
   double ret;
-  ret=_k(np);
+  ret=_k(np[l]);
   switch (gl->model.fluid.TURBMODEL){
     case TURBMODEL_KEPSILON:
-      ret=max(gl->model.fluid.kdiv,_k(np));
+      ret=max(gl->model.fluid.kdiv,_k(np[l]));
     break;
     case TURBMODEL_KOMEGA1988:
       /* etat=0.09*rho*k/psi */
-      ret=max(min(gl->model.fluid.kdiv,_psitilde(np,gl)*_eta(np,gl)/_rho(np)*0.09e0),
-              _k(np));   
+      ret=max(min(gl->model.fluid.kdiv,_psitilde(np[l],gl)*_eta(np,l,gl)/_rho(np[l])*0.09e0),
+              _k(np[l]));   
     break;
     case TURBMODEL_KOMEGA2008:
       /* etat approx rho*k/psi */
-      ret=max(min(gl->model.fluid.kdiv,_psitilde(np,gl)*_eta(np,gl)/_rho(np)*0.09e0),
-              _k(np));   
+      ret=max(min(gl->model.fluid.kdiv,_psitilde(np[l],gl)*_eta(np,l,gl)/_rho(np[l])*0.09e0),
+              _k(np[l]));   
     break;
     default:
       fatal_error("Turbulence model invalid in _ktilde");
@@ -621,18 +621,18 @@ double _eps (np_t np, gl_t *gl){
 }
 
 
-double _omega (np_t np, gl_t *gl){
+double _omega (np_t *np, long l, gl_t *gl){
   double ret;
   ret=0.0;
   switch (gl->model.fluid.TURBMODEL){
     case TURBMODEL_KEPSILON:
-      ret=_psi(np)/_ktilde(np,gl);
+      ret=_psi(np[l])/_ktilde(np,l,gl);
     break;
     case TURBMODEL_KOMEGA1988:
-      ret=_psi(np);
+      ret=_psi(np[l]);
     break;
     case TURBMODEL_KOMEGA2008:
-      ret=_psi(np);
+      ret=_psi(np[l]);
     break;
     default:
       fatal_error("Turbulence model invalid in _omega().");
@@ -702,14 +702,14 @@ double _etat_from_rho_eta_k_psitilde(np_t *np, long l, gl_t *gl, double rho, dou
 
 double _etat_mem(np_t *np, long l, gl_t *gl) {
   double etat;
-  etat=_etat_from_rho_eta_k_psitilde(np, l, gl, _rho(np[l]), _eta(np[l],gl), _k(np[l]), _psitilde(np[l],gl));
+  etat=_etat_from_rho_eta_k_psitilde(np, l, gl, _rho(np[l]), _eta(np,l,gl), _k(np[l]), _psitilde(np[l],gl));
   return(etat);
 }
 
 
 double _etastar (np_t *np, long l, gl_t *gl) {
   double etastar;
-  etastar=_eta(np[l],gl)+_etat(np,l,gl);
+  etastar=_eta(np,l,gl)+_etat(np,l,gl);
   return(etastar); 
 }
 
@@ -721,7 +721,7 @@ double _kappastar (np_t *np, long l, gl_t *gl) {
   T=_T(np[l],gl);
   find_w(np[l],w);
   cp=_cp_from_w_T(w,T);
-  kappastar=_kappa(np[l],gl)+cp*_etat(np,l,gl)/gl->model.fluid.Prt;
+  kappastar=_kappa(np,l,gl)+cp*_etat(np,l,gl)/gl->model.fluid.Prt;
   return(kappastar);
 }
 
@@ -735,7 +735,7 @@ double _nustar (np_t *np, long l, gl_t *gl, long spec) {
 
 double _etakstar (np_t *np, long l, gl_t *gl) {
   double etakstar;
-  etakstar=_eta(np[l],gl);  
+  etakstar=_eta(np,l,gl);  
   switch (gl->model.fluid.TURBMODEL){
     case TURBMODEL_KEPSILON:
       etakstar+=_etat(np,l,gl);
@@ -755,7 +755,7 @@ double _etakstar (np_t *np, long l, gl_t *gl) {
 
 double _etapsistar (np_t *np, long l, gl_t *gl) {
   double etapsistar;
-  etapsistar=_eta(np[l],gl);  
+  etapsistar=_eta(np,l,gl);  
   switch (gl->model.fluid.TURBMODEL){
     case TURBMODEL_KEPSILON:
       etapsistar+=_etat(np,l,gl)/1.3e0;
@@ -782,8 +782,8 @@ double _kappavstar (np_t *np, long l, gl_t *gl) {
   T=_T(np[l],gl);
   find_w(np[l],w);
   cp=_cp_from_w_T(w,T);
-  Pr=_eta(np[l],gl)*cp/_kappa(np[l],gl);
-  kappavstar=w[specN2]*(_eta(np[l],gl)/Pr+_etat(np,l,gl)/gl->model.fluid.Prt)*_dev_dTv_from_Tv(Tv);  
+  Pr=_eta(np,l,gl)*cp/_kappa(np,l,gl);
+  kappavstar=w[specN2]*(_eta(np,l,gl)/Pr+_etat(np,l,gl)/gl->model.fluid.Prt)*_dev_dTv_from_Tv(Tv);  
   return(kappavstar);
 }
 #endif
@@ -941,7 +941,7 @@ void find_Stnorm(np_t *np, gl_t *gl, long l, flux_t St){
   psitilde=_psitilde(np[l],gl);
   psi=_psi(np[l]);
   rho=_rho(np[l]);
-  ktilde=_ktilde(np[l],gl);
+  ktilde=_ktilde(np,l,gl);
   k=_k(np[l]);
   eps=_eps(np[l],gl);
 
@@ -949,7 +949,7 @@ void find_Stnorm(np_t *np, gl_t *gl, long l, flux_t St){
 
   switch (gl->model.fluid.TURBMODEL){
     case TURBMODEL_KEPSILON:
-      eta=_eta(np[l],gl);
+      eta=_eta(np,l,gl);
       etat=_etat(np,l,gl);
       assert_np(np[l],eta!=0.0e0);
       assert_np(np[l],psitilde!=0.0e0);
@@ -962,8 +962,8 @@ void find_Stnorm(np_t *np, gl_t *gl, long l, flux_t St){
        sum2a=0.0e0;
        for (theta=0; theta<nd; theta++){
          sum1a=sum1a+0.5e0*_X(np[l],theta,i)*(
-                +sqrt(fabs(_ktilde(np[_al(gl,l,theta,+1)],gl)))
-                -sqrt(fabs(_ktilde(np[_al(gl,l,theta,-1)],gl))));
+                +sqrt(fabs(_ktilde(np,_al(gl,l,theta,+1),gl)))
+                -sqrt(fabs(_ktilde(np,_al(gl,l,theta,-1),gl))));
            /*the following 5 lines may cause problems. This needs further validation,
              especially in 3D. Will this work independantly of the mesh orientation
              in 2D/3D? */
@@ -1057,7 +1057,7 @@ void find_Stcomp(np_t *np, gl_t *gl, long l, flux_t St){
   athermo=300.0e0;
 #endif
   psi=_psi(np[l]);
-  ktilde=_ktilde(np[l],gl);
+  ktilde=_ktilde(np,l,gl);
   if (gl->model.fluid.DILATDISSIP==DILATDISSIP_SARKAR || gl->model.fluid.DILATDISSIP==DILATDISSIP_WILCOX) {
     assert_np(np[l],athermo!=0.0e0);
     Mt=sqrt(2.0e0*max(_k(np[l]),0.0e0))/athermo;
@@ -1182,8 +1182,8 @@ void find_dStnorm_dU(np_t *np, gl_t *gl, long l, sqmat_t dStnormdU){
   switch (gl->model.fluid.TURBMODEL){
     case TURBMODEL_KEPSILON:
       dStnormdU[fluxtke][fluxpsi]=-1.0e0;
-      dStnormdU[fluxpsi][fluxtke]=1.92e0*sqr(_eps(np[l],gl))/sqr(_ktilde(np[l],gl));
-      dStnormdU[fluxpsi][fluxpsi]=-3.84e0*_eps(np[l],gl)/_ktilde(np[l],gl);
+      dStnormdU[fluxpsi][fluxtke]=1.92e0*sqr(_eps(np[l],gl))/sqr(_ktilde(np,l,gl));
+      dStnormdU[fluxpsi][fluxpsi]=-3.84e0*_eps(np[l],gl)/_ktilde(np,l,gl);
     break;
     case TURBMODEL_KOMEGA1988:
       switch_psiclip=1.0e0;
@@ -1244,7 +1244,7 @@ void find_dStcomp_dU(np_t *np, gl_t *gl, long l, sqmat_t dStcompdU){
 #ifdef TEST
     athermo=300.0e0;
 #endif
-    ktilde=_ktilde(np[l],gl);
+    ktilde=_ktilde(np,l,gl);
     k=_k(np[l]);
     assert_np(np[l],athermo!=0.0e0);
     Mt=sqrt(2.0e0*max(k,0.0e0)/sqr(athermo));

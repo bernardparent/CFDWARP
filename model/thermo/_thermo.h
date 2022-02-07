@@ -68,17 +68,17 @@ double _T_from_rhok_P(spec_t rhok, double P);
 
 double _T_from_w_rho_P(spec_t w, double rho, double P);
 
-double _kappak_from_T(long spec, double T);
-
-double _etak_from_T(long spec, double T);
-
 double _kappa_from_w_T(spec_t w, double T);
 
 double _kappan_from_w_T(spec_t w, double T);
 
-double _kappah_from_w_T(spec_t w, double T);
+double _kappac_from_rhok_Tk_Ek(spec_t rhok, double T, double E, long k);
 
 double _eta_from_w_T(spec_t w, double T);
+
+double _etan_from_w_T(spec_t w, double T);
+
+double _etac_from_rhok_Tk_Ek(spec_t rhok, double T, double E, long k);
 
 void find_nuk_from_w_rho_T_Te(spec_t w, double rho, double T, double Te, spec_t nuk);
 
@@ -123,9 +123,6 @@ double _ev_from_T(double T);
 
 double _dev_dTv_from_Tv(double T);
 
-void find_dmue_from_rhok_Te(spec_t rhok, double Te, double *dmuedTe, spec_t dmuedrhok);
-
-double _mue_from_rhok_Te(spec_t rhok, double Te);
 
 void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok);
 

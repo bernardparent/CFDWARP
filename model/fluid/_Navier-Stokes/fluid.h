@@ -43,13 +43,13 @@
   
   double _w(np_t np, long spec);
 
-  double _eta (np_t np, gl_t *gl);
+  double _eta (np_t *np, long l, gl_t *gl);
 
   double _alpha(np_t np, gl_t *gl, long theta, long vartheta);
 
   double _nu(np_t np, gl_t *gl, long spec);
 
-  double _kappa(np_t np, gl_t *gl);
+  double _kappa(np_t *np, long l, gl_t *gl);
 
   void find_U(np_t *np, long l, gl_t *gl, spec_t rhok, dim_t V, double T);
 

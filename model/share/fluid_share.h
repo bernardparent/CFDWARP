@@ -61,13 +61,13 @@ double _kappav (np_t *np, long l, gl_t *gl);
 #define DILATDISSIP_WILCOX 1
 #define DILATDISSIP_SARKAR 2
 
-double _ktilde (np_t np, gl_t *gl);
+double _ktilde (np_t *np, long l, gl_t *gl);
 
 double _psitilde (np_t np, gl_t *gl);
 
 double _eps (np_t np, gl_t *gl);
 
-double _omega (np_t np, gl_t *gl);
+double _omega (np_t *np, long l, gl_t *gl);
 
 double _dVi_dxj(np_t *np, long l, gl_t *gl, long i, long j);
 

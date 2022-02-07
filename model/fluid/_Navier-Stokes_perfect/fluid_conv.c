@@ -1279,7 +1279,7 @@ void find_jacvars(np_t np, gl_t *gl, metrics_t metrics, long theta, jacvars_t *j
     jacvars->V[dim]=_V(np,dim);
   }
   jacvars->a2=gl->model.fluid.gamma*gl->model.fluid.R*_T(np,gl);
-  jacvars->eta=_eta(np,gl);
+  jacvars->eta=_eta_from_T(_T(np,gl),gl);
   jacvars->gamma=gl->model.fluid.gamma;
 
   set_jacvars_eigenconditioning_constants(gl,jacvars);

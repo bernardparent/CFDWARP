@@ -219,7 +219,7 @@ Model(
     sigmadiv=1e-10; {S/m}
     etdiv=1e-1;     {J/kg}
     Pmin=1.0e3;    Pmax=9.9e99;   {Pa}
-    Tmin=1000;     Tmax=100000;    {K}
+    Tmin=1000;     Tmax=80000;    {K}
     Tvmin=Tmin;     Tvmax=Tmax;  {K}
     Temin=300;     Temax=5e6;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
@@ -429,8 +429,9 @@ Cycle(
     Lc=1000e44;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
     if (iter>10,
-       UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,5);
-       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,100);
+       UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,25);
+       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,400);
+       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,400);
     );
 {    UpdateEMField(Lc,relaxEMF,TSEMF_NEWTON);}
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",

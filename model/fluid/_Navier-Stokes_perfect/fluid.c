@@ -526,13 +526,13 @@ void find_Kstar_interface(np_t *np, gl_t *gl, long lL, long lR, metrics_t metric
     
     for (dim=0; dim<nd; dim++){
       for (dim2=0; dim2<nd; dim2++){
-        K[1+dim][1+dim2]=avg(_eta(np[lL],gl),_eta(np[lR],gl))*beta[dim][dim2];
+        K[1+dim][1+dim2]=avg(_eta(np,lL,gl),_eta(np,lR,gl))*beta[dim][dim2];
         K[1+nd][1+dim2]=K[1+nd][1+dim2]+
-           avg(_eta(np[lL],gl),_eta(np[lR],gl))*beta[dim][dim2]*avg(_V(np[lL],dim),_V(np[lR],dim));
+           avg(_eta(np,lL,gl),_eta(np,lR,gl))*beta[dim][dim2]*avg(_V(np[lL],dim),_V(np[lR],dim));
       }
     }
     
-    K[1+nd][1+nd]=avg(_kappa(np[lL],gl),_kappa(np[lR],gl))*alpha;
+    K[1+nd][1+nd]=avg(_kappa(np,lL,gl),_kappa(np,lR,gl))*alpha;
     
 
 }
@@ -740,11 +740,11 @@ void add_dUstar_to_U(np_t *np, long l, gl_t *gl, flux_t dUstar){
   find_prim_fluid(np,l,gl);
 }
 
-double _kappa(np_t np,gl_t *gl) {
+double _kappa(np_t *np, long l, gl_t *gl) {
   double Pr=gl->model.fluid.Pr;
   double Cp=gl->model.fluid.gamma*gl->model.fluid.R/(gl->model.fluid.gamma-1.0);
 
-  return(_eta_from_T(_T(np,gl),gl)*Cp/Pr);
+  return(_eta_from_T(_T(np[l],gl),gl)*Cp/Pr);
 }
 
 double _eta_from_T(double T,gl_t *gl) {
@@ -765,8 +765,8 @@ double _eta_from_T(double T,gl_t *gl) {
   }
 }
 
-double _eta(np_t np,gl_t *gl) {
-  return(_eta_from_T(_T(np,gl),gl));
+double _eta(np_t *np, long l, gl_t *gl) {
+  return(_eta_from_T(_T(np[l],gl),gl));
 }
 
 

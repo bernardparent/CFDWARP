@@ -75,13 +75,11 @@
 
   double _Te_m1(np_t np, gl_t *gl);
 
-  double _eta(np_t np, gl_t *gl);
+  double _eta(np_t *np, long l, gl_t *gl);
 
   double _V_from_U(np_t np, long theta);
 
-  double _kappa(np_t np, gl_t *gl);
-
-  double _eta(np_t np, gl_t *gl);
+  double _kappa(np_t *np, long l, gl_t *gl);
 
   double _nu(np_t np, gl_t *gl, long spec);
 
@@ -100,7 +98,7 @@
 
   double _psi (np_t np);
 
-  double _ktilde (np_t np, gl_t *gl);
+  double _ktilde (np_t *np, long l, gl_t *gl);
 
   double _eps (np_t np, gl_t *gl);
 

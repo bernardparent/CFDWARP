@@ -338,31 +338,31 @@ double _etstar (np_t np){
 }
 
 
-double _kappa(np_t np, gl_t *gl) {
+double _kappa(np_t *np, long l, gl_t *gl) {
   double T,cp,ret,eta,kappa;
   spec_t w,nu;
-  if (_FLUIDPRIMMEM(np)){
-    ret=np.wk->kappamem;
+  if (_FLUIDPRIMMEM(np[l])){
+    ret=np[l].wk->kappamem;
   } else {
-    T=_T(np,gl);
-    find_w(np,w);
+    T=_T(np[l],gl);
+    find_w(np[l],w);
     cp=_cp_from_w_T(w,T);
-    find_nuk_eta_kappa(w, _rho(np), T, T, nu, &eta, &kappa);
-    ret=cp*_eta(np,gl)/( /* Prandtl number */(_eta(np,gl))/(kappa)*cp );
+    find_nuk_eta_kappa(w, _rho(np[l]), T, T, nu, &eta, &kappa);
+    ret=cp*_eta(np,l,gl)/( /* Prandtl number */(_eta(np,l,gl))/(kappa)*cp );
   }
   return(ret);
 }
 
 
-double _eta(np_t np, gl_t *gl) {
+double _eta(np_t *np, long l, gl_t *gl) {
   double ret;
   spec_t w,nu;
   double eta,kappa;
-  if (_FLUIDPRIMMEM(np)){
-    ret=np.wk->etamem;
+  if (_FLUIDPRIMMEM(np[l])){
+    ret=np[l].wk->etamem;
   } else { 
-    find_w(np,w); 
-    find_nuk_eta_kappa(w, _rho(np), _T(np,gl), _T(np,gl), nu, &eta, &kappa);
+    find_w(np[l],w); 
+    find_nuk_eta_kappa(w, _rho(np[l]), _T(np[l],gl), _T(np[l],gl), nu, &eta, &kappa);
     ret=eta;
   }
   return(ret);
@@ -561,13 +561,13 @@ void find_Kstar_interface(np_t *np, gl_t *gl, long lL, long lR, metrics_t metric
     
     for (dim=0; dim<nd; dim++){
       for (dim2=0; dim2<nd; dim2++){
-        K[ns+dim][ns+dim2]=avg(_eta(np[lL],gl),_eta(np[lR],gl))*beta[dim][dim2];
+        K[ns+dim][ns+dim2]=avg(_eta(np,lL,gl),_eta(np,lR,gl))*beta[dim][dim2];
         K[fluxet][ns+dim2]=K[fluxet][ns+dim2]+
-           avg(_eta(np[lL],gl),_eta(np[lR],gl))*beta[dim][dim2]*avg(_V(np[lL],dim),_V(np[lR],dim));
+           avg(_eta(np,lL,gl),_eta(np,lR,gl))*beta[dim][dim2]*avg(_V(np[lL],dim),_V(np[lR],dim));
       }
     }
     
-    K[fluxet][fluxet]=avg(_kappa(np[lL],gl),_kappa(np[lR],gl))*alpha;
+    K[fluxet][fluxet]=avg(_kappa(np,lL,gl),_kappa(np,lR,gl))*alpha;
   } 
 }
 

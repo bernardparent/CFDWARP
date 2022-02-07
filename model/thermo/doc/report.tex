@@ -405,6 +405,246 @@ K for $T$ and $m^2/s$ for $\cal D$.
 
 
 
+
+\section{Transport Coefficients of Fully-Ionized Plasmas}
+
+
+
+\subsection{Ion Mobility in Fully-Ionized Plasma}
+
+We can obtain the mobility of ions in a fully ionized plasma assuming the only collisions of importance are ion-ion collisions:
+%
+\begin{equation}
+ \mu_{\rm i} = \frac{|C_i|}{m_i \nu_{\rm ii}}
+\end{equation}
+% 
+where the ion-ion collision frequency corresponds to \cite{book:1984:chen}:
+%
+\begin{equation}
+\nu_{\rm ii}=\xi \frac{ N_{\rm i}}{ \sqrt{m_{\rm i}} (k_{\rm B} T_{\rm i})^\frac{3}{2}}  \frac{C_{\rm i}^4}{16 \pi^2 \epsilon_0^2}  \ln \Lambda
+\end{equation}
+%
+with $\xi$ a non-dimensional constant equal to 1.71 (Macheret), 2.36 (Ian Hutchinson). As well, $\ln \Lambda$ is another constant in the range 5-7.
+
+
+After substituting the latter in the former:
+%
+\begin{equation}
+\frameeqn{
+ \mu_{\rm i} = \frac{16 \pi^2 \epsilon_0^2 (k_{\rm B} T_{\rm i})^\frac{3}{2}}{\mfd \sqrt{m_{\rm i}} \xi  N_{\rm i}  |C_{\rm i}|^3  \ln \Lambda}
+}
+\end{equation}
+% 
+Setting $\xi$ to 1.71 and $\ln \Lambda$ to 6.3, and for a single charged ion, the latter can be rewritten as:
+%
+\begin{equation}
+\frameeqn{
+ \mu_{\rm i} = 14.3 m_{\rm i}^{-0.5} T_{\rm i}^{1.5} N_{\rm i}^{-1}
+}
+\end{equation}
+% 
+where $m_{\rm i}$ is the ion mass in kg, $T_{\rm i}$ the ion translational temperature in K, $N_{\rm i}$ the total ion number density in $\rm m^{-3}$, and $\mu_{\rm i}$ the ion mobility in m$^2$/Vs.
+
+
+\subsection{Electron Mobility in Fully-Ionized Plasma}
+
+We can obtain the mobility of electrons in a fully ionized plasma assuming the only collisions of importance are electron-ion collisions:
+%
+\begin{equation}
+ \mu_{\rm e} = \frac{|C_e|}{m_e \nu_{\rm ei}}
+\end{equation}
+% 
+where the electron-ion collision frequency corresponds to \cite{book:1984:chen}:
+%
+\begin{equation}
+\nu_{\rm ei}=\xi \frac{ \sqrt{2} N_{\rm i}}{ \sqrt{m_{\rm e}} (k_{\rm B} T_{\rm e})^\frac{3}{2}}  \frac{C_{\rm e}^4}{16 \pi^2 \epsilon_0^2}  \ln \Lambda
+\end{equation}
+%
+with $\xi$ a non-dimensional constant equal to 1.71 (Macheret), 2.36 (Ian Hutchinson). As well, $\ln \Lambda$ is another constant in the range 5-7.
+
+
+After substituting the latter in the former:
+%
+\begin{equation}
+\frameeqn{
+ \mu_{\rm e} = \frac{16 \pi^2 \epsilon_0^2 (k_{\rm B} T_{\rm e})^\frac{3}{2}}{\mfd \sqrt{2}\sqrt{m_{\rm e}} \xi  N_{\rm i}  |C_{\rm e}|^3  \ln \Lambda}
+}
+\end{equation}
+% 
+
+Setting $\xi$ to 1.71 and $\ln \Lambda$ to 6.3, the latter can be rewritten as:
+%
+\begin{equation}
+\frameeqn{
+ \mu_{\rm e} = 10.1 m_{\rm e}^{-0.5} T_{\rm e}^{1.5} N_{\rm i}^{-1}
+}
+\end{equation}
+% 
+where $m_{\rm e}$ is the electron mass in kg, $T_{\rm e}$ the electron  temperature in K, $N_{\rm i}$ the total ion number density in $\rm m^{-3}$, and $\mu_{\rm e}$ the ion mobility in m$^2$/Vs.
+
+
+
+\subsection{Ion Viscosity in a Fully-Ionized Plasma}
+
+From the 2002 Revised NRL Plasma Formulary \cite{nrl:2002:huba}, the ion viscosity in a fully ionized plasma corresponds to:
+%
+\begin{equation}
+\eta_{\rm i}= 0.96    \frac{N_{\rm i} k_{\rm B} T_{\rm i} }{\nu_{\rm ii}}
+\end{equation}
+%
+But the ion mobility corresponds to:
+%
+\begin{equation}
+ \mu_{\rm i} = \frac{|C_i|}{m_i \nu_{\rm ii}}
+\end{equation}
+%
+Isolate $\nu_{\rm ii}$ and substitute the latter in the viscosity:
+%
+\begin{equation}
+\eta_{\rm i}=  0.96  \frac{N_{\rm i} k_{\rm B} T_{\rm i} m_{\rm i} \mu_{\rm i}}{|C_i|}
+\end{equation}
+%
+Substitute the mobility, assume that the ion is singly charged ($C_i=e$) and simplify:
+%
+\begin{equation}
+\frameeqn{
+\eta_{\rm i}=   0.00118  \sqrt{m_{\rm i}}   T_{\rm i}^{2.5}  
+}
+\end{equation}
+%
+In the latter, $m_{\rm i}$ is the ion mass in kg, $T_{\rm i}$ is the ion translational temperature in K, and $\eta_{\rm i}$ the ion viscosity in kg/ms. 
+
+
+
+\subsection{Electron Viscosity in a Fully-Ionized Plasma}
+
+From the 2002 Revised NRL Plasma Formulary \cite{nrl:2002:huba}, the electron viscosity in a fully ionized plasma corresponds to:
+%
+\begin{equation}
+\eta_{\rm e}= 0.73    \frac{N_{\rm i} k_{\rm B} T_{\rm e} }{\nu_{\rm ei}}
+\end{equation}
+%
+In deriving the latter, only the electron-ion collisions are taken into consideration because the electron-electron collisions would not result in significant momentum exchange.
+
+Now, note that the electron mobility corresponds to:
+%
+\begin{equation}
+ \mu_{\rm e} = \frac{|C_e|}{m_e \nu_{\rm ei}}
+\end{equation}
+%
+Isolate $\nu_{\rm ei}$ and substitute the latter in the viscosity:
+%
+\begin{equation}
+\eta_{\rm e}= 0.73    \frac{N_{\rm i} k_{\rm B} T_{\rm e}\mu_{\rm e} m_e }{|C_e|}
+\end{equation}
+%
+Substitute the electron mobility:
+%
+\begin{equation}
+\eta_{\rm e}= 7.37    \frac{ k_{\rm B} T_{\rm e}^{2.5}  \sqrt{m_e} }{|C_e|}
+\end{equation}
+%
+Substitute constants:
+%
+\begin{equation}
+\frameeqn{
+\eta_{\rm e}=   6.35 \cdot 10^{-4}  \sqrt{m_{\rm e}}   T_{\rm e}^{2.5}  
+}
+\end{equation}
+%
+In the latter, $m_{\rm e}$ is the electron mass in kg, $T_{\rm i}$ is the ion translational temperature in K, and $\eta_{\rm i}$ the ion viscosity in kg/ms. 
+
+
+\subsection{Ion Thermal Conductivity}
+
+When deriving the ion energy transport equation from the first law of thermo and substituting the ion momentum equation (drift-diffusion), and reformatting, it can be shown that the ion thermal conductivity corresponds to (for an atomic ion):
+%
+\begin{equation}
+\frameeqn{
+ \kappa_{\rm i}=\frac{5 N_{\rm i} k_{\rm B}^2 T_{\rm i} \mu_{\rm i}}{2|C_{\rm i}|}
+}
+\end{equation}
+%
+We can now find the ion Prandtl number:
+%
+\begin{equation}
+ {\rm Pr_i} = \frac{(c_p)_{\rm i} \eta_{\rm i}}{\kappa_{\rm i}}
+\end{equation}
+%
+Substitute the ion viscosity and the ion thermal conductivity in the latter:
+%
+\begin{equation}
+ {\rm Pr_i} = 0.96 (c_p)_{\rm i}  \frac{N_{\rm i} k_{\rm B} T_{\rm i} m_{\rm i} \mu_{\rm i}}{|C_i|} 
+ \frac{2|C_{\rm i}|}{5 N_{\rm i} k_{\rm B}^2 T_{\rm i} \mu_{\rm i}}
+\end{equation}
+%
+Simplify:
+%
+\begin{equation}
+ {\rm Pr_i} = (c_p)_{\rm i}  
+ \frac{2  m_{\rm i}}{15  k_{\rm B} }
+\end{equation}
+%
+But for an atomic species without electronic energy the specific heat at constant pressure is equal to $\frac{5}{2}k_{\rm B}/m$:
+%
+\begin{equation}
+ {\rm Pr_i} = 0.96 \frac{5 k_{\rm B}}{2 m_{\rm i}}
+ \frac{2  m_{\rm i}}{5  k_{\rm B} }
+\end{equation}
+%
+or
+%
+\begin{equation}
+ {\rm Pr_i} = 0.96
+\end{equation}
+%
+
+
+
+\subsection{Electron Thermal Conductivity}
+
+When deriving the electron energy transport equation from the first law of thermo and substituting the electron momentum equation (drift-diffusion), and reformatting, it can be shown that the electron thermal conductivity corresponds to (in the absence of magnetic field):
+%
+\begin{equation}
+\frameeqn{
+ \kappa_{\rm e}=\frac{5 N_{\rm e} k_{\rm B}^2 T_{\rm e} \mu_{\rm e}}{2|C_{\rm e}|}
+}
+\end{equation}
+%
+We can now find the electron Prandtl number:
+%
+\begin{equation}
+ {\rm Pr_e} = \frac{(c_p)_{\rm e} \eta_{\rm e}}{\kappa_{\rm e}}
+\end{equation}
+%
+Substitute the electron viscosity and the electron thermal conductivity in the latter:
+%
+\begin{equation}
+ {\rm Pr_e} = (c_p)_{\rm e}  6.35 \cdot 10^{-4}  \sqrt{m_{\rm e}}   T_{\rm e}^{2.5} \frac{2|C_{\rm e}|}{5 N_{\rm e} k_{\rm B}^2 T_{\rm e} \mu_{\rm e}}
+\end{equation}
+%
+Substitute the electron mobility and simplify noting that $N_{\rm i} = N_{\rm e}$ for a quasi-neutral plasma:
+%
+\begin{equation}
+ {\rm Pr_e} = 6.35 \cdot 10^{-4} (c_p)_{\rm e}    \sqrt{m_{\rm e}}    \frac{2|C_{\rm e}|}{5\cdot 10.1\cdot  k_{\rm B}^2   m_{\rm e}^{-0.5}  }
+\end{equation}
+%
+But the specific heat at constant pressure is equal to $\frac{5}{2}k_{\rm B}/m_e$:
+%
+\begin{equation}
+ {\rm Pr_e} = 6.35 \cdot 10^{-4} \cdot \frac{5}{2}  \cdot      \frac{2|C_{\rm e}|}{5\cdot 10.1\cdot  k_{\rm B}    }
+\end{equation}
+%
+After substituting values for the constants and simplifying we get the following Prandtl number for the electrons:
+%
+\begin{equation}
+\frameeqn{
+ {\rm Pr_e} = 0.73
+}
+\end{equation}
+%
+
+
 \section{Plasma Properties $\mu_k$, $T_{\rm e}$, $\zeta_{\rm v}$}
 
 %

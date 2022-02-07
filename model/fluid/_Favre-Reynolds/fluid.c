@@ -411,18 +411,18 @@ double _etat(np_t *np, long l, gl_t *gl) {
 }
 
 
-double _kappa(np_t np, gl_t *gl) {
+double _kappa(np_t *np, long l, gl_t *gl) {
   double T,cp,ret,eta,kappa;
   spec_t w,nu;
 
-  if (_FLUIDPRIMMEM(np)){
-    ret=np.wk->kappamem;
+  if (_FLUIDPRIMMEM(np[l])){
+    ret=np[l].wk->kappamem;
   } else {
-    T=_T(np,gl);
-    find_w(np,w);
+    T=_T(np[l],gl);
+    find_w(np[l],w);
     cp=_cp_from_w_T(w,T);
-    find_nuk_eta_kappa(w, _rho(np), T, T, nu, &eta, &kappa);
-    ret=cp*_eta(np,gl)/( /* Prandtl number */(_eta(np,gl))/(kappa)*cp );
+    find_nuk_eta_kappa(w, _rho(np[l]), T, T, nu, &eta, &kappa);
+    ret=cp*_eta(np,l,gl)/( /* Prandtl number */(_eta(np,l,gl))/(kappa)*cp );
 
   }
 
@@ -430,15 +430,15 @@ double _kappa(np_t np, gl_t *gl) {
 }
 
 
-double _eta(np_t np, gl_t *gl) {
+double _eta(np_t *np, long l, gl_t *gl) {
   double ret;
   spec_t w,nu;
   double eta,kappa;
-  if (_FLUIDPRIMMEM(np)){
-    ret=np.wk->etamem;
+  if (_FLUIDPRIMMEM(np[l])){
+    ret=np[l].wk->etamem;
   } else { 
-    find_w(np,w); 
-    find_nuk_eta_kappa(w, _rho(np), _T(np,gl), _T(np,gl), nu, &eta, &kappa);
+    find_w(np[l],w); 
+    find_nuk_eta_kappa(w, _rho(np[l]), _T(np[l],gl), _T(np[l],gl), nu, &eta, &kappa);
     ret=eta;
   }
   return(ret);

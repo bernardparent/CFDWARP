@@ -7,6 +7,46 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 FEB 06a
+  * in lib/soap/eg/calc.c
+    - added constants eps0, epsilon0, and NA
+  * in model/chem/_Air_Plasma_11s/chem.hh
+    - added parent2022a citation
+  * in model/emfield/_Epotential-Bfixed/emfield.c
+    - uncommented the function _Ekmag()
+  * in model/fluid/_*/fluid.c,fluid.h,fluid_post.c
+    - changed the parameters to _kappa(), _eta(), _ktilde(), _omega()
+  * in model/fluid/_*_plasma/fluid_source.c
+    - changed the call from find_dmue_from_rhok_Te() to find_dmuk_from_rhok_Tk_Ek()
+    - changed the call from _mue_from_rhok_Te() to _muk_from_rhok_Tk_Ek()
+  * in model/fluid/_*_plasma/fluid.c
+    - added the function _kappan()
+    - changed the parameters to the function _kappai()
+    - in _kappai(), now calls _kappac_from_rhok_Tk_Ek()
+    - in _kappa(), added the charged species kappa contributions using _kappac_from_rhok_Tk_Ek()
+    - in _eta(), added the charged species eta contributions using _etac_from_rhok_Tk_Ek()
+    - in find_Kstar_interface(), now determines the thermal conductivity as kappan+kappai instead
+      of kappa+kappai
+    - in find_prim_fluid_mem(), etamem is now determined as the sum of etan and etai found through
+      _etac_from_rhok_Tk_Ek()
+    - in find_prim_fluid_mem(), kappamem is now determined as the sum of kappan and kappai found through
+      _kappac_from_rhok_Tk_Ek()
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - Rearranged the various boundary conditions within one section 
+  * in model/share/fluid_share.c
+    - changed the parameters to functions _eta() and _kappa() and _ktilde()
+  * in model/thermo/_generic/thermo.c
+    - modified the charged species viscosities in _etak_from_T() 
+    - added the functions _etan_from_w_T(), _etac_from_rhok_Tk_Ek(), _kappac_from_rhok_Tk_Ek()
+    - added the function _mui_from_Nn_Ni_Ti() which includes the contribution to the ion mobility 
+      coming from ion-ion collisions
+    - added the function find_dmui_from_Nn_Ni_Ti()
+  * in model/thermo/doc/report.tex
+    - Added section on Transport Coefficients of Fully-Ionized Plasmas
+  * in src/control.c
+    - added parent2022a citation
+
+
 2022 JAN 22a
   * in model/fluid/doc/Transport_Equations/report.tex
     - improved the derivation of the thermal conductivity of the electrons in the presence

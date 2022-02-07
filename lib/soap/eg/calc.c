@@ -52,6 +52,9 @@ int main ( int argc, char **argv ) {
     SOAP_add_to_vars(&codex, "kB", "1.380649E-23");
     SOAP_add_to_vars(&codex, "me", "9.10938356E-31");
     SOAP_add_to_vars(&codex, "e", "1.60217662E-19");
+    SOAP_add_to_vars(&codex, "eps0", "8.85418782E-12");
+    SOAP_add_to_vars(&codex, "epsilon0", "8.85418782E-12");
+    SOAP_add_to_vars(&codex, "NA", "6.022E23");
 
     SOAP_process_code ( code, &codex, SOAP_VARS_KEEP_ALL );
     SOAP_free_codex ( &codex );

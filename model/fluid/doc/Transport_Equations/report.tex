@@ -3230,8 +3230,9 @@ Thus:
 
 
 
+\section{Boundary Conditions}
 
-\section{Surface Boundary Conditions}
+\subsection{Non-Catalytic Wall Boundary Conditions}
 
 While the flow properties at the inflow and outflow conditions can be specified similarly as in non-ionized aerodynamics, special care must be taken in applying the boundary conditions at the surfaces of dielectrics and electrodes. For the charged species partial densities, we here follow the boundary conditions for a weakly-ionized plasma specified in Ref.\ \cite{jcp:2014:parent}:
 %
@@ -3313,7 +3314,7 @@ The boundary conditions needed to obtain $\vec{U}$ at the surface nodes as outli
 
 
 
-\section{Catalytic Surface Boundary Conditions}
+\subsection{Catalytic Wall Boundary Conditions}
 
 When a gas interacts with a solid surface, chemical reactions can occur. In air, atomic oxygen and atomic nitrogen can form molecular oxygen and nitrogen at the surface, respectively. The surface boundary condition is governed by the catalytic recombination coefficient $\gamma$ which is defined as:
 %
@@ -3430,7 +3431,7 @@ Other models for catalysis of oxygen and nitrogen can be found in \cite{nasa:202
 
 
 
-\section{Surface Injection Boundary Conditions (Neutral Solver)}
+\subsection{Surface Injection Boundary Conditions (Neutral Solver)}
 
 Consider a surface through which some species $i$ is injected into the flow. Say that the total amount of gas injected per surface area is equal to $\dot{m}^{\rm in}_{\rm tot}$. The bulk gas velocity component perpendicular to the surface must thus be equal to:
 %
@@ -3499,7 +3500,7 @@ In the latter, the total mass flow rate injected per unit area corresponds to th
 %
 
 
-\section{Thermionic Emission Boundary Condition}
+\subsection{Thermionic Emission Boundary Condition}
 
 
 The boundary condition for the electron number density at the electrodes with thermionic emission is such that the electron flux emitted from the surface follows Richardson's emission law:
@@ -3539,6 +3540,8 @@ Substituting the latter in the former and isolating the number density gradient 
  \frac{\partial N_{\rm e}}{\partial \chi} = -\frac{J_{\rm emit}}{\mu_{\rm e} k_{\rm B} T_{\rm e}}~~~~{\rm for~}\vec{E}_\chi>0
 \end{equation}
 %
+
+
 
   \bibliographystyle{warpdoc}
   \bibliography{all}

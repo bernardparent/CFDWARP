@@ -186,12 +186,12 @@ void find_post_variable_value_fluid(np_t *np, long l, gl_t *gl,
       case nd+ns+3:   *varvalue=_T(np[l],gl);         break;
       case nd+ns+4:   *varvalue=_Tv(np[l]);         break;
       case nd+ns+5:   *varvalue=_a(np[l],gl);         break;
-      case nd+ns+6:   *varvalue=_eta(np[l],gl);        break;
+      case nd+ns+6:   *varvalue=_eta(np,l,gl);        break;
       case nd+ns+7:   *varvalue=_etastar(np,l,gl);    break;
       case nd+ns+8:   *varvalue=_kappastar(np,l,gl); break;
       case nd+ns+9:   *varvalue=_k(np[l]);         break;
       case nd+ns+10:  *varvalue=_eps(np[l],gl);       break;
-      case nd+ns+11:  *varvalue=_omega(np[l],gl);     break;
+      case nd+ns+11:  *varvalue=_omega(np,l,gl);     break;
       case nd+ns+12:  *varvalue=_gamma(np[l],gl);     break;
       case nd+ns+13:  *varvalue=N;     break;
     }
