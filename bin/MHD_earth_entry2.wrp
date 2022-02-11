@@ -221,7 +221,7 @@ Model(
     Pmin=1.0e3;    Pmax=9.9e99;   {Pa}
     Tmin=1000;     Tmax=80000;    {K}
     Tvmin=Tmin;     Tvmax=Tmax;  {K}
-    Temin=300;     Temax=5e6;  {K}
+    Temin=300;     Temax=1e5;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-9;                  {min mass fraction allowed in the domain for neutrals}
     chiimin=1e-10;  chiimax=1.0;    {min and max ion molar fraction}
@@ -324,20 +324,20 @@ Init(
 
 Disc(
   NavierStokesPlasma(
-    zetaA1=0.01e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
     zetaD=0.0;        {conditions the Dstar eigenvalues for the charged species}
     for (spec,1,numspec,
       if (SPECIESTYPE[spec]==SPECIESTYPE_IONPLUS,
-        betag[spec]=0.3;
-        betaa[spec]=0.0;
+        betag[spec]=0.5;
+        betaa[spec]=0.5;
       );
       if (SPECIESTYPE[spec]==SPECIESTYPE_IONMINUS,
         betag[spec]=-0.5;
         betaa[spec]=0.5;
       );
       if (SPECIESTYPE[spec]==SPECIESTYPE_ELECTRON,
-        betag[spec]=-0.001; 
+        betag[spec]=-0.001;
         betaa[spec]=0.999;
       );
     );
@@ -419,7 +419,7 @@ Cycle(
     if (iter==1,
       CFL=0.001;
     );
-    CFL=min(CFL*1.03,1.0);
+    CFL=min(CFL*1.03,3.0);
     Model(
       EpotentialBfixed(
         SetMagneticField(is,js, ie,je, 0,0,min(Bz,Bz*iter/(mf*300))); 
@@ -430,8 +430,8 @@ Cycle(
     relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
     if (iter>10,
        UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,25);
-       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,400);
-       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,400);
+       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,200);
+       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,200);
     );
 {    UpdateEMField(Lc,relaxEMF,TSEMF_NEWTON);}
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",

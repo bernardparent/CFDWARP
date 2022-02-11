@@ -6,6 +6,21 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2022 FEB 11a
+  * in model/thermo/_generic/thermo.c
+    - in _muk_from_rhok_Tk_Ek() and find_dmuk_from_rhok_Tk_Ek(), removed the mobilities for Oplus, Nplus
+    - in _muk_from_rhok_Tk_Ek() and find_dmuk_from_rhok_Tk_Ek(), modified the default mobility to
+      match the one outlined in the thermo document
+    - in _kappac_from_rhok_Tk_Ek(), now use _cpk_from_T_equilibrium instead 2.5*kB/m or 3.5*kB/m
+    - in _etac_from_rhok_Tk_Ek(), now use _cpk_from_T_equilibrium instead 2.5*kB/m or 3.5*kB/m
+  * in model/thermo/doc/report.tex
+    - added section on transport coefficients for partially-ionized plasmas
+  * in model/fluid/_Navier-Stokes_plasma/fluid_plasma.c
+    - in find_Dstarmat(), find_Dstarmat_test(), find_Dstar(), find_Dstar_interface()
+      replaced _hk_from_T() with _hk_from_T_equilibrium()
+  * in model/fluid/_Favre-Reynolds_plasma/fluid_plasma.c
+    - in find_Dstar(), replaced _hk_from_T() with _hk_from_T_equilibrium()
+    
 
 2022 FEB 06a
   * in lib/soap/eg/calc.c

@@ -2906,7 +2906,7 @@ static void find_Pa_index(long spec, double *T, long *index, double *dTplus, lon
   }
 }
 
-double _cpk_from_T(long spec, double T){
+static double _cpk_from_T(long spec, double T){
   double cpk,dTplus;
   long index,index2;
   double T2,T3,T4,weight2;
@@ -3458,7 +3458,7 @@ double _etak_from_T(long spec, double T){
 
 
 
-double _kappak_from_T(long spec, double T){
+static double _kappak_from_T(long spec, double T){
   double etak,kappak;
   etak=_etak_from_T(spec,T);
   if (numatoms[smap[spec]]>1) {
@@ -4047,7 +4047,7 @@ double _mui_from_Nn_Ni_Ti(double Nn, double Ni, double A, double Ti, double n, d
   H2+, Cs+, N+, O+, O- are approximated using Fig. 8 in THE MOBILITIES OF SMALL IONS THE ATMOSPHERE AND THEIR RELATIONSHIP by E. UNGETHUM, Aerosol Science, 1974, Vol. 5, pp. 25 37. 
 */ 
 double _muk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k){
-  double fact,mu,Estar,N,Nn,Ni;
+  double mu,Estar,N,Nn,Ni;
   long spec;
   mu=0.0;
   N=0.0;
@@ -4077,14 +4077,8 @@ double _muk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k){
       case SMAP_O2plus:  
         mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 1.18e23, Tk, -0.5, 3.61E12, Estar, -0.5,  _m(k));
       break;
-      case SMAP_Oplus:
-        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 1.4*1.18e23, Tk, -0.5, 1.4*3.61E12, Estar, -0.5,  _m(k));
-      break;
       case SMAP_N2plus:
         mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 0.75e23, Tk, -0.5, 2.03E12, Estar, -0.5,  _m(k));
-      break;
-      case SMAP_Nplus:
-        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 1.4*0.75e23, Tk, -0.5, 1.4*2.03E12, Estar, -0.5, _m(k));
       break;
       case SMAP_O2minus:
         mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 0.97e23, Tk, -0.5, 3.56e19, Estar, -0.1,  _m(k));
@@ -4096,8 +4090,7 @@ double _muk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k){
         mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 1.62e23, Tk, -0.5, 4.47e12, Estar, -0.5,  _m(k));
       break;
       default:
-        fact=sqrt(28.96E-3/_calM(k)); 
-        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, fact*1e23, Tk, -0.5, fact*2.5e12, Estar, -0.5,  _m(k));
+        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 2.2e10/sqrt(_m(k)), Tk, -0.5, 0.55/sqrt(_m(k)), Estar, -0.5,  _m(k));
     }
 #ifdef speceminus
   }
@@ -4190,7 +4183,7 @@ void find_dmui_from_Nn_Ni_Ti(double Nn, double Ni, double A, double Ti, double n
 
 
 void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok){
-  double N,Nn,Ni,Ekstar,fact;
+  double N,Nn,Ni,Ekstar;
   long spec;
   N=0.0;
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
@@ -4219,14 +4212,8 @@ void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double
       case SMAP_O2plus:
         find_dmui_from_Nn_Ni_Ti(Nn, Ni, 1.18e23, Tk, -0.5, 3.61E12, Ekstar, -0.5, _m(k),  dmukdTk, dmukdrhok);
       break;
-      case SMAP_Oplus:
-        find_dmui_from_Nn_Ni_Ti(Nn, Ni, 1.4*1.18e23, Tk, -0.5, 1.4*3.61E12, Ekstar, -0.5, _m(k),  dmukdTk, dmukdrhok);
-      break;
       case SMAP_N2plus:
         find_dmui_from_Nn_Ni_Ti(Nn, Ni, 0.75e23, Tk, -0.5, 2.03E12, Ekstar, -0.5, _m(k),  dmukdTk, dmukdrhok);
-      break;
-      case SMAP_Nplus:
-        find_dmui_from_Nn_Ni_Ti(Nn, Ni, 1.4*0.75e23, Tk, -0.5, 1.4*2.03E12, Ekstar, -0.5, _m(k),  dmukdTk, dmukdrhok);
       break;
       case SMAP_O2minus:
         find_dmui_from_Nn_Ni_Ti(Nn, Ni, 0.97e23, Tk, -0.5, 3.56e19, Ekstar, -0.1, _m(k),  dmukdTk, dmukdrhok);
@@ -4238,8 +4225,7 @@ void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double
         find_dmui_from_Nn_Ni_Ti(Nn, Ni, 1.62e23, Tk, -0.5, 4.47e12, Ekstar, -0.5, _m(k),  dmukdTk, dmukdrhok);
       break;
       default:
-        fact=sqrt(28.96E-3/_calM(k)); 
-        find_dmui_from_Nn_Ni_Ti(Nn, Ni, fact*1e23, Tk, -0.5, fact*2.5e12, Ekstar, -0.5, _m(k),  dmukdTk, dmukdrhok);
+        find_dmui_from_Nn_Ni_Ti(Nn, Ni, 2.2e10/sqrt(_m(k)), Tk, -0.5, 0.55/sqrt(_m(k)), Ekstar, -0.5, _m(k),  dmukdTk, dmukdrhok);
     }
 #ifdef speceminus
   }
@@ -4250,12 +4236,12 @@ void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double
 
 // find the scalar thermal conductivity of the kth charged species
 double _kappac_from_rhok_Tk_Ek(spec_t rhok, double T, double E, long k){
-  double mu,kappa,Nk;
+  double mu,kappa,cp;
   if (k>=ncs) fatal_error("_kappac_from_rhok_Tk_Ek can only be used for charged species, not for species %ld.",k);
   mu=_muk_from_rhok_Tk_Ek(rhok, T, E, k);
-  Nk=rhok[k]/_m(k);
-  if (numatoms[smap[k]]>1) kappa=7.0/2.0*sqr(kB)*Nk*T*mu/fabs(_C(k));
-    else kappa=5.0/2.0*sqr(kB)*Nk*T*mu/fabs(_C(k));
+  cp=_cpk_from_T_equilibrium(k,T);
+  //cp=5.0/2.0*kB/_m(k);
+  kappa=cp*rhok[k]*kB*T*mu/fabs(_C(k));
   return(kappa);
 }
 
@@ -4268,8 +4254,8 @@ double _etac_from_rhok_Tk_Ek(spec_t rhok, double T, double E, long k){
   // Pr=cp*eta/kappa
 
   if (speciestype[k]==SPECIES_ELECTRON) Pr=0.73; else Pr=0.96;
-  if (numatoms[smap[k]]>1) cp=7.0/2.0*kB/_m(k);
-    else cp=5.0/2.0*kB/_m(k);
+  cp=_cpk_from_T_equilibrium(k,T);
+  //if (fabs(cp-5.0/2.0*kB/_m(k))/min(cp,5.0/2.0*kB/_m(k))>2.2 && k==specN2plus ) printf("x");
   eta=Pr*kappa/cp;
   return(eta);
 }

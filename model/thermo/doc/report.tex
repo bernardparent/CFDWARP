@@ -435,7 +435,7 @@ After substituting the latter in the former:
 }
 \end{equation}
 % 
-Setting $\xi$ to 1.71 and $\ln \Lambda$ to 6.3, and for a single charged ion, the latter can be rewritten as:
+Setting $\xi$ to 1.71 and $\ln \Lambda$ to 6.3, and assuming that the ion has a single charge, the latter can be rewritten as:
 %
 \begin{equation}
 \frameeqn{
@@ -645,39 +645,40 @@ After substituting values for the constants and simplifying we get the following
 %
 
 
-\section{Plasma Properties $\mu_k$, $T_{\rm e}$, $\zeta_{\rm v}$}
+\section{Transport Coefficients in a Partially-Ionized Plasma}
 
 %
 \begin{table*}[b]
   \center
   \begin{threeparttable}
-    \tablecaption{Ion and electron mobilities in dry air.\tnote{a}}
+    \tablecaption{Ion and electron mobilities in dry air.\tnote{a,d}}
     \label{tab:mobilities}
     \fontsizetable
     \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}ll}
     \toprule
     Species & Mobility, $\rm m^2\cdot V^{-1}\cdot s^{-1}$  & Reference\\
     \midrule
-    Air$^+$         & $N^{-1} \cdot {\rm min}\left(0.84\cdot 10^{23}\cdot T^{-0.5},~~2.35 \cdot 10^{12}\cdot \left(E^\star\right)^{-0.5}\right)$  & \cite{misc:1968:sinnott}\tnote{b}\alb
-    N$_2^+$         & $N^{-1} \cdot {\rm min}\left(0.75\cdot 10^{23}\cdot T^{-0.5},~~2.03 \cdot 10^{12}\cdot \left(E^\star\right)^{-0.5}\right)$  & \cite{misc:1968:sinnott}\alb
-    O$_2^+$         & $N^{-1} \cdot {\rm min}\left(1.18\cdot 10^{23}\cdot T^{-0.5},~~3.61 \cdot 10^{12}\cdot\left(E^\star\right)^{-0.5}\right)$  & \cite{misc:1968:sinnott}\alb
-    O$_2^-$         & $N^{-1} \cdot {\rm min}\left(0.97 \cdot 10^{23}\cdot T^{-0.5},~~3.56 \cdot 10^{19} \cdot \left(E^\star\right)^{-0.1}\right)$  & \cite{misc:1983:gosho}\alb
-    e$^-$         & ${\rm avgharm}\left( N_{\rm n}^{-1} \cdot 3.74\cdot 10^{19} \cdot {\rm exp}\left(33.5 \cdot \left({\rm ln}\, T_{\rm e} \right)^{-0.5}\right) ~,~~N_{\rm i}^{-1} \cdot 1.061 \cdot 10^{16} \cdot T_{\rm e}^{1.5}  \right)$  & \cite[Ch.\ 21]{book:1997:grigoriev},\cite[pp.\ 180-181]{book:1984:chen}\tnote{c,d}\\
+    Air$^+$         & ${\rm avgh} \left(N_{\rm n}^{-1} \cdot {\rm min}\left(0.84\cdot 10^{23}\cdot T^{-0.5},~~2.35 \cdot 10^{12}\cdot \left(E^\star\right)^{-0.5}\right)~,~~14.3 \cdot m_{\rm air}^{-0.5} \cdot T^{1.5} \cdot N_{\rm i}^{-1} \right)$  & \cite{misc:1968:sinnott}\tnote{b}\alb
+    N$_2^+$         & ${\rm avgh} \left(N_{\rm n}^{-1} \cdot {\rm min}\left(0.75\cdot 10^{23}\cdot T^{-0.5},~~2.03 \cdot 10^{12}\cdot \left(E^\star\right)^{-0.5}\right)~,~~14.3 \cdot m_{\rm N_2^+}^{-0.5} \cdot T^{1.5} \cdot N_{\rm i}^{-1} \right)$  & \cite{misc:1968:sinnott}\alb
+    O$_2^+$         & ${\rm avgh} \left(N_{\rm n}^{-1} \cdot {\rm min}\left(1.18\cdot 10^{23}\cdot T^{-0.5},~~3.61 \cdot 10^{12}\cdot\left(E^\star\right)^{-0.5}\right)~,~~14.3 \cdot m_{\rm O_2^+}^{-0.5} \cdot T^{1.5} \cdot N_{\rm i}^{-1} \right)$  & \cite{misc:1968:sinnott}\alb
+    O$_2^-$         & ${\rm avgh} \left(N_{\rm n}^{-1} \cdot {\rm min}\left(0.97 \cdot 10^{23}\cdot T^{-0.5},~~3.56 \cdot 10^{19} \cdot \left(E^\star\right)^{-0.1}\right)~,~~14.3 \cdot m_{\rm O_2^-}^{-0.5} \cdot T^{1.5} \cdot N_{\rm i}^{-1} \right)$  & \cite{misc:1983:gosho}\alb
+    e$^-$         & ${\rm avgh}\left( N_{\rm n}^{-1} \cdot 3.74\cdot 10^{19} \cdot {\rm exp}\left(33.5 \cdot \left({\rm ln}\, T_{\rm e} \right)^{-0.5}\right) ~,~~N_{\rm i}^{-1} \cdot 1.061 \cdot 10^{16} \cdot T_{\rm e}^{1.5}  \right)$  & \cite[Ch.\ 21]{book:1997:grigoriev}\tnote{c}\\
+    other~ions         & ${\rm avgh} \left(N_{\rm n}^{-1} \cdot {\rm min}\left(2.2 \cdot 10^{10}\cdot (m_{\rm i} T)^{-0.5},~~0.55 \cdot \left(m_{\rm i} E^\star\right)^{-0.5}\right)~,~~14.3 \cdot m_{\rm i}^{-0.5} \cdot T^{1.5} \cdot N_{\rm i}^{-1} \right)$  & --\alb
     \bottomrule
     \end{tabular*}
     \begin{tablenotes}
       \item[a] Notation and units:  $T_{\rm e}$ is in Kelvin; $T$ is in Kelvin; $N$ is the total number density of the plasma in 1/m$^3$; $N_{\rm i}$ is the sum of the positive ion number densities in 1/m$^3$;  $N_{\rm n}$ is the sum of the neutral species number densities  in 1/m$^3$;  $E^\star$ is the reduced effective electric field  ($E^\star \equiv |\vec{E}|/N$) in units of V$\cdot$m$^2$.
       \item[b] The ``air ion'' mobility is obtained from the N$_2^+$ and O$_2^+$ ion mobilities assuming a N$_2^+$:O$_2^+$ ratio of 4:1. 
       \item[c] The expression for the electron-neutral collisions approximates the data given in Chapter 21 of Ref.\ \cite{book:1997:grigoriev}; The equation can be used in the range $1000~{\rm K} \le T_{\rm e} \le 57900 ~{\rm K}$ with a relative error on the mobility not exceeding 20\%. In the range $287~{\rm K} \le T_{\rm e} < 1000~{\rm K}$, the relative error is less than 30\%. 
-      \item[d] The function avgharm($a$,$b$) returns the harmonic average of the two arguments as follows $1/(a^{-1}+b^{-1})$.
+      \item[d] The function avgh($a$,$b$) returns the harmonic average of the two arguments as follows $1/(a^{-1}+b^{-1})$.
     \end{tablenotes}
    \end{threeparttable}
 \end{table*}
 %
 
+\subsection{Electron Mobility}
 
-
-The mobilities of the various charged species are taken from Table \ref{tab:mobilities}. Note that when the ionization fraction exceeds 0.001 or so, the electron mobility needs to be corrected to account for electron-ion collisions as follows:
+Note that when the ionization fraction exceeds 0.001 or so, the electron mobility needs to be corrected to account for electron-ion collisions as follows:
 %
 \begin{equation}
 \mu_{\rm e}=\frac{1}{\frac{1}{\mu_{\rm en}}+\frac{1}{\mu_{\rm ei}}}
@@ -703,6 +704,67 @@ Also, we can fit a polynomial through the experimental data outlined in in Chapt
 %
 where $N_{\rm n}$ is the number density of the neutrals in $m^{-3}$ and $T_{\rm e}$ is the electron temperature in K.
 The latter equation can be used in the range $1000~{\rm K} \le T_{\rm e} \le 57900 ~{\rm K}$ with a relative error on the mobility not exceeding 20\%. In the range $287~{\rm K} \le T_{\rm e} < 1000~{\rm K}$, the relative error is less than 30\%. 
+
+
+\subsection{Ion Mobility}
+
+Note that when the ionization fraction exceeds 0.001 or so, the ion mobility needs to be corrected to account for ion-ion collisions as follows:
+%
+\begin{equation}
+\mu_{\rm i}=\frac{1}{\frac{1}{\mu_{\rm in}}+\frac{1}{\mu_{\rm ii}}}
+\end{equation}
+%
+where $\mu_{\rm ii}$ is the ion mobility in the limit of a fully ionized plasma and $\mu_{\rm in}$ is the ion mobility in the limit of a weakly-ionized plasma. The ion mobility for a fully ionized plasma is found from the collision frequency of ion-ion collisions only and corresponds to:
+%
+\begin{equation}
+ \mu_{\rm ii} = \frac{16 \pi^2 \epsilon_0^2 (k_{\rm B} T_{\rm i})^\frac{3}{2}}{\mfd \sqrt{m_{\rm i}} \xi  N_{\rm i}  |C_{\rm i}|^3  \ln \Lambda}
+\end{equation}
+% 
+where $\xi$ is a constant that we here set to 1.71 and $\ln \Lambda$ is another constant that we here set to 6.3. For a single charged ion, the latter can be rewritten as:
+%
+\begin{equation}
+ \mu_{\rm ii} = 14.3 m_{\rm i}^{-0.5} T_{\rm i}^{1.5} N_{\rm i}^{-1}
+\end{equation}
+% 
+where $m_{\rm i}$ is the ion mass in kg, $T_{\rm i}$ the ion translational temperature in K, $N_{\rm i}$ the total ion number density in $\rm m^{-3}$, and $\mu_{\rm i}$ the ion mobility in m$^2$/Vs.
+
+
+We can find the ion mobility for a weakly-ionized plasma $\mu_{\rm in}$ through the collision frequency between ions and neutrals. For instance, for the nitrogen ion $\rm N_2^+$, the mobility in air can be expressed as:
+%
+\begin{equation}
+\mu_{\rm in}=N_{\rm n}^{-1} \cdot {\rm min}\left(2.2\cdot 10^{10} \cdot (m_{\rm i} T)^{-0.5},~~0.55  \cdot \left(m_{\rm i} E^\star\right)^{-0.5}\right)
+\end{equation}
+%
+where $N_{\rm n}$ is the number density of the neutrals in $m^{-3}$ and $T$ is the ion translational temperature in K.
+
+The mobility of a partially-ionized plasma can be obtained simply by taking the harmonic mean of the mobility of a fully-ionized plasma and the mobility of a weakly-ionized plasma. 
+
+The mobilities of the various charged species are tabulated in Table \ref{tab:mobilities}. 
+
+
+
+\subsection{Thermal Conductivity and Viscosity}
+
+Whether the plasma is fully-ionized or weakly-ionized, the thermal conductivity can be expressed as a function of the mobility as follows:
+%
+\begin{equation}
+\kappa_k =     \frac{ \rho_k k_{\rm B}  (c_p)_k T_k \mu_k}{|C_k|} 
+\end{equation}
+%
+where $(c_p)_k$ is the specific heat at constant pressure of the $k$th species.
+
+The scalar viscosity can be obtained from the thermal conductivity as follows:
+%
+\begin{equation}
+\eta_k = \frac{{\rm Pr} \cdot \kappa_k}{(c_p)_k}
+\end{equation}
+% 
+where Pr is the Prandtl number which is set to 0.73 for the electrons and to 0.96 for the ions.
+
+
+
+\section{Properties Needed within the Vibrational and Electron Energy Transport Equations}
+
 
 Also, the fraction of the Joule heating that is consumed in the excitation of the vibration levels of the nitrogen molecule, $\zeta_{\rm v}$,  is as specified in Table \ref{table:etavcoefficients}.
 
