@@ -6,6 +6,12 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2022 FEB 18a
+  * in model/fluid/_Navier-Stokes/fluid_post.c
+    - in find_post_variable_value_fluid(), fixed a bug related to the parameters passed to _eta and _kappa
+    
+  
 2022 FEB 11a
   * in model/thermo/_generic/thermo.c
     - in _muk_from_rhok_Tk_Ek() and find_dmuk_from_rhok_Tk_Ek(), removed the mobilities for Oplus, Nplus
