@@ -45,9 +45,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define dTrangemin 100.0e0
 // maximum reduced temperature (T/Peps) used to determine the viscosity, thermal conductivity, and mass diffusion coefficients with Leonard Jones potentials
 #define TSTAR_MAX 100.0
-#define INCLUDE_ELECTRONS_IN_ETA FALSE
+#define INCLUDE_ELECTRONS_IN_ETA TRUE
 #define INCLUDE_ELECTRONS_IN_NU FALSE
-#define INCLUDE_ELECTRONS_IN_KAPPA FALSE
+#define INCLUDE_ELECTRONS_IN_KAPPA TRUE
 
 
 typedef char speciesname_t[ns_c];
