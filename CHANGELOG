@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 FEB 28b
+  * in model/transport/_gnoffo/transport.c
+    - took away "_gnoffo" at the end of each function name
+    
+
 2022 FEB 28a
   * in lib/soap/doc/report.tex
     - added log10 function to table
@@ -32,7 +37,8 @@ ________________________________________________________________________________
   * in model
     - added transport
   * in src/test.c
-    - 
+    - in test_eta() and test_kappa() and test_Pr(), added rhok instead of w as a parameter to
+      find_nuk_eta_kappa();
 
 
 2022 FEB 19a
