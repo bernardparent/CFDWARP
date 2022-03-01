@@ -7,6 +7,34 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 FEB 28a
+  * in lib/soap/doc/report.tex
+    - added log10 function to table
+  * in lib/soap/soap.c
+    - in functions_builtin(), added log10 function
+  * in model/fluid/_*/fluid.c, model/fluid/_*/fluid_conv.c, model/fluid/_*/fluid_post.c
+    - added find_rhok()
+    - in the calls to find_nuk_eta_kappa(), _eta(), _kappan_from_rhok_T_Te(), _etan_from_rhok_T_Te()
+      changed w for rhok
+  * in model/fluid/_*plasma/fluid.c
+    - in find_prim_fluid_mem(), fixed a bug related to the determination of rhok (rhok was mistakenly
+      set to rhok/rho not to rhok)
+  * in model/share/fluid_share.c
+    - changed the parameters to find_nuk_from_rhok_T_Te() from w to rhok
+  * in model/thermo/_generic/thermo.c
+    - removed all the functions related to the transport coefficients (mobility, diffusion coefficient,
+      thermal conductivity, viscosity)
+    - removed the functions related to finding the enthalpy using the NASA Glenn polynomials
+  * in model/share
+    - added transport_share.c
+  * in model/thermo/_generic/
+    - added enthalpy.c
+  * in model
+    - added transport
+  * in src/test.c
+    - 
+
+
 2022 FEB 19a
   * in model/thermo/_generic/thermo.c
     - set INCLUDE_ELECTRONS_IN_ETA to TRUE

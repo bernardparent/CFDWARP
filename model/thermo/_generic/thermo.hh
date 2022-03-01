@@ -1,7 +1,9 @@
-#define _THERMO_METHOD "NASA Glenn Polynomials [mcbride2002a]"
+#define _THERMO_METHOD "NASA Glenn Polynomials [mcbride2002a], Dixon-Lewis transport coefficients, Gnoffo transport coefficients."
 #define _THERMO_GENERIC
 
 #define THERMO_P_REF 100000.0
+
+#define SMAP_NS 57
 
 #define SMAP_eminus   0
 #define SMAP_O2       1
@@ -60,6 +62,7 @@
 #define SMAP_Hplus   54
 #define SMAP_CH2     55
 #define SMAP_Heplus  56
+
 
 
 

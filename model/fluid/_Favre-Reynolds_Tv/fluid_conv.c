@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fluid_conv.h"
 #include <model/metrics/_metrics.h>
 #include <model/thermo/_thermo.h>
+#include <model/transport/_transport.h>
 #include <model/emfield/_emfield.h>
 #include <model/_model.h>
 #include <model/share/fluid_share.h>
@@ -302,9 +303,11 @@ double _a_from_jacvars(jacvars_t jacvars){
 
 
 double _eta_from_jacvars(jacvars_t jacvars){
-  spec_t nu;
+  spec_t nu,rhok;
+  long spec;
   double eta,kappa;
-  find_nuk_eta_kappa(jacvars.w, jacvars.rho, jacvars.T, jacvars.Te, nu, &eta, &kappa);
+  for (spec=0; spec<ns; spec++) rhok[spec]=jacvars.w[spec]*jacvars.rho;
+  find_nuk_eta_kappa(rhok, jacvars.T, jacvars.Te, nu, &eta, &kappa);
   return(eta);
 }
 
@@ -1440,15 +1443,16 @@ void find_Ustar_given_metrics(np_t np, gl_t *gl, metrics_t metrics, flux_t Ustar
 /* Peclet number */ 
 double _Pe_from_jacvars(jacvars_t jacvars, metrics_t metrics){
   double Vstar,eta,kappa,Pe,Xmag2;
-  long dim;
-  spec_t nu;
+  long dim,spec;
+  spec_t nu,rhok;
   Vstar=0.0;
   Xmag2=0.0;
   for (dim=0; dim<nd; dim++){
     Vstar+=jacvars.V[dim]*metrics.X[dim];
     Xmag2+=sqr(metrics.X[dim]);
   }
-  find_nuk_eta_kappa(jacvars.w, jacvars.rho, jacvars.T, jacvars.Te, nu, &eta, &kappa);
+  for (spec=0; spec<ns; spec++) rhok[spec]=jacvars.w[spec]*jacvars.rho;
+  find_nuk_eta_kappa(rhok, jacvars.T, jacvars.Te, nu, &eta, &kappa);
   assert(eta>0.0);
   Pe=jacvars.rho/eta*fabs(Vstar)/Xmag2;
   return(Pe);

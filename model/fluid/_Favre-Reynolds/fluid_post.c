@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fluid_bdry.h"
 #include "fluid_source.h"
 #include <model/thermo/_thermo.h>
+#include <model/transport/_transport.h>
 #include <model/metrics/_metrics.h>
 #include <model/emfield/_emfield.h>
 #include <model/_model.h>
@@ -164,7 +165,7 @@ void find_post_variable_name_fluid(long varnum, char *varname){
 
 void find_post_variable_value_fluid(np_t *np, long l, gl_t *gl,
                           long varnum, double *varvalue){
-  spec_t w,nu;
+  spec_t rhok,nu;
   double eta,kappa,N;
   long spec;
 
@@ -176,8 +177,8 @@ void find_post_variable_value_fluid(np_t *np, long l, gl_t *gl,
     if (varnum<ns) *varvalue=_rhok(np[l],varnum)/_m(varnum)/N;
     if (varnum>=ns && varnum<ns+nd) *varvalue=_V(np[l],varnum-ns);
     //assert(is_node_resumed(np[l]));
-    find_w(np[l],w);
-    find_nuk_eta_kappa(w, _rho(np[l]), _T(np[l],gl), _T(np[l],gl),  nu, &eta, &kappa);
+    find_rhok(np[l],rhok);
+    find_nuk_eta_kappa(rhok, _T(np[l],gl), _T(np[l],gl),  nu, &eta, &kappa);
     
     switch (varnum) {
       case nd+ns+0:   *varvalue=_rho(np[l]);       break;

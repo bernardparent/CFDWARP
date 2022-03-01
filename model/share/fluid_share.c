@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/share/emfield_share.h>
 #include <model/fluid/_fluid.h>
 #include <model/thermo/_thermo.h>
+#include <model/transport/_transport.h>
 #include <model/emfield/_emfield.h>
 #include <model/chem/_chem.h>
 #include <model/metrics/_metrics.h>
@@ -2542,13 +2543,14 @@ double _w_product_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long l
 
 
 void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, long theta, long thetasgn, double Twall, double Tewall, long paramstart, long paramend, spec_t wwall){
-  long specr,specp,numcat,cat;
+  long specr,specp,numcat,cat,spec;
   double dwall,gamma;
-  spec_t nuk;
+  spec_t nuk,rhok;
 
   assert(is_node_bdry(np[lA],TYPELEVEL_FLUID_WORK));
   dwall=_distance_between_near_bdry_node_and_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK);
-  find_nuk_from_w_rho_T_Te(wwall, _rho(np[lB]), Twall, Tewall, nuk);
+  for (spec=0; spec<ns; spec++) rhok[spec]=wwall[spec]*_rho(np[lB]);
+  find_nuk_from_rhok_T_Te(rhok, Twall, Tewall, nuk);
 
 
   if (mod(paramend-paramstart+1,3)!=0) fatal_error("Wrong number of extra parameters to catalytic boundary condition.");
@@ -2577,7 +2579,7 @@ void update_w_V_at_injection_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
                                   long paramstart, long paramend, spec_t wwall, dim_t Vwall){
   long dim,spec,numinj,inj;
   double sum,mdot,mdottot,dwall;
-  spec_t nuk,nukA,nukB;
+  spec_t nuk,nukA,nukB,rhok;
   dim_t n;
   assert(is_node_bdry(np[lA],TYPELEVEL_FLUID_WORK));
 
@@ -2586,8 +2588,10 @@ void update_w_V_at_injection_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
   }
   dwall=_distance_between_near_bdry_node_and_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK);
 
-  find_nuk_from_w_rho_T_Te(wwall, _rho(np[lB]), Twall, Tewall, nukB);
-  find_nuk_from_w_rho_T_Te(wwall, _rho(np[lA]), Twall, Tewall, nukA);
+  for (spec=0; spec<ns; spec++) rhok[spec]=wwall[spec]*_rho(np[lB]);
+  find_nuk_from_rhok_T_Te(rhok, Twall, Tewall, nukB);
+  for (spec=0; spec<ns; spec++) rhok[spec]=wwall[spec]*_rho(np[lA]);
+  find_nuk_from_rhok_T_Te(rhok, Twall, Tewall, nukA);
   for (spec=0; spec<ns; spec++) nuk[spec]=0.5*(nukB[spec]+nukA[spec]);
   
   //fatal_error("\n param=%ld",np[lA].numbdryparam);

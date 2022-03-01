@@ -718,8 +718,9 @@ static void functions_builtin(char *function, char **argum,
   if (strcmp(function,"asinh")==0) functionnum=19;
   if (strcmp(function,"acosh")==0) functionnum=20;
   if (strcmp(function,"atanh")==0) functionnum=21;
+  if (strcmp(function,"log10")==0) functionnum=22;
 
-  if (functionnum>0 && functionnum<22) {
+  if (functionnum>0 && functionnum<23) {
     SOAP_substitute_all_argums(argum, codex);
     if (sscanf(*argum,"%lg%n",&tmp,&eos)!=1 || (*argum)[eos]!=EOS)
       SOAP_fatal_error(codex,"Problem evaluating expression >%s<.",*argum);
@@ -747,6 +748,7 @@ static void functions_builtin(char *function, char **argum,
       case 19:  returnval=asinh(tmp); break;
       case 20:  returnval=acosh(tmp); break;
       case 21:  returnval=atanh(tmp); break;
+      case 22:  returnval=log(tmp)/2.30258509299E+00; break;
     }
     sprintf(*returnstr,DOUBLEFORMAT,returnval);
   }

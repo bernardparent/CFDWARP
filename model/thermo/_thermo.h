@@ -67,23 +67,8 @@ double _T_from_rhok_P(spec_t rhok, double P);
 
 double _T_from_w_rho_P(spec_t w, double rho, double P);
 
-double _kappa_from_w_T(spec_t w, double T);
-
-double _kappan_from_w_T(spec_t w, double T);
-
-double _kappac_from_rhok_Tk_Ek(spec_t rhok, double T, double E, long k);
-
-double _eta_from_w_T(spec_t w, double T);
-
-double _etan_from_w_T(spec_t w, double T);
-
-double _etac_from_rhok_Tk_Ek(spec_t rhok, double T, double E, long k);
-
-void find_nuk_from_w_rho_T_Te(spec_t w, double rho, double T, double Te, spec_t nuk);
 
 
-void find_nuk_eta_kappa(spec_t w, double rho, double T, double Te,
-                   spec_t nuk, double *eta, double *kappa);
 		     
 double _de_dP_at_constant_rho(spec_t rhok, double T);
 
@@ -123,11 +108,6 @@ double _ev_from_T(double T);
 double _dev_dTv_from_Tv(double T);
 
 
-void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok);
-
-/* find the mobility of species k using the species temperature Tk and electric field in the species reference frame Ek (rhok is the partial densities, Tk the species temperature and Ek the electric field in the species frame)*/ 
-double _muk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k);
-
 double _zetav_from_Te(double Te);
 
 double _zetae_from_Te(double Te);
@@ -141,5 +121,9 @@ void find_dTe_dEoverN_from_EoverN(double Estar, double *dTedEstar);
 void find_EoverN_from_Te(double Te, double *EoverN);
 
 double _ionizationpotential(long spec);
+
+double _numatoms(long spec);
+
+double _cpk_from_T(long spec, double T);
 
 #endif /* _THERMO_H */

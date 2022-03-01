@@ -301,7 +301,7 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
                             bool ADIABATIC, bool CATALYTIC, bool INJECTION, bool BDRYDIRECFOUND, int ACCURACY){
   spec_t wwall;
   double Twall,Pwall;
-  long dim,dim2,spec,specneutral;
+  long dim,spec,specneutral;
   bool ref_flag;
   dim_t Vwall;
 

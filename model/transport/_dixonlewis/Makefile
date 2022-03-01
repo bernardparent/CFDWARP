@@ -5,10 +5,10 @@ CCFLAGSLOCAL = $(CFLAGSCFD) -I../../../lib/include -I../../../.
 
 ####### Files
 
-HEADERS =   thermo.h enthalpy.h 
-SOURCES =   thermo.c enthalpy.c 
-OBJECTS =   thermo.o  enthalpy.o 
-TARGETS  = ../_thermo.a
+HEADERS =   transport.h 
+SOURCES =   transport.c 
+OBJECTS =   transport.o 
+TARGETS  = ../_transport.a
 
 
 ####### Build rules
@@ -21,5 +21,7 @@ arc:
 	( rm -f $(TARGETS) ; ar cqs $(TARGETS) *.o )                        
 
 cleanall: clean
+
+	
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.

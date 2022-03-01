@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <src/control.h>
 #include <src/common.h>
 #include <model/thermo/_thermo.h>
+#include <model/transport/_transport.h>
 #include <model/chem/_chem.h>
 #include <model/metrics/_metrics.h>
 #include <model/emfield/_emfield.h>
@@ -194,6 +195,13 @@ void find_w(np_t np, spec_t w) {
   }
 }
 
+void find_rhok(np_t np, spec_t rhok) {
+  long spec;
+  for (spec=0; spec<ns; spec++){
+    rhok[spec]=np.bs->U[spec];
+  }
+}
+
 
 double _V(np_t np, long theta) {
   double ret;
@@ -340,14 +348,15 @@ double _etstar (np_t np){
 
 double _kappa(np_t *np, long l, gl_t *gl) {
   double T,cp,ret,eta,kappa;
-  spec_t w,nu;
+  spec_t w,nu,rhok;
   if (_FLUIDPRIMMEM(np[l])){
     ret=np[l].wk->kappamem;
   } else {
     T=_T(np[l],gl);
     find_w(np[l],w);
+    find_rhok(np[l],rhok);
     cp=_cp_from_w_T(w,T);
-    find_nuk_eta_kappa(w, _rho(np[l]), T, T, nu, &eta, &kappa);
+    find_nuk_eta_kappa(rhok, T, T, nu, &eta, &kappa);
     ret=cp*_eta(np,l,gl)/( /* Prandtl number */(_eta(np,l,gl))/(kappa)*cp );
   }
   return(ret);
@@ -356,13 +365,13 @@ double _kappa(np_t *np, long l, gl_t *gl) {
 
 double _eta(np_t *np, long l, gl_t *gl) {
   double ret;
-  spec_t w,nu;
+  spec_t rhok,nu;
   double eta,kappa;
   if (_FLUIDPRIMMEM(np[l])){
     ret=np[l].wk->etamem;
   } else { 
-    find_w(np[l],w); 
-    find_nuk_eta_kappa(w, _rho(np[l]), _T(np[l],gl), _T(np[l],gl), nu, &eta, &kappa);
+    find_rhok(np[l],rhok); 
+    find_nuk_eta_kappa(rhok, _T(np[l],gl), _T(np[l],gl), nu, &eta, &kappa);
     ret=eta;
   }
   return(ret);
@@ -371,12 +380,12 @@ double _eta(np_t *np, long l, gl_t *gl) {
 
 double _nu(np_t np, gl_t *gl, long spec) {
   double ret,eta,kappa;
-  spec_t nu,w;
+  spec_t nu,rhok;
   if (_FLUIDPRIMMEM(np)){
     ret=np.wk->numem[spec];
   } else {
-    find_w(np,w); 
-    find_nuk_eta_kappa(w, _rho(np), _T(np,gl), _T(np,gl), nu, &eta, &kappa);
+    find_rhok(np,rhok); 
+    find_nuk_eta_kappa(rhok, _T(np,gl), _T(np,gl), nu, &eta, &kappa);
     ret=nu[spec];  
   }
   return(ret);
@@ -688,7 +697,7 @@ void reformat_rhok(gl_t *gl, spec_t rhok, char *suffix, bool *flag){
 
 
 void find_prim_fluid_mem(np_t *np, long l, gl_t *gl, double P, double T){
-  spec_t w;
+  spec_t w,rhok;
   double sum1,sum,rho;
   spec_t dPdrhok;
   dim_t dPdrhoV;
@@ -707,6 +716,7 @@ void find_prim_fluid_mem(np_t *np, long l, gl_t *gl, double P, double T){
   assert_np(np[l],sum1!=0.0e0);
   for (spec=0; spec<ns; spec++){
     w[spec]=np[l].bs->U[spec]/sum1;
+    rhok[spec]=np[l].bs->U[spec];
   }
   /* reformat_w(w,&ref_flag); */
   np[l].wk->athermomem=_a_from_w_T(w,T);
@@ -719,7 +729,7 @@ void find_prim_fluid_mem(np_t *np, long l, gl_t *gl, double P, double T){
   for (dim=0; dim<nd; dim++){
     np[l].wk->Vmem[dim]=np[l].bs->U[ns+dim]/rho;
   }
-  find_nuk_eta_kappa(w, rho, T, T, np[l].wk->numem, &(np[l].wk->etamem), &(np[l].wk->kappamem));
+  find_nuk_eta_kappa(rhok, T, T, np[l].wk->numem, &(np[l].wk->etamem), &(np[l].wk->kappamem));
   np[l].wk->kappamem=_cp_from_w_T(w,T)*np[l].wk->etamem/( /* Prandtl number */(np[l].wk->etamem)/(np[l].wk->kappamem)*(_cp_from_w_T(w,T)) );
 
   /* find amem */

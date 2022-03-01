@@ -69,6 +69,8 @@
 
   double _w(np_t np, long spec);
 
+  void find_rhok(np_t np, spec_t rhok);
+
   double _etastar (np_t *np, long l, gl_t *gl);
 
   double _psitilde (np_t np, gl_t *gl);

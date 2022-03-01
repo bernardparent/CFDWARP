@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fluid_init.h"
 #include <src/init.h>
 #include <model/thermo/_thermo.h>
+#include <model/transport/_transport.h>
 #include <model/_model.h>
 #include <model/share/fluid_share.h>
 
@@ -172,7 +173,7 @@ void init_node_2(np_t *np, long l, gl_t *gl, initvar_t initvar){
 void init_node_3(np_t *np, long l, gl_t *gl, initvar_t initvar){
   long dim,spec;
   double a,Re,eta,kappa,sum,rho;
-  spec_t nuk;
+  spec_t nuk,rhok;
   Init2_t Init2;
   initvar_t values;
 
@@ -187,8 +188,9 @@ void init_node_3(np_t *np, long l, gl_t *gl, initvar_t initvar){
     Init2.V[dim]=values[dim]*a;
     sum=sum+sqr(Init2.V[dim]);
   }
-  rho=1.0e0;
-  find_nuk_eta_kappa(Init2.w, rho, Init2.T, Init2.T, nuk, &eta, &kappa);
+  rho=1.0e0; //?????
+  for (spec=0; spec<ns; spec++) rhok[spec]=Init2.w[spec]*rho;
+  find_nuk_eta_kappa(rhok, Init2.T, Init2.T, nuk, &eta, &kappa);
   rho=Re*eta/sqrt(sum);
   Init2.P=_P_from_w_rho_T(Init2.w,rho,Init2.T);
   find_U_init_2(np, l, gl, Init2);

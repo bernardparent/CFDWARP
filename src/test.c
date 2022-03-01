@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/_model.h>
 #include <model/.active/model.h>
 #include <model/thermo/_thermo.h>
+#include <model/transport/_transport.h>
 #include <src/control.h>
 #include <cycle/share/cycle_share.h>
 #include <cycle/share/res_share.h>
@@ -827,8 +828,8 @@ void test_dsdT_equilibrium ( double Tmin, double Tmax, double dT ) {
 
 void test_eta ( double Tmin, double Tmax, double dT ) {
   double T, eta, kappa, Te, rho;
-  spec_t w;
-  long spec, spec2;
+  spec_t w,rhok;
+  long spec, spec2, spec3;
   spec_t nuk;
   printf ( "\n" );
   printf ( "Species viscosities [kg/ms] as function of temperature [K].\n" );
@@ -846,8 +847,9 @@ void test_eta ( double Tmin, double Tmax, double dT ) {
 #endif
       w[spec] = 1.0;
       Te=T;
-      rho=10.0; //value of rho doesn't affect viscosities
-      find_nuk_eta_kappa(w, rho, T, Te, nuk, &eta, &kappa);
+      rho=1.0; //?????? value of rho should not affect viscosities
+      for (spec3=0; spec3<ns; spec3++) rhok[spec3]=w[spec3]*rho;
+      find_nuk_eta_kappa(rhok, T, Te, nuk, &eta, &kappa);
       wfprintf ( stdout, "%+12.5E ", eta );
       
     }
@@ -861,8 +863,8 @@ void test_eta ( double Tmin, double Tmax, double dT ) {
 void test_kappa ( double Tmin, double Tmax, double dT ) {
   double T, eta, kappa, Te, rho;
   spec_t w;
-  long spec, spec2;
-  spec_t nuk;
+  long spec, spec2, spec3;
+  spec_t nuk,rhok;
   printf ( "\n" );
   printf ( "Species thermal conductivities [W/mK] as function of temperature [K].\n" );
   printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
@@ -879,8 +881,9 @@ void test_kappa ( double Tmin, double Tmax, double dT ) {
 #endif
       w[spec] = 1.0;
       Te=T;
-      rho=10.0; //value of rho doesn't affect viscosities
-      find_nuk_eta_kappa(w, rho, T, Te, nuk, &eta, &kappa);
+      rho=1.0; //?????? value of rho doesn't affect viscosities
+      for (spec3=0; spec3<ns; spec3++) rhok[spec3]=w[spec3]*rho;
+      find_nuk_eta_kappa(rhok, T, Te, nuk, &eta, &kappa);
       wfprintf ( stdout, "%+12.5E ", kappa );
     }
     wfprintf ( stdout, "\n" );
@@ -892,8 +895,8 @@ void test_kappa ( double Tmin, double Tmax, double dT ) {
 
 void test_Pr ( double Tmin, double Tmax, double dT ) {
   double T, eta, kappa, Te, rho, cp;
-  spec_t w;
-  long spec, spec2;
+  spec_t w, rhok;
+  long spec, spec2, spec3;
   spec_t nuk;
   printf ( "\n" );
   printf ( "Species Prandtl number as function of temperature [K].\n" );
@@ -911,8 +914,9 @@ void test_Pr ( double Tmin, double Tmax, double dT ) {
 #endif
       w[spec] = 1.0;
       Te=T;
-      rho=10.0; //value of rho doesn't affect viscosities
-      find_nuk_eta_kappa(w, rho, T, Te, nuk, &eta, &kappa);
+      rho=1.0; //???? value of rho doesn't affect viscosities
+      for (spec3=0; spec3<ns; spec3++) rhok[spec3]=w[spec3]*rho;
+      find_nuk_eta_kappa(rhok, T, Te, nuk, &eta, &kappa);
       cp=_cpk_from_T_equilibrium(spec, T);
 
       wfprintf ( stdout, "%+12.5E ", eta*cp/kappa );

@@ -31,6 +31,8 @@
 
   void find_w(np_t np, spec_t w);
 
+  void find_rhok(np_t np, spec_t rhok);
+
   void reformat_w(gl_t *gl, spec_t w, char *suffix, bool *flag);
 
   void reformat_rhok(gl_t *gl, spec_t rhok, char *suffix, bool *flag);

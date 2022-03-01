@@ -21,6 +21,7 @@ arc:
 	ar -x ../fluid/_fluid.a  
 	ar -x ../chem/_chem.a  
 	ar -x ../thermo/_thermo.a  
+	ar -x ../transport/_transport.a  
 	ar -x ../metrics/_metrics.a
 	ar -x ../emfield/_emfield.a
 	ar -x ../beam/_beam.a
