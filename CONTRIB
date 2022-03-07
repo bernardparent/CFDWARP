@@ -116,6 +116,8 @@ RAJENDRAN, Prasanna T.
   - addition of model/chem/_Air_Plasma_8s
   
   - fixed bug in model/share/chem_share.c within add_to_dW_3r3p() and add_to_dW_3r2p() functions
+  
+  - added model/chem/_Air_Plasma_11s/kim2021.c
 
 
 SCHWARTZENTRUBER, Thomas E.

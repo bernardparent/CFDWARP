@@ -7,6 +7,25 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 MAR 07a
+  * in /model/chem/_Air_Plasma_11s/farbar2013.c
+    - fixed a bug in reaction 3
+  * in /model/chem/_Air_Plasma_11s/kim2021.c
+    - changed the controlling temperatures of the forward and backward reactions and removed the 
+      radiative recombination reactions
+    - clipped controlling temperatures of backward reactions to the range 300 - 32000 K using a 
+      minmax function
+    - changed reaction 11 and 12 to match standard Park model
+    - fixed a typo in reaction 26
+  * in /model/chem/_Air_Plasma_11s/doc/report.tex
+    - updated the Kim 11-species chemical model with the correct controlling temperatures
+    - changed reaction 11 and 12 to match standard Park model and removed the radiative 
+      recombination reactions
+    - added references for all the reactions of the Kim 11-species chemical model
+  * in /model/chem/_Air_Plasma_11s/doc/all.bib
+    - updated references
+    
+
 2022 FEB 28b
   * in model/transport/_gnoffo/transport.c
     - took away "_gnoffo" at the end of each function name

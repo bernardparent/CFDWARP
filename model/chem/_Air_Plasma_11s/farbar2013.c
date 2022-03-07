@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2021 Prasanna Thoguluva Rajendran
+Copyright 2022 Prasanna Thoguluva Rajendran
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -259,7 +259,7 @@ void find_dW_dx_Farbar2013 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double 
 
   if (REACTION[3]){
     add_to_dW_fw_2r3p ( specN2, speceminus,   specN, specN, speceminus, 3.0e24, -1.6, 113200.0*R, TvTe, X, dWdTvTe, dWdrhok );
-    add_to_dW_bw_2r3p ( specN2, speceminus,   specN, specN, speceminus, 3.0e24, -1.6, 113200.0*R, TTe, X, dWdTe, dWdrhok );
+    add_to_dW_bw_2r3p ( specN2, speceminus,   specN, specN, speceminus, 3.0e24, -1.6, 113200.0*R, TTe, X, dWdTTe, dWdrhok );
   }
 
   if (REACTION[4]){

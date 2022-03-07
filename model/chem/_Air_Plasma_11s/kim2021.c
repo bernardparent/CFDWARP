@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2020 Bernard Parent
+Copyright 2022 Ajjay Omprakas
+Copyright 2022 Prasanna Thoguluva Rajendran
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -66,8 +67,6 @@ const static bool REACTION[32]=
 
 #define specEND -1
 
-const static bool RECFW = TRUE;
-const static bool RECBW = TRUE;
 
 const static long specM1[]=
   {
@@ -160,15 +159,15 @@ double _dkbdT_polynomial(long numreactant,double A1, double A2, double A3, doubl
 void find_W_Kim2021 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, 
                        double Qbeam, spec_t W ) {
   double N[ns];
-  double R,kf,kb,TTv,TvTe,TTe;
+  double R,kb,TTv,Tblim,Teblim;
   long k;
   spec_t X;
 
   /* find properties needed by add_to_W* functions */
   R=1.987192004e0;
   TTv=sqrt(Tv*T);
-  TTe=sqrt(T*Te);
-  TvTe=sqrt(Tv*Te);
+  Tblim=min(max(300.0,T),32000.0);
+  Teblim=min(max(300.0,Te),32000.0);
   
   for ( k = 0; k < ns; k++ ) {
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
@@ -179,340 +178,333 @@ void find_W_Kim2021 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, dou
 
   if (REACTION[1]) { 
     for (k=0; specM1[k]!=specEND; k++) {
-      if(RECFW) add_to_W_fw_2r3p ( specN2, specM1[k],   specN, specN, specM1[k], 1.216e20, -1.2140, 113200.0*R, T, X, W );
+      add_to_W_fw_2r3p ( specN2, specM1[k],   specN, specN, specM1[k], 1.216e20, -1.2140, 113200.0*R, TTv, X, W );
       
 
       if (T < 20000.0)
-        kb=_kb_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 1.216e20, -1.2140, 113200.0*R, T);
+        kb=_kb_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 1.216e20, -1.2140, 113200.0*R, Tblim);
       else
-        kb=_kb_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 1.216e20, -1.2140, 113200.0*R, T); 
+        kb=_kb_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 1.216e20, -1.2140, 113200.0*R, Tblim); 
         
-      if(RECBW) add_to_W_3r2p ( specM1[k], specN, specN,   specN2, specM1[k], kb , N, W);      
+      add_to_W_3r2p ( specM1[k], specN, specN,   specN2, specM1[k], kb , N, W);      
     }
   }
       
 
   if (REACTION[2]){
     for (k=0; specM2[k]!=specEND; k++) {
-      if(RECFW) add_to_W_fw_2r3p ( specN2, specM2[k],   specN, specN, specM2[k], 7.0e21, -1.6, 113200.0*R, T, X, W );
+      add_to_W_fw_2r3p ( specN2, specM2[k],   specN, specN, specM2[k], 7.0e21, -1.6, 113200.0*R, TTv, X, W );
       
       
       
       if (T < 20000.0)
-        kb=_kb_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 7.0e21, -1.6, 113200.0*R, T);
+        kb=_kb_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 7.0e21, -1.6, 113200.0*R, Tblim);
       else
-        kb=_kb_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 7.0e21, -1.6, 113200.0*R, T); 
+        kb=_kb_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 7.0e21, -1.6, 113200.0*R, Tblim); 
         
-      if(RECBW) add_to_W_3r2p ( specM2[k], specN, specN,   specN2, specM2[k], kb , N, W); 
+      add_to_W_3r2p ( specM2[k], specN, specN,   specN2, specM2[k], kb , N, W); 
     }
   }
 
   if (REACTION[3]){ 
     for (k=0; specM3[k]!=specEND; k++) {
-      if(RECFW) add_to_W_fw_2r3p ( specN2, specM3[k],   specN, specN, specM3[k], 3.591e20, -1.226, 113200.0*R, T, X, W );
+      add_to_W_fw_2r3p ( specN2, specM3[k],   specN, specN, specM3[k], 3.591e20, -1.226, 113200.0*R, TTv, X, W );
       
       
       if (T < 20000.0)
-        kb=_kb_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 3.591e20, -1.226, 113200.0*R, T);
+        kb=_kb_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 3.591e20, -1.226, 113200.0*R, Tblim);
       else
-        kb=_kb_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 3.591e20, -1.226, 113200.0*R, T); 
+        kb=_kb_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 3.591e20, -1.226, 113200.0*R, Tblim); 
         
-      if(RECBW) add_to_W_3r2p ( specM3[k], specN, specN,   specN2, specM3[k], kb , N, W);
+      add_to_W_3r2p ( specM3[k], specN, specN,   specN2, specM3[k], kb , N, W);
     }
   }
 
   if (REACTION[4]){ 
     for (k=0; specM4[k]!=specEND; k++) {
-      if(RECFW) add_to_W_fw_2r3p ( specN2, specM4[k],   specN, specN, specM4[k], 3.0e22, -1.6, 113200.0*R, T, X, W );
+      add_to_W_fw_2r3p ( specN2, specM4[k],   specN, specN, specM4[k], 3.0e22, -1.6, 113200.0*R, TTv, X, W );
       
       
       if (T < 20000.0)
-        kb=_kb_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 3.0e22, -1.6, 113200.0*R, T);
+        kb=_kb_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 3.0e22, -1.6, 113200.0*R, Tblim);
       else
-        kb=_kb_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 3.0e22, -1.6, 113200.0*R, T); 
+        kb=_kb_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 3.0e22, -1.6, 113200.0*R, Tblim); 
         
-      if(RECBW) add_to_W_3r2p ( specM4[k], specN, specN,   specN2, specM4[k], kb , N, W);
+      add_to_W_3r2p ( specM4[k], specN, specN,   specN2, specM4[k], kb , N, W);
     }
   }
 
   if (REACTION[5]){
     for (k=0; specM5[k]!=specEND; k++){
-      if(RECFW) add_to_W_fw_2r3p ( specO2, specM5[k],   specO, specO, specM5[k], 3.354e15, -0.2726, 59500.0*R, T, X, W );
+      add_to_W_fw_2r3p ( specO2, specM5[k],   specO, specO, specM5[k], 3.354e15, -0.2726, 59500.0*R, TTv, X, W );
       
       if (T < 20000.0)
-        kb=_kb_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 3.354e15, -0.2726, 59500.0*R, T);
+        kb=_kb_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 3.354e15, -0.2726, 59500.0*R, Tblim);
       else
-        kb=_kb_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 3.354e15, -0.2726, 59500.0*R, T); 
+        kb=_kb_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 3.354e15, -0.2726, 59500.0*R, Tblim); 
         
-      if(RECBW) add_to_W_3r2p ( specM5[k], specO, specO,   specO2, specM5[k], kb , N, W);
+      add_to_W_3r2p ( specM5[k], specO, specO,   specO2, specM5[k], kb , N, W);
     }
   }
 
   if (REACTION[6]){
     for (k=0; specM6[k]!=specEND; k++){
-      if(RECFW) add_to_W_fw_2r3p ( specO2, specM6[k],   specO, specO, specM6[k], 1.117e25, -2.585, 59500.0*R, T, X, W );
+      add_to_W_fw_2r3p ( specO2, specM6[k],   specO, specO, specM6[k], 1.117e25, -2.585, 59500.0*R, TTv, X, W );
       
       if (T < 20000.0)
-        kb=_kb_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 1.117e25, -2.585, 59500.0*R, T);
+        kb=_kb_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 1.117e25, -2.585, 59500.0*R, Tblim);
       else
-        kb=_kb_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 1.117e25, -2.585, 59500.0*R, T); 
+        kb=_kb_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 1.117e25, -2.585, 59500.0*R, Tblim); 
         
-      if(RECBW) add_to_W_3r2p ( specM6[k], specO, specO,   specO2, specM6[k], kb , N, W);
+      add_to_W_3r2p ( specM6[k], specO, specO,   specO2, specM6[k], kb , N, W);
     }
   }
 
   if (REACTION[7]){
     for (k=0; specM3[k]!=specEND; k++){
-      if(RECFW) add_to_W_fw_2r3p ( specO2, specM3[k],   specO, specO, specM3[k], 1.0e22, -1.500, 59500.0*R, T, X, W );
+      add_to_W_fw_2r3p ( specO2, specM3[k],   specO, specO, specM3[k], 1.0e22, -1.500, 59500.0*R, TTv, X, W );
       
       if (T < 20000.0)
-        kb=_kb_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 1.0e22, -1.500, 59500.0*R, T);
+        kb=_kb_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 1.0e22, -1.500, 59500.0*R, Tblim);
       else
-        kb=_kb_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 1.0e22, -1.500, 59500.0*R, T); 
+        kb=_kb_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 1.0e22, -1.500, 59500.0*R, Tblim); 
         
-      if(RECBW) add_to_W_3r2p ( specM3[k], specO, specO,   specO2, specM3[k], kb , N, W);
+      add_to_W_3r2p ( specM3[k], specO, specO,   specO2, specM3[k], kb , N, W);
     }
   }
 
   if (REACTION[8]){
     for (k=0; specM4[k]!=specEND; k++){
-      if(RECFW) add_to_W_fw_2r3p ( specO2, specM4[k],   specO, specO, specM4[k], 3.00e21, -1.50, 59500.0*R, T, X, W );
+      add_to_W_fw_2r3p ( specO2, specM4[k],   specO, specO, specM4[k], 3.00e21, -1.50, 59500.0*R, TTv, X, W );
      
       if (T < 20000.0)
-        kb=_kb_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 3.00e21, -1.50, 59500.0*R, T);
+        kb=_kb_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 3.00e21, -1.50, 59500.0*R, Tblim);
       else
-        kb=_kb_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 3.00e21, -1.50, 59500.0*R, T); 
+        kb=_kb_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 3.00e21, -1.50, 59500.0*R, Tblim); 
         
-      if(RECBW) add_to_W_3r2p ( specM4[k], specO, specO,   specO2, specM4[k], kb , N, W);
+      add_to_W_3r2p ( specM4[k], specO, specO,   specO2, specM4[k], kb , N, W);
     }
   }
 
   if (REACTION[9]){
     for (k=0; specM7[k]!=specEND; k++){
-      if(RECFW) add_to_W_fw_2r3p ( specNO, specM7[k],   specN, specO, specM7[k], 1.450e15, 0.0, 75200.0*R, T, X, W );
+      add_to_W_fw_2r3p ( specNO, specM7[k],   specN, specO, specM7[k], 1.450e15, 0.0, 75200.0*R, TTv, X, W );
       
       if (T < 20000.0)
-        kb=_kb_polynomial(3, 2.093, -6.229e-1, 2.028, -7.872, 5.586e-3, 1.450e15, 0.0, 75200.0*R, T);
+        kb=_kb_polynomial(3, 2.093, -6.229e-1, 2.028, -7.872, 5.586e-3, 1.450e15, 0.0, 75200.0*R, Tblim);
       else
-        kb=_kb_polynomial(3, -1.640, -2.142e1, -1.964e1, 1.910e1, -2.422, 1.450e15, 0.0, 75200.0*R, T); 
+        kb=_kb_polynomial(3, -1.640, -2.142e1, -1.964e1, 1.910e1, -2.422, 1.450e15, 0.0, 75200.0*R, Tblim); 
         
-      if(RECBW) add_to_W_3r2p ( specM7[k], specN, specO,   specNO, specM7[k], kb , N, W);
+      add_to_W_3r2p ( specM7[k], specN, specO,   specNO, specM7[k], kb , N, W);
     }
   }
 
   if (REACTION[10]){
     for (k=0; specM8[k]!=specEND; k++){
-      if(RECFW) add_to_W_fw_2r3p ( specNO, specM8[k],   specN, specO, specM8[k], 9.640e14, 0.0, 75200.0*R, T, X, W );
+      add_to_W_fw_2r3p ( specNO, specM8[k],   specN, specO, specM8[k], 9.640e14, 0.0, 75200.0*R, TTv, X, W );
       
       if (T < 20000.0)
-        kb=_kb_polynomial(3, 2.093, -6.229e-1, 2.028, -7.872, 5.586e-3, 9.640e14, 0.0, 75200.0*R, T);
+        kb=_kb_polynomial(3, 2.093, -6.229e-1, 2.028, -7.872, 5.586e-3, 9.640e14, 0.0, 75200.0*R, Tblim);
       else
-        kb=_kb_polynomial(3, -1.640, -2.142e1, -1.964e1, 1.910e1, -2.422, 9.640e14, 0.0, 75200.0*R, T); 
+        kb=_kb_polynomial(3, -1.640, -2.142e1, -1.964e1, 1.910e1, -2.422, 9.640e14, 0.0, 75200.0*R, Tblim); 
         
-      if(RECBW) add_to_W_3r2p ( specM8[k], specN, specO,   specNO, specM8[k], kb , N, W);
+      add_to_W_3r2p ( specM8[k], specN, specO,   specNO, specM8[k], kb , N, W);
     }
   }
 
   if (REACTION[11]){
-    if(RECFW) add_to_W_fw_2r2p ( specN2, specO,   specNO, specN, 6.4000e17, -1.0, 38400.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specN2, specO,   specNO, specN, 5.700e12, 0.42, 42938.0*R, T, X, W );
     
     if (T < 20000.0)
-        kb=_kb_polynomial(2, -1.789e-1, 1.728, -2.172e-1, -3.733, -2.285e-4, 6.4000e17, -1.0, 38400.0*R, T);
+        kb=_kb_polynomial(2, -1.789e-1, 1.728, -2.172e-1, -3.733, -2.285e-4, 5.700e12, 0.42, 42938.0*R, Tblim);
       else
-        kb=_kb_polynomial(2, 7.441e-2, 2.852, 1.054, -5.303, 1.909e-1, 6.4000e17, -1.0, 38400.0*R, T); 
+        kb=_kb_polynomial(2, 7.441e-2, 2.852, 1.054, -5.303, 1.909e-1, 5.700e12, 0.42, 42938.0*R, Tblim); 
         
-      if(RECBW) add_to_W_2r2p ( specNO, specN,  specN2, specO, kb , N, W);
+      add_to_W_2r2p ( specNO, specN,  specN2, specO, kb , N, W);
   }
 
   if (REACTION[12]){
-    if(RECFW) add_to_W_fw_2r2p ( specNO, specO,   specO2, specN, 8.4000e12, 0.0, 19450.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specNO, specO,   specO2, specN, 8.4000e12, 0.0, 19400.0*R, T, X, W );
     
     if (T < 20000.0)
-        kb=_kb_polynomial(2, -1.673e-1, -1.390, -1.656e-1, -1.551, -1.102e-4, 8.4000e12, 0.0, 19450.0*R, T);
+        kb=_kb_polynomial(2, -1.673e-1, -1.390, -1.656e-1, -1.551, -1.102e-4, 8.4000e12, 0.0, 19400.0*R, Tblim);
       else
-        kb=_kb_polynomial(2, 1.744e-2, -1.563, 2.354e-1, -1.233, -3.250e-1, 8.4000e12, 0.0, 19450.0*R, T); 
+        kb=_kb_polynomial(2, 1.744e-2, -1.563, 2.354e-1, -1.233, -3.250e-1, 8.4000e12, 0.0, 19400.0*R, Tblim); 
         
-      if(RECBW) add_to_W_2r2p ( specO2, specN,  specO, specNO, kb , N, W);
+      add_to_W_2r2p ( specO2, specN,  specO, specNO, kb , N, W);
   }
 
   if (REACTION[13]){
-    if(RECFW) add_to_W_fw_2r2p ( specN, specO,   specNOplus, speceminus, 8.80e08, 1.0, 31900.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specN, specO,   specNOplus, speceminus, 8.80e08, 1.0, 31900.0*R, T, X, W );
     
-    if (T < 20000.0)
-        kb=_kb_polynomial(2, 1.907e-1, -7.976, -1.848, -3.255, -1.662e-3, 8.80e08, 1.0, 31900.0*R, T);
+    if (Te < 20000.0)
+        kb=_kb_polynomial(2, 1.907e-1, -7.976, -1.848, -3.255, -1.662e-3, 8.80e08, 1.0, 31900.0*R, Teblim);
       else
-        kb=_kb_polynomial(2, -1.361e-1, -6.297, -1.866, -5.991, 1.384, 8.80e08, 1.0, 31900.0*R, T); 
+        kb=_kb_polynomial(2, -1.361e-1, -6.297, -1.866, -5.991, 1.384, 8.80e08, 1.0, 31900.0*R, Teblim); 
         
-      if(RECBW) add_to_W_2r2p ( specNOplus, speceminus,  specO, specN, kb , N, W);
+      add_to_W_2r2p ( specNOplus, speceminus,  specO, specN, kb , N, W);
   }
 
   if (REACTION[14]){
-    if(RECFW) add_to_W_fw_2r2p ( specO, specO,   specO2plus, speceminus, 7.10e02, 2.70, 80600.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specO, specO,   specO2plus, speceminus, 7.10e02, 2.70, 80600.0*R, T, X, W );
    
-    if (T < 20000.0)
-        kb=_kb_polynomial(2, -7.183e-3, -7.603, -2.099, -8.070, -1.989e-3, 7.10e02, 2.70, 80600.0*R, T);
+    if (Te < 20000.0)
+        kb=_kb_polynomial(2, -7.183e-3, -7.603, -2.099, -8.070, -1.989e-3, 7.10e02, 2.70, 80600.0*R, Teblim);
       else
-        kb=_kb_polynomial(2, -2.428e-2, -4.074, -3.091e-1, -1.342e1, 1.831, 7.10e02, 2.70, 80600.0*R, T); 
+        kb=_kb_polynomial(2, -2.428e-2, -4.074, -3.091e-1, -1.342e1, 1.831, 7.10e02, 2.70, 80600.0*R, Teblim); 
         
-      if(RECBW) add_to_W_2r2p ( specO2plus, speceminus,  specO, specO, kb , N, W);
+      add_to_W_2r2p ( specO2plus, speceminus,  specO, specO, kb , N, W);
   }
 
   if (REACTION[15]){
-    if(RECFW) add_to_W_fw_2r3p ( specN, speceminus,   specNplus, speceminus, speceminus, 2.50e034, -3.820, 168600.0*R, Te, X, W );
+    add_to_W_fw_2r3p ( specN, speceminus,   specNplus, speceminus, speceminus, 2.50e034, -3.820, 168600.0*R, Te, X, W );
     
-    if (T < 20000.0)
-        kb=_kb_polynomial(3, -1.217, -3.006, -2.354, -1.675e1, -2.195e-3, 2.50e034, -3.820, 168600.0*R, T);
+    if (Te < 20000.0)
+        kb=_kb_polynomial(3, -1.217, -3.006, -2.354, -1.675e1, -2.195e-3, 2.50e034, -3.820, 168600.0*R, Teblim);
       else
-        kb=_kb_polynomial(3, 1.103, 2.700, 7.541, -2.188e1, -2.910, 2.50e034, -3.820, 168600.0*R, T); 
+        kb=_kb_polynomial(3, 1.103, 2.700, 7.541, -2.188e1, -2.910, 2.50e034, -3.820, 168600.0*R, Teblim); 
         
-      if(RECBW) add_to_W_3r2p ( speceminus, speceminus, specNplus,  speceminus, specN, kb , N, W);
+      add_to_W_3r2p ( speceminus, speceminus, specNplus,  speceminus, specN, kb , N, W);
       
   }
 
   if (REACTION[16]){
-    if(RECFW) add_to_W_fw_2r3p ( specO, speceminus,   specOplus, speceminus, speceminus, 3.90e033, -3.78, 158500.0*R, Te, X, W );
+    add_to_W_fw_2r3p ( specO, speceminus,   specOplus, speceminus, speceminus, 3.90e033, -3.78, 158500.0*R, Te, X, W );
     
-    if (T < 20000.0)
-        kb=_kb_polynomial(3, -2.660e-1, -5.390, -1.747, -1.575e1, -7.662e-4, 3.90e033, -3.78, 158500.0*R, T);
+    if (Te < 20000.0)
+        kb=_kb_polynomial(3, -2.660e-1, -5.390, -1.747, -1.575e1, -7.662e-4, 3.90e033, -3.78, 158500.0*R, Teblim);
       else
-        kb=_kb_polynomial(3, 1.789, 1.711e1, 1.527e1, -4.975e1, 9.411, 3.90e033, -3.78, 158500.0*R, T); 
+        kb=_kb_polynomial(3, 1.789, 1.711e1, 1.527e1, -4.975e1, 9.411, 3.90e033, -3.78, 158500.0*R, Teblim); 
         
-      if(RECBW) add_to_W_3r2p ( speceminus, speceminus, specOplus,  speceminus, specO, kb , N, W);
+      add_to_W_3r2p ( speceminus, speceminus, specOplus,  speceminus, specO, kb , N, W);
       
   }
 
   if (REACTION[17]){
-    if(RECFW) add_to_W_fw_2r2p ( specN2, specO2plus,   specN2plus, specO2, 9.90e12, 0.0, 40700.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specN2, specO2plus,   specN2plus, specO2, 9.90e12, 0.0, 40700.0*R, T, X, W );
     
     if (T < 20000.0)
-        kb=_kb_polynomial(2, -1.970e-1, 1.031, -2.049e-1, -4.005, -9.866e-5, 9.90e12, 0.0, 40700.0*R, T);
+        kb=_kb_polynomial(2, -1.970e-1, 1.031, -2.049e-1, -4.005, -9.866e-5, 9.90e12, 0.0, 40700.0*R, Tblim);
       else
-        kb=_kb_polynomial(2, 4.428e-2, 1.462, 6.450e-1, -4.638, -3.600e-2, 9.90e12, 0.0, 40700.0*R, T); 
+        kb=_kb_polynomial(2, 4.428e-2, 1.462, 6.450e-1, -4.638, -3.600e-2, 9.90e12, 0.0, 40700.0*R, Tblim); 
         
-      if(RECBW) add_to_W_2r2p ( specO2, specN2plus,  specO2plus, specN2, kb , N, W);
+      add_to_W_2r2p ( specO2, specN2plus,  specO2plus, specN2, kb , N, W);
   }
 
   if (REACTION[18]){
-    if(RECFW) add_to_W_fw_2r2p ( specNOplus, specN,   specOplus, specN2, 3.40e13, -1.08, 12800.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specNOplus, specN,   specOplus, specN2, 3.40e13, -1.08, 12800.0*R, T, X, W );
     
     if (T < 20000.0)
-        kb=_kb_polynomial(2, -6.300e-2, -5.419e-1, -4.449e-2, -1.266, -1.089e-4, 3.40e13, -1.08, 12800.0*R, T);
+        kb=_kb_polynomial(2, -6.300e-2, -5.419e-1, -4.449e-2, -1.266, -1.089e-4, 3.40e13, -1.08, 12800.0*R, Tblim);
       else
-        kb=_kb_polynomial(2, 3.518e-2, -7.715e-2, 4.619e-1, -1.923, 9.394e-2, 3.40e13, -1.08, 12800.0*R, T); 
+        kb=_kb_polynomial(2, 3.518e-2, -7.715e-2, 4.619e-1, -1.923, 9.394e-2, 3.40e13, -1.08, 12800.0*R, Tblim); 
         
-      if(RECBW) add_to_W_2r2p ( specN2, specOplus,  specNOplus, specN, kb , N, W);
+      add_to_W_2r2p ( specN2, specOplus,  specNOplus, specN, kb , N, W);
   }
 
   if (REACTION[19]){
-    if(RECFW) add_to_W_fw_2r2p ( specNOplus, specO,   specNplus, specO2, 1.00e12, 0.5, 77200.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specNOplus, specO,   specNplus, specO2, 1.00e12, 0.5, 77200.0*R, T, X, W );
     
     if (T < 20000.0)
-        kb=_kb_polynomial(2, -4.092e-1, -7.798e-1, -4.273e-1, -7.618, -4.475e-4, 1.00e12, 0.5, 77200.0*R, T);
+        kb=_kb_polynomial(2, -4.092e-1, -7.798e-1, -4.273e-1, -7.618, -4.475e-4, 1.00e12, 0.5, 77200.0*R, Tblim);
       else
-        kb=_kb_polynomial(2, 1.270e-1, 6.372e-1, 1.751, -9.528, -4.012e-2, 1.00e12, 0.5, 77200.0*R, T); 
+        kb=_kb_polynomial(2, 1.270e-1, 6.372e-1, 1.751, -9.528, -4.012e-2, 1.00e12, 0.5, 77200.0*R, Tblim); 
         
-      if(RECBW) add_to_W_2r2p ( specO2, specNplus,  specNOplus, specO, kb , N, W);
+      add_to_W_2r2p ( specO2, specNplus,  specNOplus, specO, kb , N, W);
   }
 
   if (REACTION[20]){
-    if(RECFW) add_to_W_fw_2r2p ( specNOplus, specO2,   specO2plus, specNO, 2.40e13, 0.41, 32600.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specNOplus, specO2,   specO2plus, specNO, 2.40e13, 0.41, 32600.0*R, T, X, W );
     
     if (T < 20000.0)
-        kb=_kb_polynomial(2, -3.056e-2, 1.762, -8.580e-2, -3.265, -2.168e-4, 2.40e13, 0.41, 32600.0*R, T);
+        kb=_kb_polynomial(2, -3.056e-2, 1.762, -8.580e-2, -3.265, -2.168e-4, 2.40e13, 0.41, 32600.0*R, Tblim);
       else
-        kb=_kb_polynomial(2, 9.436e-2, 3.786, 1.322, -6.192, 7.723e-1, 2.40e13, 0.41, 32600.0*R, T); 
+        kb=_kb_polynomial(2, 9.436e-2, 3.786, 1.322, -6.192, 7.723e-1, 2.40e13, 0.41, 32600.0*R, Tblim); 
         
-      if(RECBW) add_to_W_2r2p ( specNO, specO2plus,  specO2, specNOplus, kb , N, W);
+      add_to_W_2r2p ( specNO, specO2plus,  specO2, specNOplus, kb , N, W);
   }
 
   if (REACTION[21]){
-    if(RECFW) add_to_W_fw_2r2p ( specNOplus, specN,   specN2plus, specO, 7.20e13, 0.0, 35500.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specNOplus, specN,   specN2plus, specO, 7.20e13, 0.0, 35500.0*R, T, X, W );
    
     if (T < 20000.0)
-        kb=_kb_polynomial(2, -4.862e-2, 1.066, -7.350e-2, -3.537, -8.701e-5, 7.20e13, 0.0, 35500.0*R, T);
+        kb=_kb_polynomial(2, -4.862e-2, 1.066, -7.350e-2, -3.537, -8.701e-5, 7.20e13, 0.0, 35500.0*R, Tblim);
       else
-        kb=_kb_polynomial(2, 6.423e-2, 2.396, 9.127e-1, -5.527, 5.453e-1, 7.20e13, 0.0, 35500.0*R, T); 
+        kb=_kb_polynomial(2, 6.423e-2, 2.396, 9.127e-1, -5.527, 5.453e-1, 7.20e13, 0.0, 35500.0*R, Tblim); 
         
-      if(RECBW) add_to_W_2r2p ( specO, specN2plus,  specN, specNOplus, kb , N, W);
+      add_to_W_2r2p ( specO, specN2plus,  specN, specNOplus, kb , N, W);
   }
 
   if (REACTION[22]){
-    if(RECFW) add_to_W_fw_2r2p ( specO2plus, specN,   specNplus, specO2, 8.70e13, 0.14, 28600.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specO2plus, specN,   specNplus, specO2, 8.70e13, 0.14, 28600.0*R, T, X, W );
     
     if (T < 20000.0)
-        kb=_kb_polynomial(2, -2.113e-1, -1.152, -1.758e-1, -2.803, -1.205e-4, 8.70e13, 0.14, 28600.0*R, T);
+        kb=_kb_polynomial(2, -2.113e-1, -1.152, -1.758e-1, -2.803, -1.205e-4, 8.70e13, 0.14, 28600.0*R, Tblim);
       else
-        kb=_kb_polynomial(2, 1.523e-2, -1.586, 1.942e-1, -2.103, -4.874e-1, 8.70e13, 0.14, 28600.0*R, T); 
+        kb=_kb_polynomial(2, 1.523e-2, -1.586, 1.942e-1, -2.103, -4.874e-1, 8.70e13, 0.14, 28600.0*R, Tblim); 
         
-      if(RECBW) add_to_W_2r2p ( specO2, specNplus,  specN, specO2plus, kb , N, W);
+      add_to_W_2r2p ( specO2, specNplus,  specN, specO2plus, kb , N, W);
   }
 
   if (REACTION[23]){
-    if(RECFW) add_to_W_fw_2r2p ( specOplus, specNO,   specNplus, specO2, 1.40e05, 1.90, 26600.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specOplus, specNO,   specNplus, specO2, 1.40e05, 1.90, 26600.0*R, T, X, W );
     
     if (T < 20000.0)
-        kb=_kb_polynomial(2, -1.673e-1, -1.965, -1.656e-1, -2.619, -1.102e-4, 1.40e05, 1.90, 26600.0*R, T);
+        kb=_kb_polynomial(2, -1.673e-1, -1.965, -1.656e-1, -2.619, -1.102e-4, 1.40e05, 1.90, 26600.0*R, Tblim);
       else
-        kb=_kb_polynomial(2, 1.744e-2, -2.138, 2.354e-1, -2.302, -3.250e-1, 1.40e05, 1.90, 26600.0*R, T); 
+        kb=_kb_polynomial(2, 1.744e-2, -2.138, 2.354e-1, -2.302, -3.250e-1, 1.40e05, 1.90, 26600.0*R, Tblim); 
         
-      if(RECBW) add_to_W_2r2p ( specO2, specNplus,  specNO, specOplus, kb , N, W);
+      add_to_W_2r2p ( specO2, specNplus,  specNO, specOplus, kb , N, W);
   }
 
   if (REACTION[24]){
-    if(RECFW) add_to_W_fw_2r2p ( specNOplus, specO,   specO2plus, specN, 7.20e12, 0.29, 48600.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specNOplus, specO,   specO2plus, specN, 7.20e12, 0.29, 48600.0*R, T, X, W );
     
     if (T < 20000.0)
-        kb=_kb_polynomial(2, -1.978e-1, 3.723e-1, -2.514e-1, -4.815, -3.270e-4, 7.20e12, 0.29, 48600.0*R, T);
+        kb=_kb_polynomial(2, -1.978e-1, 3.723e-1, -2.514e-1, -4.815, -3.270e-4, 7.20e12, 0.29, 48600.0*R, Tblim);
       else
-        kb=_kb_polynomial(2, 1.118e-1, 2.223, 1.557, -7.425, 4.473e-1, 7.20e12, 0.29, 48600.0*R, T); 
+        kb=_kb_polynomial(2, 1.118e-1, 2.223, 1.557, -7.425, 4.473e-1, 7.20e12, 0.29, 48600.0*R, Tblim); 
         
-      if(RECBW) add_to_W_2r2p ( specN, specO2plus,  specO, specNOplus, kb , N, W);
+      add_to_W_2r2p ( specN, specO2plus,  specO, specNOplus, kb , N, W);
   }
 
   if (REACTION[25]){
-    if(RECFW) add_to_W_fw_2r2p ( specOplus, specN2,   specN2plus, specO, 9.10e11, 0.36, 22800.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specOplus, specN2,   specN2plus, specO, 9.10e11, 0.36, 22800.0*R, T, X, W );
     
     if (T < 20000.0)
-        kb=_kb_polynomial(2, 1.438e-2, 1.608, -2.901e-2, -2.271, 2.188e-5, 9.10e11, 0.36, 22800.0*R, T);
+        kb=_kb_polynomial(2, 1.438e-2, 1.608, -2.901e-2, -2.271, 2.188e-5, 9.10e11, 0.36, 22800.0*R, Tblim);
       else
-        kb=_kb_polynomial(2, 2.905e-2, 2.473, 4.508e-1, -3.603, 4.514e-1, 9.10e11, 0.36, 22800.0*R, T); 
+        kb=_kb_polynomial(2, 2.905e-2, 2.473, 4.508e-1, -3.603, 4.514e-1, 9.10e11, 0.36, 22800.0*R, Tblim); 
         
-      if(RECBW) add_to_W_2r2p ( specO, specN2plus,  specN2, specOplus, kb , N, W);
+      add_to_W_2r2p ( specO, specN2plus,  specN2, specOplus, kb , N, W);
   }
   
   if (REACTION[26]){
-    if(RECFW) add_to_W_fw_2r2p ( specN, specN,   specN2plus, speceminus, 4.40e07, 1.5, 67500.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specN, specN,   specN2plus, speceminus, 4.40e07, 1.5, 67500.0*R, T, X, W );
     
-    if (T < 20000.0)
-        kb=_kb_polynomial(2, 1.420e-1, -6.909, -1.922, -6.792, 1.749e-3, 4.40e07, 1.5, 67500.0*R, T);
+    if (Te < 20000.0)
+        kb=_kb_polynomial(2, 1.420e-1, -6.909, -1.922, -6.792, -1.749e-3, 4.40e07, 1.5, 67500.0*R, Teblim);
       else
-        kb=_kb_polynomial(2, -7.185e-2, -3.901, -9.534e-1, -1.152e1, 1.929, 4.40e07, 1.5, 67500.0*R, T); 
+        kb=_kb_polynomial(2, -7.185e-2, -3.901, -9.534e-1, -1.152e1, 1.929, 4.40e07, 1.5, 67500.0*R, Teblim); 
         
-      if(RECBW) add_to_W_2r2p ( speceminus, specN2plus,  specN, specN, kb , N, W);
+      add_to_W_2r2p ( speceminus, specN2plus,  specN, specN, kb , N, W);
   } 
   
   if (REACTION[27]){
-    add_to_W_fwbw_2r2p ( specNplus, specN2,   specN2plus, specN, 1.00e12, 0.5, 12200.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specNplus, specN2,   specN2plus, specN, 1.00e12, 0.5, 12200.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specN2plus, specN,   specNplus, specN2,  1.00e12, 0.5, 12200.0*R, T, X, W );
   }  
   
   if (REACTION[28]){
-    add_to_W_fwbw_2r2p ( specO2plus, specO,   specOplus, specO2, 4.00e12, -0.09, 18000.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specO2plus, specO,   specOplus, specO2, 4.00e12, -0.09, 18000.0*R, T, X, W );
+    add_to_W_fw_2r2p ( specOplus, specO2,   specO2plus, specO,  4.00e12, -0.09, 18000.0*R, T, X, W );
   }   
   
   if (REACTION[29]){
-    add_to_W_fw_2r3p ( specN2, speceminus,   specN, specN, speceminus, 1.20e25, -1.6, 113200.0*R, TvTe, X, W );
-    add_to_W_bw_2r3p ( specN2, speceminus,   specN, specN, speceminus, 1.20e25, -1.6, 113200.0*R, TTe, X, W );
+    add_to_W_fw_2r3p ( specN2, speceminus,   specN, specN, speceminus, 1.20e25, -1.6, 113200.0*R, Te, X, W );
+    add_to_W_fw_3r2p ( specN, specN, speceminus,   specN2, speceminus,   1.20e25, -1.6, 113200.0*R, Te, X, W );
   }   
 
-  if (REACTION[30]){
-    kf=_kf_Arrhenius(2, 1.07e11, -0.52, 0.0, Te);
-    add_to_W_2r1p ( specOplus, speceminus,   specO,   kf , N, W);
-  }
-
-  if (REACTION[31]){
-    kf=_kf_Arrhenius(2, 1.52e11, -0.48, 0.0, Te);
-    add_to_W_2r1p ( specNplus, speceminus,   specN,   kf , N, W);
-  }
 
 }
 
@@ -529,7 +521,7 @@ void find_dW_dx_Kim2021 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, s, spec;                    
   spec_t N;
-  double TTv,TTe,TvTe,R,kf,kb, dkfdTe,dkfdT,dkfdTv,dkbdT, dkbdTTv, dkbdTe, dkbdTv;
+  double TTv,TTe,TvTe,Tblim,Teblim,R,kb,dkbdT, dkbdTv, dkbdTe;
   spec_t dWdTTv,dWdTTe,dWdTvTe;
   spec_t X;
 
@@ -541,6 +533,8 @@ void find_dW_dx_Kim2021 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te,
   TTv=sqrt(T*Tv);
   TTe=sqrt(T*Te);
   TvTe=sqrt(Tv*Te);
+  Tblim=min(max(300.0,T),32000.0);
+  Teblim=min(max(300.0,Te),32000.0);
   /* initialize all derivatives to zero */
   for ( s = 0; s < ns; s++ ) {
     dWdTTv[s] = 0.0;
@@ -563,149 +557,149 @@ void find_dW_dx_Kim2021 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te,
 
   if (REACTION[1]) {
     for (k=0; specM1[k]!=specEND; k++) {
-      if(RECFW) add_to_dW_fw_2r3p ( specN2, specM1[k],   specN, specN, specM1[k], 1.216e20, -1.2140, 113200.0*R, T, X, dWdT, dWdrhok );
+      add_to_dW_fw_2r3p ( specN2, specM1[k],   specN, specN, specM1[k], 1.216e20, -1.2140, 113200.0*R, TTv, X, dWdTTv, dWdrhok );
       
       if (T < 20000.0)
       {
-        kb=_kb_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 1.216e20, -1.2140, 113200.0*R, T);
-        dkbdT=_dkbdT_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 1.216e20, -1.2140, 113200.0*R, T);
+        kb=_kb_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 1.216e20, -1.2140, 113200.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 1.216e20, -1.2140, 113200.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 1.216e20, -1.2140, 113200.0*R, T);
-        dkbdT=_dkbdT_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 1.216e20, -1.2140, 113200.0*R, T);
+        kb=_kb_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 1.216e20, -1.2140, 113200.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 1.216e20, -1.2140, 113200.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_3r2p ( specM1[k], specN, specN,   specN2, specM1[k],   kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_3r2p ( specM1[k], specN, specN,   specN2, specM1[k],   kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
     }
   }
       
 
   if (REACTION[2]){
     for (k=0; specM2[k]!=specEND; k++) {
-      if(RECFW) add_to_dW_fw_2r3p ( specN2, specM2[k],   specN, specN, specM2[k], 7.0e21, -1.6, 113200.0*R, T, X, dWdT, dWdrhok );
+      add_to_dW_fw_2r3p ( specN2, specM2[k],   specN, specN, specM2[k], 7.0e21, -1.6, 113200.0*R, TTv, X, dWdTTv, dWdrhok );
       
       if (T < 20000.0)
       {
-        kb=_kb_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 7.0e21, -1.6, 113200.0*R, T);
-        dkbdT=_dkbdT_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 7.0e21, -1.6, 113200.0*R, T);
+        kb=_kb_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 7.0e21, -1.6, 113200.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 7.0e21, -1.6, 113200.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 7.0e21, -1.6, 113200.0*R, T);
-        dkbdT=_dkbdT_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 7.0e21, -1.6, 113200.0*R, T);
+        kb=_kb_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 7.0e21, -1.6, 113200.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 7.0e21, -1.6, 113200.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_3r2p ( specM2[k], specN, specN,   specN2, specM2[k],   kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe); 
+      add_to_dW_3r2p ( specM2[k], specN, specN,   specN2, specM2[k],   kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe); 
     }
   }
 
   if (REACTION[3]){
     for (k=0; specM3[k]!=specEND; k++) {
-      if(RECFW) add_to_dW_fw_2r3p ( specN2, specM3[k],   specN, specN, specM3[k], 3.591e20, -1.226, 113200.0*R, T, X, dWdT, dWdrhok );
+      add_to_dW_fw_2r3p ( specN2, specM3[k],   specN, specN, specM3[k], 3.591e20, -1.226, 113200.0*R, TTv, X, dWdTTv, dWdrhok );
       
       if (T < 20000.0)
       {
-        kb=_kb_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 3.591e20, -1.226, 113200.0*R, T);
-        dkbdT=_dkbdT_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 3.591e20, -1.226, 113200.0*R, T);
+        kb=_kb_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 3.591e20, -1.226, 113200.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 3.591e20, -1.226, 113200.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 3.591e20, -1.226, 113200.0*R, T);
-        dkbdT=_dkbdT_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 3.591e20, -1.226, 113200.0*R, T);
+        kb=_kb_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 3.591e20, -1.226, 113200.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 3.591e20, -1.226, 113200.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_3r2p ( specM3[k], specN, specN,   specN2, specM3[k],   kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_3r2p ( specM3[k], specN, specN,   specN2, specM3[k],   kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
     }
   }
 
   if (REACTION[4]){
     for (k=0; specM4[k]!=specEND; k++) {
-      if(RECFW) add_to_dW_fw_2r3p ( specN2, specM4[k],   specN, specN, specM4[k], 3.0e22, -1.6, 113200.0*R, T, X, dWdT, dWdrhok );
+      add_to_dW_fw_2r3p ( specN2, specM4[k],   specN, specN, specM4[k], 3.0e22, -1.6, 113200.0*R, TTv, X, dWdTTv, dWdrhok );
       
       if (T < 20000.0)
       {
-        kb=_kb_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 3.0e22, -1.6, 113200.0*R, T);
-        dkbdT=_dkbdT_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 3.0e22, -1.6, 113200.0*R, T);
+        kb=_kb_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 3.0e22, -1.6, 113200.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(3, 2.491, 7.155e-1, 2.091, -1.169e1, 5.921e-3, 3.0e22, -1.6, 113200.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 3.0e22, -1.6, 113200.0*R, T);
-        dkbdT=_dkbdT_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 3.0e22, -1.6, 113200.0*R, T);
+        kb=_kb_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 3.0e22, -1.6, 113200.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(3, -8.575e-1, -5.071e-1, -9.211, -1.734e1, 1.024e1, 3.0e22, -1.6, 113200.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_3r2p ( specM4[k], specN, specN,   specN2, specM4[k],   kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_3r2p ( specM4[k], specN, specN,   specN2, specM4[k],   kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
     }
   }
 
   if (REACTION[5]){
     for (k=0; specM5[k]!=specEND; k++){
-      if(RECFW) add_to_dW_fw_2r3p ( specO2, specM5[k],   specO, specO, specM5[k], 3.354e15, -0.2726, 59500.0*R, T, X, dWdT, dWdrhok );
+      add_to_dW_fw_2r3p ( specO2, specM5[k],   specO, specO, specM5[k], 3.354e15, -0.2726, 59500.0*R, TTv, X, dWdTTv, dWdrhok );
       
       if (T < 20000.0)
       {
-        kb=_kb_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 3.354e15, -0.2726, 59500.0*R, T);
-        dkbdT=_dkbdT_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 3.354e15, -0.2726, 59500.0*R, T);
+        kb=_kb_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 3.354e15, -0.2726, 59500.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 3.354e15, -0.2726, 59500.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 3.354e15, -0.2726, 59500.0*R, T); 
-        dkbdT=_dkbdT_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 3.354e15, -0.2726, 59500.0*R, T);
+        kb=_kb_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 3.354e15, -0.2726, 59500.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 3.354e15, -0.2726, 59500.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_3r2p ( specM5[k], specO, specO,   specO2, specM5[k],   kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_3r2p ( specM5[k], specO, specO,   specO2, specM5[k],   kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
     }
   }
 
   if (REACTION[6]){
     for (k=0; specM6[k]!=specEND; k++){
-      if(RECFW) add_to_dW_fw_2r3p ( specO2, specM6[k],   specO, specO, specM6[k], 1.117e25, -2.585, 59500.0*R, T, X, dWdT, dWdrhok );
+      add_to_dW_fw_2r3p ( specO2, specM6[k],   specO, specO, specM6[k], 1.117e25, -2.585, 59500.0*R, TTv, X, dWdTTv, dWdrhok );
       
       if (T < 20000.0)
       {
-        kb=_kb_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 1.117e25, -2.585, 59500.0*R, T);
-        dkbdT=_dkbdT_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 1.117e25, -2.585, 59500.0*R, T);
+        kb=_kb_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 1.117e25, -2.585, 59500.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 1.117e25, -2.585, 59500.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 1.117e25, -2.585, 59500.0*R, T); 
-        dkbdT=_dkbdT_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 1.117e25, -2.585, 59500.0*R, T);
+        kb=_kb_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 1.117e25, -2.585, 59500.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 1.117e25, -2.585, 59500.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_3r2p ( specM6[k], specO, specO,   specO2, specM6[k],   kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_3r2p ( specM6[k], specO, specO,   specO2, specM6[k],   kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
     }
   }
 
   if (REACTION[7]){
     for (k=0; specM3[k]!=specEND; k++){
-      if(RECFW) add_to_dW_fw_2r3p ( specO2, specM3[k],   specO, specO, specM3[k], 1.0e22, -1.500, 59500.0*R, T, X, dWdT, dWdrhok );
+      add_to_dW_fw_2r3p ( specO2, specM3[k],   specO, specO, specM3[k], 1.0e22, -1.500, 59500.0*R, TTv, X, dWdTTv, dWdrhok );
       
       if (T < 20000.0)
       {
-        kb=_kb_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 1.0e22, -1.500, 59500.0*R, T);
-        dkbdT=_dkbdT_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 1.0e22, -1.500, 59500.0*R, T);
+        kb=_kb_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 1.0e22, -1.500, 59500.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 1.0e22, -1.500, 59500.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 1.0e22, -1.500, 59500.0*R, T); 
-        dkbdT=_dkbdT_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 1.0e22, -1.500, 59500.0*R, T);
+        kb=_kb_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 1.0e22, -1.500, 59500.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 1.0e22, -1.500, 59500.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_3r2p ( specM3[k], specO, specO,   specO2, specM3[k],   kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_3r2p ( specM3[k], specO, specO,   specO2, specM3[k],   kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
     }
   }
 
@@ -713,403 +707,390 @@ void find_dW_dx_Kim2021 ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te,
 
   if (REACTION[8]){
     for (k=0; specM4[k]!=specEND; k++){
-      if(RECFW) add_to_dW_fw_2r3p ( specO2, specM4[k],   specO, specO, specM4[k], 3.00e21, -1.50, 59500.0*R, T, X, dWdT, dWdrhok );
+      add_to_dW_fw_2r3p ( specO2, specM4[k],   specO, specO, specM4[k], 3.00e21, -1.50, 59500.0*R, TTv, X, dWdTTv, dWdrhok );
       
       if (T < 20000.0)
       {
-        kb=_kb_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 3.00e21, -1.50, 59500.0*R, T);
-        dkbdT=_dkbdT_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 3.00e21, -1.50, 59500.0*R, T);
+        kb=_kb_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 3.00e21, -1.50, 59500.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(3, 1.567, 1.217, 1.909, -6.281, 5.237e-3, 3.00e21, -1.50, 59500.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 3.00e21, -1.50, 59500.0*R, T); 
-        dkbdT=_dkbdT_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 3.00e21, -1.50, 59500.0*R, T);
+        kb=_kb_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 3.00e21, -1.50, 59500.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(3, -2.087, -3.315e1, -2.595e1, 4.370e1, -1.195e1, 3.00e21, -1.50, 59500.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_3r2p ( specM4[k], specO, specO,   specO2, specM4[k],   kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_3r2p ( specM4[k], specO, specO,   specO2, specM4[k],   kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
     }
   }
 
   if (REACTION[9]){
     for (k=0; specM7[k]!=specEND; k++){
-      if(RECFW) add_to_dW_fw_2r3p ( specNO, specM7[k],   specN, specO, specM7[k], 1.450e15, 0.0, 75200.0*R, T, X, dWdT, dWdrhok );
+      add_to_dW_fw_2r3p ( specNO, specM7[k],   specN, specO, specM7[k], 1.450e15, 0.0, 75200.0*R, TTv, X, dWdTTv, dWdrhok );
       
       if (T < 20000.0)
       {
-        kb=_kb_polynomial(3, 2.093, -6.229e-1, 2.028, -7.872, 5.586e-3, 1.450e15, 0.0, 75200.0*R, T);
-        dkbdT=_dkbdT_polynomial(3, 2.093, -6.229e-1, 2.028, -7.872, 5.586e-3, 1.450e15, 0.0, 75200.0*R, T);
+        kb=_kb_polynomial(3, 2.093, -6.229e-1, 2.028, -7.872, 5.586e-3, 1.450e15, 0.0, 75200.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(3, 2.093, -6.229e-1, 2.028, -7.872, 5.586e-3, 1.450e15, 0.0, 75200.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(3, -1.640, -2.142e1, -1.964e1, 1.910e1, -2.422, 1.450e15, 0.0, 75200.0*R, T); 
-        dkbdT=_dkbdT_polynomial(3, -1.640, -2.142e1, -1.964e1, 1.910e1, -2.422, 1.450e15, 0.0, 75200.0*R, T);
+        kb=_kb_polynomial(3, -1.640, -2.142e1, -1.964e1, 1.910e1, -2.422, 1.450e15, 0.0, 75200.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(3, -1.640, -2.142e1, -1.964e1, 1.910e1, -2.422, 1.450e15, 0.0, 75200.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_3r2p ( specM7[k], specN, specO,   specNO, specM7[k],  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_3r2p ( specM7[k], specN, specO,   specNO, specM7[k],  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
     }
   }
 
   if (REACTION[10]){
     for (k=0; specM8[k]!=specEND; k++){
-      if(RECFW) add_to_dW_fw_2r3p ( specNO, specM8[k],   specN, specO, specM8[k], 9.640e14, 0.0, 75200.0*R, T, X, dWdT, dWdrhok );
+      add_to_dW_fw_2r3p ( specNO, specM8[k],   specN, specO, specM8[k], 9.640e14, 0.0, 75200.0*R, TTv, X, dWdTTv, dWdrhok );
       
       if (T < 20000.0)
       {
-        kb=_kb_polynomial(3, 2.093, -6.229e-1, 2.028, -7.872, 5.586e-3, 9.640e14, 0.0, 75200.0*R, T);
-        dkbdT=_dkbdT_polynomial(3, 2.093, -6.229e-1, 2.028, -7.872, 5.586e-3, 9.640e14, 0.0, 75200.0*R, T);
+        kb=_kb_polynomial(3, 2.093, -6.229e-1, 2.028, -7.872, 5.586e-3, 9.640e14, 0.0, 75200.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(3, 2.093, -6.229e-1, 2.028, -7.872, 5.586e-3, 9.640e14, 0.0, 75200.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(3, -1.640, -2.142e1, -1.964e1, 1.910e1, -2.422, 9.640e14, 0.0, 75200.0*R, T); 
-        dkbdT=_dkbdT_polynomial(3, -1.640, -2.142e1, -1.964e1, 1.910e1, -2.422, 9.640e14, 0.0, 75200.0*R, T);
+        kb=_kb_polynomial(3, -1.640, -2.142e1, -1.964e1, 1.910e1, -2.422, 9.640e14, 0.0, 75200.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(3, -1.640, -2.142e1, -1.964e1, 1.910e1, -2.422, 9.640e14, 0.0, 75200.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_3r2p ( specM8[k], specN, specO,   specNO, specM8[k],  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_3r2p ( specM8[k], specN, specO,   specNO, specM8[k],  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
     }
   }
 
   if (REACTION[11]){
-    if(RECFW) add_to_dW_fw_2r2p ( specN2, specO,   specNO, specN, 6.4000e17, -1.0, 38400.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specN2, specO,   specNO, specN, 5.700e12, 0.42, 42938.0*R, T, X, dWdT, dWdrhok);
     
     if (T < 20000.0)
       {
-        kb=_kb_polynomial(2, -1.789e-1, 1.728, -2.172e-1, -3.733, -2.285e-4, 6.4000e17, -1.0, 38400.0*R, T);
-        dkbdT=_dkbdT_polynomial(2, -1.789e-1, 1.728, -2.172e-1, -3.733, -2.285e-4, 6.4000e17, -1.0, 38400.0*R, T);
+        kb=_kb_polynomial(2, -1.789e-1, 1.728, -2.172e-1, -3.733, -2.285e-4, 5.700e12, 0.42, 42938.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(2, -1.789e-1, 1.728, -2.172e-1, -3.733, -2.285e-4, 5.700e12, 0.42, 42938.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(2, 7.441e-2, 2.852, 1.054, -5.303, 1.909e-1, 6.4000e17, -1.0, 38400.0*R, T); 
-        dkbdT=_dkbdT_polynomial(2, 7.441e-2, 2.852, 1.054, -5.303, 1.909e-1, 6.4000e17, -1.0, 38400.0*R, T);
+        kb=_kb_polynomial(2, 7.441e-2, 2.852, 1.054, -5.303, 1.909e-1, 5.700e12, 0.42, 42938.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(2, 7.441e-2, 2.852, 1.054, -5.303, 1.909e-1, 5.700e12, 0.42, 42938.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_2r2p ( specNO, specN,  specN2, specO,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_2r2p ( specNO, specN,  specN2, specO,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
   if (REACTION[12]){
-    if(RECFW) add_to_dW_fw_2r2p ( specNO, specO,   specO2, specN, 8.4000e12, 0.0, 19450.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specNO, specO,   specO2, specN, 8.4000e12, 0.0, 19400.0*R, T, X, dWdT, dWdrhok);
    
     if (T < 20000.0)
       {
-        kb=_kb_polynomial(2, -1.673e-1, -1.390, -1.656e-1, -1.551, -1.102e-4, 8.4000e12, 0.0, 19450.0*R, T);
-        dkbdT=_dkbdT_polynomial(2, -1.673e-1, -1.390, -1.656e-1, -1.551, -1.102e-4, 8.4000e12, 0.0, 19450.0*R, T);
+        kb=_kb_polynomial(2, -1.673e-1, -1.390, -1.656e-1, -1.551, -1.102e-4, 8.4000e12, 0.0, 19400.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(2, -1.673e-1, -1.390, -1.656e-1, -1.551, -1.102e-4, 8.4000e12, 0.0, 19450.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(2, 1.744e-2, -1.563, 2.354e-1, -1.233, -3.250e-1, 8.4000e12, 0.0, 19450.0*R, T); 
-        dkbdT=_dkbdT_polynomial(2, 1.744e-2, -1.563, 2.354e-1, -1.233, -3.250e-1, 8.4000e12, 0.0, 19450.0*R, T);
+        kb=_kb_polynomial(2, 1.744e-2, -1.563, 2.354e-1, -1.233, -3.250e-1, 8.4000e12, 0.0, 19400.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(2, 1.744e-2, -1.563, 2.354e-1, -1.233, -3.250e-1, 8.4000e12, 0.0, 19450.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_2r2p ( specO2, specN,  specNO, specO,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_2r2p ( specO2, specN,  specNO, specO,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
 
   if (REACTION[13]){
-    if(RECFW) add_to_dW_fw_2r2p ( specN, specO,   specNOplus, speceminus, 8.80e08, 1.0, 31900.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specN, specO,   specNOplus, speceminus, 8.80e08, 1.0, 31900.0*R, T, X, dWdT, dWdrhok);
     
-    if (T < 20000.0)
+    if (Te < 20000.0)
       {
-        kb=_kb_polynomial(2, 1.907e-1, -7.976, -1.848, -3.255, -1.662e-3, 8.80e08, 1.0, 31900.0*R, T);
-        dkbdT=_dkbdT_polynomial(2, 1.907e-1, -7.976, -1.848, -3.255, -1.662e-3, 8.80e08, 1.0, 31900.0*R, T);
+        kb=_kb_polynomial(2, 1.907e-1, -7.976, -1.848, -3.255, -1.662e-3, 8.80e08, 1.0, 31900.0*R, Teblim);
+        dkbdTe=_dkbdT_polynomial(2, 1.907e-1, -7.976, -1.848, -3.255, -1.662e-3, 8.80e08, 1.0, 31900.0*R, Teblim);
       }
       else
       {
-        kb=_kb_polynomial(2, -1.361e-1, -6.297, -1.866, -5.991, 1.384, 8.80e08, 1.0, 31900.0*R, T); 
-        dkbdT=_dkbdT_polynomial(2, -1.361e-1, -6.297, -1.866, -5.991, 1.384, 8.80e08, 1.0, 31900.0*R, T);
+        kb=_kb_polynomial(2, -1.361e-1, -6.297, -1.866, -5.991, 1.384, 8.80e08, 1.0, 31900.0*R, Teblim); 
+        dkbdTe=_dkbdT_polynomial(2, -1.361e-1, -6.297, -1.866, -5.991, 1.384, 8.80e08, 1.0, 31900.0*R, Teblim);
       }
       
-      dkbdTe=0.0;
+      dkbdT=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_2r2p ( specNOplus, speceminus,  specO, specN,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_2r2p ( specNOplus, speceminus,  specO, specN,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
   if (REACTION[14]){
-    if(RECFW) add_to_dW_fw_2r2p ( specO, specO,   specO2plus, speceminus, 7.10e02, 2.70, 80600.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specO, specO,   specO2plus, speceminus, 7.10e02, 2.70, 80600.0*R, T, X, dWdT, dWdrhok);
     
-    if (T < 20000.0)
+    if (Te < 20000.0)
       {
-        kb=_kb_polynomial(2, -7.183e-3, -7.603, -2.099, -8.070, -1.989e-3, 7.10e02, 2.70, 80600.0*R, T);
-        dkbdT=_dkbdT_polynomial(2, -7.183e-3, -7.603, -2.099, -8.070, -1.989e-3, 7.10e02, 2.70, 80600.0*R, T);
+        kb=_kb_polynomial(2, -7.183e-3, -7.603, -2.099, -8.070, -1.989e-3, 7.10e02, 2.70, 80600.0*R, Teblim);
+        dkbdTe=_dkbdT_polynomial(2, -7.183e-3, -7.603, -2.099, -8.070, -1.989e-3, 7.10e02, 2.70, 80600.0*R, Teblim);
       }
       else
       {
-        kb=_kb_polynomial(2, -2.428e-2, -4.074, -3.091e-1, -1.342e1, 1.831, 7.10e02, 2.70, 80600.0*R, T); 
-        dkbdT=_dkbdT_polynomial(2, -2.428e-2, -4.074, -3.091e-1, -1.342e1, 1.831, 7.10e02, 2.70, 80600.0*R, T);
+        kb=_kb_polynomial(2, -2.428e-2, -4.074, -3.091e-1, -1.342e1, 1.831, 7.10e02, 2.70, 80600.0*R, Teblim); 
+        dkbdTe=_dkbdT_polynomial(2, -2.428e-2, -4.074, -3.091e-1, -1.342e1, 1.831, 7.10e02, 2.70, 80600.0*R, Teblim);
       }
       
-      dkbdTe=0.0;
+      dkbdT=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_2r2p ( specO2plus, speceminus,  specO, specO,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_2r2p ( specO2plus, speceminus,  specO, specO,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
     
   }
 
   if (REACTION[15]){
-    if(RECFW) add_to_dW_fw_2r3p ( specN, speceminus,   specNplus, speceminus, speceminus, 2.50e034, -3.820, 168600.0*R, Te, X, dWdTe, dWdrhok);
+    add_to_dW_fw_2r3p ( specN, speceminus,   specNplus, speceminus, speceminus, 2.50e034, -3.820, 168600.0*R, Te, X, dWdTe, dWdrhok);
     
-    if (T < 20000.0)
+    if (Te < 20000.0)
       {
-        kb=_kb_polynomial(3, -1.217, -3.006, -2.354, -1.675e1, -2.195e-3, 2.50e034, -3.820, 168600.0*R, T);
-        dkbdT=_dkbdT_polynomial(3, -1.217, -3.006, -2.354, -1.675e1, -2.195e-3, 2.50e034, -3.820, 168600.0*R, T);
+        kb=_kb_polynomial(3, -1.217, -3.006, -2.354, -1.675e1, -2.195e-3, 2.50e034, -3.820, 168600.0*R, Teblim);
+        dkbdTe=_dkbdT_polynomial(3, -1.217, -3.006, -2.354, -1.675e1, -2.195e-3, 2.50e034, -3.820, 168600.0*R, Teblim);
       }
       else
       {
-        kb=_kb_polynomial(3, 1.103, 2.700, 7.541, -2.188e1, -2.910, 2.50e034, -3.820, 168600.0*R, T); 
-        dkbdT=_dkbdT_polynomial(3, 1.103, 2.700, 7.541, -2.188e1, -2.910, 2.50e034, -3.820, 168600.0*R, T);
+        kb=_kb_polynomial(3, 1.103, 2.700, 7.541, -2.188e1, -2.910, 2.50e034, -3.820, 168600.0*R, Teblim); 
+        dkbdTe=_dkbdT_polynomial(3, 1.103, 2.700, 7.541, -2.188e1, -2.910, 2.50e034, -3.820, 168600.0*R, Teblim);
       }
       
-      dkbdTe=0.0;
+      dkbdT=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_3r2p ( speceminus, speceminus, specNplus,  speceminus, specN,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_3r2p ( speceminus, speceminus, specNplus,  speceminus, specN,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
      
   }
 
   if (REACTION[16]){
-    if(RECFW) add_to_dW_fw_2r3p ( specO, speceminus,   specOplus, speceminus, speceminus, 3.90e033, -3.78, 158500.0*R, Te, X, dWdTe, dWdrhok);
+    add_to_dW_fw_2r3p ( specO, speceminus,   specOplus, speceminus, speceminus, 3.90e033, -3.78, 158500.0*R, Te, X, dWdTe, dWdrhok);
     
-    if (T < 20000.0)
+    if (Te < 20000.0)
       {
-        kb=_kb_polynomial(3, -2.660e-1, -5.390, -1.747, -1.575e1, -7.662e-4, 3.90e033, -3.78, 158500.0*R, T);
-        dkbdT=_dkbdT_polynomial(3, -2.660e-1, -5.390, -1.747, -1.575e1, -7.662e-4, 3.90e033, -3.78, 158500.0*R, T);
+        kb=_kb_polynomial(3, -2.660e-1, -5.390, -1.747, -1.575e1, -7.662e-4, 3.90e033, -3.78, 158500.0*R, Teblim);
+        dkbdTe=_dkbdT_polynomial(3, -2.660e-1, -5.390, -1.747, -1.575e1, -7.662e-4, 3.90e033, -3.78, 158500.0*R, Teblim);
       }
       else
       {
-        kb=_kb_polynomial(3, 1.789, 1.711e1, 1.527e1, -4.975e1, 9.411, 3.90e033, -3.78, 158500.0*R, T); 
-        dkbdT=_dkbdT_polynomial(3, 1.789, 1.711e1, 1.527e1, -4.975e1, 9.411, 3.90e033, -3.78, 158500.0*R, T);
+        kb=_kb_polynomial(3, 1.789, 1.711e1, 1.527e1, -4.975e1, 9.411, 3.90e033, -3.78, 158500.0*R, Teblim); 
+        dkbdTe=_dkbdT_polynomial(3, 1.789, 1.711e1, 1.527e1, -4.975e1, 9.411, 3.90e033, -3.78, 158500.0*R, Teblim);
       }
       
-      dkbdTe=0.0;
+      dkbdT=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_3r2p ( speceminus, speceminus, specOplus,  speceminus, specO,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_3r2p ( speceminus, speceminus, specOplus,  speceminus, specO,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
      
   }
 
   if (REACTION[17]){
-    if(RECFW) add_to_dW_fw_2r2p ( specN2, specO2plus,   specN2plus, specO2, 9.90e12, 0.0, 40700.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specN2, specO2plus,   specN2plus, specO2, 9.90e12, 0.0, 40700.0*R, T, X, dWdT, dWdrhok);
     
     if (T < 20000.0)
       {
-        kb=_kb_polynomial(2, -1.970e-1, 1.031, -2.049e-1, -4.005, -9.866e-5, 9.90e12, 0.0, 40700.0*R, T);
-        dkbdT=_dkbdT_polynomial(2, -1.970e-1, 1.031, -2.049e-1, -4.005, -9.866e-5, 9.90e12, 0.0, 40700.0*R, T);
+        kb=_kb_polynomial(2, -1.970e-1, 1.031, -2.049e-1, -4.005, -9.866e-5, 9.90e12, 0.0, 40700.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(2, -1.970e-1, 1.031, -2.049e-1, -4.005, -9.866e-5, 9.90e12, 0.0, 40700.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(2, 4.428e-2, 1.462, 6.450e-1, -4.638, -3.600e-2, 9.90e12, 0.0, 40700.0*R, T); 
-        dkbdT=_dkbdT_polynomial(2, 4.428e-2, 1.462, 6.450e-1, -4.638, -3.600e-2, 9.90e12, 0.0, 40700.0*R, T);
+        kb=_kb_polynomial(2, 4.428e-2, 1.462, 6.450e-1, -4.638, -3.600e-2, 9.90e12, 0.0, 40700.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(2, 4.428e-2, 1.462, 6.450e-1, -4.638, -3.600e-2, 9.90e12, 0.0, 40700.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_2r2p ( specO2, specN2plus, specO2plus,  specN2,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_2r2p ( specO2, specN2plus, specO2plus,  specN2,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
   if (REACTION[18]){
-    if(RECFW) add_to_dW_fw_2r2p ( specNOplus, specN,   specOplus, specN2, 3.40e13, -1.08, 12800.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specNOplus, specN,   specOplus, specN2, 3.40e13, -1.08, 12800.0*R, T, X, dWdT, dWdrhok);
     
     if (T < 20000.0)
       {
-        kb=_kb_polynomial(2, -6.300e-2, -5.419e-1, -4.449e-2, -1.266, -1.089e-4, 3.40e13, -1.08, 12800.0*R, T);
-        dkbdT=_dkbdT_polynomial(2, -6.300e-2, -5.419e-1, -4.449e-2, -1.266, -1.089e-4, 3.40e13, -1.08, 12800.0*R, T);
+        kb=_kb_polynomial(2, -6.300e-2, -5.419e-1, -4.449e-2, -1.266, -1.089e-4, 3.40e13, -1.08, 12800.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(2, -6.300e-2, -5.419e-1, -4.449e-2, -1.266, -1.089e-4, 3.40e13, -1.08, 12800.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(2, 3.518e-2, -7.715e-2, 4.619e-1, -1.923, 9.394e-2, 3.40e13, -1.08, 12800.0*R, T); 
-        dkbdT=_dkbdT_polynomial(2, 3.518e-2, -7.715e-2, 4.619e-1, -1.923, 9.394e-2, 3.40e13, -1.08, 12800.0*R, T);
+        kb=_kb_polynomial(2, 3.518e-2, -7.715e-2, 4.619e-1, -1.923, 9.394e-2, 3.40e13, -1.08, 12800.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(2, 3.518e-2, -7.715e-2, 4.619e-1, -1.923, 9.394e-2, 3.40e13, -1.08, 12800.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_2r2p ( specN2, specOplus,  specNOplus, specN,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_2r2p ( specN2, specOplus,  specNOplus, specN,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
   if (REACTION[19]){
-    if(RECFW) add_to_dW_fw_2r2p ( specNOplus, specO,   specNplus, specO2, 1.00e12, 0.5, 77200.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specNOplus, specO,   specNplus, specO2, 1.00e12, 0.5, 77200.0*R, T, X, dWdT, dWdrhok);
     
     if (T < 20000.0)
       {
-        kb=_kb_polynomial(2, -4.092e-1, -7.798e-1, -4.273e-1, -7.618, -4.475e-4, 1.00e12, 0.5, 77200.0*R, T);
-        dkbdT=_dkbdT_polynomial(2, -4.092e-1, -7.798e-1, -4.273e-1, -7.618, -4.475e-4, 1.00e12, 0.5, 77200.0*R, T);
+        kb=_kb_polynomial(2, -4.092e-1, -7.798e-1, -4.273e-1, -7.618, -4.475e-4, 1.00e12, 0.5, 77200.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(2, -4.092e-1, -7.798e-1, -4.273e-1, -7.618, -4.475e-4, 1.00e12, 0.5, 77200.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(2, 1.270e-1, 6.372e-1, 1.751, -9.528, -4.012e-2, 1.00e12, 0.5, 77200.0*R, T); 
-        dkbdT=_dkbdT_polynomial(2, 1.270e-1, 6.372e-1, 1.751, -9.528, -4.012e-2, 1.00e12, 0.5, 77200.0*R, T);
+        kb=_kb_polynomial(2, 1.270e-1, 6.372e-1, 1.751, -9.528, -4.012e-2, 1.00e12, 0.5, 77200.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(2, 1.270e-1, 6.372e-1, 1.751, -9.528, -4.012e-2, 1.00e12, 0.5, 77200.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_2r2p ( specO2, specNplus,  specNOplus, specO,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_2r2p ( specO2, specNplus,  specNOplus, specO,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
   if (REACTION[20]){
-    if(RECFW) add_to_dW_fw_2r2p ( specNOplus, specO2,   specO2plus, specNO, 2.40e13, 0.41, 32600.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specNOplus, specO2,   specO2plus, specNO, 2.40e13, 0.41, 32600.0*R, T, X, dWdT, dWdrhok);
     
     if (T < 20000.0)
       {
-        kb=_kb_polynomial(2, -3.056e-2, 1.762, -8.580e-2, -3.265, -2.168e-4, 2.40e13, 0.41, 32600.0*R, T);
-        dkbdT=_dkbdT_polynomial(2, -3.056e-2, 1.762, -8.580e-2, -3.265, -2.168e-4, 2.40e13, 0.41, 32600.0*R, T);
+        kb=_kb_polynomial(2, -3.056e-2, 1.762, -8.580e-2, -3.265, -2.168e-4, 2.40e13, 0.41, 32600.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(2, -3.056e-2, 1.762, -8.580e-2, -3.265, -2.168e-4, 2.40e13, 0.41, 32600.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(2, 9.436e-2, 3.786, 1.322, -6.192, 7.723e-1, 2.40e13, 0.41, 32600.0*R, T); 
-        dkbdT=_dkbdT_polynomial(2, 9.436e-2, 3.786, 1.322, -6.192, 7.723e-1, 2.40e13, 0.41, 32600.0*R, T);
+        kb=_kb_polynomial(2, 9.436e-2, 3.786, 1.322, -6.192, 7.723e-1, 2.40e13, 0.41, 32600.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(2, 9.436e-2, 3.786, 1.322, -6.192, 7.723e-1, 2.40e13, 0.41, 32600.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_2r2p ( specNO, specO2plus,  specO2, specNOplus,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_2r2p ( specNO, specO2plus,  specO2, specNOplus,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
   if (REACTION[21]){
-    if(RECFW) add_to_dW_fw_2r2p ( specNOplus, specN,   specN2plus, specO, 7.20e13, 0.0, 35500.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specNOplus, specN,   specN2plus, specO, 7.20e13, 0.0, 35500.0*R, T, X, dWdT, dWdrhok);
     
     if (T < 20000.0)
       {
-        kb=_kb_polynomial(2, -4.862e-2, 1.066, -7.350e-2, -3.537, -8.701e-5, 7.20e13, 0.0, 35500.0*R, T);
-        dkbdT=_dkbdT_polynomial(2, -4.862e-2, 1.066, -7.350e-2, -3.537, -8.701e-5, 7.20e13, 0.0, 35500.0*R, T);
+        kb=_kb_polynomial(2, -4.862e-2, 1.066, -7.350e-2, -3.537, -8.701e-5, 7.20e13, 0.0, 35500.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(2, -4.862e-2, 1.066, -7.350e-2, -3.537, -8.701e-5, 7.20e13, 0.0, 35500.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(2, 6.423e-2, 2.396, 9.127e-1, -5.527, 5.453e-1, 7.20e13, 0.0, 35500.0*R, T); 
-        dkbdT=_dkbdT_polynomial(2, 6.423e-2, 2.396, 9.127e-1, -5.527, 5.453e-1, 7.20e13, 0.0, 35500.0*R, T);
+        kb=_kb_polynomial(2, 6.423e-2, 2.396, 9.127e-1, -5.527, 5.453e-1, 7.20e13, 0.0, 35500.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(2, 6.423e-2, 2.396, 9.127e-1, -5.527, 5.453e-1, 7.20e13, 0.0, 35500.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_2r2p ( specO, specN2plus,  specN, specNOplus,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_2r2p ( specO, specN2plus,  specN, specNOplus,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
   if (REACTION[22]){
-    if(RECFW) add_to_dW_fw_2r2p ( specO2plus, specN,   specNplus, specO2, 8.70e13, 0.14, 28600.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specO2plus, specN,   specNplus, specO2, 8.70e13, 0.14, 28600.0*R, T, X, dWdT, dWdrhok);
     
     if (T < 20000.0)
       {
-        kb=_kb_polynomial(2, -2.113e-1, -1.152, -1.758e-1, -2.803, -1.205e-4, 8.70e13, 0.14, 28600.0*R, T);
-        dkbdT=_dkbdT_polynomial(2, -2.113e-1, -1.152, -1.758e-1, -2.803, -1.205e-4, 8.70e13, 0.14, 28600.0*R, T);
+        kb=_kb_polynomial(2, -2.113e-1, -1.152, -1.758e-1, -2.803, -1.205e-4, 8.70e13, 0.14, 28600.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(2, -2.113e-1, -1.152, -1.758e-1, -2.803, -1.205e-4, 8.70e13, 0.14, 28600.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(2, 1.523e-2, -1.586, 1.942e-1, -2.103, -4.874e-1, 8.70e13, 0.14, 28600.0*R, T); 
-        dkbdT=_dkbdT_polynomial(2, 1.523e-2, -1.586, 1.942e-1, -2.103, -4.874e-1, 8.70e13, 0.14, 28600.0*R, T);
+        kb=_kb_polynomial(2, 1.523e-2, -1.586, 1.942e-1, -2.103, -4.874e-1, 8.70e13, 0.14, 28600.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(2, 1.523e-2, -1.586, 1.942e-1, -2.103, -4.874e-1, 8.70e13, 0.14, 28600.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_2r2p ( specO2, specNplus,  specN, specO2plus,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_2r2p ( specO2, specNplus,  specN, specO2plus,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
   if (REACTION[23]){
-    if(RECFW) add_to_dW_fw_2r2p ( specOplus, specNO,   specNplus, specO2, 1.40e05, 1.90, 26600.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specOplus, specNO,   specNplus, specO2, 1.40e05, 1.90, 26600.0*R, T, X, dWdT, dWdrhok);
    
     if (T < 20000.0)
       {
-        kb=_kb_polynomial(2, -1.673e-1, -1.965, -1.656e-1, -2.619, -1.102e-4, 1.40e05, 1.90, 26600.0*R, T);
-        dkbdT=_dkbdT_polynomial(2, -1.673e-1, -1.965, -1.656e-1, -2.619, -1.102e-4, 1.40e05, 1.90, 26600.0*R, T);
+        kb=_kb_polynomial(2, -1.673e-1, -1.965, -1.656e-1, -2.619, -1.102e-4, 1.40e05, 1.90, 26600.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(2, -1.673e-1, -1.965, -1.656e-1, -2.619, -1.102e-4, 1.40e05, 1.90, 26600.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(2, 1.744e-2, -2.138, 2.354e-1, -2.302, -3.250e-1, 1.40e05, 1.90, 26600.0*R, T); 
-        dkbdT=_dkbdT_polynomial(2, 1.744e-2, -2.138, 2.354e-1, -2.302, -3.250e-1, 1.40e05, 1.90, 26600.0*R, T);
+        kb=_kb_polynomial(2, 1.744e-2, -2.138, 2.354e-1, -2.302, -3.250e-1, 1.40e05, 1.90, 26600.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(2, 1.744e-2, -2.138, 2.354e-1, -2.302, -3.250e-1, 1.40e05, 1.90, 26600.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_2r2p ( specO2, specNplus,  specNO, specOplus,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_2r2p ( specO2, specNplus,  specNO, specOplus,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
   if (REACTION[24]){
-    if(RECFW) add_to_dW_fw_2r2p ( specNOplus, specO,   specO2plus, specN, 7.20e12, 0.29, 48600.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specNOplus, specO,   specO2plus, specN, 7.20e12, 0.29, 48600.0*R, T, X, dWdT, dWdrhok);
     
     if (T < 20000.0)
       {
-        kb=_kb_polynomial(2, -1.978e-1, 3.723e-1, -2.514e-1, -4.815, -3.270e-4, 7.20e12, 0.29, 48600.0*R, T);
-        dkbdT=_dkbdT_polynomial(2, -1.978e-1, 3.723e-1, -2.514e-1, -4.815, -3.270e-4, 7.20e12, 0.29, 48600.0*R, T);
+        kb=_kb_polynomial(2, -1.978e-1, 3.723e-1, -2.514e-1, -4.815, -3.270e-4, 7.20e12, 0.29, 48600.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(2, -1.978e-1, 3.723e-1, -2.514e-1, -4.815, -3.270e-4, 7.20e12, 0.29, 48600.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(2, 1.118e-1, 2.223, 1.557, -7.425, 4.473e-1, 7.20e12, 0.29, 48600.0*R, T); 
-        dkbdT=_dkbdT_polynomial(2, 1.118e-1, 2.223, 1.557, -7.425, 4.473e-1, 7.20e12, 0.29, 48600.0*R, T);
+        kb=_kb_polynomial(2, 1.118e-1, 2.223, 1.557, -7.425, 4.473e-1, 7.20e12, 0.29, 48600.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(2, 1.118e-1, 2.223, 1.557, -7.425, 4.473e-1, 7.20e12, 0.29, 48600.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_2r2p ( specN, specO2plus,  specO, specNOplus,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_2r2p ( specN, specO2plus,  specO, specNOplus,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
   if (REACTION[25]){
-    if(RECFW) add_to_dW_fw_2r2p ( specOplus, specN2,   specN2plus, specO, 9.10e11, 0.36, 22800.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specOplus, specN2,   specN2plus, specO, 9.10e11, 0.36, 22800.0*R, T, X, dWdT, dWdrhok);
     
     if (T < 20000.0)
       {
-        kb=_kb_polynomial(2, 1.438e-2, 1.608, -2.901e-2, -2.271, 2.188e-5, 9.10e11, 0.36, 22800.0*R, T);
-        dkbdT=_dkbdT_polynomial(2, 1.438e-2, 1.608, -2.901e-2, -2.271, 2.188e-5, 9.10e11, 0.36, 22800.0*R, T);
+        kb=_kb_polynomial(2, 1.438e-2, 1.608, -2.901e-2, -2.271, 2.188e-5, 9.10e11, 0.36, 22800.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(2, 1.438e-2, 1.608, -2.901e-2, -2.271, 2.188e-5, 9.10e11, 0.36, 22800.0*R, Tblim);
       }
       else
       {
-        kb=_kb_polynomial(2, 2.905e-2, 2.473, 4.508e-1, -3.603, 4.514e-1, 9.10e11, 0.36, 22800.0*R, T); 
-        dkbdT=_dkbdT_polynomial(2, 2.905e-2, 2.473, 4.508e-1, -3.603, 4.514e-1, 9.10e11, 0.36, 22800.0*R, T);
+        kb=_kb_polynomial(2, 2.905e-2, 2.473, 4.508e-1, -3.603, 4.514e-1, 9.10e11, 0.36, 22800.0*R, Tblim); 
+        dkbdT=_dkbdT_polynomial(2, 2.905e-2, 2.473, 4.508e-1, -3.603, 4.514e-1, 9.10e11, 0.36, 22800.0*R, Tblim);
       }
       
       dkbdTe=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_2r2p ( specO, specN2plus,  specN2, specOplus,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_2r2p ( specO, specN2plus,  specN2, specOplus,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
   
   if (REACTION[26]){
-    if(RECFW) add_to_dW_fw_2r2p ( specN, specN,   specN2plus, speceminus, 4.40e07, 1.5, 67500.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specN, specN,   specN2plus, speceminus, 4.40e07, 1.5, 67500.0*R, T, X, dWdT, dWdrhok);
     
-    if (T < 20000.0)
+    if (Te < 20000.0)
       {
-        kb=_kb_polynomial(2, 1.420e-1, -6.909, -1.922, -6.792, 1.749e-3, 4.40e07, 1.5, 67500.0*R, T);
-        dkbdT=_dkbdT_polynomial(2, 1.420e-1, -6.909, -1.922, -6.792, 1.749e-3, 4.40e07, 1.5, 67500.0*R, T);
+        kb=_kb_polynomial(2, 1.420e-1, -6.909, -1.922, -6.792, -1.749e-3, 4.40e07, 1.5, 67500.0*R, Teblim);
+        dkbdTe=_dkbdT_polynomial(2, 1.420e-1, -6.909, -1.922, -6.792, -1.749e-3, 4.40e07, 1.5, 67500.0*R, Teblim);
       }
       else
       {
-        kb=_kb_polynomial(2, -7.185e-2, -3.901, -9.534e-1, -1.152e1, 1.929, 4.40e07, 1.5, 67500.0*R, T); 
-        dkbdT=_dkbdT_polynomial(2, -7.185e-2, -3.901, -9.534e-1, -1.152e1, 1.929, 4.40e07, 1.5, 67500.0*R, T);
+        kb=_kb_polynomial(2, -7.185e-2, -3.901, -9.534e-1, -1.152e1, 1.929, 4.40e07, 1.5, 67500.0*R, Teblim); 
+        dkbdTe=_dkbdT_polynomial(2, -7.185e-2, -3.901, -9.534e-1, -1.152e1, 1.929, 4.40e07, 1.5, 67500.0*R, Teblim);
       }
       
-      dkbdTe=0.0;
+      dkbdT=0.0;
       dkbdTv=0.0;
-      if(RECBW) add_to_dW_2r2p ( speceminus, specN2plus,  specN, specN,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+      add_to_dW_2r2p ( speceminus, specN2plus,  specN, specN,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }  
   
   if (REACTION[27]){
-    add_to_dW_fwbw_2r2p ( specNplus, specN2,   specN2plus, specN, 1.00e12, 0.5, 12200.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specNplus, specN2,   specN2plus, specN, 1.00e12, 0.5, 12200.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specN2plus, specN,   specNplus, specN2, 1.00e12, 0.5, 12200.0*R, T, X, dWdT, dWdrhok);
   }  
 
   if (REACTION[28]){
-    add_to_dW_fwbw_2r2p ( specO2plus, specO,   specOplus, specO2, 4.00e12, -0.09, 18000.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specO2plus, specO,   specOplus, specO2, 4.00e12, -0.09, 18000.0*R, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p ( specOplus, specO2,   specO2plus, specO, 4.00e12, -0.09, 18000.0*R, T, X, dWdT, dWdrhok);
   } 
 
   if (REACTION[29]){
-    add_to_dW_fw_2r3p ( specN2, speceminus,   specN, specN, speceminus, 1.20e25, -1.6, 113200.0*R, TvTe, X, dWdTvTe, dWdrhok);
-    add_to_dW_bw_2r3p ( specN2, speceminus,   specN, specN, speceminus, 1.20e25, -1.6, 113200.0*R, TTe, X, dWdTTe, dWdrhok);
+    add_to_dW_fw_2r3p ( specN2, speceminus,   specN, specN, speceminus, 1.20e25, -1.6, 113200.0*R, Te, X, dWdTe, dWdrhok);
+    add_to_dW_fw_3r2p ( specN, specN, speceminus,   specN2, speceminus, 1.20e25, -1.6, 113200.0*R, Te, X, dWdTe, dWdrhok);
   }   
 
-  if (REACTION[30]){
-    kf=_kf_Arrhenius(2, 1.07e11, -0.52, 0.0, Te);
-    dkfdT=0.0;
-    dkfdTv=0.0;
-    dkfdTe=_dkfdT_Arrhenius(2, 1.07e11, -0.52, 0.0, Te);
-    add_to_dW_2r1p ( specOplus, speceminus,   specO,   kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-  }
-
-  if (REACTION[31]){
-    kf=_kf_Arrhenius(2, 1.52e11, -0.48, 0.0, Te);
-    dkfdT=0.0;
-    dkfdTv=0.0;
-    dkfdTe=_dkfdT_Arrhenius(2, 1.52e11, -0.48, 0.0, Te);
-    add_to_dW_2r1p ( specNplus, speceminus,   specN,   kf , N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-  }
 
 
   for (spec=0; spec<ns; spec++){
