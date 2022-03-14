@@ -90,26 +90,26 @@ Bdry(
 Model(
  
   NavierStokesPerfect(
-    gamma=1.4;      {the specific heat ratio }
-    R=286.0;        {the gas constant in J/kgK }
-    eta=2e-5;       {the viscosity of the gas in kg/ms }
-    kappa=0.03;     {the thermal conductivity of the gas in W/mK }
-    Pmin=1.0e-2;    Pmax=9.9e99;   {min and max pressure allowed in the domain in Pa}
-    Tmin=1.0e1;     Tmax=6.0e3;    {min and max temperature allowed in the domain in K}
-    zetaA1=0.1e0;   {conditions the convective waves of the A jacobian}
-    zetaA1=0.1e0;   {conditions the acoustic waves of the A jacobian}
-    zetaA2=0.2;
-    zetaA3=0.1e0;   {conditions the eigenvalues of the inverted A jacobian (both acoustic and convective)}
-    
-    AXISYMMETRIC=TRUE; {axisymmetric coordinates rather than planar}
-    SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
+    gamma=1.4;
+    R=286.0;        {J/kgK }
+    ETAMODEL=ETAMODEL_SUTHERLAND;     
+    eta_ref=1.716e-5;       {kg/ms}
+    eta_ref_T=273.15;       {K}
+    eta_C=110.4;       {K}
+    Pr=0.71;     
+    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
+    Tmin=1.0e1;     Tmax=26.0e3;    {K}
+    AXISYMMETRIC=TRUE;
     SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
+    SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
+    {
+    AddHeatPoint(0.0{x,m},0.0{y,m}, 0.1{radius,m}, 0.0{W/m});
+    }
   );
 );
 
 
 Init(
-  if (!READDATAFILE,
     NavierStokesPerfect(
       {
       _______________________________________________________________________________________
@@ -128,37 +128,53 @@ Init(
       Region(is,js,  ie,je,  2, Mx,My,P,T);
       }
     );
+);
+
+
+Disc(
+  NavierStokesPerfect(
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.2e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
+    POSFILTER=POSFILTER_NONE;
+    POSFILTER_numiter=4;
   );
 );
 
 
 Cycle(
   NavierStokesPerfect(
-    xiverge=1e-3;          {residual convergence threshold}
-    rhoref=1.0;            {reference density in kg/m3}
-    aref=300.0;            {reference sound speed in m/s}
+    xiverge=1e-3;  {residual convergence threshold}
+    rhoref=1.0;  {reference density in kg/m3}
+    aref=300.0;  {reference sound speed in m/s}
     Uref[1]=rhoref;            
-    Uref[2]=rhoref*aref;       
-    Uref[3]=rhoref*aref;   
-    Uref[4]=rhoref*aref*aref;  
+    for (dim,1,numdim,
+      Uref[1+dim]=rhoref*aref;
+    );
+    Uref[2+numdim]=rhoref*aref*aref;
   );
-  MultizoneSteady(
+  SteadyState(
     if (mod(iter,50)==0,
       WriteDataFile(outputfilename);
     );
-    sigma1=0.5;      {exponent of largest pseudotime step in all dimensions}
-    sigma2=0.0;      {exponent of largest pseudotime step in all flux components}
-    PRECONDITIONER=PRECON_LOCALTIMESTEP;
+    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
-      CFL=0.1;
+      CFL=0.01;
     );
-    CFL=min(CFL*1.1,4.0);
-    phi1=20;     {maximum number of gridlines per zone in each dimension}
-    UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,phi1);
-
-    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld) %3ld/%3ld%s \n",
+    CFL=min(CFL*1.05,0.5);
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
-           j_ximax,numzones_updated,numzones_total,clipinfo);
+           j_ximax,clipinfo);
   );
 );
 
