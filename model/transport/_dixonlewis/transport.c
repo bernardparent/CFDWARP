@@ -620,7 +620,7 @@ static double _mue_from_Nn_Ni_Te(double Nn, double Ni, double Te){
   double muen,mue,muei;
   Te=max(Te,300.0);
   muen=3.74E19*exp(33.5/sqrt(log(Te)))/Nn;
-  muei=1.061e16*pow(Te,1.5)/Ni;
+  muei=1.9e16*pow(Te,1.5)/Ni;
   mue=1.0/(1.0/muen+1.0/muei);
   return(mue);
 }
@@ -709,7 +709,7 @@ static void find_dmue_from_Nn_Ni_Te(double Nn, double Ni, double Te, double *dmu
   if (Te>300.0){
 //  muei=1e16*pow(Te,1.5)/Ni;
     muen=3.74E19*exp(33.5/sqrt(log(Te)))/Nn;
-    kmuei=1.061e16;
+    kmuei=1.9e16;
     muei=kmuei/Ni*pow(Te,1.5);
 //    mue=1.0/(1.0/muen+1.0/muei);
 
