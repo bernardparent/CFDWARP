@@ -581,10 +581,10 @@ void find_nuk_from_rhok_T_Te(spec_t rhok, double T, double Te, spec_t nuk){
    * such will not be used by the fluid modules when solving the drift-diffusion model
    */
       case SPECIES_IONPLUS:
-        nuk[k]=_muk_from_rhok_Tk_Ek(rhok, T, Te, 0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
+        nuk[k]=_muk_from_rhok_T_Te_Ek(rhok, T, Te, 0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
       break;
       case SPECIES_IONMINUS:
-        nuk[k]=_muk_from_rhok_Tk_Ek(rhok, T, Te, 0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
+        nuk[k]=_muk_from_rhok_T_Te_Ek(rhok, T, Te, 0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
       break;
       case SPECIES_ELECTRON:
         nuk[k]=0.0;
@@ -646,7 +646,7 @@ static double _mui_from_Nn_Ni_Ti(double Nn, double Ni, double A, double Ti, doub
    
   H2+, Cs+, N+, O+, O- are approximated using Fig. 8 in THE MOBILITIES OF SMALL IONS THE ATMOSPHERE AND THEIR RELATIONSHIP by E. UNGETHUM, Aerosol Science, 1974, Vol. 5, pp. 25 37. 
 */ 
-double _muk_from_rhok_Tk_Ek(spec_t rhok, double T, double Te, double Ek, long k){
+double _muk_from_rhok_T_Te_Ek(spec_t rhok, double T, double Te, double Ek, long k){
   double mu,Estar,N,Nn,Ni;
   long spec;
   mu=0.0;

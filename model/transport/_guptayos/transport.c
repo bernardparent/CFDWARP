@@ -42,12 +42,23 @@ Calculations to 30000 K,” NASA RP-1232, 1990.
 #define Runiv 1.987 //cal/(g-mol K)
 #define kBol 1.38066E-16 // erg/K
 
-#define _KAPPATR_METHOD 1 // 1,2,3 or 4 for Eq. 30, Eq. 27, Eq. 40a or Eq. 49 respectively in reference
-//do not use _KAPPATR_METHOD 3 or 4 (kappa_int cannot be used with method 4)
-#define _ELECTRON_PRESSURE_CORRECTION FALSE
+#define EPC_NONE 0
+#define EPC_GUPTAYOS 1
+#define EPC_RAIZER 2
+#define EPC_NRL 3
+#define EPC EPC_GUPTAYOS  //Use EPC_GUPTAYOS. Other methods are for testing purposes only.
+
+#define METHOD1 1  // Eq(27), first Chapman-Enskog approximation
+#define METHOD2 2  // Eq(30), approximation to method 1, yields results close to method 1 for air mixture
+#define METHOD3 3  // Eq(40a), approximation to method 1 ??? or method 2??
+#define METHOD4 4   // Eq(49) : 5-temperature model, thermal non-equilibirum
+#define METHOD METHOD2  //Use METHOD2. Other methods are for testing purposes only
+
 
 double collision_integral_curvefit11(long s, long r, double T){
   double A,B,C,D;
+  
+  T=min(max(1000.0,T),30000.0);
   
   switch (smap[s]){
     case SMAP_eminus:
@@ -58,17 +69,17 @@ double collision_integral_curvefit11(long s, long r, double T){
         case SMAP_O2plus: A=0.0; B=0.0; C=-2.0; D=23.8237; break;
         case SMAP_N2plus: A=0.0; B=0.0; C=-2.0; D=23.8237; break;
         case SMAP_NOplus: A=0.0; B=0.0; C=-2.0; D=23.8237; break;
-        case SMAP_O: if(T >= 1000 && T< 9000) {A=0.0164; B=-0.2431; C=1.1231; D=-1.5561;}
-          else if(T >= 9000 && T<= 30000) {A=-0.2027; B=5.6428; C=-51.5646; D=155.6091;}
+        case SMAP_O: if(T >= 1000.0 && T< 9000.0) {A=0.0164; B=-0.2431; C=1.1231; D=-1.5561;}
+          else if(T >= 9000.0 && T<= 30000.0) {A=-0.2027; B=5.6428; C=-51.5646; D=155.6091;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;
         case SMAP_N: A=0.0; B=0.0; C=0.0; D=1.6094; break;    
-        case SMAP_NO: if(T >= 1000 && T< 8000) {A=-0.2202; B=5.2265; C=-40.5659; D=104.7126;}
-          else if(T >= 8000 && T<= 30000) {A=-0.2871; B=8.3757; C=-81.3787; D=265.6292;}
+        case SMAP_NO: if(T >= 1000.0 && T< 8000.0) {A=-0.2202; B=5.2265; C=-40.5659; D=104.7126;}
+          else if(T >= 8000.0 && T<= 30000.0) {A=-0.2871; B=8.3757; C=-81.3787; D=265.6292;}
           else fatal_error("Temperature of %.15E K is out of range of validitity (1000-30000 K) for species pair %ld,%ld.",s,r);
           break;    
-        case SMAP_O2: if(T >= 1000 && T< 9000) {A=0.0241; B=-0.3467; C=1.3887; D=-0.0110;}
-          else if(T >= 9000 && T<= 30000) {A=0.0025; B=-0.0742; C=0.7235; D=-0.2116;}
+        case SMAP_O2: if(T >= 1000.0 && T< 9000.0) {A=0.0241; B=-0.3467; C=1.3887; D=-0.0110;}
+          else if(T >= 9000.0 && T<= 30000.0) {A=0.0025; B=-0.0742; C=0.7235; D=-0.2116;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;    
         case SMAP_N2: A=0.1147; B=-2.8945; C=24.5080; D=-67.3691; break;    
@@ -157,8 +168,8 @@ double collision_integral_curvefit11(long s, long r, double T){
     break;
     case SMAP_O:
       switch (smap[r]){
-        case SMAP_eminus: if(T >= 1000 && T< 9000) {A=0.0164; B=-0.2431; C=1.1231; D=-1.5561;}
-          else if(T >= 9000 && T<= 30000) {A=-0.2027; B=5.6428; C=-51.5646; D=155.6091;}
+        case SMAP_eminus: if(T >= 1000.0 && T< 9000.0) {A=0.0164; B=-0.2431; C=1.1231; D=-1.5561;}
+          else if(T >= 9000.0 && T<= 30000.0) {A=-0.2027; B=5.6428; C=-51.5646; D=155.6091;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;
         case SMAP_Oplus: A=0.0; B=-0.0034; C=-0.0572; D=4.9901; break;
@@ -192,8 +203,8 @@ double collision_integral_curvefit11(long s, long r, double T){
     break;    
     case SMAP_NO:
       switch (smap[r]){
-        case SMAP_eminus: if(T >= 1000 && T< 8000) {A=-0.2202; B=5.2265; C=-40.5659; D=104.7126;}
-          else if(T >= 8000 && T<= 30000) {A=-0.2871; B=8.3757; C=-81.3787; D=265.6292;}
+        case SMAP_eminus: if(T >= 1000.0 && T< 8000.0) {A=-0.2202; B=5.2265; C=-40.5659; D=104.7126;}
+          else if(T >= 8000.0 && T<= 30000.0) {A=-0.2871; B=8.3757; C=-81.3787; D=265.6292;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;
         case SMAP_Oplus: A=0.0; B=0.0; C=-0.4000; D=6.8543; break;
@@ -211,8 +222,8 @@ double collision_integral_curvefit11(long s, long r, double T){
     break;    
     case SMAP_O2:
       switch (smap[r]){
-        case SMAP_eminus: if(T >= 1000 && T< 9000) {A=0.0241; B=-0.3467; C=1.3887; D=-0.0110;}
-          else if(T >= 9000 && T<= 30000) {A=0.0025; B=-0.0742; C=0.7235; D=-0.2116;}
+        case SMAP_eminus: if(T >= 1000.0 && T< 9000.0) {A=0.0241; B=-0.3467; C=1.3887; D=-0.0110;}
+          else if(T >= 9000.0 && T<= 30000.0) {A=0.0025; B=-0.0742; C=0.7235; D=-0.2116;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;
         case SMAP_Oplus: A=0.0; B=0.0; C=-0.4000; D=6.8543; break;
@@ -255,6 +266,7 @@ double collision_integral_curvefit11(long s, long r, double T){
 double collision_integral_curvefit22(long s, long r, double T){
   double A,B,C,D;
   
+  T=min(max(1000.0,T),30000.0);
   switch (smap[s]){
     case SMAP_eminus:
       switch (smap[r]){
@@ -264,17 +276,17 @@ double collision_integral_curvefit22(long s, long r, double T){
         case SMAP_O2plus: A=0.0; B=0.0; C=-2.0; D=24.3061; break;
         case SMAP_N2plus: A=0.0; B=0.0; C=-2.0; D=24.3061; break;
         case SMAP_NOplus: A=0.0; B=0.0; C=-2.0; D=24.3061; break;
-        case SMAP_O: if(T >= 1000 && T< 9000) {A=0.0164; B=-0.2431; C=1.1231; D=-1.5561;}
-          else if(T >= 9000 && T<= 30000) {A=-0.2027; B=5.6428; C=-51.5646; D=155.6091;}
+        case SMAP_O: if(T >= 1000.0 && T< 9000.0) {A=0.0164; B=-0.2431; C=1.1231; D=-1.5561;}
+          else if(T >= 9000.0 && T<= 30000.0) {A=-0.2027; B=5.6428; C=-51.5646; D=155.6091;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;
         case SMAP_N: A=0.0; B=0.0; C=0.0; D=1.6094; break;
-        case SMAP_NO: if(T >= 1000 && T< 8000) {A=-0.2202; B=5.2265; C=-40.5659; D=104.7126;}
-          else if(T >= 8000 && T<= 30000) {A=-0.2871; B=8.3757; C=-81.3787; D=265.6292;}
+        case SMAP_NO: if(T >= 1000.0 && T< 8000.0) {A=-0.2202; B=5.2265; C=-40.5659; D=104.7126;}
+          else if(T >= 8000.0 && T<= 30000.0) {A=-0.2871; B=8.3757; C=-81.3787; D=265.6292;}
           else fatal_error("Temperature of %.15E K is out of range of validitity (1000-30000 K) for species pair %ld,%ld.",s,r);
           break;
-        case SMAP_O2: if(T >= 1000 && T< 9000) {A=0.0241; B=-0.3467; C=1.3887; D=-0.0110;}
-          else if(T >= 9000 && T<= 30000) {A=0.0025; B=-0.0742; C=0.7235; D=-0.2116;}
+        case SMAP_O2: if(T >= 1000.0 && T< 9000.0) {A=0.0241; B=-0.3467; C=1.3887; D=-0.0110;}
+          else if(T >= 9000.0 && T<= 30000.0) {A=0.0025; B=-0.0742; C=0.7235; D=-0.2116;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;
         case SMAP_N2: A=0.1147; B=-2.8945; C=24.5080; D=-67.3691; break;
@@ -363,8 +375,8 @@ double collision_integral_curvefit22(long s, long r, double T){
     break;
     case SMAP_O:
       switch (smap[r]){
-        case SMAP_eminus: if(T >= 1000 && T< 9000) {A=0.0164; B=-0.2431; C=1.1231; D=-1.5561;}
-          else if(T >= 9000 && T<= 30000) {A=-0.2027; B=5.6428; C=-51.5646; D=155.6091;}
+        case SMAP_eminus: if(T >= 1000.0 && T< 9000.0) {A=0.0164; B=-0.2431; C=1.1231; D=-1.5561;}
+          else if(T >= 9000.0 && T<= 30000.0) {A=-0.2027; B=5.6428; C=-51.5646; D=155.6091;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;
         case SMAP_Oplus: A=0.0; B=0.0; C=-0.4235; D=6.7787; break;
@@ -398,8 +410,8 @@ double collision_integral_curvefit22(long s, long r, double T){
     break;    
     case SMAP_NO:
       switch (smap[r]){
-        case SMAP_eminus: if(T >= 1000 && T< 8000) {A=-0.2202; B=5.2265; C=-40.5659; D=104.7126;}
-          else if(T >= 8000 && T<= 30000) {A=-0.2871; B=8.3757; C=-81.3787; D=265.6292;}
+        case SMAP_eminus: if(T >= 1000.0 && T< 8000.0) {A=-0.2202; B=5.2265; C=-40.5659; D=104.7126;}
+          else if(T >= 8000.0 && T<= 30000.0) {A=-0.2871; B=8.3757; C=-81.3787; D=265.6292;}
           else fatal_error("Temperature of %.15E K is out of range of validitity (1000-30000 K) for species pair %ld,%ld.",s,r);
           break;
         case SMAP_Oplus: A=0.0; B=0.0; C=-0.4000; D=6.7760; break;
@@ -417,8 +429,8 @@ double collision_integral_curvefit22(long s, long r, double T){
     break;    
     case SMAP_O2:
       switch (smap[r]){
-        case SMAP_eminus: if(T >= 1000 && T< 9000) {A=0.0241; B=-0.3467; C=1.3887; D=-0.0110;}
-          else if(T >= 9000 && T<= 30000) {A=0.0025; B=-0.0742; C=0.7235; D=-0.2116;}
+        case SMAP_eminus: if(T >= 1000.0 && T< 9000.0) {A=0.0241; B=-0.3467; C=1.3887; D=-0.0110;}
+          else if(T >= 9000.0 && T<= 30000.0) {A=0.0025; B=-0.0742; C=0.7235; D=-0.2116;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;
         case SMAP_Oplus: A=0.0; B=0.0; C=-0.4000; D=6.7760; break;
@@ -645,9 +657,12 @@ double collision_crosssection_ratio(long s, long r, double T){
   return(exp(C)*pow(T,A*log(T)+B));
 }
 
-double _Cpk_from_T(long k, double T){
+static double _cpk_from_T_GUPTAYOS(long k, double T){
   double a1,a2,a3,a4,a5;
-  
+
+  T=min(max(300.0,T),30000.0);
+  a1=0.0; a2=0.0; a3=0.0; a4=0.0; a5=0.0; 
+
   switch (smap[k]){
     case SMAP_eminus: 
       if(T>=300.0e0 && T<1000.0e0)          {a1=0.25E1; a2=0.0E0; a3=0.0E0; a4=0.0E0; a5=0.0E0;}
@@ -775,59 +790,83 @@ double EXM_matrix_determinant(EXM_mat_t mat){//improve this, triangular matrix i
   return(det);
 }
 
-double _kappa_from_rhok_T_Te(spec_t rhok, double T, double Te){
+static double _epc(double rhoe, double Te){
+  double Pe;
+  double epc;
+  
+  Pe = rhoe*calR*Te/_calM(speceminus)/101325.0e0; //electron pressure, atm
+  /*electron pressure correction for the collision integrals of ionic species*/ /*Eq(24b)*/
+  switch (EPC){
+    case EPC_GUPTAYOS:
+      epc=0.5*log(2.09E-2*1E-12*Te*Te*Te*Te/Pe+1.52*pow(Te*Te*Te*Te*1E-12/Pe,2.0/3.0));
+    break;
+    case EPC_RAIZER:
+      // Raizer Gas Discharge Physics, page 14
+      epc=13.57+1.5*log(Te/11600.0)/log(10.0)-0.5*log(rhoe/_m(speceminus)/1e6)/log(10.0);
+    break;
+    case EPC_NRL:
+      // NRL Plasma Formulary, page 34
+      epc=23.0-log(sqrt(rhoe/_m(speceminus)/1e6)*pow(Te/11600.0,-1.5));
+    break;
+    case EPC_NONE:
+      epc=1.0;
+    break;
+    default:
+      fatal_error("EPC set to invalid value.");
+  }
+  return(epc);
+}
+
+
+static void find_aij_Ai_Delta1_Delta2(spec_t rhok, double T, double epc, spec2_t aij, spec_t Ai, spec2_t Delta1, spec2_t Delta2){
+  double N,Bstar;
   long spec,i,j,l;
-  spec_t chik, M, Ai;
-  double N, Pe, den, epc_T, kappa_tr, kappa_int;
-  double Tbound,Tebound,Bstar;
-  double aij[ns][ns],Bij[ns][ns],Delta1[ns][ns],Delta2[ns][ns];
-  Tbound=min(max(1000.0,T),30000.0);
-  Tebound=min(max(1000.0,Te),30000.0);
+  spec2_t Bij;
+  spec_t chik,M;
   
   N=0.0;
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
   for (spec=0; spec<ns; spec++) M[spec]=_calM(spec)*1000.0; // g/g-mole
-  
-
-  Pe = rhok[speceminus]*calR*Tebound/_calM(speceminus)/101325.0e0; //electron pressure, atm
-  /*electron pressure correction for the collision integrals of ionic species*/ /*Eq(24b)*/
-#if _ELECTRON_PRESSURE_CORRECTION==TRUE
-  // Gupta-Yos
-  epc_T=0.5*log(2.09E-2*1E-12*Tebound*Tebound*Tebound*Tebound/Pe+1.52*pow(Tebound*Tebound*Tebound*Tebound*1E-12/Pe,2.0/3.0));
-  // Raizer Gas Discharge Physics, page 14
-  epc_T=13.57+1.5*log(Te/11600.0)/log(10.0)-0.5*log(rhok[speceminus]/_m(speceminus)/1e6)/log(10.0);
-  // NRL Plasma Formulary, page 34
-  epc_T=23.0-log(sqrt(rhok[speceminus]/_m(speceminus)/1e6)*pow(Tebound/11600.0,-1.5));
-#else
-  epc_T=1.0;
-#endif
-  kappa_tr     = 0.0e0;
-  kappa_int    = 0.0e0;
-  
 
   for (i=0; i<ns; i++){
     for (j=0; j<ns; j++){
-      Delta1[i][j]=collision_integral_curvefit11(i,j,Tbound)*(8.0e0/3.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*T*(M[i] + M[j])))*1.546e-20; // 1e-20 m^2 = 1 Angstrom^2
-      Delta2[i][j]=collision_integral_curvefit22(i,j,Tbound)*(0.2*16.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*T*(M[i] + M[j])))*1.546e-20;
-      if(_Charge_number(i)!=0 && _Charge_number(j)!=0) {Delta1[i][j]*=epc_T; Delta2[i][j]*=epc_T;}
+      Delta1[i][j]=collision_integral_curvefit11(i,j,T)*(8.0e0/3.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*T*(M[i] + M[j])))*1.546e-20; // 1e-20 m^2 = 1 Angstrom^2
+      Delta2[i][j]=collision_integral_curvefit22(i,j,T)*(0.2*16.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*T*(M[i] + M[j])))*1.546e-20;
+      if(_Charge_number(i)!=0 && _Charge_number(j)!=0) {Delta1[i][j]*=epc; Delta2[i][j]*=epc;}
       
-      Bstar=collision_crosssection_ratio(i,j,Tbound);
+      Bstar=collision_crosssection_ratio(i,j,T);
       aij[i][j]=4.184E7*2.0*M[i]*M[j]*((0.5*33.0-0.2*18.0*Bstar)*Delta1[i][j]-4.0*Delta2[i][j])/(15.0*kBol*(M[i]+M[j])*(M[i]+M[j]));
       Bij[i][j]=4.184E7*2.0*(8.0*M[i]*M[j]*Delta2[i][j]+(M[i]-M[j])*(9.0*M[i]-7.5*M[j]+3.6*Bstar*M[j])*Delta1[i][j])/(15.0*kBol*(M[i]+M[j])*(M[i]+M[j]));
     }
   }
   for (i=0; i<ns; i++){
     Ai[i]=0.0;
-  }
-  for (i=0; i<ns; i++){
     for (l=0; l<ns; l++){
       Ai[i]+=chik[l]*Bij[i][l];
     }
   }
-  
-#if _KAPPATR_METHOD==1 // Eq(30), approximation to method 2, yields results close to method 2 for air mixture
+
+}
+
+
+// Eq(30), approximation to method 1, yields results close to method 1 for air mixture
+double _kappa_from_rhok_T_Te_METHOD2(spec_t rhok, double T, double Te){
+  long spec,i,j;
+  spec_t chik,  Ai;
+  spec2_t Delta1,Delta2;
+  double N, den, kappa_tr, kappa_int;
   double num,aav;
+  spec2_t aij;
+
+  find_aij_Ai_Delta1_Delta2(rhok, T, _epc(rhok[speceminus], Te), aij, Ai, Delta1, Delta2);
+  
+  N=0.0;
+  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
+  for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
+
+  kappa_tr     = 0.0e0;
+  kappa_int    = 0.0e0;
   num=0.0;
   den=0.0;
   
@@ -844,13 +883,45 @@ double _kappa_from_rhok_T_Te(spec_t rhok, double T, double Te){
   }
   kappa_tr=num/(1.0-aav*num);
   
+  /*kappa_int=kappa_rot+kappa_vib+kappa_el*/
+  den=0.0;
+  for (i=0; i<ns; i++){
+    for (j=0; j<ns; j++){
+      den+=chik[j]*Delta1[i][j];
+    }
+    kappa_int+=(_cpk_from_T_GUPTAYOS(i,T)/Runiv-2.5)*chik[i]/den;
+    den=0.0;
+  }
+  kappa_int*=2.3901E-8*kBol;
   
-#endif
+  return((kappa_tr+kappa_int)*418.4); // cal/cm-s-K to W/m-K
+}
 
-#if _KAPPATR_METHOD==2 // Eq(27), first Chapman-Enskog approximation, bug: off by factor of -1 : needs fixing
+
+
+
+
+// Eq(27), first Chapman-Enskog approximation, bug: off by factor of -1 : needs fixing
+double _kappa_from_rhok_T_Te_METHOD1(spec_t rhok, double T, double Te){
+  long spec,i,j,l;
+  spec_t chik,  Ai;
+  spec2_t Delta1,Delta2;
+  double N, den, kappa_tr, kappa_int;
+  
   double Aij[ns][ns];
   EXM_mat_t tmp1,tmp2;
   double tmp3=0.0;
+  spec2_t aij;
+
+  find_aij_Ai_Delta1_Delta2(rhok, T, _epc(rhok[speceminus], Te), aij, Ai, Delta1, Delta2);
+  
+  N=0.0;
+  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
+  for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
+
+  kappa_tr     = 0.0e0;
+  kappa_int    = 0.0e0;
+
   EXM_init_matrix(&tmp1,ns+1,ns+1);
   EXM_init_matrix(&tmp2,ns,ns);
   EXM_mat_t *numtr =&tmp1;
@@ -875,10 +946,42 @@ double _kappa_from_rhok_T_Te(spec_t rhok, double T, double Te){
   kappa_tr=EXM_matrix_determinant(tmp1)/EXM_matrix_determinant(tmp2);
   kappa_tr=fabs(kappa_tr); //bug: off by factor of -1 : needs fixing
   //EXM_display_matrix(tmp1);
-#endif
 
-#if _KAPPATR_METHOD==3 // Eq(40a), approximation to method 1
+  /*kappa_int=kappa_rot+kappa_vib+kappa_el*/
+  den=0.0;
+  for (i=0; i<ns; i++){
+    for (j=0; j<ns; j++){
+      den+=chik[j]*Delta1[i][j];
+    }
+    kappa_int+=(_cpk_from_T_GUPTAYOS(i,T)/Runiv-2.5)*chik[i]/den;
+    den=0.0;
+  }
+  kappa_int*=2.3901E-8*kBol;
+  
+  return((kappa_tr+kappa_int)*418.4); // cal/cm-s-K to W/m-K
+}
+
+
+
+
+// Eq(40a), approximation to method 1 ??? or method 2??
+double _kappa_from_rhok_T_Te_METHOD3(spec_t rhok, double T, double Te){
+  long spec,i,j;
+  spec_t chik,  Ai;
+  spec2_t Delta1,Delta2;
+  double N, den, kappa_tr, kappa_int;
   double asr;
+  spec2_t aij;
+
+  find_aij_Ai_Delta1_Delta2(rhok, T, _epc(rhok[speceminus], Te), aij, Ai, Delta1, Delta2);
+  
+  N=0.0;
+  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
+  for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
+
+  kappa_tr     = 0.0e0;
+  kappa_int    = 0.0e0;
+
   den=0.0;
   kappa_tr=0.0;
   for (i=0; i<ns; i++){
@@ -890,7 +993,6 @@ double _kappa_from_rhok_T_Te(spec_t rhok, double T, double Te){
     den=0.0;
   }
   kappa_tr*=2.3901E-8*0.25*15.0*kBol;
-#endif
 
   /*kappa_int=kappa_rot+kappa_vib+kappa_el*/
   den=0.0;
@@ -898,25 +1000,53 @@ double _kappa_from_rhok_T_Te(spec_t rhok, double T, double Te){
     for (j=0; j<ns; j++){
       den+=chik[j]*Delta1[i][j];
     }
-    kappa_int+=(_Cpk_from_T(i,Tbound)/Runiv-2.5)*chik[i]/den;
+    kappa_int+=(_cpk_from_T_GUPTAYOS(i,T)/Runiv-2.5)*chik[i]/den;
+    den=0.0;
+  }
+  kappa_int*=2.3901E-8*kBol;
+    
+  return((kappa_tr+kappa_int)*418.4); // cal/cm-s-K to W/m-K
+}
+
+
+
+
+// Eq(49) : 5-temperature model, thermal non-equilibirum
+double _kappa_from_rhok_T_Te_METHOD4(spec_t rhok, double T, double Te){
+  long spec,i,j;
+  spec_t chik,  Ai, M;
+  spec2_t Delta1,Delta2;
+  double N, den, kappa_tr, kappa_int;
+  double asr,kappa_e,kappa_vib,epc;
+  double Delta1ie[ns],Delta2ie[ns];
+  spec2_t aij;
+  epc=_epc(rhok[speceminus], Te);
+  find_aij_Ai_Delta1_Delta2(rhok, T, epc, aij, Ai, Delta1, Delta2);
+  for (spec=0; spec<ns; spec++) M[spec]=_calM(spec)*1000.0; // g/g-mole
+  
+  N=0.0;
+  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
+  for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
+
+  kappa_tr     = 0.0e0;
+  kappa_int    = 0.0e0;
+
+  /*kappa_int=kappa_rot+kappa_vib+kappa_el*/
+  den=0.0;
+  for (i=0; i<ns; i++){
+    for (j=0; j<ns; j++){
+      den+=chik[j]*Delta1[i][j];
+    }
+    kappa_int+=(_cpk_from_T_GUPTAYOS(i,T)/Runiv-2.5)*chik[i]/den;
     den=0.0;
   }
   kappa_int*=2.3901E-8*kBol;
   
-#if _KAPPATR_METHOD==4 // Eq(49) : 5-temperature model, thermal non-equilibirum
-  double asr,kappa_e,kappa_vib;
-  double Delta1ie[ns],Delta2ie[ns];
-#if _ELECTRON_PRESSURE_CORRECTION==TRUE
-  epc_T = 0.5*log(2.09E-2*1E-12*Tebound*Tebound*Tebound*Tebound/Pe+1.52*pow(Tebound*Tebound*Tebound*Tebound*1E-12/Pe,2.0/3.0));
-#else
-  epc_T=1.0;
-#endif
-  
   for (i=0; i<ns; i++){
     j=speceminus;
-    Delta1ie[i]=collision_integral_curvefit11(i,j,Tebound)*(8.0e0/3.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*Tebound*(M[i] + M[j])))*1.546e-20;
-    Delta2ie[i]=collision_integral_curvefit22(i,j,Tebound)*(0.2*16.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*Tebound*(M[i] + M[j])))*1.546e-20;
-    if(_Charge_number(i)!=0) {Delta1ie[i]*=epc_T;Delta2ie[i]*=epc_T;}
+    Delta1ie[i]=collision_integral_curvefit11(i,j,Te)*(8.0e0/3.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*Te*(M[i] + M[j])))*1.546e-20;
+    Delta2ie[i]=collision_integral_curvefit22(i,j,Te)*(0.2*16.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*Te*(M[i] + M[j])))*1.546e-20;
+    if(_Charge_number(i)!=0) {Delta1ie[i]*=epc;Delta2ie[i]*=epc;}
   }
   den=0.0;
   kappa_tr=0.0;
@@ -959,14 +1089,38 @@ double _kappa_from_rhok_T_Te(spec_t rhok, double T, double Te){
       den+=1.45*chik[j]*Delta2[speceminus][j]+chik[speceminus]*Delta2ie[speceminus];
     }
   }
-  kappa_e=2.3901E-8*kBol*chik[i]/den;
+  kappa_e=2.3901E-8*kBol*chik[speceminus]/den;
   kappa_int=kappa_vib+kappa_e; //just for calculation purposes
-  
-#endif
-  
   
   return((kappa_tr+kappa_int)*418.4); // cal/cm-s-K to W/m-K
 }
+
+
+
+double _kappa_from_rhok_T_Te(spec_t rhok, double T, double Te){
+  double kappa;
+  switch (METHOD){
+    case (METHOD1):
+      kappa=_kappa_from_rhok_T_Te_METHOD1(rhok, T, Te);
+    break;
+    case (METHOD2):
+      kappa=_kappa_from_rhok_T_Te_METHOD2(rhok, T, Te);
+    break;
+    case (METHOD3):
+      kappa=_kappa_from_rhok_T_Te_METHOD3(rhok, T, Te);
+    break;
+    case (METHOD4):
+      kappa=_kappa_from_rhok_T_Te_METHOD4(rhok, T, Te);
+    break;
+    default:
+      fatal_error("METHOD can not be set to %ld",METHOD);
+  }
+  return(kappa);
+}
+
+
+
+
 
 double _kappan_from_rhok_T_Te(spec_t rhok, double T, double Te){
   return(1.0);
@@ -986,73 +1140,38 @@ void find_nuk_from_rhok_T_Te(spec_t rhok, double T, double Te, spec_t nuk){
 
 }
 
-double _muk_from_rhok_Tk_Ek(spec_t rhok, double T, double Te, double Ek, long k){
-  double den,num,kappak,muk;
-  long spec,i,j,l;
-  spec_t chik, M, Ai;
-  double N, Pe,  epc_T;
-  double Tkbound,Tebound,Bstar;
-  double aij[ns][ns],Bij[ns][ns],Delta1[ns][ns],Delta2[ns][ns];
-  if (smap[k]==SMAP_eminus) {
-    Tkbound=min(max(1000.0,Te),30000.0);
-  } else {
-    Tkbound=min(max(1000.0,T),30000.0);    
-  }
-  Tebound=min(max(1000.0,Te),30000.0);
+double _muk_from_rhok_T_Te_Ek(spec_t rhok, double T, double Te, double Ek, long k){
+  long spec,i,j;
+  spec_t chik,  Ai;
+  spec2_t Delta1,Delta2;
+  double N, den, kappak,Tk;
+  double num,aav,muk,cpk;
+  spec2_t aij;
+
+  if (k==speceminus) Tk=Te; else Tk=T;
+  find_aij_Ai_Delta1_Delta2(rhok, Tk, _epc(rhok[speceminus], Te), aij, Ai, Delta1, Delta2);
   
   N=0.0;
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
-  for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
-  for (spec=0; spec<ns; spec++) M[spec]=_calM(spec)*1000.0; // g/g-mole
-  
-
-  Pe = rhok[speceminus]*calR*Tebound/_calM(speceminus)/101325.0e0; //electron pressure, atm
-  /*electron pressure correction for the collision integrals of ionic species*/ /*Eq(24b)*/
-#if _ELECTRON_PRESSURE_CORRECTION==TRUE
-  // Gupta-Yos
-  epc_T=0.5*log(2.09E-2*1E-12*Tebound*Tebound*Tebound*Tebound/Pe+1.52*pow(Tebound*Tebound*Tebound*Tebound*1E-12/Pe,2.0/3.0));
-  // Raizer Gas Discharge Physics, page 14
-  epc_T=13.57+1.5*log(Te/11600.0)/log(10.0)-0.5*log(rhok[speceminus]/_m(speceminus)/1e6)/log(10.0);
-  // NRL Plasma Formulary, page 34
-  epc_T=23.0-log(sqrt(rhok[speceminus]/_m(speceminus)/1e6)*pow(Tebound/11600.0,-1.5));
-#else
-  epc_T=1.0;
-#endif
-  
-
+  for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N; 
+  num=0.0;
+  den=0.0;
   for (i=0; i<ns; i++){
     for (j=0; j<ns; j++){
-      Delta1[i][j]=collision_integral_curvefit11(i,j,Tkbound)*(8.0e0/3.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*Tkbound*(M[i] + M[j])))*1.546e-20; // 1e-20 m^2 = 1 Angstrom^2
-      Delta2[i][j]=collision_integral_curvefit22(i,j,Tkbound)*(0.2*16.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*Tkbound*(M[i] + M[j])))*1.546e-20;
-      if(_Charge_number(i)!=0 && _Charge_number(j)!=0) {Delta1[i][j]*=epc_T; Delta2[i][j]*=epc_T;}
-      
-      Bstar=collision_crosssection_ratio(i,j,Tkbound);
-      aij[i][j]=4.184E7*2.0*M[i]*M[j]*((0.5*33.0-0.2*18.0*Bstar)*Delta1[i][j]-4.0*Delta2[i][j])/(15.0*kBol*(M[i]+M[j])*(M[i]+M[j]));
-      Bij[i][j]=4.184E7*2.0*(8.0*M[i]*M[j]*Delta2[i][j]+(M[i]-M[j])*(9.0*M[i]-7.5*M[j]+3.6*Bstar*M[j])*Delta1[i][j])/(15.0*kBol*(M[i]+M[j])*(M[i]+M[j]));
-    }
-  }
-  for (i=0; i<ns; i++){
-    Ai[i]=0.0;
-  }
-  for (i=0; i<ns; i++){
-    for (l=0; l<ns; l++){
-      Ai[i]+=chik[l]*Bij[i][l];
-    }
-  }
-
-  den=0.0;
-  num=0.0;
-  for (j=0; j<ns; j++){
-    for (i=0; i<ns; i++){
+      num+=chik[i]*chik[j]*(1.0/Ai[i]-1.0/Ai[j])*(1.0/Ai[i]-1.0/Ai[j])*aij[i][j];
       den+=num/aij[i][j];
     }
-    num+=chik[k]*chik[j]*(1.0/Ai[k]-1.0/Ai[j])*(1.0/Ai[k]-1.0/Ai[j])*aij[k][j];
   }
-  kappak=num/(1.0-num/den*chik[k]/(Ai[k]+num/den));
-  muk=kappak;
-  if (k==speceminus){
-     printf("\n\nkappae=%E\n",kappak);
+  aav=num/den;
+  num=0.0;
+  for (i=0; i<ns; i++){
+    num+=chik[i]/(Ai[i]+aav);
   }
+  
+  kappak=chik[k]/(Ai[k]+aav)/(1.0-aav*num)*418.4;
+  cpk=_cpk_from_T_equilibrium(k,Tk);
+  muk=kappak/(cpk*rhok[k]*kB*Tk)*fabs(_C(k));
+  
   return(muk);
 }
 

@@ -41,7 +41,7 @@ void find_nuk_eta_kappa(spec_t rhok, double T, double Te,
 double _kappac_from_rhok_Tk_Ek(spec_t rhok, double T, double Te, double E, long k){
   double mu,kappa,cp,Tk;
   if (k>=ncs) fatal_error("_kappac_from_rhok_Tk_Ek can only be used for charged species, not for species %ld.",k);
-  mu=_muk_from_rhok_Tk_Ek(rhok, T, Te, E, k);
+  mu=_muk_from_rhok_T_Te_Ek(rhok, T, Te, E, k);
   if (smap[k]==SMAP_eminus) {
     Tk=Te;
   } else {

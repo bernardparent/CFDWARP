@@ -960,12 +960,12 @@ void test_dmuk ( np_t * np, gl_t * gl, long l ) {
       Ekmag=EXM_vector_magnitude(Ek);
       find_dmuk_from_rhok_Tk_Ek(rhok, T, Ekmag, spec, &dmukdTk, dmukdrhok);
       if (spec2==-1) {
-        dmukdTk_numerical=_muk_from_rhok_Tk_Ek(rhok, T+1.0, Te, Ekmag, spec)-_muk_from_rhok_Tk_Ek(rhok, T, Te, Ekmag, spec);
+        dmukdTk_numerical=_muk_from_rhok_T_Te_Ek(rhok, T+1.0, Te, Ekmag, spec)-_muk_from_rhok_T_Te_Ek(rhok, T, Te, Ekmag, spec);
         printf("%E  %E \n",dmukdTk,dmukdTk_numerical);
       } else {
         for (spec3=0; spec3<ns; spec3++) rhok2[spec3]=rhok[spec3];
         rhok2[spec2]*=1.0001;
-        dmukdrhok_numerical=(_muk_from_rhok_Tk_Ek(rhok2, T, Te, Ekmag, spec)-_muk_from_rhok_Tk_Ek(rhok, T, Te, Ekmag, spec))/(0.0001*rhok2[spec2]);
+        dmukdrhok_numerical=(_muk_from_rhok_T_Te_Ek(rhok2, T, Te, Ekmag, spec)-_muk_from_rhok_T_Te_Ek(rhok, T, Te, Ekmag, spec))/(0.0001*rhok2[spec2]);
         printf("%E  %E \n",dmukdrhok[spec2],dmukdrhok_numerical);
       
       }
