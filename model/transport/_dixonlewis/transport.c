@@ -581,10 +581,10 @@ void find_nuk_from_rhok_T_Te(spec_t rhok, double T, double Te, spec_t nuk){
    * such will not be used by the fluid modules when solving the drift-diffusion model
    */
       case SPECIES_IONPLUS:
-        nuk[k]=_muk_from_rhok_Tk_Ek(rhok, T,  0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
+        nuk[k]=_muk_from_rhok_Tk_Ek(rhok, T, Te, 0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
       break;
       case SPECIES_IONMINUS:
-        nuk[k]=_muk_from_rhok_Tk_Ek(rhok, T,  0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
+        nuk[k]=_muk_from_rhok_Tk_Ek(rhok, T, Te, 0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
       break;
       case SPECIES_ELECTRON:
         nuk[k]=0.0;
@@ -646,7 +646,7 @@ static double _mui_from_Nn_Ni_Ti(double Nn, double Ni, double A, double Ti, doub
    
   H2+, Cs+, N+, O+, O- are approximated using Fig. 8 in THE MOBILITIES OF SMALL IONS THE ATMOSPHERE AND THEIR RELATIONSHIP by E. UNGETHUM, Aerosol Science, 1974, Vol. 5, pp. 25 37. 
 */ 
-double _muk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k){
+double _muk_from_rhok_Tk_Ek(spec_t rhok, double T, double Te, double Ek, long k){
   double mu,Estar,N,Nn,Ni;
   long spec;
   mu=0.0;
@@ -667,30 +667,30 @@ double _muk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k){
 #ifdef speceminus
   if (CHEM_NEUTRAL && k==speceminus){
     /* electrons */
-    mu=_mue_from_Nn_Ni_Te(Nn,Ni,Tk);
+    mu=_mue_from_Nn_Ni_Te(Nn,Ni,Te);
   } else {
 #endif
     switch (smap[k]){
       case SMAP_eminus:
-        mu=_mue_from_Nn_Ni_Te(Nn,Ni,Tk);
+        mu=_mue_from_Nn_Ni_Te(Nn,Ni,Te);
       break;
       case SMAP_O2plus:  
-        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 1.18e23, Tk, -0.5, 3.61E12, Estar, -0.5,  _m(k));
+        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 1.18e23, T, -0.5, 3.61E12, Estar, -0.5,  _m(k));
       break;
       case SMAP_N2plus:
-        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 0.75e23, Tk, -0.5, 2.03E12, Estar, -0.5,  _m(k));
+        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 0.75e23, T, -0.5, 2.03E12, Estar, -0.5,  _m(k));
       break;
       case SMAP_O2minus:
-        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 0.97e23, Tk, -0.5, 3.56e19, Estar, -0.1,  _m(k));
+        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 0.97e23, T, -0.5, 3.56e19, Estar, -0.1,  _m(k));
       break;
       case SMAP_Ominus:
-        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 1.4*0.97e23, Tk, -0.5, 1.4*3.56e19, Estar, -0.1,  _m(k));
+        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 1.4*0.97e23, T, -0.5, 1.4*3.56e19, Estar, -0.1,  _m(k));
       break;
       case SMAP_NOplus:
-        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 1.62e23, Tk, -0.5, 4.47e12, Estar, -0.5,  _m(k));
+        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 1.62e23, T, -0.5, 4.47e12, Estar, -0.5,  _m(k));
       break;
       default:
-        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 2.2e10/sqrt(_m(k)), Tk, -0.5, 0.55/sqrt(_m(k)), Estar, -0.5,  _m(k));
+        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 2.2e10/sqrt(_m(k)), T, -0.5, 0.55/sqrt(_m(k)), Estar, -0.5,  _m(k));
     }
 #ifdef speceminus
   }

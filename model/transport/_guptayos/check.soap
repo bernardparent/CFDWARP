@@ -1,0 +1,18 @@
+#!/usr/local/bin/soap
+Ne=2.45e20;
+kB=1.38e-23;
+Te=15000;
+
+{Gas Discharge Physics, Raizer, page 14}
+lnLambda1=13.57+1.5*ln(Te/11600)/ln(10)-0.5*ln(Ne/1e6)/ln(10); 
+
+{NRL plasma formulary page 34}
+lnLambda2=23.0-ln(sqrt(Ne/1e6)*(Te/11600)^(-1.5)); 
+
+{Gupta-Yos paper}
+Pe=Ne*kB*Te/101300;
+lnLambda3=0.5*ln(2.09E-2*(Te/1000/Pe^0.25)^4+1.52*(Te/1000/Pe^0.25)^(8/3));
+
+printf("lnLambda1=%E\n",lnLambda1);
+printf("lnLambda2=%E\n",lnLambda2);
+printf("lnLambda3=%E\n",lnLambda3);

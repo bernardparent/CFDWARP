@@ -6,6 +6,26 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2022 APR 19a
+  * in model/emfield/_Epotential*/emfield.c
+    - changed the calls to _muk_from_rhok_Tk_Ek() to include both T and Te within the parameters
+  * in model/fluid/_*_plasma/fluid.c
+    - changed calls to _kappac_from_rhok_Tk_Ek() and _etac_from_rhok_Tk_Ek() to include both T and Te
+      within the parameters
+  * in model/fluid/_*_plasma/fluid_plasma.c and model/fluid/_*_plasma/fluid_post.c
+    and model/fluid/_*_plasma/fluid_source.c
+    - changed call to _muk_from_rhok_Tk_Ek() to include both T and Te
+  * in model/share/transport_share.c
+    - changed call to _muk_from_rhok_Tk_Ek(), _kappac_from_rhok_Tk_Ek() to include both T and Te 
+  * in model/transport/_dixonlewis/transport.c
+    - changed call to _muk_from_rhok_Tk_Ek() to include both T and Te
+  * in src/test.c
+    - changed the call to _muk_from_rhok_Tk_Ek() to include both T and Te
+  * in model/transport
+    - renamed _gnoffo to _guptayos
+  * in model/transport/_guptayos/transport.c
+    - made various improvements
+    
 
 2022 MAR 16a
   * in model/transport/_dixonlewis/transport.c and model/transport/doc/report.tex

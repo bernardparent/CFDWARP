@@ -38,26 +38,36 @@ void find_nuk_eta_kappa(spec_t rhok, double T, double Te,
 
 
 // find the scalar thermal conductivity of the kth charged species
-double _kappac_from_rhok_Tk_Ek(spec_t rhok, double T, double E, long k){
-  double mu,kappa,cp;
+double _kappac_from_rhok_Tk_Ek(spec_t rhok, double T, double Te, double E, long k){
+  double mu,kappa,cp,Tk;
   if (k>=ncs) fatal_error("_kappac_from_rhok_Tk_Ek can only be used for charged species, not for species %ld.",k);
-  mu=_muk_from_rhok_Tk_Ek(rhok, T, E, k);
-  cp=_cpk_from_T_equilibrium(k,T);
+  mu=_muk_from_rhok_Tk_Ek(rhok, T, Te, E, k);
+  if (smap[k]==SMAP_eminus) {
+    Tk=Te;
+  } else {
+    Tk=T;
+  }
+  cp=_cpk_from_T_equilibrium(k,Tk);
   //cp=5.0/2.0*kB/_m(k);
-  kappa=cp*rhok[k]*kB*T*mu/fabs(_C(k));
+  kappa=cp*rhok[k]*kB*Tk*mu/fabs(_C(k));
   return(kappa);
 }
 
 
 // find the scalar viscosity of the kth charged species
-double _etac_from_rhok_Tk_Ek(spec_t rhok, double T, double E, long k){
-  double kappa,Pr,cp,eta;
+double _etac_from_rhok_Tk_Ek(spec_t rhok, double T, double Te, double E, long k){
+  double kappa,Pr,cp,eta,Tk;
   if (k>=ncs) fatal_error("_etac_from_rhok_Tk_Ek can only be used for charged species, not for species %ld.",k);
-  kappa=_kappac_from_rhok_Tk_Ek(rhok, T, E, k);
+  kappa=_kappac_from_rhok_Tk_Ek(rhok, T, Te, E, k);
   // Pr=cp*eta/kappa
+  if (smap[k]==SMAP_eminus) {
+    Tk=Te;
+  } else {
+    Tk=T;
+  }
 
   if (speciestype[k]==SPECIES_ELECTRON) Pr=0.73; else Pr=0.96;
-  cp=_cpk_from_T_equilibrium(k,T);
+  cp=_cpk_from_T_equilibrium(k,Tk);
   //if (fabs(cp-5.0/2.0*kB/_m(k))/min(cp,5.0/2.0*kB/_m(k))>2.2 && k==specN2plus ) printf("x");
   eta=Pr*kappa/cp;
   return(eta);
