@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 APR 20b
+  * in model/transport
+    - changed the default config to dixonlewis from guptayos
+    
+  
 2022 APR 20a
   * in model/transport/_guptayos/transport.c
     - made various improvements
