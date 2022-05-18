@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   typedef GRIDG_gl3d_t glgrid_t;
 #endif
 
-#define numbib 49
+#define numbib 52
 #define maxstrlen 10000
 
 typedef char longstr_t[maxstrlen];
@@ -102,7 +102,10 @@ const static longstr_t bibname[numbib]=
    "farbar2013a",
    "parent2007a",
    "kim2021a",
-   "parent2022a"
+   "parent2022a",
+   "dixonlewis1984a",
+   "gupta1990a",
+   "capitelli2015a"
   };
 
 const static longstr_t bib[numbib]=
@@ -251,7 +254,16 @@ const static longstr_t bib[numbib]=
    "Kim, Jae Gang, and Sung Min Jo. \"Modification of chemical-kinetic parameters for 11-air species in re-entry flows.\" International Journal of Heat and Mass Transfer 169:120950, 2021.",
 
    //parent2022a 
-   "Parent, B. and Thoguluva Rajendran, P. and Omprakas, A.. \"Electron Losses in Hypersonic Flows.\" Physics of Fluids 34:016110, 2022."
+   "Parent, B. and Thoguluva Rajendran, P. and Omprakas, A.. \"Electron Losses in Hypersonic Flows.\" Physics of Fluids 34:016110, 2022.",
+   
+   //dixonlewis1984a
+   "Dixon-Lewis, G., \"Computer Modelling of Combustor Reactions\", Springer Verlag, 1984.",
+
+   //gupta1990a
+   "Gupta, RN, Yos, JM, Thompson, RA. and Lee, KP, \"A review of reaction rates and thermodynamic and transport properties for an 11-species air model for chemical and thermal nonequilibrium calculations to 30000 K\", NASA Reference Publication 1232, 1990.",
+   
+   //capitelli2015a
+   "Capitelli, M. and Bruno, D. and Larrichiuta, A. \"Fundamental Aspects of Plasma Chemical Physics, Transport\", Springer, 2015",
   };
 
 
@@ -469,6 +481,7 @@ void write_modules(FILE *outputfile){
   write_modules_row(outputfile,"Fluid Model",replace_cites(_FLUID_METHOD,cite),linewidth);
 #ifdef _FLUID_MULTISPECIES
   write_modules_row(outputfile,"Thermodynamic Model",replace_cites(_THERMO_METHOD,cite),linewidth);
+  write_modules_row(outputfile,"Transport Model",replace_cites(_TRANSPORT_METHOD,cite),linewidth);
 #else
   write_modules_row(outputfile,"Thermodynamic Model","Perfect Gas",linewidth);
 #endif

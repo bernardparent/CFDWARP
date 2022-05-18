@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
 Copyright 2022 Prasanna Thoguluva Rajendran
-Copyright 2022 Felipe Martin Rodriguez Fuentes
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -28,10 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* 
  * Refs.
 
-  Gupta, R. N., Yos, J. M., Thompson, R. A., and Lee, K., “A Review of
-Reaction Rates and Thermodynamic and Transport Properties for an 11-
-Species Air Model for Chemical and Thermal Nonequilibrium
-Calculations to 30000 K,” NASA RP-1232, 1990.
+  Capitelli, M. and Bruno, D. and Larrichiuta, A. "Fundamental Aspects of Plasma Chemical Physics, Transport", Springer, 2015
 
  * */
 

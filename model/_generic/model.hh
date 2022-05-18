@@ -2,6 +2,7 @@
 #define _MODEL_GENERIC
 
 #include <model/thermo/.active/thermo.hh>
+#include <model/transport/.active/transport.hh>
 #include <model/chem/.active/chem.hh>
 #include <model/fluid/.active/fluid.hh>
 #include <model/metrics/.active/metrics.hh>

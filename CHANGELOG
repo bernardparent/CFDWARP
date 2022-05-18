@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 MAY 18a
+  * in model/transport
+    - added _capitelli
+  * in src/control.c
+    - added capitelli2015a, dixonlewis1884a, and gupta1990a to the list of bibs
+  * in src/control.c
+    - in write_modules(), added a line for the transport method
+  * in model/transport/*
+    - added transport.hh
+  * in model/_generic/model.hh
+    - added #include <model/transport/.active/transport.hh>
+    
+
 2022 APR 20b
   * in model/transport
     - changed the default config to dixonlewis from guptayos
