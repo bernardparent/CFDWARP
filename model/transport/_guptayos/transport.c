@@ -1313,7 +1313,7 @@ void find_nuk_from_rhok_T_Te(spec_t rhok, double T, double Te, spec_t nuk){
     }
     nuk[k]=rho*(1.0-chik[k])/(sum+1.0e-20);
   }
-  //adjust_nuk_using_mobilities(rhok, T, Te, nuk);
+  adjust_nuk_using_mobilities(rhok, T, Te, nuk);
 }
 
 double _muk_from_rhok_T_Te_Ek(spec_t rhok, double T, double Te, double Ek, long k){

@@ -668,6 +668,7 @@ Cycle(
       CFLmax=4.0;
     );
     CFL=min(CFL*1.03,CFLmax);
+    system("date");
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     if (EMFIELD,
       if (iter<2000,

@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 MAY 25b
+  * in model/transport/_guptayos/transport.c
+    - in find_nuk_from_rhok_T_Te(), added adjust_nuk_using_mobilities(rhok, T, Te, nuk);
+  
+
 2022 MAY 25a
   * in model/fluid/_Navier-Stokes_plasma/fluid_plasma.c
     - in find_Dstar_interface(), removed assert(NeL>0.0); and assert(NeR>0.0);
