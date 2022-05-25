@@ -1,4 +1,4 @@
-#define _THERMO_METHOD "NASA Glenn Polynomials [mcbride2002a], Dixon-Lewis transport coefficients, Gnoffo transport coefficients."
+#define _THERMO_METHOD "NASA Glenn Polynomials [mcbride2002a]."
 #define _THERMO_GENERIC
 
 #define THERMO_P_REF 100000.0

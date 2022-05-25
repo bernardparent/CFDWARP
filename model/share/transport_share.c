@@ -28,13 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/thermo/_thermo.h>
 
 
-void find_nuk_eta_kappa(spec_t rhok, double T, double Te,
-                   spec_t nuk, double *eta, double *kappa){
-  
-  *eta=_eta_from_rhok_T_Te(rhok,T,Te);
-  *kappa=_kappa_from_rhok_T_Te(rhok, T, Te);
-  find_nuk_from_rhok_T_Te(rhok, T, Te, nuk);  
-}
 
 
 // find the scalar thermal conductivity of the kth charged species
@@ -74,3 +67,72 @@ double _etac_from_rhok_Tk_Ek(spec_t rhok, double T, double Te, double E, long k)
 }
 
 
+void adjust_nuk_using_mobilities(spec_t rhok, double T, double Te, spec_t nuk){
+  long spec,k;
+  spec_t w;
+  double rho;
+  double nuwsum,wsum;
+
+  rho=0.0;
+  for (spec=0; spec<ns; spec++) rho+=rhok[spec];
+  for (spec=0; spec<ns; spec++) w[spec]=rhok[spec]/rho;
+  
+  
+  for (k=0; k<ns; k++){
+    switch (speciestype[k]){
+      case SPECIES_IONPLUS:
+        nuk[k]=_muk_from_rhok_T_Te_Ek(rhok, T, Te, 0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
+      break;
+      case SPECIES_IONMINUS:
+        nuk[k]=_muk_from_rhok_T_Te_Ek(rhok, T, Te, 0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
+      break;
+    }
+  }
+  
+#ifdef speceminus
+  nuwsum=0.0;
+  wsum=0.0;
+  for (k=0; k<ncs; k++){
+    if (speciestype[k]==SPECIES_IONPLUS || speciestype[k]==SPECIES_IONMINUS){
+      nuwsum+=nuk[k]*max(1.0e-30,w[k]); 
+      wsum+=max(1.0e-30,w[k]);
+    }
+  }
+  nuk[speceminus]=nuwsum/(1.0e-99+wsum);
+#endif
+
+}
+
+
+
+void adjust_muk_for_Ek_effect(long k, double Ek, double N, double *muk){
+  double B,p;
+  if (speciestype[k]==SPECIES_IONPLUS || speciestype[k]==SPECIES_IONMINUS){
+    switch (smap[k]){
+      case SMAP_O2plus:  
+        B=3.61E12;
+        p=-0.5;
+      break;
+      case SMAP_N2plus:
+        B=2.03E12;
+        p=-0.5;
+      break;
+      case SMAP_O2minus:
+        B=3.56e19;
+        p=-0.1;
+      break;
+      case SMAP_Ominus:
+        B=1.4*3.56e19;
+        p=-0.1;
+      break;
+      case SMAP_NOplus:
+        B=4.47e12;
+        p=-0.5;
+      break;
+      default:
+        B=0.55/sqrt(_m(k));
+        p=-0.5;
+    }
+    *muk=min(*muk,B*pow(Ek/N,p)/N);
+  }
+}

@@ -525,7 +525,6 @@ void find_nuk_from_rhok_T_Te(spec_t rhok, double T, double Te, spec_t nuk){
   double P,rho;
   double chisum,sum;
   double calD[ns][ns];
-  double nuwsum,wsum;
 
   rho=0.0;
   for (spec=0; spec<ns; spec++) rho+=rhok[spec];
@@ -564,51 +563,18 @@ void find_nuk_from_rhok_T_Te(spec_t rhok, double T, double Te, spec_t nuk){
   
   
   for (k=0; k<ns; k++){
-    switch (speciestype[k]){
-      case SPECIES_NEUTRAL:
-        sum=0.0e0;
-        for (l=0; l<ns; l++){
-          if (l!=k && (speciestype[l]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_NU)) { 
-            assert(calD[k][l]!=0.0e0);
-            sum=sum+chik[l]/calD[k][l];
-          }
-        }
-        assert((sum+1.0E-20)!=0.0e0);
-        nuk[k]=rho*(1.0e0-chik[k])/(sum+1.0E-20);
-      break; 
-  /* now set the diffusion coefficients of the ions
-   * such will only be used when solving a quasi-neutral plasma
-   * such will not be used by the fluid modules when solving the drift-diffusion model
-   */
-      case SPECIES_IONPLUS:
-        nuk[k]=_muk_from_rhok_T_Te_Ek(rhok, T, Te, 0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
-      break;
-      case SPECIES_IONMINUS:
-        nuk[k]=_muk_from_rhok_T_Te_Ek(rhok, T, Te, 0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
-      break;
-      case SPECIES_ELECTRON:
-        nuk[k]=0.0;
-      break;
-      default:
-        fatal_error("Problem with speciestype in find_nuk_eta_kappa().");
+    sum=0.0e0;
+    for (l=0; l<ns; l++){
+      if (l!=k && (speciestype[l]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_NU)) { 
+        assert(calD[k][l]!=0.0e0);
+        sum=sum+chik[l]/calD[k][l];
+      }
     }
+    assert((sum+1.0E-20)!=0.0e0);
+    nuk[k]=rho*(1.0e0-chik[k])/(sum+1.0E-20);
   }
   
-#ifdef speceminus
-  /* now set the ambipolar diffusion coefficient of the electrons from the ions diffusion coefficient
-   * such will only be used when solving a quasi-neutral plasma
-   * such will not be used by the fluid modules when solving the drift-diffusion model
-   */
-  nuwsum=0.0;
-  wsum=0.0;
-  for (k=0; k<ncs; k++){
-    if (speciestype[k]==SPECIES_IONPLUS || speciestype[k]==SPECIES_IONMINUS){
-      nuwsum+=nuk[k]*max(1.0e-30,w[k]); 
-      wsum+=max(1.0e-30,w[k]);
-    }
-  }
-  nuk[speceminus]=nuwsum/(1.0e-99+wsum);
-#endif
+  adjust_nuk_using_mobilities(rhok, T, Te, nuk);
 
 }
 
@@ -834,4 +800,11 @@ void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double
 
 }
 
+void find_nuk_eta_kappa(spec_t rhok, double T, double Te,
+                   spec_t nuk, double *eta, double *kappa){
+  
+  *eta=_eta_from_rhok_T_Te(rhok,T,Te);
+  *kappa=_kappa_from_rhok_T_Te(rhok, T, Te);
+  find_nuk_from_rhok_T_Te(rhok, T, Te, nuk);  
+}
 

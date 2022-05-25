@@ -818,7 +818,29 @@ static double _epc(double rhoe, double Te){
 }
 
 
-static void find_aij_Ai_Delta1_Delta2(spec_t rhok, double T, double epc, spec2_t aij, spec_t Ai, spec2_t Delta1, spec2_t Delta2){
+static void find_Delta1_Delta2(spec_t rhok, double T, double epc, spec2_t Delta1, spec2_t Delta2){
+  double N;
+  long spec,i,j;
+  spec_t M;
+  
+  N=0.0;
+  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
+  for (spec=0; spec<ns; spec++) M[spec]=_calM(spec)*1000.0; // g/g-mole
+
+  for (i=0; i<ns; i++){
+    for (j=0; j<ns; j++){
+      Delta1[i][j]=collision_integral_curvefit11(i,j,T)*(8.0e0/3.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*T*(M[i] + M[j])))*1.546e-20; // 1e-20 m^2 = 1 Angstrom^2
+      Delta2[i][j]=collision_integral_curvefit22(i,j,T)*(0.2*16.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*T*(M[i] + M[j])))*1.546e-20;
+      if(_Charge_number(i)!=0 && _Charge_number(j)!=0) {
+        Delta1[i][j]*=epc; 
+        Delta2[i][j]*=epc;
+      }
+    }
+  }
+}
+
+
+static void find_aij_Ai_for_kappa(spec_t rhok, double T, spec2_t Delta1, spec2_t Delta2, spec2_t aij, spec_t Ai){
   double N,Bstar;
   long spec,i,j,l;
   spec2_t Bij;
@@ -830,11 +852,7 @@ static void find_aij_Ai_Delta1_Delta2(spec_t rhok, double T, double epc, spec2_t
   for (spec=0; spec<ns; spec++) M[spec]=_calM(spec)*1000.0; // g/g-mole
 
   for (i=0; i<ns; i++){
-    for (j=0; j<ns; j++){
-      Delta1[i][j]=collision_integral_curvefit11(i,j,T)*(8.0e0/3.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*T*(M[i] + M[j])))*1.546e-20; // 1e-20 m^2 = 1 Angstrom^2
-      Delta2[i][j]=collision_integral_curvefit22(i,j,T)*(0.2*16.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*T*(M[i] + M[j])))*1.546e-20;
-      if(_Charge_number(i)!=0 && _Charge_number(j)!=0) {Delta1[i][j]*=epc; Delta2[i][j]*=epc;}
-      
+    for (j=0; j<ns; j++){      
       Bstar=collision_crosssection_ratio(i,j,T);
       aij[i][j]=4.184E7*2.0*M[i]*M[j]*((0.5*33.0-0.2*18.0*Bstar)*Delta1[i][j]-4.0*Delta2[i][j])/(15.0*kBol*(M[i]+M[j])*(M[i]+M[j]));
       Bij[i][j]=4.184E7*2.0*(8.0*M[i]*M[j]*Delta2[i][j]+(M[i]-M[j])*(9.0*M[i]-7.5*M[j]+3.6*Bstar*M[j])*Delta1[i][j])/(15.0*kBol*(M[i]+M[j])*(M[i]+M[j]));
@@ -850,6 +868,8 @@ static void find_aij_Ai_Delta1_Delta2(spec_t rhok, double T, double epc, spec2_t
 }
 
 
+
+
 // Eq(30), approximation to method 1, yields results close to method 1 for air mixture
 double _kappa_from_rhok_T_Te_METHOD2(spec_t rhok, double T, double Te){
   long spec,i,j;
@@ -859,7 +879,8 @@ double _kappa_from_rhok_T_Te_METHOD2(spec_t rhok, double T, double Te){
   double num,aav;
   spec2_t aij;
 
-  find_aij_Ai_Delta1_Delta2(rhok, T, _epc(rhok[speceminus], Te), aij, Ai, Delta1, Delta2);
+  find_Delta1_Delta2(rhok,T,_epc(rhok[speceminus], Te),Delta1,Delta2);
+  find_aij_Ai_for_kappa(rhok, T, Delta1, Delta2, aij, Ai);
   
   N=0.0;
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
@@ -873,7 +894,7 @@ double _kappa_from_rhok_T_Te_METHOD2(spec_t rhok, double T, double Te){
   for (i=0; i<ns; i++){
     for (j=0; j<ns; j++){
       num+=chik[i]*chik[j]*(1.0/Ai[i]-1.0/Ai[j])*(1.0/Ai[i]-1.0/Ai[j])*aij[i][j];
-      den+=num/aij[i][j];
+      den+=chik[i]*chik[j]*(1.0/Ai[i]-1.0/Ai[j])*(1.0/Ai[i]-1.0/Ai[j]);
     }
   }
   aav=num/den;
@@ -913,7 +934,8 @@ double _kappa_from_rhok_T_Te_METHOD1(spec_t rhok, double T, double Te){
   double tmp3=0.0;
   spec2_t aij;
 
-  find_aij_Ai_Delta1_Delta2(rhok, T, _epc(rhok[speceminus], Te), aij, Ai, Delta1, Delta2);
+  find_Delta1_Delta2(rhok,T,_epc(rhok[speceminus], Te),Delta1,Delta2);
+  find_aij_Ai_for_kappa(rhok, T, Delta1, Delta2, aij, Ai);
   
   N=0.0;
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
@@ -973,7 +995,8 @@ double _kappa_from_rhok_T_Te_METHOD3(spec_t rhok, double T, double Te){
   double asr;
   spec2_t aij;
 
-  find_aij_Ai_Delta1_Delta2(rhok, T, _epc(rhok[speceminus], Te), aij, Ai, Delta1, Delta2);
+  find_Delta1_Delta2(rhok,T,_epc(rhok[speceminus], Te),Delta1,Delta2);
+  find_aij_Ai_for_kappa(rhok, T, Delta1, Delta2, aij, Ai);
   
   N=0.0;
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
@@ -1021,7 +1044,9 @@ double _kappa_from_rhok_T_Te_METHOD4(spec_t rhok, double T, double Te){
   double Delta1ie[ns],Delta2ie[ns];
   spec2_t aij;
   epc=_epc(rhok[speceminus], Te);
-  find_aij_Ai_Delta1_Delta2(rhok, T, epc, aij, Ai, Delta1, Delta2);
+  
+  find_Delta1_Delta2(rhok,T,epc,Delta1,Delta2);
+  find_aij_Ai_for_kappa(rhok, T, Delta1, Delta2, aij, Ai);
   for (spec=0; spec<ns; spec++) M[spec]=_calM(spec)*1000.0; // g/g-mole
   
   N=0.0;
@@ -1123,21 +1148,172 @@ double _kappa_from_rhok_T_Te(spec_t rhok, double T, double Te){
 
 
 double _kappan_from_rhok_T_Te(spec_t rhok, double T, double Te){
-  return(1.0);
+  long spec,i,j;
+  spec_t chik,  Ai;
+  spec2_t Delta1,Delta2;
+  double N, den, kappa_tr, kappa_int;
+  double num,aav;
+  spec2_t aij;
+
+  find_Delta1_Delta2(rhok,T,_epc(rhok[speceminus], Te),Delta1,Delta2);
+  find_aij_Ai_for_kappa(rhok, T, Delta1, Delta2, aij, Ai);
+  
+  N=0.0;
+  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
+  for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
+
+  kappa_tr     = 0.0e0;
+  kappa_int    = 0.0e0;
+  num=0.0;
+  den=0.0;
+  
+  for (i=0; i<ns; i++){
+    for (j=0; j<ns; j++){
+      num+=chik[i]*chik[j]*(1.0/Ai[i]-1.0/Ai[j])*(1.0/Ai[i]-1.0/Ai[j])*aij[i][j];
+      den+=chik[i]*chik[j]*(1.0/Ai[i]-1.0/Ai[j])*(1.0/Ai[i]-1.0/Ai[j]);
+    }
+  }
+  aav=num/den;
+  num=0.0;
+  den=0.0;
+  for (i=0; i<ns; i++){
+    if (_Charge_number(i)==0) num+=chik[i]/(Ai[i]+aav);
+    den+=chik[i]/(Ai[i]+aav);
+  }
+  kappa_tr=num/(1.0-aav*den);
+  
+  /*kappa_int=kappa_rot+kappa_vib+kappa_el*/
+  for (i=0; i<ns; i++){
+    if (_Charge_number(i)==0) {
+      den=0.0;
+      for (j=0; j<ns; j++){
+        den+=chik[j]*Delta1[i][j];
+      }
+      kappa_int+=(_cpk_from_T_GUPTAYOS(i,T)/Runiv-2.5)*chik[i]/den;
+    }
+  }
+  kappa_int*=2.3901E-8*kBol;
+  
+  return((kappa_tr+kappa_int)*418.4); // cal/cm-s-K to W/m-K
+
 
 }
 
 double _eta_from_rhok_T_Te(spec_t rhok, double T, double Te){
-  return(1.0);
+  double N,epc,num,den,aav,eta;
+  long spec,i,j,l;
+  spec2_t Delta1,Delta2,aij;
+  spec_t chik,M,Ai;
+  
+  N=0.0;
+  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
+  for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
+  for (spec=0; spec<ns; spec++) M[spec]=_calM(spec)*1000.0; // g/g-mole
+  epc=_epc(rhok[speceminus], Te);
+  find_Delta1_Delta2(rhok,T,epc,Delta1,Delta2);
+  for (i=0; i<ns; i++){
+    for (j=0; j<ns; j++){      
+      aij[i][j]=calA/(M[i]+M[j])*(2.0*Delta1[i][j]-Delta2[i][j]); 
+    }
+  }
+  for (i=0; i<ns; i++){
+    Ai[i]=0.0;
+    for (l=0; l<ns; l++){
+      Ai[i]+=chik[l]*calA/M[i]*Delta2[i][l];
+    }
+  }
 
+  num=0.0;
+  den=0.0;
+  for (i=0; i<ns; i++){
+    for (j=0; j<ns; j++){
+      num+=chik[i]*chik[j]*(1.0/Ai[i]-1.0/Ai[j])*(1.0/Ai[i]-1.0/Ai[j])*aij[i][j];
+      den+=chik[i]*chik[j]*(1.0/Ai[i]-1.0/Ai[j])*(1.0/Ai[i]-1.0/Ai[j]);
+    }
+  }
+  aav=num/den;
+  num=0.0;
+  for (i=0; i<ns; i++){
+    num+=chik[i]/(Ai[i]+aav);
+  }
+  eta=num/(1.0-aav*num);
+
+  return(eta*0.1); // from gcm/s to kgm/s
 }
 
+
 double _etan_from_rhok_T_Te(spec_t rhok, double T, double Te){
-  return(1.0);
+  double N,epc,num,den,aav,eta;
+  long spec,i,j,l;
+  spec2_t Delta1,Delta2,aij;
+  spec_t chik,M,Ai;
+  
+  N=0.0;
+  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
+  for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
+  for (spec=0; spec<ns; spec++) M[spec]=_calM(spec)*1000.0; // g/g-mole
+  epc=_epc(rhok[speceminus], Te);
+  find_Delta1_Delta2(rhok,T,epc,Delta1,Delta2);
+  for (i=0; i<ns; i++){
+    for (j=0; j<ns; j++){      
+      aij[i][j]=calA/(M[i]+M[j])*(2.0*Delta1[i][j]-Delta2[i][j]); 
+    }
+  }
+  for (i=0; i<ns; i++){
+    Ai[i]=0.0;
+    for (l=0; l<ns; l++){
+      Ai[i]+=chik[l]*calA/M[i]*Delta2[i][l];
+    }
+  }
+
+  num=0.0;
+  den=0.0;
+  for (i=0; i<ns; i++){
+    for (j=0; j<ns; j++){
+      num+=chik[i]*chik[j]*(1.0/Ai[i]-1.0/Ai[j])*(1.0/Ai[i]-1.0/Ai[j])*aij[i][j];
+      den+=chik[i]*chik[j]*(1.0/Ai[i]-1.0/Ai[j])*(1.0/Ai[i]-1.0/Ai[j]);
+    }
+  }
+  aav=num/den;
+  num=0.0;
+  den=0.0;
+  for (i=0; i<ns; i++){
+    if (_Charge_number(i)==0)
+      num+=chik[i]/(Ai[i]+aav);
+    den+=chik[i]/(Ai[i]+aav);
+  }
+  eta=num/(1.0-aav*den);
+
+  return(eta*0.1); // from gcm/s to kgm/s
+
 }
 
 void find_nuk_from_rhok_T_Te(spec_t rhok, double T, double Te, spec_t nuk){
-
+  double N,epc,rho,sum;
+  long spec,i,j,k,l;
+  spec2_t Delta1,Delta2,Dij;
+  spec_t chik;
+  
+  N=0.0;
+  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
+  for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
+  epc=_epc(rhok[speceminus], Te);
+  find_Delta1_Delta2(rhok,T,epc,Delta1,Delta2);
+  for (i=0; i<ns; i++){
+    for (j=0; j<ns; j++){ 
+      Dij[i][j]=1.0/(N/1e6*Delta1[i][j])/1e4; //the units for Dij here are m2/s 
+    }
+  }
+  rho=0.0;
+  for (spec=0; spec<ns; spec++) rho+=rhok[spec];
+  for (k=0; k<ns; k++){
+    sum=0.0;
+    for (l=0; l<ns; l++) {
+      if (l!=k) sum+=chik[l]/(Dij[k][l]); 
+    }
+    nuk[k]=rho*(1.0-chik[k])/(sum+1.0e-20);
+  }
+  //adjust_nuk_using_mobilities(rhok, T, Te, nuk);
 }
 
 double _muk_from_rhok_T_Te_Ek(spec_t rhok, double T, double Te, double Ek, long k){
@@ -1149,7 +1325,8 @@ double _muk_from_rhok_T_Te_Ek(spec_t rhok, double T, double Te, double Ek, long 
   spec2_t aij;
 
   if (k==speceminus) Tk=Te; else Tk=T;
-  find_aij_Ai_Delta1_Delta2(rhok, Tk, _epc(rhok[speceminus], Te), aij, Ai, Delta1, Delta2);
+  find_Delta1_Delta2(rhok,Tk,_epc(rhok[speceminus], Te),Delta1,Delta2);
+  find_aij_Ai_for_kappa(rhok, Tk, Delta1, Delta2, aij, Ai);
   
   N=0.0;
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
@@ -1159,7 +1336,7 @@ double _muk_from_rhok_T_Te_Ek(spec_t rhok, double T, double Te, double Ek, long 
   for (i=0; i<ns; i++){
     for (j=0; j<ns; j++){
       num+=chik[i]*chik[j]*(1.0/Ai[i]-1.0/Ai[j])*(1.0/Ai[i]-1.0/Ai[j])*aij[i][j];
-      den+=num/aij[i][j];
+      den+=chik[i]*chik[j]*(1.0/Ai[i]-1.0/Ai[j])*(1.0/Ai[i]-1.0/Ai[j]);
     }
   }
   aav=num/den;
@@ -1172,7 +1349,7 @@ double _muk_from_rhok_T_Te_Ek(spec_t rhok, double T, double Te, double Ek, long 
 
   cpk=_cpk_from_T_equilibrium(k,Tk);
   muk=kappak/(cpk*rhok[k]*kB*Tk)*fabs(_C(k));
-  
+  adjust_muk_for_Ek_effect(k, Ek, N, &muk);  
   return(muk);
 }
 
@@ -1184,4 +1361,11 @@ void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double
 }
 
 
+void find_nuk_eta_kappa(spec_t rhok, double T, double Te,
+                   spec_t nuk, double *eta, double *kappa){
+  
+  *eta=_eta_from_rhok_T_Te(rhok,T,Te);
+  *kappa=_kappa_from_rhok_T_Te(rhok, T, Te);
+  find_nuk_from_rhok_T_Te(rhok, T, Te, nuk);  
+}
 

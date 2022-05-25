@@ -18,5 +18,7 @@ double _muk_from_rhok_T_Te_Ek(spec_t rhok, double T, double Te, double Ek, long 
 
 void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok);
 
+void find_nuk_eta_kappa(spec_t rhok, double T, double Te, spec_t nuk, double *eta, double *kappa);
+
 
 #endif

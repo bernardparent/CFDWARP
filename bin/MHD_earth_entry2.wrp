@@ -433,6 +433,7 @@ Cycle(
        UpdateEMField(Lc,relaxEMF,TSEMF_SOR,200);
        UpdateEMField(Lc,relaxEMF,TSEMF_SOR,200);
     );
+    system("date");
 {    UpdateEMField(Lc,relaxEMF,TSEMF_NEWTON);}
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,

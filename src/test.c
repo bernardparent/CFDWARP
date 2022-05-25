@@ -893,6 +893,36 @@ void test_kappa ( double Tmin, double Tmax, double dT ) {
 }
 
 
+
+void test_nu ( double Tmin, double Tmax, double dT ) {
+  double T, eta, kappa, Te;
+  long spec;
+  spec_t nuk,rhok;
+  printf ( "\n" );
+  printf ( "Species mass diffusion coefficient [kg/ms] as function of temperature [K].\n" );
+  printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
+  printf ( "\n" );
+  print_column_species_names ( 12 );
+  T = Tmin;
+  Te = T;
+  for (spec=0; spec<ns; spec++) rhok[spec]=0.1;
+  #ifdef speceminus
+  rhok[speceminus]=1e-10;
+  #endif
+  do {
+    wfprintf ( stdout, "%12.5E ", T );
+    find_nuk_eta_kappa(rhok, T, Te, nuk, &eta, &kappa);
+    for ( spec = 0; spec < ns; spec++ ) {
+      wfprintf ( stdout, "%+12.5E ", nuk[spec] );
+    }
+    wfprintf ( stdout, "\n" );
+    T += dT;
+  } while ( T < Tmax );
+
+}
+
+
+
 void test_Pr ( double Tmin, double Tmax, double dT ) {
   double T, eta, kappa, Te, rho, cp;
   spec_t w, rhok;
@@ -1157,6 +1187,8 @@ int main ( int argc, char **argv ) {
         test_eta ( Tmin, Tmax, dT );
       if ( strcmp ( "kappa", argv[1] ) == 0 )
         test_kappa ( Tmin, Tmax, dT );
+      if ( strcmp ( "nu", argv[1] ) == 0 )
+        test_nu ( Tmin, Tmax, dT );
       if ( strcmp ( "Pr", argv[1] ) == 0 )
         test_Pr ( Tmin, Tmax, dT );
       if ( strcmp ( "dsdT", argv[1] ) == 0 )
@@ -1255,6 +1287,8 @@ int main ( int argc, char **argv ) {
       write_options_row ( stderr, "eta", "none", "species viscosity  ./test eta 500 2000 2",
                           linewidth, lengthcol1, lengthcol2 );
       write_options_row ( stderr, "kappa", "none", "species thermal conductivity  ./test kappa 500 2000 2",
+                          linewidth, lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "nu", "none", "species mass diffusion coefficient  ./test nu 500 2000 2",
                           linewidth, lengthcol1, lengthcol2 );
       write_options_row ( stderr, "Pr", "none", "species Prandtl number  ./test Pr 500 2000 2",
                           linewidth, lengthcol1, lengthcol2 );

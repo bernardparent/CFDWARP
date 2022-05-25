@@ -7,6 +7,26 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 MAY 25a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_plasma.c
+    - in find_Dstar_interface(), removed assert(NeL>0.0); and assert(NeR>0.0);
+  * in model/share/transport_share.c
+    - removed find_nuk_eta_kappa()
+    - added adjust_nuk_using_mobilities()
+    - added adjust_muk_for_Ek_effect()
+  * in model/thermo/_generic/thermo.hh
+    - in _THERMO_METHOD, removed citations to Dixon-Lewis and Gnoffo transport coefficients (not
+      part of this module anymore)
+  * in model/transport/_dixonlewis/transport.c
+    - in find_nuk_from_rhok_T_Te(), added call to adjust_nuk_using_mobilities() and removed
+      redundant code
+    - added find_nuk_eta_kappa()
+  * in model/transport/_guptayos/transport.c
+    - made various additions and improvements
+  * in src/test.c
+    - added function test_nu()
+     
+
 2022 MAY 18a
   * in model/transport
     - added _capitelli
