@@ -969,7 +969,9 @@ void test_dmuk ( np_t * np, gl_t * gl, long l ) {
   double T,Te,Ekmag,dmukdTk,dmukdTk_numerical,dmukdrhok_numerical;
   long spec,spec2,spec3;
   EXM_vec3D_t Ek;
-  spec_t rhok,rhok2,dmukdrhok;
+  spec_t rhok,rhok2,dmukdrhok,nuk;
+  chargedspec_t muk1,muk2,kappac;
+  double kappan,eta;
   
   printf ( "\n" );
   printf
@@ -990,12 +992,16 @@ void test_dmuk ( np_t * np, gl_t * gl, long l ) {
       Ekmag=EXM_vector_magnitude(Ek);
       find_dmuk_from_rhok_Tk_Ek(rhok, T, Ekmag, spec, &dmukdTk, dmukdrhok);
       if (spec2==-1) {
-        dmukdTk_numerical=_muk_from_rhok_T_Te_Ek(rhok, T+1.0, Te, Ekmag, spec)-_muk_from_rhok_T_Te_Ek(rhok, T, Te, Ekmag, spec);
+        find_nuk_eta_kappak_muk(rhok,T,Te,nuk,&eta,&kappan,kappac,muk1);
+        find_nuk_eta_kappak_muk(rhok,T+1.0,Te,nuk,&eta,&kappan,kappac,muk2);
+        dmukdTk_numerical=muk2[spec]-muk1[spec];
         printf("%E  %E \n",dmukdTk,dmukdTk_numerical);
       } else {
         for (spec3=0; spec3<ns; spec3++) rhok2[spec3]=rhok[spec3];
         rhok2[spec2]*=1.0001;
-        dmukdrhok_numerical=(_muk_from_rhok_T_Te_Ek(rhok2, T, Te, Ekmag, spec)-_muk_from_rhok_T_Te_Ek(rhok, T, Te, Ekmag, spec))/(0.0001*rhok2[spec2]);
+        find_nuk_eta_kappak_muk(rhok,T,Te,nuk,&eta,&kappan,kappac,muk1);
+        find_nuk_eta_kappak_muk(rhok2,T,Te,nuk,&eta,&kappan,kappac,muk2);
+        dmukdrhok_numerical=(muk2[spec]-muk1[spec])/(0.0001*rhok2[spec2]);
         printf("%E  %E \n",dmukdrhok[spec2],dmukdrhok_numerical);
       
       }

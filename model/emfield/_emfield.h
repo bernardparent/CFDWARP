@@ -34,8 +34,6 @@
 
   void find_emfield_force(np_t *np, gl_t *gl, long l, dim_t Femfield);
 
-  double _mu(np_t *np, gl_t *gl, long l, long spec);
-
   double _sigma(np_t *np, gl_t *gl, long l);
 
   void find_DeltaVk(np_t *np, gl_t *gl, long l, long spec, EXM_vec3D_t DeltaVk);

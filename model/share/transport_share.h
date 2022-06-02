@@ -5,12 +5,18 @@
 #include <src/common.h>
 
 
+double _kappac_from_rhok_Tk_muk(spec_t rhok, double T, double Te, double muk, long k);
+
+/*
 double _kappac_from_rhok_Tk_Ek(spec_t rhok, double T, double Te, double E, long k);
 
 double _etac_from_rhok_Tk_Ek(spec_t rhok, double T, double Te, double E, long k);
+*/
+void adjust_nuk_using_mobilities_given_muk(spec_t rhok, double T, double Te, chargedspec_t muk, spec_t nuk);
 
-void adjust_nuk_using_mobilities(spec_t rhok, double T, double Te, spec_t nuk);
 
 void adjust_muk_for_Ek_effect(long k, double Ek, double N, double *muk);
+
+
 
 #endif /* _TRANSPORT_SHARE_H */

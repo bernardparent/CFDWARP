@@ -122,7 +122,8 @@ Bdry(
     }
     Cut(is,js2,  ie,js4);
     Twall=300.0;
-    All(BDRY_WALLTFIXED1,Twall);
+    gammaeminus=0.1;
+    All(BDRY_WALLTFIXED1,Twall,gammaeminus);
     {
     Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
@@ -183,6 +184,7 @@ Model(
     CHEMMODEL=CHEMMODEL_BOYD2007;
     ADDITIONALREACTION=TRUE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
+    QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}
   );
   Epotential(
     Te_buffer=300.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,T+Te_buffer);  

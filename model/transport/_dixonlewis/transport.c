@@ -519,7 +519,7 @@ double _etan_from_rhok_T_Te(spec_t rhok, double T, double Te){
 }
 
 
-void find_nuk_from_rhok_T_Te(spec_t rhok, double T, double Te, spec_t nuk){
+void find_nuk_from_rhok_T_Te_muk(spec_t rhok, double T, double Te, chargedspec_t muk, spec_t nuk){
   long spec,k,l;
   spec_t chik,w;
   double P,rho;
@@ -574,7 +574,7 @@ void find_nuk_from_rhok_T_Te(spec_t rhok, double T, double Te, spec_t nuk){
     nuk[k]=rho*(1.0e0-chik[k])/(sum+1.0E-20);
   }
   
-  adjust_nuk_using_mobilities(rhok, T, Te, nuk);
+  adjust_nuk_using_mobilities_given_muk(rhok, T, Te, muk, nuk);
 
 }
 
@@ -800,11 +800,33 @@ void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double
 
 }
 
-void find_nuk_eta_kappa(spec_t rhok, double T, double Te,
-                   spec_t nuk, double *eta, double *kappa){
+
+void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
+                   spec_t nuk, double *eta, double *kappan, chargedspec_t kappac, chargedspec_t muk){
+  double Ek;
+  long spec;
   
   *eta=_eta_from_rhok_T_Te(rhok,T,Te);
-  *kappa=_kappa_from_rhok_T_Te(rhok, T, Te);
-  find_nuk_from_rhok_T_Te(rhok, T, Te, nuk);  
+
+  Ek=0.0;
+  for (spec=0; spec<ncs; spec++) {
+    muk[spec]=_muk_from_rhok_T_Te_Ek(rhok, T, Te, Ek, spec);
+    kappac[spec]=_kappac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
+  }
+  *kappan=_kappan_from_rhok_T_Te(rhok, T, Te);
+  find_nuk_from_rhok_T_Te_muk(rhok, T, Te, muk, nuk);
 }
+
+
+void find_nuk_eta_kappa(spec_t rhok, double T, double Te,
+                   spec_t nuk, double *eta, double *kappa){
+  chargedspec_t muk,kappac;
+  double kappan;
+  long spec;
+  find_nuk_eta_kappak_muk(rhok, T, Te, nuk, eta, &kappan, kappac, muk);
+  *kappa=kappan;
+  for (spec=0; spec<ncs; spec++) *kappa+=kappac[spec];
+}
+
+
 

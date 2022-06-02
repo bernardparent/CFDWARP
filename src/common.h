@@ -279,8 +279,10 @@ typedef struct {
 
 #ifdef _FLUID_PLASMA
    double Temem;
+   chargedspec_t mumem;
    chargedspec_t Nkmem;
    chargedspec_t Pkmem;
+   chargedspec_t kappacmem;
    double Nmem,Nnmem;
 #endif
 
@@ -350,7 +352,6 @@ typedef struct {
    dim_t EMFoverL;
    double EMFmaxpower;
    double sigmasolid,epsilonr;
-   chargedspec_t mumem;
    double sigmamem,Eemagmem,Eemagsmoothedmem;
    dim_t Esmoothedmem;
 #endif
@@ -359,7 +360,6 @@ typedef struct {
    dim_t EMFoverL;
    double EMFmaxpower;
    double sigmasolid,epsilonr;
-   chargedspec_t mumem;
    double sigmamem,Eemagsmoothedmem;
    dim_t Esmoothedmem;
 #endif

@@ -7,6 +7,49 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 02a
+  * in model/emfield/_Epotential*/emfield.c
+    - removed function _mu()
+    - in find_prim_emfield_mem_2(), removed line that sets ns->mumem
+  * in model/emfield/_Epotential-Bfixed/emfield.c
+    - in find_Ek_muk_mem() and find_Ek_muk_mem_nonlocal(), now calls _mu(np,gl,l,k) instead 
+      of _muk_from_rhok_T_Te_Ek()
+  * in model/fluid/_*_plasma/fluid.c
+    - the functions _kappan(), _kappai(), _kappae(), _eta(), _nu(), find_prim_fluid_mem() were 
+      rewritten so that they call find_nuk_eta_kappak_muk() 
+    - added function _mu()
+  * in model/fluid/_*_plasma/fluid_plasma.c
+    - deleted _mu_test
+    - in find_H1 and find_H2, removed call to _mu_test
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c  
+    - removed calls to _muk_from_rhok_T_Te_Ek() and replaced them by calls to _mu()
+  * in model/fluid/_*_plasma/fluid_source.c
+    - in find_Se() and find_dSe_dU_transport(), removed calls to _muk_from_rhok_T_Te_Ek() and
+      replaced them by calls to _mu()
+  * in model/fluid/_drift-diffusion/fluid.c
+    - added function _mu()
+    - in find_prim_fluid(), added call to find_nuk_eta_kappak_muk
+    - in _nu(), removed call to find_nuk_from_rhok_T_Te() and replaced by call to find_nuk_eta_kappa()
+  * in model/share/fluid_share.c
+    - in update_w_at_catalytic_wall() and update_w_V_at_injection_wall(), replaced call to
+      find_nuk_from_rhok_T_Te() by call to find_nuk_eta_kappa()
+  * in model/share/transport_share.c
+    - replaced _kappac_from_rhok_Tk_Ek() by _kappac_from_rhok_Tk_muk()
+    - deleted _etac_from_rhok_Tk_Ek()
+    - replaced adjust_nuk_using_mobilities() by adjust_nuk_using_mobilities_given_muk()
+  * in model/transport/_dixonlewis/transport.c
+    - added find_nuk_eta_kappak_muk()
+    - rewrote find_nuk_eta_kappa()
+    - changed find_nuk_from_rhok_T_Te() for find_nuk_from_rhok_T_Te_muk()
+  * in model/transport/_guptayos/transport.c
+    - various changes 
+  * in src/common.h
+    - added mumem and kappacmem in np->wk
+    - removed mumem from np->bs
+  * in src/test.c
+    - in test_dmuk(), replaced calls to _muk_from_rhok_T_Te_Ek() by calls to find_nuk_eta_kappak_muk()
+    
+
 2022 MAY 25b
   * in model/transport/_guptayos/transport.c
     - in find_nuk_from_rhok_T_Te(), added adjust_nuk_using_mobilities(rhok, T, Te, nuk);

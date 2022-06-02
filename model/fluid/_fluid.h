@@ -124,6 +124,8 @@
 #ifdef _FLUID_PLASMA
   void find_alpha(np_t *np, gl_t *gl, long l, spec2_t alpha);
 
+  double _mu(np_t *np, gl_t *gl, long l, long k);
+
 #endif
 
 #endif

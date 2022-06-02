@@ -31,10 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 // find the scalar thermal conductivity of the kth charged species
-double _kappac_from_rhok_Tk_Ek(spec_t rhok, double T, double Te, double E, long k){
-  double mu,kappa,cp,Tk;
+double _kappac_from_rhok_Tk_muk(spec_t rhok, double T, double Te, double muk, long k){
+  double kappa,cp,Tk;
   if (k>=ncs) fatal_error("_kappac_from_rhok_Tk_Ek can only be used for charged species, not for species %ld.",k);
-  mu=_muk_from_rhok_T_Te_Ek(rhok, T, Te, E, k);
   if (smap[k]==SMAP_eminus) {
     Tk=Te;
   } else {
@@ -42,49 +41,32 @@ double _kappac_from_rhok_Tk_Ek(spec_t rhok, double T, double Te, double E, long 
   }
   cp=_cpk_from_T_equilibrium(k,Tk);
   //cp=5.0/2.0*kB/_m(k);
-  kappa=cp*rhok[k]*kB*Tk*mu/fabs(_C(k));
+  kappa=cp*rhok[k]*kB*Tk*muk/fabs(_C(k));
   return(kappa);
 }
 
 
-// find the scalar viscosity of the kth charged species
-double _etac_from_rhok_Tk_Ek(spec_t rhok, double T, double Te, double E, long k){
-  double kappa,Pr,cp,eta,Tk;
-  if (k>=ncs) fatal_error("_etac_from_rhok_Tk_Ek can only be used for charged species, not for species %ld.",k);
-  kappa=_kappac_from_rhok_Tk_Ek(rhok, T, Te, E, k);
-  // Pr=cp*eta/kappa
-  if (smap[k]==SMAP_eminus) {
-    Tk=Te;
-  } else {
-    Tk=T;
-  }
-
-  if (speciestype[k]==SPECIES_ELECTRON) Pr=0.73; else Pr=0.96;
-  cp=_cpk_from_T_equilibrium(k,Tk);
-  //if (fabs(cp-5.0/2.0*kB/_m(k))/min(cp,5.0/2.0*kB/_m(k))>2.2 && k==specN2plus ) printf("x");
-  eta=Pr*kappa/cp;
-  return(eta);
-}
 
 
-void adjust_nuk_using_mobilities(spec_t rhok, double T, double Te, spec_t nuk){
+void adjust_nuk_using_mobilities_given_muk(spec_t rhok, double T, double Te, chargedspec_t muk, spec_t nuk){
   long spec,k;
   spec_t w;
   double rho;
   double nuwsum,wsum;
+  
 
   rho=0.0;
   for (spec=0; spec<ns; spec++) rho+=rhok[spec];
   for (spec=0; spec<ns; spec++) w[spec]=rhok[spec]/rho;
   
   
-  for (k=0; k<ns; k++){
+  for (k=0; k<ncs; k++){
     switch (speciestype[k]){
       case SPECIES_IONPLUS:
-        nuk[k]=_muk_from_rhok_T_Te_Ek(rhok, T, Te, 0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
+        nuk[k]=muk[k]*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
       break;
       case SPECIES_IONMINUS:
-        nuk[k]=_muk_from_rhok_T_Te_Ek(rhok, T, Te, 0.0, k)*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
+        nuk[k]=muk[k]*kB*T* rho/fabs(_C(k))*(1.0+Te/T);
       break;
     }
   }
@@ -102,6 +84,7 @@ void adjust_nuk_using_mobilities(spec_t rhok, double T, double Te, spec_t nuk){
 #endif
 
 }
+
 
 
 

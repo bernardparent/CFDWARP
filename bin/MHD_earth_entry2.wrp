@@ -91,7 +91,7 @@ Bz=0.1; {Tesla}
 mf=1.0; 
 gamma=0.1e0;    {secondary emission coefficient}
 Twall=3000;     {wall temperature everywhere}
-workfunct=2.7; {2.7, 4.6, and 1e99 eV}
+workfunct=4.6; {2.7, 4.6, and 1e99 eV}
 THERMIONICEMISSION=TRUE;
 {
             work function   max operating temperature point
