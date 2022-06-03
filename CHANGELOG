@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 02b
+  * in model/transport
+    - renamed _dixonlewis to _Dixon-Lewis
+    - renamed _capitelli to _Capitelli
+    - renamed _guptayos to _Gupta-Yos
+  * in model/transport/_Gupta-Yos/transport.c
+    - in _muk_from_chik_N_T_Te_aav_Ai_Delta1(), fixed a bug: the thermal conductivity used to
+      find the mobility did not include the non-translational components
+  * in config/config.c
+    - in ask_number_question(), changed the default input for -O to -O1 instead of -O3
+  * in .makefile-header-default, in CFLAGS, changed -O3 to -O1
+  
+
 2022 JUN 02a
   * in model/emfield/_Epotential*/emfield.c
     - removed function _mu()

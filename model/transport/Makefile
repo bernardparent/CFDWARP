@@ -9,8 +9,9 @@ clean:
 	( cd .active ; make clean )
 
 cleanall:
-	( cd _guptayos ; make cleanall )
-	( cd _dixonlewis ; make cleanall )
+	( cd _Gupta-Yos ; make cleanall )
+	( cd _Dixon-Lewis ; make cleanall )
+	( cd _Capitelli ; make cleanall )
 	( cd doc ; make clean )
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.

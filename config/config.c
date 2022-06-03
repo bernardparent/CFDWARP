@@ -604,8 +604,7 @@ static void ask_yesno_question(bool answer_def, char *filestring, char *question
 static void ask_number_question(long numbermin, long numbermax, long answer_def, char *filestring, char *question, char *options, long *answer){
   bool ENTERFLAG,ESCFLAG,ERRORFLAG;
   long tmp;
-  if (find_num_after_str_in_file_named(
-    makefileheader, filestring, &tmp)==0){
+  if (find_num_after_str_in_file_named(makefileheader, filestring, &tmp)==0){
     tmp=answer_def;
   }
   print_section_title(question);
@@ -673,7 +672,7 @@ static void get_makefile_vars(long *nd, long *numopt,
   if (*THREADTYPE==2) printf("POSIX MULTIZONE\n\n");
   if (*THREADTYPE==3) printf("OPENMP\n\n");
 
-  ask_number_question(0, 3, 3,  "-O", "COMPILER OPTIMIZATIONS",
+  ask_number_question(0, 3, 1,  "-O", "COMPILER OPTIMIZATIONS",
                                          "  0. none\n"
                                          "  1. basic optimizations, valgrind-compatible\n"
                                          "  2. more optimizations, well-tested\n"

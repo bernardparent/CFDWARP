@@ -17,7 +17,7 @@
 MAKEFLAGS += --stop
 MAKEFLAGS += --no-print-directory
 SHELL = /bin/sh -e
-CFLAGS = -O3 -Wall -funroll-all-loops -Wfatal-errors -DNDEBUG -DOPENMPTHREADS -fopenmp
+CFLAGS = -O1 -Wall -funroll-all-loops -Wfatal-errors -DNDEBUG -DOPENMPTHREADS -fopenmp
 CC = gcc
 CFLAGSCFD = -D_2D 
 L = gcc

@@ -1254,17 +1254,21 @@ void find_nuk_from_chik_N_T_Te_muk_Delta1(spec_t chik, double N, double T, doubl
 
 
 
-double _muk_from_chik_N_T_Te_aav_Ai(spec_t chik, double N, double T, double Te, double aav, spec_t Ai, long k){
-  long i;
+double _muk_from_chik_N_T_Te_aav_Ai_Delta1(spec_t chik, double N, double T, double Te, double aav, spec_t Ai, spec2_t Delta1, long k){
   double kappak,Tk,rhok;
-  double num,muk,cpk;
+  double muk,cpk;
 
   if (k==speceminus) Tk=Te; else Tk=T;
+  
+  /*
   num=0.0;
   for (i=0; i<ns; i++){
     num+=chik[i]/(Ai[i]+aav);
   }
   kappak=chik[k]/(Ai[k]+aav)/(1.0-aav*num)*418.4;
+  */
+  
+  kappak=_kappak_from_chik_N_T_Te_aav_Ai_Delta1_METHOD2(chik, N, T, Te, aav, Ai, Delta1, k);
   cpk=_cpk_from_T_equilibrium(k,Tk);
   rhok=chik[k]*N*_m(k);
   muk=kappak/(cpk*rhok*kB*Tk)*fabs(_C(k));
@@ -1304,13 +1308,13 @@ void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
   for (k=0; k<ncs; k++) {
     switch (speciestype[k]){
       case SPECIES_IONPLUS:
-        muk[k]=_muk_from_chik_N_T_Te_aav_Ai(chik, N, T, Te, aav, Ai, k);
+        muk[k]=_muk_from_chik_N_T_Te_aav_Ai_Delta1(chik, N, T, Te, aav, Ai, Delta1, k);
       break; 
       case SPECIES_IONMINUS:
-        muk[k]=_muk_from_chik_N_T_Te_aav_Ai(chik, N, T, Te, aav, Ai, k);
+        muk[k]=_muk_from_chik_N_T_Te_aav_Ai_Delta1(chik, N, T, Te, aav, Ai, Delta1, k);
       break; 
       case SPECIES_ELECTRON:
-        muk[k]=_muk_from_chik_N_T_Te_aav_Ai(chik, N, T, Te, aav_e, Ai_e, k);
+        muk[k]=_muk_from_chik_N_T_Te_aav_Ai_Delta1(chik, N, T, Te, aav_e, Ai_e, Delta1_e, k);
       break; 
       default:
         muk[k]=0.0;      
