@@ -27,6 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/_model.h>
 #include <model/thermo/_thermo.h>
 #include <model/metrics/_metrics.h>
+#include <model/share/chem_share.h>
+
 
 #define nr 3
 
@@ -128,7 +130,7 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
     W[spec] = W[spec] / calA * calM[spec] * 1.0e6;
 }
 
-void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam,
+void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, r, s, spec;           /* counters */
   spec_t calM;
@@ -192,6 +194,7 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double 
     }
   }
 
+/*
   if ( TOWNSEND && TOWNSEND_SEMI_IMPLICIT ) {
 
     theta1 = 0.0105809;
@@ -211,7 +214,7 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double 
       dWdNk[speceminus][spec] += dktownsenddNk * Nk[specN2] * Nk[speceminus] * 1e12;
     }
   }
-
+*/
   /* reaction 2b */
 //    {/*O2  N2  O   N   O2+ N2+ O2- e-     */
 // MR=  {0,  0,  0,  0,  0,  1,  0,  1 },  /* 2b */

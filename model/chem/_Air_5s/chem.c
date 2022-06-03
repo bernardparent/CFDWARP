@@ -102,7 +102,7 @@ void find_W_None ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double
 }
 
 
-void find_dW_dx_None ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, 
+void find_dW_dx_None ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
                   double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, s;                    /* counters */
@@ -142,24 +142,24 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
 }
 
 
-void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, 
+void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
                   double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   switch (gl->model.chem.CHEMMODEL){
     case CHEMMODEL_DUNNKANG1973: 
-      find_dW_dx_DunnKang1973 ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+      find_dW_dx_DunnKang1973 ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
     break;
     case CHEMMODEL_PARK1993: 
-      find_dW_dx_Park1993 ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+      find_dW_dx_Park1993 ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
     break;
     case CHEMMODEL_BOYD2007: 
-      find_dW_dx_Boyd2007 ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+      find_dW_dx_Boyd2007 ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
     break;
     case CHEMMODEL_LENARD1964: 
-      find_dW_dx_Lenard1964 ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+      find_dW_dx_Lenard1964 ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
     break;
     case CHEMMODEL_NONE: 
-      find_dW_dx_None ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+      find_dW_dx_None ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
     break;
     default:
       fatal_error("Problem with CHEMMODEL in find_W() within chem.c");

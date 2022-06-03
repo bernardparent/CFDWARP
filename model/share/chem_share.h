@@ -276,6 +276,6 @@ void add_to_dQei(long spec, double kf, double dkfdTe, spec_t rhok, spec_t dQeidr
 
 
 
-void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam);
+void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam);
 
 #endif /* _CHEM_SHARE_H */

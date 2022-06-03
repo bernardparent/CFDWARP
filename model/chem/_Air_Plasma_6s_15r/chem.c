@@ -235,7 +235,7 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
     W[spec] = W[spec] / calA * calM[spec] * 1.0e6;
 }
 
-void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam,
+void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, r, s, spec;           /* counters */
   spec_t calM;
@@ -278,6 +278,7 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double 
 //  W[specN2plus]+=+Wp[0];
 //  W[speceminus]+=+Wp[0];
 
+/*
   if ( TOWNSEND && TOWNSEND_IMPLICIT ) {
     theta1 = 0.0105809;
     theta2 = 2.40411e-75;
@@ -297,7 +298,7 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double 
     }
 
   }
-
+*/
   /* reaction 1b */
 /* e-  +  O2  ->  O2+   +  2*e-  */
 
@@ -305,7 +306,7 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double 
 //  W[specO2]+=-Wp[1];
 //  W[specO2plus]+=+Wp[1];
 //  W[speceminus]+=+Wp[1];
-
+/*
   if ( TOWNSEND && TOWNSEND_IMPLICIT ) {
     theta1 = 0.0102785;
     theta2 = 2.42260e-75;
@@ -325,7 +326,7 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double 
     }
 
   }
-
+*/
   /* reaction 2a */
 /* e-  +  O2+  -> O2  */
   kf[2] = 2.0e-7 * pow ( 300.0 / Te, 0.7 );     /* 2a */

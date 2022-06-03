@@ -421,7 +421,7 @@ void find_W_Macheret2007old ( gl_t *gl, spec_t rhok, double T, double Te, double
     W[spec] = W[spec] / calA * calM[spec] * 1.0e6;
 }
 
-void find_dW_dx_Macheret2007old ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam,
+void find_dW_dx_Macheret2007old ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, r, s, spec;           /* counters */
   spec_t calM;
@@ -484,6 +484,7 @@ void find_dW_dx_Macheret2007old ( gl_t *gl, spec_t rhok, spec_t mu, double T, do
     }
   }
 
+/*
   if ( TOWNSEND && TOWNSEND_SEMI_IMPLICIT ) {
 
     theta1 = 0.0105809;
@@ -504,7 +505,7 @@ void find_dW_dx_Macheret2007old ( gl_t *gl, spec_t rhok, spec_t mu, double T, do
     }
 
   }
-
+*/
   /* reaction 1b */
 //    {/*O2  N2  O   N   O2+ N2+ O2- e-     */
 // MR=  {1,  0,  0,  0,  0,  0,  0,  1 },  /* 1b */
@@ -535,6 +536,7 @@ void find_dW_dx_Macheret2007old ( gl_t *gl, spec_t rhok, spec_t mu, double T, do
 
   }
 
+/*
   if ( TOWNSEND && TOWNSEND_SEMI_IMPLICIT ) {
 
     theta1 = 0.0102785;
@@ -555,7 +557,7 @@ void find_dW_dx_Macheret2007old ( gl_t *gl, spec_t rhok, spec_t mu, double T, do
     }
 
   }
-
+*/
   /* reaction 2a */
 //    {/*O2  N2  O   N   O2+ N2+ O2- e-     */
 // MR=  {0,  0,  0,  0,  1,  0,  0,  1 },  /* 2a */

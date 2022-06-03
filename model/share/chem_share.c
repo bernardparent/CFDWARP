@@ -1319,7 +1319,7 @@ void add_to_dW_bw_1r2p(int specR1, int specP1, int specP2, double A, double n, d
 }
 
 
-void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam){
+void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam){
   long r,s; 
   spec_t dWdT,dWdTe,dWdTv,dWdQbeam;
   spec2_t dWrhok,dWrhok2;   
@@ -1327,7 +1327,7 @@ void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, spec_t mu, double T, doub
   double drhok,dQbeam,dT,N,N2,Estar2;
  
   find_W(gl, rhok, T, Te, Tv, Estar, Qbeam, W);      
-  find_dW_dx(gl, rhok, mu, T, Te, Tv, Estar, Qbeam,
+  find_dW_dx(gl, rhok, T, Te, Tv, Estar, Qbeam,
               dWrhok, dWdT, dWdTe, dWdTv, dWdQbeam);
 
   N=0.0;

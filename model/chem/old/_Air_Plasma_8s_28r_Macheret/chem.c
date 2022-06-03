@@ -426,7 +426,7 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
     W[spec] = W[spec] / calA * calM[spec] * 1.0e6;
 }
 
-void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam,
+void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, r, s, spec;           /* counters */
   spec_t calM;

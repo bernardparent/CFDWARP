@@ -184,7 +184,7 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
   }
 }
 
-void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, double Estar, double Qbeam,
+void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, p, r, s;              /* counters */
   long row, col;

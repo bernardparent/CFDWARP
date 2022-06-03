@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 03a
+  * in model/chem/*/chem.c
+    - got rid of mu within parameters passed to find_dW_dx() 
+  * in model/fluid/*/fluid_source.c
+    - in find_dSchem_dU() and test_dSchem_dU(), got rid of mu within parameters
+  * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - in write_bdry_fluid_template(), added gammaeminus to the list of parameters when using 
+      a BDRY_WALLTFIXED1 boundary condition
+  * in model/share/chem_share.c
+    - got rid of mu within parameters passed to test_dW_dx()
+
+
 2022 JUN 02b
   * in model/transport
     - renamed _dixonlewis to _Dixon-Lewis

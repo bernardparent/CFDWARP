@@ -122,7 +122,7 @@ void add_W_NegativeIon ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
 
 
 
-void add_dW_dx_NegativeIon ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, 
+void add_dW_dx_NegativeIon ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
                   double Estar, double Qbeam, spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, 
                   spec_t dWdTv, spec_t dWdQbeam ) {
   long k;  
@@ -160,7 +160,7 @@ void find_W_None ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double
 }
 
 
-void find_dW_dx_None ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, 
+void find_dW_dx_None ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
                   double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, s;                    /* counters */
@@ -193,21 +193,21 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
 }
 
 
-void find_dW_dx ( gl_t *gl, spec_t rhok, spec_t mu, double T, double Te, double Tv, 
+void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
                   double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   switch (gl->model.chem.CHEMMODEL){
     case CHEMMODEL_PARENTDUNN2021: 
-      find_dW_dx_ParentDunn2021 ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+      find_dW_dx_ParentDunn2021 ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
     break;
     case CHEMMODEL_NONE: 
-      find_dW_dx_None ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+      find_dW_dx_None ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
     break;
     default:
       fatal_error("Problem with CHEMMODEL in find_W() within chem.c");
   }
   if (gl->model.chem.NEGATIVEIONREACTIONS  && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  
-    add_dW_dx_NegativeIon ( gl, rhok, mu, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+    add_dW_dx_NegativeIon ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
 
 }
 

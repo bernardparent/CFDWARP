@@ -192,7 +192,7 @@ static void find_dSvib_dU(np_t *np, gl_t *gl, long l, sqmat_t dSvibdU){
 
 static void find_dSchem_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
   long k,s;
-  spec_t mu,rhok,dWdT,dWdTe,dWdTv,dWdQbeam;
+  spec_t rhok,dWdT,dWdTe,dWdTv,dWdQbeam;
   spec2_t dWdrhok;
   flux_t dTdU,dTvdU,dTedU;
   double ev,devdTv,EoverN;
@@ -200,9 +200,8 @@ static void find_dSchem_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
     
   EoverN=0.0;
   for (s=0; s<ns; s++) rhok[s]=_rhok(np[l],s);
-  for (s=0; s<ns; s++) mu[s]=_mu(np,gl,l,s);
 
-  find_dW_dx(gl, rhok, mu, _T(np[l],gl), _T(np[l],gl), _Tv(np[l]), EoverN, _Qbeam(np[l],gl),
+  find_dW_dx(gl, rhok, _T(np[l],gl), _T(np[l],gl), _Tv(np[l]), EoverN, _Qbeam(np[l],gl),
            dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam);
   find_dT_dU(np[l], gl, dTdU);
   find_dTv_dU(np[l], gl, dTvdU);
@@ -250,12 +249,11 @@ static void find_dSchem_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
 void test_dSchem_dU(np_t *np, gl_t *gl, long l){
   long spec;
   double Estar;
-  spec_t rhok,mu;
+  spec_t rhok;
   Estar=0.0;
   for (spec=0; spec<ns; spec++) rhok[spec]=_rhok(np[l],spec);
-  for (spec=0; spec<ns; spec++) mu[spec]=_mu(np,gl,l,spec);
 
-  test_dW_dx(gl, gl->cycle.fluid.Uref, rhok, mu,_T(np[l],gl), _T(np[l],gl), _Tv(np[l]), Estar, _Qbeam(np[l],gl));
+  test_dW_dx(gl, gl->cycle.fluid.Uref, rhok,_T(np[l],gl), _T(np[l],gl), _Tv(np[l]), Estar, _Qbeam(np[l],gl));
 }
 
 
