@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
+
+Copyright 2022 Bernard Parent
 Copyright 2022 Prasanna Thoguluva Rajendran
 Copyright 2022 Felipe Martin Rodriguez Fuentes
 
@@ -51,8 +53,8 @@ Calculations to 30000 K,” NASA RP-1232, 1990.
 #define METHOD1 1  // Eq(27), first Chapman-Enskog approximation
 #define METHOD2 2  // Eq(30), approximation to method 1, yields results close to method 1 for air mixture
 #define METHOD3 3  // Eq(40a), approximation to method 1 ??? or method 2??
-#define METHOD4 4   // Eq(49) : 5-temperature model, thermal non-equilibirum
-#define METHOD METHOD2  //Use METHOD2. Other methods are for testing purposes only
+#define METHOD4 4   // Eq(49) : 5-temperature model, thermal non-equilibrium, and valid to find kappak for each species while other methods can only be used to find kappa for the bulk
+#define METHOD METHOD4  //Use METHOD4. Other methods are for testing purposes only
 
 
 double collision_integral_curvefit11(long s, long r, double T){
@@ -657,6 +659,7 @@ double collision_crosssection_ratio(long s, long r, double T){
   return(exp(C)*pow(T,A*log(T)+B));
 }
 
+/* find cp of kth species in cal/gmole K*/
 static double _cpk_from_T_GUPTAYOS(long k, double T){
   double a1,a2,a3,a4,a5;
 
@@ -750,7 +753,6 @@ static double _cpk_from_T_GUPTAYOS(long k, double T){
 }
 
 
-
 double EXM_matrix_determinant(EXM_mat_t mat){//improve this, triangular matrix is enough
   long row,col,row2;
   double fact,det;
@@ -789,6 +791,7 @@ double EXM_matrix_determinant(EXM_mat_t mat){//improve this, triangular matrix i
   EXM_free_matrix(&mattmp);
   return(det);
 }
+
 
 static double _epc(double rhoe, double Te){
   double Pe;
@@ -874,9 +877,6 @@ static void find_aij_Ai_for_kappa(spec_t chik, double N, double T, spec2_t Delta
 }
 
 
-
-
-
 // Eq(30), approximation to method 1, yields results close to method 1 for air mixture
 double _kappa_from_rhok_T_Te_METHOD2(spec_t rhok, double T, double Te){
   long spec,i,j;
@@ -893,7 +893,6 @@ double _kappa_from_rhok_T_Te_METHOD2(spec_t rhok, double T, double Te){
   find_Delta1_Delta2(N,T,_epc(rhok[speceminus], Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
   
-
   kappa_tr     = 0.0e0;
   kappa_int    = 0.0e0;
   num=0.0;
@@ -917,7 +916,6 @@ double _kappa_from_rhok_T_Te_METHOD2(spec_t rhok, double T, double Te){
 }
 
 
-
 double _kappak_from_chik_N_T_Te_aav_Ai_Delta1_METHOD2(spec_t chik, double N, double T, double Te, double aav, spec_t Ai, spec2_t Delta1, long k){
   long j;
   double den, kappa_tr, kappa_int;
@@ -939,7 +937,6 @@ double _kappak_from_chik_N_T_Te_aav_Ai_Delta1_METHOD2(spec_t chik, double N, dou
 }
 
 
-
 // Eq(30), approximation to method 1, yields results close to method 1 for air mixture
 double _kappa_from_chik_N_T_Te_aav_Ai_Delta1_METHOD2(spec_t chik, double N, double T, double Te, double aav, spec_t Ai, spec2_t Delta1){
   double kappa;
@@ -950,8 +947,6 @@ double _kappa_from_chik_N_T_Te_aav_Ai_Delta1_METHOD2(spec_t chik, double N, doub
 
   return(kappa); 
 }
-
-
 
 
 // Eq(27), first Chapman-Enskog approximation, bug: off by factor of -1 : needs fixing
@@ -1017,8 +1012,6 @@ double _kappa_from_rhok_T_Te_METHOD1(spec_t rhok, double T, double Te){
 }
 
 
-
-
 // Eq(40a), approximation to method 1 ??? or method 2??
 double _kappa_from_rhok_T_Te_METHOD3(spec_t rhok, double T, double Te){
   long spec,i,j;
@@ -1066,121 +1059,6 @@ double _kappa_from_rhok_T_Te_METHOD3(spec_t rhok, double T, double Te){
 }
 
 
-
-
-// Eq(49) : 5-temperature model, thermal non-equilibirum
-double _kappa_from_rhok_T_Te_METHOD4(spec_t rhok, double T, double Te){
-  long spec,i,j;
-  spec_t chik,  Ai, M;
-  spec2_t Delta1,Delta2;
-  double N, den, kappa_tr, kappa_int;
-  double asr,kappa_e,kappa_vib,epc,aav;
-  double Delta1ie[ns],Delta2ie[ns];
-  spec2_t aij;
-  epc=_epc(rhok[speceminus], Te);
-  
-  N=0.0;
-  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
-  for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
-
-  find_Delta1_Delta2(N,T,epc,Delta1,Delta2);
-  find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
-  for (spec=0; spec<ns; spec++) M[spec]=_calM(spec)*1000.0; // g/g-mole
-  
-
-  kappa_tr     = 0.0e0;
-  kappa_int    = 0.0e0;
-
-  /*kappa_int=kappa_rot+kappa_vib+kappa_el*/
-  den=0.0;
-  for (i=0; i<ns; i++){
-    for (j=0; j<ns; j++){
-      den+=chik[j]*Delta1[i][j];
-    }
-    kappa_int+=(_cpk_from_T_GUPTAYOS(i,T)/Runiv-2.5)*chik[i]/den;
-    den=0.0;
-  }
-  kappa_int*=2.3901E-8*kBol;
-  
-  for (i=0; i<ns; i++){
-    j=speceminus;
-    Delta1ie[i]=collision_integral_curvefit11(i,j,Te)*(8.0e0/3.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*Te*(M[i] + M[j])))*1.546e-20;
-    Delta2ie[i]=collision_integral_curvefit22(i,j,Te)*(0.2*16.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*Te*(M[i] + M[j])))*1.546e-20;
-    if(_Charge_number(i)!=0) {Delta1ie[i]*=epc;Delta2ie[i]*=epc;}
-  }
-  den=0.0;
-  kappa_tr=0.0;
-  kappa_e=0.0;
-  kappa_vib=0.0;
-  
-  for (i=0; i<ns; i++){
-    if (speciestype[i]!=SPECIES_ELECTRON) { 
-      for (j=0; j<ns; j++){
-        if (speciestype[j]!=SPECIES_ELECTRON) { 
-          asr  = 1.0e0 + (1.0e0-(_m(i)/_m(j))*(0.45e0 - 2.54e0*(_m(i)/_m(j))))/((1.0e0+_m(i)/_m(j))*(1.0e0+_m(i)/_m(j)));
-          den+=asr*chik[j]*Delta2[i][j]+3.54*chik[speceminus]*Delta2ie[i];
-        }
-      }
-      kappa_tr+=chik[i]/den;
-      den=0.0;
-    }
-  }
-  kappa_tr*=2.3901E-8*0.25*15.0*kBol;
-  
-  den=0.0;
-  for (i=0; i<ns; i++){
-    if (_numatoms(i)>1) { //molecular species 
-      for (j=0; j<ns; j++){
-        if (speciestype[j]!=SPECIES_ELECTRON) { 
-          asr  = 1.0e0 + (1.0e0-(_m(i)/_m(j))*(0.45e0 - 2.54e0*(_m(i)/_m(j))))/((1.0e0+_m(i)/_m(j))*(1.0e0+_m(i)/_m(j)));
-          den+=chik[j]*Delta1[i][j]+chik[speceminus]*Delta1ie[i];
-        }
-      }
-      kappa_vib+=chik[i]/den;
-      den=0.0;
-    }
-  }
-  kappa_vib*=2.3901E-8*kBol;
-  
-  den=0.0;
-  for (j=0; j<ns; j++){
-    if (speciestype[j]!=SPECIES_ELECTRON) { 
-      asr  = 1.0e0 + (1.0e0-(_m(i)/_m(j))*(0.45e0 - 2.54e0*(_m(i)/_m(j))))/((1.0e0+_m(i)/_m(j))*(1.0e0+_m(i)/_m(j)));
-      den+=1.45*chik[j]*Delta2[speceminus][j]+chik[speceminus]*Delta2ie[speceminus];
-    }
-  }
-  kappa_e=2.3901E-8*kBol*chik[speceminus]/den;
-  kappa_int=kappa_vib+kappa_e; //just for calculation purposes
-  
-  return((kappa_tr+kappa_int)*418.4); // cal/cm-s-K to W/m-K
-}
-
-
-
-double _kappa_from_rhok_T_Te(spec_t rhok, double T, double Te){
-  double kappa;
-  switch (METHOD){
-    case (METHOD1):
-      kappa=_kappa_from_rhok_T_Te_METHOD1(rhok, T, Te);
-    break;
-    case (METHOD2):
-      kappa=_kappa_from_rhok_T_Te_METHOD2(rhok, T, Te);
-    break;
-    case (METHOD3):
-      kappa=_kappa_from_rhok_T_Te_METHOD3(rhok, T, Te);
-    break;
-    case (METHOD4):
-      kappa=_kappa_from_rhok_T_Te_METHOD4(rhok, T, Te);
-    break;
-    default:
-      fatal_error("METHOD can not be set to %ld",METHOD);
-  }
-  return(kappa);
-}
-
-
-
-
 double _eta_from_chik_N_T_Te_Delta1_Delta2(spec_t chik, double N, double T, double Te, spec2_t Delta1, spec2_t Delta2){
   double num,den,aav,eta;
   long spec,i,j,l;
@@ -1219,11 +1097,6 @@ double _eta_from_chik_N_T_Te_Delta1_Delta2(spec_t chik, double N, double T, doub
 }
 
 
-
-
-
-
-
 void find_nuk_from_chik_N_T_Te_muk_Delta1(spec_t chik, double N, double T, double Te, spec_t muk, spec2_t Delta1, spec_t nuk){
   double rho,sum;
   long spec,i,j,k,l;
@@ -1248,41 +1121,53 @@ void find_nuk_from_chik_N_T_Te_muk_Delta1(spec_t chik, double N, double T, doubl
     nuk[k]=rho*(1.0-chik[k])/(sum+1.0e-20);
   }
   adjust_nuk_using_mobilities_given_muk(rhok, T, Te, muk, nuk);
-
 }
 
 
-
-
-double _muk_from_chik_N_T_Te_aav_Ai_Delta1(spec_t chik, double N, double T, double Te, double aav, spec_t Ai, spec2_t Delta1, long k){
-  double kappak,Tk,rhok;
-  double muk,cpk;
-
-  if (k==speceminus) Tk=Te; else Tk=T;
-  
-  /*
-  num=0.0;
-  for (i=0; i<ns; i++){
-    num+=chik[i]/(Ai[i]+aav);
-  }
-  kappak=chik[k]/(Ai[k]+aav)/(1.0-aav*num)*418.4;
-  */
-  
-  kappak=_kappak_from_chik_N_T_Te_aav_Ai_Delta1_METHOD2(chik, N, T, Te, aav, Ai, Delta1, k);
-  cpk=_cpk_from_T_equilibrium(k,Tk);
-  rhok=chik[k]*N*_m(k);
-  muk=kappak/(cpk*rhok*kB*Tk)*fabs(_C(k));
+static double _muk_from_kappak(double kappak, double Tk, double rhok, long k){
+  double muk;
+  muk=kappak/(_cpk_from_T_equilibrium(k,Tk)*rhok*kB*Tk)*fabs(_C(k));  
   return(muk);
 }
 
 
-void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok){
-  long spec;
-  *dmukdTk=0.0;
-  for (spec=0; spec<ns; spec++) dmukdrhok[spec]=0.0;
+static double _alpha(long i, long j){
+  double ret;
+  ret=1.0+(1.0-_calM(i)/_calM(j))*(0.45-2.54*_calM(i)/_calM(j))/sqr(1.0+_calM(i)/_calM(j));
+  return(ret); 
 }
 
 
+double _kappak_from_chik_Delta1_Delta2_METHOD4(double T, spec_t chik, spec2_t Delta1, spec2_t Delta2, spec2_t Delta1_e, spec2_t Delta2_e, long i){
+  double kappak;
+  double sum1,sum2;
+  long j;
+  if (speciestype[i]==SPECIES_ELECTRON){
+    sum1=0.0;
+    for (j=0; j<ns; j++){
+      if (speciestype[j]==SPECIES_ELECTRON) sum1+=chik[j]*Delta2_e[i][j];
+        else sum1+=1.45*chik[j]*Delta2_e[i][j];  
+    }
+    kappak=15.0/4.0*2.3901E-8*kBol*chik[i]/(sum1);
+  } else {
+    sum1=0.0;
+    for (j=0; j<ns; j++){
+      if (speciestype[j]==SPECIES_ELECTRON) sum1+=3.54*chik[j]*Delta2_e[i][j];
+        else sum1+=_alpha(i,j)*chik[j]*Delta2[i][j];  
+    }
+    kappak=15.0/4.0*2.3901E-8*kBol*chik[i]/(sum1);
+
+    if (_numatoms(i)>1){
+      sum2=0.0;
+      for (j=0; j<ns; j++){
+        if (speciestype[j]==SPECIES_ELECTRON) sum2+=chik[j]*Delta1_e[i][j]; 
+          else sum2+=chik[j]*Delta1[i][j];
+      }
+      kappak+=2.3901E-8*kBol*chik[i]/sum2*(_cpk_from_T_GUPTAYOS(i, T)/Runiv-5.0/2.0);
+    }
+  }
+  return(kappak*418.4); // cal/cm-s-K to W/m-K
+}
 
 
 void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
@@ -1294,7 +1179,6 @@ void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
   double aav,aav_e;
   spec2_t aij,aij_e;
   spec_t kappak;
-
   N=0.0;
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N; 
@@ -1305,35 +1189,54 @@ void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
   find_Delta1_Delta2(N,Te,_epc(rhok[speceminus], Te),Delta1_e,Delta2_e);
   find_aij_Ai_for_kappa(chik, N, Te, Delta1_e, Delta2_e, aij_e, Ai_e, &aav_e);  
   
-  for (k=0; k<ncs; k++) {
-    switch (speciestype[k]){
-      case SPECIES_IONPLUS:
-        muk[k]=_muk_from_chik_N_T_Te_aav_Ai_Delta1(chik, N, T, Te, aav, Ai, Delta1, k);
-      break; 
-      case SPECIES_IONMINUS:
-        muk[k]=_muk_from_chik_N_T_Te_aav_Ai_Delta1(chik, N, T, Te, aav, Ai, Delta1, k);
-      break; 
-      case SPECIES_ELECTRON:
-        muk[k]=_muk_from_chik_N_T_Te_aav_Ai_Delta1(chik, N, T, Te, aav_e, Ai_e, Delta1_e, k);
-      break; 
-      default:
-        muk[k]=0.0;      
-    }
+
+  switch (METHOD){
+    case METHOD1:
+      (*kappan)=_kappa_from_rhok_T_Te_METHOD1(rhok, T, Te);
+      for (k=0; k<ncs; k++){
+        kappac[k]=_kappak_from_chik_Delta1_Delta2_METHOD4(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
+        (*kappan)-=kappac[k];
+      }
+    break;
+    case METHOD2:
+      for (k=0; k<ns; k++) {
+        if (speciestype[k]==SPECIES_ELECTRON) 
+          kappak[k]=_kappak_from_chik_N_T_Te_aav_Ai_Delta1_METHOD2(chik, N, T, Te, aav_e, Ai_e, Delta1_e, k);
+        else
+          kappak[k]=_kappak_from_chik_N_T_Te_aav_Ai_Delta1_METHOD2(chik, N, T, Te, aav, Ai, Delta1, k);
+      } 
+      for (spec=0; spec<ncs; spec++) kappac[spec]=kappak[spec];
+      *kappan=0.0;
+      for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
+    break;
+    case METHOD3:
+      (*kappan)=_kappa_from_rhok_T_Te_METHOD3(rhok, T, Te);
+      for (k=0; k<ncs; k++){
+        kappac[k]=_kappak_from_chik_Delta1_Delta2_METHOD4(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
+        (*kappan)-=kappac[k];
+      }
+    break;
+    case METHOD4:
+      for (k=0; k<ns; k++){
+        kappak[k]=_kappak_from_chik_Delta1_Delta2_METHOD4(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
+      }
+      for (spec=0; spec<ncs; spec++) kappac[spec]=kappak[spec];
+      *kappan=0.0;
+      for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
+    break;
+    default:
+      fatal_error("METHOD can not be set to %ld.",METHOD);
   }
-  
-  for (k=0; k<ns; k++) {
-    if (speciestype[k]==SPECIES_ELECTRON) 
-      kappak[k]=_kappak_from_chik_N_T_Te_aav_Ai_Delta1_METHOD2(chik, N, T, Te, aav_e, Ai_e, Delta1_e, k);
-    else
-      kappak[k]=_kappak_from_chik_N_T_Te_aav_Ai_Delta1_METHOD2(chik, N, T, Te, aav, Ai, Delta1, k);
+
+  for (k=0; k<ncs; k++){
+    if (speciestype[k]==SPECIES_ELECTRON) {
+      muk[k]=_muk_from_kappak(kappak[k], Te, rhok[k], k);
+    } else {
+      muk[k]=_muk_from_kappak(kappak[k], T, rhok[k], k);      
+    }    
   }
-  
-  
   *eta=_eta_from_chik_N_T_Te_Delta1_Delta2(chik, N, T, Te, Delta1, Delta2);
   find_nuk_from_chik_N_T_Te_muk_Delta1(chik, N, T, Te, muk, Delta1, nuk);
-  for (spec=0; spec<ncs; spec++) kappac[spec]=kappak[spec];
-  *kappan=0.0;
-  for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
 }
 
 
@@ -1346,3 +1249,11 @@ void find_nuk_eta_kappa(spec_t rhok, double T, double Te,
   *kappa=kappan;
   for (k=0; k<ncs; k++)  *kappa+=kappac[k];
 }
+
+
+void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok){
+  long spec;
+  *dmukdTk=0.0;
+  for (spec=0; spec<ns; spec++) dmukdrhok[spec]=0.0;
+}
+

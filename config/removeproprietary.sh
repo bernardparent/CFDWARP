@@ -43,10 +43,6 @@ echo "Removing proprietary directory .././model/emfield/_Epotential"
 rm -rf .././model/emfield/_Epotential 
 cp -a _proprietary .././model/emfield/_Epotential 
 ( printf "current Epotential\nEND" ) > .././model/emfield/_Epotential/.config 
-echo "Removing proprietary directory .././model/emfield/_Epotential-Te"
-rm -rf .././model/emfield/_Epotential-Te 
-cp -a _proprietary .././model/emfield/_Epotential-Te 
-( printf "current Epotential-Te\nEND" ) > .././model/emfield/_Epotential-Te/.config 
 echo "Removing proprietary directory .././model/emfield/_Epotential-Bfixed"
 rm -rf .././model/emfield/_Epotential-Bfixed 
 cp -a _proprietary .././model/emfield/_Epotential-Bfixed 

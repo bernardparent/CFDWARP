@@ -850,6 +850,7 @@ void test_eta ( double Tmin, double Tmax, double dT ) {
       rho=1.0; //?????? value of rho should not affect viscosities
       for (spec3=0; spec3<ns; spec3++) rhok[spec3]=w[spec3]*rho;
       find_nuk_eta_kappa(rhok, T, Te, nuk, &eta, &kappa);
+      
       wfprintf ( stdout, "%+12.5E ", eta );
       
     }

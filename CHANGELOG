@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 04a
+  * in model/emfield
+    - removed _Epotential-Te
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - in find_post_variable_value_fluid(), removed the unneeded call to find_nuk_eta_kappak_muk()
+  * in model/transport/_Gupta-Yos/transport.c
+    - various improvements
+    
+
 2022 JUN 03a
   * in model/chem/*/chem.c
     - got rid of mu within parameters passed to find_dW_dx() 
