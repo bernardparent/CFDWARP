@@ -86,7 +86,20 @@ PARENT, Bernard
   - most modules
 
 	
-RAJENDRAN, Prasanna T.
+RODRIGUEZ FUENTES, Felipe Martin
+
+  - contributed to model/transport/_Gupta-Yos
+  
+    
+SCHWARTZENTRUBER, Thomas E.
+
+  - implementation of superzone in cycle/share/cycle_share.c part of SHAREDMPI commands
+
+  - implementation of the subsonic outflow boundary condition based
+    on constant Mach number in model/share/fluid_share.c
+
+
+THOGULUVA RAJENDRAN, Prasanna T.
 
   - addition of bin/taylor_green_vortex.*
 
@@ -118,14 +131,11 @@ RAJENDRAN, Prasanna T.
   - fixed bug in model/share/chem_share.c within add_to_dW_3r3p() and add_to_dW_3r2p() functions
   
   - added model/chem/_Air_Plasma_11s/kim2021.c
+  
+  - contributed to model/transport/_Gupta-Yos
+  
+  - added tools/equilairplasma.c
 
-
-SCHWARTZENTRUBER, Thomas E.
-
-  - implementation of superzone in cycle/share/cycle_share.c part of SHAREDMPI commands
-
-  - implementation of the subsonic outflow boundary condition based
-    on constant Mach number in model/share/fluid_share.c
 
 
 TRINH, Aaron

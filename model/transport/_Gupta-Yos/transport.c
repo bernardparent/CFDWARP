@@ -793,10 +793,10 @@ double EXM_matrix_determinant(EXM_mat_t mat){//improve this, triangular matrix i
 }
 
 
-static double _epc(double rhoe, double Te){
-  double Pe;
-  double epc;
-  
+static double _epc(spec_t rhok, double Te){
+#ifdef speceminus  
+  double Pe,rhoe,epc;
+  rhoe=rhok[speceminus];
   Pe = rhoe*calR*Te/_calM(speceminus)/101325.0e0; //electron pressure, atm
   /*electron pressure correction for the collision integrals of ionic species*/ /*Eq(24b)*/
   switch (EPC){
@@ -817,6 +817,9 @@ static double _epc(double rhoe, double Te){
     default:
       fatal_error("EPC set to invalid value.");
   }
+#else
+  epc=1.0;
+#endif
   return(epc);
 }
 
@@ -890,7 +893,7 @@ double _kappa_from_rhok_T_Te_METHOD2(spec_t rhok, double T, double Te){
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
 
-  find_Delta1_Delta2(N,T,_epc(rhok[speceminus], Te),Delta1,Delta2);
+  find_Delta1_Delta2(N,T,_epc(rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
   
   kappa_tr     = 0.0e0;
@@ -965,7 +968,7 @@ double _kappa_from_rhok_T_Te_METHOD1(spec_t rhok, double T, double Te){
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
 
-  find_Delta1_Delta2(N,T,_epc(rhok[speceminus], Te),Delta1,Delta2);
+  find_Delta1_Delta2(N,T,_epc(rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
   
 
@@ -1025,7 +1028,7 @@ double _kappa_from_rhok_T_Te_METHOD3(spec_t rhok, double T, double Te){
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
 
-  find_Delta1_Delta2(N,T,_epc(rhok[speceminus], Te),Delta1,Delta2);
+  find_Delta1_Delta2(N,T,_epc(rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
   
 
@@ -1183,10 +1186,10 @@ void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N; 
 
-  find_Delta1_Delta2(N,T,_epc(rhok[speceminus], Te),Delta1,Delta2);
+  find_Delta1_Delta2(N,T,_epc(rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);  
 
-  find_Delta1_Delta2(N,Te,_epc(rhok[speceminus], Te),Delta1_e,Delta2_e);
+  find_Delta1_Delta2(N,Te,_epc(rhok, Te),Delta1_e,Delta2_e);
   find_aij_Ai_for_kappa(chik, N, Te, Delta1_e, Delta2_e, aij_e, Ai_e, &aav_e);  
   
 

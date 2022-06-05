@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 05a
+  * in model/transport/_Gupta-Yos/transport.c
+    - in _epc(), changed the parameter rhoe by the parameter rhok
+    - in _epc(), now sets eps to 1 if no electron species is specified within the chemical model
+      using a #ifdef speceminus 
+  * in tools
+    - added equilairplasma.c
+
+
 2022 JUN 04a
   * in model/emfield
     - removed _Epotential-Te
