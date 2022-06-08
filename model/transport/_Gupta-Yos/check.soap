@@ -1,7 +1,10 @@
 #!/usr/local/bin/soap
-Ne=2.45e20;
+
 kB=1.38e-23;
-Te=15000;
+Te=10000;
+P=101300;
+N=P/kB/Te;
+Ne=N*0.01;
 
 {Gas Discharge Physics, Raizer, page 14}
 lnLambda1=13.57+1.5*ln(Te/11600)/ln(10)-0.5*ln(Ne/1e6)/ln(10); 

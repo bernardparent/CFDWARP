@@ -6,6 +6,10 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2022 JUN 07b
+  * in model/share/transport_share.c
+    - changed LNLAMBDA from LNLAMBDA_NRL to LNLAMBDA_RAIZER
+    
 
 2022 JUN 07a
   * in model/transport/_Gupta-Yos/transport.c
