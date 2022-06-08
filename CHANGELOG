@@ -7,6 +7,25 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 07a
+  * in model/transport/_Gupta-Yos/transport.c
+    - Added METHOD5 (same as METHOD4 but with the mobilities and charged species thermal conductivities
+      obtained from the Parent-Macheret model)
+    - in _epc(), added a max() to make sure that the returned epc is never below 1
+  * in model/transport/_Dixon-Lewis/transport.c
+    - deleted _mue_from_Nn_Ni_Te(), _mui_from_Nn_Ni_Ti(), _muk_from_rhok_T_Te_Ek(), 
+      find_dmue_from_Nn_Ni_Te(), find_dmui_from_Nn_Ni_Ti(), find_dmuk_from_rhok_Tk_Ek() 
+    - in find_nuk_eta_kappak_muk() and find_dmuk_from_rhok_Tk_Ek(), now calls functions ParentMacheret
+      functions in transport_share.c to find the mobilities and thermal conductivities of the charged
+      species
+  * in model/share/transport_share.c
+    - added function_lnLambda()
+    - added _mue_from_Nn_Ni_Te_rhok(), _mui_from_Nn_Ni_Ti(), _muk_from_rhok_T_Te_ParentMacheret(),
+      find_dmue_from_Nn_Ni_Te(), find_dmui_from_Nn_Ni_Ti(), find_dmuk_from_rhok_Tk_Ek_ParentMacheret()
+  * in tools/README
+    - added a line explaining the purpose of equilairplasma.c
+          
+
 2022 JUN 05a
   * in model/transport/_Gupta-Yos/transport.c
     - in _epc(), changed the parameter rhoe by the parameter rhok

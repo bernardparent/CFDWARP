@@ -581,236 +581,15 @@ void find_nuk_from_rhok_T_Te_muk(spec_t rhok, double T, double Te, chargedspec_t
 
 
 
-/* electron mobility as a function of electron temperature and mass densities*/
-static double _mue_from_Nn_Ni_Te(double Nn, double Ni, double Te){
-  double muen,mue,muei;
-  Te=max(Te,300.0);
-  muen=3.74E19*exp(33.5/sqrt(log(Te)))/Nn;
-  muei=1.9e16*pow(Te,1.5)/Ni;
-  mue=1.0/(1.0/muen+1.0/muei);
-  return(mue);
-}
-
-
-/* the weakly-ionized ion mobility corresponds to mui=min(A*Ti^n,B*Estar^p)/Nn 
- * mi is the mass of the ion in kg*/
-static double _mui_from_Nn_Ni_Ti(double Nn, double Ni, double A, double Ti, double n, double B, double Estar, double p, double mi){
-  double muin,muii,mui;
-  muin=min(A*pow(Ti,n),B*pow(Estar,p))/Nn;
-  muii=14.3e0/sqrt(mi)*pow(Ti,1.5)/Ni;
-  mui=1.0/(1.0/muin+1.0/muii);
-  return(mui);
-}
-
-
-
-/* find the mobility of species k [m2/Vs] using the species temperature Tk [K] and electric field in the species reference frame Ek [V/m] 
-
-  O2+, N2+, and NO+ are found from Sinnott, G., Golden, D. E., & Varney, R. N. (1968). Positive-Ion Mobilities in Dry Air. Physical Review, 170(1), 272–275. doi:10.1103/physrev.170.272 
-
-  O2- is found from GOSHO, Y. AND HARADA, A., “A New Technique for Measuring Negative Ion Mobilities at Atmospheric Pressure,” Journal of Physics D, Vol. 16, 1983, pp. 1159–1166.
-   
-  H2+, Cs+, N+, O+, O- are approximated using Fig. 8 in THE MOBILITIES OF SMALL IONS THE ATMOSPHERE AND THEIR RELATIONSHIP by E. UNGETHUM, Aerosol Science, 1974, Vol. 5, pp. 25 37. 
-*/ 
-double _muk_from_rhok_T_Te_Ek(spec_t rhok, double T, double Te, double Ek, long k){
-  double mu,Estar,N,Nn,Ni;
-  long spec;
-  mu=0.0;
-  N=0.0;
-  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
-  Nn=0.0;
-  for (spec=ncs; spec<ns; spec++){
-    Nn+=rhok[spec]/_m(spec);
-  }
-  Nn=max(1e0,Nn);
-  Ni=0.0;
-  for (spec=0; spec<ncs; spec++){
-    if (speciestype[spec]==SPECIES_IONPLUS) Ni+=rhok[spec]/_m(spec);
-  }
-  Ni=max(1e0,Ni);
-
-  Estar=Ek/N;
-#ifdef speceminus
-  if (CHEM_NEUTRAL && k==speceminus){
-    /* electrons */
-    mu=_mue_from_Nn_Ni_Te(Nn,Ni,Te);
-  } else {
-#endif
-    switch (smap[k]){
-      case SMAP_eminus:
-        mu=_mue_from_Nn_Ni_Te(Nn,Ni,Te);
-      break;
-      case SMAP_O2plus:  
-        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 1.18e23, T, -0.5, 3.61E12, Estar, -0.5,  _m(k));
-      break;
-      case SMAP_N2plus:
-        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 0.75e23, T, -0.5, 2.03E12, Estar, -0.5,  _m(k));
-      break;
-      case SMAP_O2minus:
-        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 0.97e23, T, -0.5, 3.56e19, Estar, -0.1,  _m(k));
-      break;
-      case SMAP_Ominus:
-        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 1.4*0.97e23, T, -0.5, 1.4*3.56e19, Estar, -0.1,  _m(k));
-      break;
-      case SMAP_NOplus:
-        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 1.62e23, T, -0.5, 4.47e12, Estar, -0.5,  _m(k));
-      break;
-      default:
-        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 2.2e10/sqrt(_m(k)), T, -0.5, 0.55/sqrt(_m(k)), Estar, -0.5,  _m(k));
-    }
-#ifdef speceminus
-  }
-#endif
-  return(mu);
-}
-
-
-
-
-static void find_dmue_from_Nn_Ni_Te(double Nn, double Ni, double Te, double *dmuedTe, spec_t dmuedrhok){
-  double logTe,dmuendTe;
-  double muen,kmuei,muei,dmuendNn,dmueidTe,dmueidNi,dmuedmuen,dmuedmuei;
-  spec_t dmuendrhok,dmueidrhok;
-  long spec;
-  if (Te>300.0){
-//  muei=1e16*pow(Te,1.5)/Ni;
-    muen=3.74E19*exp(33.5/sqrt(log(Te)))/Nn;
-    kmuei=1.9e16;
-    muei=kmuei/Ni*pow(Te,1.5);
-//    mue=1.0/(1.0/muen+1.0/muei);
-
-    
-    logTe=log(Te);
-    dmuendTe=-6.2645E20*exp(33.5/sqrt(logTe))/(Te*pow(logTe,1.5e0))/Nn;
-    dmuendNn=-3.74E19*exp(33.5/sqrt(logTe))/sqr(Nn);
-    for (spec=0; spec<ns; spec++){
-      dmuendrhok[spec]=0.0;
-      if (spec>=ncs) dmuendrhok[spec]=dmuendNn*1.0/_m(spec);
-    }
-
-    dmueidTe=kmuei/Ni*1.5*pow(Te,0.5);
-    dmueidNi=-kmuei/sqr(Ni)*pow(Te,1.5);
-    for (spec=0; spec<ns; spec++){
-      dmueidrhok[spec]=0.0;
-      if (speciestype[spec]==SPECIES_IONPLUS) dmueidrhok[spec]=dmueidNi*1.0/_m(spec);
-    }
-    
- 
-
-    dmuedmuen=1.0/sqr(muen)/sqr(1.0/muen+1.0/muei);
-    dmuedmuei=1.0/sqr(muei)/sqr(1.0/muen+1.0/muei);
-    *dmuedTe=dmuendTe*dmuedmuen+dmueidTe*dmuedmuei;
-    for (spec=0; spec<ns; spec++) dmuedrhok[spec]=dmuendrhok[spec]*dmuedmuen+dmueidrhok[spec]*dmuedmuei;
-  } else {
-    *dmuedTe=0.0;
-    for (spec=0; spec<ns; spec++) dmuedrhok[spec]=0.0;
-  }
-}
-
-
-
-/* the mobility corresponds to mui=min(A*Ti^n,B*Estar^p)/N */
-static void find_dmui_from_Nn_Ni_Ti(double Nn, double Ni, double A, double Ti, double n, double B, double Estar, double p, double mi,  double *dmuidTi, spec_t dmuidrhok){
-  long spec;
-  double term1,term2;
-  double dmuindTi,dmuiidNi,dmuidmuin,dmuidmuii,kmuii,muii,muin,dmuiidTi;
-  spec_t dmuindrhok,dmuiidrhok;
-  
-  for (spec=0; spec<ns; spec++) dmuindrhok[spec]=0.0;
-
-  muin=min(A*pow(Ti,n),B*pow(Estar,p))/Nn;
-  term1=A*pow(Ti,n);
-  term2=B*pow(Estar,p);
-  if (term1<term2){
-  	dmuindTi=term1*n/Ti/Nn;
-    for (spec=ncs; spec<ns; spec++) dmuindrhok[spec]=term1;
-  } else {
-  	dmuindTi=0.0;
-    for (spec=ncs; spec<ns; spec++) dmuindrhok[spec]=term2;
-  }
-  for (spec=ncs; spec<ns; spec++) dmuindrhok[spec]*=-1.0/(Nn*Nn)/_m(spec);
-
-  kmuii=14.3/sqrt(mi);
-  muii=kmuii/Ni*pow(Ti,1.5);
-  dmuiidTi=kmuii/Ni*1.5*pow(Ti,0.5);
-  dmuiidNi=-kmuii/sqr(Ni)*pow(Ti,1.5);
-  for (spec=0; spec<ns; spec++){
-    dmuiidrhok[spec]=0.0;
-    if (speciestype[spec]==SPECIES_IONPLUS) dmuiidrhok[spec]=dmuiidNi*1.0/_m(spec);
-  }
-
-
-  dmuidmuin=1.0/sqr(muin)/sqr(1.0/muin+1.0/muii);
-  dmuidmuii=1.0/sqr(muii)/sqr(1.0/muin+1.0/muii);
-  *dmuidTi=dmuindTi*dmuidmuin+dmuiidTi*dmuidmuii;
-  for (spec=0; spec<ns; spec++) dmuidrhok[spec]=dmuindrhok[spec]*dmuidmuin+dmuiidrhok[spec]*dmuidmuii;
-
-}
-
-
-void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok){
-  double N,Nn,Ni,Ekstar;
-  long spec;
-  N=0.0;
-  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
-  Nn=0.0;
-  for (spec=ncs; spec<ns; spec++){
-    Nn+=rhok[spec]/_m(spec);
-  }
-  Nn=max(1e0,Nn);
-  Ni=0.0;
-  for (spec=0; spec<ncs; spec++){
-    if (speciestype[spec]==SPECIES_IONPLUS) Ni+=rhok[spec]/_m(spec);
-  }
-  Ni=max(1e0,Ni);
-  Ekstar=Ek/N;
-#ifdef speceminus
-  if (CHEM_NEUTRAL && k==speceminus){
-    /* electrons */
-    find_dmue_from_Nn_Ni_Te(Nn, Ni, Tk, dmukdTk, dmukdrhok);
-  } else {
-#endif
-    for (spec=0; spec<ns; spec++) dmukdrhok[spec]=0.0;
-    switch (smap[k]){
-      case SMAP_eminus:
-        find_dmue_from_Nn_Ni_Te(Nn, Ni, Tk, dmukdTk, dmukdrhok);
-      break;
-      case SMAP_O2plus:
-        find_dmui_from_Nn_Ni_Ti(Nn, Ni, 1.18e23, Tk, -0.5, 3.61E12, Ekstar, -0.5, _m(k),  dmukdTk, dmukdrhok);
-      break;
-      case SMAP_N2plus:
-        find_dmui_from_Nn_Ni_Ti(Nn, Ni, 0.75e23, Tk, -0.5, 2.03E12, Ekstar, -0.5, _m(k),  dmukdTk, dmukdrhok);
-      break;
-      case SMAP_O2minus:
-        find_dmui_from_Nn_Ni_Ti(Nn, Ni, 0.97e23, Tk, -0.5, 3.56e19, Ekstar, -0.1, _m(k),  dmukdTk, dmukdrhok);
-      break;
-      case SMAP_Ominus:
-        find_dmui_from_Nn_Ni_Ti(Nn, Ni, 1.4*0.97e23, Tk, -0.5, 1.4*3.56e19, Ekstar, -0.1, _m(k),  dmukdTk, dmukdrhok);
-      break;
-      case SMAP_NOplus:
-        find_dmui_from_Nn_Ni_Ti(Nn, Ni, 1.62e23, Tk, -0.5, 4.47e12, Ekstar, -0.5, _m(k),  dmukdTk, dmukdrhok);
-      break;
-      default:
-        find_dmui_from_Nn_Ni_Ti(Nn, Ni, 2.2e10/sqrt(_m(k)), Tk, -0.5, 0.55/sqrt(_m(k)), Ekstar, -0.5, _m(k),  dmukdTk, dmukdrhok);
-    }
-#ifdef speceminus
-  }
-#endif
-
-
-}
-
 
 void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
                    spec_t nuk, double *eta, double *kappan, chargedspec_t kappac, chargedspec_t muk){
-  double Ek;
   long spec;
   
   *eta=_eta_from_rhok_T_Te(rhok,T,Te);
 
-  Ek=0.0;
   for (spec=0; spec<ncs; spec++) {
-    muk[spec]=_muk_from_rhok_T_Te_Ek(rhok, T, Te, Ek, spec);
+    muk[spec]=_muk_from_rhok_T_Te_ParentMacheret(rhok, T, Te, spec);
     kappac[spec]=_kappac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
   }
   *kappan=_kappan_from_rhok_T_Te(rhok, T, Te);
@@ -828,5 +607,10 @@ void find_nuk_eta_kappa(spec_t rhok, double T, double Te,
   for (spec=0; spec<ncs; spec++) *kappa+=kappac[spec];
 }
 
+
+
+void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok){
+  find_dmuk_from_rhok_Tk_Ek_ParentMacheret(rhok, Tk, Ek, k, dmukdTk, dmukdrhok);
+}
 
 

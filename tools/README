@@ -23,6 +23,8 @@ cathode.c                    finds the voltage drop through a cathode plasma she
 
 compressionfan.c             finds the x and y position of a prandtl-meyer compression 
                              surface
+                             
+equilairplasma.c             outputs the molar fractions of air in thermochemical equilibrium
 
 inlet.c                      finds properties in a 2-oblique-shock Oswatitch supersonic 
                              inlet 

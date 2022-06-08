@@ -54,7 +54,8 @@ Calculations to 30000 K,” NASA RP-1232, 1990.
 #define METHOD2 2  // Eq(30), approximation to method 1, yields results close to method 1 for air mixture
 #define METHOD3 3  // Eq(40a), approximation to method 1 ??? or method 2??
 #define METHOD4 4   // Eq(49) : 5-temperature model, thermal non-equilibrium, and valid to find kappak for each species while other methods can only be used to find kappa for the bulk
-#define METHOD METHOD4  //Use METHOD4. Other methods are for testing purposes only
+#define METHOD5 5  //same as METHOD4 except that muk and kappac are found from the Parent-Macheret model
+#define METHOD METHOD5  //Use METHOD5. Other methods are for testing purposes only
 
 
 double collision_integral_curvefit11(long s, long r, double T){
@@ -820,6 +821,7 @@ static double _epc(spec_t rhok, double Te){
 #else
   epc=1.0;
 #endif
+  epc=max(1.0,epc);
   return(epc);
 }
 
@@ -1227,16 +1229,30 @@ void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
       *kappan=0.0;
       for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
     break;
+    case METHOD5:
+      for (spec=0; spec<ncs; spec++) {
+        muk[spec]=_muk_from_rhok_T_Te_ParentMacheret(rhok, T, Te, spec);
+        kappac[spec]=_kappac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
+      }
+      for (k=0; k<ns; k++){
+        if (k<ncs) kappak[k]=kappac[k];
+          else kappak[k]=_kappak_from_chik_Delta1_Delta2_METHOD4(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
+      }
+      *kappan=0.0;
+      for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
+    break;
     default:
       fatal_error("METHOD can not be set to %ld.",METHOD);
   }
 
-  for (k=0; k<ncs; k++){
-    if (speciestype[k]==SPECIES_ELECTRON) {
-      muk[k]=_muk_from_kappak(kappak[k], Te, rhok[k], k);
-    } else {
-      muk[k]=_muk_from_kappak(kappak[k], T, rhok[k], k);      
-    }    
+  if (METHOD!=METHOD5){
+    for (k=0; k<ncs; k++){
+      if (speciestype[k]==SPECIES_ELECTRON) {
+        muk[k]=_muk_from_kappak(kappak[k], Te, rhok[k], k);
+      } else {
+        muk[k]=_muk_from_kappak(kappak[k], T, rhok[k], k);      
+      }    
+    }
   }
   *eta=_eta_from_chik_N_T_Te_Delta1_Delta2(chik, N, T, Te, Delta1, Delta2);
   find_nuk_from_chik_N_T_Te_muk_Delta1(chik, N, T, Te, muk, Delta1, nuk);
