@@ -7,6 +7,8 @@
 
 double _kappac_from_rhok_Tk_muk(spec_t rhok, double T, double Te, double muk, long k);
 
+double _etac_from_rhok_Tk_muk(spec_t rhok, double T, double Te, double muk, long k);
+
 /*
 double _kappac_from_rhok_Tk_Ek(spec_t rhok, double T, double Te, double E, long k);
 

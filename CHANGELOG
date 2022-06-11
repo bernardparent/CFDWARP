@@ -6,6 +6,24 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2022 JUN 11a
+  * in model/share/transport_share.c
+    - added function _etac_from_rhok_Tk_muk()
+  * moved
+    - model/thermo/_generic/ref/SAND86-8246REV98.pdf
+    - model/transport/_Dixon-Lewis/ref/NASA-TR-R-132.pdf
+    - model/transport/_Dixon-Lewis/ref/SAND86-8246.pdf
+    to model/transport/ref/
+  * in model/transport/_Dixon-Lewis/transport.c
+    - made modifications: now eta is found from the sum of etan and etac with etac
+      found from _etac_from_rhok_Tk_muk()
+  * in model/transport/doc/report.tex
+    - added Gupta-Yos and Capitelli models
+    - upgraded the Dixon-Lewis documentation
+    - added Parent-Macheret model for the charged species
+  
+
 2022 JUN 07b
   * in model/share/transport_share.c
     - changed LNLAMBDA from LNLAMBDA_NRL to LNLAMBDA_RAIZER

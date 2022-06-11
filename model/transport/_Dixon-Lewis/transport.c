@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 1998-2018,2020 Bernard Parent
+Copyright 1998-2018,2020,2022 Bernard Parent
 Copyright 2020 Aaron Trinh
 Copyright 2001 Jason Etele
 Copyright 2000 Giovanni Fusina
@@ -39,9 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // maximum reduced temperature (T/Peps) used to determine the viscosity, thermal conductivity, and mass diffusion coefficients with Leonard Jones potentials
 #define TSTAR_MAX 100.0
 
-#define INCLUDE_ELECTRONS_IN_ETA TRUE
 #define INCLUDE_ELECTRONS_IN_NU FALSE
-#define INCLUDE_ELECTRONS_IN_KAPPA TRUE
 
 
 
@@ -67,13 +65,13 @@ transport properties: Lennard-Jones Potential Parameters: epsilon & sigma
 Primary Reference: all species except those not mentioned in the secondary reference
 Svehla, R.A,"Estimated Viscosities and Thermal Conductivites of Gases at high temperature,"
 	NASA TR R-132, 1962
-CFDWARP/model/thermo/_generic/ref/NASA-TR-R-132.pdf
+CFDWARP/model/transport/ref/NASA-TR-R-132.pdf
 
 Secondary Reference: HO2, HCO, C2H3, C2H5, C4H8, CH2O, CH3, CH3O, HNO, NO2
 Sandia National Laboratories, "A Fortran Computer Code Package for the Evaluation of Gas Phase
 	Multicomponent Transport Properties," SAND86-8246, 1986
 Sandia National Laboratories: SAND86-8246 Update/Revision, 1998
-CFDWARP/model/transport/_dixonlewis/ref/SAND86-8246.pdf
+CFDWARP/model/transport/ref/SAND86-8246.pdf
 
 the transport properties of CHO, H2CO, C4H8O, C6H12O, C8H16, and C12H24
 are calculated as           HCO, CH2O, C4H8, C2H5OC2H5, C6H12, and C6H12 respectively
@@ -83,7 +81,7 @@ are calculated as           HCO, CH2O, C4H8, C2H5OC2H5, C6H12, and C6H12 respect
 /*The epsilon parameter values below are sourced from one of two tables above and include
  * Boltzmann's constant inside already. Thus the units are in Kelvin. (epsilon/k_b)
  * 
- * Units of sigma: A/10 (dA, deciangstrom)
+ * Units of sigma: nanometer
  * 
  * */
 
@@ -148,6 +146,8 @@ const static double Peps[SMAP_NS]=
    10.22,         /* He+  !! unknown value: fixed to the one of He*/
   };
 
+
+// collision diameter in nm
 const static double Psig[SMAP_NS]=
   {
    0.34e0,      /* e- */   /* !! unknown value: fixed to the one of O */
@@ -278,13 +278,7 @@ static double _etak_from_T(long spec, double T){
   double etak;
   etak=0.0;
   switch (speciestype[spec]) {
-    case SPECIES_IONPLUS:
-      etak=0.00118*sqrt(_m(spec))*pow(T,2.5e0);
-    break;
-    case SPECIES_ELECTRON:
-      etak=6.35e-4*sqrt(_m(spec))*pow(T,2.5e0);
-    break;
-    default: 
+    case SPECIES_NEUTRAL:
       assert((Psig[smap[spec]]*Psig[smap[spec]]*_Omega22(T,Peps[smap[spec]]))!=0.0e0);
       assert((_calM(spec)*T)>=0.0e0);
       etak=8.44107E-7*sqrt(_calM(spec)*T)/(Psig[smap[spec]]*Psig[smap[spec]]
@@ -297,71 +291,33 @@ static double _etak_from_T(long spec, double T){
       }
 #endif
     break;
+    default:
+      etak=0.0;
+      fatal_error("Wrong speciestype in _etak_from_T().");
   }
   assert(etak>0.0);
   return(etak);
 }
 
 
-
-
-
 static double _kappak_from_T(long spec, double T){
   double etak,kappak;
   etak=_etak_from_T(spec,T);
-  if (_numatoms(spec)>1) {
-    kappak=15.0e0/4.0e0*calR/_calM(spec)*etak*
+  switch (speciestype[spec]) {
+    case SPECIES_NEUTRAL:
+      if (_numatoms(spec)>1) {
+        kappak=15.0e0/4.0e0*calR/_calM(spec)*etak*
                   (0.115e0+0.354e0*_calM(spec)*_cpk_from_T(spec,T)/calR);
-  } else {
-    kappak=15.0e0/4.0e0*calR/_calM(spec)*etak;
-  }  
-  return(kappak);
-}
-
-
-
-double _kappa_from_rhok_T_Te(spec_t rhok, double T, double Te){
-  long spec,k,l;
-  spec_t kappak,chik,etak,w;
-  double rho,chisum,kappamix,sum;
-
-  rho=0.0;
-  for (spec=0; spec<ns; spec++) rho+=rhok[spec];
-  for (spec=0; spec<ns; spec++) w[spec]=rhok[spec]/rho;
-  
-  for (spec=0; spec<ns; spec++){
-    kappak[spec]=_kappak_from_T(spec,T); 
-    etak[spec]=_etak_from_T(spec,T);
+      } else {
+        kappak=15.0e0/4.0e0*calR/_calM(spec)*etak;
+      }  
+    break;
+    default:
+      kappak=0.0;
+      fatal_error("Wrong speciestype in _kappak_from_T().");
   }
-  chisum=0.0e0;
-  for (spec=0; spec<ns; spec++){
-    if (speciestype[spec]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_KAPPA) 
-      chisum+=w[spec]/_calM(spec);
-  }
-  assert(chisum!=0.0e0);
-  for (spec=0; spec<ns; spec++){
-    chik[spec]=w[spec]/_calM(spec)/chisum;
-  }
-  kappamix=0.0e0;
-  for (k=0; k<ns; k++){
-    if (speciestype[k]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_KAPPA) { 
-      sum=0.0e0;
-      for (l=0; l<ns; l++){
-        if (l!=k && (speciestype[l]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_KAPPA)) { 
-          assert(etak[l]!=0.0e0);
-          assert((1.0e0+_calM(k)/_calM(l))*8.0e0>0.0e0);
-          assert((etak[k]/etak[l])>0.0e0);
-          sum=sum+chik[l]/sqrt((1.0e0+_calM(k)/_calM(l))*8.0e0)*
-                pow(1.0e0+sqrt(etak[k]/etak[l])*pow(_calM(l)/_calM(k),0.25e0),2.0e0);
-        }
-      }	
-      assert((chik[k]+1.0654e0*sum)!=0.0e0);
-      kappamix=kappamix+chik[k]*kappak[k]/(chik[k]+1.0654e0*sum);
-    }
-  }
-
     
-  return(kappamix);                   
+  return(kappak);
 }
 
 
@@ -375,7 +331,7 @@ double _kappan_from_rhok_T_Te(spec_t rhok, double T, double Te){
   for (spec=0; spec<ns; spec++) rho+=rhok[spec];
   for (spec=0; spec<ns; spec++) w[spec]=rhok[spec]/rho;
   
-  for (spec=0; spec<ns; spec++){
+  for (spec=ncs; spec<ns; spec++){
     kappak[spec]=_kappak_from_T(spec,T); 
     etak[spec]=_etak_from_T(spec,T);
   }
@@ -389,23 +345,20 @@ double _kappan_from_rhok_T_Te(spec_t rhok, double T, double Te){
     chik[spec]=w[spec]/_calM(spec)/chisum;
   }
   kappamix=0.0e0;
-  for (k=0; k<ns; k++){
-    if (speciestype[k]==SPECIES_NEUTRAL) { 
-      sum=0.0e0;
-      for (l=0; l<ns; l++){
-        if (l!=k && (speciestype[l]==SPECIES_NEUTRAL)) { 
-          assert(etak[l]!=0.0e0);
-          assert((1.0e0+_calM(k)/_calM(l))*8.0e0>0.0e0);
-          assert((etak[k]/etak[l])>0.0e0);
-          sum=sum+chik[l]/sqrt((1.0e0+_calM(k)/_calM(l))*8.0e0)*
-                pow(1.0e0+sqrt(etak[k]/etak[l])*pow(_calM(l)/_calM(k),0.25e0),2.0e0);
-        }
-      }	
-      assert((chik[k]+1.0654e0*sum)!=0.0e0);
-      kappamix=kappamix+chik[k]*kappak[k]/(chik[k]+1.0654e0*sum);
-    }
+  for (k=ncs; k<ns; k++){
+    sum=0.0e0;
+    for (l=0; l<ns; l++){
+      if (l!=k && (speciestype[l]==SPECIES_NEUTRAL)) { 
+        assert(etak[l]!=0.0e0);
+        assert((1.0e0+_calM(k)/_calM(l))*8.0e0>0.0e0);
+        assert((etak[k]/etak[l])>0.0e0);
+        sum=sum+chik[l]/sqrt((1.0e0+_calM(k)/_calM(l))*8.0e0)*
+              pow(1.0e0+sqrt(etak[k]/etak[l])*pow(_calM(l)/_calM(k),0.25e0),2.0e0);
+      }
+    }	
+    assert((chik[k]+1.0654e0*sum)!=0.0e0);
+    kappamix=kappamix+chik[k]*kappak[k]/(chik[k]+1.0654e0*sum);
   }
-
 
   /* make an adjustment to *kappa when charged species are not included */
   sum=0.0;
@@ -420,52 +373,6 @@ double _kappan_from_rhok_T_Te(spec_t rhok, double T, double Te){
 }
 
 
-
-
-double _eta_from_rhok_T_Te(spec_t rhok, double T, double Te){
-  long spec,k,l;
-  spec_t etak,chik,w;
-  double chisum,etamix,sum,rho;
-
-  rho=0.0;
-  for (spec=0; spec<ns; spec++) rho+=rhok[spec];
-  for (spec=0; spec<ns; spec++) w[spec]=rhok[spec]/rho;
-  
-  for (spec=0; spec<ns; spec++){
-    etak[spec]=_etak_from_T(spec,T);
-  }
-  chisum=0.0e0;
-  for (spec=0; spec<ns; spec++){
-    if (speciestype[spec]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_ETA) 
-      chisum+=w[spec]/_calM(spec);
-  }
-  assert(chisum!=0.0e0);
-  for (spec=0; spec<ns; spec++){
-    chik[spec]=w[spec]/_calM(spec)/chisum;
-  }
-  etamix=0.0e0;
-  for (k=0; k<ns; k++){
-    if (speciestype[k]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_ETA) { 
-      sum=0.0e0;
-      for (l=0; l<ns; l++){
-        if (l!=k && (speciestype[l]!=SPECIES_ELECTRON || INCLUDE_ELECTRONS_IN_ETA)) { 
-          assert(etak[l]!=0.0e0);
-          assert((1.0e0+_calM(k)/_calM(l))*8.0e0>0.0e0);
-          assert((etak[k]/etak[l])>0.0e0);
-          sum=sum+chik[l]/sqrt((1.0e0+_calM(k)/_calM(l))*8.0e0)*
-                pow(1.0e0+sqrt(etak[k]/etak[l])*pow(_calM(l)/_calM(k),0.25e0),2.0e0);
-        }
-      }	
-      assert((chik[k]+sum)!=0.0e0);
-      etamix+=chik[k]*etak[k]/(chik[k]+sum);
-    }
-  }
-  return(etamix);
-
-}
-
-
-
 /* find eta for the neutral species mixture */
 double _etan_from_rhok_T_Te(spec_t rhok, double T, double Te){
   long spec,k,l;
@@ -476,7 +383,7 @@ double _etan_from_rhok_T_Te(spec_t rhok, double T, double Te){
   for (spec=0; spec<ns; spec++) rho+=rhok[spec];
   for (spec=0; spec<ns; spec++) w[spec]=rhok[spec]/rho;
   
-  for (spec=0; spec<ns; spec++){
+  for (spec=ncs; spec<ns; spec++){
     etak[spec]=_etak_from_T(spec,T);
   }
   chisum=0.0e0;
@@ -489,21 +396,19 @@ double _etan_from_rhok_T_Te(spec_t rhok, double T, double Te){
     chik[spec]=w[spec]/_calM(spec)/chisum;
   }
   etamix=0.0e0;
-  for (k=0; k<ns; k++){
-    if (speciestype[k]==SPECIES_NEUTRAL) { 
-      sum=0.0e0;
-      for (l=0; l<ns; l++){
-        if (l!=k && (speciestype[l]==SPECIES_NEUTRAL)) { 
-          assert(etak[l]!=0.0e0);
-          assert((1.0e0+_calM(k)/_calM(l))*8.0e0>0.0e0);
-          assert((etak[k]/etak[l])>0.0e0);
-          sum=sum+chik[l]/sqrt((1.0e0+_calM(k)/_calM(l))*8.0e0)*
-                pow(1.0e0+sqrt(etak[k]/etak[l])*pow(_calM(l)/_calM(k),0.25e0),2.0e0);
-        }
-      }	
-      assert((chik[k]+sum)!=0.0e0);
-      etamix+=chik[k]*etak[k]/(chik[k]+sum);
-    }
+  for (k=ncs; k<ns; k++){
+    sum=0.0e0;
+    for (l=0; l<ns; l++){
+      if (l!=k && (speciestype[l]==SPECIES_NEUTRAL)) { 
+        assert(etak[l]!=0.0e0);
+        assert((1.0e0+_calM(k)/_calM(l))*8.0e0>0.0e0);
+        assert((etak[k]/etak[l])>0.0e0);
+        sum=sum+chik[l]/sqrt((1.0e0+_calM(k)/_calM(l))*8.0e0)*
+              pow(1.0e0+sqrt(etak[k]/etak[l])*pow(_calM(l)/_calM(k),0.25e0),2.0e0);
+      }
+    }	
+    assert((chik[k]+sum)!=0.0e0);
+    etamix+=chik[k]*etak[k]/(chik[k]+sum);
   }
   /* make an adjustment to *eta when charged species are not included */
   sum=0.0;
@@ -515,7 +420,6 @@ double _etan_from_rhok_T_Te(spec_t rhok, double T, double Te){
     sum2+=w[k]/_calM(k);
   }
   return(etamix*sum/sum2);
-
 }
 
 
@@ -561,7 +465,6 @@ void find_nuk_from_rhok_T_Te_muk(spec_t rhok, double T, double Te, chargedspec_t
     }
   }
   
-  
   for (k=0; k<ns; k++){
     sum=0.0e0;
     for (l=0; l<ns; l++){
@@ -575,22 +478,18 @@ void find_nuk_from_rhok_T_Te_muk(spec_t rhok, double T, double Te, chargedspec_t
   }
   
   adjust_nuk_using_mobilities_given_muk(rhok, T, Te, muk, nuk);
-
 }
-
-
-
 
 
 void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
                    spec_t nuk, double *eta, double *kappan, chargedspec_t kappac, chargedspec_t muk){
   long spec;
   
-  *eta=_eta_from_rhok_T_Te(rhok,T,Te);
-
+  *eta=_etan_from_rhok_T_Te(rhok,T,Te);
   for (spec=0; spec<ncs; spec++) {
     muk[spec]=_muk_from_rhok_T_Te_ParentMacheret(rhok, T, Te, spec);
     kappac[spec]=_kappac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
+    (*eta)+=_etac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
   }
   *kappan=_kappan_from_rhok_T_Te(rhok, T, Te);
   find_nuk_from_rhok_T_Te_muk(rhok, T, Te, muk, nuk);
@@ -606,7 +505,6 @@ void find_nuk_eta_kappa(spec_t rhok, double T, double Te,
   *kappa=kappan;
   for (spec=0; spec<ncs; spec++) *kappa+=kappac[spec];
 }
-
 
 
 void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok){

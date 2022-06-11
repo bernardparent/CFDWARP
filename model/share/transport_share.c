@@ -53,6 +53,27 @@ double _kappac_from_rhok_Tk_muk(spec_t rhok, double T, double Te, double muk, lo
 
 
 
+// find the scalar viscosity of the kth charged species
+double _etac_from_rhok_Tk_muk(spec_t rhok, double T, double Te, double muk, long k){
+  double Pr,eta,kappa,cp,Tk;
+  if (k>=ncs) fatal_error("_etac_from_rhok_Tk_Ek can only be used for charged species, not for species %ld.",k);
+  if (smap[k]==SMAP_eminus) {
+    Tk=Te;
+  } else {
+    Tk=T;
+  }
+  cp=_cpk_from_T_equilibrium(k,Tk);
+  kappa=_kappac_from_rhok_Tk_muk(rhok,T,Te,muk,k);
+  if (speciestype[k]==SPECIES_ELECTRON){
+    Pr=0.73; 
+  } else {
+    Pr=0.96;
+  }
+  eta=Pr*kappa/cp;
+  return(eta);
+}
+
+
 
 void adjust_nuk_using_mobilities_given_muk(spec_t rhok, double T, double Te, chargedspec_t muk, spec_t nuk){
   long spec,k;

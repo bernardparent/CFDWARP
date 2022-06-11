@@ -219,7 +219,7 @@ Model(
     sigmadiv=1e-10; {S/m}
     etdiv=1e-1;     {J/kg}
     Pmin=1.0e3;    Pmax=9.9e99;   {Pa}
-    Tmin=1000;     Tmax=80000;    {K}
+    Tmin=1000;     Tmax=150000;    {K}
     Tvmin=Tmin;     Tvmax=Tmax;  {K}
     Temin=300;     Temax=4e5;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}

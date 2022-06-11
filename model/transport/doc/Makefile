@@ -22,6 +22,7 @@ clean:
 	( rm -f report.dvi )
 	( rm -f report.ps )
 	( rm -f report.pdf ) 
+	( rm -f report.out ) 
 	( rm -f core )
 	( rm -f *~ )
 	( rm -f *.aux *.bbl *.blg *.log *.toc *.ilg *.ind) 
