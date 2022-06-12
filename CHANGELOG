@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 12a
+  * in model/thermo/_generic/thermo.c
+    - added species: C2H
+  * in model/thermo/_generic/thermo.hh
+    - added species: C2H to species map
+  * in model/thermo/_generic/enthalpy.c
+    - added Glenn polynomial coefficients for species: C2H
+  * in model/transport/_Dixon-Lewis/transport.c
+    - added transport properties for species: C2H
+  * in model/thermo/_generic/thermo.c
+    - added species C2H
+      
+
 2022 JUN 11a
   * in model/share/transport_share.c
     - added function _etac_from_rhok_Tk_muk()

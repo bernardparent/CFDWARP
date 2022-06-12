@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
+Copyright 2022 Felipe Martin Rodriguez Fuentes
 Copyright 1998-2018,2020 Bernard Parent
 Copyright 2020 Aaron Trinh
 Copyright 2001 Jason Etele
@@ -2333,8 +2334,55 @@ const static double Pa[SMAP_NS][3][11]=
         2.853233739E+05,
         1.621665557E+00
       }
-    }
-   
+    },
+
+/* species C2H, Ethynyl
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +200.0e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       1.343669487E+04,
+      -5.067970720E+02,
+       7.772107410E+00,
+      -6.512339820E-03,
+       1.030117855E-05,
+      -5.880147670E-09,
+       1.226901861E-12,
+       6.892269990E+04,
+      -1.871881626E+01
+      },
+      {
+       +1000.0e0,            /* Tmin [K] */ 
+       +6000.0e0-dTrangemin, /* Tmax [K] */
+        3.922334570E+06,
+       -1.204751703E+04,
+        1.756172920E+01,
+       -3.655442940E-03,
+        6.987685430E-07,
+       -6.825162010E-11,
+        2.719262793E-15,
+        1.433266627E+05,
+       -9.561634380E+01
+      },
+      {
+       +6000.0e0-dTrangemin,  /* Tmin [K] */
+       +6000.0e0,             /* Tmax [K] */
+        3.922334570E+06,
+       -1.204751703E+04,
+        1.756172920E+01,
+       -3.655442940E-03,
+        6.987685430E-07,
+       -6.825162010E-11,
+        2.719262793E-15,
+        1.433266627E+05,
+       -9.561634380E+01
+      }
+    }   
    
   };
 

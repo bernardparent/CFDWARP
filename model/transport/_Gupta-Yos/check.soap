@@ -1,10 +1,23 @@
 #!/usr/local/bin/soap
 
 kB=1.38e-23;
-Te=10000;
+Ce=1.602e-19;
+Te=8000;
 P=101300;
 N=P/kB/Te;
-Ne=N*0.01;
+
+Ne=2.04e-8*N; {3000 K}
+Ne=1.95e-6*N; {4000 K}
+Ne=3.45e-5*N; {5000 K}
+Ne=1.49e-4*N; {6000 K}
+Ne=3.22e-4*N; {7000 K}
+Ne=1.45e-3*N; {8000 K}
+Ne=8.74e-3*N; {9000 K}
+Ne=2.44e-2*N; {10000 K}
+
+Ne=3.22e-4*N; {7000 K}
+
+Nn=N-Ne*2;
 
 {Gas Discharge Physics, Raizer, page 14}
 lnLambda1=13.57+1.5*ln(Te/11600)/ln(10)-0.5*ln(Ne/1e6)/ln(10); 
@@ -16,6 +29,14 @@ lnLambda2=23.0-ln(sqrt(Ne/1e6)*(Te/11600)^(-1.5));
 Pe=Ne*kB*Te/101300;
 lnLambda3=0.5*ln(2.09E-2*(Te/1000/Pe^0.25)^4+1.52*(Te/1000/Pe^0.25)^(8/3));
 
+lnLambda=lnLambda1;
+
+muei=9.5e16*Te^1.5/Ne/lnLambda;
+muen=3.74e19/Nn*exp(33.5*(ln(Te))^(-0.5));
+
+mue=1/(1/muei+1/muen);
+
 printf("lnLambda1=%E\n",lnLambda1);
 printf("lnLambda2=%E\n",lnLambda2);
 printf("lnLambda3=%E\n",lnLambda3);
+printf("sigma=%E\n",Ne*mue*Ce);

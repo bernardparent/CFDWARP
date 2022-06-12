@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
+Copyright 2022 Felipe Martin Rodriguez Fuentes
 Copyright 1998-2018,2020,2022 Bernard Parent
 Copyright 2020 Aaron Trinh
 Copyright 2001 Jason Etele
@@ -144,6 +145,7 @@ const static double Peps[SMAP_NS]=
    37.0,        /* H+ */ /* !! unknown value: fixed to the one of H */
    144.0,         /* CH2 */
    10.22,         /* He+  !! unknown value: fixed to the one of He*/
+   209.0E+0,     /* C2H */ /* SAND86-8246 */
   };
 
 
@@ -207,6 +209,7 @@ const static double Psig[SMAP_NS]=
    0.2708E+0,   /* H+  !! fixed to the one of H */ 
    0.3800E+0,   /* CH2 */
    0.2551E+0,   /* He+ !! fixed to the one of He */
+   0.4100E+0,   /* C2H */ /* from SAND86-8246 */
   };
 
 static double _Omega11(double T, double eps){

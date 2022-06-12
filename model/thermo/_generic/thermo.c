@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
+Copyright 2022 Felipe Martin Rodriguez Fuentes
 Copyright 1998-2018,2020 Bernard Parent
 Copyright 2020 Aaron Trinh
 Copyright 2001 Jason Etele
@@ -102,7 +103,8 @@ const static speciesname_t speciesname[SMAP_NS]=
    "NO2",
    "H+",
    "CH2",
-   "He+"
+   "He+",
+   "C2H"
   };
 
 
@@ -178,8 +180,9 @@ const static double calM[SMAP_NS]=
    1.00739E-3,     /* H+ */
    14.02658E-3,    /* CH2 */
    4.00205e-3,    /* He+ */
+   25.21134e-3,    /* C2H */   
   };
-  
+
 
 /* the species number of charges */
 const static long ck[SMAP_NS]=
@@ -241,6 +244,7 @@ const static long ck[SMAP_NS]=
    1,  /* H+ */
    0,  /* CH2 */
    1,  /* He+ */
+   0,  /* C2H */
   };
   
 const static long numatoms[SMAP_NS]=
@@ -302,6 +306,7 @@ const static long numatoms[SMAP_NS]=
    1,  /* H+ */
    3,  /* CH2 */
    1,  /* He+ */
+   3,  /* C2H */
   }; 
   
 
