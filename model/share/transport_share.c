@@ -77,14 +77,11 @@ double _etac_from_rhok_Tk_muk(spec_t rhok, double T, double Te, double muk, long
 
 void adjust_nuk_using_mobilities_given_muk(spec_t rhok, double T, double Te, chargedspec_t muk, spec_t nuk){
   long spec,k;
-  spec_t w;
   double rho;
-  double nuwsum,wsum;
   
 
   rho=0.0;
   for (spec=0; spec<ns; spec++) rho+=rhok[spec];
-  for (spec=0; spec<ns; spec++) w[spec]=rhok[spec]/rho;
   
   
   for (k=0; k<ncs; k++){
@@ -99,6 +96,10 @@ void adjust_nuk_using_mobilities_given_muk(spec_t rhok, double T, double Te, cha
   }
   
 #ifdef speceminus
+  double nuwsum,wsum;
+  spec_t w;
+
+  for (spec=0; spec<ns; spec++) w[spec]=rhok[spec]/rho;
   nuwsum=0.0;
   wsum=0.0;
   for (k=0; k<ncs; k++){
@@ -149,8 +150,9 @@ void adjust_muk_for_Ek_effect(long k, double Ek, double N, double *muk){
 
 
 static double _lnLambda(spec_t rhok, double Te){
+  double lnlambda;
 #ifdef speceminus  
-  double Pe,rhoe,lnlambda;
+  double Pe,rhoe;
   rhoe=rhok[speceminus];
   Pe = rhoe*calR*Te/_calM(speceminus)/101325.0e0; //electron pressure, atm
   /*electron pressure correction for the collision integrals of ionic species*/ /*Eq(24b)*/

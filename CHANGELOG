@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 13a
+  * in model/share/transport_share.c
+    - in _lnLambda(), fixed a bug: when the chemical models does not include electrons, the variable
+      lnlambda was not defined.
+    - in adjust_nuk_using_mobilities_given_muk(), cleaned up the code so that no compilation
+      warning is given about some defined variables not being used
+      
+
 2022 JUN 12a
   * in model/thermo/_generic/thermo.c
     - added species: C2H
