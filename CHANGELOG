@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 16a
+  * in model/thermo/_generic/enthalpy.c
+    - added species N2(A3Sigma), N2(B3Pi), N2(ap1Sigma), N2(C3Pi), O(1D), O(1S) to the enthalpies
+  * in model/thermo/_generic/thermo.c
+    - added species N2(A3Sigma), N2(B3Pi), N2(ap1Sigma), N2(C3Pi), O(1D), O(1S) to speciesname,
+      calM, ck, numatoms
+  * in model/transport/_Dixon-Lewis/transport.c
+    - added species N2(A3Sigma), N2(B3Pi), N2(ap1Sigma), N2(C3Pi), O(1D), O(1S) to Peps and Psig
+
+
 2022 JUN 13a
   * in model/share/transport_share.c
     - in _lnLambda(), fixed a bug: when the chemical models does not include electrons, the variable

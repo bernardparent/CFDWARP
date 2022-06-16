@@ -53,7 +53,7 @@ Calculations to 30000 K,” NASA RP-1232, 1990.
 #define METHOD1 1  // Eq(27), first Chapman-Enskog approximation
 #define METHOD2 2  // Eq(30), approximation to method 1, yields results close to method 1 for air mixture
 #define METHOD3 3  // Eq(40a), approximation to method 1 ??? or method 2??
-#define METHOD4 4   // Eq(49) : 5-temperature model, thermal non-equilibrium, and valid to find kappak for each species while other methods can only be used to find kappa for the bulk
+#define METHOD4 4   // Eq(49) : 5-temperature model, thermal non-equilibrium, and valid to find kappak for each species while METHOD1,METHOD2,METHOD3 can only be used to find kappa for the bulk
 #define METHOD5 5  //same as METHOD4 except that muk and kappac are found from the Parent-Macheret model
 #define METHOD METHOD5  //Use METHOD5. Other methods are for testing purposes only
 

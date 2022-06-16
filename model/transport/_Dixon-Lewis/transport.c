@@ -140,12 +140,18 @@ const static double Peps[SMAP_NS]=
    78.8,        /*C2+*/  /* !! unknown value: fixed to the one of C2 */
    75.0,        /*CN+*/  /* !! unknown value: fixed to the one of CN */
    91.7,        /*CO+*/  /* !! unknown value: fixed to the one of CO */
-   116.7,        /*HNO*/
-   200.0,        /*NO2*/
+   116.7,       /*HNO*/
+   200.0,       /*NO2*/
    37.0,        /* H+ */ /* !! unknown value: fixed to the one of H */
-   144.0,         /* CH2 */
-   10.22,         /* He+  !! unknown value: fixed to the one of He*/
-   209.0E+0,     /* C2H */ /* SAND86-8246 */
+   144.0,       /* CH2 */
+   10.22,       /* He+  !! unknown value: fixed to the one of He*/
+   209.0E+0,    /* C2H */ /* SAND86-8246 */
+   71.4,        /* N2(A3Sigma) */  /* !! unknown value: fixed to the one of N2 */
+   71.4,        /* N2(B3Pi) */  /* !! unknown value: fixed to the one of N2 */
+   71.4,        /* N2(ap1Sigma) */  /* !! unknown value: fixed to the one of N2 */
+   71.4,        /* N2(C3Pi) */  /* !! unknown value: fixed to the one of N2 */
+   106.7,       /* O(1D) */  /* !! unknown value: fixed to the one of O */
+   106.7,       /* O(1S) */  /* !! unknown value: fixed to the one of O */
   };
 
 
@@ -210,6 +216,12 @@ const static double Psig[SMAP_NS]=
    0.3800E+0,   /* CH2 */
    0.2551E+0,   /* He+ !! fixed to the one of He */
    0.4100E+0,   /* C2H */ /* from SAND86-8246 */
+   0.3798e0,    /* N2(A3Sigma) */ /* !! fixed to the one of N2 */
+   0.3798e0,    /* N2(B3Pi) */  /* !! fixed to the one of N2 */
+   0.3798e0,    /* N2(ap1Sigma) */  /* !! fixed to the one of N2 */
+   0.3798e0,    /* N2(C3Pi) */  /* !! fixed to the one of N2 */
+   0.34e0,      /* O(1D) */   /* !! fixed to the one of O */
+   0.34e0,      /* O(1S) */   /* !! fixed to the one of O */
   };
 
 static double _Omega11(double T, double eps){

@@ -2,7 +2,8 @@
 
 kB=1.38e-23;
 Ce=1.602e-19;
-Te=4000;
+
+Te=20000;
 P=101300;
 N=P/kB/Te;
 
@@ -15,7 +16,7 @@ Ne=1.45e-3*N; {8000 K}
 Ne=8.74e-3*N; {9000 K}
 Ne=2.44e-2*N; {10000 K}
 
-Ne=1.96e-6*N; 
+Ne=2.44e-1*N; 
 
 Nn=N-Ne*2;
 
@@ -31,12 +32,21 @@ lnLambda3=0.5*ln(2.09E-2*(Te/1000/Pe^0.25)^4+1.52*(Te/1000/Pe^0.25)^(8/3));
 
 lnLambda=lnLambda1;
 
-muei=9.5e16*Te^1.5/Ne/lnLambda;
+{from Raizer}
+muei1=9.5e16*Te^1.5/Ne/lnLambda;
+
+{from NRL Plasma Formulary}
+muei2=3.44e5*Te^1.5/Ne/lnLambda*1.602e-19/9.109e-31;
+
 muen=3.74e19/Nn*exp(33.5*(ln(Te))^(-0.5));
 
-mue=1/(1/muei+1/muen);
+mue=1/(1/muei1+1/muen);
 
-printf("lnLambda1=%E\n",lnLambda1);
-printf("lnLambda2=%E\n",lnLambda2);
-printf("lnLambda3=%E\n",lnLambda3);
+printf("Raizer lnLambda=%E\n",lnLambda1);
+printf("NRL lnLambda=%E\n",lnLambda2);
+printf("Gupta-Yos lnLambda=%E\n",lnLambda3);
 printf("sigma=%E\n",Ne*mue*Ce);
+printf("Raizer muei=%E\n",muei1);
+printf("NRL muei=%E\n",muei2);
+printf("Raizer muei/lnLambda=%E\n",muei1/lnLambda1);
+printf("NRL muei/lnLambda=%E\n",muei2/lnLambda2);

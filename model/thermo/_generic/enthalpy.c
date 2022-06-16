@@ -49,6 +49,25 @@ const static double Pa[SMAP_NS][3][11]=
 	McBride, B. "NASA Glenn Coefficients for Calculating Thermodynamic Properties
 	of Individual Species" NASA-TP-2002-211556, september 2002
   CFDWARP/model/thermo/_generic/ref/mcbride.2002.pdf
+   
+  or
+   
+  CFDWARP/model/thermo/_generic/ref/Thermo data Konnov plus excited species and ions.dat
+  
+  Also, look into the following sources:
+   
+  Alexander Burcat and Bonnie McBride
+  "1997 Ideal Gas Thermodynamic Data for Combustion and Air-Pollution Use"
+  Technion Aerospace Engineering (TAE) Report # 804 June 1997.
+
+  Alexander Burcat's Ideal Gas Thermochemical Database
+  http://ftp.technion.ac.il/pub/supported/aetdd/thermodynamics
+  October 1999
+
+  Anderson,W.R. Comb.Flame, 1999, v.117, p.394
+
+  CHEMKIN Thermodynamic Database (1997)
+  
 */
 
 /* species e-
@@ -2382,10 +2401,297 @@ const static double Pa[SMAP_NS][3][11]=
         1.433266627E+05,
        -9.561634380E+01
       }
-    }   
-   
-  };
+    },
+    
+/* species N2(A3Sigma)  
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +300.0e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+        0.0,
+        0.0,
+        0.02926640E+02,
+        0.14879768E-02,
+       -0.05684760E-05,
+        0.10097038E-09,
+       -0.06753351E-13,    
+        70677.106080,
+        0.05980528E+02,
+      },
+      {
+       +1000.0e0,            /* Tmin [K] */ 
+       +5000.0e0-dTrangemin, /* Tmax [K] */
+        0.0,
+        0.0,
+        0.03298677E+02,
+        0.14082404E-02,
+       -0.03963222E-04,    
+        0.05641515E-07,
+       -0.02444854E-10,
+        70579.106080,
+        0.03950372E+02                   
+      },
+      {
+       +5000.0e0-dTrangemin,  /* Tmin [K] */
+       +5000.0e0,             /* Tmax [K] */
+        0.0,
+        0.0,
+        0.03298677E+02,
+        0.14082404E-02,
+       -0.03963222E-04,    
+        0.05641515E-07,
+       -0.02444854E-10,
+        70579.106080,
+        0.03950372E+02                   
+      }
+    },
+     
+/* species N2(B3Pi) 
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +300.0e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+        0.0,
+        0.0,
+        0.02926640E+02,
+        0.14879768E-02,
+       -0.05684760E-05,
+        0.10097038E-09,
+       -0.06753351E-13,    
+        84370.442620,   
+        0.05980528E+02   
+      },
+      {
+       +1000.0e0,            /* Tmin [K] */ 
+       +5000.0e0-dTrangemin, /* Tmax [K] */
+       0.0,
+       0.0,
+       0.03298677E+02,
+       0.14082404E-02,
+       -0.03963222E-04,    
+       0.05641515E-07,
+       -0.02444854E-10,
+       84272.342620,
+       0.03950372E+02
+      },
+      {
+       +5000.0e0-dTrangemin,  /* Tmin [K] */
+       +5000.0e0,             /* Tmax [K] */
+       0.0,
+       0.0,
+       0.03298677E+02,
+       0.14082404E-02,
+       -0.03963222E-04,    
+       0.05641515E-07,
+       -0.02444854E-10,
+       84272.342620,
+       0.03950372E+02
+      }
+    },
 
+/* species N2(ap1Sigma) 
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +300.0e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+        0.0,
+        0.0,
+        0.02926640E+02,
+        0.14879768E-02,
+        -0.05684760E-05,
+        0.10097038E-09,
+        -0.06753351E-13,    
+        96555.191230,
+        0.05980528E+02 
+      },
+      {
+       +1000.0e0,            /* Tmin [K] */ 
+       +5000.0e0-dTrangemin, /* Tmax [K] */
+       0.0,
+       0.0,
+       0.03298677E+02,
+       0.14082404E-02,
+       -0.03963222E-04,
+       0.05641515E-07,
+       -0.02444854E-10,
+       96457.091230,
+       0.03950372E+02
+      },
+      {
+       +5000.0e0-dTrangemin,  /* Tmin [K] */
+       +5000.0e0,             /* Tmax [K] */
+       0.0,
+       0.0,
+       0.03298677E+02,
+       0.14082404E-02,
+       -0.03963222E-04,
+       0.05641515E-07,
+       -0.02444854E-10,
+       96457.091230,
+       0.03950372E+02
+      }
+    },
+
+/* species N2(C3Pi) 
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +300.0e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       0.0,
+       0.0,
+       0.02926640E+02,
+       0.14879768E-02,
+      -0.05684760E-05,
+       0.10097038E-09,
+      -0.06753351E-13,    
+       127075.08540,
+       0.05980528E+02
+      },
+      {
+       +1000.0e0,            /* Tmin [K] */ 
+       +5000.0e0-dTrangemin, /* Tmax [K] */
+        0.0,
+        0.0,
+        0.03298677E+02,
+        0.14082404E-02,
+       -0.03963222E-04,
+        0.05641515E-07,
+       -0.02444854E-10,
+        126977.01540,
+        0.03950372E+02
+      },
+      {
+       +5000.0e0-dTrangemin,  /* Tmin [K] */
+       +5000.0e0,             /* Tmax [K] */
+        0.0,
+        0.0,
+        0.03298677E+02,
+        0.14082404E-02,
+       -0.03963222E-04,
+        0.05641515E-07,
+       -0.02444854E-10,
+        126977.01540,
+        0.03950372E+02
+      }
+    },
+
+/* species O(1D) 
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +300.0e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+        0.0,
+        0.0,
+        0.02542059E+02,
+       -0.02755061E-03,
+       -0.03102803E-07,
+        0.04551067E-10,
+       -0.04368051E-14,
+        5.20920000E+04,
+        0.04920308E+02
+      },
+      {
+       +1000.0e0,            /* Tmin [K] */ 
+       +5000.0e0-dTrangemin, /* Tmax [K] */
+        0.0,
+        0.0,
+        0.02946428E+02,
+       -0.16381665E-02,
+        0.02421031E-04,
+       -0.16028431E-08,
+        0.03890696E-11,
+        5.20090000E+04,
+        0.02963995E+02                   
+      },
+      {
+       +5000.0e0-dTrangemin,  /* Tmin [K] */
+       +5000.0e0,             /* Tmax [K] */
+        0.0,
+        0.0,
+        0.02946428E+02,
+       -0.16381665E-02,
+        0.02421031E-04,
+       -0.16028431E-08,
+        0.03890696E-11,
+        5.20090000E+04,
+        0.02963995E+02                   
+      }
+    },
+
+/* species O(1S)
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +300.0e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+        0.0,
+        0.0,
+        0.02542059E+02,
+       -0.02755061E-03,
+       -0.03102803E-07,
+        0.04551067E-10,
+       -0.04368051E-14,
+        7.78540000E+04,
+        0.04920308E+02
+      },
+      {
+       +1000.0e0,            /* Tmin [K] */ 
+       +5000.0e0-dTrangemin, /* Tmax [K] */
+        0.0,
+        0.0,
+        0.02946428E+02,
+       -0.16381665E-02,
+        0.02421031E-04,
+       -0.16028431E-08,
+        0.03890696E-11,
+        7.77710000E+04,
+        0.02963995E+02                   
+      },
+      {
+       +5000.0e0-dTrangemin,  /* Tmin [K] */
+       +5000.0e0,             /* Tmax [K] */
+        0.0,
+        0.0,
+        0.02946428E+02,
+       -0.16381665E-02,
+        0.02421031E-04,
+       -0.16028431E-08,
+        0.03890696E-11,
+        7.77710000E+04,
+        0.02963995E+02                   
+      }
+    },
+
+  };
 
 
 
