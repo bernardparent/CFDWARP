@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 17a
+  * in model/share/chem_share.c
+    - added add_to_W_fw_2r2p_fit4(), add_to_W_fw_2r3p_fit4(), add_to_dW_fw_2r2p_fit4(),
+      add_to_dW_fw_2r3p_fit4()
+  * in model/thermo/_generic/enthalpy.c
+    - changed the polynomials for N2(A3Sigma), N2(B3Pi), N2(ap1Sigma), N2(C3Pi), O(1D), O(1S)
+      Now, they are simply set to the polynomials for N2 and O but with the heat of formation b1
+      altered
+    - added species C2H4plus
+  * in model/transport/_Dixon-Lewis/transport.c and model/thermo/_generic/thermo.c
+    - added species C2H4plus
+  * in model/chem
+    - added proprietary module _C2H4_Air_Plasma_30s
+    
+
 2022 JUN 16a
   * in model/thermo/_generic/enthalpy.c
     - added species N2(A3Sigma), N2(B3Pi), N2(ap1Sigma), N2(C3Pi), O(1D), O(1S) to the enthalpies

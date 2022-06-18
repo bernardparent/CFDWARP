@@ -230,6 +230,40 @@ void add_to_dW_bw_1r2p(int specR1,
                              double A, double n, double E, double T, spec_t X, 
                              spec_t dWdT, spec2_t dWdrhok);
 
+
+/* 
+   k = A*T^n*exp(E1/Te+E2/Te^2+E3/Te^3+E4/Te^4)
+   A in cm^3 (mole s)^(-1) K^(-n) 
+   E1 in K
+   E2 in K^2
+   E3 in K^3
+   E4 in K^4
+   T in Kelvin
+   X in mole/cm3
+   dWdT in kg m^(-3) s^(-1) K^(-1)
+   dWdrhok in s^(-1)
+*/
+
+void add_to_W_fw_2r2p_fit4(int specR1, int specR2,
+                           int specP1, int specP2,
+                           double A, double n, double E1, double E2, double E3, double E4, double T, spec_t X, spec_t W);
+
+void add_to_W_fw_2r3p_fit4(int specR1, int specR2,
+                      int specP1, int specP2, int specP3,
+                      double A, double n, double E1, double E2, double E3, double E4, double T, spec_t X, spec_t W);
+
+void add_to_dW_fw_2r2p_fit4(int specR1, int specR2,
+                            int specP1, int specP2,
+                            double A, double n, double E1, double E2, double E3, double E4,
+                            double T, spec_t X, 
+                            spec_t dWdT, spec2_t dWdrhok);
+
+void add_to_dW_fw_2r3p_fit4(int specR1, int specR2,
+                       int specP1, int specP2, int specP3,
+                       double A, double n, double E1, double E2, double E3, double E4, double T, spec_t X, 
+                       spec_t dWdT, spec2_t dWdrhok);
+
+
 /* find the forward reaction rate cofficient kf = A * (calA)^(1-numreactant) * T^n * exp(-E/(R*T))
  * 
  * numreactant : the number of reactants

@@ -111,6 +111,7 @@ const static speciesname_t speciesname[SMAP_NS]=
    "N2(C3Pi)",
    "O(1D)",
    "O(1S)",
+   "C2H4+",
   };
 
 
@@ -192,7 +193,8 @@ const static double calM[SMAP_NS]=
    28.0134e-3,     /* N2(ap1Sigma) */
    28.0134e-3,     /* N2(C3Pi) */
    15.9994e-3,     /* O(1D) */
-   15.9994e-3,      /* O(1S) */
+   15.9994e-3,     /* O(1S) */
+   28.0526E-3,     /*C2H4+*/
   };
 
 
@@ -263,6 +265,7 @@ const static long ck[SMAP_NS]=
    0,     /* N2(C3Pi) */
    0,     /* O(1D) */
    0,      /* O(1S) */
+   1,  /* C2H4+ */
   };
   
 const static long numatoms[SMAP_NS]=
@@ -331,6 +334,7 @@ const static long numatoms[SMAP_NS]=
    2,     /* N2(C3Pi) */
    1,     /* O(1D) */
    1,      /* O(1S) */
+   6,  /*C2H4+ */
   }; 
   
 
