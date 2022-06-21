@@ -74,6 +74,30 @@ double _etac_from_rhok_Tk_muk(spec_t rhok, double T, double Te, double muk, long
 }
 
 
+void find_muk_from_nuk(spec_t nuk, spec_t rhok, double T, double Te, chargedspec_t muk){
+  long spec,k;
+  double rho;
+  
+
+  rho=0.0;
+  for (spec=0; spec<ns; spec++) rho+=rhok[spec];
+  
+
+  for (k=0; k<ncs; k++){
+    switch (speciestype[k]){
+      case SPECIES_IONPLUS:
+        muk[k]=nuk[k]/(kB*T*rho)*fabs(_C(k));
+      break;
+      case SPECIES_IONMINUS:
+        muk[k]=nuk[k]/(kB*T*rho)*fabs(_C(k));
+      break;
+      case SPECIES_ELECTRON:
+        muk[k]=nuk[k]/(kB*Te*rho)*fabs(_C(k));
+      break;
+    }
+  }
+}
+
 
 void adjust_nuk_using_mobilities_given_muk(spec_t rhok, double T, double Te, chargedspec_t muk, spec_t nuk){
   long spec,k;
@@ -82,7 +106,7 @@ void adjust_nuk_using_mobilities_given_muk(spec_t rhok, double T, double Te, cha
 
   rho=0.0;
   for (spec=0; spec<ns; spec++) rho+=rhok[spec];
-  
+    
   
   for (k=0; k<ncs; k++){
     switch (speciestype[k]){

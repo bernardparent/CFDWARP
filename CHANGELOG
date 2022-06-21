@@ -7,6 +7,26 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 20a
+  * in model/share/transport_share.c
+    - added function find_muk_from_nuk()
+  * in model/transport/_Dixon-Lewis/transport.c
+    - added choices of METHOD1, METHOD2, METHOD3
+    - in  find_nuk_from_rhok_T_Te_muk(), added fix to diffusion coefficient for ion-ion collisions
+      (METHOD2)
+    - in find_nuk_eta_kappak_muk(), added changes for METHOD1, METHOD2, METHOD3
+  * in model/transport/_Gupta-Yos/transport.c
+    - added METHOD6 which is the same as METHOD5 except that only mue is found from Parent-Macheret
+      while the other kappai are found from the Gupta-Yos integrals.
+    - in find_nuk_eta_kappak_muk(), added code for METHOD6
+  * in src/test.c
+    - added print_column_charged_species_names()
+    - in test_nu, changed the function so that the molar fractions can be specified on the command
+      line
+    - added test_mu()
+    - in main(), added call to test_mu and changed call to test_nu
+    
+
 2022 JUN 17a
   * in model/share/chem_share.c
     - added add_to_W_fw_2r2p_fit4(), add_to_W_fw_2r3p_fit4(), add_to_dW_fw_2r2p_fit4(),

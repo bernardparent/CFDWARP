@@ -55,6 +55,7 @@ Calculations to 30000 K,” NASA RP-1232, 1990.
 #define METHOD3 3  // Eq(40a), approximation to method 1 ??? or method 2??
 #define METHOD4 4   // Eq(49) : 5-temperature model, thermal non-equilibrium, and valid to find kappak for each species while METHOD1,METHOD2,METHOD3 can only be used to find kappa for the bulk
 #define METHOD5 5  //same as METHOD4 except that muk and kappac are found from the Parent-Macheret model
+#define METHOD6 6  //same as METHOD4 except that mue and kappae are found from the Parent-Macheret model
 #define METHOD METHOD5  //Use METHOD5. Other methods are for testing purposes only
 
 
@@ -1102,7 +1103,7 @@ double _eta_from_chik_N_T_Te_Delta1_Delta2(spec_t chik, double N, double T, doub
 }
 
 
-void find_nuk_from_chik_N_T_Te_muk_Delta1(spec_t chik, double N, double T, double Te, spec_t muk, spec2_t Delta1, spec_t nuk){
+void find_nuk_from_chik_N_T_Te_muk_Delta1(spec_t chik, double N, double T, double Te, spec2_t Delta1, spec_t nuk){
   double rho,sum;
   long spec,i,j,k,l;
   spec2_t Dij;
@@ -1121,11 +1122,11 @@ void find_nuk_from_chik_N_T_Te_muk_Delta1(spec_t chik, double N, double T, doubl
   for (k=0; k<ns; k++){
     sum=0.0;
     for (l=0; l<ns; l++) {
-      if (l!=k) sum+=chik[l]/(Dij[k][l]); 
+      if (l!=k) 
+        sum+=chik[l]/(Dij[k][l]); 
     }
     nuk[k]=rho*(1.0-chik[k])/(sum+1.0e-20);
   }
-  adjust_nuk_using_mobilities_given_muk(rhok, T, Te, muk, nuk);
 }
 
 
@@ -1194,6 +1195,10 @@ void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
   find_Delta1_Delta2(N,Te,_epc(rhok, Te),Delta1_e,Delta2_e);
   find_aij_Ai_for_kappa(chik, N, Te, Delta1_e, Delta2_e, aij_e, Ai_e, &aav_e);  
   
+  *eta=_eta_from_chik_N_T_Te_Delta1_Delta2(chik, N, T, Te, Delta1, Delta2);
+  find_nuk_from_chik_N_T_Te_muk_Delta1(chik, N, T, Te, Delta1, nuk);
+
+  find_muk_from_nuk(nuk, rhok, T, Te, muk);
 
   switch (METHOD){
     case METHOD1:
@@ -1241,11 +1246,26 @@ void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
       *kappan=0.0;
       for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
     break;
+    case METHOD6:
+#ifdef speceminus    
+      muk[speceminus]=_muk_from_rhok_T_Te_ParentMacheret(rhok, T, Te, speceminus);
+#endif
+      for (spec=0; spec<ncs; spec++) {
+        //muk[spec]=_muk_from_rhok_T_Te_ParentMacheret(rhok, T, Te, spec);
+        kappac[spec]=_kappac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
+      }
+      for (k=0; k<ns; k++){
+        if (k<ncs) kappak[k]=kappac[k];
+          else kappak[k]=_kappak_from_chik_Delta1_Delta2_METHOD4(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
+      }
+      *kappan=0.0;
+      for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
+    break;
     default:
       fatal_error("METHOD can not be set to %ld.",METHOD);
   }
 
-  if (METHOD!=METHOD5){
+  if (METHOD==METHOD1 || METHOD==METHOD2 || METHOD==METHOD3 || METHOD==METHOD4){
     for (k=0; k<ncs; k++){
       if (speciestype[k]==SPECIES_ELECTRON) {
         muk[k]=_muk_from_kappak(kappak[k], Te, rhok[k], k);
@@ -1254,8 +1274,7 @@ void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
       }    
     }
   }
-  *eta=_eta_from_chik_N_T_Te_Delta1_Delta2(chik, N, T, Te, Delta1, Delta2);
-  find_nuk_from_chik_N_T_Te_muk_Delta1(chik, N, T, Te, muk, Delta1, nuk);
+  adjust_nuk_using_mobilities_given_muk(rhok, T, Te, muk, nuk);  
 }
 
 

@@ -16,6 +16,10 @@ double _etac_from_rhok_Tk_Ek(spec_t rhok, double T, double Te, double E, long k)
 */
 void adjust_nuk_using_mobilities_given_muk(spec_t rhok, double T, double Te, chargedspec_t muk, spec_t nuk);
 
+void adjust_muk_using_nuk(spec_t rhok, double T, double Te, chargedspec_t muk, spec_t nuk);
+
+void find_muk_from_nuk(spec_t nuk, spec_t rhok, double T, double Te, chargedspec_t muk);
+
 
 void adjust_muk_for_Ek_effect(long k, double Ek, double N, double *muk);
 

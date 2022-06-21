@@ -643,6 +643,26 @@ void print_column_species_names ( long digits ) {
 
 }
 
+
+void print_column_charged_species_names ( long digits ) {
+  long spec, cnt;
+  char *speciesname = ( char * ) malloc ( sizeof ( char ) );
+
+  printf ( " T" );
+  for ( cnt = 0; cnt < digits; cnt++ )
+    printf ( " " );
+  for ( spec = 0; spec < ncs; spec++ ) {
+    find_species_name ( spec, &speciesname );
+    printf ( "%s", speciesname );
+    for ( cnt = 0; cnt < 1 + digits - strlen ( speciesname ); cnt++ )
+      printf ( " " );
+  }
+  printf ( "\n" );
+  free ( speciesname );
+
+}
+
+
 void test_h ( double Tmin, double Tmax, double dT ) {
   double T, h;
   spec_t w;
@@ -895,26 +915,64 @@ void test_kappa ( double Tmin, double Tmax, double dT ) {
 
 
 
-void test_nu ( double Tmin, double Tmax, double dT ) {
-  double T, eta, kappa, Te;
+void test_nu ( spec_t chik, double P, double Tmin, double Tmax, double dT ) {
+  double T, N, eta, kappa, Te;
   long spec;
   spec_t nuk,rhok;
   printf ( "\n" );
   printf ( "Species mass diffusion coefficient [kg/ms] as function of temperature [K].\n" );
   printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
+  printf ( "P=%E Pa\n", P);
+  for (spec=0; spec<ns; spec++) printf ( "chi[%ld]=%E \n", spec, chik[spec] );
+  
   printf ( "\n" );
   print_column_species_names ( 12 );
   T = Tmin;
-  Te = T;
-  for (spec=0; spec<ns; spec++) rhok[spec]=0.1;
-  #ifdef speceminus
-  rhok[speceminus]=1e-10;
-  #endif
   do {
+    Te = T;
+    N=P/kB/T;
+    for (spec=0; spec<ns; spec++) {
+      rhok[spec]=chik[spec]*_m(spec)*N;
+    }
     wfprintf ( stdout, "%12.5E ", T );
     find_nuk_eta_kappa(rhok, T, Te, nuk, &eta, &kappa);
     for ( spec = 0; spec < ns; spec++ ) {
       wfprintf ( stdout, "%+12.5E ", nuk[spec] );
+    }
+    wfprintf ( stdout, "\n" );
+    T += dT;
+  } while ( T < Tmax );
+
+}
+
+
+void test_mu ( spec_t chik, double P, double Tmin, double Tmax, double dT ) {
+  double T, N, eta, kappan, Te;
+  long spec;
+  chargedspec_t kappac,muk;
+  spec_t nuk,rhok;
+  printf ( "\n" );
+  printf ( "Species mobilities [m2/V-s] as function of temperature [K].\n" );
+  printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
+  printf ( "P=%E Pa\n", P);
+  for (spec=0; spec<ns; spec++) printf ( "chi[%ld]=%E \n", spec, chik[spec] );
+  
+  printf ( "\n" );
+  print_column_charged_species_names ( 12 );
+  T = Tmin;
+  do {
+    Te = T;
+    N=P/kB/T;
+    for (spec=0; spec<ns; spec++) {
+      rhok[spec]=chik[spec]*_m(spec)*N;
+    }
+    wfprintf ( stdout, "%12.5E ", T );
+
+    find_nuk_eta_kappak_muk(rhok, T, Te, nuk, &eta, &kappan, kappac, muk);
+
+
+    for ( spec = 0; spec < ncs; spec++ ) {
+      wfprintf ( stdout, "%+12.5E ", muk[spec] );
     }
     wfprintf ( stdout, "\n" );
     T += dT;
@@ -1038,7 +1096,9 @@ int main ( int argc, char **argv ) {
   char tmpstr[1000];
 
 #ifdef _FLUID_MULTISPECIES
-  double Tmin, Tmax, dT;
+  long spec;
+  spec_t chik;
+  double P, Tmin, Tmax, dT;
 #endif
   int term_width, term_height, linewidth;
 
@@ -1178,10 +1238,14 @@ int main ( int argc, char **argv ) {
 
   } else {
 #ifdef _FLUID_MULTISPECIES
-    if ( argc == 5 ) {
+    if ( argc == 5 || argc == 6+ns) {
       sscanf ( argv[2], "%lg", &Tmin );
       sscanf ( argv[3], "%lg", &Tmax );
       sscanf ( argv[4], "%lg", &dT );
+      if (argc==(6+ns)) {
+        sscanf ( argv[5], "%lg", &P );
+        for (spec=0; spec<ns; spec++)  sscanf ( argv[6+spec], "%lg", &(chik[spec]) );
+      }
       if ( strcmp ( "h", argv[1] ) == 0 )
         test_h ( Tmin, Tmax, dT );
       if ( strcmp ( "hmolar", argv[1] ) == 0 )
@@ -1194,8 +1258,6 @@ int main ( int argc, char **argv ) {
         test_eta ( Tmin, Tmax, dT );
       if ( strcmp ( "kappa", argv[1] ) == 0 )
         test_kappa ( Tmin, Tmax, dT );
-      if ( strcmp ( "nu", argv[1] ) == 0 )
-        test_nu ( Tmin, Tmax, dT );
       if ( strcmp ( "Pr", argv[1] ) == 0 )
         test_Pr ( Tmin, Tmax, dT );
       if ( strcmp ( "dsdT", argv[1] ) == 0 )
@@ -1204,6 +1266,11 @@ int main ( int argc, char **argv ) {
         test_s_equilibrium ( Tmin, Tmax, dT );
       if ( strcmp ( "dsdT_equil", argv[1] ) == 0 )
         test_dsdT_equilibrium ( Tmin, Tmax, dT );
+      if ( strcmp ( "nu", argv[1] ) == 0 )
+        test_nu(chik,P,Tmin,Tmax,dT);
+      if ( strcmp ( "mu", argv[1] ) == 0 )
+        test_mu(chik,P,Tmin,Tmax,dT);
+
     } else {
 #endif
       write_hline ( stderr, linewidth, 2 );
@@ -1295,7 +1362,9 @@ int main ( int argc, char **argv ) {
                           linewidth, lengthcol1, lengthcol2 );
       write_options_row ( stderr, "kappa", "none", "species thermal conductivity  ./test kappa 500 2000 2",
                           linewidth, lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "nu", "none", "species mass diffusion coefficient  ./test nu 500 2000 2",
+      write_options_row ( stderr, "nu", "none", "species mass diffusion coefficient  ./test nu  500 2000 2 101300 0.2 0.2 0.2 0.2 0.2",
+                          linewidth, lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "mu", "none", "species mobility  ./test mu  500 2000 2 101300 0.2 0.2 0.2 0.2 0.2",
                           linewidth, lengthcol1, lengthcol2 );
       write_options_row ( stderr, "Pr", "none", "species Prandtl number  ./test Pr 500 2000 2",
                           linewidth, lengthcol1, lengthcol2 );

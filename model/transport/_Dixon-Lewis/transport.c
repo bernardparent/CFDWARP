@@ -42,7 +42,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define INCLUDE_ELECTRONS_IN_NU FALSE
 
-
+#define METHOD1 1  //muk and kappac are found from Parent-Macheret model
+#define METHOD2 2  //mue and kappae are found from Parent-Macheret model, mui and kappai are adjusted to take into consideration ion-ion collisions  
+#define METHOD3 3  //no adjustments from Parent-Macheret
+#define METHOD METHOD1  // use METHOD1. Other methods are for testing purposes only.
 
 
 const static double Pd[3][5]=
@@ -440,10 +443,10 @@ double _etan_from_rhok_T_Te(spec_t rhok, double T, double Te){
 }
 
 
-void find_nuk_from_rhok_T_Te_muk(spec_t rhok, double T, double Te, chargedspec_t muk, spec_t nuk){
+void find_nuk_from_rhok_T_Te(spec_t rhok, double T, double Te, spec_t nuk){
   long spec,k,l;
   spec_t chik,w;
-  double P,rho;
+  double P,rho,N;
   double chisum,sum;
   double calD[ns][ns];
 
@@ -462,13 +465,14 @@ void find_nuk_from_rhok_T_Te_muk(spec_t rhok, double T, double Te, chargedspec_t
       chisum+=w[spec]/_calM(spec);
   }
   assert(chisum!=0.0e0);
+  N=0.0;
   for (spec=0; spec<ns; spec++){
     chik[spec]=w[spec]/_calM(spec)/chisum;
+    N+=rhok[spec]/_m(spec);
   }
   
   for (k=0; k<ns; k++){
     for (l=0; l<ns; l++){
-      if ((speciestype[k]!=SPECIES_ELECTRON && speciestype[l]!=SPECIES_ELECTRON) || INCLUDE_ELECTRONS_IN_NU) { 
         assert(Peps[smap[k]]*Peps[smap[l]]>0.0e0);
         assert(P!=0.0e0);
         assert(_Omega11(T,sqrt(Peps[smap[k]]*Peps[smap[l]])));
@@ -478,9 +482,13 @@ void find_nuk_from_rhok_T_Te_muk(spec_t rhok, double T, double Te, chargedspec_t
         calD[k][l]=2.381112E-5*sqrt(T*T*T*(1.0e0/_calM(l)+1.0e0/_calM(k)))
                  /(P*_Omega11(T,sqrt(Peps[smap[k]]*Peps[smap[l]]))
                  *(Psig[smap[k]]+Psig[smap[l]])*(Psig[smap[k]]+Psig[smap[l]]));
-      }
+  // implement a correction for ion-ion coulomb collisions 
+        if (METHOD==METHOD2) {
+          if ((speciestype[k]==SPECIES_IONPLUS) && (speciestype[l]==SPECIES_IONPLUS)) calD[k][l]=kB*T/fabs(_C(k))*14.3/sqrt(_m(k))*pow(T,1.5)/N;
+        }
     }
   }
+  
   
   for (k=0; k<ns; k++){
     sum=0.0e0;
@@ -492,9 +500,8 @@ void find_nuk_from_rhok_T_Te_muk(spec_t rhok, double T, double Te, chargedspec_t
     }
     assert((sum+1.0E-20)!=0.0e0);
     nuk[k]=rho*(1.0e0-chik[k])/(sum+1.0E-20);
+    
   }
-  
-  adjust_nuk_using_mobilities_given_muk(rhok, T, Te, muk, nuk);
 }
 
 
@@ -503,13 +510,20 @@ void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
   long spec;
   
   *eta=_etan_from_rhok_T_Te(rhok,T,Te);
+  find_nuk_from_rhok_T_Te(rhok, T, Te, nuk);
+  find_muk_from_nuk(nuk, rhok, T, Te, muk);
+  if (METHOD==METHOD2)
+    muk[speceminus]=_muk_from_rhok_T_Te_ParentMacheret(rhok, T, Te, speceminus);
   for (spec=0; spec<ncs; spec++) {
-    muk[spec]=_muk_from_rhok_T_Te_ParentMacheret(rhok, T, Te, spec);
+    if (METHOD==METHOD1){
+      muk[spec]=_muk_from_rhok_T_Te_ParentMacheret(rhok, T, Te, spec);
+    }
     kappac[spec]=_kappac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
     (*eta)+=_etac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
   }
   *kappan=_kappan_from_rhok_T_Te(rhok, T, Te);
-  find_nuk_from_rhok_T_Te_muk(rhok, T, Te, muk, nuk);
+
+  adjust_nuk_using_mobilities_given_muk(rhok, T, Te, muk, nuk);
 }
 
 
