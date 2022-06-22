@@ -5,6 +5,10 @@
 #include <src/common.h>
 
 
+void find_nuk_from_Dij(spec_t rhok, spec2_t Dij, spec_t nuk);
+
+void adjust_nue_given_nui(spec_t rhok, double T, double Te, spec_t nuk);
+
 double _kappac_from_rhok_Tk_muk(spec_t rhok, double T, double Te, double muk, long k);
 
 double _etac_from_rhok_Tk_muk(spec_t rhok, double T, double Te, double muk, long k);

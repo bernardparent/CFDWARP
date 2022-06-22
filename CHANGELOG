@@ -7,6 +7,28 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 22a
+  * in model/chem/_C2H4_Air_Plasma_30s/chem.c
+    - added some reactions
+  * in model/share/transport_share.c
+    - added adjust_nue_given_nui()
+    - added find_nuk_from_Dij()
+  * in model/transport/_Gupta-Yos/transport.c
+    - in _epc(), made sure electron pressure is at least 1e-10 atm (or some NAN would occur)
+    - in _epc(), made sure epc does not exceed 100
+    - in find_nuk_from_chik_N_T_Te_Delta1(), added the ambipolar diffusion effect on Dij at this point
+    - in find_nuk_from_chik_N_T_Te_Delta1(), now calls find_nuk_from_Dij() and adjust_nue_given_nui()
+    - added find_muk_from_chik_N_T_Te_Delta1()
+    - in find_nuk_eta_kappak_muk(), now calls find_muk_from_chik_N_T_Te_Delta1() instead of
+      find_nuk_from_chik_N_T_Te_muk_Delta1()
+    - added code for METHOD7 in find_nuk_eta_kappak_muk()
+    - in find_nuk_eta_kappak_muk(), took away calls to _muk_from_kappak() and to
+      adjust_nuk_using_mobilities_given_muk()
+  * in src/test.c
+    - in test_kappa, rewrote the function so that its parameters include chik, P, Tmin, Tmax
+    - in main, now calls test_kappa with its new set of parameters
+  
+
 2022 JUN 20a
   * in model/share/transport_share.c
     - added function find_muk_from_nuk()

@@ -56,7 +56,9 @@ Calculations to 30000 K,” NASA RP-1232, 1990.
 #define METHOD4 4   // Eq(49) : 5-temperature model, thermal non-equilibrium, and valid to find kappak for each species while METHOD1,METHOD2,METHOD3 can only be used to find kappa for the bulk
 #define METHOD5 5  //same as METHOD4 except that muk and kappac are found from the Parent-Macheret model
 #define METHOD6 6  //same as METHOD4 except that mue and kappae are found from the Parent-Macheret model
-#define METHOD METHOD5  //Use METHOD5. Other methods are for testing purposes only
+#define METHOD7 7  //same as METHOD4 except that electron-electron collisions are are not counted in finding mue
+                   // and that kappac is found from muk, not from its own equation
+#define METHOD METHOD7  //Use METHOD7. Other methods are for testing purposes only
 
 
 double collision_integral_curvefit11(long s, long r, double T){
@@ -799,7 +801,7 @@ static double _epc(spec_t rhok, double Te){
 #ifdef speceminus  
   double Pe,rhoe,epc;
   rhoe=rhok[speceminus];
-  Pe = rhoe*calR*Te/_calM(speceminus)/101325.0e0; //electron pressure, atm
+  Pe = max(1e-10,rhoe*calR*Te/_calM(speceminus)/101325.0e0); //electron pressure, atm
   /*electron pressure correction for the collision integrals of ionic species*/ /*Eq(24b)*/
   switch (EPC){
     case EPC_GUPTAYOS:
@@ -822,7 +824,7 @@ static double _epc(spec_t rhok, double Te){
 #else
   epc=1.0;
 #endif
-  epc=max(1.0,epc);
+  epc=min(100.0,max(1.0,epc));
   return(epc);
 }
 
@@ -1103,15 +1105,17 @@ double _eta_from_chik_N_T_Te_Delta1_Delta2(spec_t chik, double N, double T, doub
 }
 
 
-void find_nuk_from_chik_N_T_Te_muk_Delta1(spec_t chik, double N, double T, double Te, spec2_t Delta1, spec_t nuk){
-  double rho,sum;
-  long spec,i,j,k,l;
+void find_nuk_from_chik_N_T_Te_Delta1(spec_t chik, double N, double T, double Te, spec2_t Delta1, spec_t nuk){
+  double rho;
+  long spec,i,j;
   spec2_t Dij;
   spec_t rhok;
   
   for (i=0; i<ns; i++){
     for (j=0; j<ns; j++){ 
       Dij[i][j]=1.0/(N/1e6*Delta1[i][j])/1e4; //the units for Dij here are m2/s 
+      // impose ambipolar diffusion
+      if (speciestype[i]==SPECIES_IONPLUS) Dij[i][j]*=(1.0+Te/T);
     }
   }
   rho=0.0;
@@ -1119,15 +1123,71 @@ void find_nuk_from_chik_N_T_Te_muk_Delta1(spec_t chik, double N, double T, doubl
     rhok[spec]=chik[spec]*N*_m(spec);
     rho+=rhok[spec];
   }
-  for (k=0; k<ns; k++){
-    sum=0.0;
-    for (l=0; l<ns; l++) {
-      if (l!=k) 
-        sum+=chik[l]/(Dij[k][l]); 
+  
+  find_nuk_from_Dij(rhok,Dij,nuk);
+  // adjust nuk for the electrons for a quasi-neutral ambipolar situation
+  adjust_nue_given_nui(rhok, T, Te, nuk);
+   
+}
+
+
+void find_muk_from_chik_N_T_Te_Delta1(spec_t chik, double N, double T, double Te, spec2_t Delta1, chargedspec_t muk){
+  double Dm,sum;
+  long i,j;
+  spec2_t Dij;
+  
+  for (i=0; i<ns; i++){
+    for (j=0; j<ns; j++){ 
+      Dij[i][j]=1.0/(N/1e6*Delta1[i][j])/1e4; //the units for Dij here are m2/s 
+      assert(Dij[i][j]!=0.0);
     }
-    nuk[k]=rho*(1.0-chik[k])/(sum+1.0e-20);
+  }
+  for (i=0; i<ncs; i++){
+    sum=0; 
+    switch (speciestype[i]){
+      case SPECIES_ELECTRON:
+        if (METHOD==METHOD7){
+          for (j=0; j<ns; j++) {
+            if (i!=j)
+              sum+=chik[j]/(Dij[i][j]); 
+          }
+        } else {
+          for (j=0; j<ns; j++) {
+            sum+=chik[j]/(Dij[i][j]); 
+          }          
+        }
+      break; 
+      case SPECIES_IONPLUS:
+        for (j=0; j<ns; j++) {
+          sum+=chik[j]/(Dij[i][j]); 
+        }
+      break; 
+      case SPECIES_IONMINUS:
+        for (j=0; j<ns; j++) {
+          sum+=chik[j]/(Dij[i][j]); 
+        }
+      break; 
+      default:
+        fatal_error("Problem with speciestype in find_muk_from_chik_N_T_Te_Delta1().");
+    }
+   // Dm=(1.0-chik[i])/(sum+1.0e-20); 
+    Dm=(1.0)/(sum+1.0e-20); 
+    switch (speciestype[i]){
+      case SPECIES_IONPLUS:
+        muk[i]=Dm/(kB*T)*fabs(_C(i));
+      break;
+      case SPECIES_IONMINUS:
+        muk[i]=Dm/(kB*T)*fabs(_C(i));
+      break;
+      case SPECIES_ELECTRON:
+        muk[i]=Dm/(kB*Te)*fabs(_C(i));
+      break;
+      default:
+        fatal_error("Problem with speciestype in find_muk_from_chik_N_T_Te_Delta1().");
+    }
   }
 }
+
 
 
 static double _muk_from_kappak(double kappak, double Tk, double rhok, long k){
@@ -1196,10 +1256,10 @@ void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
   find_aij_Ai_for_kappa(chik, N, Te, Delta1_e, Delta2_e, aij_e, Ai_e, &aav_e);  
   
   *eta=_eta_from_chik_N_T_Te_Delta1_Delta2(chik, N, T, Te, Delta1, Delta2);
-  find_nuk_from_chik_N_T_Te_muk_Delta1(chik, N, T, Te, Delta1, nuk);
+  find_nuk_from_chik_N_T_Te_Delta1(chik, N, T, Te, Delta1, nuk);
 
-  find_muk_from_nuk(nuk, rhok, T, Te, muk);
-
+  find_muk_from_chik_N_T_Te_Delta1(chik, N, T, Te, Delta1, muk);
+  
   switch (METHOD){
     case METHOD1:
       (*kappan)=_kappa_from_rhok_T_Te_METHOD1(rhok, T, Te);
@@ -1251,7 +1311,17 @@ void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
       muk[speceminus]=_muk_from_rhok_T_Te_ParentMacheret(rhok, T, Te, speceminus);
 #endif
       for (spec=0; spec<ncs; spec++) {
-        //muk[spec]=_muk_from_rhok_T_Te_ParentMacheret(rhok, T, Te, spec);
+        kappac[spec]=_kappac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
+      }
+      for (k=0; k<ns; k++){
+        if (k<ncs) kappak[k]=kappac[k];
+          else kappak[k]=_kappak_from_chik_Delta1_Delta2_METHOD4(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
+      }
+      *kappan=0.0;
+      for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
+    break;
+    case METHOD7:
+      for (spec=0; spec<ncs; spec++) {
         kappac[spec]=_kappac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
       }
       for (k=0; k<ns; k++){
@@ -1265,16 +1335,6 @@ void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
       fatal_error("METHOD can not be set to %ld.",METHOD);
   }
 
-  if (METHOD==METHOD1 || METHOD==METHOD2 || METHOD==METHOD3 || METHOD==METHOD4){
-    for (k=0; k<ncs; k++){
-      if (speciestype[k]==SPECIES_ELECTRON) {
-        muk[k]=_muk_from_kappak(kappak[k], Te, rhok[k], k);
-      } else {
-        muk[k]=_muk_from_kappak(kappak[k], T, rhok[k], k);      
-      }    
-    }
-  }
-  adjust_nuk_using_mobilities_given_muk(rhok, T, Te, muk, nuk);  
 }
 
 

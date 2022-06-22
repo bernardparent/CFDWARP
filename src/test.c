@@ -881,32 +881,39 @@ void test_eta ( double Tmin, double Tmax, double dT ) {
 }
 
 
-void test_kappa ( double Tmin, double Tmax, double dT ) {
-  double T, eta, kappa, Te, rho;
-  spec_t w;
-  long spec, spec2, spec3;
+
+
+void test_kappa ( spec_t chik, double P, double Tmin, double Tmax, double dT ) {
+  double T, N, eta, kappan, Te;
+  long spec;
+  chargedspec_t kappac,muk;
   spec_t nuk,rhok;
   printf ( "\n" );
-  printf ( "Species thermal conductivities [W/mK] as function of temperature [K].\n" );
+  printf ( "Charged species thermal conductivities [W/mK] as function of temperature [K].\n" );
+  printf ( "The last column (without a title) is kappan, the thermal conductivity of the neutrals.\n");
   printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
+  printf ( "P=%E Pa\n", P);
+  for (spec=0; spec<ns; spec++) printf ( "chi[%ld]=%E \n", spec, chik[spec] );
+  
   printf ( "\n" );
-  print_column_species_names ( 12 );
+  print_column_charged_species_names ( 12 );
   T = Tmin;
   do {
-    wfprintf ( stdout, "%12.5E ", T );
-    for ( spec = 0; spec < ns; spec++ ) {
-      for ( spec2 = 0; spec2 < ns; spec2++ )
-        w[spec2] = 1e-10;
-#ifdef speceminus
-      w[speceminus]=1e-20;
-#endif
-      w[spec] = 1.0;
-      Te=T;
-      rho=1.0; //?????? value of rho doesn't affect viscosities
-      for (spec3=0; spec3<ns; spec3++) rhok[spec3]=w[spec3]*rho;
-      find_nuk_eta_kappa(rhok, T, Te, nuk, &eta, &kappa);
-      wfprintf ( stdout, "%+12.5E ", kappa );
+    Te = T;
+    N=P/kB/T;
+    for (spec=0; spec<ns; spec++) {
+      rhok[spec]=chik[spec]*_m(spec)*N;
     }
+    wfprintf ( stdout, "%12.5E ", T );
+
+    find_nuk_eta_kappak_muk(rhok, T, Te, nuk, &eta, &kappan, kappac, muk);
+
+
+    for ( spec = 0; spec < ncs; spec++ ) {
+      wfprintf ( stdout, "%+12.5E ", kappac[spec] );
+    }
+      wfprintf ( stdout, "%+12.5E ", kappan );
+    
     wfprintf ( stdout, "\n" );
     T += dT;
   } while ( T < Tmax );
@@ -1256,8 +1263,6 @@ int main ( int argc, char **argv ) {
         test_s ( Tmin, Tmax, dT );
       if ( strcmp ( "eta", argv[1] ) == 0 )
         test_eta ( Tmin, Tmax, dT );
-      if ( strcmp ( "kappa", argv[1] ) == 0 )
-        test_kappa ( Tmin, Tmax, dT );
       if ( strcmp ( "Pr", argv[1] ) == 0 )
         test_Pr ( Tmin, Tmax, dT );
       if ( strcmp ( "dsdT", argv[1] ) == 0 )
@@ -1270,6 +1275,8 @@ int main ( int argc, char **argv ) {
         test_nu(chik,P,Tmin,Tmax,dT);
       if ( strcmp ( "mu", argv[1] ) == 0 )
         test_mu(chik,P,Tmin,Tmax,dT);
+      if ( strcmp ( "kappa", argv[1] ) == 0 )
+        test_kappa(chik,P,Tmin,Tmax,dT);
 
     } else {
 #endif
@@ -1360,7 +1367,7 @@ int main ( int argc, char **argv ) {
                           lengthcol2 );
       write_options_row ( stderr, "eta", "none", "species viscosity  ./test eta 500 2000 2",
                           linewidth, lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "kappa", "none", "species thermal conductivity  ./test kappa 500 2000 2",
+      write_options_row ( stderr, "kappa", "none", "species thermal conductivity  ./test kappa  500 2000 2 101300 0.2 0.2 0.2 0.2 0.2",
                           linewidth, lengthcol1, lengthcol2 );
       write_options_row ( stderr, "nu", "none", "species mass diffusion coefficient  ./test nu  500 2000 2 101300 0.2 0.2 0.2 0.2 0.2",
                           linewidth, lengthcol1, lengthcol2 );
