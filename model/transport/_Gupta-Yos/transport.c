@@ -50,11 +50,11 @@ Calculations to 30000 K,” NASA RP-1232, 1990.
 //       Thus, set OMEGATMINCLIP to 10 K 
 #define OMEGATMINCLIP 10.0
 
-#define EPC_NONE 0
-#define EPC_GUPTAYOS 1
-#define EPC_RAIZER 2
-#define EPC_NRL 3
-#define EPC EPC_GUPTAYOS  //Use EPC_GUPTAYOS. Other methods are for testing purposes only.
+#define LNLAMBDA_NONE 0
+#define LNLAMBDA_GUPTAYOS 1
+#define LNLAMBDA_RAIZER 2
+#define LNLAMBDA_NRL 3
+#define LNLAMBDA LNLAMBDA_GUPTAYOS  //Use LNLAMBDA_GUPTAYOS. Other methods are for testing purposes only.
 
 #define METHOD1 1  // Eq(27), first Chapman-Enskog approximation
 #define METHOD2 2  // Eq(30), approximation to method 1, yields results close to method 1 for air mixture
@@ -67,7 +67,7 @@ Calculations to 30000 K,” NASA RP-1232, 1990.
 #define METHOD METHOD7  //Use METHOD7. Other methods are for testing purposes only
 
 
-double collision_integral_curvefit11(long s, long r, double T){
+double _piOmega11(long s, long r, double T){
   double A,B,C,D;
   
   T=min(max(OMEGATMINCLIP,T),30000.0);
@@ -275,7 +275,7 @@ double collision_integral_curvefit11(long s, long r, double T){
   return(exp(D)*pow(T,A*log(T)*log(T)+B*log(T)+C));
 }
 
-double collision_integral_curvefit22(long s, long r, double T){
+double _piOmega22(long s, long r, double T){
   double A,B,C,D;
   
   T=min(max(OMEGATMINCLIP,T),30000.0);
@@ -803,39 +803,39 @@ double EXM_matrix_determinant(EXM_mat_t mat){//improve this, triangular matrix i
 }
 
 
-static double _epc(spec_t rhok, double Te){
+static double _lnLambda(spec_t rhok, double Te){
 #ifdef speceminus  
-  double Pe,rhoe,epc;
+  double Pe,rhoe,lnLambda;
   rhoe=rhok[speceminus];
   Pe = max(1e-10,rhoe*calR*Te/_calM(speceminus)/101325.0e0); //electron pressure, atm
   /*electron pressure correction for the collision integrals of ionic species*/ /*Eq(24b)*/
-  switch (EPC){
-    case EPC_GUPTAYOS:
-      epc=0.5*log(2.09E-2*1E-12*Te*Te*Te*Te/Pe+1.52*pow(Te*Te*Te*Te*1E-12/Pe,2.0/3.0));
+  switch (LNLAMBDA){
+    case LNLAMBDA_GUPTAYOS:
+      lnLambda=0.5*log(2.09E-2*1E-12*Te*Te*Te*Te/Pe+1.52*pow(Te*Te*Te*Te*1E-12/Pe,2.0/3.0));
     break;
-    case EPC_RAIZER:
+    case LNLAMBDA_RAIZER:
       // Raizer Gas Discharge Physics, page 14
-      epc=13.57+1.5*log(Te/11600.0)/log(10.0)-0.5*log(rhoe/_m(speceminus)/1e6)/log(10.0);
+      lnLambda=13.57+1.5*log(Te/11600.0)/log(10.0)-0.5*log(rhoe/_m(speceminus)/1e6)/log(10.0);
     break;
-    case EPC_NRL:
+    case LNLAMBDA_NRL:
       // NRL Plasma Formulary, page 34
-      epc=23.0-log(sqrt(rhoe/_m(speceminus)/1e6)*pow(Te/11600.0,-1.5));
+      lnLambda=23.0-log(sqrt(rhoe/_m(speceminus)/1e6)*pow(Te/11600.0,-1.5));
     break;
-    case EPC_NONE:
-      epc=1.0;
+    case LNLAMBDA_NONE:
+      lnLambda=1.0;
     break;
     default:
-      fatal_error("EPC set to invalid value.");
+      fatal_error("LNLAMBDA set to invalid value.");
   }
 #else
-  epc=1.0;
+  lnLambda=1.0;
 #endif
-  epc=min(100.0,max(1.0,epc));
-  return(epc);
+  lnLambda=min(100.0,max(1.0,lnLambda));
+  return(lnLambda);
 }
 
 
-static void find_Delta1_Delta2(double N, double T, double epc, spec2_t Delta1, spec2_t Delta2){
+static void find_Delta1_Delta2(double N, double T, double lnLambda, spec2_t Delta1, spec2_t Delta2){
   
   long spec,i,j;
   spec_t M;
@@ -844,11 +844,11 @@ static void find_Delta1_Delta2(double N, double T, double epc, spec2_t Delta1, s
 
   for (i=0; i<ns; i++){
     for (j=0; j<ns; j++){
-      Delta1[i][j]=collision_integral_curvefit11(i,j,T)*(8.0e0/3.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*T*(M[i] + M[j])))*1.546e-20; // 1e-20 m^2 = 1 Angstrom^2
-      Delta2[i][j]=collision_integral_curvefit22(i,j,T)*(0.2*16.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*T*(M[i] + M[j])))*1.546e-20;
+      Delta1[i][j]=_piOmega11(i,j,T)*(8.0e0/3.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*T*(M[i] + M[j])))*1.546e-20; // 1e-20 m^2 = 1 Angstrom^2
+      Delta2[i][j]=_piOmega22(i,j,T)*(0.2*16.0e0)*sqrt((2.0e0*M[i]*M[j])/(pi*Runiv*T*(M[i] + M[j])))*1.546e-20;
       if(_Charge_number(i)!=0 && _Charge_number(j)!=0) {
-        Delta1[i][j]*=epc; 
-        Delta2[i][j]*=epc;
+        Delta1[i][j]*=lnLambda; 
+        Delta2[i][j]*=lnLambda;
       }
     }
   }
@@ -904,7 +904,7 @@ double _kappa_from_rhok_T_Te_METHOD2(spec_t rhok, double T, double Te){
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
 
-  find_Delta1_Delta2(N,T,_epc(rhok, Te),Delta1,Delta2);
+  find_Delta1_Delta2(N,T,_lnLambda(rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
   
   kappa_tr     = 0.0e0;
@@ -979,7 +979,7 @@ double _kappa_from_rhok_T_Te_METHOD1(spec_t rhok, double T, double Te){
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
 
-  find_Delta1_Delta2(N,T,_epc(rhok, Te),Delta1,Delta2);
+  find_Delta1_Delta2(N,T,_lnLambda(rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
   
 
@@ -1039,7 +1039,7 @@ double _kappa_from_rhok_T_Te_METHOD3(spec_t rhok, double T, double Te){
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
 
-  find_Delta1_Delta2(N,T,_epc(rhok, Te),Delta1,Delta2);
+  find_Delta1_Delta2(N,T,_lnLambda(rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
   
 
@@ -1257,10 +1257,10 @@ void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N; 
 
-  find_Delta1_Delta2(N,T,_epc(rhok, Te),Delta1,Delta2);
+  find_Delta1_Delta2(N,T,_lnLambda(rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);  
 
-  find_Delta1_Delta2(N,Te,_epc(rhok, Te),Delta1_e,Delta2_e);
+  find_Delta1_Delta2(N,Te,_lnLambda(rhok, Te),Delta1_e,Delta2_e);
   find_aij_Ai_for_kappa(chik, N, Te, Delta1_e, Delta2_e, aij_e, Ai_e, &aav_e);  
   
   *eta=_eta_from_chik_N_T_Te_Delta1_Delta2(chik, N, T, Te, Delta1, Delta2);

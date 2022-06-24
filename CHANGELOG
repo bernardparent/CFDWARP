@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 24a
+  * in model/transport/doc/report.tex
+    - improved the binary diffusion coefficient text within the Gupta-Yos section
+  * in model/transport/_Gupta-Yos/transport.c
+    - renamed EPC_* to LNLAMBDA_*
+    - renamed collision_integral_curvefit11() to _piOmega11()
+    - renamed collision_integral_curvefit22() to _piOmega22()
+    - renamed _epc() to _lnLambda()
+    - renamed epc to lnLambda
+
 2022 JUN 23c
   * in model/transport/_Gupta-Yos/transport.c
     - in find_muk_from_chik_N_T_Te_Delta1(), added  Delta1_e as a parameter

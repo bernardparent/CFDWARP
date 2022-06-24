@@ -509,24 +509,17 @@ with $(\ln \Lambda)_{ij}$ the electron pressure correction which is set here to:
 with $P_{\rm e}$ the electron pressure in atm, $\cal R$ the universal gas constant in cal/(g-mol K), $T_{\rm e}$ the electron temperature in K, $T$ the heavy species temperature in K. Also, $\Omega_{ij}^{(1,1)}$ is the average collision cross-section (used for diffusion, viscosity, translational, internal, and reaction components of
 thermal conductivity) for collisions between species $i$ and $j$ in square Angstroms. Similarly $\Omega_{ij}^{(2,2)}(T)$ is the average collision cross-section (used for viscosity and translational component of thermal conductivity) for collisions between species $i$ and $j$ in square Angstroms.  Expressions and data for $\Omega_{ij}^{(1,1)}(T)$ and $\Omega_{ij}^{(2,2)}(T)$ as a function of temperature can be found in \cite{nasa:1990:gupta}.
 
-\subsection{Diffusion Coefficients}
+\subsection{Binary Diffusion Coefficients}
 
 The binary diffusion coefficient corresponds to:
 %
 \begin{equation}
     {\cal D}_{ij}=\frac{1}{N \Delta_{ij}^{(1)}}
+    \label{eqn:GY:Dij}
 \end{equation}
 %
 with ${\cal D}_{ij}$ the binary diffusion coefficient in cm$^2$/s, $N$ the number density of the plasma in $1/{\rm cm}^3$ and $\Delta_{ij}^{(1)}$ has units of cm$\cdot$s.
 
-The mass diffusion coefficient (i.e., the coefficient multiplying the gradient of the mass fraction within the species conservation equation) can be obtained from the binary diffusion coefficients from the following:
-%
-\begin{equation}
-\mfd\nu_k= \frac{\rhos \left( 1 - {\chi}_k \right)}
-            {\mfd\sum_{\mfa l=1..\ns}^{l \neq k} \frac{{\chi}_l}{{\cal D}_{k,l}} +10^{-20}   }
-\end{equation}
-%
-where $\rho$ is the total density of the mixture in kg/m$^3$, $\chi_k$ is the molar fraction of the $k$th species, ${\cal D}_{ij}$ is the binary diffusion coefficient in m$^2$/s, and $\nu_k$ is mass diffusion coefficient in kg/ms. The number $10^{-20}$ is added to the denominator to prevent a division by zero.
 
 
 \subsection{Species Thermal Conductivity}
@@ -604,18 +597,28 @@ In the latter $\alpha_{ij}$ is equal to:
 %
 with $M_i$ the molecular weight of the $i$th species.
 
+
 \subsection{Species Mobilities}
 
 The mobility of the charged species (either electrons or ions) can be obtained from the binary diffusion coefficients as follows:
 %
 \begin{equation}
  \mu_i= \left\{\begin{array}{ll}
-   \mfd  |C_i| \left( k_{\rm B} T_{\rm e} \sum_{j=1}^{n_{\rm s}} \frac{\chi_j}{{\cal D}_{ij}}\right)^{-1} & \textrm{for electrons} \alb
-    \mfd  |C_i| \left( k_{\rm B} T \sum_{j=1}^{n_{\rm s}} \frac{\chi_j}{{\cal D}_{ij}}\right)^{-1} & \textrm{for ions} \alb
+   \mfd  |C_i| \left( k_{\rm B} T_{\rm e} \sum_{j=1}^{n_{\rm s}} \frac{\chi_j}{{\cal D}_{ij}(T_{\rm e})}\right)^{-1} & \textrm{for electrons} \alb
+    \mfd  |C_i| \left( k_{\rm B} T \sum_{j=1}^{n_{\rm s}} \frac{\chi_j}{{\cal D}_{ij}(T)}\right)^{-1} & \textrm{for ions} \alb
  \end{array} \right.
 \end{equation}
 %
-where ${\cal D}_{ij}$ is the binary diffusion coefficient in m$^2$/s, $\mu_i$ the mobility of the $i$th species in m$^2$/V-s, $C_k$ is the charge in Coulombs of the $k$th species (eg.\ $-e$ for electrons, $+e$ for singly-charged positive ions with $e$ the elementary charge), $k_{\rm B}$ the Boltzmann constant in m$^2$kg/s$^2$-K, $T$ the temperature in Kelvin of the bulk, and $T_{\rm e}$ the electron temperature in K.
+where ${\cal D}_{ij}$ is the binary diffusion coefficient in m$^2$/s, where $\mu_i$ is the mobility of the $i$th species in m$^2$/V-s, $C_k$ is the charge in Coulombs of the $k$th species (eg.\ $-e$ for electrons, $+e$ for singly-charged positive ions with $e$ the elementary charge), $k_{\rm B}$ the Boltzmann constant in m$^2$kg/s$^2$-K, $T$ the temperature in Kelvin of the bulk, and $T_{\rm e}$ the electron temperature in K.
+Also, the latter can be expressed differently by substituting $D_{ij}$ from Eq.\ (\ref{eqn:GY:Dij}):
+%
+\begin{equation}
+ \mu_i= \left\{\begin{array}{ll}
+   \mfd  |C_i| \left( N k_{\rm B} T_{\rm e} \sum_{j=1}^{n_{\rm s}} \chi_j  \Delta_{ij}^{(1)}(T_{\rm e}) \right)^{-1} & \textrm{for electrons} \alb
+    \mfd  |C_i| \left( N k_{\rm B} T \sum_{j=1}^{n_{\rm s}} \chi_j  \Delta_{ij}^{(1)}(T) \right)^{-1} & \textrm{for ions} \alb
+ \end{array} \right.
+\end{equation}
+%
 
 \subsection{Recommended Modifications}
 
@@ -623,8 +626,8 @@ The first modification to the Gupta-Yos that we recommend is to exclude the elec
 %
 \begin{equation}
  \mu_i= \left\{\begin{array}{ll}
-   \mfd  |C_i| \left( k_{\rm B} T_{\rm e} \sum_{j=1..n_{\rm s}}^{j\neq i} \frac{\chi_j}{{\cal D}_{ij}}\right)^{-1} & \textrm{for electrons} \alb
-    \mfd  |C_i| \left( k_{\rm B} T \sum_{j=1}^{n_{\rm s}} \frac{\chi_j}{{\cal D}_{ij}}\right)^{-1} & \textrm{for ions} \alb
+   \mfd  |C_i| \left( k_{\rm B} T_{\rm e} \sum_{j=1..n_{\rm s}}^{j\neq i} \frac{\chi_j}{{\cal D}_{ij}(T_{\rm e})}\right)^{-1} & \textrm{for electrons} \alb
+    \mfd  |C_i| \left( k_{\rm B} T \sum_{j=1}^{n_{\rm s}} \frac{\chi_j}{{\cal D}_{ij}(T)}\right)^{-1} & \textrm{for ions} \alb
  \end{array} \right.
 \end{equation}
 %
