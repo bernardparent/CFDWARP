@@ -44,6 +44,12 @@ Calculations to 30000 K,” NASA RP-1232, 1990.
 #define Runiv 1.987 //cal/(g-mol K)
 #define kBol 1.38066E-16 // erg/K
 
+// NOTE: the polynomials in OMEGA are accurate if the temperature is higher than 1000K.
+//       However, better predictions are obtained when using the polynomials at at a below-bound
+//       temperature rather than clipping the temperature to 1000 K
+//       Thus, set OMEGATMINCLIP to 10 K 
+#define OMEGATMINCLIP 10.0
+
 #define EPC_NONE 0
 #define EPC_GUPTAYOS 1
 #define EPC_RAIZER 2
@@ -64,7 +70,7 @@ Calculations to 30000 K,” NASA RP-1232, 1990.
 double collision_integral_curvefit11(long s, long r, double T){
   double A,B,C,D;
   
-  T=min(max(1000.0,T),30000.0);
+  T=min(max(OMEGATMINCLIP,T),30000.0);
   
   switch (smap[s]){
     case SMAP_eminus:
@@ -75,16 +81,16 @@ double collision_integral_curvefit11(long s, long r, double T){
         case SMAP_O2plus: A=0.0; B=0.0; C=-2.0; D=23.8237; break;
         case SMAP_N2plus: A=0.0; B=0.0; C=-2.0; D=23.8237; break;
         case SMAP_NOplus: A=0.0; B=0.0; C=-2.0; D=23.8237; break;
-        case SMAP_O: if(T >= 1000.0 && T< 9000.0) {A=0.0164; B=-0.2431; C=1.1231; D=-1.5561;}
+        case SMAP_O: if(T< 9000.0) {A=0.0164; B=-0.2431; C=1.1231; D=-1.5561;}
           else if(T >= 9000.0 && T<= 30000.0) {A=-0.2027; B=5.6428; C=-51.5646; D=155.6091;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;
         case SMAP_N: A=0.0; B=0.0; C=0.0; D=1.6094; break;    
-        case SMAP_NO: if(T >= 1000.0 && T< 8000.0) {A=-0.2202; B=5.2265; C=-40.5659; D=104.7126;}
+        case SMAP_NO: if(T< 8000.0) {A=-0.2202; B=5.2265; C=-40.5659; D=104.7126;}
           else if(T >= 8000.0 && T<= 30000.0) {A=-0.2871; B=8.3757; C=-81.3787; D=265.6292;}
           else fatal_error("Temperature of %.15E K is out of range of validitity (1000-30000 K) for species pair %ld,%ld.",s,r);
           break;    
-        case SMAP_O2: if(T >= 1000.0 && T< 9000.0) {A=0.0241; B=-0.3467; C=1.3887; D=-0.0110;}
+        case SMAP_O2: if(T< 9000.0) {A=0.0241; B=-0.3467; C=1.3887; D=-0.0110;}
           else if(T >= 9000.0 && T<= 30000.0) {A=0.0025; B=-0.0742; C=0.7235; D=-0.2116;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;    
@@ -174,7 +180,7 @@ double collision_integral_curvefit11(long s, long r, double T){
     break;
     case SMAP_O:
       switch (smap[r]){
-        case SMAP_eminus: if(T >= 1000.0 && T< 9000.0) {A=0.0164; B=-0.2431; C=1.1231; D=-1.5561;}
+        case SMAP_eminus: if(T< 9000.0) {A=0.0164; B=-0.2431; C=1.1231; D=-1.5561;}
           else if(T >= 9000.0 && T<= 30000.0) {A=-0.2027; B=5.6428; C=-51.5646; D=155.6091;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;
@@ -209,7 +215,7 @@ double collision_integral_curvefit11(long s, long r, double T){
     break;    
     case SMAP_NO:
       switch (smap[r]){
-        case SMAP_eminus: if(T >= 1000.0 && T< 8000.0) {A=-0.2202; B=5.2265; C=-40.5659; D=104.7126;}
+        case SMAP_eminus: if(T< 8000.0) {A=-0.2202; B=5.2265; C=-40.5659; D=104.7126;}
           else if(T >= 8000.0 && T<= 30000.0) {A=-0.2871; B=8.3757; C=-81.3787; D=265.6292;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;
@@ -228,7 +234,7 @@ double collision_integral_curvefit11(long s, long r, double T){
     break;    
     case SMAP_O2:
       switch (smap[r]){
-        case SMAP_eminus: if(T >= 1000.0 && T< 9000.0) {A=0.0241; B=-0.3467; C=1.3887; D=-0.0110;}
+        case SMAP_eminus: if(T< 9000.0) {A=0.0241; B=-0.3467; C=1.3887; D=-0.0110;}
           else if(T >= 9000.0 && T<= 30000.0) {A=0.0025; B=-0.0742; C=0.7235; D=-0.2116;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;
@@ -272,7 +278,7 @@ double collision_integral_curvefit11(long s, long r, double T){
 double collision_integral_curvefit22(long s, long r, double T){
   double A,B,C,D;
   
-  T=min(max(1000.0,T),30000.0);
+  T=min(max(OMEGATMINCLIP,T),30000.0);
   switch (smap[s]){
     case SMAP_eminus:
       switch (smap[r]){
@@ -282,16 +288,16 @@ double collision_integral_curvefit22(long s, long r, double T){
         case SMAP_O2plus: A=0.0; B=0.0; C=-2.0; D=24.3061; break;
         case SMAP_N2plus: A=0.0; B=0.0; C=-2.0; D=24.3061; break;
         case SMAP_NOplus: A=0.0; B=0.0; C=-2.0; D=24.3061; break;
-        case SMAP_O: if(T >= 1000.0 && T< 9000.0) {A=0.0164; B=-0.2431; C=1.1231; D=-1.5561;}
+        case SMAP_O: if(T< 9000.0) {A=0.0164; B=-0.2431; C=1.1231; D=-1.5561;}
           else if(T >= 9000.0 && T<= 30000.0) {A=-0.2027; B=5.6428; C=-51.5646; D=155.6091;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;
         case SMAP_N: A=0.0; B=0.0; C=0.0; D=1.6094; break;
-        case SMAP_NO: if(T >= 1000.0 && T< 8000.0) {A=-0.2202; B=5.2265; C=-40.5659; D=104.7126;}
+        case SMAP_NO: if(T< 8000.0) {A=-0.2202; B=5.2265; C=-40.5659; D=104.7126;}
           else if(T >= 8000.0 && T<= 30000.0) {A=-0.2871; B=8.3757; C=-81.3787; D=265.6292;}
           else fatal_error("Temperature of %.15E K is out of range of validitity (1000-30000 K) for species pair %ld,%ld.",s,r);
           break;
-        case SMAP_O2: if(T >= 1000.0 && T< 9000.0) {A=0.0241; B=-0.3467; C=1.3887; D=-0.0110;}
+        case SMAP_O2: if(T< 9000.0) {A=0.0241; B=-0.3467; C=1.3887; D=-0.0110;}
           else if(T >= 9000.0 && T<= 30000.0) {A=0.0025; B=-0.0742; C=0.7235; D=-0.2116;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;
@@ -381,7 +387,7 @@ double collision_integral_curvefit22(long s, long r, double T){
     break;
     case SMAP_O:
       switch (smap[r]){
-        case SMAP_eminus: if(T >= 1000.0 && T< 9000.0) {A=0.0164; B=-0.2431; C=1.1231; D=-1.5561;}
+        case SMAP_eminus: if(T< 9000.0) {A=0.0164; B=-0.2431; C=1.1231; D=-1.5561;}
           else if(T >= 9000.0 && T<= 30000.0) {A=-0.2027; B=5.6428; C=-51.5646; D=155.6091;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;
@@ -416,7 +422,7 @@ double collision_integral_curvefit22(long s, long r, double T){
     break;    
     case SMAP_NO:
       switch (smap[r]){
-        case SMAP_eminus: if(T >= 1000.0 && T< 8000.0) {A=-0.2202; B=5.2265; C=-40.5659; D=104.7126;}
+        case SMAP_eminus: if(T< 8000.0) {A=-0.2202; B=5.2265; C=-40.5659; D=104.7126;}
           else if(T >= 8000.0 && T<= 30000.0) {A=-0.2871; B=8.3757; C=-81.3787; D=265.6292;}
           else fatal_error("Temperature of %.15E K is out of range of validitity (1000-30000 K) for species pair %ld,%ld.",s,r);
           break;
@@ -435,7 +441,7 @@ double collision_integral_curvefit22(long s, long r, double T){
     break;    
     case SMAP_O2:
       switch (smap[r]){
-        case SMAP_eminus: if(T >= 1000.0 && T< 9000.0) {A=0.0241; B=-0.3467; C=1.3887; D=-0.0110;}
+        case SMAP_eminus: if(T< 9000.0) {A=0.0241; B=-0.3467; C=1.3887; D=-0.0110;}
           else if(T >= 9000.0 && T<= 30000.0) {A=0.0025; B=-0.0742; C=0.7235; D=-0.2116;}
           else fatal_error("Temperature is out of range of validitity for species pair %ld,%ld.",s,r);
           break;

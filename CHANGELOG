@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 23b
+  * in model/transport/_Gupta-Yos/transport.c
+    - in collision_integral_curvefit22() and collision_integral_curvefit11(), removed the clipping
+      of the temperature that prevented it to fall below 1000K. Now, the polynomials are used
+      for temperatures as low as OMEGATMINCLIP (which is set to 10K).
+      
+
 2022 JUN 23a
   * in model/share/transport_share.c
     - in find_nuk_from_Dij(), got rid of code that is not used (only kept the first Oran-Boris method)
