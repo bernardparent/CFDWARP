@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 23a
+  * in model/share/transport_share.c
+    - in find_nuk_from_Dij(), got rid of code that is not used (only kept the first Oran-Boris method)
+  * in model/transport/doc/report.tex
+    - made various changes to reflect latest changes to transport modules
+    
+
 2022 JUN 22a
   * in model/chem/_C2H4_Air_Plasma_30s/chem.c
     - added some reactions

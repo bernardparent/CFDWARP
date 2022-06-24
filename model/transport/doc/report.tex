@@ -147,25 +147,15 @@ The electron mobility in a partially ionized plasma (a plasma in which both the 
 \mu_{\rm e}=\frac{1}{\frac{1}{\mu_{\rm en}}+\frac{1}{\mu_{\rm ei}}}
 \end{equation}
 %
-with the electron mobility with respect to ions is set to (see \cite[page 180--181]{book:1984:chen}):
-%
-\begin{equation}
-\mu_{\rm ei} = \frac{9}{4\pi\sqrt{3}} \frac{(4\pi\epsilon_0)^2 (k_{\rm B}T_{\rm e})^{1.5}}{m_{\rm e}^{0.5} e^3 N_{\rm i} \ln \Lambda}
-\end{equation}
-%
-where $e$ is the elementary charge, $N_{\rm i}$ the positive ion number density (sum of all positive ions), $m_{\rm e}$ the electron mass. Substituting the constants, $\mu_{\rm ei}$ becomes: 
+with the electron mobility with respect to ions set to
 %
 \begin{equation}
 \mu_{\rm ei}= \frac{9.5 \times 10^{16}}{\rm m\cdot K^{1.5}\cdot V \cdot s} \frac{T_{\rm e}^{1.5}}{N_{\rm i} \ln \Lambda}
 \end{equation}
 %
-where $\Lambda$ is the shielding parameter and $\ln \Lambda$ is the Coulomb logarithm. The Coulomb logarithm can be  found from the NRL Plasma Formulary \cite{nrl:2013:huba}:
-%
-\begin{equation}
-    \ln \Lambda=23-\ln\left(\sqrt{\frac{\rho_{\rm e}}{m_{\rm e}\cdot 10^6}}\cdot\left(\frac{T_{\rm e}}{11600}\right)^{-1.5}\right)
-\end{equation}
-%
-or from Raizer's book \cite[p. 14]{book:1991:raizer}:
+where $T_{\rm e}$ is the electron temperature in K, $N_{\rm i}$ is the ion number density in m$^{-3}$.
+The latter is obtained from Raizer \cite[Eq.\ (2.9)]{book:1991:raizer}.
+Also, $\Lambda$ is the shielding parameter and $\ln \Lambda$ is the Coulomb logarithm. The Coulomb logarithm can be  found from the following \cite[p. 14]{book:1991:raizer}:
 %
 \begin{equation}
     \ln \Lambda=13.57+\frac{3}{2} {\rm log}_{10} \left(\frac{T_{\rm e}}{11600}\right)-\frac{1}{2}{\rm log}_{10}\left(\frac{N_{\rm e}}{10^6}\right)
@@ -254,8 +244,45 @@ The scalar viscosity can be obtained from the thermal conductivity as follows:
 % 
 where Pr is the Prandtl number which is set to 0.73 for the electrons and to 0.96 for the ions.
 
+\subsection{Diffusion Coefficient}
+
+The diffusion coefficient ${\cal D}$ is related to the mobility $\mu$ following the Einsteins-Smoluchowski relation as follows:
+%
+\begin{equation}
+    {\cal D}_k= \frac{\mu_k k_{\rm B} T_k}{|C_k|}
+\end{equation}
+%
+with $\mu_k$ the mobility in m$^2$/V-s, $\cal D$ the diffusion coefficient in m$^2$/s, $C_k$ the charge in Coulomb of one particule and $k_{\rm B}$ the Boltzmann constant.
 
 
+\section{Mass Diffusion Coefficients from Binary Diffusion Coefficients}
+
+Transport models by Dixon-Lewis or by Gupta-Yos will give expressions for the binary diffusion coefficients $D_{ij}$. However, those need to be converted into a mass diffusion coefficient $\nu_k$ in order to be implemented in a CFD code. There are several ways to do this, with varying amount of computing and accuracy.
+
+\subsection{Oran-Boris Mass Diffusion Model}
+
+One of the simplest mass diffusion coefficient model is the one outlined in Oran-Boris \cite{pces:1981:oran}.
+The molecular diffusion coefficient of species $k$, $\nu_k$,
+is found from the binary diffusion coefficients as follows \cite[Eq.\ (6.15)]{pces:1981:oran}:
+%
+\begin{equation}
+\mfd\nu_k= \frac{\rhos \left( 1 - {\chi}_k \right)}
+            {\mfd\sum_{\mfa l=1..\ns}^{l \neq k} \frac{{\chi}_l}{{\cal D}_{k,l}} +10^{-20}   }
+\label{eqn:moldiff-nu}
+\end{equation}
+%
+In the latter, the molar fraction can be found from the mass fractions as follows:
+%
+\begin{equation}
+{\chi}_k= \mfd\frac{w_k / {\cal M}_k}
+              {\mfd\sum_{\mfa l=1}^{\ns} \left( w_l / {\cal M}_l \right)}
+\end{equation}
+%
+where $w_k$ is the mass fraction. 
+
+\subsection{Ramshaw-Shang SCEBD Mass Diffusion Model}
+
+Another model is the SCEBD (Self-Consistent Effective Binary Diffusion) model by Ramshaw and Shang \cite{jnet:1996:ramshaw}.
 
 
 \section{Dixon-Lewis Transport Coefficients}
@@ -316,7 +343,7 @@ $>10$      & $1.1059000$E$+0$ & $+6.5136364$E$-4$ & $-3.4090910$E$-6$ &~&~ \\
 \end{table*}
 %
 
-\subsection{Mixture Viscosity}
+\subsection{Neutrals Mixture Viscosity}
 
 The viscosity of the mixture of neutral gases $\eta_{\rm n}$ is computed using Wilke's mixing rule:
 %
@@ -369,7 +396,7 @@ Further, $\Omega^{22}_k$ is the reduced collision integral involving polynomials
  is the non-dimensional reduced temperature corresponding to $T/ \epsilon_k$  with $\epsilon_k$ being the Lennard-Jones potential well depth in Kelvin. Data for $\epsilon_k$ can be found in Table \ref{tab:dl:epsilon-sigma} and the polynomials needed to compute $\Omega_k^{22}$ can be found in Table \ref{tab:dl:Omega}.
  
  
-\subsection{Mixture Thermal Conductivity}
+\subsection{Neutrals Mixture Thermal Conductivity}
 
 The molecular thermal conductivity of a mixture of neutral gases $\kappa_{\rm n}$ is found similarly to the molecular dynamic viscosity from the Mason and Saxena \cite{gen:mason-saxena} relation:
 %
@@ -406,26 +433,8 @@ where $(c_p)_k$ is the specific heat at constant pressure.
 
 Note that the Dixon-Lewis model is only applicable to mixtures that do not include electrons or ions. Thus, we can use the latter expression for the thermal conductivity of the neutrals and then add the thermal conductivity of the charged species as outlined by the Parent-Macheret model in Section 1 above. When charged species are present the thermal conductivity of the neutrals 
 
-\subsection{Mass Diffusion Coefficients}
 
-The molecular diffusion coefficient of species $k$, $\nu_k$,
-is found from the binary diffusion coefficients as outlined in Dixon-Lewis \cite{gen:dixon-lewis}:
-%
-\begin{equation}
-\mfd\nu_k= \frac{\rhos \left( 1 - {\chi}_k \right)}
-            {\mfd\sum_{\mfa l=1..\ns}^{l \neq k} \frac{{\chi}_l}{{\cal D}_{k,l}} +10^{-20}   }
-\label{eqn:moldiff-nu}
-\end{equation}
-%
-In the latter, the molar fraction can be found from the mass fractions as follows:
-%
-\begin{equation}
-{\chi}_k= \mfd\frac{w_k / {\cal M}_k}
-              {\mfd\sum_{\mfa l=1}^{\ns} \left( w_l / {\cal M}_l \right)}
-\end{equation}
-%
-where $w_k$ is the mass fraction. 
-
+\subsection{Binary Diffusion Coefficients}
 
 Also, ${\cal D}_{k,l}$ is the binary diffusion coefficient, or
 a measure of how much gas $k$ diffuses into gas $l$. The binary diffusion coefficient of species $k$ with respect to species $l$,
@@ -597,14 +606,36 @@ with $M_i$ the molecular weight of the $i$th species.
 
 \subsection{Species Mobilities}
 
-The mobility of the charged species (either electrons or ions) can be obtained from the species thermal conductivity as follows:
+The mobility of the charged species (either electrons or ions) can be obtained from the binary diffusion coefficients as follows:
 %
 \begin{equation}
- \mu_k= \frac{\kappa_k |C_k|}{(c_p)_k \rho_k k_{\rm B} T_k}
+ \mu_i= \left\{\begin{array}{ll}
+   \mfd  |C_i| \left( k_{\rm B} T_{\rm e} \sum_{j=1}^{n_{\rm s}} \frac{\chi_j}{{\cal D}_{ij}}\right)^{-1} & \textrm{for electrons} \alb
+    \mfd  |C_i| \left( k_{\rm B} T \sum_{j=1}^{n_{\rm s}} \frac{\chi_j}{{\cal D}_{ij}}\right)^{-1} & \textrm{for ions} \alb
+ \end{array} \right.
 \end{equation}
 %
-where $\kappa_k$ is the thermal conductivity of the $k$th species in W/m-K, $C_k$ is the charge in Coulombs of the $k$th species (eg.\ $-e$ for electrons, $+e$ for singly-charged positive ions with $e$ the elementary charge), $(c_p)_k$ is the specific heat at constant pressure of the $k$th species in J/kg-K, $\rho_k$ is the partial density of the $k$th species in kg/m$^3$, $k_{\rm B}$ the Boltzmann constant in m$^2$kg/s$^2$-K, and $T_k$ the $k$th species temperature in K.
+where ${\cal D}_{ij}$ is the binary diffusion coefficient in m$^2$/s, $\mu_i$ the mobility of the $i$th species in m$^2$/V-s, $C_k$ is the charge in Coulombs of the $k$th species (eg.\ $-e$ for electrons, $+e$ for singly-charged positive ions with $e$ the elementary charge), $k_{\rm B}$ the Boltzmann constant in m$^2$kg/s$^2$-K, $T$ the temperature in Kelvin of the bulk, and $T_{\rm e}$ the electron temperature in K.
 
+\subsection{Recommended Modifications}
+
+The first modification to the Gupta-Yos that we recommend is to exclude the electron-electron collisions when determining the mobilities. Thus, the electron and ion mobilities should be:
+%
+\begin{equation}
+ \mu_i= \left\{\begin{array}{ll}
+   \mfd  |C_i| \left( k_{\rm B} T_{\rm e} \sum_{j=1..n_{\rm s}}^{j\neq i} \frac{\chi_j}{{\cal D}_{ij}}\right)^{-1} & \textrm{for electrons} \alb
+    \mfd  |C_i| \left( k_{\rm B} T \sum_{j=1}^{n_{\rm s}} \frac{\chi_j}{{\cal D}_{ij}}\right)^{-1} & \textrm{for ions} \alb
+ \end{array} \right.
+\end{equation}
+%
+
+The second modification we recommend is to determine the thermal conductivities of the charged species from the following relationship:
+%
+\begin{equation}
+  \kappa_k = \frac{\rho_k k_{\rm B} (c_p)_k T_k \mu_k}{|C_k|}    
+\end{equation}
+%
+where $(c_p)_k$ is the specific heat at constant pressure of the $k$th species and $T_k$ is the species temperature (either $T$ for the ions or $T_{\rm e}$ for the electrons).
 \section{Capitelli Transport Coefficients}
 
 The equations used to evaluate the transport coefficients are described in Ref.\ \cite{tepjd:2000:capitelli}. The choice of collision integrals will affect the transport properties. 

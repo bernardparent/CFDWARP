@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define LNLAMBDA_NRL 3
 #define LNLAMBDA LNLAMBDA_RAIZER  //Use LNLAMBDA_RAIZER. Other methods are for testing purposes only.
 
+#define MASSDIFFCOEFF_ORANBORIS 1
+#define MASSDIFFCOEFF_SCEBD 2
+#define MASSDIFFCOEFF MASSDIFFCOEFF_ORANBORIS  //Use MASSDIFFCOEFF_ORANBORIS. 
 
 
 // find the scalar thermal conductivity of the kth charged species
@@ -452,36 +455,20 @@ void find_dmuk_from_rhok_Tk_Ek_ParentMacheret(spec_t rhok, double Tk, double Ek,
 
 }
 
-#define MASSDIFFCOEFF_OLD 1
-#define MASSDIFFCOEFF_ORANBORIS1 2
-#define MASSDIFFCOEFF_ORANBORIS2 3
-#define MASSDIFFCOEFF MASSDIFFCOEFF_ORANBORIS1
 
 void find_nuk_from_Dij(spec_t rhok, spec2_t Dij, spec_t nuk){
-  long k,i,j,l;
-  double sum,sum2,rho,N;
-  spec_t chi,w,Dm;
-  spec2_t A;
+  long k,i,j;
+  double sum,rho,N;
+  spec_t chi,Dm;
   
   rho=0;
   for (k=0; k<ns; k++) rho+=rhok[k];
-  for (k=0; k<ns; k++) w[k]=max(1.0e-99,rhok[k]/rho);
   N=0.0;
   for (k=0; k<ns; k++) N+=rhok[k]/_m(k);
   for (k=0; k<ns; k++) chi[k]=max(1.0e-99,rhok[k]/_m(k)/N); 
   
   switch (MASSDIFFCOEFF){
-    case MASSDIFFCOEFF_OLD:
-      for (k=0; k<ns; k++){
-        sum=0.0;
-        for (l=0; l<ns; l++) {
-          if (l!=k) 
-            sum+=chi[l]/(Dij[k][l]); 
-        }
-        nuk[k]=rho*(1.0-chi[k])/(sum+1.0e-20);
-      }
-    break;
-    case MASSDIFFCOEFF_ORANBORIS1:
+    case MASSDIFFCOEFF_ORANBORIS:
       for (i=0; i<ns; i++){
         sum=0.0;
         for (j=0; j<ns; j++) {
@@ -492,32 +479,6 @@ void find_nuk_from_Dij(spec_t rhok, spec2_t Dij, spec_t nuk){
       }
       for (i=0; i<ns; i++){
         nuk[i]=rho*Dm[i]; 
-      }
-    break;
-    case MASSDIFFCOEFF_ORANBORIS2:
-      for (i=0; i<ns; i++){
-        sum=0.0;
-        for (j=0; j<ns; j++) {
-          if (j!=i) 
-            sum+=chi[j]/(Dij[i][j]); 
-        }
-        Dm[i]=(1.0-chi[i])/(sum+1.0e-20); 
-      }
-      for (i=0; i<ns; i++){
-        for (j=0; j<ns; j++){
-          A[i][j]=w[i]*krodelta(i,j)+chi[i]/Dij[i][j]*(1.0-w[j])*Dm[j]/(1.0-chi[j])*(1.0-krodelta(i,j)); 
-        }
-      }
-      for (i=0; i<ns; i++){
-        sum=0; 
-        for (j=0; j<ns; j++){
-          sum2=0; 
-          for (k=0; k<ns; k++){
-            sum2+=A[i][k]*A[k][j]; 
-          }
-          sum+=krodelta(i,j)+A[i][j]+sum2; 
-        }
-        nuk[i]=rho*Dm[i]*sum; 
       }
     break;
     default:
