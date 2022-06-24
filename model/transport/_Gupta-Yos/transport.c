@@ -1137,15 +1137,17 @@ void find_nuk_from_chik_N_T_Te_Delta1(spec_t chik, double N, double T, double Te
 }
 
 
-void find_muk_from_chik_N_T_Te_Delta1(spec_t chik, double N, double T, double Te, spec2_t Delta1, chargedspec_t muk){
+void find_muk_from_chik_N_T_Te_Delta1(spec_t chik, double N, double T, double Te, spec2_t Delta1, spec2_t Delta1_e, chargedspec_t muk){
   double Dm,sum;
   long i,j;
-  spec2_t Dij;
+  spec2_t Dij,Dij_e;
   
   for (i=0; i<ns; i++){
     for (j=0; j<ns; j++){ 
       Dij[i][j]=1.0/(N/1e6*Delta1[i][j])/1e4; //the units for Dij here are m2/s 
       assert(Dij[i][j]!=0.0);
+      Dij_e[i][j]=1.0/(N/1e6*Delta1_e[i][j])/1e4; //the units for Dij here are m2/s 
+      assert(Dij_e[i][j]!=0.0);
     }
   }
   for (i=0; i<ncs; i++){
@@ -1155,11 +1157,11 @@ void find_muk_from_chik_N_T_Te_Delta1(spec_t chik, double N, double T, double Te
         if (METHOD==METHOD7){
           for (j=0; j<ns; j++) {
             if (i!=j)
-              sum+=chik[j]/(Dij[i][j]); 
+              sum+=chik[j]/(Dij_e[i][j]); 
           }
         } else {
           for (j=0; j<ns; j++) {
-            sum+=chik[j]/(Dij[i][j]); 
+            sum+=chik[j]/(Dij_e[i][j]); 
           }          
         }
       break; 
@@ -1264,7 +1266,7 @@ void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
   *eta=_eta_from_chik_N_T_Te_Delta1_Delta2(chik, N, T, Te, Delta1, Delta2);
   find_nuk_from_chik_N_T_Te_Delta1(chik, N, T, Te, Delta1, nuk);
 
-  find_muk_from_chik_N_T_Te_Delta1(chik, N, T, Te, Delta1, muk);
+  find_muk_from_chik_N_T_Te_Delta1(chik, N, T, Te, Delta1, Delta1_e, muk);
   
   switch (METHOD){
     case METHOD1:

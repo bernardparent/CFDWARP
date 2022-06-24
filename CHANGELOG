@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 23c
+  * in model/transport/_Gupta-Yos/transport.c
+    - in find_muk_from_chik_N_T_Te_Delta1(), added  Delta1_e as a parameter
+    - in find_muk_from_chik_N_T_Te_Delta1(), made the electron mobility function of Delta1_e instead
+      of Delta1 (makes a difference when Te is different from T)
+      
+
 2022 JUN 23b
   * in model/transport/_Gupta-Yos/transport.c
     - in collision_integral_curvefit22() and collision_integral_curvefit11(), removed the clipping
