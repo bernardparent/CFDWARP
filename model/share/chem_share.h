@@ -37,6 +37,11 @@ void add_to_W_3r3p ( int specR1, int specR2, int specR3,
                      double kf, spec_t N, spec_t W);
 
 
+void add_to_W_fw_1r1p(int specR1, int specP1, double A, double n, double E, double T, spec_t X, spec_t W);
+
+void add_to_dW_fw_1r1p(int specR1, int specP1, double A, double n, double E, double T, spec_t X, spec_t dWdT, spec2_t dWdrhok);
+
+
 /* kf in cm^3 s^(-1) 
    N in cm^(-3)
    dkfdT in cm^3 s^(-1) K^(-1)

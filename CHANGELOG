@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUN 25a
+  * in model/chem/_C2H4_Air_Plasma_30s/chem.c
+    - finished implementing the first version of the Adamovich model
+  * in model/share/chem_share.c
+    - added function add_to_W_fw_1r1p() and add_to_dW_fw_1r1p()
+
+
 2022 JUN 24a
   * in model/transport/doc/report.tex
     - improved the binary diffusion coefficient text within the Gupta-Yos section
@@ -16,6 +23,7 @@ ________________________________________________________________________________
     - renamed collision_integral_curvefit22() to _piOmega22()
     - renamed _epc() to _lnLambda()
     - renamed epc to lnLambda
+
 
 2022 JUN 23c
   * in model/transport/_Gupta-Yos/transport.c
