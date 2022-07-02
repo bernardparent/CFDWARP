@@ -1531,6 +1531,175 @@ void add_to_dW_fw_2r3p_fit4(int specR1, int specR2,
 
 
 
+void add_to_W_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
+                                int specP1, int specP2,
+                                double A0, double n0, double E0, 
+                                double A,  double n , double E, 								
+							                	double T, double M, spec_t X, spec_t W){
+  double kf,sum, kf0, P_r, kinf;
+  
+  
+  kf0  = A0*pow(T,n0)*exp(-E0/(T*1.987192004e0));  /* low  pressure limit cm^3 (mole s)^(-1) */ 
+  kinf = A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* high pressure limit cm^3 (mole s)^(-1) */ 
+  
+  P_r = M * kf0 / kinf;
+  
+  kf = kinf * P_r / ( 1 + P_r ); /* Lindemann aprroximation */
+
+  sum=kf*X[specR1]*X[specR2]*X[specR3]; /* mole cm^(-3) (s)^(-1) */
+  W[specR1]-=_calM(specR1)*sum*1e6;
+  W[specR2]-=_calM(specR2)*sum*1e6;
+  W[specR3]-=_calM(specR3)*sum*1e6;
+  W[specP1]+=_calM(specP1)*sum*1e6;
+  W[specP2]+=_calM(specP2)*sum*1e6; /* kg m^(-3) s^(-1) */
+} 
+
+
+void add_to_W_fw_2r3p_Lindemann(int specR1, int specR2,
+                                int specP1, int specP2, int specP3,
+                                double A0, double n0, double E0,
+                                double A, double n, double E,								
+                                double T, double M, spec_t X, spec_t W){
+  double kf,sum, kf0, P_r, kinf;
+
+  kf0  = A0*pow(T,n0)*exp(-E0/(T*1.987192004e0));  /* low  pressure limit cm^3 (mole s)^(-1) */ 
+  kinf = A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* high pressure limit cm^3 (mole s)^(-1) */ 
+  
+  P_r = M * kf0 / kinf;
+  
+  kf = kinf * P_r / ( 1 + P_r ); /* Lindemann aprroximation */
+
+  sum=kf*X[specR1]*X[specR2];
+  W[specR1]-=_calM(specR1)*sum*1e6;
+  W[specR2]-=_calM(specR2)*sum*1e6;
+  W[specP1]+=_calM(specP1)*sum*1e6;
+  W[specP2]+=_calM(specP2)*sum*1e6; 
+  W[specP3]+=_calM(specP3)*sum*1e6; 
+  /* kg m^(-3) s^(-1) */
+}
+
+
+void add_to_dW_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
+                                 int specP1, int specP2,
+                                 double A0, double n0, double E0,
+                                 double A, double n, double E, 
+                                 double T, double M, spec_t X, 
+                                 spec_t dWdT, spec2_t dWdrhok){
+									 
+  double kf, sum, kf0, P_r, kinf, dkfdT, dkf0dT, dkinfdT, dPrdk0, dPrdki;
+
+  kf0  = A0*pow(T,n0)*exp(-E0/(T*1.987192004e0));  /* low  pressure limit cm^3 (mole s)^(-1) */ 
+  kinf = A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* high pressure limit cm^3 (mole s)^(-1) */ 
+  
+  P_r = M * kf0 / kinf;
+  
+  kf = kinf * P_r / (1 + P_r); /* Lindemann aprroximation */
+  
+  sum=X[specR1]*X[specR2]*X[specR3]; /* mole cm^(-3) (s)^(-1) */
+  
+   /* dWdT */
+  
+  dkf0dT  = kf0*n0/T + kf0*(E0/(sqr(T)*1.987192004e0));
+  dkinfdT = kinf*n/T + kinf*(E/(sqr(T)*1.987192004e0));
+  
+  dPrdk0 = M / kinf;
+  dPrdki = -P_r / kinf;
+ 
+  dkfdT = dkinfdT * P_r / ( 1 + P_r ) 
+        + kinf * ( dPrdk0*dkf0dT + dPrdki*dkinfdT ) / sqr(1 + P_r);
+
+  dWdT[specR1] -= _calM(specR1)*dkfdT*1e6*sum ;
+  dWdT[specR2] -= _calM(specR2)*dkfdT*1e6*sum ;
+  dWdT[specR3] -= _calM(specR3)*dkfdT*1e6*sum ;
+  dWdT[specP1] += _calM(specP1)*dkfdT*1e6*sum ;
+  dWdT[specP2] += _calM(specP2)*dkfdT*1e6*sum ; 
+
+  /* dW[specR1]dX */
+  dWdrhok[specR1][specR1]-=_calM(specR1)/_calM(specR1)*kf*X[specR2]*X[specR3];
+  dWdrhok[specR1][specR2]-=_calM(specR1)/_calM(specR2)*kf*X[specR1]*X[specR3];
+  dWdrhok[specR1][specR3]-=_calM(specR1)/_calM(specR3)*kf*X[specR1]*X[specR2];
+
+  /* dW[specR2]dX */
+  dWdrhok[specR2][specR1]-=_calM(specR2)/_calM(specR1)*kf*X[specR2]*X[specR3];
+  dWdrhok[specR2][specR2]-=_calM(specR2)/_calM(specR2)*kf*X[specR1]*X[specR3];
+  dWdrhok[specR2][specR3]-=_calM(specR2)/_calM(specR3)*kf*X[specR1]*X[specR2];
+
+  /* dW[specR3]dX */
+  dWdrhok[specR3][specR1]-=_calM(specR3)/_calM(specR1)*kf*X[specR2]*X[specR3];
+  dWdrhok[specR3][specR2]-=_calM(specR3)/_calM(specR2)*kf*X[specR1]*X[specR3];
+  dWdrhok[specR3][specR3]-=_calM(specR3)/_calM(specR3)*kf*X[specR1]*X[specR2];
+
+  /* dW[specP1]dX */
+  dWdrhok[specP1][specR1]+=_calM(specP1)/_calM(specR1)*kf*X[specR2]*X[specR3];
+  dWdrhok[specP1][specR2]+=_calM(specP1)/_calM(specR2)*kf*X[specR1]*X[specR3];
+  dWdrhok[specP1][specR3]+=_calM(specP1)/_calM(specR3)*kf*X[specR1]*X[specR2];
+
+  /* dW[specP2]dX */
+  dWdrhok[specP2][specR1]+=_calM(specP2)/_calM(specR1)*kf*X[specR2]*X[specR3];
+  dWdrhok[specP2][specR2]+=_calM(specP2)/_calM(specR2)*kf*X[specR1]*X[specR3];
+  dWdrhok[specP2][specR3]+=_calM(specP2)/_calM(specR3)*kf*X[specR1]*X[specR2];
+  
+} 
+
+
+void add_to_dW_fw_2r3p_Lindemann(int specR1, int specR2,
+                                 int specP1, int specP2, int specP3,
+                                 double A0, double n0, double E0,
+                                 double A, double n, double E, 								 
+                                 double T, double M, spec_t X, 
+                                 spec_t dWdT, spec2_t dWdrhok){
+									 
+  double kf,sum, kf0, P_r, kinf, dkfdT, dkf0dT, dkinfdT, dPrdk0, dPrdki;
+
+  kf0  = A0*pow(T,n0)*exp(-E0/(T*1.987192004e0));  /* low  pressure limit cm^3 (mole s)^(-1) */ 
+  kinf = A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* high pressure limit cm^3 (mole s)^(-1) */ 
+  
+  P_r = M * kf0 / kinf;
+  
+  kf = kinf * P_r / (1 + P_r); /* Lindemann aprroximation */
+  
+  sum=X[specR1]*X[specR2]; /* mole cm^(-3) (s)^(-1) */
+
+  // dWdT 
+  
+  dkf0dT  = kf0*n0/T + kf0*(E0/(sqr(T)*1.987192004e0));
+  dkinfdT = kinf*n/T + kinf*(E/(sqr(T)*1.987192004e0));
+  
+  dPrdk0 = M / kinf;
+  dPrdki = -P_r / kinf;
+ 
+  dkfdT = dkinfdT * P_r / ( 1 + P_r ) 
+        + kinf * ( dPrdk0*dkf0dT + dPrdki*dkinfdT ) / sqr(1 + P_r);
+
+  dWdT[specR1] -= _calM(specR1)*dkfdT*1e6*sum ;
+  dWdT[specR2] -= _calM(specR2)*dkfdT*1e6*sum ;
+  dWdT[specP1] += _calM(specP1)*dkfdT*1e6*sum ;
+  dWdT[specP2] += _calM(specP2)*dkfdT*1e6*sum ; 
+  dWdT[specP3] += _calM(specP3)*dkfdT*1e6*sum ; 
+
+  // dW[specR1]dX 
+  dWdrhok[specR1][specR1]-=_calM(specR1)/_calM(specR1)*kf*X[specR2];
+  dWdrhok[specR1][specR2]-=_calM(specR1)/_calM(specR2)*kf*X[specR1];
+
+  // dW[specR2]dX 
+  dWdrhok[specR2][specR1]-=_calM(specR2)/_calM(specR1)*kf*X[specR2];
+  dWdrhok[specR2][specR2]-=_calM(specR2)/_calM(specR2)*kf*X[specR1];
+
+  // dW[specP1]dX 
+  dWdrhok[specP1][specR1]+=_calM(specP1)/_calM(specR1)*kf*X[specR2];
+  dWdrhok[specP1][specR2]+=_calM(specP1)/_calM(specR2)*kf*X[specR1];
+
+  // dW[specP2]dX 
+  dWdrhok[specP2][specR1]+=_calM(specP2)/_calM(specR1)*kf*X[specR2];
+  dWdrhok[specP2][specR2]+=_calM(specP2)/_calM(specR2)*kf*X[specR1];
+
+  // dW[specP3]dX 
+  dWdrhok[specP3][specR1]+=_calM(specP3)/_calM(specR1)*kf*X[specR2];
+  dWdrhok[specP3][specR2]+=_calM(specP3)/_calM(specR2)*kf*X[specR1];
+  
+}
+
+
 void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam){
   long r,s; 
   spec_t dWdT,dWdTe,dWdTv,dWdQbeam;

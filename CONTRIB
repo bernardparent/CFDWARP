@@ -89,6 +89,9 @@ PARENT, Bernard
 RODRIGUEZ FUENTES, Felipe Martin
 
   - contributed to model/transport/_Gupta-Yos
+
+  - implemented add_to_W_fw_3r2p_Lindemann(), add_to_W_fw_2r3p_Lindemann(), 
+    add_to_dW_fw_3r2p_Lindemann(), add_to_dW_fw_2r3p_Lindemann() in model/share/chem_share.c
   
     
 SCHWARTZENTRUBER, Thomas E.

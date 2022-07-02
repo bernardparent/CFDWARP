@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 01b
+  * in model/chem/_C2H4_Air_Plasma_30s/zettervall2017.c
+    - added the reaction rates from Felipe
+  * in model/share/chem_share.c
+    - added add_to_W_fw_3r2p_Lindemann(), add_to_W_fw_2r3p_Lindemann(), 
+      add_to_dW_fw_3r2p_Lindemann(), add_to_dW_fw_2r3p_Lindemann() from Felipe
+  * in model/share/chem_share.h
+    - added missing units for some functions
+  
+
 2022 JUL 01a
   * in model/share/chem_share.c
     - fixed typos pertaining to the units
