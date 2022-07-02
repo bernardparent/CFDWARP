@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 01a
+  * in model/share/chem_share.c
+    - fixed typos pertaining to the units
+  * in model/chem/doc/report.tex
+    - fixed a typo related to the units of the pre-exponential factor
+  * in model/chem/_C2H4_Air_Plasma_30s/chem.c
+    - added TOWNSENDIMPLICIT flag
+    - added calls to find_Te_from_EoverN()
+  * in bin
+    - added DoCapitelli.wrp
+    
+    
 2022 JUN 25a
   * in model/chem/_C2H4_Air_Plasma_30s/chem.c
     - finished implementing the first version of the Adamovich model

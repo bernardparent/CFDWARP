@@ -2,7 +2,7 @@
 /*
 Copyright 2018-2020 Bernard Parent
 Copyright 2020 Ajjay Omprakas
-Copyright 2021 Prasanna Thoguluva Rajendran
+Copyright 2021-2022 Prasanna Thoguluva Rajendran
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -457,7 +457,7 @@ void add_to_W_bw_2r2p(int specR1, int specR2,
 
 
 
-/* A in cm^3 (mole s)^(-1) K^(-n) 
+/* A in cm^6 mole^(-2) s^(-1) K^(-n)
    E in cal mole^(-1) 
    T in Kelvin
    X in mole/cm3
@@ -472,7 +472,7 @@ void add_to_W_fwbw_3r2p(int specR1, int specR2, int specR3,
 
 
 
-/* A in cm^3 (mole s)^(-1) K^(-n) 
+/* A in cm^6 mole^(-2) s^(-1) K^(-n)
    E in cal mole^(-1) 
    T in Kelvin
    X in mole/cm3
@@ -483,7 +483,7 @@ void add_to_W_fw_3r2p(int specR1, int specR2, int specR3,
                       double A, double n, double E, double T, spec_t X, spec_t W){
   double kf,sum;
 
-  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^3 (mole s)^(-1) */
+  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^6 mole^(-2) s^(-1) */
   sum=kf*X[specR1]*X[specR2]*X[specR3]; /* mole cm^(-3) (s)^(-1) */
   W[specR1]-=_calM(specR1)*sum*1e6;
   W[specR2]-=_calM(specR2)*sum*1e6;
@@ -493,7 +493,7 @@ void add_to_W_fw_3r2p(int specR1, int specR2, int specR3,
 } 
 
 
-/* A in cm^3 (mole s)^(-1) K^(-n) 
+/* A in cm^6 mole^(-2) s^(-1) K^(-n)
    E in cal mole^(-1) 
    T in Kelvin
    X in mole/cm3
@@ -504,14 +504,14 @@ void add_to_W_bw_3r2p(int specR1, int specR2, int specR3,
                       double A, double n, double E, double T, spec_t X, spec_t W){
   double kf,dG0,Kc,kb,sum;
 
-  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^3 (mole s)^(-1) */
+  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^6 mole^(-2) s^(-1) */
   dG0=_Gs(specP1,T)
      +_Gs(specP2,T)
      -_Gs(specR1,T)
      -_Gs(specR2,T)
      -_Gs(specR3,T); /* J/mole */
   Kc=max(Kcmin, exp(-dG0/(calR*T)));
-  Kc /= 1E-6 * THERMO_P_REF/(calR*T); /* mole/cm^3 */
+  Kc /= 1E-6 * THERMO_P_REF/(calR*T); /* cm^3/mole */
   kb=kf/Kc; /* cm^3 (mole s)^(-1) */
   sum=-kb*X[specP1]*X[specP2]; /* mole cm^(-3) (s)^(-1) */
   if (exp(-dG0/(calR*T))>Kcmin){
@@ -525,7 +525,7 @@ void add_to_W_bw_3r2p(int specR1, int specR2, int specR3,
 
 
 
-/* A in cm^3 (mole s)^(-1) K^(-n) 
+/* A in cm^3 (mole s)^(-1) K^(-n)
    E in cal mole^(-1) 
    T in Kelvin
    X in mole/cm3
@@ -558,7 +558,7 @@ void add_to_W_fw_2r1p(int specR1, int specR2,
 } 
 
 
-/* A in cm^3 (mole s)^(-1) K^(-n) 
+/* A in cm^3 (mole s)^(-1) K^(-n)
    E in cal mole^(-1) 
    T in Kelvin
    X in mole/cm3
@@ -574,8 +574,8 @@ void add_to_W_bw_2r1p(int specR1, int specR2,
      -_Gs(specR1,T)
      -_Gs(specR2,T); /* J/mole */
   Kc=max(Kcmin, exp(-dG0/(calR*T)));
-  Kc /= 1E-6 * THERMO_P_REF/(calR*T); /* mole/cm^3 */
-  kb=kf/Kc; /* cm^3 (mole s)^(-1) */
+  Kc /= 1E-6 * THERMO_P_REF/(calR*T); /* cm^3/mole */
+  kb=kf/Kc; /*  s^(-1) */
   sum=-kb*X[specP1]; /* mole cm^(-3) (s)^(-1) */
   if (exp(-dG0/(calR*T))>Kcmin){
     W[specR1]-=_calM(specR1)*sum*1e6;
@@ -585,7 +585,7 @@ void add_to_W_bw_2r1p(int specR1, int specR2,
 } 
 
 
-/* A in cm^3 (mole s)^(-1) K^(-n) 
+/* A in cm^3 (mole s)^(-1) K^(-n)
    E in cal mole^(-1) 
    T in Kelvin
    X in mole/cm3
@@ -622,7 +622,7 @@ void add_to_W_fw_2r3p(int specR1, int specR2,
 }
 
 
-/* A in cm^3 (mole s)^(-1) K^(-n) 
+/* A in cm^3 (mole s)^(-1) K^(-n)
    E in cal mole^(-1) 
    T in Kelvin
    X in mole/cm3
@@ -655,7 +655,7 @@ void add_to_W_bw_2r3p(int specR1, int specR2,
 
 
 
-/* A in cm^3 (mole s)^(-1) K^(-n)
+/* A in s^(-1) K^(-n)
    E in cal mole^(-1)
    T in Kelvin
    X in mole/cm3
@@ -669,7 +669,7 @@ void add_to_W_fwbw_1r2p(int specR1, int specP1, int specP2, double A, double n, 
  
 }
 
-/* A in cm^3 (mole s)^(-1) K^(-n)
+/* A in s^(-1) K^(-n)
    E in cal mole^(-1)
    T in Kelvin
    X in mole/cm3
@@ -680,7 +680,7 @@ void add_to_W_fw_1r2p(int specR1, int specP1, int specP2, double A, double n, do
  
   double kf,sum;
  
-  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0)); /* cm^3 (mol s)^(-1) */
+  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0)); /* s^(-1) */
   sum=kf*X[specR1];
   W[specR1]-=_calM(specR1)*sum*1e6;
   W[specP1]+=_calM(specP1)*sum*1e6;
@@ -688,7 +688,7 @@ void add_to_W_fw_1r2p(int specR1, int specP1, int specP2, double A, double n, do
  
 }
 
-/* A in cm^3 (mole s)^(-1) K^(-n)
+/* A in s^(-1) K^(-n)
    E in cal mole^(-1)
    T in Kelvin
    X in mole/cm3
@@ -699,7 +699,7 @@ void add_to_W_bw_1r2p(int specR1, int specP1, int specP2, double A, double n, do
  
   double kf,dG0,Kc,kb,sum;
  
-  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));
+  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));/* s^(-1) */
   dG0=_Gs(specP1,T)
      +_Gs(specP2,T)
      -_Gs(specR1,T);                      /* J/mole */
@@ -719,7 +719,7 @@ void add_to_W_bw_1r2p(int specR1, int specP1, int specP2, double A, double n, do
 
 
 
-/* A in cm^3 (mole s)^(-1) K^(-n)
+/* A in s^(-1) K^(-n)
    E in cal mole^(-1)
    T in Kelvin
    X in mole/cm3
@@ -730,7 +730,7 @@ void add_to_W_fw_1r1p(int specR1, int specP1, double A, double n, double E, doub
  
   double kf,sum;
  
-  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0)); /* cm^3 (mol s)^(-1) */
+  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0)); /* s^(-1) */
   sum=kf*X[specR1];
   W[specR1]-=_calM(specR1)*sum*1e6;
   W[specP1]+=_calM(specP1)*sum*1e6; /* kg m^(-3) s^(-1) */     
@@ -768,7 +768,7 @@ void add_to_dW_fw_2r2p(int specR1, int specR2,
   double kf,sum,dkfdT;
 
   kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^3 (mole s)^(-1) */
-  sum=X[specR1]*X[specR2]; /* mole cm^(-3) (s)^(-1) */
+  sum=X[specR1]*X[specR2];
 /*  W[specR1]-=_calM(specR1)*kf*1e6*sum;
   W[specR2]-=_calM(specR2)*kf*1e6*sum;
   W[specP1]+=_calM(specP1)*kf*1e6*sum;
@@ -821,7 +821,7 @@ void add_to_dW_bw_2r2p(int specR1, int specR2,
      -_Gs(specR1,T)
      -_Gs(specR2,T); /* J/mole */
   Kc=max(Kcmin,exp(-dG0/(calR*T)));
-  sum=-X[specP1]*X[specP2]/Kc; /* mole cm^(-3) (s)^(-1) */
+  sum=-X[specP1]*X[specP2]/Kc; /* mole^2 cm^(-6) */
   /* dWdT */
   dG0dT=_dGsdT(specP1,T)+_dGsdT(specP2,T)-_dGsdT(specR1,T)-_dGsdT(specR2,T);
   dKcdToverKc=(dG0/(calR*sqr(T)))-dG0dT/(calR*T);
@@ -859,7 +859,7 @@ void add_to_dW_bw_2r2p(int specR1, int specR2,
 
 
 
-/* A in cm^3 (mole s)^(-1) K^(-n) 
+/* A in cm^6 mole^(-2) s^(-1) K^(-n)
    E in cal mole^(-1) 
    T in Kelvin
    X in mole/cm3
@@ -875,7 +875,7 @@ void add_to_dW_fwbw_3r2p(int specR1, int specR2, int specR3,
 } 
 
 
-/* A in cm^3 (mole s)^(-1) K^(-n) 
+/* A in cm^6 mole^(-2) s^(-1) K^(-n)
    E in cal mole^(-1) 
    T in Kelvin
    X in mole/cm3
@@ -890,7 +890,7 @@ void add_to_dW_fw_3r2p(int specR1, int specR2, int specR3,
 
   kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^3 (mole s)^(-1) */
 
-  sum=X[specR1]*X[specR2]*X[specR3]; /* mole cm^(-3) (s)^(-1) */
+  sum=X[specR1]*X[specR2]*X[specR3]; /* mole^3 cm^(-9) */
 
   dkfdT= kf*n/T 
        + kf*(E/(sqr(T)*1.987192004e0));
@@ -929,7 +929,7 @@ void add_to_dW_fw_3r2p(int specR1, int specR2, int specR3,
 } 
 
 
-/* A in cm^3 (mole s)^(-1) K^(-n) 
+/* A in cm^6 mole^(-2) s^(-1) K^(-n)
    E in cal mole^(-1) 
    T in Kelvin
    X in mole/cm3
@@ -942,16 +942,16 @@ void add_to_dW_bw_3r2p(int specR1, int specR2, int specR3,
                              spec_t dWdT, spec2_t dWdrhok){
   double kf,dG0,Kc,sum,dkfdT,dsumdT,dKcdToverKc,dG0dT;
 
-  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^3 (mole s)^(-1) */
+  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^6 mole^(-2) s^(-1) */
   dG0=_Gs(specP1,T)
      +_Gs(specP2,T)
      -_Gs(specR1,T)
      -_Gs(specR2,T)
      -_Gs(specR3,T); /* J/mole */
   Kc=max(Kcmin,exp(-dG0/(calR*T)));
-  Kc /= 1E-6 * THERMO_P_REF/(calR*T); /* mole/cm^3 */
+  Kc /= 1E-6 * THERMO_P_REF/(calR*T); /* cm^3/mole */
 
-  sum=-X[specP1]*X[specP2]/Kc; /* mole cm^(-3) (s)^(-1) */
+  sum=-X[specP1]*X[specP2]/Kc; /* mole^3 cm^(-9) */
 
   /* dWdT */
   dG0dT=_dGsdT(specP1,T)+_dGsdT(specP2,T)-_dGsdT(specR1,T)-_dGsdT(specR2,T)-_dGsdT(specR3,T);
@@ -1024,7 +1024,7 @@ void add_to_dW_fw_2r1p(int specR1, int specR2,
 
   kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^3 (mole s)^(-1) */
 
-  sum=X[specR1]*X[specR2]; /* mole cm^(-3) (s)^(-1) */
+  sum=X[specR1]*X[specR2];
 
   /* dWdT */
   dkfdT= kf*n/T 
@@ -1068,9 +1068,9 @@ void add_to_dW_bw_2r1p(int specR1, int specR2,
      -_Gs(specR1,T)
      -_Gs(specR2,T); /* J/mole */
   Kc=max(Kcmin, exp(-dG0/(calR*T)));
-  Kc /= 1E-6 * THERMO_P_REF/(calR*T); /* mole/cm^3 */
+  Kc /= 1E-6 * THERMO_P_REF/(calR*T); /* cm^3/mole */
 
-  sum=-X[specP1]/Kc; /* mole cm^(-3) (s)^(-1) */
+  sum=-X[specP1]/Kc; /* mole^2 cm^(-6) */
 
   /* dWdT */
   dG0dT=_dGsdT(specP1,T)-_dGsdT(specR1,T)-_dGsdT(specR2,T);
@@ -1133,7 +1133,7 @@ void add_to_dW_fw_2r3p(int specR1, int specR2,
   double kf,sum,dkfdT;
 
   kf=A*pow(T,n)*exp(-E/(T*1.987192004e0));  /* cm^3 (mole s)^(-1) */
-  sum=X[specR1]*X[specR2]; /* mole cm^(-3) (s)^(-1) */
+  sum=X[specR1]*X[specR2];
 
   // dWdT 
   dkfdT= kf*n/T 
@@ -1189,7 +1189,7 @@ void add_to_dW_bw_2r3p(int specR1, int specR2,
      -_Gs(specR2,T); /* J/mole */
   Kc=1E-6 * THERMO_P_REF/(calR*T) * max(Kcmin, exp(-dG0/(calR*T))); /* mole/cm^3 */
 
-  sum=-X[specP1]*X[specP2]*X[specP3]/Kc; /* mole cm^(-3) (s)^(-1) */
+  sum=-X[specP1]*X[specP2]*X[specP3]/Kc; /* mole^2 cm^(-6)*/
 
   // dWdT 
   dG0dT=_dGsdT(specP1,T)+_dGsdT(specP2,T)+_dGsdT(specP3,T)-_dGsdT(specR1,T)-_dGsdT(specR2,T);
@@ -1238,7 +1238,7 @@ void add_to_dW_bw_2r3p(int specR1, int specR2,
 }
 
 
-/* A in cm^3 (mole s)^(-1) K^(-n)
+/* A in s^(-1) K^(-n)
    E in cal mole^(-1)
    T in Kelvin
    X in mole/cm3
@@ -1254,7 +1254,7 @@ void add_to_dW_fwbw_1r2p(int specR1, int specP1, int specP2, double A, double n,
 }
 
 
-/* A in cm^3 (mole s)^(-1) K^(-n)
+/* A in s^(-1) K^(-n)
    E in cal mole^(-1)
    T in Kelvin
    X in mole/cm3
@@ -1266,7 +1266,7 @@ void add_to_dW_fw_1r2p(int specR1, int specP1, int specP2, double A, double n, d
  
   double kf,sum,dkfdT;
  
-  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0)); /* cm^3 (mole s)^(-1) */
+  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0)); /* s^(-1) */
   sum=X[specR1];
   dkfdT=kf*n/T + kf*(E/(sqr(T)*1.987192004e0));
  
@@ -1286,7 +1286,7 @@ void add_to_dW_fw_1r2p(int specR1, int specP1, int specP2, double A, double n, d
 }
 
 
-/* A in cm^3 (mole s)^(-1) K^(-n)
+/* A in s^(-1) K^(-n)
    E in cal mole^(-1)
    T in Kelvin
    X in mole/cm3
@@ -1342,7 +1342,7 @@ void add_to_dW_bw_1r2p(int specR1, int specP1, int specP2, double A, double n, d
   }      
 }
 
-/* A in cm^3 (mole s)^(-1) K^(-n)
+/* A in s^(-1) K^(-n)
    E in cal mole^(-1)
    T in Kelvin
    X in mole/cm3
@@ -1354,7 +1354,7 @@ void add_to_dW_fw_1r1p(int specR1, int specP1, double A, double n, double E, dou
  
   double kf,sum,dkfdT;
  
-  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0)); /* cm^3 (mole s)^(-1) */
+  kf=A*pow(T,n)*exp(-E/(T*1.987192004e0)); /* s^(-1) */
   sum=X[specR1];
   dkfdT=kf*n/T + kf*(E/(sqr(T)*1.987192004e0));
  
@@ -1445,7 +1445,7 @@ void add_to_dW_fw_2r2p_fit4(int specR1, int specR2,
   double kf,sum,dkfdT;
 
   kf=A*pow(T,n)*exp(E1/T+E2/(T*T)+E3/(T*T*T)+E4/(T*T*T*T));  /* cm^3 (mole s)^(-1) */
-  sum=X[specR1]*X[specR2]; /* mole cm^(-3) (s)^(-1) */
+  sum=X[specR1]*X[specR2]; /* mole^2 cm^(-6) */
 /*  W[specR1]-=_calM(specR1)*kf*1e6*sum;
   W[specR2]-=_calM(specR2)*kf*1e6*sum;
   W[specP1]+=_calM(specP1)*kf*1e6*sum;
@@ -1495,7 +1495,7 @@ void add_to_dW_fw_2r3p_fit4(int specR1, int specR2,
   double kf,sum,dkfdT;
 
   kf=A*pow(T,n)*exp(E1/T+E2/(T*T)+E3/(T*T*T)+E4/(T*T*T*T));  /* cm^3 (mole s)^(-1) */
-  sum=X[specR1]*X[specR2]; /* mole cm^(-3) (s)^(-1) */
+  sum=X[specR1]*X[specR2]; /* mole^2 cm^(-6) */
 
   // dWdT 
   dkfdT= kf*n/T 
