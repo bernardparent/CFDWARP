@@ -447,15 +447,15 @@ void find_Qei_ParentDunn2021(gl_t *gl, spec_t rhok, double Estar, double Te, dou
 
     Te=min(TEMAX_TOWNSEND,Te);
     if (REACTION[8]) 
-      add_to_Qei(specO, 6.37e16/calA*pow(Te,0.0029)*exp(-477190.0/Te), rhok, Qei);
+      add_to_Qei(specO,_ionizationpot(specO), 6.37e16/calA*pow(Te,0.0029)*exp(-477190.0/Te), rhok, Qei);
     if (REACTION[9]) 
-      add_to_Qei(specN, 1.06e18/calA*pow(Te,-0.2072)*exp(-629700.0/Te), rhok, Qei);
+      add_to_Qei(specN,_ionizationpot(specN), 1.06e18/calA*pow(Te,-0.2072)*exp(-629700.0/Te), rhok, Qei);
     if (REACTION[10]) 
-      add_to_Qei(specO2, 2.33e16/calA*pow(Te,0.1166)*exp(-567360.0/Te), rhok, Qei);
+      add_to_Qei(specO2,_ionizationpot(specO2), 2.33e16/calA*pow(Te,0.1166)*exp(-567360.0/Te), rhok, Qei);
     if (REACTION[11]) 
-      add_to_Qei(specN2, 1.58e16/calA*pow(Te,0.1420)*exp(-536330.0/Te), rhok, Qei);
+      add_to_Qei(specN2,_ionizationpot(specN2), 1.58e16/calA*pow(Te,0.1420)*exp(-536330.0/Te), rhok, Qei);
     if (REACTION[12]) 
-      add_to_Qei(specNO, 5.63e18/calA*pow(Te,-0.2607)*exp(-686030.0/Te), rhok, Qei);
+      add_to_Qei(specNO,_ionizationpot(specNO), 5.63e18/calA*pow(Te,-0.2607)*exp(-686030.0/Te), rhok, Qei);
 
 }
 
@@ -464,14 +464,14 @@ void find_Qei_ParentDunn2021(gl_t *gl, spec_t rhok, double Estar, double Te, dou
 void find_dQei_dx_ParentDunn2021(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
     Te=min(TEMAX_TOWNSEND,Te);
     if (REACTION[8]) 
-      add_to_dQei(specO, 6.37e16/calA*pow(Te,0.0029)*exp(-477190.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(specO,_ionizationpot(specO), 6.37e16/calA*pow(Te,0.0029)*exp(-477190.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
     if (REACTION[9]) 
-      add_to_dQei(specN, 1.06e18/calA*pow(Te,-0.2072)*exp(-629700.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(specN,_ionizationpot(specN), 1.06e18/calA*pow(Te,-0.2072)*exp(-629700.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
     if (REACTION[10]) 
-      add_to_dQei(specO2, 2.33e16/calA*pow(Te,0.1166)*exp(-567360.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(specO2,_ionizationpot(specO2), 2.33e16/calA*pow(Te,0.1166)*exp(-567360.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
     if (REACTION[11]) 
-      add_to_dQei(specN2, 1.58e16/calA*pow(Te,0.1420)*exp(-536330.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(specN2,_ionizationpot(specN2), 1.58e16/calA*pow(Te,0.1420)*exp(-536330.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
     if (REACTION[12]) 
-      add_to_dQei(specNO, 5.63e18/calA*pow(Te,-0.2607)*exp(-686030.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(specNO,_ionizationpot(specNO), 5.63e18/calA*pow(Te,-0.2607)*exp(-686030.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
 
 }

@@ -1842,32 +1842,38 @@ double _dkfdT_Arrhenius(long numreactant, double A, double n, double E, double T
 #ifdef speceminus
 /* add contributions to Qei coming from one electron impact chemical reaction
  * spec is the neutral molecule the electrons impact
+ * exci is the excitation energy in eV
  * kf is the reaction rate in cm3/s
  * rhok is the partial densities in kg/m3
  * Qei is the heat removed from the electrons in J/m3
  */
-void add_to_Qei(long spec, double kf, spec_t rhok, double *Qei){
+void add_to_Qei(long spec, double exci, double kf, spec_t rhok, double *Qei){
 #ifdef TEST
   kf=1e-17;
 #endif
-  (*Qei) += kf * 1E-6* _ionizationpotential(spec) * rhok[speceminus] / _calM ( speceminus ) * rhok[spec] / _calM ( spec ) * sqr(calA);
+  (*Qei) += kf * 1E-6* exci * echarge * rhok[speceminus] / _calM ( speceminus ) * rhok[spec] / _calM ( spec ) * sqr(calA);
 }
 
 
 /* add contributions to dQei_dx coming from one electron impact chemical reaction
  * spec is the neutral molecule the electrons impact
+ * exci is the excitation energy in eV
  * kf is the reaction rate in cm3/s
  * dkfdTe is the derivative of kf with respect to Te in cm3/(s K)
  * rhok is the partial densities in kg/m3
  * dQeidrhok is in J/kg 
  * dQeidTe is in J/(m3 K)
  */
-void add_to_dQei(long spec, double kf, double dkfdTe, spec_t rhok, spec_t dQeidrhok, double *dQeidTe){
+void add_to_dQei(long spec, double exci, double kf, double dkfdTe, spec_t rhok, spec_t dQeidrhok, double *dQeidTe){
 #ifdef TEST
   kf=1e-17;
 #endif
-  dQeidrhok[spec] += kf *1e-6* _ionizationpotential(spec) * rhok[speceminus] / _calM ( speceminus )  / _calM ( spec ) * sqr(calA);
-  dQeidrhok[speceminus] += kf *1e-6* _ionizationpotential(spec) / _calM ( speceminus ) * rhok[spec] / _calM ( spec ) * sqr(calA);
+  dQeidrhok[spec] += kf *1e-6* exci * echarge * rhok[speceminus] / _calM ( speceminus )  / _calM ( spec ) * sqr(calA);
+  dQeidrhok[speceminus] += kf *1e-6* exci * echarge / _calM ( speceminus ) * rhok[spec] / _calM ( spec ) * sqr(calA);
 }
+
+
+
+
 
 #endif

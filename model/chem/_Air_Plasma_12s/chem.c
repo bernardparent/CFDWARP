@@ -235,15 +235,15 @@ void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
 
     if (gl->model.chem.NEGATIVEIONREACTIONS && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
       if (NEGATIVEIONREACTION[1]) 
-        add_to_Qei(specN2, exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), rhok, Qei);
+        add_to_Qei(specN2,_ionizationpot(specN2), exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), rhok, Qei);
       if (NEGATIVEIONREACTION[2]) 
-        add_to_Qei(specO2, exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), rhok, Qei);
+        add_to_Qei(specO2,_ionizationpot(specO2), exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), rhok, Qei);
       if (NEGATIVEIONREACTION[3]) 
-        add_to_Qei(specNO, exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), rhok, Qei);
+        add_to_Qei(specNO,_ionizationpot(specNO), exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), rhok, Qei);
       if (NEGATIVEIONREACTION[5]) 
-        add_to_Qei(specN, exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), rhok, Qei);
+        add_to_Qei(specN,_ionizationpot(specN), exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), rhok, Qei);
       if (NEGATIVEIONREACTION[6]) 
-        add_to_Qei(specO, exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), rhok, Qei);
+        add_to_Qei(specO,_ionizationpot(specO), exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), rhok, Qei);
     }
   } 
 }
@@ -274,15 +274,15 @@ void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrh
 
     if (gl->model.chem.NEGATIVEIONREACTIONS && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
       if (NEGATIVEIONREACTION[1]) 
-        add_to_dQei(specN2, exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
+        add_to_dQei(specN2,_ionizationpot(specN2), exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
       if (NEGATIVEIONREACTION[2]) 
-        add_to_dQei(specO2, exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
+        add_to_dQei(specO2,_ionizationpot(specO2), exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
       if (NEGATIVEIONREACTION[3]) 
-        add_to_dQei(specNO, exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), 0.0, rhok, dQeidrhok, dQeidTe);
+        add_to_dQei(specNO,_ionizationpot(specNO), exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), 0.0, rhok, dQeidrhok, dQeidTe);
       if (NEGATIVEIONREACTION[5]) 
-      add_to_dQei(specN, exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(specN,_ionizationpot(specN), exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), 0.0, rhok, dQeidrhok, dQeidTe);
       if (NEGATIVEIONREACTION[6]) 
-      add_to_dQei(specO, exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(specO,_ionizationpot(specO), exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), 0.0, rhok, dQeidrhok, dQeidTe);
     }
   }
 }

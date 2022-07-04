@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 03a
+  * in model/share/chem_share.c
+    - in add_to_Qei() and add_to_dQei(), added excitation energy argument 
+  * in model/chem/*/*.c
+    - added excitation energy argument (using _ionizationpot()) to all existing 
+      add_to_Qei() and add_to_dQei(). This does not change the algorithms because the excitation
+      energy was included through a call to _ionizationpot()
+  * in model/thermo/_generic/thermo.c
+    - renamed _ionizationpotential() to _ionizationpot()
+    - changed the units of _ionizationpot() from J to eV
+    
+
 2022 JUL 01b
   * in model/chem/_C2H4_Air_Plasma_30s/zettervall2017.c
     - added the reaction rates from Felipe

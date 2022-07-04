@@ -120,7 +120,7 @@ void find_dTe_dEoverN_from_EoverN(double Estar, double *dTedEstar);
 
 void find_EoverN_from_Te(double Te, double *EoverN);
 
-double _ionizationpotential(long spec);
+double _ionizationpot(long spec);
 
 double _numatoms(long spec);
 
