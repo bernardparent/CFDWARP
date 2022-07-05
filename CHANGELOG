@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 04a
+  * in model/chem/_C2H4_Air_Plasma_30s/chem.c
+    - in find_dQei_dx() and find_Qei(), added all the ionization potentials
+    
+
 2022 JUL 03a
   * in model/share/chem_share.c
     - in add_to_Qei() and add_to_dQei(), added excitation energy argument 
