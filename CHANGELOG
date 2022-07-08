@@ -7,6 +7,26 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 08a
+  * in model/transport/_Dixon-Lewis/transport.c
+    - in find_nuk_eta_kappak_muk(), fixed a bug: need to make sure there are some #ifdel speceminus
+      surrounding code with speceminus. This gets rids of compilation errors when using a chemical
+      solver without electrons
+  * in model/share/transport_share.c
+    - in adjust_nue_given_nui(), moved ``long k'' to within #ifdef speceminus
+  * in model/fluid/_Navier-Stokes_perfect/fluid.c
+    - in  write_model_fluid_template(), read_model_fluid_actions(), _eta_from_T(), made 
+      modifications so that in the control file eta_ref is renamed to eta, eta_ref_T is renamed to 
+      eta_T0. Also made modications so that ETAMODEL is set to ETAMODEL_CONSTANT by default rather 
+      than ETAMODEL_SUTHERLAND
+  * in model/fluid/_Navier-Stokes_perfect/fluid.hh
+    - deleted eta_model
+    - renamed eta_ref to eta, eta_ref_T to eta_T0.
+  * in bin
+    - reorganized the directory so that only the most important validation cases are within bin
+      and the other cases are within bin/misc
+    
+
 2022 JUL 04a
   * in model/chem/_C2H4_Air_Plasma_30s/chem.c
     - in find_dQei_dx() and find_Qei(), added all the ionization potentials

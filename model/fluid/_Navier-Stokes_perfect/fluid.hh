@@ -47,7 +47,7 @@ typedef struct {
   double Pmin,Pmax,Tmin,Tmax;
   double gamma,R;
   int ETAMODEL;
-  double eta_model,eta_ref,eta_ref_T,eta_C,Pr;
+  double eta,eta_T0,eta_C,Pr;
   bool AXISYMMETRIC;
 } gl_model_fluid_t;
 

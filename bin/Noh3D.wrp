@@ -6,16 +6,17 @@
                                 CFD Code for Plasma & Reactive Flow
   _______________________________________________________________________________________________
 
-  Version                          18nov13a
-  Compiler                         gcc 4.9.2 with OPENMP threads
-  Compiled on                      Nov 18 2018 at 10:12:57 by parent on WAFL101
+  Version                          22jul04a
+  Compiler                         gcc 8.3.0 with OPENMP threads
+  Compiled on                      Jul  8 2022 at 15:07:52
   Cycle Strategy                   Standard
-  Fluid Relaxation                 Block DDADI [2,1]
+  Fluid Relaxation                 Block ADI [1,2]
   EM Field Relaxation              None
-  Convection Discretization        MUSCL+ with flux FVS+ [3], FDS+ [4], and primitive
-                                   interpolation TVD [5], WENO [7], CWENO [9], AOWENO [8], and
-                                   eigenvalue conditioning HARTEN, GNOFFO [10], PECLET [11],
-                                   PARENT [6]
+  Convection Discretization        Reconstruction-Evolution MUSCL with flux FVS [3], FDS [5],
+                                   and primitive interpolation TVD [4], WENO [7], CWENO [9],
+                                   AOWENO [8], and eigenvalue conditioning HARTEN, GNOFFO [10],
+                                   PECLET [11], PASCAL [6], and PARENT positivity-preserving
+                                   filter [12]
   Temporal Discretization          Positivity-Preserving Cross-Difference Formula [6]
   Fluid Model                      Navier-Stokes Perfect Gas
   Thermodynamic Model              Perfect Gas
@@ -26,17 +27,17 @@
   Number of Flux Components        5
   _______________________________________________________________________________________________
 
-  [1]  RW MacCormack. "A New Implicit Algorithm for Fluid Flow", 13th Computational Fluid
-       Dynamics Conference, AIAA Paper 97-2100, 1997.
-  [2]  J Bardina and CK Lombard. "Three Dimensional Hypersonic Flow Simulations with the CSCM
-       Implicit Upwind Navier-Stokes Method", Proceedings of the 8th Computational Fluid
-       Dynamics Conference, AIAA Paper 87-1114, 1987.
-  [3]  B Parent. "Positivity-Preserving High-Resolution Schemes for Systems of Conservation
-       Laws", Journal of Computational Physics 231:173-189, 2012.
-  [4]  B Parent. "Positivity-Preserving Flux Difference Splitting Schemes", Journal of
-       Computational Physics 243:194-209, 2013.
-  [5]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume Flux Vector
+  [1]  WR Briley and H McDonald. "On the Structure and Use of Linearized Block Implicit
+       Schemes", Journal of Computational Physics 34:54-73, 1980.
+  [2]  RM Beam and RF Warming. "An Implicit Finite-Difference Algorithm for Hyperbolic Systems
+       in Conservation-Law-Form", Journal of Computational Physics 22:87-110, 1976.
+  [3]  JL Steger and RF Warming. "Flux Vector Splitting of the Inviscid Gasdynamic Equations
+       with Application to Finite-Difference Methods", Journal of Computational Physics 40:263-
+       293, 1981.
+  [4]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume Flux Vector
        Splittings for the Euler Equations", AIAA Journal 24:1453-1460, 1986.
+  [5]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes", Journal
+       of Computational Physics 43:357-372, 1981.
   [6]  B Parent. "Positivity-Preserving Dual Time Stepping Schemes for Gas Dynamics", Journal of
        Computational Physics 361:391-411, 2018.
   [7]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes", Journal of
@@ -50,6 +51,8 @@
        Unstructured Grids", 37th AIAA Thermophysics Conference, AIAA Paper 2004-2371, 2004.
   [11] B Parent. "Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows", AIAA
        Journal, 55:141-152, 2017.
+  [12] B Parent. "Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler
+       Equations", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.
 
 
 }
@@ -108,8 +111,9 @@ Model(
   NavierStokesPerfect(
     gamma=5/3;
     R=286.0;        {J/kgK }
-    eta=0;       {kg/ms}
-    kappa=0.0;     {W/mK}
+    ETAMODEL=ETAMODEL_CONSTANT;     
+    eta=0e-5;       {kg/ms}
+    Pr=0.71;     
     Pmin=1.0e-20;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e-20;     Tmax=6.0e3;    {K}
     SetBodyForce(is,js,ks, ie,je,ke, 0.0{N/m3},0.0{N/m3},0.0{N/m3});

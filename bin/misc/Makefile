@@ -18,7 +18,6 @@ makecleanout:
 	( rm -f *.avi `find . -type f -name '*.avi' -print` ) 
 	( rm -f *.mp4 `find . -type f -name '*.mp4' -print` ) 
 	( rm -f *.mpg `find . -type f -name '*.mpg' -print` ) 
-	( cd misc ; make cleanout )
 
 clean:
 	( rm -f tecplot.phy `find . -type f -name 'tecplot.phy' -print` ) 

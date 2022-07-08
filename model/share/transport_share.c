@@ -104,7 +104,7 @@ void find_muk_from_nuk(spec_t nuk, spec_t rhok, double T, double Te, chargedspec
 
 /* compute nue given nui for a quasi-neutral plasma */
 void adjust_nue_given_nui(spec_t rhok, double T, double Te, spec_t nuk){
-  long spec,k;
+  long spec;
   double rho;
   
 
@@ -113,6 +113,7 @@ void adjust_nue_given_nui(spec_t rhok, double T, double Te, spec_t nuk){
 
 #ifdef speceminus
   double nuwsum,wsum;
+  long k;
   spec_t w;
 
   for (spec=0; spec<ns; spec++) w[spec]=rhok[spec]/rho;

@@ -6,9 +6,9 @@
                                 CFD Code for Plasma & Reactive Flow
   _______________________________________________________________________________________________
 
-  Version                          19may04c
-  Compiler                         gcc 4.9.2 with OPENMP threads with distributed memory MPI
-  Compiled on                      May  7 2019 at 10:42:54 by prasanna on WAFL101
+  Version                          22jul04a
+  Compiler                         gcc 8.3.0 with OPENMP threads
+  Compiled on                      Jul  8 2022 at 15:12:39
   Cycle Strategy                   Standard
   Fluid Relaxation                 Block ADI [1,2]
   EM Field Relaxation              None
@@ -80,7 +80,7 @@ Lz=2*pi/21*Lref;
 deltalam=0.025*Lref;
 deltaturb=0.175*Lref;
 
-mf=2*sqrt(2);
+mf=1;
 numtimelevelsskip_writedatafile=round(6*mf);
 
 is=1;
@@ -185,6 +185,8 @@ Bdry(
     }
     All(BDRY_OUTFLOWSUPERSONIC1);
     Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLTFIXED1,BDRY_OUTFLOWSUPERSONIC1,  BDRY_SYMMETRICAL2,BDRY_SYMMETRICAL2);
+    
+    Plane("j",js,BDRY_WALLTFIXED1,Twall);
     for (i,is+1,ie-1,
       for (j,js+1,je-1,
         Link(i,j,ks+1,i,j,ke);
@@ -205,8 +207,9 @@ Model(
   NavierStokesPerfect(
     gamma=1.4;
     R=286.0;        {J/kgK }
+    ETAMODEL=ETAMODEL_CONSTANT;     
     eta=2.8e-5;       {kg/ms}
-    kappa=0.044;     {W/mK}
+    Pr=0.71;     
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e1;     Tmax=6.0e3;    {K}
     SetBodyForce(is,js,ks, ie,je,ke, 0.0{N/m3},0.0{N/m3},0.0{N/m3});
@@ -282,7 +285,6 @@ Init(
 	);
   );
 
-  Bdry(BDRY_WALLTFIXED1, INIT_TYPE2, Mx,My,Mz,P,Twall);
 
   );
 );

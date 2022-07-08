@@ -54,10 +54,8 @@ void write_model_fluid_template(FILE **controlfile){
     "  %s(\n"
     "    gamma=1.4;\n"
     "    R=286.0;        {J/kgK }\n"
-    "    ETAMODEL=ETAMODEL_SUTHERLAND;     \n"
-    "    eta_ref=1.716e-5;       {kg/ms}\n"
-    "    eta_ref_T=273.15;       {K}\n"
-    "    eta_C=110.4;       {K}\n"
+    "    ETAMODEL=ETAMODEL_CONSTANT;     \n"
+    "    eta=1.716e-5;       {kg/ms}\n"
     "    Pr=0.71;     \n"
     "    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}\n"
     "    Tmin=1.0e1;     Tmax=26.0e3;    {K}\n"
@@ -213,9 +211,14 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
     find_double_var_from_codex(codex,"gamma",&gl->model.fluid.gamma);
     find_double_var_from_codex(codex,"R",&gl->model.fluid.R);
     find_int_var_from_codex(codex,"ETAMODEL",&gl->model.fluid.ETAMODEL);
-    find_double_var_from_codex(codex,"eta_ref",&gl->model.fluid.eta_ref);
-    find_double_var_from_codex(codex,"eta_ref_T",&gl->model.fluid.eta_ref_T);
-    find_double_var_from_codex(codex,"eta_C",&gl->model.fluid.eta_C);
+    find_double_var_from_codex(codex,"eta",&gl->model.fluid.eta);
+    if (gl->model.fluid.ETAMODEL==ETAMODEL_SUTHERLAND){
+      find_double_var_from_codex(codex,"eta_T0",&gl->model.fluid.eta_T0);
+      find_double_var_from_codex(codex,"eta_C",&gl->model.fluid.eta_C);
+    } else {
+      gl->model.fluid.eta_T0=0.0;
+      gl->model.fluid.eta_C=0.0;
+    }
     find_double_var_from_codex(codex,"Pr",&gl->model.fluid.Pr);
     find_double_var_from_codex(codex,"Pmin",&gl->model.fluid.Pmin);
     find_double_var_from_codex(codex,"Pmax",&gl->model.fluid.Pmax);
@@ -748,9 +751,9 @@ double _kappa(np_t *np, long l, gl_t *gl) {
 }
 
 double _eta_from_T(double T,gl_t *gl) {
-  double mu_0=gl->model.fluid.eta_ref;
+  double mu_0=gl->model.fluid.eta;
   double C=gl->model.fluid.eta_C;
-  double T_0=gl->model.fluid.eta_ref_T;
+  double T_0=gl->model.fluid.eta_T0;
 
   switch (gl->model.fluid.ETAMODEL){
     case ETAMODEL_CONSTANT:

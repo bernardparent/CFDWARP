@@ -512,8 +512,10 @@ void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
   *eta=_etan_from_rhok_T_Te(rhok,T,Te);
   find_nuk_from_rhok_T_Te(rhok, T, Te, nuk);
   find_muk_from_nuk(nuk, rhok, T, Te, muk);
+#ifdef speceminus
   if (METHOD==METHOD2)
     muk[speceminus]=_muk_from_rhok_T_Te_ParentMacheret(rhok, T, Te, speceminus);
+#endif
   for (spec=0; spec<ncs; spec++) {
     if (METHOD==METHOD1){
       muk[spec]=_muk_from_rhok_T_Te_ParentMacheret(rhok, T, Te, spec);
