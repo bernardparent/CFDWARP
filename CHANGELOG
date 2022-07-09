@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 08b
+  * in model/transport/_Gupta-Yos/transport.c
+    - in _piOmega11() and _piOmega22(), removed the clipping
+      of the temperature that prevented it to be above 30000K. Now, the polynomials are used
+      for temperatures as low as OMEGATMAXCLIP (which is set to 1e9K).
+  
+
 2022 JUL 08a
   * in model/transport/_Dixon-Lewis/transport.c
     - in find_nuk_eta_kappak_muk(), fixed a bug: need to make sure there are some #ifdel speceminus
