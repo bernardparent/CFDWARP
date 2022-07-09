@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUl 09a
+  * in model/transport/_Gupta-Yos/transport.c
+    - fixed a bug related to yesterday's change: 30000 K should be OMEGATMAXCLIP in _piOmega11()
+    
+
 2022 JUL 08b
   * in model/transport/_Gupta-Yos/transport.c
     - in _piOmega11() and _piOmega22(), removed the clipping

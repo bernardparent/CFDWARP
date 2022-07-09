@@ -280,7 +280,7 @@ double _piOmega11(long s, long r, double T){
 double _piOmega22(long s, long r, double T){
   double A,B,C,D;
   
-  T=min(max(OMEGATMINCLIP,T),30000.0);
+  T=min(max(OMEGATMINCLIP,T),OMEGATMAXCLIP);
   switch (smap[s]){
     case SMAP_eminus:
       switch (smap[r]){
