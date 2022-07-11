@@ -1,20 +1,22 @@
-{ _______________________________________________________________________________________________
+{
+  _______________________________________________________________________________________________
 
                                            C F D W A R P
 
                                 CFD Code for Plasma & Reactive Flow
   _______________________________________________________________________________________________
 
-  Version                          19feb08b
-  Compiler                         gcc 4.9.2 with OPENMP threads with distributed memory MPI
-  Compiled on                      Feb  8 2019 at 16:25:22 by prasanna on WAFL101
+  Version                          22jul09a
+  Compiler                         gcc 8.3.0 with OPENMP threads
+  Compiled on                      Jul 10 2022 at 15:44:37
   Cycle Strategy                   Predictor-Corrector
   Fluid Relaxation                 None
   EM Field Relaxation              None
-  Convection Discretization        Multidimensional MUSCL with flux FVS [1], FDS [3], and
-                                   primitive interpolation TVD [2], WENO [5], CWENO [7], AOWENO
-                                   [6], and eigenvalue conditioning HARTEN, GNOFFO [8], PECLET
-                                   [9], PARENT [4], and PARENT positivity-preserving filter [10]
+  Convection Discretization        Reconstruction-Evolution MUSCL with flux FVS [1], FDS [3],
+                                   and primitive interpolation TVD [2], WENO [5], CWENO [7],
+                                   AOWENO [6], and eigenvalue conditioning HARTEN, GNOFFO [8],
+                                   PECLET [9], PASCAL [4], and PARENT positivity-preserving
+                                   filter [10]
   Temporal Discretization          Total Variation Diminishing Runge Kutta [11]
   Fluid Model                      Navier-Stokes Perfect Gas
   Thermodynamic Model              Perfect Gas
@@ -46,10 +48,13 @@
   [9]  B Parent. "Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows", AIAA
        Journal, 55:141-152, 2017.
   [10] B Parent. "Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler
-       Equatons", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.
+       Equations", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.
   [11] S Gottlieb and CW Shu. "Total Variation Diminishing Runge Kutta Schemes", Mathematics of
        Computation, 67:73-85, 1998.
+
+
 }
+
 
 {
 Initial conditions from :
@@ -132,8 +137,9 @@ Model(
   NavierStokesPerfect(
     gamma=1.4;
     R=287;
+    ETAMODEL=ETAMODEL_CONSTANT;
     eta=mu_0;       {kg/ms}
-    kappa=eta*1004.5/0.71;     {W/mK}
+    Pr=0.71;
     Pmin=1.0e-5;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e-5;     Tmax=6.0e3;    {K}
     AXISYMMETRIC=FALSE;
@@ -186,7 +192,6 @@ Disc(
     AOWENO_gammahi=0.9999;
     INTERPOL=INTERPOL_AOWENO7;
     EIGENVALCOND=EIGENVALCOND_GNOFFO; 
-    FACEINTEG=FACEINTEG_CENTRAL3;
     POSFILTER=POSFILTER_NONE;
     POSFILTER_numiter=4;
   );

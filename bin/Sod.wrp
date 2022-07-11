@@ -1,21 +1,77 @@
 {
-  Number of Dimensions    : nd           : 2
+  _______________________________________________________________________________________________
+
+                                           C F D W A R P
+
+                                CFD Code for Plasma & Reactive Flow
+  _______________________________________________________________________________________________
+
+  Version                          22jul09a
+  Compiler                         gcc 8.3.0 with OPENMP threads
+  Compiled on                      Jul 10 2022 at 14:28:29
+  Cycle Strategy                   Standard
+  Fluid Relaxation                 Block ADI [1,2]
+  EM Field Relaxation              None
+  Convection Discretization        Reconstruction-Evolution MUSCL with flux FVS [3], FDS [5],
+                                   and primitive interpolation TVD [4], WENO [7], CWENO [9],
+                                   AOWENO [8], and eigenvalue conditioning HARTEN, GNOFFO [10],
+                                   PECLET [11], PASCAL [6], and PARENT positivity-preserving
+                                   filter [12]
+  Temporal Discretization          Positivity-Preserving Cross-Difference Formula [6]
+  Fluid Model                      Navier-Stokes Perfect Gas
+  Thermodynamic Model              Perfect Gas
+  Chemical Model                   Air 1 species 0 reaction
+  EM Field Model                   None
+  Beam Model                       None
+  Number of Dimensions             2
+  Number of Flux Components        4
+  _______________________________________________________________________________________________
+
+  [1]  WR Briley and H McDonald. "On the Structure and Use of Linearized Block Implicit
+       Schemes", Journal of Computational Physics 34:54-73, 1980.
+  [2]  RM Beam and RF Warming. "An Implicit Finite-Difference Algorithm for Hyperbolic Systems
+       in Conservation-Law-Form", Journal of Computational Physics 22:87-110, 1976.
+  [3]  JL Steger and RF Warming. "Flux Vector Splitting of the Inviscid Gasdynamic Equations
+       with Application to Finite-Difference Methods", Journal of Computational Physics 40:263-
+       293, 1981.
+  [4]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume Flux Vector
+       Splittings for the Euler Equations", AIAA Journal 24:1453-1460, 1986.
+  [5]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes", Journal
+       of Computational Physics 43:357-372, 1981.
+  [6]  B Parent. "Positivity-Preserving Dual Time Stepping Schemes for Gas Dynamics", Journal of
+       Computational Physics 361:391-411, 2018.
+  [7]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes", Journal of
+       Computational Physics 126:202-228, 1996.
+  [8]  DS Balsara, S Garain, and CW Shu. "An Efficient Class of WENO schemes with Adaptive
+       Order", Journal of Computational Physics 326:780-804, 2016.
+  [9]  M Dumbser and M Kaser. "Arbitrary High Order Non-oscillatory Finite Volume Schemes on
+       Unstructured Meshes for Linear Hyperbolic Systems", Journal of Computational Physics,
+       221:693-723, 2007.
+  [10] P Gnoffo and  JA White. "Computational Aerothermodynamic Simulation Issues on
+       Unstructured Grids", 37th AIAA Thermophysics Conference, AIAA Paper 2004-2371, 2004.
+  [11] B Parent. "Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows", AIAA
+       Journal, 55:141-152, 2017.
+  [12] B Parent. "Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler
+       Equations", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.
+
 
 }
+
+
 R=286.0;        {the gas constant in J/kgK }
 
 mf=0.5;
 tf=2.0;
 
 
-  PL=10000;
-  PR=10000;
-  rhoL=1;
-  rhoR=1;
-  uL=-1000;
-  uR=1000; 
-  tmax=3e-4;   {simulation time span in seconds}
-  timelevels=round(100*mf*tf);  
+PL=10000;
+PR=10000;
+rhoL=1;
+rhoR=1;
+uL=-100;
+uR=100; 
+tmax=3e-4;   {simulation time span in seconds}
+timelevels=round(100*mf*tf);  
 
 TL=PL/R/rhoL;
 TR=PR/R/rhoR;
@@ -73,11 +129,11 @@ Bdry(
  
  
 Model(
- 
   NavierStokesPerfect(
     gamma=1.4;      {the specific heat ratio }
-    eta=0e-5;       {the viscosity of the gas in kg/ms }
-    kappa=0.0;     {the thermal conductivity of the gas in W/mK }
+    ETAMODEL=ETAMODEL_CONSTANT;     
+    eta=0;       {kg/ms}
+    Pr=0.71;     
     Pmin=1.0e-20;    Pmax=9.9e99;   {min and max pressure allowed in the domain in Pa}
     Tmin=1.0e-20;     Tmax=6.0e4;    {min and max temperature allowed in the domain in K}    
     AXISYMMETRIC=FALSE;
@@ -113,6 +169,17 @@ Disc(
   NavierStokesPerfect(
     zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.00001e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
+    POSFILTER=POSFILTER_NONE;
+    POSFILTER_numiter=4;
   );
   FVSTVDplus(
     LIMITER=LIMITER_VANLEER;
@@ -183,52 +250,3 @@ Cycle(
 
 );
 
-
-Post(
-  xstation[1]=0.1;{m}
-  xstation[2]=0.2;{m}
-  xstation[3]=0.3;{m}
-  for (cnt,1,3,
-    XSTATION_Set(xstation[cnt]);
-    Pback=XSTATION_Pback({Aback,m2}1.0, {Pback_min,Pa}400, {Pback_max,Pa}4000, {numsteps}300,
-                 {q_min (as small a positive value as possible)}1.0);
-    Fpot=XSTATION_Fpot(Pback,{numsteps}300, {q_min}1.0);
-    mdot=XSTATION_mdot();
-    Tstag=XSTATION_Tstag();
-    Pstag=XSTATION_Pstag({numsteps} 300);
-    Pstar=XSTATION_Pstar();
-    T=XSTATION_T();
-    q=XSTATION_q();
-    rho=XSTATION_rho();
-    htstar=XSTATION_htstar();
-    printf(
-           "x      = %E m\n"
-           "Pback  = %E Pa\n"
-           "Fpot   = %E Ns/kg\n"
-           "mdot   = %E kg/s\n"
-           "Tstag  = %E K\n"
-           "Pstag  = %E Pa\n"
-           "Pstar  = %E Pa\n"
-           "T      = %E K\n"
-           "q      = %E m/s\n"
-           "rho    = %E kg/m3\n\n"
-           ,xstation[cnt],Pback,Fpot,mdot,Tstag,Pstag,Pstar,T,q,rho);
-  );
-
-
-  printf("\n");
-  for (dim,1,2,
-    Fshear[dim]=_Fshear(is,js, ie,je,dim,BDRY_SYMMETRICAL2  );
-    Fpressure[dim]=_Fpressure(is,js, ie,je,dim,BDRY_SYMMETRICAL2  );
-  );
-  printf("Fshear    = (%+E,%+E) N/m\n",Fshear[1],Fshear[2]);
-  printf("Fpressure = (%+E,%+E) N/m\n",Fpressure[1],Fpressure[2]);
-  {
-  WritePostFile("post.01", "tecplot",POSTFILE_ALL);
-  WritePostFile("grid.01", "tecplot",POSTFILE_GRID);
-  }
-  printf("metotal   = %+E J/m\n",_metotal(is,js, ie,je));
-
-  printf("m         = %+E kg/m\n",_m(is,js, ie,je));
-
-);

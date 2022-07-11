@@ -1,3 +1,99 @@
+{
+  _______________________________________________________________________________________________
+
+                                           C F D W A R P
+
+                                CFD Code for Plasma & Reactive Flow
+  _______________________________________________________________________________________________
+
+  Version                          22jul09a
+  Compiler                         gcc 8.3.0 with OPENMP threads
+  Compiled on                      Jul 10 2022 at 19:16:15
+  Cycle Strategy                   Standard
+  Fluid Relaxation                 Block DDADI [2,1]
+  EM Field Relaxation              Implicit schemes based on approximate factorization including
+                                   ADI [4], DDADI [2,1], and IMAF [3]
+  Convection Discretization        Reconstruction-Evolution MUSCL with flux FVS [5], FDS [7],
+                                   and primitive interpolation TVD [6], WENO [9], CWENO [11],
+                                   AOWENO [10], and eigenvalue conditioning HARTEN, GNOFFO
+                                   [12], PECLET [13], PASCAL [8], and PARENT positivity-
+                                   preserving filter [14]
+  Temporal Discretization          Positivity-Preserving Cross-Difference Formula [8]
+  Fluid Model                      Navier-Stokes with drift-diffusion plasma model [15]
+  Thermodynamic Model              NASA Glenn Polynomials [16].
+  Transport Model                  Dixon-Lewis [17]
+  Chemical Model                   Air Plasma 11s Dunn-Kang [18], Park [20], Lenard [19], Boyd
+                                   [21], Farbar [22], Parent-Dunn and Parent-Park [24], Kim [23]
+  EM Field Model                   Electric field potential [25]
+  Beam Model                       None
+  Number of Dimensions             2
+  Number of Flux Components        16
+  Number of Species                11
+  Number of Charged Species        6
+  List of Species                  e-, O+, N+, O2+, N2+, NO+, O, N, NO, O2, N2
+  _______________________________________________________________________________________________
+
+  [1]  RW MacCormack. "A New Implicit Algorithm for Fluid Flow", 13th Computational Fluid
+       Dynamics Conference, AIAA Paper 97-2100, 1997.
+  [2]  J Bardina and CK Lombard. "Three Dimensional Hypersonic Flow Simulations with the CSCM
+       Implicit Upwind Navier-Stokes Method", Proceedings of the 8th Computational Fluid
+       Dynamics Conference, AIAA Paper 87-1114, 1987.
+  [3]  RW MacCormack. "Iterative Modified Approximate Factorization", Computers and Fluids
+       30:917-925, 2001.
+  [4]  DW Peaceman and HH Rachford. "The Numerical Solution of Parabolic and Elliptic
+       Differential Equations", J. Soc. Ind. Appl. Math. 3:28-41, 1955.
+  [5]  JL Steger and RF Warming. "Flux Vector Splitting of the Inviscid Gasdynamic Equations
+       with Application to Finite-Difference Methods", Journal of Computational Physics 40:263-
+       293, 1981.
+  [6]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume Flux Vector
+       Splittings for the Euler Equations", AIAA Journal 24:1453-1460, 1986.
+  [7]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes", Journal
+       of Computational Physics 43:357-372, 1981.
+  [8]  B Parent. "Positivity-Preserving Dual Time Stepping Schemes for Gas Dynamics", Journal of
+       Computational Physics 361:391-411, 2018.
+  [9]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes", Journal of
+       Computational Physics 126:202-228, 1996.
+  [10] DS Balsara, S Garain, and CW Shu. "An Efficient Class of WENO schemes with Adaptive
+       Order", Journal of Computational Physics 326:780-804, 2016.
+  [11] M Dumbser and M Kaser. "Arbitrary High Order Non-oscillatory Finite Volume Schemes on
+       Unstructured Meshes for Linear Hyperbolic Systems", Journal of Computational Physics,
+       221:693-723, 2007.
+  [12] P Gnoffo and  JA White. "Computational Aerothermodynamic Simulation Issues on
+       Unstructured Grids", 37th AIAA Thermophysics Conference, AIAA Paper 2004-2371, 2004.
+  [13] B Parent. "Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows", AIAA
+       Journal, 55:141-152, 2017.
+  [14] B Parent. "Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler
+       Equations", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.
+  [15] B Parent, MN Shneider, and SO Macheret. "Detailed Modeling of Plasmas for Computational
+       Aerodynamics", AIAA Journal, 54:898-911, 2016.
+  [16] BJ McBride, MJ Zehe, and S Gordon. "NASA Glenn Coefficients for Calculating Thermodynamic
+       Properties of Individual Species", NASA TP 2002-211556, 2002.
+  [17] Dixon-Lewis, G., "Computer Modelling of Combustor Reactions", Springer Verlag, 1984.
+  [18] MG Dunn and SW Kang. "Theoretical and Experimental Studies of Reentry Plasmas", NASA CR-
+       2232, 1973.
+  [19] M Lenard. "Ionization of Cesium and Sodium Contaminated Air in the Hypersonic Slender
+       Body Boundary Layer", General Electric Missile and Space Division Technical Report
+       R64SD22, 1964.
+  [20] C Park. "Review of Chemical-Kinetic Problems of Future NASA Missions, I: Earth Entries,"
+       Journal of Thermophysics and Heat Transfer 7:385-398, 1993.
+  [21] ID Boyd, "Modeling of associative ionization reactions in hypersonic rarefied flows,"
+       Physics of Fluids 19:096102, 2007.
+  [22] E Farbar, ID Boyd, and A Martin. "Numerical Prediction of Hypersonic Flowfields Including
+       Effects of Electron Translational Nonequilibrium", Journal of Thermophysics and Heat
+       Transfer, 24:593-606, 2013.
+  [23] Kim, Jae Gang, and Sung Min Jo. "Modification of chemical-kinetic parameters for 11-air
+       species in re-entry flows." International Journal of Heat and Mass Transfer 169:120950,
+       2021.
+  [24] Parent, B. and Thoguluva Rajendran, P. and Omprakas, A.. "Electron Losses in Hypersonic
+       Flows." Physics of Fluids 34:016110, 2022.
+  [25] B Parent, SO Macheret, and MN Shneider. "Electron and Ion Transport Equations in
+       Computational Weakly-Ionized Plasmadynamics", Journal of Computational Physics 259:51-
+       69, 2014.
+
+
+}
+
+
 
 {See experimental results in Starikovskii, A. Y., Nikipelov, A. A., Nudnova, M. M., and Roupassov, D. V., “SDBD plasma actuator with nanosecond pulseperiodic discharge,” Plasma Sources Science and Technology, Vol. 18, 2009, pp. 1–17.}
  

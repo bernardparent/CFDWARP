@@ -150,6 +150,7 @@ Model(
   NavierStokesPerfect(
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e1;     Tmax=6.0e3;    {K}
+    ETAMODEL=ETAMODEL_CONSTANT;
     SetBodyForce(is,js,ks, ie,je,ke, 0.0{N/m3},0.0{N/m3},0.0{N/m3});
     SetHeatDeposited(is,js,ks, ie,je,ke, 0.0 {W/m3});
     {
@@ -203,7 +204,8 @@ Disc(
     AOWENO_gammahi=0.999999;
     INTERPOL=INTERPOL_AOWENO9;
     EIGENVALCOND=EIGENVALCOND_GNOFFO;
-    FACEINTEG=FACEINTEG_CENTRAL3;
+    POSFILTER=POSFILTER_NONE;
+    POSFILTER_numiter=4;
   );
   TVDRK(
     METHOD=METHOD_TVDRK2;

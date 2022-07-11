@@ -6,9 +6,9 @@
                                 CFD Code for Plasma & Reactive Flow
   _______________________________________________________________________________________________
 
-  Version                          20sep02a
+  Version                          22jul09a
   Compiler                         gcc 8.3.0 with OPENMP threads
-  Compiled on                      Sep  3 2020 at 15:19:09
+  Compiled on                      Jul 10 2022 at 19:25:18
   Cycle Strategy                   Standard
   Fluid Relaxation                 Block ADI [1,2]
   EM Field Relaxation              None
@@ -19,16 +19,17 @@
                                    filter [12]
   Temporal Discretization          Steady-State
   Fluid Model                      Navier-Stokes Multispecies
-  Thermodynamic Model              NASA Glenn Polynomials [13]
-  Chemical Model                   Air 5s Lenard [15], Dunn-Kang [14], Park [16], Boyd
-                                   [boyd2007a]
+  Thermodynamic Model              NASA Glenn Polynomials [13].
+  Transport Model                  Dixon-Lewis [14]
+  Chemical Model                   Air Plasma 11s Dunn-Kang [15], Park [17], Lenard [16], Boyd
+                                   [18], Farbar [19], Parent-Dunn and Parent-Park [21], Kim [20]
   EM Field Model                   None
   Beam Model                       None
   Number of Dimensions             2
-  Number of Flux Components        8
-  Number of Species                5
-  Number of Charged Species        0
-  List of Species                  O, N, NO, O2, N2
+  Number of Flux Components        14
+  Number of Species                11
+  Number of Charged Species        6
+  List of Species                  e-, O+, N+, O2+, N2+, NO+, O, N, NO, O2, N2
   _______________________________________________________________________________________________
 
   [1]  WR Briley and H McDonald. "On the Structure and Use of Linearized Block Implicit
@@ -59,16 +60,28 @@
        Equations", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.
   [13] BJ McBride, MJ Zehe, and S Gordon. "NASA Glenn Coefficients for Calculating Thermodynamic
        Properties of Individual Species", NASA TP 2002-211556, 2002.
-  [14] MG Dunn and SW Kang. "Theoretical and Experimental Studies of Reentry Plasmas", NASA CR-
+  [14] Dixon-Lewis, G., "Computer Modelling of Combustor Reactions", Springer Verlag, 1984.
+  [15] MG Dunn and SW Kang. "Theoretical and Experimental Studies of Reentry Plasmas", NASA CR-
        2232, 1973.
-  [15] M Lenard. "Ionization of Cesium and Sodium Contaminated Air in the Hypersonic Slender
+  [16] M Lenard. "Ionization of Cesium and Sodium Contaminated Air in the Hypersonic Slender
        Body Boundary Layer", General Electric Missile and Space Division Technical Report
        R64SD22, 1964.
-  [16] C Park. "Review of Chemical-Kinetic Problems of Future NASA Missions, I: Earth Entries,"
+  [17] C Park. "Review of Chemical-Kinetic Problems of Future NASA Missions, I: Earth Entries,"
        Journal of Thermophysics and Heat Transfer 7:385-398, 1993.
+  [18] ID Boyd, "Modeling of associative ionization reactions in hypersonic rarefied flows,"
+       Physics of Fluids 19:096102, 2007.
+  [19] E Farbar, ID Boyd, and A Martin. "Numerical Prediction of Hypersonic Flowfields Including
+       Effects of Electron Translational Nonequilibrium", Journal of Thermophysics and Heat
+       Transfer, 24:593-606, 2013.
+  [20] Kim, Jae Gang, and Sung Min Jo. "Modification of chemical-kinetic parameters for 11-air
+       species in re-entry flows." International Journal of Heat and Mass Transfer 169:120950,
+       2021.
+  [21] Parent, B. and Thoguluva Rajendran, P. and Omprakas, A.. "Electron Losses in Hypersonic
+       Flows." Physics of Fluids 34:016110, 2022.
 
 
 }
+
 
 
 {

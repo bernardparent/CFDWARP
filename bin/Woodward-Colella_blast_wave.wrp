@@ -1,35 +1,60 @@
 {
-  ____________________________________________________________________________
+  _______________________________________________________________________________________________
 
-  CFDWARP: a CFD Code for Plasma & Reactive Flow [a]
-  ____________________________________________________________________________
+                                           C F D W A R P
 
-  Cycle Strategy                          Predictor-Corrector Cycle
-  Fluid Transport Integration             None
-  EM Field Integration                    none
-  Convection Derivative Discretization    FDS [1] WENO 5th Order [2]
-  Time Derivative Discretization          Runge-Kutta 3rd Order TVD [3]
-  Fluid Transport Model                   Navier-Stokes Perfect Gas
-  Chemical Model                          Air 1 species 0 reaction
-  Beam Model                              None
-  EM Field Model                          None
-  Thermodynamic Model                     Perfect Gas
-  Number of Dimensions                    2
-  Number of Flux Components               4
-  ____________________________________________________________________________
+                                CFD Code for Plasma & Reactive Flow
+  _______________________________________________________________________________________________
 
-  [a]  B Parent. "CFDWARP: a CFD Code for Plasma & Reactive Flows", WARP
-       version 17dec08b compiled on Dec 10 2017 at 01:16:09 using gcc 5.4.0
-       20160609 with OPENMP threads. CFDWARP is a Copyright (c) 1998-2017 of
-       Bernard Parent. Copying and distribution of CFDWARP is prohibited.
-  [1]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference
-       Schemes", Journal of Computational Physics 43:357-372, 1981.
-  [2]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes",
-       Journal of Computational Physics 126:202-228, 1996.
-  [3]  S Gottlieb and CW Shu. "Total Variation Diminishing Runge Kutta
-       Schemes", Mathematics of Computation, 67:73-85, 1998.
+  Version                          22jul09a
+  Compiler                         gcc 8.3.0 with OPENMP threads
+  Compiled on                      Jul 10 2022 at 18:59:11
+  Cycle Strategy                   Predictor-Corrector
+  Fluid Relaxation                 None
+  EM Field Relaxation              None
+  Convection Discretization        Reconstruction-Evolution MUSCL with flux FVS [1], FDS [3],
+                                   and primitive interpolation TVD [2], WENO [5], CWENO [7],
+                                   AOWENO [6], and eigenvalue conditioning HARTEN, GNOFFO [8],
+                                   PECLET [9], PASCAL [4], and PARENT positivity-preserving
+                                   filter [10]
+  Temporal Discretization          Total Variation Diminishing Runge Kutta [11]
+  Fluid Model                      Navier-Stokes Perfect Gas
+  Thermodynamic Model              Perfect Gas
+  Chemical Model                   Air 1 species 0 reaction
+  EM Field Model                   None
+  Beam Model                       None
+  Number of Dimensions             2
+  Number of Flux Components        4
+  _______________________________________________________________________________________________
+
+  [1]  JL Steger and RF Warming. "Flux Vector Splitting of the Inviscid Gasdynamic Equations
+       with Application to Finite-Difference Methods", Journal of Computational Physics 40:263-
+       293, 1981.
+  [2]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume Flux Vector
+       Splittings for the Euler Equations", AIAA Journal 24:1453-1460, 1986.
+  [3]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes", Journal
+       of Computational Physics 43:357-372, 1981.
+  [4]  B Parent. "Positivity-Preserving Dual Time Stepping Schemes for Gas Dynamics", Journal of
+       Computational Physics 361:391-411, 2018.
+  [5]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes", Journal of
+       Computational Physics 126:202-228, 1996.
+  [6]  DS Balsara, S Garain, and CW Shu. "An Efficient Class of WENO schemes with Adaptive
+       Order", Journal of Computational Physics 326:780-804, 2016.
+  [7]  M Dumbser and M Kaser. "Arbitrary High Order Non-oscillatory Finite Volume Schemes on
+       Unstructured Meshes for Linear Hyperbolic Systems", Journal of Computational Physics,
+       221:693-723, 2007.
+  [8]  P Gnoffo and  JA White. "Computational Aerothermodynamic Simulation Issues on
+       Unstructured Grids", 37th AIAA Thermophysics Conference, AIAA Paper 2004-2371, 2004.
+  [9]  B Parent. "Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows", AIAA
+       Journal, 55:141-152, 2017.
+  [10] B Parent. "Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler
+       Equations", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.
+  [11] S Gottlieb and CW Shu. "Total Variation Diminishing Runge Kutta Schemes", Mathematics of
+       Computation, 67:73-85, 1998.
+
 
 }
+
 
 {
 
@@ -93,13 +118,11 @@ Bdry(
 Model(
   NavierStokesPerfect(
     gamma=1.4;
+    ETAMODEL=ETAMODEL_CONSTANT;
     eta=0;       {kg/ms}
-    kappa=0.0;     {W/mK}
+    Pr=0.71;
     Pmin=1.0e-5;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e-30;     Tmax=6.0e3;    {K}
-    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.1;  {eigenvalue clipping factor: 2.0-20.0}
-    EIGENVALCOND=EIGENVALCOND_PASCAL; 
     AXISYMMETRIC=FALSE;
     SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
     SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
@@ -136,6 +159,28 @@ Init(
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE2, Mx,My,P,T);
     Region(is,js,  ie,je,  INIT_TYPE2, Mx,My,P,T);
     }
+  );
+);
+
+
+Disc(
+  NavierStokesPerfect(
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
+    POSFILTER=POSFILTER_NONE;
+    POSFILTER_numiter=4;
+  );
+  TVDRK(
+    METHOD=METHOD_TVDRK2;
   );
 );
 

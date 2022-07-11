@@ -1,36 +1,59 @@
 {
-  ____________________________________________________________________________
+  _______________________________________________________________________________________________
 
-  CFDWARP: a CFD Code for Plasma & Reactive Flow [a]
-  ____________________________________________________________________________
+                                           C F D W A R P
 
-  Cycle Strategy                          Standard Cycle
-  Fluid Transport Integration             Block ADI [1,2]
-  EM Field Integration                    none
-  Convection Derivative Discretization    FDS [3] WENO 5th Order [4]
-  Time Derivative Discretization          Steady-State
-  Fluid Transport Model                   Navier-Stokes Perfect Gas
-  Chemical Model                          Air 1 species 0 reaction
-  Beam Model                              None
-  EM Field Model                          None
-  Thermodynamic Model                     Perfect Gas
-  Number of Dimensions                    2
-  Number of Flux Components               4
-  ____________________________________________________________________________
+                                CFD Code for Plasma & Reactive Flow
+  _______________________________________________________________________________________________
 
-  [a]  B Parent. "CFDWARP: a CFD Code for Plasma & Reactive Flows", WARP
-       version 17nov26b compiled on Dec  8 2017 at 22:43:34 using gcc 5.4.0
-       20160609 with OPENMP threads. CFDWARP is a Copyright (c) 1998-2017 of
-       Bernard Parent. Copying and distribution of CFDWARP is prohibited.
-  [1]  WR Briley and H McDonald. "On the Structure and Use of Linearized Block
-       Implicit Schemes", Journal of Computational Physics 34:54-73, 1980.
-  [2]  RM Beam and RF Warming. "An Implicit Finite-Difference Algorithm for
-       Hyperbolic Systems in Conservation-Law-Form", Journal of Computational
-       Physics 22:87-110, 1976.
-  [3]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference
-       Schemes", Journal of Computational Physics 43:357-372, 1981.
-  [4]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes",
-       Journal of Computational Physics 126:202-228, 1996.
+  Version                          22jul09a
+  Compiler                         gcc 8.3.0 with OPENMP threads
+  Compiled on                      Jul 10 2022 at 13:59:38
+  Cycle Strategy                   Standard
+  Fluid Relaxation                 Block ADI [1,2]
+  EM Field Relaxation              None
+  Convection Discretization        Reconstruction-Evolution MUSCL with flux FVS [3], FDS [5],
+                                   and primitive interpolation TVD [4], WENO [7], CWENO [9],
+                                   AOWENO [8], and eigenvalue conditioning HARTEN, GNOFFO [10],
+                                   PECLET [11], PASCAL [6], and PARENT positivity-preserving
+                                   filter [12]
+  Temporal Discretization          Steady-State
+  Fluid Model                      Navier-Stokes Perfect Gas
+  Thermodynamic Model              Perfect Gas
+  Chemical Model                   Air 1 species 0 reaction
+  EM Field Model                   None
+  Beam Model                       None
+  Number of Dimensions             2
+  Number of Flux Components        4
+  _______________________________________________________________________________________________
+
+  [1]  WR Briley and H McDonald. "On the Structure and Use of Linearized Block Implicit
+       Schemes", Journal of Computational Physics 34:54-73, 1980.
+  [2]  RM Beam and RF Warming. "An Implicit Finite-Difference Algorithm for Hyperbolic Systems
+       in Conservation-Law-Form", Journal of Computational Physics 22:87-110, 1976.
+  [3]  JL Steger and RF Warming. "Flux Vector Splitting of the Inviscid Gasdynamic Equations
+       with Application to Finite-Difference Methods", Journal of Computational Physics 40:263-
+       293, 1981.
+  [4]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume Flux Vector
+       Splittings for the Euler Equations", AIAA Journal 24:1453-1460, 1986.
+  [5]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes", Journal
+       of Computational Physics 43:357-372, 1981.
+  [6]  B Parent. "Positivity-Preserving Dual Time Stepping Schemes for Gas Dynamics", Journal of
+       Computational Physics 361:391-411, 2018.
+  [7]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes", Journal of
+       Computational Physics 126:202-228, 1996.
+  [8]  DS Balsara, S Garain, and CW Shu. "An Efficient Class of WENO schemes with Adaptive
+       Order", Journal of Computational Physics 326:780-804, 2016.
+  [9]  M Dumbser and M Kaser. "Arbitrary High Order Non-oscillatory Finite Volume Schemes on
+       Unstructured Meshes for Linear Hyperbolic Systems", Journal of Computational Physics,
+       221:693-723, 2007.
+  [10] P Gnoffo and  JA White. "Computational Aerothermodynamic Simulation Issues on
+       Unstructured Grids", 37th AIAA Thermophysics Conference, AIAA Paper 2004-2371, 2004.
+  [11] B Parent. "Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows", AIAA
+       Journal, 55:141-152, 2017.
+  [12] B Parent. "Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler
+       Equations", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.
+
 
 }
 
@@ -12525,13 +12548,11 @@ Model(
   NavierStokesPerfect(
     gamma=1.4;
     R=286.0;        {J/kgK }
-    eta=0e-5;       {kg/ms}
-    kappa=0.0;     {W/mK}
+    ETAMODEL=ETAMODEL_CONSTANT;     
+    eta=0;       {kg/ms}
+    Pr=0.71;     
     Pmin=1.0e-20;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e-20;     Tmax=6.0e3;    {K}
-    zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
-    zetaA2=0.25;  {eigenvalue clipping factor: 2.0-20.0}
-    EIGENVALCOND=EIGENVALCOND_PECLET; 
     AXISYMMETRIC=FALSE;
     SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
     SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
@@ -24997,6 +25018,26 @@ if (mf==1,
    );
   );
 );
+
+
+Disc(
+  NavierStokesPerfect(
+    zetaA1=0.0e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.25e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.95;
+    AOWENO_gammahi=0.999;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
+    POSFILTER=POSFILTER_NONE;
+    POSFILTER_numiter=4;
+  );
+);
+
 
 Cycle(
   NavierStokesPerfect(
