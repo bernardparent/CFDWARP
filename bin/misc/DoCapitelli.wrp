@@ -81,11 +81,12 @@
 is=1;
 is1=50; {start of 1st electrode}
 is2=is1+25; {end of 1st electrode}
-is3=is2+45; {start of second electrode}
+is3=is2+85; {start of second electrode}
 is4=is3+25; {end of 2nd electrode}
 ie=is4+30;
 js=1;
-je=60;
+js1=80;
+je=js1+35;
 
 
 xs=0.0;
@@ -96,33 +97,39 @@ xs4=0.019;
 xe=0.029;
 
 ys=0.0;
+ys1=0.0007;
 ye=0.015;
 
 dwall=1e-6;
+dx=30e-6;
 
 Grid(
   Size(is,js, ie,je);
 
 
   {flow above 1st electrode}
-  Corners(is1,js, is2,je, xs1,ys,   xs2,ye);
-  JoinCorners(is1,js, is2,je,  ff,0.5e0,dwall,dwall,  FE,0.75e0,dwall,1.0e0);
+  Corners(is1,js, is2,js1, xs1,ys,   xs2,ys1);
+  JoinCorners(is1,js, is2,js1,  ff,0.5e0,dx,dx,  FE,0.2e0,dwall,1.0e0);
   
   {flow above 2nd electrode}
-  Corners(is3,js,  is4,je, xs3,ys,  xs4,ye);
-  JoinCorners(is3,js, is4,je,  ff,0.5e0,dwall,dwall,  FE,0.75e0,dwall,1.0e0);
+  Corners(is3,js,  is4,js1, xs3,ys,  xs4,ys1);
+  JoinCorners(is3,js, is4,js1,  ff,0.5e0,dx,dx,  FE,0.2e0,dwall,1.0e0);
 
 
   {upstream of 1st electrode }
-  Corners(is,js, is1,je, xs,ys,  xs1,ye);
-  JoinCorners(is,js, is1,je,  FG,0.5e0,dwall*10,1.0,  FE,0.75e0,dwall,1.0e0);
+  Corners(is,js, is1,js1, xs,ys,  xs1,ys1);
+  JoinCorners(is,js, is1,js1,  FG,0.5e0,dx,1.0,  FE,0.2e0,dwall,1.0e0);
 
   {downstream of 2nd electrode }
-  Corners(is4,js, ie,je, xs4,ys,  xe,ye);
-  JoinCorners(is4,js, ie,je,  GE,0.5e0,1.0e0,1.0,  FE,0.75e0,dwall,1.0e0);
+  Corners(is4,js, ie,js1, xs4,ys,  xe,ys1);
+  JoinCorners(is4,js, ie,js1,  GE,0.5e0,1.0e0,1.0,  FE,0.2e0,dwall,1.0e0);
   
   {in-between electrodes}
-  JoinCorners(is2,js, is3,je, gg,0.5,1.0,1.0, FE,0.75e0,dwall,1.0e0);
+  JoinCorners(is2,js, is3,js1, gg,0.5,1.0,1.0, FE,0.2e0,dwall,1.0e0);
+
+  Copy(is,js1,ie,js1, is,je);
+  Translate(is,je,ie,je, 0,ye-ys1);
+  Join(is,js1,ie,je, j, GE, 0.5, 1.0, 1.0);
 );
 
 
@@ -192,7 +199,7 @@ Bdry(
  
 Model(
   NavierStokesPlasma(
-    TEMODEL=TEMODEL_LOCAL;
+    TEMODEL=TEMODEL_TRANSPORT;
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=YES;
@@ -219,7 +226,7 @@ Model(
     Te_buffer=300.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,Te_buffer);  
                        needed to prevent convergence hangs where |E| becomes close to 0;
                        set to as little a value as possible but at least as high as 300 K}
-    Jmax=20000000.0;     {the maximum current density in A/m2 expected in the domain; this will affect only
+    Jmax=20000000000.0;     {the maximum current density in A/m2 expected in the domain; this will affect only
                        the Townsend ionization rates; make sure Jmax > sigma*Emag in the converged solution.}
     SetRelativePermittivity(is,js, ie,je, 1.0 );
     SetSolidConductivity(is,js, ie,je, 0.0 {S/m});
@@ -343,7 +350,7 @@ Cycle(
                            near cathode}
     relaxNi_bdry=1.0;     {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.2;     {the electron density relaxation factor at the boundary }
-    relaxTe=0.03;          {the electron temperature relaxation factor }
+    relaxTe=1.0;          {the electron temperature relaxation factor }
     rhoref=0.1;           {reference density in kg/m3}
     Tref=300.0;           {reference temperature in K}
     Teref=20000.0;        {reference electron temperature in K}
@@ -396,10 +403,8 @@ Cycle(
     Lc=1e20;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
     UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,4);
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,400);
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,400);
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,4);
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,400);
+    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,200);
+    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,200);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
@@ -416,40 +421,6 @@ Cycle(
 
 
 Post(
-  xstation[1]=0.1; {m}
-  xstation[2]=0.2; {m}
-  xstation[3]=0.3; {m}
-  numsteps=300;
-  qmin=1.0; {m/s, as small a value as possible}
-  Pback_min=400; {Pa}
-  Pback_max=40000; {Pa}
-  Aback=1.0; {m2/m}
-  for (cnt,1,3,
-    XSTATION_Set(xstation[cnt]);
-    Pback=XSTATION_Pback(Aback, Pback_min, Pback_max, numsteps, qmin);
-    Fpot=XSTATION_Fpot(Pback, numsteps, qmin);
-    mdot=XSTATION_mdot();
-    Tstag=XSTATION_Tstag();
-    Pstag=XSTATION_Pstag(numsteps);
-    Pstar=XSTATION_Pstar();
-    T=XSTATION_T();
-    q=XSTATION_q();
-    rho=XSTATION_rho();
-    htstar=XSTATION_htstar();
-    fprintf(postfilename,"x      = %E m\n"
-           "Pback  = %E Pa\n"
-           "Fpot   = %E Ns/kg\n"
-           "mdot   = %E kg/ms\n"
-           "htstar = %E J/kg\n"
-           "Tstag  = %E K\n"
-           "Pstag  = %E Pa\n"
-           "Pstar  = %E Pa\n"
-           "T      = %E K\n"
-           "q      = %E m/s\n"
-           "rho    = %E kg/m3\n\n"
-           ,xstation[cnt],Pback,Fpot,mdot,htstar,Tstag,Pstag,Pstar,T,q,rho);
-  );
-  fprintf(postfilename,"\n");
   for (dim,1,2,
     Area[dim]=_Area(is,js, ie,je, dim,BDRY_WALLTFIXED1);
     Fshear[dim]=_Fshear(is,js, ie,je, dim,BDRY_WALLTFIXED1);

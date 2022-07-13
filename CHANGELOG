@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 12a
+  * in model/chem/_C2H4_Air_Plasma_30s/chem.c
+    - implemented TEMIN, TEMAX, TEFROMEOVERN
+    - in _kfit4(), fixed a bug: kf shouldn't be divided by calA
+  * in .makefile-header-default
+    - took away -DNDEBUG from the default C and linker flags: this fixes odd bugs we were getting
+      recently with gcc and mpicc when using compiler optimization -O1 or higher
+    
+
 2022 JUL 10a
   * in bin/*.wrp
     - upgraded the control files so they can be run without change with the latest version

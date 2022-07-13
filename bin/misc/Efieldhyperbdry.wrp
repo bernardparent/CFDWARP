@@ -264,7 +264,7 @@ Model(
     N2VIBJOULEHEATING=YES;
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     REACTING=YES;
-    emfieldworkheatfact=0.0;   {factor multiplying the emfield work and heat source terms}
+    emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
     sigmadiv=1e-9; {S/m}
     etdiv=1e-1;     {J/kg}
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
@@ -455,7 +455,7 @@ Cycle(
           chiimin=1e-10;
         );
       );
-    CFLmax=0.1;
+    CFLmax=0.3;
     CFL=min(CFL*1.015,CFLmax);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     Lc=1e30;      {characteristic length scale in meters used to solve the emfield equation}
