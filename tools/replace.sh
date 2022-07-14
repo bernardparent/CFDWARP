@@ -98,10 +98,10 @@ FLAG           ARGUMENT                                      Required?
 
 EXAMPLES
 
-$0 -find 'John' -replace 'Mikey' -filename '*.txt' 
+${0##*/} -find 'John' -replace 'Mikey' -filename '*.txt' 
 will search within all *.txt files recursively for the string John and replace it by Mikey using rpl.
 
-$0 -git -w -find 'John' -replace 'Mikey' -filename '*Makefile' -mode perl 
+${0##*/} -git -w -find 'John' -replace 'Mikey' -filename '*Makefile' -mode perl 
 will search within all Makefiles recursively for the word John and replace it by Mikey using perl.
 
 

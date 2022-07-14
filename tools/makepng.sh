@@ -2,7 +2,7 @@
 
 # SPDX-License-Identifier: BSD-2-Clause
 #
-# Copyright 2016 Bernard Parent
+# Copyright 2016,2022 Bernard Parent
 #
 # Redistribution and use in source and binary forms, with or without modification, are
 # permitted provided that the following conditions are met:
@@ -129,7 +129,7 @@ _________________________________________________________________
 -reorderstart  counter start when reordering [int]      N
 
 Eg: 
-$0 -data data. -post post. -start 10 -end 12 -style rho.sty -png rho.
+${0##*/} -data data. -post post. -start 10 -end 12 -style rho.sty -png rho.
 will read in data.10,data.11,data.12 and post.10,post.11,post.12 and make png files rho.1.png, rho.2.png, etc according to the tecplot style rho.sty " 
 
   exit 1
@@ -196,33 +196,27 @@ while [ $i -le $ie ]
 
 
     #create the macro file that tecplot will read 
-    echo "#!MC 1200
-\$!VarSet |MFBD| = './'
-" > __makepng.$iw.mcr
+    echo "#!MC 1410" > __makepng.$iw.mcr
 
     if [ -n "$stylefilename" ]
     then
-      echo "\$!READSTYLESHEET  \"./$stylefilename\"
-" >> __makepng.$iw.mcr
+      echo "\$!ReadStyleSheet  \"./$stylefilename\"" >> __makepng.$iw.mcr
     fi
 
-    echo "INCLUDEPLOTSTYLE = YES
-INCLUDETEXT = YES
-INCLUDEGEOM = YES
-INCLUDEAUXDATA = YES
-INCLUDESTREAMPOSITIONS = YES
-INCLUDECONTOURLEVELS = YES
-MERGE = NO
-INCLUDEFRAMESIZEANDPOSITION = NO
-\$!EXPORTSETUP EXPORTFORMAT = PNG
-\$!PRINTSETUP PALETTE = COLOR
-\$!EXPORTSETUP IMAGEWIDTH = "$imagewidth"
-\$!EXPORTSETUP USESUPERSAMPLEANTIALIASING = YES
-\$!EXPORTSETUP CONVERTTO256COLORS = YES
-\$!EXPORTSETUP EXPORTFNAME = './$pngfilename$iw.png'
-\$!EXPORT
-EXPORTREGION = ALLFRAMES
-\$!RemoveVar |MFBD|" >> __makepng.$iw.mcr
+    echo "  IncludePlotStyle = Yes
+  IncludeText = Yes
+  IncludeGeom = Yes
+  IncludeAuxData = Yes
+  IncludeStreamPositions = Yes
+  IncludeContourLevels = Yes
+  Merge = No
+  IncludeFrameSizeAndPosition = No
+\$!PrintSetup Palette = Color
+\$!ExportSetup ImageWidth = "$imagewidth"
+\$!ExportSetup ConvertTo256Colors = Yes
+\$!ExportSetup ExportFName = './$pngfilename$iw.png'
+\$!Export
+  ExportRegion = AllFrames" >> __makepng.$iw.mcr
 
 
 
@@ -246,12 +240,13 @@ EXPORTREGION = ALLFRAMES
     if [ $(( cnt % $modulo)) -eq 0 ]; then
       echo Creating the file $pngfilename$iw.png from $postfilename$i [$time s]  
       if [ -z "$macrofilename" ]; then 
-        tecplotexec="tec360 -b -p __makepng.$iw.mcr $postfilename$i"
+        tecplotexec="tec360 --osmesa -b -p __makepng.$iw.mcr $postfilename$i"
       else
-        tecplotexec="tec360 -b -p $macrofilename -p __makepng.$iw.mcr $postfilename$i"     
+        tecplotexec="tec360 --osmesa -b -p $macrofilename -p __makepng.$iw.mcr $postfilename$i"     
       fi
       echo $tecplotexec
       convertexec="convert $pngfilename$iw.png -font Times-Roman -pointsize $fontsize -draw \"gravity north fill white  text 0,15 '$time s' fill black  text 5,10 '$time s'\" $pngfilename$iw.png"
+      echo $convertexec
       if [ $maxthreads -eq 1 ]; then
         eval $tecplotexec 1> /dev/null  
         eval $convertexec 1> /dev/null  &

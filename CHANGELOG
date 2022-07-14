@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 13a
+  * in tools/makepng.sh
+    - Modified the tecplot macro script so that it is compatible with tecplot 2022 (the previous
+      used to be compatible with tecplot 2009)
+    - added the --osmesa flag to the tec360 call (needed with tecplot 2022 when doing batch 
+      processing)
+  * in tools/makemissing.sh, tools/makemovie.sh, tools/makepng.sh, tools/makepost.sh, 
+    tools/renamebatch.sh, tools/replace.sh, tools/search.sh, tools/tecplotpostfiles.sh
+    - changed $0 by ${0##*/} when outputting the name of the script in the help screen
+    
+    
 2022 JUL 12a
   * in model/chem/_C2H4_Air_Plasma_30s/chem.c
     - implemented TEMIN, TEMAX, TEFROMEOVERN

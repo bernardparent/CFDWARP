@@ -99,7 +99,7 @@ _________________________________________________________________
                new files
 
 Eg: 
-$0 -prefix 'vlc.' -suffix '.jpg' -start 1 -end 10 -digits 3" 
+${0##*/} -prefix 'vlc.' -suffix '.jpg' -start 1 -end 10 -digits 3" 
 
   exit 1
 fi

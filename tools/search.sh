@@ -90,10 +90,10 @@ FLAG           ARGUMENT                                      Required?
 
 EXAMPLES
  
-$0 -w 'John' -filename '*.c'
+${0##*/} -w 'John' -filename '*.c'
 will search within all *.c files recursively for the word John and write out the name of the files that contain such a word
 
-$0 -i -git 'John' 
+${0##*/} -i -git 'John' 
 will search within all files including those within .git directories recursively for the string John (case insensitive) and write out the name of the files that contain such a string
 
 

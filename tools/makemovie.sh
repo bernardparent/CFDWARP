@@ -118,7 +118,7 @@ Flag         Arg                                      Required?
              your license allows you to run)
 
 Eg: 
-$0 -data data. -post post. -start 10 -end 12 -style rho.sty -movie rho.mp4
+${0##*/} -data data. -post post. -start 10 -end 12 -style rho.sty -movie rho.mp4
 will read in data.10,data.11,data.12 and post.10,post.11,post.12 and make a movie rho.mp4 according to the tecplot style rho.sty" 
 
   exit 1

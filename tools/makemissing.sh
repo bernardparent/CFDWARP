@@ -62,7 +62,7 @@ Flag         Arg                             Required?
 -end         counter end [int]               Y
 
 Eg: 
-$0 -file data. -start 10 -end 30 
+${0##*/} -file data. -start 10 -end 30 
 If data.11 is not present, will ln -s data.10 data.11
 If data.12 is not present, will ln -s data.11 data.12
 ..and so on until data.30

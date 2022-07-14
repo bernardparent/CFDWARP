@@ -102,7 +102,7 @@ Flag         Arg                                 Required?
 
 
 Eg: 
-$0 -warp './warp -r riemann.wrp' -data data. -post post. -start 10 -end 30 
+${0##*/} -warp './warp -r riemann.wrp' -data data. -post post. -start 10 -end 30 
 will do:
 ./warp -r riemann.wrp -i out.01.10 -op post.10
 ./warp -r riemann.wrp -i out.01.11 -op post.11

@@ -42,9 +42,9 @@ then
   /tmp/_tecplotpostfiles_$USER.sh
 }   else
 {
-  echo "tecplotpostfiles.sh must be called with 3 arguments:"
+  echo "${0##*/} must be called with 3 arguments:"
   echo " "
-  echo "./tecplotpostfiles.sh  post 1 20"
+  echo "${0##*/}  post 1 20"
   echo " "
   echo "where post is the name of the tecplot post file excluding the time step suffices"
   echo "  1 is first time step suffix (integer)"
