@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 13b
+  * in README
+    - updated the overview of CFDWARP
+    
+
 2022 JUL 13a
   * in tools/makepng.sh
     - Modified the tecplot macro script so that it is compatible with tecplot 2022 (the previous
