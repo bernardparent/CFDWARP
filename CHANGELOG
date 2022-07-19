@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 19a
+  * in model/chem/_C2H4_Air_Plasma_30s/chem.c
+    - added find_Te_from_EoverN_C2H4AIR()
+    - in add_W_Ionization_Adamovich() and add_dW_dx_Ionization_Adamovich(), changed the reaction
+      rates using from_Igor_v2.txt
+    - in find_Qei() and find_dQei_dx(), removed all electron impact excitation energies
+  
+
 2022 JUL 13b
   * in README
     - updated the overview of CFDWARP

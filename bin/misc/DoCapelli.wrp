@@ -83,16 +83,16 @@ Setup taken from:
 Hyungrok Do, Seong-kyun Im, Mark A. Cappelli, M. Godfrey Mungal, Plasma assisted flame ignition of supersonic flows over a flat wall, Combustion and Flame Vol. 157, 2010, Pages 2298–2305
 }
  
-
+mf=1;
 is=1;
-is1=50; {start of 1st electrode}
-is2=is1+25; {end of 1st electrode}
-is3=is2+85; {start of second electrode}
-is4=is3+25; {end of 2nd electrode}
-ie=is4+30;
+is1=round(50*mf); {start of 1st electrode}
+is2=is1+round(25*mf); {end of 1st electrode}
+is3=is2+round(85*mf); {start of second electrode}
+is4=is3+round(25*mf); {end of 2nd electrode}
+ie=is4+round(30*mf);
 js=1;
-js1=80;
-je=js1+35;
+js1=round(80*mf);
+je=js1+round(35*mf);
 
 
 xs=0.0;
@@ -106,8 +106,8 @@ ys=0.0;
 ys1=0.0007;
 ye=0.015;
 
-dwall=1e-6;
-dx=30e-6;
+dwall=1e-6/mf;
+dx=30e-6/mf;
 
 Grid(
   Size(is,js, ie,je);
@@ -259,10 +259,14 @@ Init(
     _______________________________________________________________________________________
 
     }
+    {RUN 1}
+    {========================}
     Vx=1000; {m/s}
-    Vy=0; {m/s}
     P=25000; {Pa}
     T=900; {K}
+    {------------------------}
+    
+    Vy=0; {m/s}
     Tv=T; {K}
     Te=T; {K}
     Species("C2H4","O2","N2","C2H4+","e-","default");
@@ -386,42 +390,93 @@ Cycle(
     sigmaref=3e-6; {reference value for the conductivity in S/m -> used to determine the local time step of the potential equation}
     Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
+  SteadyState(
+    if (mod(iter,50)==0,
+      WriteDataFile(outputfilename);
+    );
+    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
+    if (iter==1,
+      CFL=0.01;
+    );
+    Init(Epotential(
+      Region(is1,js,  is2,js,INITEMF_TYPE1,0);
+      Region(is3,js,  is4,js,INITEMF_TYPE1,0);
+    ););
+    CFL=min(CFL*1.05,0.5);
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
+    Lc=1e99;      {characteristic length scale in meters used to solve the emfield equation}
+    relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
+    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,50); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}
+    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,i_ximax,
+           j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
+  );
   DualTimeStepping(
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
       CFL=0.1;
     );
-    pulseperiod=10*1e-9; {seconds}
-    tmax=pulseperiod;    {simulation time span in seconds}
-    dt=tmax/80;   {physical time step in seconds}
-
+    {=================SETUP==================}
+    numpulses=5;
+    dischargeduration=10e-9; {seconds}
+    pulsefrequency=50000; {Hz}
     dphimax=15000; {Volts}
-    tlocal=time;
-    dphi=max(0,min(min(dphimax,dphimax*tlocal/pulseperiod*4),dphimax*(pulseperiod-tlocal)/pulseperiod*4));
-    Init(Epotential(
-      printf("%6.2Es %6.2EV ",tlocal,dphi);
-      Region(is1,js,  is2,js,INITEMF_TYPE1,-dphi/2);
-      Region(is3,js,  is4,js,INITEMF_TYPE1,+dphi/2);
-    ););
-    CFL=min(CFL*1.2,0.5);
-    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
-    Lc=1e20;      {characteristic length scale in meters used to solve the emfield equation}
-    relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,4);
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,200);
-    UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,200);
-    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
+    DRYRUN=FALSE;
+    {----------------------------------------}
+    
+    
+    pulseperiod=1/pulsefrequency; {seconds}
+    tmax=numpulses*pulseperiod;    {simulation time span in seconds}
+
+    tlocalperiod=(time/pulseperiod-floor(time/pulseperiod))*pulseperiod;
+
+    dtref=dischargeduration/(mf*80);
+    if (tlocalperiod<dischargeduration,
+      dt=dischargeduration/(mf*80);   {physical time step in seconds}    
+    ,{else}
+      dt=(pulseperiod-dischargeduration)/(mf*50);  
+    );
+    
+    dphi=max(0,min(min(dphimax,dphimax*tlocalperiod/dischargeduration*3),dphimax*(dischargeduration-tlocalperiod)/dischargeduration*3));
+    
+    if (DRYRUN,
+      if (iter>1,
+        IncreaseTimeLevel();
+        printf("t=%E  dt=%E  tlocal=%E  dphi=%E \n",time,dt,tlocalperiod,dphi);
+        if (time>tmax-0.1*dt,
+          exit(EXIT_SUCCESS);
+        );
+      );
+    ,{else}
+      Init(Epotential(
+        printf("%6.2Es %6.2EV ",tlocalperiod,dphi);
+        Region(is1,js,  is2,js,INITEMF_TYPE1,-dphi/2);
+        Region(is3,js,  is4,js,INITEMF_TYPE1,+dphi/2);
+      ););
+      CFL=min(CFL*1.2,0.5);
+      UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
+      Lc=1e20;      {characteristic length scale in meters used to solve the emfield equation}
+      relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
+      UpdateEMField(Lc,relaxEMF,dt,TSEMF_IMAF,4);
+      UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,200);
+      UpdateEMField(Lc,relaxEMF,dt,TSEMF_SOR,200);
+      printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
-    if ((ximax<xiverge && ximax_emfield<xiverge_emfield) || iter>60,
-      IncreaseTimeLevel();
-      WriteDataFile(outputfilename"."round(time/dt));
-      printf("dt=%E time=%Es\n",dt,time);
-      if (time>tmax-0.1*dt,
-        exit(EXIT_SUCCESS);
+    
+    
+      if ((ximax<xiverge && ximax_emfield<xiverge_emfield) || iter>120,
+        IncreaseTimeLevel();
+        WriteDataFile(outputfilename"."round(time/dtref));
+        printf("dt=%E time=%Es\n",dt,time);
+        if (time>tmax-0.1*dt,
+          exit(EXIT_SUCCESS);
+        );
       );
     );
+    
   );
 );
 
