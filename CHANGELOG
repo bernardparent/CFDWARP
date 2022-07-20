@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 20a
+  * in model/chem/_C2H4_Air_Plasma_30s/chem.c
+    - in add_W_Ionization_Adamovich() and add_dW_dx_Ionization_Adamovich(), fixed a bug related
+      to setting W, dWdX to 0
+    - in add_W_Ionization_Adamovich() and add_dW_dx_Ionization_Adamovich(), fixed a bug related
+      to the units of the reactions not involving fit4 (A should not be multiplied by calA here)
+      
+
 2022 JUL 19a
   * in model/chem/_C2H4_Air_Plasma_30s/chem.c
     - added find_Te_from_EoverN_C2H4AIR()
