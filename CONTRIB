@@ -52,6 +52,11 @@ HUI, Timothy
   - all files in model/chem/old/_lutz
 
 
+LAFOLEY, Spencer
+  
+  - addition of tools/chemkin2cfdwarp.c
+  
+  
 LEE, Jaehyuk
 
   - addition of EXM_invert_matrix_partial_pivoting() in   lib/exm/exm.c

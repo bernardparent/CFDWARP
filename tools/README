@@ -21,6 +21,9 @@ calc.c                       command line calculator that uses the SOAP language
 
 cathode.c                    finds the voltage drop through a cathode plasma sheath
 
+chemkin2cfdwarp.c            reads the data from an input file in Chemkin format and converts 
+                             it to CFDWARP format in an output file
+
 compressionfan.c             finds the x and y position of a prandtl-meyer compression 
                              surface
                              

@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 22a
+  * in tools/
+    - added chemkin2cfdwarp.c by Spencer LaFoley 
+  * in tools/Makefile
+    - added chemkin2cfdwarp to targets and sources sections. Also added chemkin2cfdwarp build rules.
+  * in tools/README
+    - added chemkin2cfdwarp.c to C Tools* list with a description.
+    
+
 2022 JUL 20a
   * in model/chem/_C2H4_Air_Plasma_30s/chem.c
     - in add_W_Ionization_Adamovich() and add_dW_dx_Ionization_Adamovich(), fixed a bug related
