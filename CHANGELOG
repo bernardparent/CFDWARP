@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 24a
+  * in model/share/emfield_share.c
+    - in find_E_at_interface(), fixed a bug: the discretization stencil used invalid nodes
+      when in the presence of a magnetic field
+      
+
 2022 JUL 23a
   * in model/share/emfield_share.c
     - in find_J_at_node_from_Jstar_at_interfaces(), some of the asserts checking if the node is valid
