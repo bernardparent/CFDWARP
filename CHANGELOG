@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 23a
+  * in model/share/emfield_share.c
+    - in find_J_at_node_from_Jstar_at_interfaces(), some of the asserts checking if the node is valid
+      were changed for TYPELEVEL_EMFIELD instead of TYPELEVEL_FLUID
+      
+
 2022 JUL 22a
   * in tools/
     - added chemkin2cfdwarp.c by Spencer LaFoley 
