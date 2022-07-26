@@ -147,6 +147,94 @@ void read_disc_fluid_actions(char *actionname, char **argum, SOAP_codex_t *codex
 }
 
 
+#ifdef _FLUID_FBODY_QADD
+void read_model_fluid_actions_Fbody_Qadd(char *actionname, char **argum, SOAP_codex_t *codex){
+  long i,j,k,dim;
+  zone_t zone;
+  gl_t *gl=((readcontrolarg_t *)codex->action_args)->gl;
+  np_t **np=((readcontrolarg_t *)codex->action_args)->np;
+
+  int pass;
+  long l;
+  dim_t xsphere;
+  double Q,R,Rsphere,P;
+  double Pfirstpass;
+#ifdef DISTMPI
+  double Pfirstpass_sum;
+#endif
+
+  if (strcmp(actionname,"SetHeatDeposited")==0) {
+    SOAP_substitute_all_argums(argum, codex);
+    if (SOAP_number_argums(*argum)!=nd*2+1)
+      SOAP_fatal_error(codex,"Number of arguments not equal to %ld in SetHeatDeposited(); action.",nd*2+1);
+    find_zone_from_argum(*argum, 0, gl, codex, &zone);
+    for_ijk(zone,is,js,ks,ie,je,ke){
+          if (is_node_in_zone(i, j, k, gl->domain_lim)){
+            (*np)[_ai(gl,i,j,k)].bs->Qadd=SOAP_get_argum_double(codex,*argum,2*nd);
+          }
+    }
+    codex->ACTIONPROCESSED=TRUE;    
+  }
+
+
+  if (strcmp(actionname,"SetBodyForce")==0) {
+    SOAP_substitute_all_argums(argum, codex);
+    if (SOAP_number_argums(*argum)!=nd*2+nd)
+      SOAP_fatal_error(codex,"Number of arguments not equal to %ld in SetBodyForce(); action.",nd*2+nd);
+    find_zone_from_argum(*argum, 0, gl, codex, &zone);
+    for_ijk(zone,is,js,ks,ie,je,ke){
+          if (is_node_in_zone(i, j, k, gl->domain_lim)){
+            for (dim=0; dim<nd; dim++) (*np)[_ai(gl,i,j,k)].bs->Fbody[dim]=SOAP_get_argum_double(codex,*argum,2*nd+dim);
+          }
+    }
+    codex->ACTIONPROCESSED=TRUE;
+  }
+
+  if (strcmp(actionname,"AddHeatPoint")==0) {
+    SOAP_substitute_all_argums(argum, codex);
+    if (SOAP_number_argums(*argum)!=nd+2)
+      SOAP_fatal_error(codex,"Number of arguments not equal to %ld in AddHeatPoint(); action.",nd+1);
+    for (dim=0; dim<nd; dim++) xsphere[dim]=SOAP_get_argum_double(codex,*argum,dim);
+    Rsphere=SOAP_get_argum_double(codex,*argum,nd);
+    P=SOAP_get_argum_double(codex,*argum,nd+1);
+    Pfirstpass=0.0;
+    if (P<0.0){
+      SOAP_fatal_error(codex,"Heat added in AddHeatPoint() can not be negative.");
+    }
+    if (P>0.0){
+     for (pass=1; pass<=2; pass++){
+      for_ijk(gl->domain,is,js,ks,ie,je,ke){
+            l=_ai(gl,i,j,k);
+            // only add heat to inner nodes, because heat addition has no effect on boundary nodes
+            if (is_node_inner((*np)[l],TYPELEVEL_FLUID)) {
+              R=0.0;
+              for (dim=0; dim<nd; dim++) R+=sqr(xsphere[dim]-_x((*np)[l],dim));
+              if (R<sqr(Rsphere)){
+                R=sqrt(R);
+                Q=3.0/pi/(Rsphere*Rsphere*Rsphere*Rsphere)*(Rsphere-R)*P;
+                if (pass==1){
+                  Pfirstpass+=Q*_Omega((*np)[l],gl);
+                } else {
+                  // here, multiply by P/Pfirstpass to ensure that the energy given to the flow corresponds exactly to P
+                  (*np)[l].bs->Qadd+=Q*P/Pfirstpass;
+                }
+              }
+            }
+      }
+#ifdef DISTMPI
+      MPI_Allreduce(&Pfirstpass, &Pfirstpass_sum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      Pfirstpass=Pfirstpass_sum;
+#endif
+      if (Pfirstpass/(P+1e-30)<1e-5) {
+        SOAP_fatal_error(codex,"Problem finding nodes on which to distribute heat within AddHeatPoint(). Increase the radius or change the x,y,z parameters. Power_firstpass=%EW Power_desired=%EW.",Pfirstpass,P);
+      }
+     }
+    }
+    codex->ACTIONPROCESSED=TRUE;
+  }
+
+}
+#endif
 
 
 void find_chi_inverse(dim2_t X, dim2_t ChiInv){

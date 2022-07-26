@@ -323,7 +323,7 @@ typedef struct {
    double Omega,Omega_int[nd];
    dim2_t X,X_int[nd];
 
-#ifdef _FLUID_NAVIERSTOKESPERFECT
+#ifdef _FLUID_FBODY_QADD
    dim_t Fbody;
    double Qadd;
 #endif

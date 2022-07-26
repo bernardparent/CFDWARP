@@ -1505,10 +1505,11 @@ static void BA_fprintf(char **argum, SOAP_codex_t *codex){
   SOAP_get_argum_string(codex, &filename, *argum, 0);
   if (codex->FILEOUTPUT) {
     /* here, append to the file named in the first argument */
-    stream=fopen(filename,"a");
+    if (strcmp(filename,"stdout")==0) stream=stdout;
+      else stream=fopen(filename,"a");
     /* send everything to printf*/
     SOAP_printf((int)numargum-1,argv,stream);
-    fclose(stream);
+    if (stream!=stdout) fclose(stream);
   }
   /* free pointers */
   for (cnt=1; cnt<numargum; cnt++) free(argv[cnt-1]);

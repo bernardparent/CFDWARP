@@ -66,6 +66,11 @@ void write_model_fluid_template(FILE **controlfile){
 #ifdef _2D
     "    AXISYMMETRIC=NO;\n"
 #endif
+    "    SetBodyForce(is,"if2DL("js,")if3DL("ks,")" ie,"if2DL("je,")if3DL("ke,")" 0.0{N/m3}"if2DL(",0.0{N/m3}")if3DL(",0.0{N/m3}")");\n"
+    "    SetHeatDeposited(is,"if2DL("js,")if3DL("ks,")" ie,"if2DL("je,")if3DL("ke,")" 0.0 {W/m3});\n"
+    "    {\n"
+    "    AddHeatPoint(0.0{x,m},"if2DL("0.0{y,m},")if3DL("0.0{z,m},")" 0.1{radius,m}, 0.0{W"if2D("/m")"});\n"
+    "    }\n"
     "  );\n"
   ,_FLUID_ACTIONNAME);
 
@@ -96,11 +101,12 @@ void write_cycle_fluid_template(FILE **controlfile){
 
 
 void read_model_fluid_actions_2(char *actionname, char **argum, SOAP_codex_t *codex){
+  read_model_fluid_actions_Fbody_Qadd(actionname, argum, codex);
 }
 
 
 void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *codex){
-  long numvarsinit;
+  long numvarsinit,i,j,k,dim;
   void (*action_original) (char *, char **, struct SOAP_codex_t *);
   gl_t *gl=((readcontrolarg_t *)codex->action_args)->gl;
   if (strcmp(actionname,_FLUID_ACTIONNAME)==0) {
@@ -116,6 +122,15 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
 
     gl->MODEL_FLUID_READ=TRUE;
     
+    if (!gl->CONTROL_READ){
+      gl->MODEL_FLUID_READ=TRUE;
+      for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
+          (*((readcontrolarg_t *)codex->action_args)->np)[_ai(((readcontrolarg_t *)codex->action_args)->gl,i,j,k)].bs->Qadd=0.0e0;
+          for (dim=0; dim<nd; dim++) {
+              (*((readcontrolarg_t *)codex->action_args)->np)[_ai(((readcontrolarg_t *)codex->action_args)->gl,i,j,k)].bs->Fbody[dim]=0.0e0;
+          }
+      }
+    }
     action_original=codex->action;
     codex->action=&read_model_fluid_actions_2;
     SOAP_process_code(*argum, codex, SOAP_VARS_KEEP_ALL);

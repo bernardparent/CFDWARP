@@ -25,7 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -48,24 +47,21 @@ int check_fit(char Line_str[]);
 int search_current_line(char Line_str[], int* way, int* tot, FILE* output, int loc);
 int number_of_reactants(char Line_str[]);
 int number_of_products(char Line_str[]);
-
+int process_flag_string(int argc, char **argv, char *flag, char** arg);
+int find_remaining_options(int argc, char **argv, char **options);
 
 int main(int argc, char **argv) {
 
-
-  char *inpfile, *outfile; 
-  
-
+  char *inpfile, *outfile;
   bool VALIDOPTIONS = TRUE;
   char *options;
   int RET, run;
   options = NULL;
   
-   inpfile =(char *)malloc(4000*sizeof(char));
-   strcpy(inpfile,argv[1]);
-   outfile =(char *)malloc(4000*sizeof(char));
-   strcpy(outfile,argv[2]);
-
+  
+   inpfile =(char *)malloc(400*sizeof(char));
+   outfile =(char *)malloc(400*sizeof(char));
+  
   if (process_flag_string(argc, argv, "-i", &inpfile)!=2) VALIDOPTIONS=FALSE;
   if (process_flag_string(argc, argv, "-o", &outfile)!=2) VALIDOPTIONS=FALSE;
   
@@ -76,7 +72,7 @@ int main(int argc, char **argv) {
              "-i        Input file              string       Y\n"
              "-o        Output file             string       Y\n\n"
              "Eg: \n"
-             "./chemkin2cfdwarp -i input.txt -o output.txt \nWill convert input.txt in Chemkin format to output.txt in CFDWARP format\n\n");
+             "./chemkin2cfdwarp -i input.txt -o output.c \nWill convert input.txt in Chemkin format to output.c in CFDWARP format\n\n");
     exit (EXIT_FAILURE);
   }
   RET = find_remaining_options ( argc, argv, &options );

@@ -7,6 +7,24 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 25a
+  * in model/fluid/_Favre-Reynolds/fluid.c
+    - in write_model_fluid_template(), added templates for body forces and heat addition
+    - in read_model_fluid_actions_2(), calls read_model_fluid_actions_Fbody_Qadd()
+    - in read_model_fluid_actions(), initialize Qadd and Fbody
+  * in model/fluid/_Favre-Reynolds/fluid.hh and model/fluid/_Navier-Stokes_perfect/fluid.hh
+    - added #define _FLUID_FBODY_QADD
+  * in model/fluid/_Favre-Reynolds/fluid_source.c
+    - in find_Sstar(), added Qadd and Fbody contributions
+  * in model/fluid/_Navier-Stokes_perfect/fluid.c
+    - in read_model_fluid_actions_2(), replaced all the coding by a call to 
+      read_model_fluid_actions_Fbody_Qadd()
+  * in model/share/fluid_share.c
+    - added read_model_fluid_actions_Fbody_Qadd()
+  * in tools/chemkin2cfdwarp.c
+    - fixed bugs that lead to a crash when called with no flags
+    
+
 2022 JUL 24a
   * in model/share/emfield_share.c
     - in find_E_at_interface(), fixed a bug: the discretization stencil used invalid nodes

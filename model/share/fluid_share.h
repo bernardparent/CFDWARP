@@ -12,6 +12,8 @@
 #endif
 
 
+void read_model_fluid_actions_Fbody_Qadd(char *actionname, char **argum, SOAP_codex_t *codex);
+
 void find_chi_inverse(dim2_t X, dim2_t ChiInv);
 
 #if defined(_FLUID_NEUTRALSTRANSPORT)
