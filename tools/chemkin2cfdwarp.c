@@ -32,23 +32,57 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #include "share.h"
 
-void make_function(int run, FILE* input, FILE* output);
-void print_head(int run, FILE* output);
-void check_above(char oldLine[], char prevLine[], char lastLine[], char newLine[], int* ind, int* e, int* Q);
-void print_begin(char oldLine[], char prevLine[], char lastLine[], char newLine[], int ind, int e, int Q, int way, int tot, int run, int numR, int numP, FILE* output);
-void print_elem0(char oldLine[], FILE* output, int numR, int numP);
-void print_num0(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output);
-void print_num1(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output, int run);
-void print_Q(char line[], FILE* output);
-void print_Q2(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output, char newLine[], char lastLine[], int Q, int e, int run);
+ // Given the cycle run of the program, build the appropriate function in the output file
+void build_current_function(int run, FILE* input, FILE* output);
+
+ // Given the cycle run of the program, print the aprropriate function header in the output file
+void print_function_header(int run, FILE* output); 
+
+ // Given an input line containing a reaction, classify the reaction in terms of fit, electron temperature, and Qei and return their indicators
+void check_all_indicators_formfit_electrontemperature_Q(char oldLine[], char prevLine[], char lastLine[], char newLine[], int* ind, int* e, int* Q);
+
+ // Print the output of a line containing a reaction to the output file according to what function is currently being built
+void print_output_line(char oldLine[], char prevLine[], char lastLine[], char newLine[], int ind, int e, int Q, int way, int tot, int run, int numR, int numP, FILE* output);
+
+ // Print the elements of the add Ionization Adamovich functions 
+void print_elements_add_Adamovich(char oldLine[], FILE* output, int numR, int numP);
+
+ // Print the numbers of the add Ionization Adamovich functions
+void print_numbers_add_Adamovich(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output);
+
+ // Print the primary element and other information of the find Qei functions
+void print_info_find_Qei(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output, char newLine[], char lastLine[], int Q, int e, int run);
+
+ // Print the numbers of the find Qei functions
+void print_numbers_find_Qei(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output, int run);
+
+ // Print the EXCI value of the Qei functions
+void print_Qei_value(char line[], FILE* output);
+
+ // Check a reaction line if there is a Qei value
 int check_Q(char line[]);
-int check_elec(char line[]);
-int check_fit(char Line_str[]);
-int search_current_line(char Line_str[], int* way, int* tot, FILE* output, int loc);
+
+ // Check a reaction line if there is an electron temperature indicator
+int check_electron_temperature(char line[]);
+
+ // Check a reaction line if it is in standard or fitted form
+int check_fitted_form(char Line_str[]);
+
+ // Check the current line if a reaction is present, indicating the direction, location, and total count of the reaction
+int check_reaction_current_line(char Line_str[], int* way, int* tot, FILE* output, int loc);
+
+ // Return the number of reactants in a reaction line
 int number_of_reactants(char Line_str[]);
+
+ // Return the number of products in a reaction line
 int number_of_products(char Line_str[]);
+
+ // Check that the correct flags are used in terminal execution
 int process_flag_string(int argc, char **argv, char *flag, char** arg);
+
+ // Check that there are no extra commands given beyond the required flags
 int find_remaining_options(int argc, char **argv, char **options);
+
 
 int main(int argc, char **argv) {
 
@@ -59,13 +93,13 @@ int main(int argc, char **argv) {
   options = NULL;
   
   
-   inpfile =(char *)malloc(400*sizeof(char));
-   outfile =(char *)malloc(400*sizeof(char));
+  inpfile =(char *)malloc(400*sizeof(char));
+  outfile =(char *)malloc(400*sizeof(char));
   
   if (process_flag_string(argc, argv, "-i", &inpfile)!=2) VALIDOPTIONS=FALSE;
   if (process_flag_string(argc, argv, "-o", &outfile)!=2) VALIDOPTIONS=FALSE;
   
-   if (!VALIDOPTIONS) {
+  if (!VALIDOPTIONS) {
     fprintf (stderr, "\nPROBLEM WITH FLAGS\n\n\nRequired and Optional Flags:\n\n"
              "Flag      Arg                     Arg Type     Required?\n"
              "----------------------------------------------------------\n"
@@ -92,8 +126,8 @@ int main(int argc, char **argv) {
   
 	for (run = 0; run != 4; run++) {
 
-		print_head(run, output);
-		make_function(run, input, output);
+		print_function_header(run, output);
+		build_current_function(run, input, output);
 		fprintf(output, "}\n\n");
     }
     
@@ -102,6 +136,8 @@ int main(int argc, char **argv) {
   }
 
 	free ( options );
+  free ( inpfile );
+  free ( outfile );
   return(EXIT_SUCCESS);
 }
 
@@ -109,7 +145,7 @@ int main(int argc, char **argv) {
 
 
 
-int number_of_reactants(char Line_str[]) {									// This function determines the reactant count
+int number_of_reactants(char Line_str[]) {									// This function determines the reactant count from the reaction line
 	int i = 0, j = 0, num = 1;
 	for (j = 0; Line_str[i] != '='; j++) {
 		if (Line_str[i] == '\t')
@@ -119,7 +155,7 @@ int number_of_reactants(char Line_str[]) {									// This function determines t
 		else if (Line_str[i] == ' ')
 			j--, i++;
 		else if (Line_str[i] == '+' && Line_str[i - 1] == ' ')
-			num++, i++, j--;
+			num++, i++, j--;                                            // The presence of a '+' sign prior to the equal sign adds to the reactant count
 		else if (Line_str[i] == '(' || Line_str[i] == ')') {
 			Line_str[i] = ' ';
 			i++, j--;
@@ -130,16 +166,15 @@ int number_of_reactants(char Line_str[]) {									// This function determines t
 					i++;
 				else if (Line_str[i] == '<' || Line_str[i] == '>')
 					break;
-				else {
+				else
 					i = i + 1;
-				}
 			}
 		}
 	}
 	return num;																// returns the number of reactants
 }
 
-int number_of_products(char Line_str[]) {									// This function determines the product count
+int number_of_products(char Line_str[]) {									// This function determines the product count from the reaction line
 	int i = 0, j = 0, num = 1;
 
 	while (Line_str[i] != '>')
@@ -151,7 +186,7 @@ int number_of_products(char Line_str[]) {									// This function determines th
 		else if (Line_str[i] == ' ')
 			i++;
 		else if (Line_str[i] == '+' && Line_str[i - 1] == ' ')
-			num++, i++;
+			num++, i++;                                        // The presence of a '+' sign after the equal sign adds to the reactant count
 		else if (Line_str[i] == '(' || Line_str[i] == ')') {
 			Line_str[i] = ' ';
 			i++;
@@ -170,7 +205,7 @@ int number_of_products(char Line_str[]) {									// This function determines th
 	return num;																// returns the number of products
 }
 
-int check_elec(char line[]) {												// This function checks if a reaction should use Te or T
+int check_electron_temperature(char line[]) {												// This function checks if a reaction should use Te or T
 	int i = 0, result = 0;
 	for (i = 0; line[i] != '\n'; i++) {
 		if (line[i] == 'T' && line[i + 1] == 'D' && line[i + 2] == 'E' && line[i + 3] == 'P' && line[i + 4] == '/' && line[i + 5] == 'E' && line[i + 6] == '/')
@@ -179,7 +214,7 @@ int check_elec(char line[]) {												// This function checks if a reaction s
 	return result;															// 1 is returned if Te, 0 is returned if T
 }
 
-int check_fit(char Line_str[]) {											// This function classifies a reaction between fitted and standard
+int check_fitted_form(char Line_str[]) {											// This function classifies a reaction between fitted and standard form
 	int i, num = 0;
 	for (i = 0; Line_str[i] != '\n'; i++) {
 		if (Line_str[i] == 'F' && Line_str[i + 1] == 'I' && Line_str[i + 2] == 'T') {
@@ -188,7 +223,7 @@ int check_fit(char Line_str[]) {											// This function classifies a reactio
 	}
 	return num;																// returns 0 if the reaction is a standard form, 1 if it is fitted form
 }
-void print_head(int run, FILE* output) {
+void print_function_header(int run, FILE* output) {       // This function prints the appropriate function header based on the current run
 	if (run == 0) {
 		fprintf(output, "void add_W_Ionization_Adamovich ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {\n  double N[ns];\n  double R;\n  long k;\n  spec_t X;\n\n  for ( k = 0; k < ns; k++ ) {\n  \tN[k] = rhok[k] / _calM (k) * 1.0e-6 * calA;\t\t/* particules/cm^3 */\n  \tX[k] = rhok[k] / _calM (k) * 1.0e-6;\t\t/* mole/cm^3 */\n  }\n  R = 1.9872;\n\n");
 	}
@@ -203,7 +238,7 @@ void print_head(int run, FILE* output) {
 	}
 }
 
-int check_Q(char line[]) {
+int check_Q(char line[]) {            // This function indicates whether or not there is the variable for the Qei function
 	int i = 0, ind = 0;
 
 	for (i = 0; line[i] != '\0'; i++) {
@@ -215,7 +250,7 @@ int check_Q(char line[]) {
 	return ind;
 }
 
-void print_Q(char line[], FILE* output) {
+void print_Qei_value(char line[], FILE* output) {   // This function prints the Qei function value
 	int i = 0, k = 0, j = 0;
 	char Qei[10];									// initialize Qei[]
 	while (line[i] != '/')
@@ -237,7 +272,7 @@ void print_Q(char line[], FILE* output) {
 	fprintf(output, ", ");
 }
 
-void print_Q2(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output, char newLine[], char lastLine[], int Q, int e, int run) {
+void print_info_find_Qei(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output, char newLine[], char lastLine[], int Q, int e, int run) {                        // This function prints information on the find Qei functions such as primary element, numbers, fit, etc
 	int i = 0, j = 0, k = 0;
 	char reactants[10][12];										// create a string array to hold reactant names
 	for (j = 0; oldLine[i] != '='; j++) {
@@ -277,18 +312,18 @@ void print_Q2(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE
 	}
 	fprintf(output, ", ");
 	if (Q == 1)
-		print_Q(newLine, output);
+		print_Qei_value(newLine, output);
 	if (Q == 2)
-		print_Q(prevLine, output);
+		print_Qei_value(prevLine, output);
 	if (Q == 3)
-		print_Q(lastLine, output);
+		print_Qei_value(lastLine, output);
 	if (ind == 1) {												// printing fitted form numbers
 		fprintf(output, "_kfit4(");
 		if (e == 1)
 			fprintf(output, "Te, ");
 		else
 			fprintf(output, "T, ");
-		print_num1(oldLine, prevLine, numR, numP, ind, output, run);
+		print_numbers_find_Qei(oldLine, prevLine, numR, numP, ind, output, run);
 	}
 	else if (ind == 0) {											// printing standard form numbers
 		fprintf(output, "_k(");
@@ -296,11 +331,11 @@ void print_Q2(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE
 			fprintf(output, "Te, ");
 		else
 			fprintf(output, "T, ");
-		print_num1(oldLine, prevLine, numR, numP, ind, output, run);
+		print_numbers_find_Qei(oldLine, prevLine, numR, numP, ind, output, run);
 	}
 }
 
-void print_num0(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output) {
+void print_numbers_add_Adamovich(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output) {
 	char numsF[6][12], numsS[3][12];
 	if (ind == 1) {										// builds an array to store the numbers of a fitted form reaction
 		int i = 0, h = 0, j = 0, k = 0;
@@ -401,7 +436,7 @@ void print_num0(char oldLine[], char prevLine[], int numR, int numP, int ind, FI
 			if (dec == 0)
 				numsS[j][v] = '.', numsS[j][v + 1] = '0', numsS[j][v + 2] = '\0';
 		}
-		for (j = 0; j < 3; j++) {
+		for (j = 0; j < 3; j++) {             
 			for (i = 0; numsS[j][i] != '\0'; i++)
 				fprintf(output, "%c", numsS[j][i]);
 			fprintf(output, ", ");
@@ -409,7 +444,7 @@ void print_num0(char oldLine[], char prevLine[], int numR, int numP, int ind, FI
 	}
 }
 
-void print_num1(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output, int run) {
+void print_numbers_find_Qei(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output, int run) {
 	char numsF[6][12], numsS[3][12];
 	if (ind == 1) {										// builds an array to store the numbers of a fitted form reaction
 		int i = 0, h = 0, j = 0, k = 0;
@@ -526,7 +561,7 @@ void print_num1(char oldLine[], char prevLine[], int numR, int numP, int ind, FI
 	fprintf(output, "\n");
 }
 
-void print_elem0(char oldLine[], FILE* output, int numR, int numP) {
+void print_elements_add_Adamovich(char oldLine[], FILE* output, int numR, int numP) {
 	int i = 0, j = 0, k = 0;
 	char reactants[10][12];										// create a string array to hold reactant names
 	for (j = 0; oldLine[i] != '='; j++) {
@@ -620,7 +655,7 @@ void print_elem0(char oldLine[], FILE* output, int numR, int numP) {
 }
 
 
-void print_begin(char oldLine[], char prevLine[], char lastLine[], char newLine[], int ind, int e, int Q, int way, int tot, int run, int numR, int numP, FILE* output) {
+void print_output_line(char oldLine[], char prevLine[], char lastLine[], char newLine[], int ind, int e, int Q, int way, int tot, int run, int numR, int numP, FILE* output) {
 
 	if (run == 0) {																		// Begin printing first function
 		fprintf(output, "  if (IONIZATIONREACTION[%d])\n", tot);						// begin printing information in output file
@@ -632,8 +667,8 @@ void print_begin(char oldLine[], char prevLine[], char lastLine[], char newLine[
 			fprintf(output, "_fit4(");									// printing fit information
 		else
 			fprintf(output, "(");
-		print_elem0(oldLine, output, numR, numP);
-		print_num0(oldLine, prevLine, numR, numP, ind, output);
+		print_elements_add_Adamovich(oldLine, output, numR, numP);
+		print_numbers_add_Adamovich(oldLine, prevLine, numR, numP, ind, output);
 		if (e == 1)														// printing temperature Te vs T information
 			fprintf(output, "Te, X, W);");
 		else
@@ -650,8 +685,8 @@ void print_begin(char oldLine[], char prevLine[], char lastLine[], char newLine[
 			fprintf(output, "_fit4(");									// printing fit information
 		else
 			fprintf(output, "(");
-		print_elem0(oldLine, output, numR, numP);
-		print_num0(oldLine, prevLine, numR, numP, ind, output);
+		print_elements_add_Adamovich(oldLine, output, numR, numP);
+		print_numbers_add_Adamovich(oldLine, prevLine, numR, numP, ind, output);
 		if (e == 1)														// printing temperature Te vs T information
 			fprintf(output, "Te, X, dWdTe, dWdrhok);");
 		else
@@ -661,28 +696,28 @@ void print_begin(char oldLine[], char prevLine[], char lastLine[], char newLine[
 	else if (run == 2 && Q != 0) {
 		fprintf(output, "  \t\tif (IONIZATIONREACTION[%d])\n", tot);
 		fprintf(output, "  \t\t\tadd_to_Qei(spec");
-		print_Q2(oldLine, prevLine, numR, numP, ind, output, newLine, lastLine, Q, e, run);					// func HERE__________printing R/P/#/ending of run 2
+		print_info_find_Qei(oldLine, prevLine, numR, numP, ind, output, newLine, lastLine, Q, e, run);					
 
 	}
-	else if (run == 3 && Q == 1) {
+	else if (run == 3 && Q != 0) {
 		fprintf(output, "  \t\tif (IONIZATIONREACTION[%d])\n", tot);
 		fprintf(output, "  \t\t\tadd_to_dQei(spec");
-		print_Q2(oldLine, prevLine, numR, numP, ind, output, newLine, lastLine, Q, e, run);			// func HERE__________printing R/P/#/ending of run 3
+		print_info_find_Qei(oldLine, prevLine, numR, numP, ind, output, newLine, lastLine, Q, e, run);			
 
 	}
 }
 
 
-void check_above(char oldLine[], char prevLine[], char lastLine[], char newLine[], int* ind, int* e, int* Q) {
-
-	*ind = check_fit(prevLine);
+void check_all_indicators_formfit_electrontemperature_Q(char oldLine[], char prevLine[], char lastLine[], char newLine[], int* ind, int* e, int* Q) {
+                      // This function checks indicators such as form fit, electron temp, and Qei
+	*ind = check_fitted_form(prevLine);
 	if (*ind == 1) {
-		*e = check_elec(lastLine);								// call function to check Te or T in reaction
+		*e = check_electron_temperature(lastLine);								
 		if (check_Q(newLine) == 1)
 			*Q = 1;
 	}
 	else {
-		*e = check_elec(prevLine);
+		*e = check_electron_temperature(prevLine);
 		if (check_Q(prevLine) == 1)
 			*Q = 2;
 		if (*Q == 0)
@@ -691,7 +726,7 @@ void check_above(char oldLine[], char prevLine[], char lastLine[], char newLine[
 	}
 }
 
-void make_function(int run, FILE* input, FILE* output) {
+void build_current_function(int run, FILE* input, FILE* output) {       // This function builds the C code in the output of the appropriate function based on the cycle run
 	char newLine[300], oldLine[300], prevLine[300], lastLine[300];
 	int loc = 0, numR = 0, numP = 0, tot = 0, ind = 0, check = 0, e = 0, way = 10, Q = 0;
 
@@ -703,17 +738,12 @@ void make_function(int run, FILE* input, FILE* output) {
 	while (fgets(newLine, 300, input) != NULL) {					  // searches each line until the end of the document
 		loc++;
 		Q = 0, way = 10, e = 0, check = 0, ind = 0;
-		if (loc == 41 && run == 3)
-			loc = loc;
-		check = search_current_line(oldLine, &way, &tot, output, loc);
-		if (tot == 18)
-			tot = tot;
+		check = check_reaction_current_line(oldLine, &way, &tot, output, loc);
 		if (check == 1 || check == 3) {
-			ind = check_fit(prevLine);
-			check_above(oldLine, prevLine, lastLine, newLine, &ind, &e, &Q);
+			check_all_indicators_formfit_electrontemperature_Q(oldLine, prevLine, lastLine, newLine, &ind, &e, &Q);
 			numR = number_of_reactants(oldLine);
 			numP = number_of_products(oldLine);
-			print_begin(oldLine, prevLine, lastLine, newLine, ind, e, Q, way, tot, run, numR, numP, output);
+			print_output_line(oldLine, prevLine, lastLine, newLine, ind, e, Q, way, tot, run, numR, numP, output);
 		}
 		strcpy(oldLine, prevLine);									// shifts line storage to next line
 		strcpy(prevLine, lastLine);
@@ -723,7 +753,7 @@ void make_function(int run, FILE* input, FILE* output) {
 }
 
 
-int search_current_line(char Line_str[], int* way, int* tot, FILE* output, int loc) {						// This functions checks a line for a reaction
+int check_reaction_current_line(char Line_str[], int* way, int* tot, FILE* output, int loc) {						// This functions checks a line for a reaction and also the direction of the reaction
 	int i, num = 0;
 	for (i = 0; Line_str[i] != '\n'; i++) {
 		if (Line_str[i] == '=' && Line_str[i + 1] == '>' && (Line_str[i - 2] != ' ' || Line_str[i + 2] != ' ') && Line_str[i - 1] == '<') {

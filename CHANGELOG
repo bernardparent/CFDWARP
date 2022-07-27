@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 26a
+  * in tools/chemkin2cfdwarp.c
+    - added comments describing each function
+    - fixed a memory leak
+  * in model/emfield/_Epotential*/emfield.c
+    - in write_disc_emfield_template(), added a better description of what Ediv does
+    
+ 
 2022 JUL 25a
   * in model/fluid/_Favre-Reynolds/fluid.c
     - in write_model_fluid_template(), added templates for body forces and heat addition
@@ -23,7 +31,10 @@ ________________________________________________________________________________
     - added read_model_fluid_actions_Fbody_Qadd()
   * in tools/chemkin2cfdwarp.c
     - fixed bugs that lead to a crash when called with no flags
-    
+  * in lib/soap/soap.c
+    - in BA_fprintf(), made modifications so that when the output file is "stdout", the output
+      is directed to the terminal's stdout instead of the file "./stdout".
+
 
 2022 JUL 24a
   * in model/share/emfield_share.c
