@@ -65,7 +65,7 @@ void write_options ( FILE * outputfile ) {
 #endif
   write_options_row ( outputfile, "-h", "none", "List command line options", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-i", "string", "Input binary data file", line_width, LENGTH_COL1, LENGTH_COL2 );
-  write_options_row ( outputfile, "-im", "string", "Input binary (MPI) data file", line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-im", "string", "Input binary (MPI) data file (EXPERIMENTAL)", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-ia", "string", "Input ascii data file", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-ii", "string", "Input interpolation data file", line_width, LENGTH_COL1, LENGTH_COL2 );
 #ifdef UNSTEADY
@@ -79,14 +79,14 @@ void write_options ( FILE * outputfile ) {
   write_options_row ( outputfile, "-i3", "string", "Input time level minus 3 binary data file",
                       line_width, LENGTH_COL1, LENGTH_COL2 );
 #endif
-  write_options_row ( outputfile, "-im1", "string", "Input time level minus 1 binary (MPI) data file",
+  write_options_row ( outputfile, "-im1", "string", "Input time level minus 1 binary (MPI) data file (EXPERIMENTAL)",
                       line_width, LENGTH_COL1, LENGTH_COL2 );
 #if _RESTIME_BW > 2
-  write_options_row ( outputfile, "-im2", "string", "Input time level minus 2 binary (MPI) data file",
+  write_options_row ( outputfile, "-im2", "string", "Input time level minus 2 binary (MPI) data file (EXPERIMENTAL)",
                       line_width, LENGTH_COL1, LENGTH_COL2 );
 #endif
 #if _RESTIME_BW > 3
-  write_options_row ( outputfile, "-im3", "string", "Input time level minus 3 binary (MPI) data file",
+  write_options_row ( outputfile, "-im3", "string", "Input time level minus 3 binary (MPI) data file (EXPERIMENTAL)",
                       line_width, LENGTH_COL1, LENGTH_COL2 );
 #endif
 #endif
@@ -106,7 +106,7 @@ void write_options ( FILE * outputfile ) {
 #endif
   write_options_row ( outputfile, "-nvr", "none", "No vars resetting at end of cycle module", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-o", "string", "Output binary data file", line_width, LENGTH_COL1, LENGTH_COL2 );
-  write_options_row ( outputfile, "-om", "string", "Output binary (MPI) data file", line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-om", "string", "Output binary (MPI) data file (EXPERIMENTAL)", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-oa", "string", "Output ascii data file", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-oi", "string", "Output interpolation data file", line_width, LENGTH_COL1, LENGTH_COL2 );
   sprintf(tmpstr,"%d int",nd+1);

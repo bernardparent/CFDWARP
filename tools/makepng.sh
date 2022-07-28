@@ -213,7 +213,6 @@ while [ $i -le $ie ]
   IncludeFrameSizeAndPosition = No
 \$!PrintSetup Palette = Color
 \$!ExportSetup ImageWidth = "$imagewidth"
-\$!ExportSetup ConvertTo256Colors = Yes
 \$!ExportSetup ExportFName = './$pngfilename$iw.png'
 \$!Export
   ExportRegion = AllFrames" >> __makepng.$iw.mcr

@@ -7,6 +7,25 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 27a
+  * in model/chem
+    - added _C2H4_Air_23s
+  * in model/transport/doc/report.tex
+    - fixed a mistake in the table outlining the ion mobilities
+  * in src/control.c
+    - added Zettervall bib
+  * in src/main.c
+    - in write_options(), added "(EXPERIMENTAL)" to the mpi input and output (-im, -im1, -om etc) 
+      flags
+  * in tools/chemkin2cfdwarp.c
+    - fixed a bug related to the UNIX vs Windows end of line characters. Now, the code should
+      work whether the CHEMKIN file was written with a Windows or a UNIX editor
+    - made the description of the functions more detailed
+  * in tools/makepng.sh
+    - got rid of "ConvertTo256Colors = Yes". This leads to problems when too many contour
+      levels are specified in the style file
+      
+
 2022 JUL 26a
   * in tools/chemkin2cfdwarp.c
     - added comments describing each function

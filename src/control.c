@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   typedef GRIDG_gl3d_t glgrid_t;
 #endif
 
-#define numbib 52
+#define numbib 53
 #define maxstrlen 10000
 
 typedef char longstr_t[maxstrlen];
@@ -103,6 +103,7 @@ const static longstr_t bibname[numbib]=
    "parent2007a",
    "kim2021a",
    "parent2022a",
+   "zettervall2017a",
    "dixonlewis1984a",
    "gupta1990a",
    "capitelli2015a"
@@ -255,6 +256,9 @@ const static longstr_t bib[numbib]=
 
    //parent2022a 
    "Parent, B. and Thoguluva Rajendran, P. and Omprakas, A.. \"Electron Losses in Hypersonic Flows.\" Physics of Fluids 34:016110, 2022.",
+   
+   //zettervall2017a 
+   "Zettervall, N., Fureby, C., and Nilsson, E. J., \"Small skeletal kinetic reaction mechanism for ethylene–air combustion.\" Energy and Fuels 31(12):14138–14149, 2017.",
    
    //dixonlewis1984a
    "Dixon-Lewis, G., \"Computer Modelling of Combustor Reactions\", Springer Verlag, 1984.",

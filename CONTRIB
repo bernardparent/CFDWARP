@@ -97,7 +97,9 @@ RODRIGUEZ FUENTES, Felipe Martin
 
   - implemented add_to_W_fw_3r2p_Lindemann(), add_to_W_fw_2r3p_Lindemann(), 
     add_to_dW_fw_3r2p_Lindemann(), add_to_dW_fw_2r3p_Lindemann() in model/share/chem_share.c
-  
+
+  - added model/chem/_C2H4_Air_23s/
+    
     
 SCHWARTZENTRUBER, Thomas E.
 

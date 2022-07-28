@@ -1,0 +1,278 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{bm}
+\usepackage{amsmath}
+
+% %%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\efficiency}{\eta}
+\newcommand{\ordi}{{\rm d}}
+\newcommand{\unitvecdiff}[2]{\overline{\vec{#1} - \vec{#2}}}
+\let\vec\bf
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\rhos}{\rho}
+\newcommand{\Cv}{{C_{\rm v}}}
+\newcommand{\Cp}{{C_{\rm p}}}
+\newcommand{\Sct}{{{\rm Sc}_{\rm T}}}
+\newcommand{\Prt}{{{\rm Pr}_{\rm T}}}
+\newcommand{\nd}{{{n}_{\rm d}}}
+\newcommand{\ns}{{{n}_{\rm s}}}
+\newcommand{\nn}{{{n}_{\rm n}}}
+\newcommand{\nr}{{{n}_{\rm r}}}
+\newcommand{\ndm}{{\bar{n}_{\rm d}}}
+\newcommand{\nsm}{{\bar{n}_{\rm s}}}
+\newcommand{\turb}{_{\rm T}}
+\newcommand{\mut}{{\mu\turb}}
+\newcommand{\mfa}{\scriptscriptstyle}
+\newcommand{\mfb}{\scriptstyle}
+\newcommand{\mfc}{\textstyle}
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\hlinex}{\vspace{-0.34cm}~~\\ \hline \vspace{-0.31cm}~~\\}
+\newcommand{\hlinextop}{\vspace{-0.46cm}~~\\ \hline \hline \vspace{-0.32cm}~~\\}
+\newcommand{\hlinexbot}{\vspace{-0.37cm}~~\\ \hline \hline \vspace{-0.50cm}~~\\}
+\newcommand{\tablespacing}{\vspace{-0.4cm}}
+\newcommand{\fontxfig}{\footnotesize\scalefont{0.918}}
+\newcommand{\fontgnu}{\footnotesize\scalefont{0.896}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{0.9}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\author{
+  Felipe Martín Rodríguez Fuentes
+}
+
+\email{
+  fmrodriguez@arizona.edu
+}
+
+\department{
+  Aerospace and Mechanical Engineering
+}
+
+\institution{
+  University of Arizona
+}
+
+\title{23-Species 66-Reaction Chemical Model for Ethylene-Air
+Combustion
+}
+
+\date{
+  July 2022
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+%  \tableofcontents
+%  \makenomenclature
+%  \listoftables
+%%  \listoffigures
+
+
+
+\begin{table}[h]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Zettervall Reaction Mechanism for Ethylene-Air \cite{ef:2017:zettervall}}
+\begin{tabular}{cccccc} 
+\toprule
+\multicolumn{2}{c}{Reaction} & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole & ref \\ 
+\midrule
+(1) & $\rm C_2 H_5 + H \rightarrow CH_3 + CH_3$  & 1.50 $\times$ 10$^{13}$  & 0.00 & 0.00  & \cite{pci:2015:saghafian}\\
+
+(2) & $\rm C_2 H_4 + H + M\rightarrow C_2 H_5 + M$  & 4.17 $\times$ 10$^{10}$  & 0.00 & 11030&\cite{pci:2015:saghafian} \\
+
+(3) & $\rm C_2 H_4 + H\rightarrow C_2 H_5 $ & 1.80 $\times$ 10$^{12}$  & 1.00 & 9400 &\cite{ef:2017:zettervall}\\
+
+(4) & $\rm C_2 H_4\rightarrow C_2 H_3 +H $ & 1.00 $\times$ 10$^{12}$  & 0.00 & 48200 &\cite{ef:2017:zettervall}\\
+
+(5) & $\rm C_2 H_4 + H \rightarrow C_2 H_3 +H_2 $ & 5.00 $\times$ 10$^{12}$  & 0.00 & 5000 &\cite{ef:2017:zettervall}\\
+
+(6) & $\rm C_2 H_4 + O \rightarrow HCO + CH_3$ & 3.31 $\times$ 10$^{12}$  & 0.00 & 1130 & \cite{caf:1989:refael}\\
+
+(7) & $\rm HCO + CH_3 \rightarrow C_2 H_4 + O$ & 1.58 $\times$ 10$^{11}$  & 0.00 & 31180 &\cite{caf:1989:refael}\\
+
+(8) & $\rm C_2 H_4 + OH \rightarrow C_2 H_3 + H_2 O$ & 4.79 $\times$ 10$^{12}$  & 0.00 & 1230 &\cite{caf:1989:refael}\\
+
+(9) & $\rm  C_2 H_3 + H_2 O \rightarrow C_2 H_4 + OH  $ & 1.20 $\times$ 10$^{12}$  & 0.00 & 14000 &\cite{caf:1989:refael}\\
+
+(10) & $\rm  C_2 H_4 + C H_3 \rightarrow C_2 H_3 + C H_4  $ & 1.00 $\times$ 10$^{13}$  & 0.00 & 13000 &\cite{caf:1989:refael}\\
+
+(11) & $\rm  C_2 H_3 + C H_4  \rightarrow C_2 H_4 + C H_3 $ & 3.02 $\times$ 10$^{13}$  & 0.00 & 12580 &\cite{caf:1989:refael}\\
+
+(12) & $\rm  C_2 H_3  \rightarrow C_2 H +H_2 $ & 1.80 $\times$ 10$^{12}$  & 0.00 &44800 &\cite{ef:2017:zettervall}\\
+
+(13) & $\rm  C_2 H_3 +H \rightarrow C_2 H_2 +H_2 $ & 2.00 $\times$ 10$^{13}$  & 0.00 &2500 &\cite{caf:1989:refael}\\
+
+(14) & $\rm  C_2 H_3 +OH \rightarrow C_2 H_2 +H_2 O $ & 7.00 $\times$ 10$^{14}$  & 0.00 &1100 &\cite{ef:2017:zettervall}\\
+
+(15) & $\rm  C_2 H_2 +H+M \rightarrow C_2 H_3 +M $ & 1.23 $\times$ 10$^{11}$  & 1.00 &10360 &\cite{caf:1989:refael}\\
+
+(16) & $\rm  C_2 H_2 +H\rightarrow C_2 H +H_2 $ & 2.00 $\times$ 10$^{14}$  & 0.00 &19000 &\cite{caf:1989:refael}\\
+
+(17) & $\rm  C_2 H_2 +OH\rightarrow C_2 H +H_2 O $ &8.00 $\times$ 10$^{12}$  & 0.00 &5000 &\cite{caf:1989:refael}\\
+
+(18) & $\rm  C_2 H +H_2 O\rightarrow C_2 H_2 + OH $ &5.37 $\times$ 10$^{12}$  & 0.00 &16360 &\cite{caf:1989:refael}\\
+
+(19) & $\rm  C_2 H_2 + O\rightarrow C_2 H + OH $ &3.24 $\times$ 10$^{15}$  & 0.60 &12000 &\cite{caf:1989:refael}\\
+
+(20) & $\rm  C_2 H + OH\rightarrow C_2 H_2 + O $ &2.95 $\times$ 10$^{14}$  & 0.60 &910 &\cite{caf:1989:refael}\\
+
+(21) & $\rm  C_2 H + H + M \rightarrow C_2 H_2 + M $ &1.10 $\times$ 10$^{9}$  & 1.00 &770 &\cite{caf:1989:refael}\\
+
+(22) & $\rm  C_2 H + O_2 \rightarrow HCO +CO $ &1.00 $\times$ 10$^{13}$  & 0.00 &7000 &\cite{caf:1989:refael}\\
+
+(23) & $\rm HCO+CO \rightarrow C_2 H + O_2 $ &8.51 $\times$ 10$^{12}$  & 0.00 &138400 &\cite{caf:1989:refael}\\
+
+(24) & $\rm C_2 H + OH \rightarrow HCO + CH $ &8.00 $\times$ 10$^{12}$  & 0.00 &5000 &\cite{ef:2017:zettervall}\\
+
+(25) & $\rm C H_4(+M) \rightarrow CH_3 + H(+M) $ \tnote{2} &  &  &  & \cite{rkm:1991:smoke}\\
+
+  & $k_f $ \tnote{1} & 6.30 $\times$ 10$^{14}$ &0.00  &104000  &\\
+
+  & $k_{f0} $\tnote{1} & 1.00 $\times$ 10$^{17}$ & 0.00 & 86000 &\\
+  
+  (26) & $\rm CH_3 + H(+M)  \rightarrow C H_4(+M) $ \tnote{2} &  &  &  &\cite{rkm:1991:smoke}\\
+
+  & $k_f $ & 5.20 $\times$ 10$^{12}$ &0.00  &-1310  &\\
+
+  & $k_{f0} $ & 8.25 $\times$ 10$^{14}$ & 0.00 & -19310 &\\
+  
+(27) & $\rm C H_4 + H \rightarrow C H_3 + H_2 $ &2.20 $\times$ 10$^{4}$  & 3.00 &8750 &\cite{rkm:1991:smoke}\\  
+
+(28) & $\rm C H_3 + H_2 \rightarrow C H_4 + H $ &9.57 $\times$ 10$^{2}$  & 3.00 &8750 &\cite{rkm:1991:smoke}\\ 
+
+(29) & $\rm C H_4 + OH \rightarrow C H_3 + H_2 O $ &1.60 $\times$ 10$^{6}$  & 2.10 &2460 &\cite{rkm:1991:smoke}\\ 
+
+(30) & $\rm C H_3 + H_2 O \rightarrow C H_4 + OH $ &3.02 $\times$ 10$^{5}$  & 2.10 &17422 &\cite{rkm:1991:smoke}\\ 
+
+(31) & $\rm C H_3 + O \rightarrow C H_2 O + H $ &6.80 $\times$ 10$^{13}$  & 0.00 &0 &\cite{rkm:1991:smoke}\\ 
+
+(32) & $\rm C H_3 + O_2 \rightarrow C H_3 O + O $ &3.00 $\times$ 10$^{13}$  & 0.00 &25652 &\cite{rkm:1991:smoke}\\ 
+
+(33) & $\rm C H_3 + OH \rightarrow C H_2  + H_2 O $ &7.60 $\times$ 10$^{6}$  & 2.00 &5000 &\cite{comb:2010:glassman}\\
+
+(34) & $\rm C H_3 O + H \rightarrow C H_2 O  + H_2 $ &2.00 $\times$ 10$^{13}$  & 0.00 &0 &\cite{rkm:1991:smoke}\\ 
+
+(35) & $\rm C H_3 O + M \rightarrow C H_2 O  + H + M $ &2.40 $\times$ 10$^{13}$  & 0.00 &28812&\cite{rkm:1991:smoke}\\ 
+
+(36) & $\rm C H_2 + O \rightarrow CO + H_2 $ &3.00 $\times$ 10$^{13}$  & 0.00 & 0 &\cite{comb:2010:glassman}\\ 
+
+(37) & $\rm C H_2 + OH \rightarrow CH + H_2 O$ &1.13 $\times$ 10$^{7}$  & 2.00 & 3000 &\cite{comb:2010:glassman}\\ 
+
+(38) & $\rm C H_2 O + H \rightarrow HCO + H_2 $ &5.00 $\times$ 10$^{13}$  & 0.00 & 3991 &\cite{rkm:1991:smoke}\\ 
+
+(39) & $\rm C H_2 O + OH \rightarrow HCO + H_2 O $ &1.40 $\times$ 10$^{14}$  & 0.00 & 1100 &\cite{rkm:1991:smoke}\\
+
+(40) & $\rm CH  + O \rightarrow CO+H $ &5.70 $\times$ 10$^{13}$  & 0.00 &0&\cite{comb:2010:glassman}\\
+
+(41) & $\rm CH  + OH \rightarrow HCO+H $ &3.00 $\times$ 10$^{13}$  & 0.00 &0&\cite{comb:2010:glassman}\\
+
+(42) & $\rm CH  + O_2 \rightarrow HCO+O $ &3.30 $\times$ 10$^{13}$  & 0.00 &0&\cite{comb:2010:glassman}\\
+
+(43) & $\rm CH  +  C O_2 \rightarrow HCO+CO $ &8.40 $\times$ 10$^{13}$  & 0.00 &200&\cite{comb:2010:glassman}\\
+
+(44) & $\rm HCO  +  H \rightarrow CO + H_2 $ &4.00 $\times$ 10$^{13}$  & 0.00 &0&\cite{rkm:1991:smoke}\\
+
+(45) & $\rm HCO  +  M \rightarrow CO + H + M $ &1.60 $\times$ 10$^{14}$  & 0.00 &14700&\cite{rkm:1991:smoke}\\
+(46) & $\rm CO + OH \rightarrow C O_2 + H $ &1.51 $\times$ 10$^{7}$  & 1.30 &-758&\cite{rkm:1991:smoke}\\
+
+(47) & $\rm C O_2 + H \rightarrow CO + OH $ &1.57 $\times$ 10$^{9}$  & 1.30 &19800&\cite{rkm:1991:smoke}\\
+
+(48) & $\rm H + O_2 \rightarrow OH +O $ &5.00 $\times$ 10$^{14}$  & 0.00 &16800&\cite{rkm:1991:smoke}\\
+
+(49) & $\rm OH + O \rightarrow H +O_2 $ &1.20 $\times$ 10$^{13}$  & 0.00 &690&\cite{rkm:1991:smoke}\\
+
+(50) & $\rm O + H_2 \rightarrow OH+H $ &1.80 $\times$ 10$^{10}$  & 1.00 &8826&\cite{rkm:1991:smoke}\\
+
+(51) & $\rm OH +H \rightarrow O + H_2 $ &8.00 $\times$ 10$^{9}$  & 1.00 &6760&\cite{rkm:1991:smoke}\\
+
+(52) & $\rm H_2 + OH \rightarrow H_2 O + H  $ &1.17 $\times$ 10$^{9}$  & 1.30 &3626&\cite{rkm:1991:smoke}\\
+
+(53) & $\rm H_2 O + H \rightarrow H_2 +OH  $ &6.00 $\times$ 10$^{9}$  & 1.30 &18588&\cite{rkm:1991:smoke}\\
+
+(54) & $\rm OH+OH \rightarrow O + H_2 O  $ &6.00 $\times$ 10$^{8}$  & 1.30 &0&\cite{rkm:1991:smoke}\\
+
+(55) & $\rm O + H_2 O \rightarrow OH + OH  $ &4.00 $\times$ 10$^{9}$  & 1.30 &17029&\cite{rkm:1991:smoke}\\
+
+(56) & $\rm H + O_2 + M \rightarrow H O_2 + M $ &2.50 $\times$ 10$^{18}$  & -0.80 &0&\cite{rkm:1991:smoke}\\
+
+(57) & $\rm H + H O_2  \rightarrow OH + OH $ &1.50 $\times$ 10$^{14}$  & 0.00 &1004&\cite{rkm:1991:smoke}\\
+
+(58) & $\rm H + H O_2  \rightarrow H_2 + O_2 $ &2.50 $\times$ 10$^{13}$  &0.00 &700&\cite{rkm:1991:smoke}\\
+
+(59) & $\rm OH + H O_2  \rightarrow H_2 O + O_2 $ &2.00 $\times$ 10$^{13}$  &0.00 &1000&\cite{rkm:1991:smoke}\\
+
+(60) & $\rm H O_2 + H O_2  \rightarrow H_2 O_2 + O_2 $ &2.00 $\times$ 10$^{14}$  &0.00 &0&\cite{rkm:1991:smoke}\\
+
+(61) & $\rm H_2 O_2 + M  \rightarrow OH+OH+M $ &1.30 $\times$ 10$^{17}$  &0.00 &45500&\cite{rkm:1991:smoke}\\
+
+(62) & $\rm OH+OH+M  \rightarrow H_2 O_2 + M $ &9.86 $\times$ 10$^{14}$  &0.00 &-5070&\cite{rkm:1991:smoke}\\
+
+(63) & $\rm H_2 O_2 + OH \rightarrow H_2 O + H O_2 $ &1.00 $\times$ 10$^{13}$  &0.00 &1800&\cite{rkm:1991:smoke}\\
+
+(64) & $\rm H_2 O + H O_2  \rightarrow H_2 O_2 + OH $ &2.86 $\times$ 10$^{13}$  &0.00 &32790&\cite{rkm:1991:smoke}\\
+
+(65) & $\rm OH + H+ M  \rightarrow H_2 O +M $ &2.20 $\times$ 10$^{22}$  &-2.00 &0&\cite{rkm:1991:smoke}\\
+
+(66) & $\rm H + H+ M  \rightarrow H_2  +M $ &1.80 $\times$ 10$^{18}$  &-1.00 &0&\cite{rkm:1991:smoke}\\
+
+\bottomrule
+\end{tabular}
+\label{tab:park}
+\begin{tablenotes}
+\item[{1}] Lindemann approximation for the forward
+rate constants given by $k = P_r k_f / (1+P_r)$, where $P_r = k_{f0}[M]/k_f$ with [$M$] the third body concentration in mole/cm$^3$.
+\item[{2}] Third body efficiencies: $\rm C_2 H_4, 3; CH_4, 6.5; CO, 0.75; C O_2, 1.5; H_2, 1; H_2 O, 6.5; N_2, 0.4; O_2, 0.4.$
+% \item[{3}] The universal gas constant $R$ must be set to 1.9872 cal/K mole.
+% \item[{4}] $\rm M_4 = Ar, C_2, N_2, O_2, CN, CO$
+% \item[{5}] $\rm M_5 = C, N, O, NO, CO_2$
+% \item[{6}] $\rm M_6 = C_2, N_2, O_2, CN, CO, NO, CO_2$
+% \item[{7}] $\rm R = 1.9872 \frac{\rm cal}{\rm mol \cdot K}$
+
+\end{tablenotes}
+\end{threeparttable}
+\end{center}
+\end{table} 
+%
+\clearpage
+\bibliographystyle{warpdoc}
+\bibliography{all}
+
+
+\end{document}
+
+
+
