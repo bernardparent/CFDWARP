@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define LNLAMBDA_GUPTAYOS 1
 #define LNLAMBDA_RAIZER 2
 #define LNLAMBDA_NRL 3
-#define LNLAMBDA LNLAMBDA_RAIZER  //Use LNLAMBDA_RAIZER. Other methods are for testing purposes only.
+#define LNLAMBDA LNLAMBDA_NRL  //Use LNLAMBDA_NRL. Other methods are for testing purposes only.
 
 #define MASSDIFFCOEFF_ORANBORIS 1
 #define MASSDIFFCOEFF_SCEBD 2

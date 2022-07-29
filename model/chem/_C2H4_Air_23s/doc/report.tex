@@ -108,7 +108,7 @@ abstract
 \tablecaption{Zettervall Reaction Mechanism for Ethylene-Air \cite{ef:2017:zettervall}}
 \begin{tabular}{cccccc} 
 \toprule
-\multicolumn{2}{c}{Reaction} & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole & ref \\ 
+\multicolumn{2}{c}{Reaction \tnote{a,~b}} & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole & ref \\ 
 \midrule
 (1) & $\rm C_2 H_5 + H \rightarrow CH_3 + CH_3$  & 1.50 $\times$ 10$^{13}$  & 0.00 & 0.00  & \cite{pci:2015:saghafian}\\
 
@@ -158,13 +158,13 @@ abstract
 
 (24) & $\rm C_2 H + OH \rightarrow HCO + CH $ &8.00 $\times$ 10$^{12}$  & 0.00 &5000 &\cite{ef:2017:zettervall}\\
 
-(25) & $\rm C H_4(+M) \rightarrow CH_3 + H(+M) $ \tnote{2} &  &  &  & \cite{rkm:1991:smoke}\\
+(25) & $\rm C H_4(+M) \rightarrow CH_3 + H(+M) $  &  &  &  & \cite{rkm:1991:smoke}\\
 
-  & $k_f $ \tnote{1} & 6.30 $\times$ 10$^{14}$ &0.00  &104000  &\\
+  & $k_f $ \tnote{c} & 6.30 $\times$ 10$^{14}$ &0.00  &104000  &\\
 
-  & $k_{f0} $\tnote{1} & 1.00 $\times$ 10$^{17}$ & 0.00 & 86000 &\\
+  & $k_{f0} $\tnote{c} & 1.00 $\times$ 10$^{17}$ & 0.00 & 86000 &\\
   
-  (26) & $\rm CH_3 + H(+M)  \rightarrow C H_4(+M) $ \tnote{2} &  &  &  &\cite{rkm:1991:smoke}\\
+  (26) & $\rm CH_3 + H(+M)  \rightarrow C H_4(+M) $&  &  &  &\cite{rkm:1991:smoke}\\
 
   & $k_f $ & 5.20 $\times$ 10$^{12}$ &0.00  &-1310  &\\
 
@@ -253,9 +253,13 @@ abstract
 \end{tabular}
 \label{tab:park}
 \begin{tablenotes}
-\item[{1}] Lindemann approximation for the forward
+\item[{a}] List of third body: M = H, H$_2$, O, O$_2$, OH, H$_2$O, N$_2$, H$_2$O$_2$,
+   C$_2$H, C$_2$H$_2$, C$_2$H$_3$, C$_2$H$_4$, C$_2$H$_5$, CH, CH$_2$, 
+   CH$_3$, CH$_4$, HO$_2$, HCO, CH$_2$O, CH$_3$O, CO, CO$_2$.
+\item[{b}] Third body efficiencies: $\rm C_2 H_4, 3; CH_4, 6.5; CO, 0.75; C O_2, 1.5; H_2, 1; H_2 O, 6.5; N_2, 0.4; O_2, 0.4$. Set to 1.0 for all other species.
+\item[{c}] Lindemann approximation for the forward
 rate constants given by $k = P_r k_f / (1+P_r)$, where $P_r = k_{f0}[M]/k_f$ with [$M$] the third body concentration in mole/cm$^3$.
-\item[{2}] Third body efficiencies: $\rm C_2 H_4, 3; CH_4, 6.5; CO, 0.75; C O_2, 1.5; H_2, 1; H_2 O, 6.5; N_2, 0.4; O_2, 0.4.$
+
 % \item[{3}] The universal gas constant $R$ must be set to 1.9872 cal/K mole.
 % \item[{4}] $\rm M_4 = Ar, C_2, N_2, O_2, CN, CO$
 % \item[{5}] $\rm M_5 = C, N, O, NO, CO_2$

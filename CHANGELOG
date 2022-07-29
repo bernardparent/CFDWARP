@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 JUL 29a
+  * in model/chem/_C2H4_Air_23s/doc/report.tex
+    - updated the footnotes
+  * in model/transport/doc/report.tex
+    - added the NRL Coulomb logarithm to determine the Parent-Macheret electron mobility
+  * in model/share/transport_share.c
+    - changed LNLAMBDA from LNLAMBDA_RAIZER to LNLAMBDA_NRL (matches experimental data better
+      for both air and hydrogen plasmas)
+
+
 2022 JUL 27a
   * in model/chem
     - added _C2H4_Air_23s

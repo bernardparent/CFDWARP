@@ -20,7 +20,9 @@ src: $(OBJECTS)
 arc: 
 	( rm -f $(TARGETS) ; ar cqs $(TARGETS) *.o )                        
 
-cleanall: clean
+cleanall:
+	( cd doc ; make clean )
+	( make clean )
 
 	
 

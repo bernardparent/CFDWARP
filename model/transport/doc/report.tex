@@ -162,6 +162,15 @@ Also, $\Lambda$ is the shielding parameter and $\ln \Lambda$ is the Coulomb loga
 \end{equation}
 %
 with $\rho_{\rm e}$ the electron partial density in kg/m$^3$, $m_{\rm e}$ the electron mass in kg, $N_{\rm e}$ the electron number density in m$^{-3}$, and $T_{\rm e}$ the electron temperature in K.
+
+However, we find that using the latter leads to the electrical conductivity being underestimated by 30\% for equilibrium air or equilibrium hydrogen plasmas (see experimental data of electrical conductivity on \cite[page 276]{book:1991:raizer}). We get better agreement with experimental data by using the Coulomb logarithm recommended in the NRL Plasma Formulary for electron-ion collisions \cite[page 34]{nrl:2002:huba}:
+%
+\begin{equation}
+ \ln \Lambda = 23-\ln \left(\left(N_{\rm e}/1e6\right)^\frac{1}{2} \cdot (T_{\rm e}/11600.0)^{-1.5}\right)
+\end{equation}
+%
+with $N_{\rm e}$ the electron number density in 1/m$^3$ and $T_{\rm e}$ the electron temperature in K. The latter is valid as long as the electron temperature is less than 10 eV. 
+
 Also, we can fit a polynomial through the experimental data outlined in in Chapter 21 of Ref.\ \cite{book:1997:grigoriev} to find $\mu_{\rm en}$ in units of $\rm m^2\cdot V^{-1}\cdot s^{-1}$:
 %
 \begin{equation}

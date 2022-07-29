@@ -1,9 +1,10 @@
 #!/usr/local/bin/soap
 
-P=1300;
-T=1000;
-chieminus=1e-4;
-
+P=60450;
+T=10200;
+Te=T;
+chieminus=3.18e-2;
+e=1.602e-19;
 
 kB=1.38e-23;
 calA=6.023e23;
@@ -12,6 +13,8 @@ Ne=chieminus*N;
 Ni=chieminus*N;
 Nn=N-Ne-Ni;
 mi=0.032/calA;
+Pe=Ne*kB*Te;
+Pe_atm=Pe/101300;
 
 muin=0.75E23/Nn/sqrt(T);
 muii=14.3*T^1.5/Ni/sqrt(mi);
@@ -22,3 +25,21 @@ mui=1/(1/(muin)+1/(muii));
 printf("muii=%E\n",muii);
 printf("muin=%E\n",muin);
 printf("mui=%E\n",mui);
+
+lnLambda_Raizer=13.57+1.5*log10(Te/11600)-0.5*log10(Ne/1e6);
+lnLambda_NRL=23.0-ln(sqrt(Ne/1e6)*(Te/11600.0)^(-1.5));
+lnLambda_GY=0.5*ln(2.09E-2*1E-12*Te^4/Pe_atm+1.52*(Te^4*1E-12/Pe_atm)^(2.0/3.0));
+
+printf("lnLambda (Raizer)=%E\n",lnLambda_Raizer);
+printf("lnLambda (NRL)=%E\n",lnLambda_NRL);
+printf("lnLambda (GuptaYos)=%E\n",lnLambda_GY);
+
+lnLambda=lnLambda_NRL;
+muei=9.5e16*Te^1.5/Ni/lnLambda;
+muen=1/Nn*3.74e19*exp(33.5/sqrt(ln(Te)));
+sigma=1.0/(1/muei+1/muen)*Ne*e;
+
+printf("lnLambda=%E\n",lnLambda);
+printf("muei=%E\n",muei);
+printf("muen=%E\n",muen);
+printf("sigma=%E S/m\n",sigma);
