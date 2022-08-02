@@ -7,6 +7,22 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 AUG 01a
+  * in model/fluid/_*_plasma/fluid.hh and model/fluid/_drift-diffusion/fluid.hh
+    - added INCLUDE_E_EFFECTS_ON_MOBILITY to gl_model_fluid_t
+  * in model/fluid/_*_plasma/fluid.c and model/fluid/_drift-diffusion/fluid.c
+    - in write_model_fluid_template(), added INCLUDE_E_EFFECTS_ON_MOBILITY
+    - in read_model_fluid_actions(), added find_bool_var_from_codex() to read 
+      INCLUDE_E_EFFECTS_ON_MOBILITY
+    - in _mu(), added call to adjust_muk_for_Ek_effect()
+    - in find_prim_fluid_mem(), added call to adjust_muk_for_Ek_effect()
+  * in model/share/transport_share.c
+    - in adjust_muk_for_Ek_effect(), removed code for O-
+  * in model/transport/doc/report.tex
+    - fixed a typo in the table for the mobilities: N_n should be N when finding
+      the effect of the electric field on the ion mobility
+
+
 2022 JUL 29a
   * in model/chem/_C2H4_Air_23s/doc/report.tex
     - updated the footnotes

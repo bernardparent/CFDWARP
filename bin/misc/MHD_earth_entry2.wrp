@@ -228,6 +228,7 @@ Model(
     chiemin=1e-9;  chiemax=1.0;    {min and max electron molar fraction}
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
     AXISYMMETRIC=NO;
+    INCLUDE_E_EFFECTS_ON_MOBILITY=YES;
   );
   AirPlasma11s(
     CHEMMODEL=CHEMMODEL_BOYD2007;
@@ -406,6 +407,8 @@ Cycle(
     if(iter<1000, CFLmax=0.2;);
     if(iter<500, CFLmax=0.1;);
     CFL=min(CFL*1.02,CFLmax);
+
+    
     Model(
       EpotentialBfixed(
         SetMagneticField(is,js, ie,je, 0,0,min(Bz,Bz*iter/(mf*300))); 

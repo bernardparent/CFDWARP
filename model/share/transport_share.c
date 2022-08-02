@@ -184,17 +184,13 @@ void adjust_muk_for_Ek_effect(long k, double Ek, double N, double *muk){
         B=2.03E12;
         p=-0.5;
       break;
-      case SMAP_O2minus:
-        B=3.56e19;
-        p=-0.1;
-      break;
-      case SMAP_Ominus:
-        B=1.4*3.56e19;
-        p=-0.1;
-      break;
       case SMAP_NOplus:
         B=4.47e12;
         p=-0.5;
+      break;
+      case SMAP_O2minus:
+        B=3.56e19;
+        p=-0.1;
       break;
       default:
         B=0.55/sqrt(_m(k));
