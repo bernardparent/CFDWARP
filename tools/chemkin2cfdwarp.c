@@ -24,7 +24,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -73,7 +73,7 @@ void check_all_indicators_formfit_electrontemperature_Q(char oldLine[], char pre
   *      = 0 when reaction does not have "EXCI" value
   *      = 1 when reaction does have "EXCI" value   */
 
-void print_output_line(char oldLine[], char prevLine[], char lastLine[], char newLine[], int ind, int e, int Q, int way, int tot, int run, int numR, int numP, FILE* output);
+void print_output_line(char oldLine[], char prevLine[], char lastLine[], char newLine[], int ind, int e, int Q, int way, int tot, int run, int numR, int numP, FILE* output, int M);
  // This function prints the necessary output lines according to the reaction information provided and the current function being built
  /* Input parameters: 
   *   1. oldLine[], prevLine[], lastLine[], newLine[] - the current reaction line being searched and the following 3 lines of information from the input file
@@ -101,7 +101,7 @@ void print_output_line(char oldLine[], char prevLine[], char lastLine[], char ne
   *   1. output file - the appropriate output lines for each function are printed to the output file */
 
 
-void print_elements_add_ionization(char oldLine[], FILE* output, int numR, int numP);
+void print_elements_add_ionization(char oldLine[], char prevLine[], FILE* output, int numR, int numP, int step, int M);
  // This function prints the elements on the add Ionization functions
  /* Input parameters: 
   *   1. oldLine[] - the current reaction line being searched
@@ -111,7 +111,7 @@ void print_elements_add_ionization(char oldLine[], FILE* output, int numR, int n
   *   1. output file - the elements for a reaction added in the add_Ionization functions is printed to the output file  */
 
 
-void print_numbers_add_ionization(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output);
+void print_numbers_add_ionization(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output, int step, int M);
  // This function prints the data numbers for the add_Ionization functions
  /* Input parameters:
   *   1. oldLine[], prevLine[] - the current reaction line being searched and the following line of information from the input file
@@ -233,12 +233,18 @@ int number_of_products(char Line_str[]);
  /* Output parameters:
   *   1. (returned int) num - the number of products present in the reaction */
 
-
+int check_M_reaction(char oldLine[], char prevLine[]);
+ // This function determines whether or not a reaction includes a third body and then determines how many steps are necessary to build each reaction substitution
+ /* Input parameters:
+  *   1. oldLine[], prevLine[] - the current reaction line being searched and the following line of information from the input file   */
+ /* Output parameters:
+  *   1. (returned int) M - the indicator for a reaction with a third body
+  *       = -2 when there is no third body or the third body does not have specified element substitutions
+  *       = int > 0 when there is a third body with specified elements/factors, the int represents how many different elements are present  */
 
 
 int main(int argc, char **argv) {
-
-  char *inpfile, *outfile;
+char *inpfile, *outfile;
   bool VALIDOPTIONS = TRUE;
   char *options;
   int RET, run;
@@ -292,7 +298,6 @@ int main(int argc, char **argv) {
   free ( outfile );
   return(EXIT_SUCCESS);
 }
-
 
 
 
@@ -487,10 +492,28 @@ void print_info_find_Qei(char oldLine[], char prevLine[], int numR, int numP, in
 	}
 }
 
-void print_numbers_add_ionization(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output) {
-	char numsF[6][12], numsS[3][12];
+void print_numbers_add_ionization(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output, int step, int M) {
+	char numsF[6][12], numsS[3][12], factor[15];
+  int count = 0, n = 0;
 	if (ind == 1) {										// builds an array to store the numbers of a fitted form reaction
 		int i = 0, h = 0, j = 0, k = 0;
+    if (M != -3) {
+      while (count != step - 1) {
+        if (prevLine[n] == '/')
+            count++;
+        n++;
+        }
+        if (prevLine[n] == '/')
+            n++;
+        while (prevLine[n] != '/') {
+            if (prevLine[n] == ' ' || prevLine[n] == '\t' || prevLine[n] == '\n')
+                n++;
+            factor[k] = prevLine[n];
+            k++;
+            n++;
+        }
+        factor[k] = '\0';
+      }
 		while (oldLine[i + 2] != '.' && oldLine[i + 2] != 'e')
 			i++;
 		while (prevLine[h + 2] != '.' && prevLine[h + 2] != 'e')
@@ -552,6 +575,14 @@ void print_numbers_add_ionization(char oldLine[], char prevLine[], int numR, int
 					numsF[j][v] = '.', numsF[j][v + 1] = '0', numsF[j][v + 2] = '\0';
 			}
 		}
+    j = 0;
+        if (M != -3) {
+            while (factor[j] != '\0') {
+                fprintf(output, "%c", factor[j]);
+                j++;
+            }
+            fprintf(output, "*");
+        }
 		for (j = 0; j < 6; j++) {
 			for (i = 0; numsF[j][i] != '\0'; i++) {   // print fitted form numbers
 				fprintf(output, "%c", numsF[j][i]);
@@ -563,7 +594,25 @@ void print_numbers_add_ionization(char oldLine[], char prevLine[], int numR, int
 		}
 	}
 	else {												// builds an array to store the numbers of a standard form reaction
-		int	i = 0, j = 0, k = 0;
+		int	i = 0, j = 0, k = 0, n = 0;
+    count = 0;
+    if (M != -3) {
+          while (count != step - 1) {
+              if (prevLine[n] == '/')
+                  count++;
+              n++;
+          }
+          if (prevLine[n] == '/')
+              n++;
+          while (prevLine[n] != '/') {
+              if (prevLine[n] == ' ' || prevLine[n] == '\t' || prevLine[n] == '\n')
+                  n++;
+              factor[k] = prevLine[n];
+              k++;
+              n++;
+          }
+          factor[k] = '\0';
+    }
 		while (oldLine[i + 2] != '.' && oldLine[i + 2] != 'e')
 			i++;
 		for (j = 0; j < 3; j++) {
@@ -594,6 +643,14 @@ void print_numbers_add_ionization(char oldLine[], char prevLine[], int numR, int
 			if (dec == 0)
 				numsS[j][v] = '.', numsS[j][v + 1] = '0', numsS[j][v + 2] = '\0';
 		}
+    j = 0;
+        if (M != -3) {
+            while (factor[j] != '\0') {
+                fprintf(output, "%c", factor[j]);
+                j++;
+            }
+            fprintf(output, "*");
+    }
 		for (j = 0; j < 3; j++) {             
 			for (i = 0; numsS[j][i] != '\0'; i++)
 				fprintf(output, "%c", numsS[j][i]);           // print standard form numbers
@@ -721,8 +778,8 @@ void print_numbers_find_Qei(char oldLine[], char prevLine[], int numR, int numP,
 	fprintf(output, "\n");
 }
 
-void print_elements_add_ionization(char oldLine[], FILE* output, int numR, int numP) {                        
-	int i = 0, j = 0, k = 0;
+void print_elements_add_ionization(char oldLine[], char prevLine[], FILE* output, int numR, int numP, int step, int M) {                        
+	int i = 0, j = 0, k = 0, n = 0, count = 0;
 	char reactants[10][12];										// create a string array to hold reactant names
 	for (j = 0; oldLine[i] != '='; j++) {
 		k = 0;
@@ -753,6 +810,26 @@ void print_elements_add_ionization(char oldLine[], FILE* output, int numR, int n
 				reactants[j][0] = 'e', reactants[j][1] = 'm', reactants[j][2] = 'i', reactants[j][3] = 'n', reactants[j][4] = 'u', reactants[j][5] = 's', reactants[j][6] = '\0';
 			if (reactants[j][k - 1] == '+' && reactants[j][k] == '\0')
 				reactants[j][k - 1] = 'p', reactants[j][k] = 'l', reactants[j][k + 1] = 'u', reactants[j][k + 2] = 's', reactants[j][k + 3] = '\0';
+      k = 0, n = 0;
+      if (reactants[j][0] == 'M' && reactants[j][1] == '\0' && M != -3) {
+        while (count != step - 1) {
+          n++;
+          if (prevLine[n] == '/')
+            count++;
+        }
+        if (prevLine[n] == '/')
+          n++;
+        while (prevLine[n] == ' ' || prevLine[n] == '\t' || prevLine[n] == '\r' || prevLine[n] == '\n')
+          n++;      
+        while (prevLine[n] != '/') {
+          reactants[j][k] = prevLine[n];
+          k++;
+          n++;
+        }
+        count++;
+
+        reactants[j][k] = '\0';
+      }
 		}
 	}
 	i = 0, j = 0, k = 0;
@@ -786,6 +863,25 @@ void print_elements_add_ionization(char oldLine[], FILE* output, int numR, int n
 				products[j][0] = 'e', products[j][1] = 'm', products[j][2] = 'i', products[j][3] = 'n', products[j][4] = 'u', products[j][5] = 's', products[j][6] = '\0';
 			if (products[j][k - 1] == '+' && products[j][k] == '\0')
 				products[j][k - 1] = 'p', products[j][k] = 'l', products[j][k + 1] = 'u', products[j][k + 2] = 's', products[j][k + 3] = '\0';
+      k = 0, n = 0, count = 0;
+      if (products[j][0] == 'M' && products[j][1] == '\0' && M != -3) {
+        while (count != step - 1) {
+          n++;
+          if (prevLine[n] == '/')
+            count++;
+        }
+        if (prevLine[n] == '/')
+          n++;
+        while (prevLine[n] == ' ' || prevLine[n] == '\t' || prevLine[n] == '\r' || prevLine[n] == '\n')
+          n++;      
+        while (prevLine[n] != '/') {
+          products[j][k] = prevLine[n];
+          k++;
+          n++;
+          count++;
+          products[j][k] = '\0';
+        }
+      }
 			j++;
 		}
 	}
@@ -815,9 +911,22 @@ void print_elements_add_ionization(char oldLine[], FILE* output, int numR, int n
 }
 
 
-void print_output_line(char oldLine[], char prevLine[], char lastLine[], char newLine[], int ind, int e, int Q, int way, int tot, int run, int numR, int numP, FILE* output) {
+void print_output_line(char oldLine[], char prevLine[], char lastLine[], char newLine[], int ind, int e, int Q, int way, int tot, int run, int numR, int numP, FILE* output, int M) {
+  
+  int step = 0;
+  while (M > 0 || M == -2) {
+    step++;
+    M = M - 1;
+    if (M == -3)
+      step = 0;
 	if (run == 0) {																		// Begin printing first function
-		fprintf(output, "  if (IONIZATIONREACTION[%d])\n", tot);						// begin printing information in output file
+    if (step == 0 || step == 1) {
+		fprintf(output, "  if (IONIZATIONREACTION[%d])", tot);						// begin printing information in output file
+    }
+    if (step == 1)
+      fprintf(output, "\t{\n");
+    else 
+      fprintf(output, "\n");
 		if (way == 2)
 			fprintf(output, "\t  add_to_W_fwbw_%dr%dp", numR, numP);
 		else
@@ -826,16 +935,26 @@ void print_output_line(char oldLine[], char prevLine[], char lastLine[], char ne
 			fprintf(output, "_fit4(");									// printing fit information
 		else
 			fprintf(output, "(");
-		print_elements_add_ionization(oldLine, output, numR, numP);
-		print_numbers_add_ionization(oldLine, prevLine, numR, numP, ind, output);
+		print_elements_add_ionization(oldLine, prevLine, output, numR, numP, step, M);
+    step++;
+    if (M == -3)
+      step = 0;
+		print_numbers_add_ionization(oldLine, prevLine, numR, numP, ind, output, step, M);
 		if (e == 1)														// printing temperature Te vs T information
 			fprintf(output, "Te, X, W);");
 		else
 			fprintf(output, "T, X, W);");
-		fprintf(output, "\n\n");
+    if (step == 0)
+      fprintf(output, "\n\n");
 	}
 	else if (run == 1) {
-		fprintf(output, "  if (IONIZATIONREACTION[%d])\n", tot);						// begin printing information in output file
+		if (step == 0 || step == 1) {
+		fprintf(output, "  if (IONIZATIONREACTION[%d])", tot);						// begin printing information in output file
+    }
+    if (step == 1)
+      fprintf(output, "\t{\n");
+    else 
+      fprintf(output, "\n");
 		if (way == 2)
 			fprintf(output, "\t  add_to_dW_fwbw_%dr%dp", numR, numP);
 		else
@@ -844,13 +963,17 @@ void print_output_line(char oldLine[], char prevLine[], char lastLine[], char ne
 			fprintf(output, "_fit4(");									// printing fit information
 		else
 			fprintf(output, "(");
-		print_elements_add_ionization(oldLine, output, numR, numP);
-		print_numbers_add_ionization(oldLine, prevLine, numR, numP, ind, output);
+		print_elements_add_ionization(oldLine, prevLine, output, numR, numP, step, M);
+    step++;
+    if (M == -3)
+      step = 0;
+		print_numbers_add_ionization(oldLine, prevLine, numR, numP, ind, output, step, M);
 		if (e == 1)														// printing temperature Te vs T information
 			fprintf(output, "Te, X, dWdTe, dWdrhok);");
 		else
 			fprintf(output, "T, X, dWdT, dWdrhok);");
-		fprintf(output, "\n\n");
+		if (step == 0)
+      fprintf(output, "\n\n");
 	}
 	else if (run == 2 && Q != 0) {
 		fprintf(output, "  \t\tif (IONIZATIONREACTION[%d])\n", tot);
@@ -864,6 +987,12 @@ void print_output_line(char oldLine[], char prevLine[], char lastLine[], char ne
 		print_info_find_Qei(oldLine, prevLine, numR, numP, ind, output, newLine, lastLine, Q, e, run);			
 
 	}
+  
+}
+if (run == 0 || run == 1) {
+    if (step != 0)
+      fprintf(output, "\n\t}\n\n");
+    }
 }
 
 
@@ -885,8 +1014,8 @@ void check_all_indicators_formfit_electrontemperature_Q(char oldLine[], char pre
 }
 
 void build_current_function(int run, FILE* input, FILE* output) {       
-	char newLine[300], oldLine[300], prevLine[300], lastLine[300];
-	int loc = 0, numR = 0, numP = 0, tot = 0, ind = 0, check = 0, e = 0, way = 10, Q = 0;
+	char newLine[500], oldLine[500], prevLine[500], lastLine[500];
+	int loc = 0, numR = 0, numP = 0, tot = 0, ind = 0, check = 0, e = 0, way = 10, Q = 0, M = 0;
 
 	rewind(input);
 	fgets(oldLine, 300, input);
@@ -895,13 +1024,16 @@ void build_current_function(int run, FILE* input, FILE* output) {
 
 	while (fgets(newLine, 300, input) != NULL) {					  // searches each line until the end of the document
 		loc++;
+    if (loc == 280)
+      loc = loc;
 		Q = 0, way = 10, e = 0, check = 0, ind = 0;
 		check = check_reaction_current_line(oldLine, &way, &tot, output, loc);
 		if (check == 1 || check == 3) {
 			check_all_indicators_formfit_electrontemperature_Q(oldLine, prevLine, lastLine, newLine, &ind, &e, &Q);
+      M = check_M_reaction(oldLine, prevLine);
 			numR = number_of_reactants(oldLine);
 			numP = number_of_products(oldLine);
-			print_output_line(oldLine, prevLine, lastLine, newLine, ind, e, Q, way, tot, run, numR, numP, output);
+			print_output_line(oldLine, prevLine, lastLine, newLine, ind, e, Q, way, tot, run, numR, numP, output, M);
 		}
 		strcpy(oldLine, prevLine);									// shifts line storage to next line
 		strcpy(prevLine, lastLine);
@@ -944,3 +1076,60 @@ int check_reaction_current_line(char Line_str[], int* way, int* tot, FILE* outpu
 
 	return num;																 // returns 0 if there is no reaction and 1 if there is a reaction
 }
+
+int check_M_reaction(char oldLine[], char prevLine[]) {
+  int i = 0, j = 0, k = 0, M = 0;
+  char reactants[10][12]; // create a string array to hold reactant names
+    for (j = 0; oldLine[i] != '='; j++) {
+        k = 0;
+        if (oldLine[i] == '\t' || oldLine[i] == ' ' || oldLine[i] == '<' || oldLine[i] == '>') {
+            j--, i++;
+        }
+        else if (oldLine[i] == '+' && oldLine[i - 1] == ' ') {
+            i++, j--;
+        }
+        else if (oldLine[i] == '(' || oldLine[i] == ')') {
+            oldLine[i] = ' ';
+            i++, j--;
+        }
+        else {
+            while (oldLine[i] != ' ' && oldLine[i] != '\n') {
+                if (oldLine[i] == '(' || oldLine[i] == ')') {
+                    i++;
+                }
+                else if (oldLine[i] == '<' || oldLine[i] == '>')
+                    break;
+                else {
+                    reactants[j][k] = oldLine[i];
+                    i = i + 1, k = k + 1;
+                }
+            }
+            reactants[j][k] = '\0';
+            if (reactants[j][0] == 'E' && reactants[j][1] == '\0')
+                reactants[j][0] = 'e', reactants[j][1] = 'm', reactants[j][2] = 'i', reactants[j][3] = 'n', reactants[j][4] = 'u', reactants[j][5] = 's', reactants[j][6] = '\0';
+            if (reactants[j][0] == 'M' && reactants[j][1] == '\0')              // determine if any include an M third body
+                M = 1;
+            if (M == 1) {
+              int i = 0, count = 0;
+              for (i = 0; prevLine[i] != '\n' && prevLine[i] != '\r'; i++) {
+                if (prevLine[i] == '=' && prevLine[i+1] == '>') {
+                  M = -2;                                                 // if there is a third body but not enough info provided for substitutions
+                  break;
+                }
+              }
+              if (M != -2) {
+                for (i = 0; prevLine[i] != '\n' && prevLine[i] != '\r'; i++) {
+                  if (prevLine[i] == '/')
+                    count = count + 1;
+                }
+                M = count / 2;                                    // count for how many substitutions are necessary if third body info is present
+              }
+            }
+            else
+              M = -2;
+        }
+    }
+    return M;                   // returns number of substitutions necessary if third body is present, returns -2 if no third body or additional info
+  
+}
+

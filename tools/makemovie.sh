@@ -86,6 +86,10 @@ if [ -z "$moviefilename" ]; then
   argerror="1"; 
 fi
 
+if [ -z "$stylefilename" ]; then 
+  argerror="1"; 
+fi
+
 if [ -z "$is" ]; then 
   argerror="1"; 
 fi
@@ -103,8 +107,8 @@ Flag         Arg                                      Required?
 -start       counter start [int]                      Y
 -end         counter end [int]                        Y
 -movie       movie file to create [string]            Y
+-style       tecplot style file [string]              Y
 -fps         frames per second [int]                  N
--style       tecplot style file [string]              N
 -macro       tecplot macro file [string]              N
 -modulo      modulo used to skip files read [int]     N
              default: 1

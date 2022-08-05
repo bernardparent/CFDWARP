@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 AUG 04a
+  * in src/post.c
+    - in write_post_file_tecplot(), added wprintf statements that write the datatype of the variables to the Tecplot post file header
+  * in tools/chemkin2cfdwarp.c
+    - fixed bugs related to reactions that include the M species
+  * in tools/makemovie.sh and tools/makepng.sh
+    - now outputs an error message if the -style flag is not used
+
+
 2022 AUG 01a
   * in model/fluid/_*_plasma/fluid.hh and model/fluid/_drift-diffusion/fluid.hh
     - added INCLUDE_E_EFFECTS_ON_MOBILITY to gl_model_fluid_t

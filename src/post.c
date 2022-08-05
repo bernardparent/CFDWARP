@@ -234,6 +234,10 @@ void write_post_file_tecplot(np_t *np, gl_t *gl, zone_t zone, char *filename, bo
        J=1 is accepted. Go figure. */
     if (zone.ie-zone.is==0) set_dimname(axisname,'J','I','K');
     wfprintf(postfile, "ZONE %c=%ld, %c=%ld F=POINT\n", axisname[0],zone.ie-zone.is+1,axisname[1],zone.je-zone.js+1);
+    wfprintf(postfile, "DT=(");
+    for (dim=0; dim<nd; dim++) wfprintf(postfile, "DOUBLE ");
+    if (!GRIDONLY) for (cnt=0; cnt<numpostvar; cnt++) wfprintf(postfile, "DOUBLE ");
+    wfprintf(postfile,")\n");
 #endif
 #ifdef _3D
     set_dimname(axisname,'I','J','K');
@@ -244,6 +248,10 @@ void write_post_file_tecplot(np_t *np, gl_t *gl, zone_t zone, char *filename, bo
     wfprintf(postfile, "ZONE %c=%ld, %c=%ld, %c=%ld F=POINT\n",
              axisname[0],zone.ie-zone.is+1,axisname[1],zone.je-zone.js+1,axisname[2],
              zone.ke-zone.ks+1);
+    wfprintf(postfile, "DT=(");
+    for (dim=0; dim<nd; dim++) wfprintf(postfile, "DOUBLE ");
+    if (!GRIDONLY) for (cnt=0; cnt<numpostvar; cnt++) wfprintf(postfile, "DOUBLE ");
+    wfprintf(postfile,")\n");
 #endif
   }
   wfprintf(stdout,"Writing to postfile %s for TECPLOT use..",filename);

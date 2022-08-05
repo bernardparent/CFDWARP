@@ -91,6 +91,10 @@ if [ -z "$pngfilename" ]; then
   argerror="1"; 
 fi
 
+if [ -z "$stylefilename" ]; then 
+  argerror="1"; 
+fi
+
 if [ -z "$is" ]; then 
   argerror="1"; 
 fi
@@ -109,7 +113,7 @@ _________________________________________________________________
 -png           png file prefix [string]                 Y
 -start         counter start [int]                      Y
 -end           counter end [int]                        Y
--style         tecplot style file [string]              N
+-style         tecplot style file [string]              Y
 -digits        minimum number of digits used when       N 
                writing png files
 -macro         tecplot macro file [string]              N
