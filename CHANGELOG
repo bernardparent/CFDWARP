@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 AUG 09a
+  * in model/chem/_Air_Plasma_11s/
+    - added parent2023.c and parent2023.h
+  * in model/chem/_Air_Plasma_11s/chem.c and model/chem/_Air_Plasma_11s/chem.hh and model/chem/_Air_Plasma_11s/Makefile
+    - incorporated the parent2023 model
+  * in model/chem/_Air_Plasma_11s/doc/report.tex and model/chem/_Air_Plasma_11s/doc/all.bib
+    - added the parent2023 model documentation
+  * in model/emfield/_Epotential*/emfield.c
+    - in write_disc_emfield_template(), changed the default value of Ediv from 10.0 to 1e99
+  * in cycle/_standard/cycle.c
+    - in init_cycle(), uncommented the first update_prim_emfield_mem_in_zone()  
+
+    
 2022 AUG 04a
   * in src/post.c
     - in write_post_file_tecplot(), added wprintf statements that write the datatype of the variables to the Tecplot post file header

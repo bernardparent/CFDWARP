@@ -248,7 +248,7 @@ static double _mue_from_Nn_Ni_Te_rhok(double Nn, double Ni, double Te, spec_t rh
 }
 
 
-/* the weakly-ionized ion mobility corresponds to mui=min(A*Ti^n,B*Estar^p)/Nn 
+/* the ion mobility due to collisions with neutrals is calculated as muin=A*Ti^n/Nn 
  * mi is the mass of the ion in kg*/
 static double _mui_from_Nn_Ni_Ti(double Nn, double Ni, double A, double Ti, double n,  double mi){
   double muin,muii,mui;

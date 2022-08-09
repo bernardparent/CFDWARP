@@ -279,7 +279,7 @@ void init_cycle(char *argum, SOAP_codex_t *codexcontrol){
   np=((readcontrolarg_t *)codexcontrol->action_args)->np;
   gl=((readcontrolarg_t *)codexcontrol->action_args)->gl;
 #ifdef EMFIELD
-//  update_prim_emfield_mem_in_zone(*np, gl, _zone_intersection(gl->domain_all,gl->domain_lim));
+  update_prim_emfield_mem_in_zone(*np, gl, _zone_intersection(gl->domain_all,gl->domain_lim));
 #endif
 
   resume_nodes_only_in_zone(*np, gl, _zone_intersection(gl->domain_all,_zone_expansion(gl->domain,+max(hbw_res_fluid,hbw_bdry_fluid))));

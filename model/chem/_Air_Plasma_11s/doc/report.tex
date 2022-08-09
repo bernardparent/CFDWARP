@@ -897,6 +897,89 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 \end{table}
 %
 
+
+%
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Parent (2023) 11-species high-temperature air model. \cite{pof:2022:parent}}
+\begin{tabular}{ccccccc} 
+\toprule
+No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole~\tnote{(a)}\\ 
+~   & ~                   & Control. Temp.   & Control. Temp.\tnote{(c)} &~ & ~ & ~ \\
+\midrule
+1 & $\rm N_2 + M_1 \rightleftarrows N + N + M_1$ & $T$ & $T$  & 3.0 $\cdot$ 10$^{22}$  & $-1.6$ & $113200 \, R$  \\
+
+2 & $\rm N_2 + M_2 \rightleftarrows N + N + M_2$ & $T$ & $T$ & 7.0 $\cdot$ 10$^{21}$  & $-1.6$ & $113200 \, R$ \\
+
+3 & $\rm N_2 + e^- \rightleftarrows N + N + e^-$ & $T_{\rm e}$ & $T_{\rm e}$ & 3.0 $\cdot$ 10$^{24}$  & $-1.6$ & $113200 \, R$  \\
+
+4 & $\rm O_2 + M_1 \rightleftarrows O + O + M_1$ & $T$ & $T$ & 1.0 $\cdot$ 10$^{22}$  & $-1.5$ & $59500 \, R$ \\
+
+5 & $\rm O_2 + M_2 \rightleftarrows O + O + M_2$ & $T$ & $T$ & 2.0 $\cdot$ 10$^{21}$  & $-1.5$ & $59500 \, R$ \\
+
+6 & $\rm NO + M_3 \rightleftarrows N + O + M_3$ & $T$ & $T$ & 1.1 $\cdot$ 10$^{17}$  & 0.0 & $75500 \, R$ \\
+
+7 & $\rm NO + M_4 \rightleftarrows N + O + M_4$ & $T$ & $T$ & 5.0 $\cdot$ 10$^{15}$  & 0.0 & $75500 \, R$ \\
+
+8 & $\rm NO + O \rightleftarrows N + O_2 $ & $T$  & $T$ & 8.4 $\cdot$ 10$^{12}$  & 0.0 & $19400 \, R$ \\
+
+9 & $\rm N_2 + O \rightleftarrows NO + N $ & $T$  & $T$ & 5.7 $\cdot$ 10$^{12}$  & $0.42$ & $42938 \, R$ \\
+
+10 & $\rm N + O \rightleftarrows NO^+ + e^- $ & $T$ & $T_{\rm e}$ & 5.3 $\cdot$ 10$^{12}$  & 0.0 & $32000 \, R$  \\
+
+11 & $\rm O + O \rightleftarrows O_2^+ + e^- $ & $T$ & $T_{\rm e}$ & 1.1 $\cdot$ 10$^{13}$  & 0 & $81200 \, R$ \\
+
+12 & $\rm N + N \rightleftarrows N_2^+ + e^- $ & $T$ & $T_{\rm e}$ & 2.0 $\cdot$ 10$^{13}$  & 0 & $67700 \, R$ \\
+
+13 & $\rm NO^+ + O \rightleftarrows N^+ + O_2 $ & $T$  & $T$ & 1.0 $\cdot$ 10$^{12}$  & 0.5 & $77200 \, R$ \\
+
+14 & $\rm N^+ + N_2 \rightleftarrows N_2^+ + N $ & $T$  & $T$ & 1.0 $\cdot$ 10$^{12}$  & 0.5 & $12200 \, R$ \\
+
+15 & $\rm O_2^+ + N \rightleftarrows N^+ + O_2 $ & $T$ & $T$  & 8.7 $\cdot$ 10$^{13}$  & 0.14 & $28600 \, R$ \\
+
+16 & $\rm O^+ + NO \rightleftarrows N^+ + O_2 $ & $T$ & $T$  & 1.4 $\cdot$ 10$^{5}$  & 1.90 & $26600 \, R$ \\
+
+17 & $\rm O_2^+ + N_2 \rightleftarrows N_2^+ + O_2 $ & $T$ & $T$  & 9.9 $\cdot$ 10$^{12}$  & 0.00 & $40700 \, R$ \\
+
+18 & $\rm O_2^+ + O \rightleftarrows O^+ + O_2 $ & $T$ & $T$  & 4.0 $\cdot$ 10$^{12}$  & $-0.09$ & $18000 \, R$ \\
+
+19 & $\rm NO^+ + N \rightleftarrows O^+ + N_2 $ & $T$ & $T$  & 3.4 $\cdot$ 10$^{13}$  & $-1.08$ & $12800 \, R$ \\
+
+20 & $\rm NO^+ + O_2 \rightleftarrows O_2^+ + NO $ & $T$ & $T$  & 2.4 $\cdot$ 10$^{13}$  & 0.41 & $32600 \, R$ \\
+
+21 & $\rm NO^+ + O \rightleftarrows O_2^+ + N $ & $T$ & $T$  & 7.2 $\cdot$ 10$^{12}$  & 0.29 & $48600 \, R$ \\
+
+22 & $\rm O^+ + N_2 \rightleftarrows N_2^+ + O $ & $T$ & $T$ & 9.1 $\cdot$ 10$^{11}$  & 0.36 & $22800 \, R$ \\
+
+23 & $\rm NO^+ + N \rightleftarrows N_2^+ + O $  & $T$ & $T$ & 7.2 $\cdot$ 10$^{13}$  & 0.00 & $35500 \, R$  \\
+
+
+24 & $\rm O + e^- \rightleftarrows O^+ + e^- + e^- $ & $T_{\rm e}$  & $T_{\rm e}$ & 6.37 $\cdot$ 10$^{16}$  & $0.0029$ & $477190 \, R$  \\
+
+25 & $\rm N + e^- \rightleftarrows N^+ + e^- + e^- $ & $T_{\rm e}$ & $T_{\rm e}$ & 1.06 $\cdot$ 10$^{18}$  & $-0.2072$ & $629700 \, R$ \\
+
+26 & $\rm O_2 + e^- \rightleftarrows O_2^+ + e^- + e^-$ &$T_{\rm e}$ &$T_{\rm e}$ & 2.33 $\cdot$ 10$^{16}$ & $0.1166$ & $567360\, R$ \\
+
+27 & $\rm N_2 + e^- \rightleftarrows N_2^+ + e^- + e^-$ &$T_{\rm e}$ &$T_{\rm e}$ & 1.58 $\cdot$ 10$^{16}$ & $0.1420$ & $536330\, R$ \\
+
+28 & $\rm NO + e^- \rightleftarrows NO^+ + e^- + e^-$ &$T_{\rm e}$ &$T_{\rm e}$ & 5.63 $\cdot$ 10$^{18}$ & $-0.2607$ & $686030\, R$ \\
+
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol. $A$ has units of $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$. $E$ has units of cal/mole. The rate is given by $A T^n \exp(-E/RT).$
+\item[{b}] $\rm M_1=N,~O,~N^+,~O^+$; $\rm M_2=N_2,~O_2,~NO,~N_2^+,~O_2^+,~NO^+$; $\rm M_3= N,~O,~NO,~N^+,~O^+$; $\rm M_4=N_2,O_2,N_2^+,~O_2^+,~NO^+$.
+\item[{c}] The backward reaction rates are calculated using equilibrium constant. The reaction rates for 10, 11, and 12 are taken from \cite{pf:2007:boyd}. Reaction 8 is taken from \cite{jcp:1997:bose} and reaction 9 from \cite{jcp:1996:bose}. The reactions 24--28 are taken from \cite{pof:2022:parent}.  Other reactions are taken from \cite{book:1990:park}.
+\end{tablenotes}
+\label{tab:parent2023}
+\end{threeparttable}
+\end{center}
+\end{table}
+%
+
+
 ~
 \newpage
 ~
