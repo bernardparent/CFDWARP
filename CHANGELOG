@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 AUG 09b
+  * in cycle/_standard/cycle.c
+    - in init_cycle(), reverted to commenting out the first update_prim_emfield_mem_in_zone()
+  * in model/chem/_C2H4_Air_Plasma_30s/chem.c
+    - in add_W_Ionization_Adamovich() and add_dW_dx_Ionization_Adamovich(), added Te=max(Te,T)
+  
+
 2022 AUG 09a
   * in model/chem/_Air_Plasma_11s/
     - added parent2023.c and parent2023.h
