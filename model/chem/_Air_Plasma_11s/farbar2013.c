@@ -77,7 +77,7 @@ void find_W_Farbar2013 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
   spec_t X;
 
   /* find properties needed by add_to_W* functions */
-  R=1.9872;
+  R=Rchem;
   TTv=pow(T,0.67)*pow(Tv,0.33);
   TTe=sqrt(T*Te);
   TvTe=sqrt(Tv*Te);
@@ -224,7 +224,7 @@ void find_dW_dx_Farbar2013 ( gl_t *gl, spec_t rhok, double T, double Te, double 
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
   }
   
-  R=1.9872;
+  R=Rchem;
   TTv=pow(T,0.67)*pow(Tv,0.33);
   TTe=sqrt(T*Te);
   TvTe=sqrt(Tv*Te);

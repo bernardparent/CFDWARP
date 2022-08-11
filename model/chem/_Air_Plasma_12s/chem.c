@@ -101,7 +101,7 @@ void add_W_NegativeIon ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
   long k;
   spec_t X;
   
-  R=1.9872;
+  R=Rchem;
   for ( k = 0; k < ns; k++ ) {
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
   }
@@ -129,7 +129,7 @@ void add_dW_dx_NegativeIon ( gl_t *gl, spec_t rhok, double T, double Te, double 
   spec_t N,X;
   double R;
   
-  R=1.9872;
+  R=Rchem;
   for ( k = 0; k < ns; k++ ) {
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
   }

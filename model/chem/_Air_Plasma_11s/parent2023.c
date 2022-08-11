@@ -95,7 +95,7 @@ void find_W_Parent2023 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
   spec_t X;
 
   /* find properties needed by add_to_W* functions */
-  R=1.9872;
+  R=Rchem;
   TTv=pow(T,EXPON_TTV)*pow(Tv,1.0-EXPON_TTV);
   TTe=pow(T,EXPON_TTE)*pow(Te,1.0-EXPON_TTE);
   TvTe=pow(Tv,EXPON_TVTE)*pow(Te,1.0-EXPON_TVTE);
@@ -265,7 +265,7 @@ void find_dW_dx_Parent2023 ( gl_t *gl, spec_t rhok, double T, double Te, double 
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
   }
   
-  R=1.9872;
+  R=Rchem;
   TTv=pow(T,EXPON_TTV)*pow(Tv,1.0-EXPON_TTV);
   TTe=pow(T,EXPON_TTE)*pow(Te,1.0-EXPON_TTE);
   TvTe=pow(Tv,EXPON_TVTE)*pow(Te,1.0-EXPON_TVTE);

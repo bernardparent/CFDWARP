@@ -270,12 +270,12 @@ void add_to_dW_bw_1r2p(int specR1,
 
 
 /* 
-   k = A*T^n*exp(E1/Te+E2/Te^2+E3/Te^3+E4/Te^4)
+   k = A*T^n*exp(E1/(R*T)+E2/(R*T)^2+E3/(R*T)^3+E4/(R*T)^4)
    A in cm^3 (mole s)^(-1) K^(-n) 
-   E1 in K
-   E2 in K^2
-   E3 in K^3
-   E4 in K^4
+   E1 in cal/mole
+   E2 in (cal/mole)^2
+   E3 in (cal/mole)^3
+   E4 in (cal/mole)^4
    T in Kelvin
    X in mole/cm3
    dWdT in kg m^(-3) s^(-1) K^(-1)

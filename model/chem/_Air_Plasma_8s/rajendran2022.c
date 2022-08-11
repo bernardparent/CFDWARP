@@ -77,7 +77,7 @@ void find_W_Rajendran2022 ( gl_t *gl, spec_t rhok, double T, double Te, double T
   spec_t N,X;
 
   Nt = 0.0;
-  R=1.9872;
+  R=Rchem;
   for ( k = 0; k < ns; k++ ) {
     W[k] = 0.0;
     N[k] = rhok[k] / _calM (k ) * 1e-6 * calA;  /* particules/cm^3 */
@@ -224,7 +224,7 @@ void find_dW_dx_Rajendran2022 ( gl_t *gl, spec_t rhok, double T, double Te, doub
   
   /* find properties needed by add_to_dW* functions in proper units */
   Nt = 0.0;
-  R=1.9872;
+  R=Rchem;
   for ( k = 0; k < ns; k++ ) {
     N[k] = rhok[k] / _calM ( k ) * 1e-6 * calA; /* particules/cm^3 */
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */

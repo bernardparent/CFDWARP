@@ -94,7 +94,7 @@ void find_W_DunnKang1973 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv
     W[k] = 0.0;
   }
 
-  R=1.9872;
+  R=Rchem;
 
   if (REACTION[1]){
     for (k=0; specM1[k]!=specEND; k++){
@@ -258,7 +258,7 @@ void find_dW_dx_DunnKang1973 ( gl_t *gl, spec_t rhok, double T, double Te, doubl
     }
   }
 
-  R=1.9872;
+  R=Rchem;
 
 
   if (REACTION[1]){

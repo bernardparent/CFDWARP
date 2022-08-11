@@ -97,7 +97,7 @@ void find_W_ParentDunn2021 ( gl_t *gl, spec_t rhok, double T, double Te, double 
     W[k] = 0.0;
   }
 
-  R=1.9872;
+  R=Rchem;
 
   if (REACTION[1]){
     for (k=0; specM1[k]!=specEND; k++){
@@ -281,7 +281,7 @@ void find_dW_dx_ParentDunn2021 ( gl_t *gl, spec_t rhok, double T, double Te, dou
     }
   }
 
-  R=1.9872;
+  R=Rchem;
 
 
   if (REACTION[1]){

@@ -356,7 +356,7 @@ void find_dW_dx (gl_t *gl, spec_t rhok, double T, double Te, double Tv, double E
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
   }
   
-  R=1.9872;
+  R=Rchem;
   TTv=sqrt(T*Tv);
   TTe=sqrt(T*Te);
   TvTe=sqrt(Tv*Te);

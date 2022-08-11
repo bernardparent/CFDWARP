@@ -132,7 +132,7 @@ void add_W_Additional ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, d
   spec_t X;
   double Estar_from_Te,Te_from_Estar;
   
-  R=1.9872;
+  R=Rchem;
   for ( k = 0; k < ns; k++ ) {
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
   }
@@ -180,7 +180,7 @@ void add_dW_dx_Additional ( gl_t *gl, spec_t rhok, double T, double Te, double T
   spec_t N,X;
   double R,theta,kf,dkfdTe,dkfdT,dkfdTv,Te_from_Estar;
   
-  R=1.9872;
+  R=Rchem;
   for ( k = 0; k < ns; k++ ) {
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
   }

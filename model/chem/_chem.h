@@ -3,6 +3,7 @@
 
 #include <src/common.h>
 
+
 void write_model_chem_template(FILE **controlfile);
 
 void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex);

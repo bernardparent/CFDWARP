@@ -71,7 +71,7 @@ void find_W_Boyd2007 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, do
   spec_t X;
 
   /* find properties needed by add_to_W* functions */
-  R=1.9872;
+  R=Rchem;
   TTv=sqrt(Tv*T);
   
   for ( k = 0; k < ns; k++ ) {
@@ -156,7 +156,7 @@ void find_dW_dx_Boyd2007 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
   }
   
-  R=1.9872;
+  R=Rchem;
   TTv=sqrt(T*Tv);
   TTe=sqrt(T*Te);
   TvTe=sqrt(Tv*Te);

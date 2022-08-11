@@ -113,7 +113,7 @@ const static long specM8[]=
 double _kb_polynomial(long numreactant,double A1, double A2, double A3, double A4, double A5, double A, double n, double E, double T)
 {
   double ke,kf,kb,Z, R;
-  R=1.9872;
+  R=Rchem;
   Z = 10000.0/T;
   ke = exp(A1/Z + A2 + A3*log(Z) + A4*Z + A5*Z*Z);
   switch (numreactant){
@@ -137,7 +137,7 @@ double _kb_polynomial(long numreactant,double A1, double A2, double A3, double A
 double _dkbdT_polynomial(long numreactant,double A1, double A2, double A3, double A4, double A5, double A, double n, double E, double T)
 {
   double dkbdT,R;
-  R=1.9872;
+  R=Rchem;
   
   switch (numreactant){
     case 2:
@@ -529,7 +529,7 @@ void find_dW_dx_Kim2021 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
   }
   
-  R=1.9872;
+  R=Rchem;
   TTv=sqrt(T*Tv);
   TTe=sqrt(T*Te);
   TvTe=sqrt(Tv*Te);

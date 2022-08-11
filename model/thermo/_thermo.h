@@ -5,12 +5,13 @@
 #include <src/common.h>
 #include <stdio.h>
 
-#define calR 8.314472e0
-#define calA 6.02214199E23  
-#define echarge 1.602176462e-19
-#define emass 9.10938188E-31
+#define calR 8.314472e0  /* J/(K mol) */
+#define calA 6.02214199E23  /* particules per mole */
+#define Rchem 1.987192004e0  /*cal/(K mol)*/
+#define echarge 1.602176462e-19 /* C */
+#define emass 9.10938188E-31  /* kg */
 #define epsilon0 8.854187817E-12 /* permittivity of free space */
-#define kB 1.3806488E-23
+#define kB 1.3806488E-23   /* m2*kg/(s2*K) */
 
 
 /* taken from - Journal of Physical and Chemical Reference Data, Vol. 28, No. 6, 1999

@@ -7,6 +7,23 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 AUG 10a
+  * in cycle/resconv/_MUSCL/resconv.c
+    - in write_disc_resconv_template(), changed the default values for AOWENO_gammalo and
+      AOWENO_gammahi
+  * in various files
+    - replaced "R=1.9872;" by "R=Rchem;"
+  * in model/thermo/_thermo.h
+    - added #define Rchem 1.987192004e0
+  * in model/share/chem_share.c
+    - replaced 1.987192004e0 by Rchem
+    - in add_to_*_fit4(), changed k = A*T^n*exp(E1/Te+E2/Te^2+E3/Te^3+E4/Te^4) 
+      to k = A*T^n*exp(E1/(R*T)+E2/(R*T)^2+E3/(R*T)^3+E4/(R*T)^4) and E1[K] to E1[cal/mole]
+      and similarly for E2, E3, E4
+  * in bin
+    - added Schulein.wrp
+    
+
 2022 AUG 09b
   * in cycle/_standard/cycle.c
     - in init_cycle(), reverted to commenting out the first update_prim_emfield_mem_in_zone()

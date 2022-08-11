@@ -79,7 +79,7 @@ void find_W_Lenard1964 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
   
       
   /* find properties needed by add_to_W* functions */
-  R=1.9872;
+  R=Rchem;
   for ( k = 0; k < ns; k++ ) {
     W[k] = 0.0;
     N[k] = rhok[k] / _calM (k ) * 1e-6 * calA;  /* particules/cm^3 */
@@ -186,7 +186,7 @@ void find_dW_dx_Lenard1964 ( gl_t *gl, spec_t rhok, double T, double Te, double 
   double R,kf,dkfdTe,dkfdT,dkfdTv;
   
   
-  R=1.9872;
+  R=Rchem;
   /* initialize all derivatives to zero */
   for ( s = 0; s < ns; s++ ) {
     dWdT[s] = 0.0;
@@ -382,7 +382,7 @@ void find_We_Lenard1964 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
   spec_t N;
   double R;
 
-  R=1.9872;
+  R=Rchem;
   for ( k = 0; k < ns; k++ ) {
     N[k] = rhok[k] / _calM ( k ) * 1e-6 * calA;
   }
