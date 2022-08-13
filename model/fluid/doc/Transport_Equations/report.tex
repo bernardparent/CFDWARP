@@ -3506,12 +3506,12 @@ In the latter, the total mass flow rate injected per unit area corresponds to th
 The boundary condition for the electron number density at the electrodes with thermionic emission is such that the electron flux emitted from the surface follows Richardson's emission law:
 %
 \begin{equation}
-    J_{\rm emit}= \lambda_R A_0 T_{\rm w}^2 \exp(-W/(k_{\rm B} T_{\rm w})) 
+    J_{\rm emit}= \lambda_R A_0 T_{\rm w}^2 \exp(-(W-\Delta W_\textrm{Schottky})/(k_{\rm B} T_{\rm w})) 
 \end{equation}
 %
 where $T_{\rm w}$ is the wall temperature in Kelvin, $W$ is the work function in eV, $k_{\rm B}$ is the Boltzmann constant, $\lambda_R$ is a material specific constant here set to 0.5 unless otherwise specified, and $A_0$ is a constant set to $1.202\cdot10^6$~A/m$^2$K$^2$. 
 
-First, define $\chi$ as a coordinate perpendicular to the surface and pointing from the surface towards the plasma. 
+Let us define $\chi$ as a coordinate perpendicular to the surface and pointing from the surface towards the plasma. 
 
 When the component of the electric field along $\chi$ is negative, the sheath is in the \emph{classical regime} because the electric field entrains the positive ions towards the surface and the electrons  away from the surface. In this regime, electrons emitted from the surface through thermionic emission will be carried into the plasma by the electric field:
 %
@@ -3540,8 +3540,17 @@ Substituting the latter in the former and isolating the number density gradient 
  \frac{\partial N_{\rm e}}{\partial \chi} = -\frac{J_{\rm emit}}{\mu_{\rm e} k_{\rm B} T_{\rm e}}~~~~{\rm for~}\vec{E}_\chi>0
 \end{equation}
 %
-
-
+Lastly, $\Delta W_{\rm Schottky}$ is the decrease of the work function by the Schottky effect, as follows:
+%
+\begin{equation}
+ \Delta W_{\rm Schottky} = 
+ \left\{ \begin{array}{ll}
+ \sqrt{\frac{e \min\left(|\vec{E}_\chi|,~10^8~V/m\right)}{4 \pi \epsilon_0}}  & \textrm{if}~\vec{E}_\chi<0 \\
+ 0 & \textrm{otherwise} \\
+ \end{array}  \right.
+\end{equation}
+%
+where $\Delta W_{\rm Schottky}$ is in eV, $e$ is the electron charge in Coulomb, $\vec{E}_\chi$ is in V/m, and $\epsilon_0$ is the permittivity of free space in $\rm m^{-3} kg^{-1} s^4 A^2$. 
 
   \bibliographystyle{warpdoc}
   \bibliography{all}

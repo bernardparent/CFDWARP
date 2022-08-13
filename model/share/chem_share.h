@@ -281,12 +281,21 @@ void add_to_dW_bw_1r2p(int specR1,
    dWdT in kg m^(-3) s^(-1) K^(-1)
    dWdrhok in s^(-1)
 */
+
+double _kf_fit4(double A, double n, double E1, double E2, double E3, double E4, double T);
+
+double _dkfdT_fit4(double A, double n, double E1, double E2, double E3, double E4, double T);
+
 void add_to_W_fw_2r2p_fit4(int specR1, int specR2,
                            int specP1, int specP2,
                            double A, double n, double E1, double E2, double E3, double E4, double T, spec_t X, spec_t W);
 
 void add_to_W_fw_2r3p_fit4(int specR1, int specR2,
                       int specP1, int specP2, int specP3,
+                      double A, double n, double E1, double E2, double E3, double E4, double T, spec_t X, spec_t W);
+
+void add_to_W_fw_2r4p_fit4(int specR1, int specR2,
+                      int specP1, int specP2, int specP3, int specP4,
                       double A, double n, double E1, double E2, double E3, double E4, double T, spec_t X, spec_t W);
 
 void add_to_dW_fw_2r2p_fit4(int specR1, int specR2,
@@ -299,6 +308,12 @@ void add_to_dW_fw_2r3p_fit4(int specR1, int specR2,
                        int specP1, int specP2, int specP3,
                        double A, double n, double E1, double E2, double E3, double E4, double T, spec_t X, 
                        spec_t dWdT, spec2_t dWdrhok);
+
+void add_to_dW_fw_2r4p_fit4(int specR1, int specR2,
+                       int specP1, int specP2, int specP3, int specP4,
+                       double A, double n, double E1, double E2, double E3, double E4, double T, spec_t X, 
+                       spec_t dWdT, spec2_t dWdrhok);
+
 
 
 void add_to_W_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,

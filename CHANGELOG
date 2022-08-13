@@ -7,6 +7,25 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 AUG 13a
+  * in model/chem/_C2H4_Air_Plasma_30s/chem.c
+    - made modifications
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - in write_model_fluid_template() and read_model_fluid_actions() added SCHOTTKY_EFFECT
+  * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - in update_bdry_wall(), added dWschottky contribution to the work function
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - in the section ``Thermionic Emission Boundary Condition'', added documentation explaining
+      Schottky effect to the work function
+  * in model/share/chem_share.c
+    - added  _kf_fit4() and _dkfdT_fit4()
+    - in add_to_*_fit4(), added calls to _kf_fit4() and _dkfdT_fit4()
+  * in tools/chemkin2cfdwarp.c
+    - made various modifications to take into account CHEMKIN syntax involving REACTIONS
+  * in bin
+    - Updated Schulein.wrp
+    
+
 2022 AUG 10a
   * in cycle/resconv/_MUSCL/resconv.c
     - in write_disc_resconv_template(), changed the default values for AOWENO_gammalo and

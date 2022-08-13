@@ -197,10 +197,10 @@ Init(
     (b) In the freestream make sure that 1E-5*q_infty^2/ReL<k<0.1*q_infty^2/ReL.
     }
     
-   {Test Tube Inflow Conditions}
+    {Test Tube Inflow Conditions}
     
     Mx = 5.0;		
-	My = 0;
+	  My = 0;
     Mz = 0;
     T  = 68.3333; {K}	
     P  = 4006.8636;
@@ -210,42 +210,43 @@ Init(
     w_O2 = 0.235; {Mass %}
     w_N2 = 0.765; {Mass %}
 	
-	{After Shock Properties}
+	  {After Shock Properties}
 	
-  if(shock10deg == YES,  
-  
-    wave_ang = rad(19.3760105);    
-    P2P1  = 3.04367327;
-    T2T1  = 1.42902761;   
-    P2    = P2P1*P;
-    T2    = T2T1*T;
-    M2    = 3.99916189;
-    delta = rad(10);
-    Mx2   =  M2*cos(delta);
-    My2   = -M2*sin(delta);
-    x_shock  = 0.06565466; {after shock inflow position, set to always reach the wall at the same x-coordinate.}
-  ,   
-    wave_ang = rad(23.28722);    
-    P2P1  = 4.39191784;
-    T2T1  = 1.66866305;   
-    P2    = P2P1*P;
-    T2    = T2T1*T;
-    M2    = 3.6025636;
-    delta = rad(14);
-    Mx2   =  M2*cos(delta);
-    My2   = -M2*sin(delta);
-    x_shock  = 0.1176599582;
-    
-  );    
+    if(shock10deg == YES,   
+      wave_ang = rad(19.3760105);    
+      P2P1  = 3.04367327;
+      T2T1  = 1.42902761;   
+      P2    = P2P1*P;
+      T2    = T2T1*T;
+      M2    = 3.99916189;
+      delta = rad(10);
+      Mx2   =  M2*cos(delta);
+      My2   = -M2*sin(delta);
+      x_shock  = 0.06565466; {after shock inflow position, set to always reach the wall at the same x-coordinate.}
+	
+    ,{else}   
+	
+      wave_ang = rad(23.28722);    
+      P2P1  = 4.39191784;
+      T2T1  = 1.66866305;   
+      P2    = P2P1*P;
+      T2    = T2T1*T;
+      M2    = 3.6025636;
+      delta = rad(14);
+      Mx2   =  M2*cos(delta);
+      My2   = -M2*sin(delta);
+      x_shock  = 0.1176599582;
+    );    
 	
     psi2  = 110*sqrt(Mx2^2+My2^2)*sqrt(1.4*287*T2); {1/s for TURBMODEL_KOMEGA*}
   
     All(INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,k,psi2);
         
     i_shock  = 1;
+	
     while ( _x_global(i_shock,je)<x_shock,                                                    
       i_shock = i_shock + 1;
-     ); 
+    ); 
     
     for (i,i_shock+1,ie,                                                    
       for (j,js+1,je,                                                    
@@ -253,7 +254,8 @@ Init(
           Region(i,j,ie,j,INIT_TYPE2,Mx2,My2,P2,T2,w_O2,w_N2,k,psi2);
         );
       ); 
-    );
+	  );
+	
   );
 );
 
@@ -295,28 +297,28 @@ Cycle(
     Uref[numspec+numdim+2]=rhoref*kref*1e99;
     Uref[numspec+numdim+3]=rhoref*psiref*1e99;
   );
+  
   SteadyState(
- 
-  if (mod(iter,500)==0,
+    if (mod(iter,500)==0,
       WriteDataFile(outputfilename"."iter);
-       Post(
-         q       = 0.5*P*1.4*(Mx^2+My^2+Mz^2);
-          Area    = _Area(is+1,js,ie-1,js,2,BDRY_WALLTFIXED1);
-           Fshe    = _Fshear(is+1,js,ie-1,js,1,BDRY_WALLTFIXED1);
-           );
-           fprintf("cf_monitor_wil20.txt","%6ld  %E\n",iter,Fshe/Area/q);
-            ks = 1; 
-             xrec[0] = 0;
-              xrec[1] = 0; 
-               for (i,is+1,ie-1, 
-                 Fshear[i]=_Fshear(i,js,i,js,1,BDRY_WALLTFIXED1);  
-                  if (Fshear[i] < 0,
-                   xrec[ks] = _x_global(i,1);
-                   ks = ks + 1;
-                ); 
-          );
-         fprintf("bubble_size_wil20.txt","%6ld %E\n",iter, xrec[ks-1]-xrec[1]);
-     );
+      Post(
+        q    = 0.5*P*1.4*(Mx^2+My^2+Mz^2);
+        Area = _Area(is+1,js,ie-1,js,2,BDRY_WALLTFIXED1);
+        Fshe = _Fshear(is+1,js,ie-1,js,1,BDRY_WALLTFIXED1);
+      );
+      fprintf("cf_monitor.txt","%6ld  %E\n",iter,Fshe/Area/q);
+      ks = 1; 
+      xrec[0] = 0;
+      xrec[1] = 0;   
+	    for (i,is+1,ie-1, 
+        Fshear[i]=_Fshear(i,js,i,js,1,BDRY_WALLTFIXED1);  
+        if (Fshear[i] < 0,
+          xrec[ks] = _x_global(i,1);
+          ks = ks + 1;
+        ); 
+      );
+      fprintf("bubble_size.txt","%6ld %E\n",iter, xrec[ks-1]-xrec[1]);   
+    );
     
     sigma1=0.1;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
@@ -324,24 +326,23 @@ Cycle(
     if (iter==1,
       CFL=0.5;
     );
+	
     CFL=min(CFL*1.0002,1.0);
     
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
-       printf("%6.4f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
-           CFL,iter,effiter_U,ximax,i_ximax,
-           j_ximax,clipinfo);
-
+    printf("%6.4f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
+    CFL,iter,effiter_U,ximax,i_ximax,j_ximax,clipinfo);
   );
 );
 
 
 Post(
-q = 0.5*P*1.4*(Mx^2+My^2+Mz^2);
-   for (i,is+1,ie-1,                                                    
+  q = 0.5*P*1.4*(Mx^2+My^2+Mz^2);
+  for (i,is+1,ie-1,                                                    
     Area[i]  =_  Area(i,js,i,js,2,BDRY_WALLTFIXED1);    
     Fpres[i]=_Fpressure(i,js,i,js,2,BDRY_WALLTFIXED1);
     fprintf(postfilename".cp","%E %E\n",_x(i,1),-Fpres[i]/Area[i]);
-   );
+  ); 
   for (i,is+1,ie-1,                                                    
     Area[i]  =_  Area(i,js,i,js,2,BDRY_WALLTFIXED1);   
     Fshear[i]=_Fshear(i,js,i,js,1,BDRY_WALLTFIXED1);

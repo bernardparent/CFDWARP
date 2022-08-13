@@ -87,11 +87,11 @@
 }
 
 
-Bz=0.11; {Tesla}
+Bz=0.09; {Tesla}
 mf=1.0; 
 gamma=0.1e0;    {secondary emission coefficient}
 Twall=3000;     {wall temperature everywhere}
-workfunct=2.7; {2.7, 4.6, and 1e99 eV}
+workfunct=4.6; {2.7, 4.6, and 1e99 eV}
 THERMIONICEMISSION=TRUE;
 {
             work function   max operating temperature point
@@ -108,7 +108,7 @@ THERMIONICEMISSION=TRUE;
      J A Sillero et al 2010 J. Phys. D: Appl. Phys. 43 185204
 }
 
-theta=rad(20);
+theta=rad(0);
 
 is=1;
 is1=is+round(mf*40); {start of electrode}
@@ -230,9 +230,10 @@ Model(
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
     AXISYMMETRIC=NO;
     INCLUDE_E_EFFECTS_ON_MOBILITY=YES;
+    SCHOTTKY_EFFECT=YES;
   );
   AirPlasma11s(
-    CHEMMODEL=CHEMMODEL_BOYD2007;
+    CHEMMODEL=CHEMMODEL_PARENT2023;
     ADDITIONALREACTION=FALSE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE even if TOWNSENDIONIZATION=TRUE}
     QEISOURCETERMS=TRUE;
@@ -407,7 +408,7 @@ Cycle(
     if(iter<1500, CFLmax=0.2;);
     if(iter<1000, CFLmax=0.2;);
     if(iter<500, CFLmax=0.1;);
-    CFLmax=0.1;
+    CFLmax=0.5;
     CFL=min(CFL*1.02,CFLmax);
 
     
