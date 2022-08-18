@@ -1373,7 +1373,8 @@ void add_to_dW_fw_1r1p(int specR1, int specP1, double A, double n, double E, dou
 
 /* 
    k = A*T^n*exp(E1/(R*T)+E2/(R*T)^2+E3/(R*T)^3+E4/(R*T)^4)
-   A in cm^3 (mole s)^(-1) K^(-n) 
+   for A in cm^3 (mole s)^(-1) K^(-n), kf will be in cm^3 (mole s)^(-1)
+   for A in cm^3 (s)^(-1) K^(-n), kf will be in cm^3 (s)^(-1)     
    E1 in cal/mole
    E2 in (cal/mole)^2
    E3 in (cal/mole)^3
@@ -1383,14 +1384,15 @@ void add_to_dW_fw_1r1p(int specR1, int specP1, double A, double n, double E, dou
 double _kf_fit4(double A, double n, double E1, double E2, double E3, double E4, double T){
   double kf;
   kf=A*pow(T,n)*exp(E1/(Rchem*T)+E2/(Rchem*Rchem*T*T)+E3/(Rchem*Rchem*Rchem*T*T*T)
-    +E4/(Rchem*Rchem*Rchem*Rchem*T*T*T*T));  /* cm^3 (mole s)^(-1) */
+    +E4/(Rchem*Rchem*Rchem*Rchem*T*T*T*T)); 
   return(kf);
 }
 
 
 /* 
    kf = A*T^n*exp(E1/(R*T)+E2/(R*T)^2+E3/(R*T)^3+E4/(R*T)^4)
-   A in cm^3 (mole s)^(-1) K^(-n) 
+   for A in cm^3 (mole s)^(-1) K^(-n), dkfdT will be in  cm^3 (K mole s)^(-1)
+   for A in cm^3 (s)^(-1) K^(-n), dkfdT will be in  cm^3 (K s)^(-1)
    E1 in cal/mole
    E2 in (cal/mole)^2
    E3 in (cal/mole)^3

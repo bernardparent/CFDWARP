@@ -1,0 +1,37 @@
+#!/usr/local/bin/soap
+
+
+{see 
+High-Power Subnanosecond Beams of Runaway Electrons Generated in Dense Gases
+Victor F Tarasenko and Sergei I Yakovlenko, Physica Scripta,
+https://iopscience.iop.org/article/10.1238/Physica.Regular.072a00041}
+
+Nn=3.22e24; {1/m3}
+
+E=1e5; {V/m}
+while (E<1e11,
+  EoverN=E/Nn; {Vm2}
+
+  mue=((-ln(EoverN)-30)^4/8E4+EoverN*4E15)*3.22e24/Nn; {m2/V*s}
+
+  mue2=(4E19*(-ln(EoverN)-30)^4+1.3e40*EoverN)/Nn; {m2/V*s}
+
+
+  xi=15*exp(-235/((E/100)/100) - 1.7e-4/100*(E/100));  {1/cm*Torr}
+  alpha=xi*100 {1/cm};
+  w_dr=mue*E*100; {cm/s} 
+  k_high=alpha*w_dr/(Nn/1e6); {cm3/s}
+
+  k_high=EoverN*15e10*((-ln(EoverN)-30)^4/8E4+EoverN*4E15)*exp(-7.3e-19/EoverN - 5.474e16*EoverN); {cm3/s}
+  k_high=EoverN*(1.875E6*(-ln(EoverN)-30.0)^4+6E26*EoverN)*exp(-7.3e-19/EoverN - 5.474e16*EoverN);
+  k_high_approx=EoverN*(1.875E6*(-ln(EoverN)-30.0)^4+6E26*EoverN)*exp( - 5.474e16*EoverN);
+  k_low=exp ( -0.0105809 * sqr ( ln(EoverN) ) - 2.40411e-75 * ( (ln(EoverN))^ 46.0 ) ); {cm3/s}
+  k=min(k_high,k_low);
+  k2=min(k_high_approx,k_low);
+  
+  printf("mue=%E  mue2=%E  EoverN=%E Vm2  k_low=%E  k_high=%E   k=%E  k2=%E\n",mue,mue2,EoverN,k_low,k_high,k,k2);
+
+  
+
+  E=E*2;
+);

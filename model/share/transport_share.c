@@ -173,7 +173,7 @@ void adjust_nuk_using_mobilities_given_muk(spec_t rhok, double T, double Te, cha
 
 
 void adjust_muk_for_Ek_effect(long k, double Ek, double N, double *muk){
-  double B,p;
+  double B,p,EoverN,weight,muehi;
   if (speciestype[k]==SPECIES_IONPLUS || speciestype[k]==SPECIES_IONMINUS){
     switch (smap[k]){
       case SMAP_O2plus:  
@@ -197,6 +197,19 @@ void adjust_muk_for_Ek_effect(long k, double Ek, double N, double *muk){
         p=-0.5;
     }
     *muk=min(*muk,B*pow(Ek/N,p)/N);
+  }
+  if (speciestype[k]==SPECIES_ELECTRON){
+    EoverN=Ek/N;
+    if (EoverN>1e-19){
+      /* High-Power Subnanosecond Beams of Runaway Electrons Generated in Dense Gases
+         Victor F Tarasenko and Sergei I Yakovlenko, Physica Scripta,
+         https://iopscience.iop.org/article/10.1238/Physica.Regular.072a00041
+      */
+      EoverN=min(EoverN,5e-17);  // muehi is valid between 1e-19 and 5e-17 Vm2
+      muehi=(4.0E19*powint(-log(EoverN)-30.0,4)+1.3e40*EoverN)/N; 
+      weight=max(0.0,min(1.0,19.0+log(EoverN)/log(10.0)));
+      *muk=weight*muehi+(1.0-weight)*(*muk);
+    }  
   }
 }
 

@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 AUG 18a
+  * in model/share/transport_share.c
+    - in adjust_muk_for_Ek_effect(), added contribution of electric field to electron mobilities
+      from Tarasenko paper
+  * in model/transport/doc/report.tex
+    - added section "Effect of Electric Field on Mobilities"
+  * in model/chem/_Air_Plasma_11s/chem.c, model/chem/_Air_Plasma_11s/doc/report.tex,
+    model/chem/_Air_Plasma_11s/parent2023b.c
+    - added PARENT2023B model
+  * in model/chem/_C2H4_Air_Plasma_30s/chem.c
+    - changed TEMAX from 1e6 to 1e5 K
+  * in model/share/chem_share.c
+    - improved documentation of fit4 functions
+  
+
 2022 AUG 13a
   * in model/chem/_C2H4_Air_Plasma_30s/chem.c
     - made modifications

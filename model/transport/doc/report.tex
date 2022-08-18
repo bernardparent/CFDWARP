@@ -107,161 +107,39 @@ abstract
 %%  \listoffigures
 
 
+\section{Effect of Electric Field on Mobilities}
 
-\section{Parent-Macheret Charged Species Transport Coefficients}
 
 %
-\begin{table*}[b]
+\begin{table*}[t]
   \center
   \begin{threeparttable}
-    \tablecaption{Ion and electron mobilities in dry air.\tnote{a,d}}
-    \label{tab:pm:mu}
+    \tablecaption{Effect of electric field on electron and ion mobilities.\tnote{a}}
+    \label{tab:mobilities:Ecorrection}
     \fontsizetable
     \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}ll}
     \toprule
-    Species & Mobility, $\rm m^2\cdot V^{-1}\cdot s^{-1}$  & Reference\\
+    Species & Corrected Mobility, $\rm m^2\cdot V^{-1}\cdot s^{-1}$  & Reference\\
     \midrule
-    Air$^+$         & $\min\left( \frac{1}{2}{\rm avgh} \left(N_{\rm n}^{-1} \cdot 0.84\cdot 10^{23}\cdot T^{-0.5}~,~~14.3 \cdot m_{\rm air}^{-0.5} \cdot T^{1.5} \cdot N_{\rm i}^{-1} \right),~~N^{-1}\cdot 2.35 \cdot 10^{12}\cdot \left(E^\star\right)^{-0.5}\right)$  & \cite{misc:1968:sinnott}\tnote{b}\alb
-    N$_2^+$         & $\min\left(\frac{1}{2}{\rm avgh}\left( N_{\rm n}^{-1} \cdot 0.75\cdot 10^{23}\cdot T^{-0.5}~,~~14.3 \cdot m_{\rm N_2^+}^{-0.5} \cdot T^{1.5} \cdot N_{\rm i}^{-1}\right),~~N^{-1}\cdot 2.03 \cdot 10^{12}\cdot \left(E^\star\right)^{-0.5} \right)$  & \cite{misc:1968:sinnott}\alb
-    O$_2^+$         &  $\min \left( \frac{1}{2}{\rm avgh} \left(N_{\rm n}^{-1} \cdot 1.18\cdot 10^{23}\cdot T^{-0.5},~~14.3 \cdot m_{\rm O_2^+}^{-0.5} \cdot T^{1.5} \cdot N_{\rm i}^{-1} \right)~~N^{-1}\cdot 3.61 \cdot 10^{12}\cdot\left(E^\star\right)^{-0.5}\right)$  & \cite{misc:1968:sinnott}\alb
-    O$_2^-$         & $\min \left( \frac{1}{2}{\rm avgh} \left(N_{\rm n}^{-1} \cdot 0.97 \cdot 10^{23}\cdot T^{-0.5},~~14.3 \cdot m_{\rm O_2^-}^{-0.5} \cdot T^{1.5} \cdot N_{\rm i}^{-1} \right),~~N^{-1}\cdot 3.56 \cdot 10^{19} \cdot \left(E^\star\right)^{-0.1}\right)$  & \cite{misc:1983:gosho}\alb
-    other~ions         & $\min\left( \frac{1}{2}{\rm avgh} \left(N_{\rm n}^{-1} \cdot 2.2 \cdot 10^{10}\cdot (m_{\rm i} T)^{-0.5},~~14.3 \cdot m_{\rm i}^{-0.5} \cdot T^{1.5} \cdot N_{\rm i}^{-1} \right),~~N^{-1}\cdot 0.55 \cdot \left(m_{\rm i} E^\star\right)^{-0.5}\right)$  & --\alb
-    e$^-$         & $\frac{1}{2}{\rm avgh}\left( N_{\rm n}^{-1} \cdot 3.74\cdot 10^{19} \cdot {\rm exp}\left(33.5 \cdot \left({\rm ln}\, T_{\rm e} \right)^{-0.5}\right) ~,~~N_{\rm i}^{-1} \cdot 9.5 \cdot 10^{16} \cdot T_{\rm e}^{1.5}\cdot (\ln \Lambda)^{-1}  \right)$  & \cite[Ch.\ 21]{book:1997:grigoriev}\tnote{c}\\
+    N$_2^+$         & $\min\left( \mu_{\rm N_2^+},~~N^{-1}\cdot 2.03 \cdot 10^{12}\cdot \left(E^\star\right)^{-0.5} \right)$  & \cite{misc:1968:sinnott}\alb
+    O$_2^+$         &  $\min \left( \mu_{\rm O_2^+},~~N^{-1}\cdot 3.61 \cdot 10^{12}\cdot\left(E^\star\right)^{-0.5}\right)$  & \cite{misc:1968:sinnott}\alb
+    O$_2^-$         & $\min \left( \mu_{\rm O_2^-},~~N^{-1}\cdot 3.56 \cdot 10^{19} \cdot \left(E^\star\right)^{-0.1}\right)$  & \cite{misc:1983:gosho}\alb
+    other~ions         & $\min\left( \mu_{\rm i},~~N^{-1}\cdot 0.55 \cdot \left(m_{\rm i} E^\star\right)^{-0.5}\right)$  & --\alb
+    e$^-$         & \begin{tabular}{@{}l}$(1-\xi)\cdot \mu_{\rm e} + \xi \cdot N^{-1} \cdot \left(4\cdot 10^{19}\cdot(-30 -\ln E^\star)^4+1.3\cdot 10^{40}\cdot E^\star\right) $\\~~~~with~$\xi=\max\left(0,~\min(1,~19+\log_{10}E^\star)\right)$\end{tabular}  & \cite{ps:2005:tarasenko}\tnote{b}\\
     \bottomrule
     \end{tabular*}
     \begin{tablenotes}
-      \item[a] Notation and units:  $T_{\rm e}$ is in Kelvin; $T$ is in Kelvin; $m_{\rm i}$ is the mass of one ion particule in kg; $N$ is the total number density of the plasma in 1/m$^3$; $N_{\rm i}$ is the sum of the positive ion number densities in 1/m$^3$;  $N_{\rm n}$ is the sum of the neutral species number densities  in 1/m$^3$;  $E^\star$ is the reduced effective electric field  ($E^\star \equiv |\vec{E}|/N$) in units of V$\cdot$m$^2$.
-      \item[b] The ``air ion'' mobility is obtained from the N$_2^+$ and O$_2^+$ ion mobilities assuming a N$_2^+$:O$_2^+$ ratio of 4:1. 
-      \item[c] The expression for the electron-neutral collisions approximates the data given in Chapter 21 of Ref.\ \cite{book:1997:grigoriev}; The equation can be used in the range $1000~{\rm K} \le T_{\rm e} \le 57900 ~{\rm K}$ with a relative error on the mobility not exceeding 20\%. In the range $287~{\rm K} \le T_{\rm e} < 1000~{\rm K}$, the relative error is less than 30\%. 
-      \item[d] The function avgh($a$,$b$) returns the harmonic average of the two arguments as follows $2/(a^{-1}+b^{-1})$.
+      \item[a] Notation and units:  $m_{\rm i}$ is the mass of one ion particule in kg; $N$ is the total number density of the plasma in 1/m$^3$; $E^\star$ is the reduced effective electric field  ($E^\star \equiv |\vec{E}|/N$) in units of V$\cdot$m$^2$; $\mu_k$ is the uncorrected mobility of species $k$ in $\rm m^2\cdot V^{-1}\cdot s^{-1}$.
+      \item[b] The electron mobility weight factor $\xi$ is such that the corrected mobility is a blend of the uncorrected mobility (function of electron temperature only) and the high-electric-field mobility (function of reduced electric field only) in the range $10^{-19}<E^\star<10^{-18}~ {\rm Vm^2}$. In the range $E^\star>10^{-19}~ {\rm Vm^2}$ the corrected mobility is simply set equal to the high-electric-field mobility. Note that the corrected mobility data outlined in \cite{ps:2005:tarasenko} is valid for $10^{-19}<E^\star<5\cdot 10^{-17}$~Vm$^2$.
     \end{tablenotes}
    \end{threeparttable}
 \end{table*}
 %
 
-\subsection{Electron Mobility}
+Electron and ion mobilities are function not only of ion or electron temperature but also of the reduced electric field. This can be explained as follows. Consider first the electron mobility. In high $E$-field discharges or in electron beams, the electron temperature (i.e.\ defined as being proportional to the average kinetic energy of the electrons with respect to the electron bulk motion) ceases to have a meaningful impact on chemical reactions between electrons and heavier particules. This is because the main source of velocity difference between electrons and heavy particules is the drift of the electrons with respect to the gas. Because the electron drift velocity is function of the reduced electric field, the electron mobility also becomes function mostly of the electric field (and not electron temperature) when the reduced electric field is high. Similar arguments can be made for the ions. As the reduced electric field becomes large, the ion mobility is less function of ion temperature but more function of the ion drift because the main source of velocity difference between the ions and the neutrals is the drift of the ions, not the ions thermal velocity. Thus, in discharges where the electric field is high, the ion mobility should be function of the reduced electric field.
 
-The electron mobility in a partially ionized plasma (a plasma in which both the molar fraction of all neutrals and the molar fraction of all charged species are significant) needs to include collisions between the electrons and the neutrals and collisions between electrons and ions. This results in an electron mobility equal to:
-%
-\begin{equation}
-\mu_{\rm e}=\frac{1}{\frac{1}{\mu_{\rm en}}+\frac{1}{\mu_{\rm ei}}}
-\end{equation}
-%
-with the electron mobility with respect to ions set to
-%
-\begin{equation}
-\mu_{\rm ei}= \frac{9.5 \times 10^{16}}{\rm m\cdot K^{1.5}\cdot V \cdot s} \frac{T_{\rm e}^{1.5}}{N_{\rm i} \ln \Lambda}
-\end{equation}
-%
-where $T_{\rm e}$ is the electron temperature in K, $N_{\rm i}$ is the ion number density in m$^{-3}$.
-The latter is obtained from Raizer \cite[Eq.\ (2.9)]{book:1991:raizer}.
-Also, $\Lambda$ is the shielding parameter and $\ln \Lambda$ is the Coulomb logarithm. The Coulomb logarithm can be  found from the following \cite[p. 14]{book:1991:raizer}:
-%
-\begin{equation}
-    \ln \Lambda=13.57+\frac{3}{2} {\rm log}_{10} \left(\frac{T_{\rm e}}{11600}\right)-\frac{1}{2}{\rm log}_{10}\left(\frac{N_{\rm e}}{10^6}\right)
-\end{equation}
-%
-with $\rho_{\rm e}$ the electron partial density in kg/m$^3$, $m_{\rm e}$ the electron mass in kg, $N_{\rm e}$ the electron number density in m$^{-3}$, and $T_{\rm e}$ the electron temperature in K.
+The effect of the electric field on the electron and ion mobilities is taken from various sources and tabulated in Table \ref{tab:mobilities:Ecorrection}. 
 
-However, we find that using the latter leads to the electrical conductivity being underestimated by 30\% for equilibrium air or equilibrium hydrogen plasmas (see experimental data of electrical conductivity on \cite[page 276]{book:1991:raizer}). We get better agreement with experimental data by using the Coulomb logarithm recommended in the NRL Plasma Formulary for electron-ion collisions \cite[page 34]{nrl:2002:huba}:
-%
-\begin{equation}
- \ln \Lambda = 23-\ln \left(\left(N_{\rm e}/1e6\right)^\frac{1}{2} \cdot (T_{\rm e}/11600.0)^{-1.5}\right)
-\end{equation}
-%
-with $N_{\rm e}$ the electron number density in 1/m$^3$ and $T_{\rm e}$ the electron temperature in K. The latter is valid as long as the electron temperature is less than 10 eV. 
-
-Also, we can fit a polynomial through the experimental data outlined in in Chapter 21 of Ref.\ \cite{book:1997:grigoriev} to find $\mu_{\rm en}$ in units of $\rm m^2\cdot V^{-1}\cdot s^{-1}$:
-%
-\begin{equation}
-\mu_{\rm en}=N_{\rm n}^{-1} \cdot 3.74\cdot 10^{19} \cdot {\rm exp}\left(33.5 \cdot \left({\rm ln}\, T_{\rm e} \right)^{-0.5}\right)
-\end{equation}
-%
-where $N_{\rm n}$ is the number density of the neutrals in $m^{-3}$ and $T_{\rm e}$ is the electron temperature in K.
-The latter equation can be used in the range $1000~{\rm K} \le T_{\rm e} \le 57900 ~{\rm K}$ with a relative error on the mobility not exceeding 20\%. In the range $287~{\rm K} \le T_{\rm e} < 1000~{\rm K}$, the relative error is less than 30\%. 
-
-
-\subsection{Ion Mobility}
-
-When the plasma has a low ionization fraction, the ion mobility depends only on ion-neutral collisions. When the plasma's ionization fraction increases, then the ion-ion collisions can also affect the mobility. We thus formulate the ion mobility as follows:
-%
-\begin{equation}
-\mu_{\rm i}=\frac{1}{\frac{1}{\mu_{\rm in}}+\frac{1}{\mu_{\rm ii}}}
-\end{equation}
-%
-where $\mu_{\rm ii}$ is the ion mobility in the limit of a fully ionized plasma and $\mu_{\rm in}$ is the ion mobility in the limit of a weakly-ionized plasma. The ion mobility for a fully ionized plasma is found from the collision frequency of ion-ion collisions as follows:
-%
-\begin{equation}
- \mu_{\rm ii} = \frac{|C_i|}{m_i \nu_{\rm ii}}
-\end{equation}
-% 
-where $C_i$ is the charge of the ion in Coulomb and where the ion-ion collision frequency corresponds to \cite{book:1984:chen}:
-%
-\begin{equation}
-\nu_{\rm ii}=\xi \frac{ N_{\rm i}}{ \sqrt{m_{\rm i}} (k_{\rm B} T_{\rm i})^\frac{3}{2}}  \frac{C_{\rm i}^4}{16 \pi^2 \epsilon_0^2}  \ln \Lambda
-\end{equation}
-%
-with $\xi$ a non-dimensional constant in the range 1.7-2.4. As well, $\ln \Lambda$ is another constant in the range 5-7.
-
-
-After substituting the latter in the former:
-%
-\begin{equation}
- \mu_{\rm ii} = \frac{16 \pi^2 \epsilon_0^2 (k_{\rm B} T_{\rm i})^\frac{3}{2}}{\mfd \sqrt{m_{\rm i}} \xi  N_{\rm i}  |C_{\rm i}|^3  \ln \Lambda}
-\end{equation}
-% 
-Setting $\xi$ to 1.71 and $\ln \Lambda$ to 6.3, and assuming that the ion has a single charge, the latter can be rewritten as:
-%
-\begin{equation}
- \mu_{\rm ii} = 14.3 m_{\rm i}^{-0.5} T_{\rm i}^{1.5} N_{\rm i}^{-1}
-\end{equation}
-% 
-where $m_{\rm i}$ is the ion mass in kg, $T_{\rm i}$ the ion translational temperature in K, $N_{\rm i}$ the total ion number density in $\rm m^{-3}$, and $\mu_{\rm i}$ the ion mobility in m$^2$/Vs.
-
-
-We can find the ion mobility for a weakly-ionized plasma $\mu_{\rm in}$ through the collision frequency between ions and neutrals. For instance, for the nitrogen ion $\rm N_2^+$, the mobility in air can be expressed as:
-%
-\begin{equation}
-\mu_{\rm in}=N_{\rm n}^{-1} \cdot 0.75\cdot 10^{23}\cdot T^{-0.5}
-\end{equation}
-%
-where $N_{\rm n}$ is the number density of the neutrals in $m^{-3}$ and $T$ is the ion translational temperature in K, and $\mu_{\rm in}$ is the ion mobility in a weakly-ionized plasma in m$^2$/V-s.
-
-The mobility of a partially-ionized plasma (in-between weakly-ionized and fully-ionized) can be obtained simply by taking half of the harmonic mean of the mobility of a fully-ionized plasma and the mobility of a weakly-ionized plasma. 
-
-The ion mobilities of the various charged species are tabulated in Table \ref{tab:pm:mu}. 
-
-
-
-\subsection{Electron and Ion Thermal Conductivity}
-
-Whether the plasma is fully-ionized or weakly-ionized, the thermal conductivity can be expressed as a function of the mobility as follows:
-%
-\begin{equation}
-\kappa_k =     \frac{ \rho_k k_{\rm B}  (c_p)_k T_k \mu_k}{|C_k|} 
-\end{equation}
-%
-where $(c_p)_k$ is the specific heat at constant pressure of the $k$th species.
-
-\subsection{Electron and Ion Viscosity}
-
-The scalar viscosity can be obtained from the thermal conductivity as follows:
-%
-\begin{equation}
-\eta_k = \frac{{\rm Pr} \cdot \kappa_k}{(c_p)_k}
-\end{equation}
-% 
-where Pr is the Prandtl number which is set to 0.73 for the electrons and to 0.96 for the ions.
-
-\subsection{Diffusion Coefficient}
-
-The diffusion coefficient ${\cal D}$ is related to the mobility $\mu$ following the Einsteins-Smoluchowski relation as follows:
-%
-\begin{equation}
-    {\cal D}_k= \frac{\mu_k k_{\rm B} T_k}{|C_k|}
-\end{equation}
-%
-with $\mu_k$ the mobility in m$^2$/V-s, $\cal D$ the diffusion coefficient in m$^2$/s, $C_k$ the charge in Coulomb of one particule and $k_{\rm B}$ the Boltzmann constant.
 
 
 \section{Mass Diffusion Coefficients from Binary Diffusion Coefficients}
@@ -294,172 +172,10 @@ where $w_k$ is the mass fraction.
 Another model is the SCEBD (Self-Consistent Effective Binary Diffusion) model by Ramshaw and Shang \cite{jnet:1996:ramshaw}.
 
 
-\section{Dixon-Lewis Transport Coefficients}
-%
-\begin{table}[t]
-\fontsizetable
-\begin{center}
-  \begin{threeparttable}
-    \tablecaption{$\epsilon$ and $\sigma$ for some species \tnote{1}}
-    \fontsizetable
-    \begin{tabular}{lllll}
-      \toprule
-species$_k$     &  ${\rm He}$    &  ${\rm H}_2$   &  ${\rm O}_2$   &  ${\rm N}_2$  \\
-\midrule
-$\epsilon_k$ [K]&  $10.22$       &  $59.7$        &  $106.7$       &  $71.4$       \\
-$\sigma_k$ [nm] &  $0.2576$      &  $0.2827$      &  $0.3467$      &  $0.3798$     \\
-      \bottomrule
-    \end{tabular}
-    \label{tab:dl:epsilon-sigma}
-    \begin{tablenotes}
-      \item [1] taken from Dixon-Lewis; $T^\star_k=T/ \epsilon_k$
-    \end{tablenotes}
-  \end{threeparttable}
-\end{center}
-\end{table}
-%
-%
-\begin{table*}[t]
-\fontsizetable
-\begin{center}
-  \begin{threeparttable}
-    \tablecaption{Polynomial constants needed to determine $\Omega^{22}$ 
-             $\Omega^{11}$ and $A^\star$ taken from Dixon-Lewis}
-    \fontsizetable
-    \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}llllll}
-      \toprule
-$T^\star_k$& $d_0$          & $d_1$           & $d_2$          & $d_3$           & $d_4$ \\
-\midrule
-$<5$       & $2.3527333$E$+0$ & $-1.3589968$E$+0$ & $5.2202460$E$-1$ & $-9.4262883$E$-2$ & $6.4354629$E$-3$ \\
-$5-10$     & $1.2660308$E$+0$ & $-1.6441443$E$-1$ & $2.2945928$E$-2$ & $-1.6324168$E$-3$ & $4.5833672$E$-5$ \\
-$>10$      & $8.5263337$E$-1$ & $-1.3552911$E$-2$ & $2.6162080$E$-4$ & $-2.4647654$E$-6$ & $8.6538568$E$-9$ \\
-\midrule
-$T^\star_k$& $e_0$          & $e_1$           & $e_2$           &~&~\\
-\midrule
-$<5$       & $1.1077725$E$+0$ & $-9.4802344$E$-3$ & $+1.6918277$E$-3$ &~&~ \\
-$5-10$     & $1.0871429$E$+0$ & $+3.1964282$E$-3$ & $-8.9285689$E$-5$ &~& ~\\
-$>10$      & $1.1059000$E$+0$ & $+6.5136364$E$-4$ & $-3.4090910$E$-6$ &~&~ \\
-      \bottomrule
-    \end{tabular*}
-    \label{tab:dl:Omega}
-    \begin{tablenotes}
-      \item  $\Omega^{22}(T^\star_k)= A^\star (T^\star_k) \Omega^{11}(T^\star_k)$ 
-      \item  $\Omega^{11}(T^\star_k)=d_0+d_1 {T^\star_k}+d_2 {T^\star_k}^2+d_3 {T^\star_k}^3+d_4 {T^\star_k}^4$ 
-      \item  $A^\star (T^\star_k)=e_0+e_1 {T^\star_k}+e_2 {T^\star_k}^2$ 
-    \end{tablenotes}
-  \end{threeparttable}
-\end{center}
-\end{table*}
-%
-
-\subsection{Neutrals Mixture Viscosity}
-
-The viscosity of the mixture of neutral gases $\eta_{\rm n}$ is computed using Wilke's mixing rule:
-%
-\begin{equation}
-\eta_{\rm n}= \mfd \chi_{\rm n} \sum_{\mfa k=1}^{\ns}   \frac{\mfd \eta_k {\chi}_k^\star}
-                     {\mfd {\chi}_k^\star +
-                          \mfd\sum_{\mfa l=1..\ns}^{l \neq k}{\chi}_l^\star \phi_{k,l}}
-\label{eqn:dl:molvisc-mixture}
-\end{equation}
-%
-where $\chi_k^\star$ is the neutral molar fraction. That is, $\chi_k^\star$ is the ratio between the number of moles of species $k$ and the number of moles of all neutral species:
-%
-\begin{equation}
-  \chi_k^\star
-  = \frac{N_k}{\mfd\sum_{j=1..\ns}^{j \neq {\rm e,i}} N_j} = \frac{\rho_k/m_k}{\mfd\sum_{j=1..\ns}^{j \neq {\rm e,i}} \rho_j/m_j} 
-= \frac{w_k /m_k}{\mfd\sum_{j=1..\ns}^{j \neq {\rm e,i}} w_j /m_j} 
-\end{equation}
-%
-where $m_k$ is the particule mass of the $k$th species and $N_k$ is the number density of the $k$th species. Also, $\chi_{\rm n}$ is the molar fraction of the neutrals within the mixture:
-%
-\begin{equation}
-    \chi_{\rm n}= \frac{\mfd \sum_{k=1..\ns}^{k\neq {\rm i,e}} N_k }{\mfd \sum_{k=1}^\ns N_k}
-    =\frac{\mfd \sum_{k=1..\ns}^{k\neq {\rm i,e}} \frac{w_k}{m_k} }{\mfd \sum_{k=1}^\ns \frac{w_k}{m_k}}
-\end{equation}
 
 
 
-Also $\phi_{k,l}$ is specified as follows:
-%
-\begin{equation}
-\phi_{k,l}=\mfd \frac{ \left[  1 + \sqrt{ \mfd {\eta_k }/{\eta_l }}
-                              \left( \mfd {{\cal M}_l}/{{\cal M}_k}  \right)^ \frac{1}{4}  \right]^2}
-{ \sqrt{\mfd 8\left(1+\mfd {{\cal M}_k}/{{\cal M}_l}\right)}}
-\label{eqn:dl:molvisc-phi}
-\end{equation}
-%
-where $\cal M_k$ is the molecular weight of the $k$th species.
 
-Also, the species dynamic viscosity $\eta_k$ in kg/m-s is
-derived from kinetic theory assuming that species $k$ is a pure gas (standalone, not mixed with other species):
-%
-\begin{equation}
-\eta_k= 
-\mfd 8.44107 \cdot 10^{-7} \cdot \frac{  \sqrt{{\cal M}_k T}}{\sigma_k^2 \Omega^{22}_k} 
-\label{eqn:dl:molvisc-muk1}
-\end{equation}
-%
-In the latter ${\cal M}_k$ is the molecular weight in kg/mole and $m_k$ is the mass of one electron or ion in kg.  Also $\sigma_k$ is the Lennard-Jones collision diameter tabulated in Table \ref{tab:dl:epsilon-sigma} in nm. 
-Further, $\Omega^{22}_k$ is the reduced collision integral involving polynomials function of $T^\star_k$ with  $T^\star_k$
- is the non-dimensional reduced temperature corresponding to $T/ \epsilon_k$  with $\epsilon_k$ being the Lennard-Jones potential well depth in Kelvin. Data for $\epsilon_k$ can be found in Table \ref{tab:dl:epsilon-sigma} and the polynomials needed to compute $\Omega_k^{22}$ can be found in Table \ref{tab:dl:Omega}.
- 
- 
-\subsection{Neutrals Mixture Thermal Conductivity}
-
-The molecular thermal conductivity of a mixture of neutral gases $\kappa_{\rm n}$ is found similarly to the molecular dynamic viscosity from the Mason and Saxena \cite{gen:mason-saxena} relation:
-%
-\begin{equation}
-\kappa_{\rm n}= \chi_{\rm n} \mfd\sum_{\mfa k=1}^{\ns}  \mfd \frac{\mfd\kappa_k \chi_k^\star}
-                     {\mfd \chi_k^\star + \mfd 1.0654
-                          \mfd\sum_{\mfa l=1..\ns}^{l \neq k}  {\chi}_l^\star \phi_{k,l}}
-\label{eqn:moltherm-mixture}
-\end{equation}
-%
-where the thermal conductivity of species $k$, $\kappa_k$ is determined
-differently depending on whether
-species $k$ is polyatomic (such as H$_2$O) or monoatomic
-(such as H and O); for a monoatomic gas, only the
-translational energy of the particle is considered,
-neglecting the vibrational energy. For a polyatomic gas,
-both the translational and vibrational energies are taken into
-account, the Eucken correction being used. Hence $\kappa_k$
-is found from:
-%
-\begin{equation}
-\kappa_k = \left\{ \begin{array}{ll}
-\vspace{0.2cm}
-\mfd\frac{15}{4} \mfd\frac{\cal R}{{\cal M}_k} \eta_k & {\rm for~monatomic~neutrals} \alb
-\mfd\frac{15}{4} \mfd\frac{\cal R}{{\cal M}_k} \eta_k \left(  0.115 +
-   \mfd\frac{ \left( 0.354 \right) {\cp}_k{\cal M}_k}{\cal R}  \right)
-        & {\rm for~polyatomic~neutrals} \alb
-\end{array}
-\right.
-\label{eqn:moltherm-kappa}
-\end{equation}
-%
-where $(c_p)_k$ is the specific heat at constant pressure.
-
-Note that the Dixon-Lewis model is only applicable to mixtures that do not include electrons or ions. Thus, we can use the latter expression for the thermal conductivity of the neutrals and then add the thermal conductivity of the charged species as outlined by the Parent-Macheret model in Section 1 above. When charged species are present the thermal conductivity of the neutrals 
-
-
-\subsection{Binary Diffusion Coefficients}
-
-Also, ${\cal D}_{k,l}$ is the binary diffusion coefficient, or
-a measure of how much gas $k$ diffuses into gas $l$. The binary diffusion coefficient of species $k$ with respect to species $l$,
-${\cal D}_{k,l}$, is given by:
-%
-\begin{equation}
-{\cal D}_{k,l}=\left( 2.381112 \times 10^{-5} \right) \frac{\sqrt{T^3 \mfd  \left(\frac{1}{{\cal M}_l} + \frac{1}{{\cal M}_k} \right)}}
-              {  \left( \sigma_k + \sigma_l \right)^2 P \Omega^{11}_{k,l}}
-\label{eqn:moldiff-binary}
-\end{equation}
-%
-where $\Omega^{11}_{k,l}$ involves
-polynomials dependent on the reduced temperature $T^\star_k$
-and can be found in Dixon-Lewis, noting that in this case, $T^\star=T/\epsilon_{k,l}$
-where $\epsilon_{k,l}=\sqrt{\epsilon_k \epsilon_l}$; the units are Pascal for $P$, nm for $\sigma$,
-K for $T$ and $m^2/s$ for $\cal D$.
 
 
 \section{Gupta-Yos Transport Coefficients}
@@ -648,6 +364,344 @@ The second modification we recommend is to determine the thermal conductivities 
 \end{equation}
 %
 where $(c_p)_k$ is the specific heat at constant pressure of the $k$th species and $T_k$ is the species temperature (either $T$ for the ions or $T_{\rm e}$ for the electrons).
+
+
+
+
+
+
+
+
+
+
+\section{Parent-Macheret Charged Species Transport Coefficients}
+
+
+
+
+%
+\begin{table*}[b]
+  \center
+  \begin{threeparttable}
+    \tablecaption{Ion and electron mobilities in dry air.\tnote{a,d}}
+    \label{tab:pm:mu}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}ll}
+    \toprule
+    Species & Mobility, $\rm m^2\cdot V^{-1}\cdot s^{-1}$  & Reference\\
+    \midrule
+    Air$^+$         & $ \frac{1}{2}{\rm avgh} \left(N_{\rm n}^{-1} \cdot 0.84\cdot 10^{23}\cdot T^{-0.5}~,~~14.3 \cdot m_{\rm air}^{-0.5} \cdot T^{1.5} \cdot N_{\rm i}^{-1} \right)$  & \cite{misc:1968:sinnott}\tnote{b}\alb
+    N$_2^+$         & $\frac{1}{2}{\rm avgh}\left( N_{\rm n}^{-1} \cdot 0.75\cdot 10^{23}\cdot T^{-0.5}~,~~14.3 \cdot m_{\rm N_2^+}^{-0.5} \cdot T^{1.5} \cdot N_{\rm i}^{-1}\right)$  & \cite{misc:1968:sinnott}\alb
+    O$_2^+$         &  $ \frac{1}{2}{\rm avgh} \left(N_{\rm n}^{-1} \cdot 1.18\cdot 10^{23}\cdot T^{-0.5},~~14.3 \cdot m_{\rm O_2^+}^{-0.5} \cdot T^{1.5} \cdot N_{\rm i}^{-1} \right)$  & \cite{misc:1968:sinnott}\alb
+    O$_2^-$         & $ \frac{1}{2}{\rm avgh} \left(N_{\rm n}^{-1} \cdot 0.97 \cdot 10^{23}\cdot T^{-0.5},~~14.3 \cdot m_{\rm O_2^-}^{-0.5} \cdot T^{1.5} \cdot N_{\rm i}^{-1} \right)$  & \cite{misc:1983:gosho}\alb
+    other~ions         & $ \frac{1}{2}{\rm avgh} \left(N_{\rm n}^{-1} \cdot 2.2 \cdot 10^{10}\cdot (m_{\rm i} T)^{-0.5},~~14.3 \cdot m_{\rm i}^{-0.5} \cdot T^{1.5} \cdot N_{\rm i}^{-1} \right)$  & --\alb
+    e$^-$         & $\frac{1}{2}{\rm avgh}\left( N_{\rm n}^{-1} \cdot 3.74\cdot 10^{19} \cdot {\rm exp}\left(33.5 \cdot \left({\rm ln}\, T_{\rm e} \right)^{-0.5}\right) ~,~~N_{\rm i}^{-1} \cdot 9.5 \cdot 10^{16} \cdot T_{\rm e}^{1.5}\cdot (\ln \Lambda)^{-1}  \right)$  & \cite[Ch.\ 21]{book:1997:grigoriev}\tnote{c}\\
+    \bottomrule
+    \end{tabular*}
+    \begin{tablenotes}
+      \item[a] Notation and units:  $T_{\rm e}$ is in Kelvin; $T$ is in Kelvin; $m_{\rm i}$ is the mass of one ion particule in kg; $N$ is the total number density of the plasma in 1/m$^3$; $N_{\rm i}$ is the sum of the positive ion number densities in 1/m$^3$;  $N_{\rm n}$ is the sum of the neutral species number densities  in 1/m$^3$.
+      \item[b] The ``air ion'' mobility is obtained from the N$_2^+$ and O$_2^+$ ion mobilities assuming a N$_2^+$:O$_2^+$ ratio of 4:1. 
+      \item[c] The expression for the electron-neutral collisions approximates the data given in Chapter 21 of Ref.\ \cite{book:1997:grigoriev}; The equation can be used in the range $1000~{\rm K} \le T_{\rm e} \le 57900 ~{\rm K}$ with a relative error on the mobility not exceeding 20\%. In the range $287~{\rm K} \le T_{\rm e} < 1000~{\rm K}$, the relative error is less than 30\%. 
+      \item[d] The function avgh($a$,$b$) returns the harmonic average of the two arguments as follows $2/(a^{-1}+b^{-1})$.
+    \end{tablenotes}
+   \end{threeparttable}
+\end{table*}
+%
+
+\subsection{Electron Mobility}
+
+The electron mobility in a partially ionized plasma (a plasma in which both the molar fraction of all neutrals and the molar fraction of all charged species are significant) needs to include collisions between the electrons and the neutrals and collisions between electrons and ions. This results in an electron mobility equal to:
+%
+\begin{equation}
+\mu_{\rm e}=\frac{1}{\frac{1}{\mu_{\rm en}}+\frac{1}{\mu_{\rm ei}}}
+\end{equation}
+%
+with the electron mobility with respect to ions set to
+%
+\begin{equation}
+\mu_{\rm ei}= \frac{9.5 \times 10^{16}}{\rm m\cdot K^{1.5}\cdot V \cdot s} \frac{T_{\rm e}^{1.5}}{N_{\rm i} \ln \Lambda}
+\end{equation}
+%
+where $T_{\rm e}$ is the electron temperature in K, $N_{\rm i}$ is the ion number density in m$^{-3}$.
+The latter is obtained from Raizer \cite[Eq.\ (2.9)]{book:1991:raizer}.
+Also, $\Lambda$ is the shielding parameter and $\ln \Lambda$ is the Coulomb logarithm. The Coulomb logarithm can be  found from the following \cite[p. 14]{book:1991:raizer}:
+%
+\begin{equation}
+    \ln \Lambda=13.57+\frac{3}{2} {\rm log}_{10} \left(\frac{T_{\rm e}}{11600}\right)-\frac{1}{2}{\rm log}_{10}\left(\frac{N_{\rm e}}{10^6}\right)
+\end{equation}
+%
+with $\rho_{\rm e}$ the electron partial density in kg/m$^3$, $m_{\rm e}$ the electron mass in kg, $N_{\rm e}$ the electron number density in m$^{-3}$, and $T_{\rm e}$ the electron temperature in K.
+
+However, we find that using the latter leads to the electrical conductivity being underestimated by 30\% for equilibrium air or equilibrium hydrogen plasmas (see experimental data of electrical conductivity on \cite[page 276]{book:1991:raizer}). We get better agreement with experimental data by using the Coulomb logarithm recommended in the NRL Plasma Formulary for electron-ion collisions \cite[page 34]{nrl:2002:huba}:
+%
+\begin{equation}
+ \ln \Lambda = 23-\ln \left(\left(N_{\rm e}/1e6\right)^\frac{1}{2} \cdot (T_{\rm e}/11600.0)^{-1.5}\right)
+\end{equation}
+%
+with $N_{\rm e}$ the electron number density in 1/m$^3$ and $T_{\rm e}$ the electron temperature in K. The latter is valid as long as the electron temperature is less than 10 eV. 
+
+Also, we can fit a polynomial through the experimental data outlined in in Chapter 21 of Ref.\ \cite{book:1997:grigoriev} to find $\mu_{\rm en}$ in units of $\rm m^2\cdot V^{-1}\cdot s^{-1}$:
+%
+\begin{equation}
+\mu_{\rm en}=N_{\rm n}^{-1} \cdot 3.74\cdot 10^{19} \cdot {\rm exp}\left(33.5 \cdot \left({\rm ln}\, T_{\rm e} \right)^{-0.5}\right)
+\end{equation}
+%
+where $N_{\rm n}$ is the number density of the neutrals in $m^{-3}$ and $T_{\rm e}$ is the electron temperature in K.
+The latter equation can be used in the range $1000~{\rm K} \le T_{\rm e} \le 57900 ~{\rm K}$ with a relative error on the mobility not exceeding 20\%. In the range $287~{\rm K} \le T_{\rm e} < 1000~{\rm K}$, the relative error is less than 30\%. 
+
+
+\subsection{Ion Mobility}
+
+When the plasma has a low ionization fraction, the ion mobility depends only on ion-neutral collisions. When the plasma's ionization fraction increases, then the ion-ion collisions can also affect the mobility. We thus formulate the ion mobility as follows:
+%
+\begin{equation}
+\mu_{\rm i}=\frac{1}{\frac{1}{\mu_{\rm in}}+\frac{1}{\mu_{\rm ii}}}
+\end{equation}
+%
+where $\mu_{\rm ii}$ is the ion mobility in the limit of a fully ionized plasma and $\mu_{\rm in}$ is the ion mobility in the limit of a weakly-ionized plasma. The ion mobility for a fully ionized plasma is found from the collision frequency of ion-ion collisions as follows:
+%
+\begin{equation}
+ \mu_{\rm ii} = \frac{|C_i|}{m_i \nu_{\rm ii}}
+\end{equation}
+% 
+where $C_i$ is the charge of the ion in Coulomb and where the ion-ion collision frequency corresponds to \cite{book:1984:chen}:
+%
+\begin{equation}
+\nu_{\rm ii}=\xi \frac{ N_{\rm i}}{ \sqrt{m_{\rm i}} (k_{\rm B} T_{\rm i})^\frac{3}{2}}  \frac{C_{\rm i}^4}{16 \pi^2 \epsilon_0^2}  \ln \Lambda
+\end{equation}
+%
+with $\xi$ a non-dimensional constant in the range 1.7-2.4. As well, $\ln \Lambda$ is another constant in the range 5-7.
+
+
+After substituting the latter in the former:
+%
+\begin{equation}
+ \mu_{\rm ii} = \frac{16 \pi^2 \epsilon_0^2 (k_{\rm B} T_{\rm i})^\frac{3}{2}}{\mfd \sqrt{m_{\rm i}} \xi  N_{\rm i}  |C_{\rm i}|^3  \ln \Lambda}
+\end{equation}
+% 
+Setting $\xi$ to 1.71 and $\ln \Lambda$ to 6.3, and assuming that the ion has a single charge, the latter can be rewritten as:
+%
+\begin{equation}
+ \mu_{\rm ii} = 14.3 m_{\rm i}^{-0.5} T_{\rm i}^{1.5} N_{\rm i}^{-1}
+\end{equation}
+% 
+where $m_{\rm i}$ is the ion mass in kg, $T_{\rm i}$ the ion translational temperature in K, $N_{\rm i}$ the total ion number density in $\rm m^{-3}$, and $\mu_{\rm i}$ the ion mobility in m$^2$/Vs.
+
+
+We can find the ion mobility for a weakly-ionized plasma $\mu_{\rm in}$ through the collision frequency between ions and neutrals. For instance, for the nitrogen ion $\rm N_2^+$, the mobility in air can be expressed as:
+%
+\begin{equation}
+\mu_{\rm in}=N_{\rm n}^{-1} \cdot 0.75\cdot 10^{23}\cdot T^{-0.5}
+\end{equation}
+%
+where $N_{\rm n}$ is the number density of the neutrals in $m^{-3}$ and $T$ is the ion translational temperature in K, and $\mu_{\rm in}$ is the ion mobility in a weakly-ionized plasma in m$^2$/V-s.
+
+The mobility of a partially-ionized plasma (in-between weakly-ionized and fully-ionized) can be obtained simply by taking half of the harmonic mean of the mobility of a fully-ionized plasma and the mobility of a weakly-ionized plasma. 
+
+The ion mobilities of the various charged species are tabulated in Table \ref{tab:pm:mu}. 
+
+
+
+\subsection{Electron and Ion Thermal Conductivity}
+
+Whether the plasma is fully-ionized or weakly-ionized, the thermal conductivity can be expressed as a function of the mobility as follows:
+%
+\begin{equation}
+\kappa_k =     \frac{ \rho_k k_{\rm B}  (c_p)_k T_k \mu_k}{|C_k|} 
+\end{equation}
+%
+where $(c_p)_k$ is the specific heat at constant pressure of the $k$th species.
+
+\subsection{Electron and Ion Viscosity}
+
+The scalar viscosity can be obtained from the thermal conductivity as follows:
+%
+\begin{equation}
+\eta_k = \frac{{\rm Pr} \cdot \kappa_k}{(c_p)_k}
+\end{equation}
+% 
+where Pr is the Prandtl number which is set to 0.73 for the electrons and to 0.96 for the ions.
+
+\subsection{Diffusion Coefficient}
+
+The diffusion coefficient ${\cal D}$ is related to the mobility $\mu$ following the Einsteins-Smoluchowski relation as follows:
+%
+\begin{equation}
+    {\cal D}_k= \frac{\mu_k k_{\rm B} T_k}{|C_k|}
+\end{equation}
+%
+with $\mu_k$ the mobility in m$^2$/V-s, $\cal D$ the diffusion coefficient in m$^2$/s, $C_k$ the charge in Coulomb of one particule and $k_{\rm B}$ the Boltzmann constant.
+
+
+
+
+\section{Dixon-Lewis Transport Coefficients}
+%
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+  \begin{threeparttable}
+    \tablecaption{$\epsilon$ and $\sigma$ for some species \tnote{1}}
+    \fontsizetable
+    \begin{tabular}{lllll}
+      \toprule
+species$_k$     &  ${\rm He}$    &  ${\rm H}_2$   &  ${\rm O}_2$   &  ${\rm N}_2$  \\
+\midrule
+$\epsilon_k$ [K]&  $10.22$       &  $59.7$        &  $106.7$       &  $71.4$       \\
+$\sigma_k$ [nm] &  $0.2576$      &  $0.2827$      &  $0.3467$      &  $0.3798$     \\
+      \bottomrule
+    \end{tabular}
+    \label{tab:dl:epsilon-sigma}
+    \begin{tablenotes}
+      \item [1] taken from Dixon-Lewis; $T^\star_k=T/ \epsilon_k$
+    \end{tablenotes}
+  \end{threeparttable}
+\end{center}
+\end{table}
+%
+%
+\begin{table*}[t]
+\fontsizetable
+\begin{center}
+  \begin{threeparttable}
+    \tablecaption{Polynomial constants needed to determine $\Omega^{22}$ 
+             $\Omega^{11}$ and $A^\star$ taken from Dixon-Lewis}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}llllll}
+      \toprule
+$T^\star_k$& $d_0$          & $d_1$           & $d_2$          & $d_3$           & $d_4$ \\
+\midrule
+$<5$       & $2.3527333$E$+0$ & $-1.3589968$E$+0$ & $5.2202460$E$-1$ & $-9.4262883$E$-2$ & $6.4354629$E$-3$ \\
+$5-10$     & $1.2660308$E$+0$ & $-1.6441443$E$-1$ & $2.2945928$E$-2$ & $-1.6324168$E$-3$ & $4.5833672$E$-5$ \\
+$>10$      & $8.5263337$E$-1$ & $-1.3552911$E$-2$ & $2.6162080$E$-4$ & $-2.4647654$E$-6$ & $8.6538568$E$-9$ \\
+\midrule
+$T^\star_k$& $e_0$          & $e_1$           & $e_2$           &~&~\\
+\midrule
+$<5$       & $1.1077725$E$+0$ & $-9.4802344$E$-3$ & $+1.6918277$E$-3$ &~&~ \\
+$5-10$     & $1.0871429$E$+0$ & $+3.1964282$E$-3$ & $-8.9285689$E$-5$ &~& ~\\
+$>10$      & $1.1059000$E$+0$ & $+6.5136364$E$-4$ & $-3.4090910$E$-6$ &~&~ \\
+      \bottomrule
+    \end{tabular*}
+    \label{tab:dl:Omega}
+    \begin{tablenotes}
+      \item  $\Omega^{22}(T^\star_k)= A^\star (T^\star_k) \Omega^{11}(T^\star_k)$ 
+      \item  $\Omega^{11}(T^\star_k)=d_0+d_1 {T^\star_k}+d_2 {T^\star_k}^2+d_3 {T^\star_k}^3+d_4 {T^\star_k}^4$ 
+      \item  $A^\star (T^\star_k)=e_0+e_1 {T^\star_k}+e_2 {T^\star_k}^2$ 
+    \end{tablenotes}
+  \end{threeparttable}
+\end{center}
+\end{table*}
+%
+
+\subsection{Neutrals Mixture Viscosity}
+
+The viscosity of the mixture of neutral gases $\eta_{\rm n}$ is computed using Wilke's mixing rule:
+%
+\begin{equation}
+\eta_{\rm n}= \mfd \chi_{\rm n} \sum_{\mfa k=1}^{\ns}   \frac{\mfd \eta_k {\chi}_k^\star}
+                     {\mfd {\chi}_k^\star +
+                          \mfd\sum_{\mfa l=1..\ns}^{l \neq k}{\chi}_l^\star \phi_{k,l}}
+\label{eqn:dl:molvisc-mixture}
+\end{equation}
+%
+where $\chi_k^\star$ is the neutral molar fraction. That is, $\chi_k^\star$ is the ratio between the number of moles of species $k$ and the number of moles of all neutral species:
+%
+\begin{equation}
+  \chi_k^\star
+  = \frac{N_k}{\mfd\sum_{j=1..\ns}^{j \neq {\rm e,i}} N_j} = \frac{\rho_k/m_k}{\mfd\sum_{j=1..\ns}^{j \neq {\rm e,i}} \rho_j/m_j} 
+= \frac{w_k /m_k}{\mfd\sum_{j=1..\ns}^{j \neq {\rm e,i}} w_j /m_j} 
+\end{equation}
+%
+where $m_k$ is the particule mass of the $k$th species and $N_k$ is the number density of the $k$th species. Also, $\chi_{\rm n}$ is the molar fraction of the neutrals within the mixture:
+%
+\begin{equation}
+    \chi_{\rm n}= \frac{\mfd \sum_{k=1..\ns}^{k\neq {\rm i,e}} N_k }{\mfd \sum_{k=1}^\ns N_k}
+    =\frac{\mfd \sum_{k=1..\ns}^{k\neq {\rm i,e}} \frac{w_k}{m_k} }{\mfd \sum_{k=1}^\ns \frac{w_k}{m_k}}
+\end{equation}
+
+
+
+Also $\phi_{k,l}$ is specified as follows:
+%
+\begin{equation}
+\phi_{k,l}=\mfd \frac{ \left[  1 + \sqrt{ \mfd {\eta_k }/{\eta_l }}
+                              \left( \mfd {{\cal M}_l}/{{\cal M}_k}  \right)^ \frac{1}{4}  \right]^2}
+{ \sqrt{\mfd 8\left(1+\mfd {{\cal M}_k}/{{\cal M}_l}\right)}}
+\label{eqn:dl:molvisc-phi}
+\end{equation}
+%
+where $\cal M_k$ is the molecular weight of the $k$th species.
+
+Also, the species dynamic viscosity $\eta_k$ in kg/m-s is
+derived from kinetic theory assuming that species $k$ is a pure gas (standalone, not mixed with other species):
+%
+\begin{equation}
+\eta_k= 
+\mfd 8.44107 \cdot 10^{-7} \cdot \frac{  \sqrt{{\cal M}_k T}}{\sigma_k^2 \Omega^{22}_k} 
+\label{eqn:dl:molvisc-muk1}
+\end{equation}
+%
+In the latter ${\cal M}_k$ is the molecular weight in kg/mole and $m_k$ is the mass of one electron or ion in kg.  Also $\sigma_k$ is the Lennard-Jones collision diameter tabulated in Table \ref{tab:dl:epsilon-sigma} in nm. 
+Further, $\Omega^{22}_k$ is the reduced collision integral involving polynomials function of $T^\star_k$ with  $T^\star_k$
+ is the non-dimensional reduced temperature corresponding to $T/ \epsilon_k$  with $\epsilon_k$ being the Lennard-Jones potential well depth in Kelvin. Data for $\epsilon_k$ can be found in Table \ref{tab:dl:epsilon-sigma} and the polynomials needed to compute $\Omega_k^{22}$ can be found in Table \ref{tab:dl:Omega}.
+ 
+ 
+\subsection{Neutrals Mixture Thermal Conductivity}
+
+The molecular thermal conductivity of a mixture of neutral gases $\kappa_{\rm n}$ is found similarly to the molecular dynamic viscosity from the Mason and Saxena \cite{gen:mason-saxena} relation:
+%
+\begin{equation}
+\kappa_{\rm n}= \chi_{\rm n} \mfd\sum_{\mfa k=1}^{\ns}  \mfd \frac{\mfd\kappa_k \chi_k^\star}
+                     {\mfd \chi_k^\star + \mfd 1.0654
+                          \mfd\sum_{\mfa l=1..\ns}^{l \neq k}  {\chi}_l^\star \phi_{k,l}}
+\label{eqn:moltherm-mixture}
+\end{equation}
+%
+where the thermal conductivity of species $k$, $\kappa_k$ is determined
+differently depending on whether
+species $k$ is polyatomic (such as H$_2$O) or monoatomic
+(such as H and O); for a monoatomic gas, only the
+translational energy of the particle is considered,
+neglecting the vibrational energy. For a polyatomic gas,
+both the translational and vibrational energies are taken into
+account, the Eucken correction being used. Hence $\kappa_k$
+is found from:
+%
+\begin{equation}
+\kappa_k = \left\{ \begin{array}{ll}
+\vspace{0.2cm}
+\mfd\frac{15}{4} \mfd\frac{\cal R}{{\cal M}_k} \eta_k & {\rm for~monatomic~neutrals} \alb
+\mfd\frac{15}{4} \mfd\frac{\cal R}{{\cal M}_k} \eta_k \left(  0.115 +
+   \mfd\frac{ \left( 0.354 \right) {\cp}_k{\cal M}_k}{\cal R}  \right)
+        & {\rm for~polyatomic~neutrals} \alb
+\end{array}
+\right.
+\label{eqn:moltherm-kappa}
+\end{equation}
+%
+where $(c_p)_k$ is the specific heat at constant pressure.
+
+Note that the Dixon-Lewis model is only applicable to mixtures that do not include electrons or ions. Thus, we can use the latter expression for the thermal conductivity of the neutrals and then add the thermal conductivity of the charged species as outlined by the Parent-Macheret model in Section 1 above. When charged species are present the thermal conductivity of the neutrals 
+
+
+\subsection{Binary Diffusion Coefficients}
+
+Also, ${\cal D}_{k,l}$ is the binary diffusion coefficient, or
+a measure of how much gas $k$ diffuses into gas $l$. The binary diffusion coefficient of species $k$ with respect to species $l$,
+${\cal D}_{k,l}$, is given by:
+%
+\begin{equation}
+{\cal D}_{k,l}=\left( 2.381112 \times 10^{-5} \right) \frac{\sqrt{T^3 \mfd  \left(\frac{1}{{\cal M}_l} + \frac{1}{{\cal M}_k} \right)}}
+              {  \left( \sigma_k + \sigma_l \right)^2 P \Omega^{11}_{k,l}}
+\label{eqn:moldiff-binary}
+\end{equation}
+%
+where $\Omega^{11}_{k,l}$ involves
+polynomials dependent on the reduced temperature $T^\star_k$
+and can be found in Dixon-Lewis, noting that in this case, $T^\star=T/\epsilon_{k,l}$
+where $\epsilon_{k,l}=\sqrt{\epsilon_k \epsilon_l}$; the units are Pascal for $P$, nm for $\sigma$,
+K for $T$ and $m^2/s$ for $\cal D$.
+
 \section{Capitelli Transport Coefficients}
 
 The equations used to evaluate the transport coefficients are described in Ref.\ \cite{tepjd:2000:capitelli}. The choice of collision integrals will affect the transport properties. 
