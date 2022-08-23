@@ -377,9 +377,11 @@ int number_of_reactants(char Line_str[]) {
 int number_of_products(char Line_str[]) {
     int i = 0, num = 1, m = 0;
 
-    while (Line_str[i] != '>')
+    while (Line_str[i] != '=')
         i++;
     i++;
+    if (Line_str[i] == '>')
+        i++;
     while (Line_str[i + 2] != '.' && Line_str[i + 2] != 'e') {          // Examine the elements of the current reaction after a "=" sign
         if (Line_str[i] == '\t' || Line_str[i] == '\r')
             i++;
@@ -813,9 +815,9 @@ void print_numbers_find_Qei(char oldLine[], char prevLine[], int numR, int numP,
             
         }
         if (e == 1)
-              fprintf(output, ", Te)");
+              fprintf(output, ", Te)/calA");
             else
-              fprintf(output, ", T)");
+              fprintf(output, ", T)/calA");
             if (run == 2 && j == 6)
                 fprintf(output, ", rhok, Qei);\n");
             else if (run == 3 && j == 6)
@@ -870,9 +872,9 @@ void print_numbers_find_Qei(char oldLine[], char prevLine[], int numR, int numP,
             
         }
         if (e == 1)
-              fprintf(output, ", Te)");
+              fprintf(output, ", Te)/calA");
         else
-              fprintf(output, ", T)");
+              fprintf(output, ", T)/calA");
         if (run == 2 && j == 3)
                 fprintf(output, ", rhok, Qei);\n");
         else if (run == 3 && j == 3)
@@ -950,9 +952,11 @@ void print_elements_add_ionization(char oldLine[], char prevLine[], FILE* output
     }
     i = 0, j = 0, k = 0;
     char products[10][12]; // create a string array to hold product names
-    while (oldLine[i] != '>')
+    while (oldLine[i] != '=')
         i++;
     i++;
+    if (oldLine[i] == '>')
+        i++;
     while (oldLine[i + 2] != '.' && oldLine[i + 2] != 'e') {
         k = 0;
         if (oldLine[i] == '\t')
@@ -1204,7 +1208,7 @@ int check_reaction_current_line(char Line_str[], int* way, int* tot, FILE* outpu
             *way = 2;                                                 // way indicates whether the reaction is forwards or backwards
             break;
         }
-        if (Line_str[i] == '=' && Line_str[i + 1] == '>') {
+        if (Line_str[i] == '=' && Line_str[i+1] == '>') {
             *tot = *tot + 1;
             num = 1;
             *way = 1;
@@ -1215,8 +1219,26 @@ int check_reaction_current_line(char Line_str[], int* way, int* tot, FILE* outpu
         num = 0;
         fprintf(output, "\n  \t\t\t// ************ERROR: Reaction #%d ignored on line %d due to commenting out.\n\n", *tot, loc);
         return num;
+        }
+    if (num == 1)
+      return num;
+    else {
+      
+      for (i = 0; Line_str[i] != '\n' && Line_str[i] != '\r'; i++) {    
+        if (Line_str[i] == '=') {
+          num = 1;
+          *tot = *tot + 1;
+          *way = 2;
+        }
+      }
+      if (Line_str[0] == '!' && num == 1) {
+        num = 0;
+        return num;
+      }
     }
-
+    if (num == 1)
+        fprintf(output, "\n  \t// **********WARNING: The following reaction, Reaction #%d on line %d, interpreted '=' as '<=>'.\n", *tot, loc);
+    
 
 
     return num; // returns 0 if there is no reaction and 1 if there is a reaction
@@ -1297,7 +1319,7 @@ int check_process(char Line[], int tot, int loc, FILE* output) {
     int i, k = 0;
 
     for (i = 0; Line[i] != '\n' && Line[i] != '\r'; i++) {              // determines the presence of a reaction by "=>" or "<=>"
-        if (Line[i] == '=' && Line[i + 1] == '>')
+        if (Line[i] == '=')
             return 3;
     }
     i = 0;

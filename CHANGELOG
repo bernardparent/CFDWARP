@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 AUG 22a
+  * in tools/chemkin2cfdwarp.c
+    - added capability to read reactions with "=" operator
+    
+
 2022 AUG 18a
   * in model/share/transport_share.c
     - in adjust_muk_for_Ek_effect(), added contribution of electric field to electron mobilities
