@@ -315,30 +315,57 @@ void add_to_dW_fw_2r4p_fit4(int specR1, int specR2,
 
 
 
+/*
+ Note : kf  = P_r*kinf/(1+P_r)
+        with P_r = k0*X[specR3]/kinf 
+             kinf determined from A, n, E
+             k0 determined from A0, n0, E0
+ Units:
+ A in cm^6 mole^(-2) s^(-1) K^(-n) 
+ A0 in cm^3 (mole s)^(-1) K^(-n)
+ E,E0 in cal/mole
+ T in Kelvin
+ X in mole/cm3
+*/ 
+
 void add_to_W_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
                                 int specP1, int specP2,
-                                double A0, double n0, double E0, 
                                 double A,  double n , double E, 								
-							                	double T, double M, spec_t X, spec_t W);
-                                
-void add_to_W_fw_2r3p_Lindemann(int specR1, int specR2,
-                                int specP1, int specP2, int specP3,
-                                double A0, double n0, double E0,
-                                double A, double n, double E,								
-                                double T, double M, spec_t X, spec_t W);
-                                
+                                double A0, double n0, double E0, 
+							                	double T,  spec_t X, spec_t W);
+
 void add_to_dW_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
                                  int specP1, int specP2,
-                                 double A0, double n0, double E0,
                                  double A, double n, double E, 
-                                 double T, double M, spec_t X, 
+                                 double A0, double n0, double E0,
+                                 double T, spec_t X, 
                                  spec_t dWdT, spec2_t dWdrhok);
+
+/*
+ Note : kf  = P_r*kinf/(1+P_r)
+        with P_r = k0*X[specR2]/kinf 
+             kinf determined from A, n, E
+             k0 determined from A0, n0, E0
+ Units:
+ A in cm^3 (mole s)^(-1) K^(-n)
+ A0 in  s^(-1) K^(-n)
+ E,E0 in cal/mole
+ T in Kelvin
+ X in mole/cm3
+*/ 
+
+void add_to_W_fw_2r3p_Lindemann(int specR1, int specR2,
+                                int specP1, int specP2, int specP3,
+                                double A, double n, double E,								
+                                double A0, double n0, double E0,
+                                double T, spec_t X, spec_t W);
+
 
 void add_to_dW_fw_2r3p_Lindemann(int specR1, int specR2,
                                  int specP1, int specP2, int specP3,
-                                 double A0, double n0, double E0,
                                  double A, double n, double E, 								 
-                                 double T, double M, spec_t X, 
+                                 double A0, double n0, double E0,
+                                 double T, spec_t X, 
                                  spec_t dWdT, spec2_t dWdrhok);
 
 

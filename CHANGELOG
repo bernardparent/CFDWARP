@@ -7,6 +7,31 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 AUG 24b
+  * in model/chem/_C2H4_Air_Plasma_30s/zettervall2017.c
+    - updated the reactions following those in model/chem/_C2H4_Air_23s/chem.c
+
+
+2022 AUG 24a
+  * in model/chem/_C2H4_Air_23s/chem.c
+    - in find_W() and find_dW_dx(), fixed a mistake in the call to add_*_Lindemann: M should not
+      be the sum of all the M species molar fractions, but simply the molar fraction of the 
+      species M under consideration
+    - in find_W() and find_dW_dx(), changed the calls to add_*_Lindemann
+  * in model/chem/_C2H4_Air_23s/doc/report.tex
+    - improved the explanations and notations for the Lindermann reactions so that they are in 
+      sync with the code
+  * in model/share/chem_share.c
+    - in add_*_Lindemann, removed the parameter M; rather the molar fraction of M is now set
+      to the one of the last reactant species
+    - in add_*_Lindemann, fixed the units of A and A0 and their associated reaction rate coefficients
+      everywhere
+  * in tools/chemkin2cfdwarp.c
+    - fixed a bug related to reaction count
+  * in model/chem/_C2H4_Air_Plasma_30s
+    - added from_Igor_v3.txt
+      
+
 2022 AUG 22b
   * in model/chem/_C2H4_Air_Plasma_30s/chem.c
     - updated the chemical reactions using the latest chemkin2cfdwarp

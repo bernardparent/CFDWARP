@@ -1233,6 +1233,7 @@ int check_reaction_current_line(char Line_str[], int* way, int* tot, FILE* outpu
       }
       if (Line_str[0] == '!' && num == 1) {
         num = 0;
+        *tot = *tot - 1;
         return num;
       }
     }

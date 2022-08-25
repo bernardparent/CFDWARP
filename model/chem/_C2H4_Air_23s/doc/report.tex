@@ -108,7 +108,7 @@ abstract
 \tablecaption{Zettervall Reaction Mechanism for Ethylene-Air \cite{ef:2017:zettervall}}
 \begin{tabular}{cccccc} 
 \toprule
-\multicolumn{2}{c}{Reaction \tnote{a,~b}} & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole & ref \\ 
+\multicolumn{2}{c}{Reaction \tnote{a,~b,~c}} & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole & ref \\ 
 \midrule
 (1) & $\rm C_2 H_5 + H \rightarrow CH_3 + CH_3$  & 1.50 $\times$ 10$^{13}$  & 0.00 & 0.00  & \cite{pci:2015:saghafian}\\
 
@@ -158,17 +158,17 @@ abstract
 
 (24) & $\rm C_2 H + OH \rightarrow HCO + CH $ &8.00 $\times$ 10$^{12}$  & 0.00 &5000 &\cite{ef:2017:zettervall}\\
 
-(25) & $\rm C H_4 +M \rightarrow CH_3 + H +M $  &  &  &  & \cite{rkm:1991:smoke}\\
+(25) & $\rm C H_4 (+M) \rightarrow CH_3 + H (+M) $  &  &  &  & \cite{rkm:1991:smoke}\\
 
-  & $k_f $ \tnote{c} & 6.30 $\times$ 10$^{14}$ &0.00  &104000  &\\
+  & $k_\infty $ & 6.30 $\times$ 10$^{14}$ &0.00  &104000  &\\
 
-  & $k_{f0} $\tnote{c} & 1.00 $\times$ 10$^{17}$ & 0.00 & 86000 &\\
+  & $k_{0} $ & 1.00 $\times$ 10$^{17}$ & 0.00 & 86000 &\\
   
-  (26) & $\rm CH_3 + H +M  \rightarrow C H_4 + M $&  &  &  &\cite{rkm:1991:smoke}\\
+(26) & $\rm CH_3 + H (+M)  \rightarrow C H_4 (+M) $&  &  &  &\cite{rkm:1991:smoke}\\
 
-  & $k_f $ & 5.20 $\times$ 10$^{12}$ &0.00  &-1310  &\\
+  & $k_\infty $ & 5.20 $\times$ 10$^{12}$ &0.00  &-1310  &\\
 
-  & $k_{f0} $ & 8.25 $\times$ 10$^{14}$ & 0.00 & -19310 &\\
+  & $k_{0} $ & 8.25 $\times$ 10$^{14}$ & 0.00 & -19310 &\\
   
 (27) & $\rm C H_4 + H \rightarrow C H_3 + H_2 $ &2.20 $\times$ 10$^{4}$  & 3.00 &8750 &\cite{rkm:1991:smoke}\\  
 
@@ -258,13 +258,7 @@ abstract
    CH$_3$, CH$_4$, HO$_2$, HCO, CH$_2$O, CH$_3$O, CO, CO$_2$.
 \item[{b}] Third body efficiencies: $\rm C_2 H_4, 3; CH_4, 6.5; CO, 0.75; C O_2, 1.5; H_2, 1; H_2 O, 6.5; N_2, 0.4; O_2, 0.4$. Set to 1.0 for all other species.
 \item[{c}] Lindemann approximation for the forward
-rate constants given by $k = P_r k_f / (1+P_r)$, where $P_r = k_{f0}[M]/k_f$ with [$M$] the third body concentration in mole/cm$^3$.
-
-% \item[{3}] The universal gas constant $R$ must be set to 1.9872 cal/K mole.
-% \item[{4}] $\rm M_4 = Ar, C_2, N_2, O_2, CN, CO$
-% \item[{5}] $\rm M_5 = C, N, O, NO, CO_2$
-% \item[{6}] $\rm M_6 = C_2, N_2, O_2, CN, CO, NO, CO_2$
-% \item[{7}] $\rm R = 1.9872 \frac{\rm cal}{\rm mol \cdot K}$
+reaction rate coefficient given by $k_{\rm f} = P_r k_\infty / (1+P_r)$, where $P_r = k_{0}\chi_{\rm M}/k_\infty$ with $\chi_{\rm M}$ the third body molar fraction in mole/cm$^3$.
 
 \end{tablenotes}
 \end{threeparttable}

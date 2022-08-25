@@ -153,14 +153,12 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
  
   long k;
   spec_t X;
-  double M;
 
   for ( k = 0; k < ns; k++ ) {
     X[k]   = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
     W[k]   = 0.0;
   }
   
-  M = 0.0;
 
   if (REACTION[1]){
   // reaction (1): C2H5 + H -> CH3 + CH3
@@ -290,22 +288,15 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
   
   if (REACTION[25]){
   // reaction (25): CH4(+M) -> CH3 + H(+M) 	  	  
-  for (k=0; specM[k]!=specEND; k++){	
-     M     += third1[k]*X[k];
-  }
 	 for (k=0; specM[k]!=specEND; k++){	
-  add_to_W_fw_2r3p_Lindemann ( specCH4, specM[k], specCH3, specH, specM[k],third1[k]*1.00e+17, 0.0, 86000.0, third1[k]*6.30e+14, 0.0, 104000.0, T,M, X, W );
+  add_to_W_fw_2r3p_Lindemann ( specCH4, specM[k], specCH3, specH, specM[k], third1[k]*6.30e+14, 0.0, 104000.0,third1[k]*1.00e+17, 0.0, 86000.0, T, X, W );
 	 }
   } 
   
   if (REACTION[26]){
   // reaction (26): CH3 + H(+M)  -> CH4(+M) 
-    for (k=0; specM[k]!=specEND; k++){	
-     M     += third1[k]*X[k];
-   }
-    
 	 for (k=0; specM[k]!=specEND; k++){		  
-  add_to_W_fw_3r2p_Lindemann ( specCH3, specH, specM[k], specCH4, specM[k], third1[k]*8.25e+14, 0.0, -19310.0, third1[k]*5.20e+12, 0.0, -1310.0, T,M, X, W );
+  add_to_W_fw_3r2p_Lindemann ( specCH3, specH, specM[k], specCH4, specM[k], third1[k]*5.20e+12, 0.0, -1310.0, third1[k]*8.25e+14, 0.0, -19310.0,  T, X, W );
 	 }  
   } 
   
@@ -534,7 +525,6 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
                     
    long k, s;  
    spec_t X;  
-   double M;
    
    for ( k = 0; k < ns; k++ ) {
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
@@ -552,7 +542,6 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
       }
     }
 
-   M = 0.0;
 
   if (REACTION[1]){
   // reaction (1): C2H5 + H -> CH3 + CH3
@@ -681,26 +670,16 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
   } 
   
   if (REACTION[25]){
-  // reaction (25): CH4(+M) -> CH3 + H(+M)
-  
-  for (k=0; specM[k]!=specEND; k++){	
-     M     += third1[k]*X[k];
-   }
-  
+  // reaction (25): CH4(+M) -> CH3 + H(+M)  
   	 for (k=0; specM[k]!=specEND; k++){	
-  add_to_dW_fw_2r3p_Lindemann ( specCH4, specM[k], specCH3, specH, specM[k], third1[k]*1.00e+17, 0.0, 86000.0, third1[k]*6.30e+14, 0.0, 104000.0, T,M, X, dWdT, dWdrhok );
+  add_to_dW_fw_2r3p_Lindemann ( specCH4, specM[k], specCH3, specH, specM[k], third1[k]*6.30e+14, 0.0, 104000.0, third1[k]*1.00e+17, 0.0, 86000.0,  T, X, dWdT, dWdrhok );
 	 }
   } 
   
   if (REACTION[26]){
   // reaction (26): CH3 + H(+M)  -> CH4(+M)
-  
-  for (k=0; specM[k]!=specEND; k++){	
-     M     += third1[k]*X[k];
-   }
-  
 	 for (k=0; specM[k]!=specEND; k++){		  
-  add_to_dW_fw_3r2p_Lindemann ( specCH3, specH, specM[k], specCH4, specM[k], third1[k]*8.25e+14, 0.0, -19310.0, third1[k]*5.20e+12, 0.0, -1310.0, T,M, X, dWdT, dWdrhok );
+  add_to_dW_fw_3r2p_Lindemann ( specCH3, specH, specM[k], specCH4, specM[k], third1[k]*5.20e+12, 0.0, -1310.0, third1[k]*8.25e+14, 0.0, -19310.0,  T,X, dWdT, dWdrhok );
 	 }    
   } 
   

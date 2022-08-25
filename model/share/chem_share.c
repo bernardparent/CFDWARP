@@ -1168,6 +1168,7 @@ void add_to_dW_fw_2r3p(int specR1, int specR2,
 }
 
 
+
 /* A in cm^3 (mole s)^(-1) K^(-n) 
    E in cal mole^(-1) 
    T in Kelvin
@@ -1236,6 +1237,7 @@ void add_to_dW_bw_2r3p(int specR1, int specR2,
     dWdrhok[specP3][specP3]+=-_calM(specP3)/_calM(specP3)*kf*X[specP1]*X[specP2]/Kc; 
   }
 }
+
 
 
 /* A in s^(-1) K^(-n)
@@ -1654,22 +1656,35 @@ void add_to_dW_fw_2r4p_fit4(int specR1, int specR2,
 }
 
 
+
+/*
+ Note : kf  = P_r*kinf/(1+P_r)
+        with P_r = k0*X[specR3]/kinf 
+             kinf determined from A, n, E
+             k0 determined from A0, n0, E0
+ Units:
+ A in cm^6 mole^(-2) s^(-1) K^(-n) 
+ A0 in cm^3 (mole s)^(-1) K^(-n)
+ E,E0 in cal/mole
+ T in Kelvin
+ X in mole/cm3
+*/ 
 void add_to_W_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
                                 int specP1, int specP2,
-                                double A0, double n0, double E0, 
                                 double A,  double n , double E, 								
-							                	double T, double M, spec_t X, spec_t W){
-  double kf,sum, kf0, P_r, kinf;
+                                double A0, double n0, double E0, 
+							                	double T,  spec_t X, spec_t W){
+  double kf,sum, k0, P_r, kinf;
   
   
-  kf0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));  /* low  pressure limit cm^3 (mole s)^(-1) */ 
-  kinf = A*pow(T,n)*exp(-E/(T*Rchem));  /* high pressure limit cm^3 (mole s)^(-1) */ 
+  k0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));  /* low  pressure limit cm^3 (mole s)^(-1) */ 
+  kinf = A*pow(T,n)*exp(-E/(T*Rchem));  /* high pressure limit cm^6 mole^(-2) s^(-1)  */ 
   
-  P_r = M * kf0 / kinf;
+  P_r = X[specR3] * k0 / kinf;
   
-  kf = kinf * P_r / ( 1 + P_r ); /* Lindemann aprroximation */
-
-  sum=kf*X[specR1]*X[specR2]*X[specR3]; /* mole cm^(-3) (s)^(-1) */
+  kf = kinf * P_r / ( 1.0 + P_r ); 
+  
+  sum=kf*X[specR1]*X[specR2]*X[specR3]; 
   W[specR1]-=_calM(specR1)*sum*1e6;
   W[specR2]-=_calM(specR2)*sum*1e6;
   W[specR3]-=_calM(specR3)*sum*1e6;
@@ -1678,19 +1693,34 @@ void add_to_W_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
 } 
 
 
+
+
+
+/*
+ Note : kf  = P_r*kinf/(1+P_r)
+        with P_r = k0*X[specR2]/kinf 
+             kinf determined from A, n, E
+             k0 determined from A0, n0, E0
+ Units:
+ A in cm^3 (mole s)^(-1) K^(-n)
+ A0 in  s^(-1) K^(-n)
+ E,E0 in cal/mole
+ T in Kelvin
+ X in mole/cm3
+*/ 
 void add_to_W_fw_2r3p_Lindemann(int specR1, int specR2,
                                 int specP1, int specP2, int specP3,
-                                double A0, double n0, double E0,
                                 double A, double n, double E,								
-                                double T, double M, spec_t X, spec_t W){
-  double kf,sum, kf0, P_r, kinf;
+                                double A0, double n0, double E0,
+                                double T, spec_t X, spec_t W){
+  double kf,sum, k0, P_r, kinf;
 
-  kf0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));  /* low  pressure limit cm^3 (mole s)^(-1) */ 
+  k0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));  /* low  pressure limit s^(-1)  */ 
   kinf = A*pow(T,n)*exp(-E/(T*Rchem));  /* high pressure limit cm^3 (mole s)^(-1) */ 
   
-  P_r = M * kf0 / kinf;
+  P_r = X[specR2] * k0 / kinf;
   
-  kf = kinf * P_r / ( 1 + P_r ); /* Lindemann aprroximation */
+  kf = kinf * P_r / ( 1.0 + P_r ); 
 
   sum=kf*X[specR1]*X[specR2];
   W[specR1]-=_calM(specR1)*sum*1e6;
@@ -1702,34 +1732,47 @@ void add_to_W_fw_2r3p_Lindemann(int specR1, int specR2,
 }
 
 
+
+/*
+ Note : kf  = P_r*kinf/(1+P_r)
+        with P_r = k0*X[specR3]/kinf 
+             kinf determined from A, n, E
+             k0 determined from A0, n0, E0
+ Units:
+ A in cm^6 mole^(-2) s^(-1) K^(-n) 
+ A0 in cm^3 (mole s)^(-1) K^(-n)
+ E,E0 in cal/mole
+ T in Kelvin
+ X in mole/cm3
+*/ 
 void add_to_dW_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
                                  int specP1, int specP2,
-                                 double A0, double n0, double E0,
                                  double A, double n, double E, 
-                                 double T, double M, spec_t X, 
+                                 double A0, double n0, double E0,
+                                 double T, spec_t X, 
                                  spec_t dWdT, spec2_t dWdrhok){
 									 
-  double kf, sum, kf0, P_r, kinf, dkfdT, dkf0dT, dkinfdT, dPrdk0, dPrdki;
+  double kf, sum, k0, P_r, kinf, dkfdT, dk0dT, dkinfdT, dPrdk0, dPrdki;
 
-  kf0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));  /* low  pressure limit cm^3 (mole s)^(-1) */ 
-  kinf = A*pow(T,n)*exp(-E/(T*Rchem));  /* high pressure limit cm^3 (mole s)^(-1) */ 
+  k0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));  /* low  pressure limit cm^3 (mole s)^(-1) */ 
+  kinf = A*pow(T,n)*exp(-E/(T*Rchem));  /* high pressure limit cm^6 mole^(-2) s^(-1) */ 
   
-  P_r = M * kf0 / kinf;
+  P_r = X[specR3] * k0 / kinf;
   
-  kf = kinf * P_r / (1 + P_r); /* Lindemann aprroximation */
+  kf = kinf * P_r / (1.0 + P_r); 
   
-  sum=X[specR1]*X[specR2]*X[specR3]; /* mole cm^(-3) (s)^(-1) */
+  sum=X[specR1]*X[specR2]*X[specR3]; 
   
    /* dWdT */
   
-  dkf0dT  = kf0*n0/T + kf0*(E0/(sqr(T)*Rchem));
+  dk0dT  = k0*n0/T + k0*(E0/(sqr(T)*Rchem));
   dkinfdT = kinf*n/T + kinf*(E/(sqr(T)*Rchem));
   
-  dPrdk0 = M / kinf;
+  dPrdk0 = X[specR3] / kinf;
   dPrdki = -P_r / kinf;
  
   dkfdT = dkinfdT * P_r / ( 1 + P_r ) 
-        + kinf * ( dPrdk0*dkf0dT + dPrdki*dkinfdT ) / sqr(1 + P_r);
+        + kinf * ( dPrdk0*dk0dT + dPrdki*dkinfdT ) / sqr(1.0 + P_r);
 
   dWdT[specR1] -= _calM(specR1)*dkfdT*1e6*sum ;
   dWdT[specR2] -= _calM(specR2)*dkfdT*1e6*sum ;
@@ -1765,34 +1808,46 @@ void add_to_dW_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
 } 
 
 
+/*
+ Note : kf  = P_r*kinf/(1+P_r)
+        with P_r = k0*X[specR2]/kinf 
+             kinf determined from A, n, E
+             k0 determined from A0, n0, E0
+ Units:
+ A in cm^3 (mole s)^(-1) K^(-n)
+ A0 in  s^(-1) K^(-n)
+ E,E0 in cal/mole
+ T in Kelvin
+ X in mole/cm3
+*/ 
 void add_to_dW_fw_2r3p_Lindemann(int specR1, int specR2,
                                  int specP1, int specP2, int specP3,
-                                 double A0, double n0, double E0,
                                  double A, double n, double E, 								 
-                                 double T, double M, spec_t X, 
+                                 double A0, double n0, double E0,
+                                 double T, spec_t X, 
                                  spec_t dWdT, spec2_t dWdrhok){
 									 
-  double kf,sum, kf0, P_r, kinf, dkfdT, dkf0dT, dkinfdT, dPrdk0, dPrdki;
+  double kf,sum, k0, P_r, kinf, dkfdT, dk0dT, dkinfdT, dPrdk0, dPrdki;
 
-  kf0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));  /* low  pressure limit cm^3 (mole s)^(-1) */ 
+  k0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));  /* low  pressure limit (s)^(-1) */ 
   kinf = A*pow(T,n)*exp(-E/(T*Rchem));  /* high pressure limit cm^3 (mole s)^(-1) */ 
   
-  P_r = M * kf0 / kinf;
+  P_r = X[specR2] * k0 / kinf;
   
-  kf = kinf * P_r / (1 + P_r); /* Lindemann aprroximation */
+  kf = kinf * P_r / (1.0 + P_r); 
   
-  sum=X[specR1]*X[specR2]; /* mole cm^(-3) (s)^(-1) */
+  sum=X[specR1]*X[specR2]; 
 
   // dWdT 
   
-  dkf0dT  = kf0*n0/T + kf0*(E0/(sqr(T)*Rchem));
+  dk0dT  = k0*n0/T + k0*(E0/(sqr(T)*Rchem));
   dkinfdT = kinf*n/T + kinf*(E/(sqr(T)*Rchem));
   
-  dPrdk0 = M / kinf;
+  dPrdk0 = X[specR2] / kinf;
   dPrdki = -P_r / kinf;
  
-  dkfdT = dkinfdT * P_r / ( 1 + P_r ) 
-        + kinf * ( dPrdk0*dkf0dT + dPrdki*dkinfdT ) / sqr(1 + P_r);
+  dkfdT = dkinfdT * P_r / ( 1.0 + P_r ) 
+        + kinf * ( dPrdk0*dk0dT + dPrdki*dkinfdT ) / sqr(1.0 + P_r);
 
   dWdT[specR1] -= _calM(specR1)*dkfdT*1e6*sum ;
   dWdT[specR2] -= _calM(specR2)*dkfdT*1e6*sum ;
