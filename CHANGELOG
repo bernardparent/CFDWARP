@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 AUG 25a
+  * in bin/Schulein.wrp
+    - fixed several bugs
+  * in model/share/chem_share.c
+    - fixed a bug in the rate coefficients in the add_to_W_fw_*_Lindemann() functions  
+    
+
 2022 AUG 24b
   * in model/chem/_C2H4_Air_Plasma_30s/zettervall2017.c
     - updated the reactions following those in model/chem/_C2H4_Air_23s/chem.c

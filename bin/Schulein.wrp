@@ -68,7 +68,7 @@ pp. 157–168.}
 
 {10 deg or 14 deg shock wedge}
 
-shock10deg = NO; 
+shock10deg = YES;
 
 Twall  = 300; {K}	
 
@@ -86,8 +86,8 @@ je = round(mf*200);
 Lplate    = 0.5;	
 Lshock    = 0.35;	
 
-delta1    = 0.15;
-delta2    = 0.02;
+delta1 = 0.06;
+delta2 = 0.02;
 
 dxmin   = (4.0e-6/mf)/1.5;	
 dyzmin  =  2.0e-6/mf; 
@@ -167,10 +167,10 @@ Model(
     kdiv=1.0e-50;    {m2/s2}
     psidiv=0.1e-3;   {1/s}
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
-    Tmin=1.0e1;     Tmax=26.0e3;    {K}
+    Tmin=1.0e-2;     Tmax=26.0e3;    {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
-    kmin=1.0e-10;   kmax=9.9e99;   {m2/s2}
-    psimin=1e-10;   psimax=9.9e99; {1/s}
+    kmin=1.0e-15;   kmax=9.9e99;   {m2/s2}
+    psimin=1e-12;   psimax=9.9e99; {1/s}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain}
     AXISYMMETRIC=NO;
   );
@@ -271,7 +271,7 @@ Disc(
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.999;
-    INTERPOL=INTERPOL_TVD2_VANLEER;
+    INTERPOL=INTERPOL_WENO5;
     EIGENVALCOND=EIGENVALCOND_PECLET;
     POSFILTER=POSFILTER_NONE;
     POSFILTER_numiter=4;
@@ -299,6 +299,10 @@ Cycle(
   );
   
   SteadyState(
+    Mx = 5.0;		
+	  My = 0;
+    Mz = 0;
+    P  = 4006.8636;
     if (mod(iter,500)==0,
       WriteDataFile(outputfilename"."iter);
       Post(
@@ -324,10 +328,10 @@ Cycle(
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     
     if (iter==1,
-      CFL=0.5;
+      CFL=0.1;
     );
 	
-    CFL=min(CFL*1.0002,1.0);
+    CFL=min(CFL*1.003,3.0);
     
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     printf("%6.4f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
