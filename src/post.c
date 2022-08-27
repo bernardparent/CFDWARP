@@ -1253,6 +1253,9 @@ static void integrate_heat_to_surface_on_bdry(np_t *np, gl_t *gl, zone_t zone,
   flux_t Gp0p1,Gp0m1,Gp1p1,Gp1m1;
   sqmat_t Kp1h;
   metrics_t metricsp1h;
+#ifdef _FLUID_PLASMA
+  flux_t Dstarplusp0,Dstarminusp1,Ustarp0,Ustarp1,DUstarplusp0,DUstarminusp1;
+#endif
 #ifdef DISTMPI
   int rank;
   double tempsum;
@@ -1298,6 +1301,17 @@ static void integrate_heat_to_surface_on_bdry(np_t *np, gl_t *gl, zone_t zone,
                 multiply_matrix_and_vector(Kp1h,dGp1h,tmpp1h);
                 (*heat_to_surface)+=sign(metricsp1h.Omega)*thetasgn*tmpp1h[fluxet];
               }
+#ifdef _FLUID_PLASMA
+              find_Dstarplus (np, gl, _al(gl,l,theta,+0),       theta, metricsp1h, Dstarplusp0);
+              find_Dstarminus(np, gl, _al(gl,l,theta,thetasgn), theta, metricsp1h, Dstarminusp1);
+              find_Ustar(np[_al(gl,l,theta,+0)],       gl, Ustarp0);
+              find_Ustar(np[_al(gl,l,theta,thetasgn)], gl, Ustarp1);
+              for (flux=0; flux<nf; flux++){
+                DUstarplusp0[flux]=Dstarplusp0[flux]*Ustarp0[flux];
+                DUstarminusp1[flux]=Dstarminusp1[flux]*Ustarp1[flux]; 
+              }
+              (*heat_to_surface)-=sign(metricsp1h.Omega)*thetasgn*(DUstarplusp0[fluxet]+DUstarminusp1[fluxet]); 
+#endif
             }
           }
 #ifdef DISTMPI
@@ -2055,7 +2069,7 @@ static void read_post_functions(char *functionname, char **argum,
     dim=SOAP_get_argum_long(codex,*argum,2*nd);
     BDRYTYPE_SURFACE=SOAP_get_argum_long(codex,*argum,2*nd+1);
     dim--;
-    if (dim<0 || dim>=nd) SOAP_fatal_error(codex,"The specified dimension is not within range when calling _Fshear().");
+    if (dim<0 || dim>=nd) SOAP_fatal_error(codex,"The specified dimension is not within range when calling _Area().");
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
     integrate_area_on_bdry(np, &gl, *domain_post, Area, BDRYTYPE_SURFACE);
     sprintf(*returnstr,"%E",Area[dim]);

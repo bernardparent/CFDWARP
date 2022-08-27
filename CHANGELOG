@@ -7,6 +7,23 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 AUG 26a
+  * in bin/misc/MHD_earth_entry2.wrp
+    - in Post() added code to correctly compute the heat flux on the top and bottom surfaces
+  * in model/chem/_C2H4_Air_23s/doc/report.tex
+    - fixed the documentation for the Lindemann reaction rate
+  * in model/fluid/_*_plasma/fluid.c
+    - in write_model_fluid_template(), read_model_fluid_actions(), got rid of 
+      INCLUDE_E_EFFECTS_ON_MOBILITY and added
+      INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY and INCLUDE_E_EFFECTS_ON_ION_MOBILITY
+    - in _mu(), find_prim_fluid_mem(), made modifications to implement the new 
+      INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY and INCLUDE_E_EFFECTS_ON_ION_MOBILITY flags
+  * in src/post.c
+    - in integrate_heat_to_surface_on_bdry(), added code to account for the contribution of
+      Dstar*Ustar to the heat flux; this includes the contributions coming from the charged
+      species enthalpies
+      
+
 2022 AUG 25a
   * in bin/Schulein.wrp
     - fixed several bugs

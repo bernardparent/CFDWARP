@@ -91,7 +91,7 @@ Bz=0.09; {Tesla}
 mf=1.0; 
 gamma=0.1e0;    {secondary emission coefficient}
 Twall=3000;     {wall temperature everywhere}
-workfunct=4.6; {2.7, 4.6, and 1e99 eV}
+workfunct=2.7; {2.7, 4.6, and 1e99 eV}
 THERMIONICEMISSION=TRUE;
 {
             work function   max operating temperature point
@@ -229,7 +229,8 @@ Model(
     chiemin=1e-9;  chiemax=1.0;    {min and max electron molar fraction}
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
     AXISYMMETRIC=NO;
-    INCLUDE_E_EFFECTS_ON_MOBILITY=YES;
+    INCLUDE_E_EFFECTS_ON_ION_MOBILITY=YES;
+    INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY=NO;
     SCHOTTKY_EFFECT=YES;
   );
   AirPlasma11s(
@@ -483,6 +484,19 @@ Post(
   fprintf(postfilename,"EdotJ     = %+E W/m\n",_EdotJ(is,js, ie,je));
   fprintf(postfilename,"Wemfield  = %+E W/m\n",_Wemfield(is,js, ie,je)); {Wemfield=Femfield dot Vn}
   fprintf(postfilename,"\n");
+
+
+  fprintf(postfilename,"\n Heat flux on bottom and top wall.\n\n");
+  for (i,is+1,ie-1,
+    if (i>=is1 && i<=is2,
+      BDRY=BDRY_WALLTFIXEDTHERMIONIC1;
+    ,{else}
+      BDRY=BDRY_WALLTFIXED1;
+    );    
+    fprintf(postfilename,"x=%E  Qheat_bottom=%+E W/m2  Qheat_top=%+E W/m2\n",_x(i,js),_Qheat(i,js, i,js+2, BDRY)/sqrt(_Area(i,js, i,js+2, 1,BDRY)^2+_Area(i,js, i,js+2, 2,BDRY)^2),_Qheat(i,je-2, i,je, BDRY)/sqrt(_Area(i,je-2, i,je, 1,BDRY)^2+_Area(i,je-2, i,je, 2,BDRY)^2));
+  );
+
+  
   {
   POSTGRIDONLY=FALSE;
   WritePostFile(is,js, ie,je, "post.01", "tecplot", POSTGRIDONLY);
