@@ -334,12 +334,38 @@ void add_to_W_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
                                 double A0, double n0, double E0, 
 							                	double T,  spec_t X, spec_t W);
 
+void add_to_W_bw_3r2p_Lindemann(int specR1, int specR2, int specR3,
+                                int specP1, int specP2,
+                                double Ainf, double ninf, double Einf, 
+                                double A0,  double n0 , double E0, 								
+                                double T, spec_t X, spec_t W);
+
+void add_to_W_fwbw_3r2p_Lindemann(int specR1, int specR2, int specR3,
+                                  int specP1, int specP2,
+                                  double Ainf, double ninf, double Einf, 
+                                  double A0,  double n0 , double E0, 								
+                                  double T, spec_t X, spec_t W);
+
 void add_to_dW_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
                                  int specP1, int specP2,
                                  double Ainf, double ninf, double Einf, 
                                  double A0, double n0, double E0,
                                  double T, spec_t X, 
                                  spec_t dWdT, spec2_t dWdrhok);
+
+void add_to_dW_bw_3r2p_Lindemann(int specR1, int specR2, int specR3,
+                                 int specP1, int specP2,
+                                 double Ainf, double ninf, double Einf, 
+                                 double A0, double n0, double E0,
+                                 double T, spec_t X, 
+                                 spec_t dWdT, spec2_t dWdrhok);
+
+void add_to_dW_fwbw_3r2p_Lindemann(int specR1, int specR2, int specR3,
+                                   int specP1, int specP2,
+                                   double Ainf, double ninf, double Einf, 
+                                   double A0, double n0, double E0,
+                                   double T, spec_t X, 
+                                   spec_t dWdT, spec2_t dWdrhok);
 
 /*
  Note : kf  = k0/(1+k0*X[specR2]/kinf)
@@ -360,6 +386,17 @@ void add_to_W_fw_2r3p_Lindemann(int specR1, int specR2,
                                 double A0, double n0, double E0,
                                 double T, spec_t X, spec_t W);
 
+void add_to_W_bw_2r3p_Lindemann(int specR1, int specR2,
+                                int specP1, int specP2, int specP3,
+                                double Ainf, double ninf, double Einf,								
+                                double A0, double n0, double E0,
+                                double T, spec_t X, spec_t W);
+
+void add_to_W_fwbw_2r3p_Lindemann(int specR1, int specR2,
+                                  int specP1, int specP2, int specP3,
+                                  double Ainf, double ninf, double Einf,								
+                                  double A0, double n0, double E0,
+                                  double T, spec_t X, spec_t W);
 
 void add_to_dW_fw_2r3p_Lindemann(int specR1, int specR2,
                                  int specP1, int specP2, int specP3,
@@ -368,6 +405,19 @@ void add_to_dW_fw_2r3p_Lindemann(int specR1, int specR2,
                                  double T, spec_t X, 
                                  spec_t dWdT, spec2_t dWdrhok);
 
+void add_to_dW_bw_2r3p_Lindemann(int specR1, int specR2,
+                                 int specP1, int specP2, int specP3,
+                                 double Ainf, double ninf, double Einf, 								 
+                                 double A0, double n0, double E0,
+                                 double T, spec_t X, 
+                                 spec_t dWdT, spec2_t dWdrhok);
+
+void add_to_dW_fwbw_2r3p_Lindemann(int specR1, int specR2,
+                                   int specP1, int specP2, int specP3,
+                                   double Ainf, double ninf, double Einf, 								 
+                                   double A0, double n0, double E0,
+                                   double T, spec_t X, 
+                                   spec_t dWdT, spec2_t dWdrhok);
 
 /* find the forward reaction rate cofficient kf = A * (calA)^(1-numreactant) * T^n * exp(-E/(R*T))
  * 

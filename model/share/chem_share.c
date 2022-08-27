@@ -1657,37 +1657,7 @@ void add_to_dW_fw_2r4p_fit4(int specR1, int specR2,
 
 
 
-/*
- Note : kf  = k0/(1+k0*X[specR3]/kinf)
-        with kinf determined from Ainf, ninf, Einf
-             k0 determined from A0, n0, E0
- Units:
- A0 in cm^6 mole^(-2) s^(-1) K^(-n) 
- Ainf in cm^3 (mole s)^(-1) K^(-n)
- Einf,E0 in cal/mole
- T in Kelvin
- X in mole/cm3
- W in kg m^(-3) s^(-1)
-*/ 
-void add_to_W_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
-                                int specP1, int specP2,
-                                double Ainf, double ninf, double Einf, 
-                                double A0,  double n0 , double E0, 								
-							                	double T,  spec_t X, spec_t W){
-  double kf,sum, k0, kinf;
-  
-  k0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));  /* cm^6 mole^(-2) s^(-1) */ 
-  kinf = Ainf*pow(T,ninf)*exp(-Einf/(T*Rchem));  /*  cm^3 (mole s)^(-1)   */ 
-  
-  kf = k0/(1.0+k0*X[specR3]/kinf); 
-  
-  sum=kf*X[specR1]*X[specR2]*X[specR3]; 
-  W[specR1]-=_calM(specR1)*sum*1e6;
-  W[specR2]-=_calM(specR2)*sum*1e6;
-  W[specR3]-=_calM(specR3)*sum*1e6;
-  W[specP1]+=_calM(specP1)*sum*1e6;
-  W[specP2]+=_calM(specP2)*sum*1e6; 
-} 
+
 
 
 
@@ -1724,6 +1694,357 @@ void add_to_W_fw_2r3p_Lindemann(int specR1, int specR2,
   W[specP2]+=_calM(specP2)*sum*1e6; 
   W[specP3]+=_calM(specP3)*sum*1e6; 
 }
+
+
+/*
+ Note : kf  = k0/(1+k0*X[specR2]/kinf)
+        with kinf determined from Ainf, ninf, Einf
+             k0 determined from A0, n0, E0
+ Units:
+ A0 in cm^3 (mole s)^(-1) K^(-n) 
+ Ainf in s^(-1) K^(-n)
+ Einf,E0 in cal/mole
+ T in Kelvin
+ X in mole/cm3
+ W in kg m^(-3) s^(-1)
+*/ 
+void add_to_W_bw_2r3p_Lindemann(int specR1, int specR2,
+                                int specP1, int specP2, int specP3,
+                                double Ainf, double ninf, double Einf,								
+                                double A0, double n0, double E0,
+                                double T, spec_t X, spec_t W){
+  double k0, kinf;
+  double kf,dG0,Kc,kb,sum;
+
+  k0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));    /*  cm^3 (mole s)^(-1) */
+  kinf = Ainf*pow(T,ninf)*exp(-Einf/(T*Rchem)); /* s^(-1)  */ 
+  kf = k0/(1.0+k0*X[specR2]/kinf); /*  cm^3 (mole s)^(-1) */
+
+  dG0=_Gs(specP1,T)
+     +_Gs(specP2,T)
+     +_Gs(specP3,T)
+     -_Gs(specR1,T)
+     -_Gs(specR2,T); /* J/mole */
+  Kc=max(Kcmin,exp(-dG0/(calR*T)));
+  if (exp(-dG0/(calR*T))>Kcmin){
+    Kc *= 1E-6 * THERMO_P_REF/(calR*T); /* mole/cm^3 */
+    kb=kf/Kc; /*  cm^6 (mole)^(-2) s^(-1) */
+    sum=-kb*X[specP1]*X[specP2]*X[specP3]; /* mole cm^(-3) (s)^(-1) */
+    W[specR1]-=_calM(specR1)*sum*1e6;
+    W[specR2]-=_calM(specR2)*sum*1e6;
+    W[specP1]+=_calM(specP1)*sum*1e6;
+    W[specP2]+=_calM(specP2)*sum*1e6; 
+    W[specP3]+=_calM(specP3)*sum*1e6; 
+    /* kg m^(-3) s^(-1) */
+  }
+
+}
+
+
+
+/*
+ Note : kf  = k0/(1+k0*X[specR2]/kinf)
+        with kinf determined from Ainf, ninf, Einf
+             k0 determined from A0, n0, E0
+ Units:
+ A0 in cm^3 (mole s)^(-1) K^(-n) 
+ Ainf in s^(-1) K^(-n)
+ Einf,E0 in cal/mole
+ T in Kelvin
+ X in mole/cm3
+ W in kg m^(-3) s^(-1)
+*/ 
+void add_to_W_fwbw_2r3p_Lindemann(int specR1, int specR2,
+                                  int specP1, int specP2, int specP3,
+                                  double Ainf, double ninf, double Einf,								
+                                  double A0, double n0, double E0,
+                                  double T, spec_t X, spec_t W){
+  add_to_W_fw_2r3p_Lindemann(specR1, specR2, specP1, specP2, specP3,
+                             Ainf, ninf, Einf, A0, n0, E0, T, X, W);
+  add_to_W_bw_2r3p_Lindemann(specR1, specR2, specP1, specP2, specP3,
+                             Ainf, ninf, Einf, A0, n0, E0, T, X, W);
+}
+
+
+/*
+ Note : kf  = k0/(1+k0*X[specR2]/kinf)
+        with kinf determined from Ainf, ninf, Einf
+             k0 determined from A0, n0, E0
+ Units:
+ A0 in cm^3 (mole s)^(-1) K^(-n)
+ Ainf in  s^(-1) K^(-n)
+ Einf,E0 in cal/mole
+ T in Kelvin
+ X in mole/cm3
+ dWdT in kg m^(-3) s^(-1) K^(-1)
+ dWdrhok in s^(-1)
+*/ 
+void add_to_dW_fw_2r3p_Lindemann(int specR1, int specR2,
+                                 int specP1, int specP2, int specP3,
+                                 double Ainf, double ninf, double Einf, 								 
+                                 double A0, double n0, double E0,
+                                 double T, spec_t X, 
+                                 spec_t dWdT, spec2_t dWdrhok){
+									 
+  double kf,sum, k0, kinf, dkfdT, dk0dT, dkinfdT, dPrdk0, dPrdki, P_r;
+
+  k0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));    /*  cm^3 (mole s)^(-1) */
+  kinf = Ainf*pow(T,ninf)*exp(-Einf/(T*Rchem)); /* s^(-1)  */ 
+  kf = k0/(1.0+k0*X[specR2]/kinf); /*  cm^3 (mole s)^(-1) */
+
+  P_r=1.0; //????
+  sum=X[specR1]*X[specR2]; 
+
+  // dWdT 
+  
+  dk0dT  = k0*n0/T + k0*(E0/(sqr(T)*Rchem));
+  dkinfdT = kinf*ninf/T + kinf*(Einf/(sqr(T)*Rchem));
+  
+  dPrdk0 = X[specR2] / kinf;
+  dPrdki = -P_r / kinf;
+ 
+  dkfdT = dkinfdT * P_r / ( 1.0 + P_r ) 
+        + kinf * ( dPrdk0*dk0dT + dPrdki*dkinfdT ) / sqr(1.0 + P_r);
+
+  dWdT[specR1] -= _calM(specR1)*dkfdT*1e6*sum ;
+  dWdT[specR2] -= _calM(specR2)*dkfdT*1e6*sum ;
+  dWdT[specP1] += _calM(specP1)*dkfdT*1e6*sum ;
+  dWdT[specP2] += _calM(specP2)*dkfdT*1e6*sum ; 
+  dWdT[specP3] += _calM(specP3)*dkfdT*1e6*sum ; 
+
+  // dW[specR1]dX 
+  dWdrhok[specR1][specR1]-=_calM(specR1)/_calM(specR1)*kf*X[specR2];
+  dWdrhok[specR1][specR2]-=_calM(specR1)/_calM(specR2)*kf*X[specR1];
+
+  // dW[specR2]dX 
+  dWdrhok[specR2][specR1]-=_calM(specR2)/_calM(specR1)*kf*X[specR2];
+  dWdrhok[specR2][specR2]-=_calM(specR2)/_calM(specR2)*kf*X[specR1];
+
+  // dW[specP1]dX 
+  dWdrhok[specP1][specR1]+=_calM(specP1)/_calM(specR1)*kf*X[specR2];
+  dWdrhok[specP1][specR2]+=_calM(specP1)/_calM(specR2)*kf*X[specR1];
+
+  // dW[specP2]dX 
+  dWdrhok[specP2][specR1]+=_calM(specP2)/_calM(specR1)*kf*X[specR2];
+  dWdrhok[specP2][specR2]+=_calM(specP2)/_calM(specR2)*kf*X[specR1];
+
+  // dW[specP3]dX 
+  dWdrhok[specP3][specR1]+=_calM(specP3)/_calM(specR1)*kf*X[specR2];
+  dWdrhok[specP3][specR2]+=_calM(specP3)/_calM(specR2)*kf*X[specR1];
+  
+}
+
+
+
+/*
+ Note : kf  = k0/(1+k0*X[specR2]/kinf)
+        with kinf determined from Ainf, ninf, Einf
+             k0 determined from A0, n0, E0
+ Units:
+ A0 in cm^3 (mole s)^(-1) K^(-n)
+ Ainf in  s^(-1) K^(-n)
+ Einf,E0 in cal/mole
+ T in Kelvin
+ X in mole/cm3
+ dWdT in kg m^(-3) s^(-1) K^(-1)
+ dWdrhok in s^(-1)
+*/ 
+void add_to_dW_bw_2r3p_Lindemann(int specR1, int specR2,
+                                 int specP1, int specP2, int specP3,
+                                 double Ainf, double ninf, double Einf, 								 
+                                 double A0, double n0, double E0,
+                                 double T, spec_t X, 
+                                 spec_t dWdT, spec2_t dWdrhok){
+  double kinf,k0;
+  double kf,dG0,Kc,sum,dkfdT,dsumdT,dKcdToverKc,dG0dT;
+
+  k0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));    /*  cm^3 (mole s)^(-1) */
+  kinf = Ainf*pow(T,ninf)*exp(-Einf/(T*Rchem)); /* s^(-1)  */ 
+  kf = k0/(1.0+k0*X[specR2]/kinf); /*  cm^3 (mole s)^(-1) */
+
+  dG0=_Gs(specP1,T)
+     +_Gs(specP2,T)
+     +_Gs(specP3,T)
+     -_Gs(specR1,T)
+     -_Gs(specR2,T); /* J/mole */
+  Kc=1E-6 * THERMO_P_REF/(calR*T) * max(Kcmin, exp(-dG0/(calR*T))); /* mole/cm^3 */
+
+  sum=-X[specP1]*X[specP2]*X[specP3]/Kc; /* mole^2 cm^(-6)*/
+
+  // dWdT 
+  dG0dT=_dGsdT(specP1,T)+_dGsdT(specP2,T)+_dGsdT(specP3,T)-_dGsdT(specR1,T)-_dGsdT(specR2,T);
+  dKcdToverKc=( dG0/(calR*sqr(T)) - dG0dT/(calR*T) - 1.0/T);
+  if (exp(-dG0/(calR*T))<Kcmin) dKcdToverKc=-1.0/T;
+
+
+  dsumdT=X[specP1]*X[specP2]*X[specP3]/Kc*dKcdToverKc;
+
+  dkfdT= kf*ninf/T 
+       + kf*(Einf/(sqr(T)*Rchem));
+
+  if (exp(-dG0/(calR*T))>Kcmin ){
+
+    dWdT[specR1] -= _calM(specR1)*dkfdT*1e6*sum + _calM(specR1)*kf*1e6*dsumdT;
+    dWdT[specR2] -= _calM(specR2)*dkfdT*1e6*sum + _calM(specR2)*kf*1e6*dsumdT;
+    dWdT[specP1] += _calM(specP1)*dkfdT*1e6*sum + _calM(specP1)*kf*1e6*dsumdT;
+    dWdT[specP2] += _calM(specP2)*dkfdT*1e6*sum + _calM(specP2)*kf*1e6*dsumdT; 
+    dWdT[specP3] += _calM(specP3)*dkfdT*1e6*sum + _calM(specP3)*kf*1e6*dsumdT; 
+
+    // dW[specR1]dX 
+    dWdrhok[specR1][specP1]-=-_calM(specR1)/_calM(specP1)*kf*X[specP2]*X[specP3]/Kc;
+    dWdrhok[specR1][specP2]-=-_calM(specR1)/_calM(specP2)*kf*X[specP1]*X[specP3]/Kc;
+    dWdrhok[specR1][specP3]-=-_calM(specR1)/_calM(specP3)*kf*X[specP1]*X[specP2]/Kc;
+
+    // dW[specR2]dX 
+    dWdrhok[specR2][specP1]-=-_calM(specR2)/_calM(specP1)*kf*X[specP2]*X[specP3]/Kc;
+    dWdrhok[specR2][specP2]-=-_calM(specR2)/_calM(specP2)*kf*X[specP1]*X[specP3]/Kc;
+    dWdrhok[specR2][specP3]-=-_calM(specR2)/_calM(specP3)*kf*X[specP1]*X[specP2]/Kc;
+
+    // dW[specP1]dX 
+    dWdrhok[specP1][specP1]+=-_calM(specP1)/_calM(specP1)*kf*X[specP2]*X[specP3]/Kc;
+    dWdrhok[specP1][specP2]+=-_calM(specP1)/_calM(specP2)*kf*X[specP1]*X[specP3]/Kc;
+    dWdrhok[specP1][specP3]+=-_calM(specP1)/_calM(specP3)*kf*X[specP1]*X[specP2]/Kc;
+
+    // dW[specP2]dX 
+    dWdrhok[specP2][specP1]+=-_calM(specP2)/_calM(specP1)*kf*X[specP2]*X[specP3]/Kc;
+    dWdrhok[specP2][specP2]+=-_calM(specP2)/_calM(specP2)*kf*X[specP1]*X[specP3]/Kc;
+    dWdrhok[specP2][specP3]+=-_calM(specP2)/_calM(specP3)*kf*X[specP1]*X[specP2]/Kc;
+
+    // dW[specP3]dX 
+    dWdrhok[specP3][specP1]+=-_calM(specP3)/_calM(specP1)*kf*X[specP2]*X[specP3]/Kc;
+    dWdrhok[specP3][specP2]+=-_calM(specP3)/_calM(specP2)*kf*X[specP1]*X[specP3]/Kc;
+    dWdrhok[specP3][specP3]+=-_calM(specP3)/_calM(specP3)*kf*X[specP1]*X[specP2]/Kc; 
+  }
+  
+}
+
+
+
+/*
+ Note : kf  = k0/(1+k0*X[specR2]/kinf)
+        with kinf determined from Ainf, ninf, Einf
+             k0 determined from A0, n0, E0
+ Units:
+ A0 in cm^3 (mole s)^(-1) K^(-n)
+ Ainf in  s^(-1) K^(-n)
+ Einf,E0 in cal/mole
+ T in Kelvin
+ X in mole/cm3
+ dWdT in kg m^(-3) s^(-1) K^(-1)
+ dWdrhok in s^(-1)
+*/ 
+void add_to_dW_fwbw_2r3p_Lindemann(int specR1, int specR2,
+                                   int specP1, int specP2, int specP3,
+                                   double Ainf, double ninf, double Einf, 								 
+                                   double A0, double n0, double E0,
+                                   double T, spec_t X, 
+                                   spec_t dWdT, spec2_t dWdrhok){
+  add_to_dW_fw_2r3p_Lindemann(specR1, specR2, specP1, specP2, specP3,
+                              Ainf, ninf, Einf, A0, n0, E0, T, X, dWdT, dWdrhok);
+  add_to_dW_bw_2r3p_Lindemann(specR1, specR2, specP1, specP2, specP3,
+                              Ainf, ninf, Einf, A0, n0, E0, T, X, dWdT, dWdrhok);
+}
+
+
+
+
+/*
+ Note : kf  = k0/(1+k0*X[specR3]/kinf)
+        with kinf determined from Ainf, ninf, Einf
+             k0 determined from A0, n0, E0
+ Units:
+ A0 in cm^6 mole^(-2) s^(-1) K^(-n) 
+ Ainf in cm^3 (mole s)^(-1) K^(-n)
+ Einf,E0 in cal/mole
+ T in Kelvin
+ X in mole/cm3
+ W in kg m^(-3) s^(-1)
+*/ 
+void add_to_W_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
+                                int specP1, int specP2,
+                                double Ainf, double ninf, double Einf, 
+                                double A0,  double n0 , double E0, 								
+							                	double T,  spec_t X, spec_t W){
+  double kf,sum, k0, kinf;
+  
+  k0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));  /* cm^6 mole^(-2) s^(-1) */ 
+  kinf = Ainf*pow(T,ninf)*exp(-Einf/(T*Rchem));  /*  cm^3 (mole s)^(-1)   */ 
+  
+  kf = k0/(1.0+k0*X[specR3]/kinf); 
+  
+  sum=kf*X[specR1]*X[specR2]*X[specR3]; 
+  W[specR1]-=_calM(specR1)*sum*1e6;
+  W[specR2]-=_calM(specR2)*sum*1e6;
+  W[specR3]-=_calM(specR3)*sum*1e6;
+  W[specP1]+=_calM(specP1)*sum*1e6;
+  W[specP2]+=_calM(specP2)*sum*1e6; 
+} 
+
+
+/*
+ Note : kf  = k0/(1+k0*X[specR3]/kinf)
+        with kinf determined from Ainf, ninf, Einf
+             k0 determined from A0, n0, E0
+ Units:
+ A0 in cm^6 mole^(-2) s^(-1) K^(-n) 
+ Ainf in cm^3 (mole s)^(-1) K^(-n)
+ Einf,E0 in cal/mole
+ T in Kelvin
+ X in mole/cm3
+ W in kg m^(-3) s^(-1)
+*/ 
+void add_to_W_bw_3r2p_Lindemann(int specR1, int specR2, int specR3,
+                                int specP1, int specP2,
+                                double Ainf, double ninf, double Einf, 
+                                double A0,  double n0 , double E0, 								
+                                double T, spec_t X, spec_t W){
+  double kf,dG0,Kc,kb,sum,k0,kinf;
+
+  k0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));  /* cm^6 mole^(-2) s^(-1) */ 
+  kinf = Ainf*pow(T,ninf)*exp(-Einf/(T*Rchem));  /*  cm^3 (mole s)^(-1)   */ 
+  
+  kf = k0/(1.0+k0*X[specR3]/kinf); /* cm^6 mole^(-2) s^(-1) */
+
+  dG0=_Gs(specP1,T)
+     +_Gs(specP2,T)
+     -_Gs(specR1,T)
+     -_Gs(specR2,T)
+     -_Gs(specR3,T); /* J/mole */
+  Kc=max(Kcmin, exp(-dG0/(calR*T)));
+  Kc /= 1E-6 * THERMO_P_REF/(calR*T); /* cm^3/mole */
+  kb=kf/Kc; /* cm^3 (mole s)^(-1) */
+  sum=-kb*X[specP1]*X[specP2]; /* mole cm^(-3) (s)^(-1) */
+  if (exp(-dG0/(calR*T))>Kcmin){
+    W[specR1]-=_calM(specR1)*sum*1e6;
+    W[specR2]-=_calM(specR2)*sum*1e6;
+    W[specR3]-=_calM(specR3)*sum*1e6;
+    W[specP1]+=_calM(specP1)*sum*1e6;
+    W[specP2]+=_calM(specP2)*sum*1e6; /* kg m^(-3) s^(-1) */
+  }
+} 
+
+
+/*
+ Note : kf  = k0/(1+k0*X[specR3]/kinf)
+        with kinf determined from Ainf, ninf, Einf
+             k0 determined from A0, n0, E0
+ Units:
+ A0 in cm^6 mole^(-2) s^(-1) K^(-n) 
+ Ainf in cm^3 (mole s)^(-1) K^(-n)
+ Einf,E0 in cal/mole
+ T in Kelvin
+ X in mole/cm3
+ W in kg m^(-3) s^(-1)
+*/ 
+void add_to_W_fwbw_3r2p_Lindemann(int specR1, int specR2, int specR3,
+                                  int specP1, int specP2,
+                                  double Ainf, double ninf, double Einf, 
+                                  double A0,  double n0 , double E0, 								
+                                  double T, spec_t X, spec_t W){
+  add_to_W_fw_3r2p_Lindemann(specR1, specR2, specR3, specP1, specP2, Ainf, ninf, Einf, A0, n0, E0, T, X, W);
+  add_to_W_bw_3r2p_Lindemann(specR1, specR2, specR3, specP1, specP2, Ainf, ninf, Einf, A0, n0, E0, T, X, W);
+} 
+
 
 
 
@@ -1803,73 +2124,106 @@ void add_to_dW_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
 
 
 /*
- Note : kf  = k0/(1+k0*X[specR2]/kinf)
+ Note : kf  = k0/(1+k0*X[specR3]/kinf)
         with kinf determined from Ainf, ninf, Einf
              k0 determined from A0, n0, E0
  Units:
- A0 in cm^3 (mole s)^(-1) K^(-n)
- Ainf in  s^(-1) K^(-n)
+ Ainf in cm^3 (mole s)^(-1) K^(-n) 
+ A0 in cm^6 mole^(-2) s^(-1) K^(-n)
  Einf,E0 in cal/mole
  T in Kelvin
  X in mole/cm3
  dWdT in kg m^(-3) s^(-1) K^(-1)
  dWdrhok in s^(-1)
 */ 
-void add_to_dW_fw_2r3p_Lindemann(int specR1, int specR2,
-                                 int specP1, int specP2, int specP3,
-                                 double Ainf, double ninf, double Einf, 								 
+void add_to_dW_bw_3r2p_Lindemann(int specR1, int specR2, int specR3,
+                                 int specP1, int specP2,
+                                 double Ainf, double ninf, double Einf, 
                                  double A0, double n0, double E0,
                                  double T, spec_t X, 
                                  spec_t dWdT, spec2_t dWdrhok){
-									 
-  double kf,sum, k0, kinf, dkfdT, dk0dT, dkinfdT, dPrdk0, dPrdki, P_r;
+  double kf,dG0,Kc,sum,dkfdT,dsumdT,dKcdToverKc,dG0dT,k0,kinf;
 
-  k0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));    /*  cm^3 (mole s)^(-1) */
-  kinf = Ainf*pow(T,ninf)*exp(-Einf/(T*Rchem)); /* s^(-1)  */ 
+  k0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));  /* cm^6 mole^(-2) s^(-1) */ 
+  kinf = Ainf*pow(T,ninf)*exp(-Einf/(T*Rchem));  /*  cm^3 (mole s)^(-1)   */ 
   
-  kf = k0/(1.0+k0*X[specR2]/kinf); 
+  kf = k0/(1.0+k0*X[specR3]/kinf); /* cm^6 mole^(-2) s^(-1) */
 
-  P_r=1.0; //????
-  sum=X[specR1]*X[specR2]; 
+  dG0=_Gs(specP1,T)
+     +_Gs(specP2,T)
+     -_Gs(specR1,T)
+     -_Gs(specR2,T)
+     -_Gs(specR3,T); /* J/mole */
+  Kc=max(Kcmin,exp(-dG0/(calR*T)));
+  Kc /= 1E-6 * THERMO_P_REF/(calR*T); /* cm^3/mole */
 
-  // dWdT 
-  
-  dk0dT  = k0*n0/T + k0*(E0/(sqr(T)*Rchem));
-  dkinfdT = kinf*ninf/T + kinf*(Einf/(sqr(T)*Rchem));
-  
-  dPrdk0 = X[specR2] / kinf;
-  dPrdki = -P_r / kinf;
- 
-  dkfdT = dkinfdT * P_r / ( 1.0 + P_r ) 
-        + kinf * ( dPrdk0*dk0dT + dPrdki*dkinfdT ) / sqr(1.0 + P_r);
+  sum=-X[specP1]*X[specP2]/Kc; /* mole^3 cm^(-9) */
 
-  dWdT[specR1] -= _calM(specR1)*dkfdT*1e6*sum ;
-  dWdT[specR2] -= _calM(specR2)*dkfdT*1e6*sum ;
-  dWdT[specP1] += _calM(specP1)*dkfdT*1e6*sum ;
-  dWdT[specP2] += _calM(specP2)*dkfdT*1e6*sum ; 
-  dWdT[specP3] += _calM(specP3)*dkfdT*1e6*sum ; 
+  /* dWdT */
+  dG0dT=_dGsdT(specP1,T)+_dGsdT(specP2,T)-_dGsdT(specR1,T)-_dGsdT(specR2,T)-_dGsdT(specR3,T);
+  dKcdToverKc=(dG0/(calR*sqr(T)))-dG0dT/(calR*T)+1.0/T;
 
-  // dW[specR1]dX 
-  dWdrhok[specR1][specR1]-=_calM(specR1)/_calM(specR1)*kf*X[specR2];
-  dWdrhok[specR1][specR2]-=_calM(specR1)/_calM(specR2)*kf*X[specR1];
+  dsumdT=X[specP1]*X[specP2]/Kc*dKcdToverKc;
+  dkfdT= kf*ninf/T 
+       + kf*(Einf/(sqr(T)*Rchem));
 
-  // dW[specR2]dX 
-  dWdrhok[specR2][specR1]-=_calM(specR2)/_calM(specR1)*kf*X[specR2];
-  dWdrhok[specR2][specR2]-=_calM(specR2)/_calM(specR2)*kf*X[specR1];
+  if (exp(-dG0/(calR*T))>Kcmin){
 
-  // dW[specP1]dX 
-  dWdrhok[specP1][specR1]+=_calM(specP1)/_calM(specR1)*kf*X[specR2];
-  dWdrhok[specP1][specR2]+=_calM(specP1)/_calM(specR2)*kf*X[specR1];
+    dWdT[specR1] -= _calM(specR1)*dkfdT*1e6*sum + _calM(specR1)*kf*1e6*dsumdT;
+    dWdT[specR2] -= _calM(specR2)*dkfdT*1e6*sum + _calM(specR2)*kf*1e6*dsumdT;
+    dWdT[specR3] -= _calM(specR3)*dkfdT*1e6*sum + _calM(specR3)*kf*1e6*dsumdT;
+    dWdT[specP1] += _calM(specP1)*dkfdT*1e6*sum + _calM(specP1)*kf*1e6*dsumdT;
+    dWdT[specP2] += _calM(specP2)*dkfdT*1e6*sum + _calM(specP2)*kf*1e6*dsumdT; 
 
-  // dW[specP2]dX 
-  dWdrhok[specP2][specR1]+=_calM(specP2)/_calM(specR1)*kf*X[specR2];
-  dWdrhok[specP2][specR2]+=_calM(specP2)/_calM(specR2)*kf*X[specR1];
+    /* dW[specR1]dX */
+    dWdrhok[specR1][specP1]-=-_calM(specR1)/_calM(specP1)*kf*X[specP2]/Kc;
+    dWdrhok[specR1][specP2]-=-_calM(specR1)/_calM(specP2)*kf*X[specP1]/Kc;
 
-  // dW[specP3]dX 
-  dWdrhok[specP3][specR1]+=_calM(specP3)/_calM(specR1)*kf*X[specR2];
-  dWdrhok[specP3][specR2]+=_calM(specP3)/_calM(specR2)*kf*X[specR1];
-  
+    /* dW[specR2]dX */
+    dWdrhok[specR2][specP1]-=-_calM(specR2)/_calM(specP1)*kf*X[specP2]/Kc;
+    dWdrhok[specR2][specP2]-=-_calM(specR2)/_calM(specP2)*kf*X[specP1]/Kc;
+
+    /* dW[specR3]dX */
+    dWdrhok[specR3][specP1]-=-_calM(specR3)/_calM(specP1)*kf*X[specP2]/Kc;
+    dWdrhok[specR3][specP2]-=-_calM(specR3)/_calM(specP2)*kf*X[specP1]/Kc;
+
+    /* dW[specP1]dX */
+    dWdrhok[specP1][specP1]+=-_calM(specP1)/_calM(specP1)*kf*X[specP2]/Kc;
+    dWdrhok[specP1][specP2]+=-_calM(specP1)/_calM(specP2)*kf*X[specP1]/Kc;
+
+    /* dW[specP2]dX */
+    dWdrhok[specP2][specP1]+=-_calM(specP2)/_calM(specP1)*kf*X[specP2]/Kc;
+    dWdrhok[specP2][specP2]+=-_calM(specP2)/_calM(specP2)*kf*X[specP1]/Kc;
+  }
+} 
+
+
+/*
+ Note : kf  = k0/(1+k0*X[specR3]/kinf)
+        with kinf determined from Ainf, ninf, Einf
+             k0 determined from A0, n0, E0
+ Units:
+ Ainf in cm^3 (mole s)^(-1) K^(-n) 
+ A0 in cm^6 mole^(-2) s^(-1) K^(-n)
+ Einf,E0 in cal/mole
+ T in Kelvin
+ X in mole/cm3
+ dWdT in kg m^(-3) s^(-1) K^(-1)
+ dWdrhok in s^(-1)
+*/ 
+void add_to_dW_fwbw_3r2p_Lindemann(int specR1, int specR2, int specR3,
+                                   int specP1, int specP2,
+                                   double Ainf, double ninf, double Einf, 
+                                   double A0, double n0, double E0,
+                                   double T, spec_t X, 
+                                   spec_t dWdT, spec2_t dWdrhok){
+  add_to_dW_fw_3r2p_Lindemann(specR1, specR2, specR3, specP1, specP2,
+                              Ainf, ninf, Einf, A0, n0, E0, T, X, dWdT, dWdrhok);
+  add_to_dW_bw_3r2p_Lindemann(specR1, specR2, specR3, specP1, specP2,
+                              Ainf, ninf, Einf, A0, n0, E0, T, X, dWdT, dWdrhok);
 }
+
+
 
 
 void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam){

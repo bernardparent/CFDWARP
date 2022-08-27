@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 AUG 27a
+  * in model/share/chem_share.c
+    - added functions add_to_W_fwbw_2r3p_Lindemann, add_to_W_fwbw_3r2p_Lindemann,
+      add_to_W_bw_2r3p_Lindemann, add_to_W_bw_3r2p_Lindemann, add_to_dW_fwbw_2r3p_Lindemann,
+      add_to_dW_fwbw_3r2p_Lindemann, add_to_dW_bw_2r3p_Lindemann, add_to_dW_bw_3r2p_Lindemann
+      
+
 2022 AUG 26a
   * in bin/misc/MHD_earth_entry2.wrp
     - in Post() added code to correctly compute the heat flux on the top and bottom surfaces
