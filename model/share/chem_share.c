@@ -1668,8 +1668,8 @@ void add_to_dW_fw_2r4p_fit4(int specR1, int specR2,
         with kinf determined from Ainf, ninf, Einf
              k0 determined from A0, n0, E0
  Units:
- A0 in cm^3 (mole s)^(-1) K^(-n) 
- Ainf in s^(-1) K^(-n)
+ A0 in cm^3 (mole s)^(-1) K^(-n0) 
+ Ainf in s^(-1) K^(-ninf)
  Einf,E0 in cal/mole
  T in Kelvin
  X in mole/cm3
@@ -1701,8 +1701,8 @@ void add_to_W_fw_2r3p_Lindemann(int specR1, int specR2,
         with kinf determined from Ainf, ninf, Einf
              k0 determined from A0, n0, E0
  Units:
- A0 in cm^3 (mole s)^(-1) K^(-n) 
- Ainf in s^(-1) K^(-n)
+ A0 in cm^3 (mole s)^(-1) K^(-n0) 
+ Ainf in s^(-1) K^(-ninf)
  Einf,E0 in cal/mole
  T in Kelvin
  X in mole/cm3
@@ -1747,8 +1747,8 @@ void add_to_W_bw_2r3p_Lindemann(int specR1, int specR2,
         with kinf determined from Ainf, ninf, Einf
              k0 determined from A0, n0, E0
  Units:
- A0 in cm^3 (mole s)^(-1) K^(-n) 
- Ainf in s^(-1) K^(-n)
+ A0 in cm^3 (mole s)^(-1) K^(-n0) 
+ Ainf in s^(-1) K^(-ninf)
  Einf,E0 in cal/mole
  T in Kelvin
  X in mole/cm3
@@ -1771,8 +1771,8 @@ void add_to_W_fwbw_2r3p_Lindemann(int specR1, int specR2,
         with kinf determined from Ainf, ninf, Einf
              k0 determined from A0, n0, E0
  Units:
- A0 in cm^3 (mole s)^(-1) K^(-n)
- Ainf in  s^(-1) K^(-n)
+ A0 in cm^3 (mole s)^(-1) K^(-n0)
+ Ainf in  s^(-1) K^(-ninf)
  Einf,E0 in cal/mole
  T in Kelvin
  X in mole/cm3
@@ -1841,8 +1841,8 @@ void add_to_dW_fw_2r3p_Lindemann(int specR1, int specR2,
         with kinf determined from Ainf, ninf, Einf
              k0 determined from A0, n0, E0
  Units:
- A0 in cm^3 (mole s)^(-1) K^(-n)
- Ainf in  s^(-1) K^(-n)
+ A0 in cm^3 (mole s)^(-1) K^(-n0)
+ Ainf in  s^(-1) K^(-ninf)
  Einf,E0 in cal/mole
  T in Kelvin
  X in mole/cm3
@@ -1925,8 +1925,8 @@ void add_to_dW_bw_2r3p_Lindemann(int specR1, int specR2,
         with kinf determined from Ainf, ninf, Einf
              k0 determined from A0, n0, E0
  Units:
- A0 in cm^3 (mole s)^(-1) K^(-n)
- Ainf in  s^(-1) K^(-n)
+ A0 in cm^3 (mole s)^(-1) K^(-n0)
+ Ainf in  s^(-1) K^(-ninf)
  Einf,E0 in cal/mole
  T in Kelvin
  X in mole/cm3
@@ -1953,8 +1953,8 @@ void add_to_dW_fwbw_2r3p_Lindemann(int specR1, int specR2,
         with kinf determined from Ainf, ninf, Einf
              k0 determined from A0, n0, E0
  Units:
- A0 in cm^6 mole^(-2) s^(-1) K^(-n) 
- Ainf in cm^3 (mole s)^(-1) K^(-n)
+ A0 in cm^6 mole^(-2) s^(-1) K^(-n0) 
+ Ainf in cm^3 (mole s)^(-1) K^(-ninf)
  Einf,E0 in cal/mole
  T in Kelvin
  X in mole/cm3
@@ -1986,8 +1986,8 @@ void add_to_W_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
         with kinf determined from Ainf, ninf, Einf
              k0 determined from A0, n0, E0
  Units:
- A0 in cm^6 mole^(-2) s^(-1) K^(-n) 
- Ainf in cm^3 (mole s)^(-1) K^(-n)
+ A0 in cm^6 mole^(-2) s^(-1) K^(-n0) 
+ Ainf in cm^3 (mole s)^(-1) K^(-ninf)
  Einf,E0 in cal/mole
  T in Kelvin
  X in mole/cm3
@@ -2029,8 +2029,8 @@ void add_to_W_bw_3r2p_Lindemann(int specR1, int specR2, int specR3,
         with kinf determined from Ainf, ninf, Einf
              k0 determined from A0, n0, E0
  Units:
- A0 in cm^6 mole^(-2) s^(-1) K^(-n) 
- Ainf in cm^3 (mole s)^(-1) K^(-n)
+ A0 in cm^6 mole^(-2) s^(-1) K^(-n0) 
+ Ainf in cm^3 (mole s)^(-1) K^(-ninf)
  Einf,E0 in cal/mole
  T in Kelvin
  X in mole/cm3
@@ -2053,8 +2053,8 @@ void add_to_W_fwbw_3r2p_Lindemann(int specR1, int specR2, int specR3,
         with kinf determined from Ainf, ninf, Einf
              k0 determined from A0, n0, E0
  Units:
- Ainf in cm^3 (mole s)^(-1) K^(-n) 
- A0 in cm^6 mole^(-2) s^(-1) K^(-n)
+ Ainf in cm^3 (mole s)^(-1) K^(-ninf) 
+ A0 in cm^6 mole^(-2) s^(-1) K^(-n0)
  Einf,E0 in cal/mole
  T in Kelvin
  X in mole/cm3
@@ -2128,8 +2128,8 @@ void add_to_dW_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
         with kinf determined from Ainf, ninf, Einf
              k0 determined from A0, n0, E0
  Units:
- Ainf in cm^3 (mole s)^(-1) K^(-n) 
- A0 in cm^6 mole^(-2) s^(-1) K^(-n)
+ Ainf in cm^3 (mole s)^(-1) K^(-ninf) 
+ A0 in cm^6 mole^(-2) s^(-1) K^(-n0)
  Einf,E0 in cal/mole
  T in Kelvin
  X in mole/cm3
@@ -2203,8 +2203,8 @@ void add_to_dW_bw_3r2p_Lindemann(int specR1, int specR2, int specR3,
         with kinf determined from Ainf, ninf, Einf
              k0 determined from A0, n0, E0
  Units:
- Ainf in cm^3 (mole s)^(-1) K^(-n) 
- A0 in cm^6 mole^(-2) s^(-1) K^(-n)
+ Ainf in cm^3 (mole s)^(-1) K^(-ninf) 
+ A0 in cm^6 mole^(-2) s^(-1) K^(-n0)
  Einf,E0 in cal/mole
  T in Kelvin
  X in mole/cm3

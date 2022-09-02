@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 SEP 02a
+  * in model/chem/_C2H4_Air_Plasma_30s/chem.c
+    - added ADJUSTED_N2_TOWNSEND_IONIZATION and ADJUSTED_O2_TOWNSEND_IONIZATION
+    - updated the reactions to model/chem/_C2H4_Air_Plasma_30s/from_Igor_v3.txt
+  * in model/share/chem_share.c and model/share/chem_share.h
+    - fixed a typo in the  units outlined before the *Lindermann* functions
+    
+
 2022 AUG 27a
   * in model/share/chem_share.c
     - added functions add_to_W_fwbw_2r3p_Lindemann, add_to_W_fwbw_3r2p_Lindemann,
