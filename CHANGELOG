@@ -7,12 +7,23 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 SEP 12a
+  * in tools/chemkin2cfdwarp.c
+    - various modifications to be able to handle the Lindemann (HIGH and LOW) reactions
+  * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - added function _Echi() to find the electric field to be used with the Schottky effect
+  * in model/share/chem_share.c
+    - in add_to_W_*_Lindemann, rewrote kf so that there is no division by kinf to avoid possible
+      division by zero
+    - in add_to_dW_*_Lindemann, fixed the jacobians
+    
+
 2022 SEP 02a
   * in model/chem/_C2H4_Air_Plasma_30s/chem.c
     - added ADJUSTED_N2_TOWNSEND_IONIZATION and ADJUSTED_O2_TOWNSEND_IONIZATION
     - updated the reactions to model/chem/_C2H4_Air_Plasma_30s/from_Igor_v3.txt
   * in model/share/chem_share.c and model/share/chem_share.h
-    - fixed a typo in the  units outlined before the *Lindermann* functions
+    - fixed a typo in the  units outlined before the *Lindemann* functions
     
 
 2022 AUG 27a
