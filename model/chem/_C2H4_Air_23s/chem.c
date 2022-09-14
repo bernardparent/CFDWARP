@@ -59,8 +59,8 @@ const static bool REACTION[67]=
    TRUE, /* reaction 22 */
    TRUE, /* reaction 23 */
    TRUE, /* reaction 24 */
-   TRUE, /* reaction 25 */
-   TRUE, /* reaction 26 */
+   TRUE,  /* reaction 25 */
+   TRUE,  /* reaction 26 */
    TRUE, /* reaction 27 */
    TRUE, /* reaction 28 */
    TRUE, /* reaction 29 */
@@ -106,7 +106,7 @@ const static bool REACTION[67]=
    
 #define specEND -1
 
-const static long specM[]=
+   const static long specM[]=
   {
    specH, specH2, specO, specO2, specOH, specH2O, specN2, specH2O2,
    specC2H, specC2H2, specC2H3, specC2H4, specC2H5, specCH, specCH2, 
@@ -117,12 +117,20 @@ const static long specM[]=
   
   /* Third-body efficiencies */
   
-  /* checked also with - Smooke, M. D.; Giovangigli, V. Formulation of the Premixed
+  /* Smooke, M. D.; Giovangigli, V. Formulation of the Premixed
      and Nonpremixed Test Problems. In Reduced Chemical Mechansims
      and Asymptotic Approximations for Methane-Air Flames; Springer-
      Verlag: New York, 1991; p 384. */
+	 
+  const static double eff1[]=                       
+  {
+   1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+   1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 
+   1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,  
+   1.0
+  };
   
-  const static double third1[]=                       
+  const static double eff2[]=                       
   {
    1.0, 1.0, 1.0, 0.4, 1.0, 6.5, 0.4, 1.0,
    1.0, 1.0, 1.0, 3.0, 1.0, 1.0, 1.0, 
@@ -130,7 +138,7 @@ const static long specM[]=
    1.5
   };
   
-  const static double third2[]=                       
+  const static double eff3[]=                       
   {
    1.0, 1.0, 1.0, 0.4, 1.0, 6.5, 0.4, 1.0,
    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 
@@ -168,7 +176,7 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
   if (REACTION[2]){
 	 for (k=0; specM[k]!=specEND; k++){
   // reaction (2): C2H4 + H + M-> C2H5 + M
-  add_to_W_fw_3r2p ( specC2H4, specH, specM[k], specC2H5, specM[k],  third1[k]*4.17e+10, 0.0, 11030.0, T, X, W );
+  add_to_W_fw_3r2p ( specC2H4, specH, specM[k], specC2H5, specM[k], eff1[k]*4.17e+10, 0.0, 11030.0, T, X, W );
 	 }
   } 
   
@@ -235,7 +243,7 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
   if (REACTION[15]){
 	 for (k=0; specM[k]!=specEND; k++){	  
   // reaction (15): C2H2 + H + M -> C2H3 + M
-  add_to_W_fw_3r2p ( specC2H2, specH, specM[k], specC2H3, specM[k],  third1[k]*1.23e+11, 1.0, 10360.0, T, X, W );
+  add_to_W_fw_3r2p ( specC2H2, specH, specM[k], specC2H3, specM[k], eff1[k]*1.23e+11, 1.0, 10360.0, T, X, W );
      }
   } 
   
@@ -267,8 +275,8 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
   if (REACTION[21]){
 	 for (k=0; specM[k]!=specEND; k++){		  
   // reaction (21): C2H + H + M -> C2H2 + M
-  add_to_W_fw_3r2p ( specC2H, specH, specM[k], specC2H2, specM[k],  third1[k]*1.10e+9, 1.0, 770.0, T, X, W );   
-     }  
+    add_to_W_fw_3r2p ( specC2H, specH, specM[k], specC2H2, specM[k], eff1[k]*1.10e+9, 1.0, 770.0, T, X, W );   
+   }  
   } 
   
   if (REACTION[22]){
@@ -288,15 +296,15 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
   
   if (REACTION[25]){
   // reaction (25): CH4(+M) -> CH3 + H(+M) 	  	  
-	 for (k=0; specM[k]!=specEND; k++){	
-  add_to_W_fw_2r3p_Lindemann ( specCH4, specM[k], specCH3, specH, specM[k], third1[k]*6.30e+14, 0.0, 104000.0,third1[k]*1.00e+17, 0.0, 86000.0, T, X, W );
+	 for (k=0; specM[k]!=specEND; k++){	 
+    add_to_W_fw_2r3p_Lindemann ( specCH4, specM[k], specCH3, specH, specM[k], eff2[k]*6.30e+14, 0.0, 104000.0, eff2[k]*1.00e+17, 0.0, 86000.0, T, X, W );
 	 }
   } 
   
   if (REACTION[26]){
   // reaction (26): CH3 + H(+M)  -> CH4(+M) 
-	 for (k=0; specM[k]!=specEND; k++){		  
-  add_to_W_fw_3r2p_Lindemann ( specCH3, specH, specM[k], specCH4, specM[k], third1[k]*5.20e+12, 0.0, -1310.0, third1[k]*8.25e+14, 0.0, -19310.0,  T, X, W );
+	 for (k=0; specM[k]!=specEND; k++){
+    add_to_W_fw_3r2p_Lindemann ( specCH3, specH, specM[k], specCH4, specM[k], eff2[k]*5.20e+12, 0.0, -1.310e+3, eff2[k]*8.25e+14, 0.0, -1.9310e+4,  T, X, W );
 	 }  
   } 
   
@@ -343,8 +351,8 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
   if (REACTION[35]){ 
 	 for (k=0; specM[k]!=specEND; k++){  
   // reaction (35) CH3O + M  -> CH2O + H + M
-  add_to_W_fw_2r3p ( specCH3O, specM[k], specCH2O, specH, specM[k] ,  third1[k]*2.40e+13, 0.0, 28812.0, T, X, W );
-     }  
+    add_to_W_fw_2r3p ( specCH3O, specM[k], specCH2O, specH, specM[k] ,  eff3[k]*2.40e+13, 0.0, 28812.0, T, X, W );
+   }  
   } 
   
   if (REACTION[36]){  
@@ -395,8 +403,8 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
   if (REACTION[45]){ 
 	 for (k=0; specM[k]!=specEND; k++){  
   // reaction (45) CHO + M  -> CO + H + M
-  add_to_W_fw_2r3p ( specCHO, specM[k], specCO, specH, specM[k] ,  third1[k]*1.60e+14, 0.0, 14700.0, T, X, W );
-     }  
+    add_to_W_fw_2r3p ( specCHO, specM[k], specCO, specH, specM[k], eff3[k]*1.60e+14, 0.0, 14700.0, T, X, W );
+   }  
   } 
   
   if (REACTION[46]){  
@@ -452,8 +460,8 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
   if (REACTION[56]){
 	 for (k=0; specM[k]!=specEND; k++){	  
   // reaction (56) H + O2 + M -> HO2 + M
-  add_to_W_fw_3r2p ( specH, specO2, specM[k], specHO2, specM[k] ,  third2[k]*2.50e+18, -0.8, 0.0, T, X, W ); 
-     }  
+    add_to_W_fw_3r2p ( specH, specO2, specM[k], specHO2, specM[k] ,  eff3[k]*2.50e+18, -0.8, 0.0, T, X, W ); 
+   }  
   } 
   
   if (REACTION[57]){  
@@ -479,14 +487,14 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
   if (REACTION[61]){
 	 for (k=0; specM[k]!=specEND; k++){	 	  
   // reaction (61) H2O2 + M -> OH + OH + M
-  add_to_W_fw_2r3p ( specH2O2, specM[k], specOH, specOH, specM[k],  third2[k]*1.30e+17, 0.0, 45500.0, T, X, W );    
-     }
+    add_to_W_fw_2r3p ( specH2O2, specM[k], specOH, specOH, specM[k],  eff3[k]*1.30e+17, 0.0, 45500.0, T, X, W );    
+   }
   } 
   
   if (REACTION[62]){
 	 for (k=0; specM[k]!=specEND; k++){		  
   // reaction (62) OH + OH + M -> H2O2 + M 
-  add_to_W_fw_3r2p ( specOH, specOH, specM[k], specH2O2, specM[k],  third2[k]*9.86e+14, 0.0, -5070.0, T, X, W );
+  add_to_W_fw_3r2p ( specOH, specOH, specM[k], specH2O2, specM[k],  eff3[k]*9.86e+14, 0.0, -5070.0, T, X, W );
      }  
   } 
   
@@ -503,15 +511,15 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
   if (REACTION[65]){  
 	 for (k=0; specM[k]!=specEND; k++){	
   // reaction (65) OH + H + M -> H2O + M 
-  add_to_W_fw_3r2p ( specOH, specH, specM[k], specH2O, specM[k],  third2[k]*2.20e+22, -2.0, 0.0, T, X, W );
-     }  
+    add_to_W_fw_3r2p ( specOH, specH, specM[k], specH2O, specM[k],  eff3[k]*2.20e+22, -2.0, 0.0, T, X, W );
+   }  
   } 
   
   if (REACTION[66]){  
 	 for (k=0; specM[k]!=specEND; k++){	  
   // reaction (66) H + H + M -> H2 + M
-  add_to_W_fw_3r2p ( specH, specH, specM[k], specH2, specM[k],  third2[k]*1.80e+18, -1.0, 0.0, T, X, W );  
-     }
+    add_to_W_fw_3r2p ( specH, specH, specM[k], specH2, specM[k],  eff3[k]*1.80e+18, -1.0, 0.0, T, X, W );  
+   }
   } 
 
 
@@ -528,19 +536,17 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
    
    for ( k = 0; k < ns; k++ ) {
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
-    }
+   }
 
-    for ( s = 0; s < ns; s++ ) {
-		
+   for ( s = 0; s < ns; s++ ) {
     dWdT[s]     = 0.0;
-     dWdTe[s]    = 0.0;
-      dWdTv[s]    = 0.0;
-       dWdQbeam[s] = 0.0;
-	
-      for ( k = 0; k < ns; k++ ) {
-       dWdrhok[s][k] = 0.0;
-      }
-    }
+    dWdTe[s]    = 0.0;
+    dWdTv[s]    = 0.0;
+    dWdQbeam[s] = 0.0;
+     for ( k = 0; k < ns; k++ ) {
+      dWdrhok[s][k] = 0.0;
+     }
+   }
 
 
   if (REACTION[1]){
@@ -551,7 +557,7 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
   if (REACTION[2]){
 	 for (k=0; specM[k]!=specEND; k++){
   // reaction (2): C2H4 + H + M-> C2H5 + M
-  add_to_dW_fw_3r2p ( specC2H4, specH, specM[k], specC2H5, specM[k],  third1[k]*4.17e+10, 0.0, 11030.0, T, X, dWdT, dWdrhok );
+    add_to_dW_fw_3r2p ( specC2H4, specH, specM[k], specC2H5, specM[k], eff1[k]*4.17e+10, 0.0, 11030.0, T, X, dWdT, dWdrhok );
 	 }
   } 
   
@@ -618,8 +624,8 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
   if (REACTION[15]){
 	 for (k=0; specM[k]!=specEND; k++){	  
   // reaction (15): C2H2 + H + M -> C2H3 + M
-  add_to_dW_fw_3r2p ( specC2H2, specH, specM[k], specC2H3, specM[k],  third1[k]*1.23e+11, 1.0, 10360.0, T, X, dWdT, dWdrhok );
-     }
+    add_to_dW_fw_3r2p ( specC2H2, specH, specM[k], specC2H3, specM[k], eff1[k]*1.23e+11, 1.0, 10360.0, T, X, dWdT, dWdrhok );
+   }
   } 
   
   if (REACTION[16]){
@@ -650,8 +656,8 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
   if (REACTION[21]){
 	 for (k=0; specM[k]!=specEND; k++){		  
   // reaction (21): C2H + H + M -> C2H2 + M
-  add_to_dW_fw_3r2p ( specC2H, specH, specM[k], specC2H2, specM[k],  third1[k]*1.10e+9, 1.0, 770.0, T, X, dWdT, dWdrhok );   
-     }  
+    add_to_dW_fw_3r2p ( specC2H, specH, specM[k], specC2H2, specM[k], eff1[k]*1.10e+9, 1.0, 770.0, T, X, dWdT, dWdrhok );   
+   }  
   } 
   
   if (REACTION[22]){
@@ -671,17 +677,18 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
   
   if (REACTION[25]){
   // reaction (25): CH4(+M) -> CH3 + H(+M)  
-  	 for (k=0; specM[k]!=specEND; k++){	
-  add_to_dW_fw_2r3p_Lindemann ( specCH4, specM[k], specCH3, specH, specM[k], third1[k]*6.30e+14, 0.0, 104000.0, third1[k]*1.00e+17, 0.0, 86000.0,  T, X, dWdT, dWdrhok );
+   for (k=0; specM[k]!=specEND; k++){	
+    add_to_dW_fw_2r3p_Lindemann ( specCH4, specM[k], specCH3, specH, specM[k], eff2[k]*6.30e+14, 0.0, 104000.0, eff2[k]*1.00e+17, 0.0, 86000.0,  T, X, dWdT, dWdrhok );
 	 }
   } 
   
   if (REACTION[26]){
   // reaction (26): CH3 + H(+M)  -> CH4(+M)
-	 for (k=0; specM[k]!=specEND; k++){		  
-  add_to_dW_fw_3r2p_Lindemann ( specCH3, specH, specM[k], specCH4, specM[k], third1[k]*5.20e+12, 0.0, -1310.0, third1[k]*8.25e+14, 0.0, -19310.0,  T,X, dWdT, dWdrhok );
+   for (k=0; specM[k]!=specEND; k++){	
+    add_to_dW_fw_3r2p_Lindemann ( specCH3, specH, specM[k], specCH4, specM[k], eff2[k]*5.20e+12, 0.0, -1.310e+3, eff2[k]*8.25e+14, 0.0, -1.9310e+4,  T,X, dWdT, dWdrhok );
 	 }    
   } 
+
   
   if (REACTION[27]){
   // reaction (27): CH4 + H  -> CH3 + H2
@@ -726,8 +733,8 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
   if (REACTION[35]){ 
 	 for (k=0; specM[k]!=specEND; k++){  
   // reaction (35) CH3O + M  -> CH2O + H + M
-  add_to_dW_fw_2r3p ( specCH3O, specM[k], specCH2O, specH, specM[k] ,  third1[k]*2.40e+13, 0.0, 28812.0, T, X, dWdT, dWdrhok );
-     }  
+    add_to_dW_fw_2r3p ( specCH3O, specM[k], specCH2O, specH, specM[k] ,  eff3[k]*2.40e+13, 0.0, 28812.0, T, X, dWdT, dWdrhok );
+   }  
   } 
   
   if (REACTION[36]){  
@@ -778,8 +785,8 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
   if (REACTION[45]){ 
 	 for (k=0; specM[k]!=specEND; k++){  
   // reaction (45) CHO + M  -> CO + H + M
-  add_to_dW_fw_2r3p ( specCHO, specM[k], specCO, specH, specM[k] ,  third1[k]*1.60e+14, 0.0, 14700.0, T, X, dWdT, dWdrhok );
-     }  
+    add_to_dW_fw_2r3p ( specCHO, specM[k], specCO, specH, specM[k] ,  eff3[k]*1.60e+14, 0.0, 14700.0, T, X, dWdT, dWdrhok );
+   }  
   } 
   
   if (REACTION[46]){  
@@ -835,8 +842,8 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
   if (REACTION[56]){
 	 for (k=0; specM[k]!=specEND; k++){	  
   // reaction (56) H + O2 + M -> HO2 + M
-  add_to_dW_fw_3r2p ( specH, specO2, specM[k], specHO2, specM[k] ,  third2[k]*2.50e+18, -0.8, 0, T, X, dWdT, dWdrhok ); 
-     }  
+    add_to_dW_fw_3r2p ( specH, specO2, specM[k], specHO2, specM[k] ,  eff3[k]*2.50e+18, -0.8, 0, T, X, dWdT, dWdrhok ); 
+   }  
   } 
   
   if (REACTION[57]){  
@@ -862,15 +869,15 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
   if (REACTION[61]){
 	 for (k=0; specM[k]!=specEND; k++){	 	  
   // reaction (61) H2O2 + M -> OH + OH + M
-  add_to_dW_fw_2r3p ( specH2O2, specM[k], specOH, specOH, specM[k],  third2[k]*1.30e+17, 0.0, 45500.0, T, X, dWdT, dWdrhok );    
-     }
+    add_to_dW_fw_2r3p ( specH2O2, specM[k], specOH, specOH, specM[k],  eff3[k]*1.30e+17, 0.0, 45500.0, T, X, dWdT, dWdrhok );    
+   }
   } 
   
   if (REACTION[62]){
 	 for (k=0; specM[k]!=specEND; k++){		  
   // reaction (62) OH + OH + M -> H2O2 + M 
-  add_to_dW_fw_3r2p ( specOH, specOH, specM[k], specH2O2, specM[k],  third2[k]*9.86e+14, 0.0, -5070.0, T, X, dWdT, dWdrhok );
-     }  
+    add_to_dW_fw_3r2p ( specOH, specOH, specM[k], specH2O2, specM[k],  eff3[k]*9.86e+14, 0.0, -5070.0, T, X, dWdT, dWdrhok );
+   }  
   } 
   
   if (REACTION[63]){  
@@ -886,15 +893,15 @@ void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
   if (REACTION[65]){  
 	 for (k=0; specM[k]!=specEND; k++){	
   // reaction (65) OH + H + M -> H2O + M 
-  add_to_dW_fw_3r2p ( specOH, specH, specM[k], specH2O, specM[k],  third2[k]*2.20e+22, -2.0, 0.0, T, X, dWdT, dWdrhok );
-     }  
+    add_to_dW_fw_3r2p ( specOH, specH, specM[k], specH2O, specM[k],  eff3[k]*2.20e+22, -2.0, 0.0, T, X, dWdT, dWdrhok );
+   }  
   } 
   
   if (REACTION[66]){  
 	 for (k=0; specM[k]!=specEND; k++){	  
   // reaction (66) H + H + M -> H2 + M
-  add_to_dW_fw_3r2p ( specH, specH, specM[k], specH2, specM[k],  third2[k]*1.80e+18, -1.0, 0.0, T, X, dWdT, dWdrhok );  
-     }
+    add_to_dW_fw_3r2p ( specH, specH, specM[k], specH2, specM[k],  eff3[k]*1.80e+18, -1.0, 0.0, T, X, dWdT, dWdrhok );  
+   }
   } 
 
 

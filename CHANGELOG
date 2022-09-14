@@ -7,6 +7,27 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 SEP 14a
+  * in model/chem/_C2H4_Air_23s/chem.c
+    - made modifications to the third body efficiencies
+  * in model/chem/_C2H4_Air_23s/doc/report.tex
+    - made modifications to the third body efficiencies
+  * in model/chem/_C2H4_Air_Plasma_30s/chem.c
+    - added Kunnov2009 combustion model
+    - added species HCO and HCCO
+  * in model/thermo/_generic/enthalpy.c
+    - added species HCO and HCCO
+  * in model/thermo/_generic/thermo.c
+    - added species HCO and HCCO
+  * in model/transport/_Dixon-Lewis/transport.c
+    - added species HCO and HCCO
+  * in model/transport/doc/report.tex
+    - changed M for \cal M in a few locations
+    - changed D for \cal D in one location
+  * in model/chem/_C2H4_Air_Plasma_30s
+    - added konnov2009.c and konnov2009.h
+    
+
 2022 SEP 12a
   * in tools/chemkin2cfdwarp.c
     - various modifications to be able to handle the Lindemann (HIGH and LOW) reactions

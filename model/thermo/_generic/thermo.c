@@ -112,6 +112,8 @@ const static speciesname_t speciesname[SMAP_NS]=
    "O(1D)",
    "O(1S)",
    "C2H4+",
+   "HCO",
+   "HCCO",
   };
 
 
@@ -195,6 +197,8 @@ const static double calM[SMAP_NS]=
    15.9994e-3,     /* O(1D) */
    15.9994e-3,     /* O(1S) */
    28.0526E-3,     /*C2H4+*/
+   29.01804E-3,    /*HCO*/
+   41.02874E-3,    /*HCCO */
   };
 
 
@@ -266,6 +270,8 @@ const static long ck[SMAP_NS]=
    0,     /* O(1D) */
    0,      /* O(1S) */
    1,  /* C2H4+ */
+   0,  /* HCO */
+   0,  /* HCCO */
   };
   
 const static long numatoms[SMAP_NS]=
@@ -335,6 +341,8 @@ const static long numatoms[SMAP_NS]=
    1,     /* O(1D) */
    1,      /* O(1S) */
    6,  /*C2H4+ */
+   3,  /* HCO */
+   4,  /* HCCO */
   }; 
   
 

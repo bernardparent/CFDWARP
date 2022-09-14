@@ -156,6 +156,8 @@ const static double Peps[SMAP_NS]=
    106.7,       /* O(1D) */  /* !! unknown value: fixed to the one of O */
    106.7,       /* O(1S) */  /* !! unknown value: fixed to the one of O */
    224.7E+0,    /* C2H4+   !! fixed to the one of C2H4 */
+   498.0,       /* HCO */
+   150.0,       /* HCCO */
   };
 
 
@@ -227,6 +229,8 @@ const static double Psig[SMAP_NS]=
    0.34e0,      /* O(1D) */   /* !! fixed to the one of O */
    0.34e0,      /* O(1S) */   /* !! fixed to the one of O */
    0.4163E+0,   /* C2H4+   !! fixed to the one of C2H4*/
+   0.359e0,     /* HCO */
+   0.25e0,      /* HCCO */
   };
 
 static double _Omega11(double T, double eps){

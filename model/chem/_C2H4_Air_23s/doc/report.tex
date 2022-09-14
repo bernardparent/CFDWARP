@@ -108,11 +108,11 @@ abstract
 \tablecaption{Zettervall Reaction Mechanism for Ethylene-Air \cite{ef:2017:zettervall}}
 \begin{tabular}{cccccc} 
 \toprule
-\multicolumn{2}{c}{Reaction \tnote{a,~b,~c}} & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole & ref \\ 
+\multicolumn{2}{c}{Reaction \tnote{d}} & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole & ref \\ 
 \midrule
 (1) & $\rm C_2 H_5 + H \rightarrow CH_3 + CH_3$  & 1.50 $\times$ 10$^{13}$  & 0.00 & 0.00  & \cite{pci:2015:saghafian}\\
 
-(2) & $\rm C_2 H_4 + H + M\rightarrow C_2 H_5 + M$  & 4.17 $\times$ 10$^{10}$  & 0.00 & 11030&\cite{pci:2015:saghafian} \\
+(2) & $\rm C_2 H_4 + H + M_1\rightarrow C_2 H_5 + M_1$  & 4.17 $\times$ 10$^{10}$  & 0.00 & 11030&\cite{pci:2015:saghafian}\tnote{a}\\
 
 (3) & $\rm C_2 H_4 + H\rightarrow C_2 H_5 $ & 1.80 $\times$ 10$^{12}$  & 1.00 & 9400 &\cite{ef:2017:zettervall}\\
 
@@ -138,7 +138,7 @@ abstract
 
 (14) & $\rm  C_2 H_3 +OH \rightarrow C_2 H_2 +H_2 O $ & 7.00 $\times$ 10$^{14}$  & 0.00 &1100 &\cite{ef:2017:zettervall}\\
 
-(15) & $\rm  C_2 H_2 +H+M \rightarrow C_2 H_3 +M $ & 1.23 $\times$ 10$^{11}$  & 1.00 &10360 &\cite{caf:1989:refael}\\
+(15) & $\rm  C_2 H_2 +H+M_1 \rightarrow C_2 H_3 +M_1 $ & 1.23 $\times$ 10$^{11}$  & 1.00 &10360 &\cite{caf:1989:refael}\tnote{a}\\
 
 (16) & $\rm  C_2 H_2 +H\rightarrow C_2 H +H_2 $ & 2.00 $\times$ 10$^{14}$  & 0.00 &19000 &\cite{caf:1989:refael}\\
 
@@ -150,7 +150,7 @@ abstract
 
 (20) & $\rm  C_2 H + OH\rightarrow C_2 H_2 + O $ &2.95 $\times$ 10$^{14}$  & 0.60 &910 &\cite{caf:1989:refael}\\
 
-(21) & $\rm  C_2 H + H + M \rightarrow C_2 H_2 + M $ &1.10 $\times$ 10$^{9}$  & 1.00 &770 &\cite{caf:1989:refael}\\
+(21) & $\rm  C_2 H + H + M_1 \rightarrow C_2 H_2 + M_1 $ &1.10 $\times$ 10$^{9}$  & 1.00 &770 &\cite{caf:1989:refael}\tnote{a}\\
 
 (22) & $\rm  C_2 H + O_2 \rightarrow HCO +CO $ &1.00 $\times$ 10$^{13}$  & 0.00 &7000 &\cite{caf:1989:refael}\\
 
@@ -158,13 +158,13 @@ abstract
 
 (24) & $\rm C_2 H + OH \rightarrow HCO + CH $ &8.00 $\times$ 10$^{12}$  & 0.00 &5000 &\cite{ef:2017:zettervall}\\
 
-(25) & $\rm C H_4 (+M) \rightarrow CH_3 + H (+M) $  &  &  &  & \cite{rkm:1991:smoke}\\
+(25) & $\rm C H_4 (+M_2) \rightarrow CH_3 + H (+M_2) $  &  &  &  & \cite{rkm:1991:smoke}\tnote{b}\\
 
   & $k_\infty $ & 6.30 $\times$ 10$^{14}$ &0.00  &104000  &\\
 
   & $k_{0} $ & 1.00 $\times$ 10$^{17}$ & 0.00 & 86000 &\\
   
-(26) & $\rm CH_3 + H (+M)  \rightarrow C H_4 (+M) $&  &  &  &\cite{rkm:1991:smoke}\\
+(26) & $\rm CH_3 + H (+M_2)  \rightarrow C H_4 (+M_2) $&  &  &  &\cite{rkm:1991:smoke}\tnote{b}\\
 
   & $k_\infty $ & 5.20 $\times$ 10$^{12}$ &0.00  &-1310  &\\
 
@@ -186,7 +186,7 @@ abstract
 
 (34) & $\rm C H_3 O + H \rightarrow C H_2 O  + H_2 $ &2.00 $\times$ 10$^{13}$  & 0.00 &0 &\cite{rkm:1991:smoke}\\ 
 
-(35) & $\rm C H_3 O + M \rightarrow C H_2 O  + H + M $ &2.40 $\times$ 10$^{13}$  & 0.00 &28812&\cite{rkm:1991:smoke}\\ 
+(35) & $\rm C H_3 O + M_3 \rightarrow C H_2 O  + H + M_3 $ &2.40 $\times$ 10$^{13}$  & 0.00 &28812&\cite{rkm:1991:smoke}\tnote{c}\\ 
 
 (36) & $\rm C H_2 + O \rightarrow CO + H_2 $ &3.00 $\times$ 10$^{13}$  & 0.00 & 0 &\cite{comb:2010:glassman}\\ 
 
@@ -206,7 +206,7 @@ abstract
 
 (44) & $\rm HCO  +  H \rightarrow CO + H_2 $ &4.00 $\times$ 10$^{13}$  & 0.00 &0&\cite{rkm:1991:smoke}\\
 
-(45) & $\rm HCO  +  M \rightarrow CO + H + M $ &1.60 $\times$ 10$^{14}$  & 0.00 &14700&\cite{rkm:1991:smoke}\\
+(45) & $\rm HCO  +  M_3 \rightarrow CO + H + M_3 $ &1.60 $\times$ 10$^{14}$  & 0.00 &14700&\cite{rkm:1991:smoke}\tnote{c}\\
 (46) & $\rm CO + OH \rightarrow C O_2 + H $ &1.51 $\times$ 10$^{7}$  & 1.30 &-758&\cite{rkm:1991:smoke}\\
 
 (47) & $\rm C O_2 + H \rightarrow CO + OH $ &1.57 $\times$ 10$^{9}$  & 1.30 &19800&\cite{rkm:1991:smoke}\\
@@ -227,7 +227,7 @@ abstract
 
 (55) & $\rm O + H_2 O \rightarrow OH + OH  $ &4.00 $\times$ 10$^{9}$  & 1.30 &17029&\cite{rkm:1991:smoke}\\
 
-(56) & $\rm H + O_2 + M \rightarrow H O_2 + M $ &2.50 $\times$ 10$^{18}$  & -0.80 &0&\cite{rkm:1991:smoke}\\
+(56) & $\rm H + O_2 + M_3 \rightarrow H O_2 + M_3 $ &2.50 $\times$ 10$^{18}$  & -0.80 &0&\cite{rkm:1991:smoke}\tnote{c}\\
 
 (57) & $\rm H + H O_2  \rightarrow OH + OH $ &1.50 $\times$ 10$^{14}$  & 0.00 &1004&\cite{rkm:1991:smoke}\\
 
@@ -237,27 +237,57 @@ abstract
 
 (60) & $\rm H O_2 + H O_2  \rightarrow H_2 O_2 + O_2 $ &2.00 $\times$ 10$^{14}$  &0.00 &0&\cite{rkm:1991:smoke}\\
 
-(61) & $\rm H_2 O_2 + M  \rightarrow OH+OH+M $ &1.30 $\times$ 10$^{17}$  &0.00 &45500&\cite{rkm:1991:smoke}\\
+(61) & $\rm H_2 O_2 + M_3  \rightarrow OH+OH+M_3 $ &1.30 $\times$ 10$^{17}$  &0.00 &45500&\cite{rkm:1991:smoke}\tnote{c}\\
 
-(62) & $\rm OH+OH+M  \rightarrow H_2 O_2 + M $ &9.86 $\times$ 10$^{14}$  &0.00 &-5070&\cite{rkm:1991:smoke}\\
+(62) & $\rm OH+OH+M_3  \rightarrow H_2 O_2 + M_3 $ &9.86 $\times$ 10$^{14}$  &0.00 &-5070&\cite{rkm:1991:smoke}\tnote{c}\\
+
+\bottomrule
+\end{tabular}
+\label{tab:zet}
+\end{threeparttable}
+\end{center}
+\end{table} 
+
+
+
+\begin{table}[h]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\renewcommand\thetable{1} 
+\tablecaption{Continued.}
+\begin{tabular}{cccccc} 
+\toprule
+\multicolumn{2}{c}{Reaction \tnote{d}} & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole & ref \\ 
+\midrule
 
 (63) & $\rm H_2 O_2 + OH \rightarrow H_2 O + H O_2 $ &1.00 $\times$ 10$^{13}$  &0.00 &1800&\cite{rkm:1991:smoke}\\
 
 (64) & $\rm H_2 O + H O_2  \rightarrow H_2 O_2 + OH $ &2.86 $\times$ 10$^{13}$  &0.00 &32790&\cite{rkm:1991:smoke}\\
 
-(65) & $\rm OH + H+ M  \rightarrow H_2 O +M $ &2.20 $\times$ 10$^{22}$  &-2.00 &0&\cite{rkm:1991:smoke}\\
+(65) & $\rm OH + H+ M_3  \rightarrow H_2 O +M_3 $ &2.20 $\times$ 10$^{22}$  &-2.00 &0&\cite{rkm:1991:smoke}\tnote{c}\\
 
-(66) & $\rm H + H+ M  \rightarrow H_2  +M $ &1.80 $\times$ 10$^{18}$  &-1.00 &0&\cite{rkm:1991:smoke}\\
+(66) & $\rm H + H+ M_3  \rightarrow H_2  +M_3 $ &1.80 $\times$ 10$^{18}$  &-1.00 &0&\cite{rkm:1991:smoke}\tnote{c}\\
 
 \bottomrule
 \end{tabular}
-\label{tab:park}
+\label{tab:zet}
 \begin{tablenotes}
-\item[{a}] List of third body: M = H, H$_2$, O, O$_2$, OH, H$_2$O, N$_2$, H$_2$O$_2$,
-   C$_2$H, C$_2$H$_2$, C$_2$H$_3$, C$_2$H$_4$, C$_2$H$_5$, CH, CH$_2$, 
-   CH$_3$, CH$_4$, HO$_2$, HCO, CH$_2$O, CH$_3$O, CO, CO$_2$.
-\item[{b}] Third body efficiencies: $\rm C_2 H_4, 3; CH_4, 6.5; CO, 0.75; C O_2, 1.5; H_2, 1; H_2 O, 6.5; N_2, 0.4; O_2, 0.4$. Set to 1.0 for all other species.
-\item[{c}] Lindemann approximation for the forward
+
+%\item[{a}] List of third body: M = H, H$_2$, O, O$_2$, OH, H$_2$O, N$_2$, H$_2$O$_2$,
+%   C$_2$H, C$_2$H$_2$, C$_2$H$_3$, C$_2$H$_4$, C$_2$H$_5$, CH, CH$_2$, 
+%   CH$_3$, CH$_4$, HO$_2$, HCO, CH$_2$O, CH$_3$O, CO, CO$_2$.
+
+\item[{a}] Third body $\rm M_1$ efficiencies: H, 1.0; H$_2$, 1.0; O, 1.0; O$_2$, 1.0; OH, 1.0; H$_2$O, 1.0; N$_2$, 1.0; H$_2$O$_2$, 1.0;
+   C$_2$H, 1.0; C$_2$H$_2$, 1.0; C$_2$H$_3$, 1.0; C$_2$H$_4$, 1.0; C$_2$H$_5$, 1.0; CH, 1.0; CH$_2$, 1.0; CH$_3$, 1.0; CH$_4$, 1.0; HO$_2$, 1.0; HCO, 1.0; CH$_2$O, 1.0; CH$_3$O, 1.0; CO, 1.0; CO$_2$, 1.0.
+
+\item[{b}] Third body $\rm M_2$ efficiencies: H, 1.0; H$_2$, 1.0; O, 1.0; O$_2$, 0.4; OH, 1.0; H$_2$O, 6.5; N$_2$, 0.4; H$_2$O$_2$, 1.0;
+   C$_2$H, 1.0; C$_2$H$_2$, 1.0; C$_2$H$_3$, 1.0; C$_2$H$_4$, 3.0; C$_2$H$_5$, 1.0; CH, 1.0; CH$_2$, 1.0; CH$_3$, 1.0; CH$_4$, 6.5; HO$_2$, 1.0; HCO, 1.0; CH$_2$O, 1.0; CH$_3$O, 1.0; CO, 0.75; CO$_2$, 1.5.
+
+\item[{c}] Third body $\rm M_3$ efficiencies: H, 1.0; H$_2$, 1.0; O, 1.0; O$_2$, 0.4; OH, 1.0; H$_2$O, 6.5; N$_2$, 0.4; H$_2$O$_2$, 1.0;
+   C$_2$H, 1.0; C$_2$H$_2$, 1.0; C$_2$H$_3$, 1.0; C$_2$H$_4$, 1.0; C$_2$H$_5$, 1.0; CH, 1.0; CH$_2$, 1.0; CH$_3$, 1.0; CH$_4$, 6.5; HO$_2$, 1.0; HCO, 1.0; CH$_2$O, 1.0; CH$_3$O, 1.0; CO, 0.75; CO$_2$, 1.5.
+   
+\item[{d}] Lindemann approximation for the forward
 reaction rate coefficient given by $k_{\rm f} = k_0 / (1+k_0 X_{\rm M} / k_\infty)$, where $X_{\rm M}$ the third body concentration in mole/cm$^3$.
 
 \end{tablenotes}
@@ -271,7 +301,3 @@ reaction rate coefficient given by $k_{\rm f} = k_0 / (1+k_0 X_{\rm M} / k_\inft
 
 
 \end{document}
-
-
-
-
