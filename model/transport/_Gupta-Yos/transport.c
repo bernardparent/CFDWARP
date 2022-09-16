@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Reaction Rates and Thermodynamic and Transport Properties for an 11-
 Species Air Model for Chemical and Thermal Nonequilibrium
 Calculations to 30000 K,” NASA RP-1232, 1990.
+https://ntrs.nasa.gov/api/citations/19900017748/downloads/19900017748.pdf
 
  * */
 

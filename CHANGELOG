@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 SEP 16a
+  * in model/share/chem_share.c
+    - Updated add_to_W_*_Lindemann and add_to_dW_*_Lindemann functions to handle the case where 
+      both A0 and Ainf are zero
+
+
 2022 SEP 14a
   * in model/chem/_C2H4_Air_23s/chem.c
     - made modifications to the third body efficiencies
