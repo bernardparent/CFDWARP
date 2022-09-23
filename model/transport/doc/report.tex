@@ -377,6 +377,44 @@ where $(c_p)_k$ is the specific heat at constant pressure of the $k$th species a
 \section{Parent-Macheret Charged Species Transport Coefficients}
 
 
+%
+\begin{table}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Drift velocities as a function of the effective electric field from Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev}.}
+    \label{tab:electrondriftvelocities}
+    \fontsizetable
+    \begin{tabular}{r@{.}lr@{.}lr@{.}lr@{.}l}
+    \toprule
+    \multicolumn{2}{c}{$|\vec{E}|/N$}  & \multicolumn{2}{c}{${v_{\rm dr,~N_2}}$}   &  \multicolumn{2}{c}{$v_{\rm dr,~O_2}$} &  \multicolumn{2}{c}{$(\mu_{\rm e} N)_{\rm air}$} \\
+    \multicolumn{2}{c}{V~m$^2$}  & \multicolumn{2}{c}{m/s}   &  \multicolumn{2}{c}{m/s} &  \multicolumn{2}{c}{$\rm 1/V\,m\,s$} \\
+    \midrule
+      0&003 $\times 10^{-20}$  &  1&1 $\times 10^{3}$  &  2&6 $\times 10^{3}$ &  4&8417 $\times 10^{25}$  \\
+      0&005 $\times 10^{-20}$  &  1&6 $\times 10^{3}$  &  3&7 $\times 10^{3}$ &  4&1870 $\times 10^{25}$  \\
+      0&007 $\times 10^{-20}$  &  2&0 $\times 10^{3}$  &  4&1 $\times 10^{3}$ &  3&5621 $\times 10^{25}$  \\
+      0&01 $\times 10^{-20}$  &  2&4 $\times 10^{3}$  &  4&3 $\times 10^{3}$ &  2&8465 $\times 10^{25}$\\
+      0&03 $\times 10^{-20}$  &  3&1 $\times 10^{3}$  &  5&4 $\times 10^{3}$ &  1&2135 $\times 10^{25}$\\
+      0&05 $\times 10^{-20}$  &  3&5 $\times 10^{3}$  &  7&3 $\times 10^{3}$ &  0&87860 $\times 10^{25}$\\
+      0&07 $\times 10^{-20}$  &  3&9 $\times 10^{3}$  &  9&2 $\times 10^{3}$ &  0&73507 $\times 10^{25}$\\
+      0&1 $\times 10^{-20}$  &  4&4 $\times 10^{3}$  & 10&0 $\times 10^{3}$ &  0&57160 $\times 10^{25}$\\
+      0&3 $\times 10^{-20}$  &  7&5 $\times 10^{3}$  & 22&0 $\times 10^{3}$ &  0&36358 $\times 10^{25}$\\
+      0&5 $\times 10^{-20}$  & 11&0 $\times 10^{3}$  & 26&0 $\times 10^{3}$ &  0&29050 $\times 10^{25}$\\
+      0&7 $\times 10^{-20}$  & 14&0 $\times 10^{3}$  & 28&0 $\times 10^{3}$ &  0&24700 $\times 10^{25}$\\
+     1&0 $\times 10^{-20}$  & 18&0 $\times 10^{3}$  & 31&0 $\times 10^{3}$ &  0&21055 $\times 10^{25}$ \\
+     3&0 $\times 10^{-20}$  & 42&0 $\times 10^{3}$  & 72&0 $\times 10^{3}$ &  0&16350 $\times 10^{25}$ \\
+     5&0 $\times 10^{-20}$  & 61&0 $\times 10^{3}$  &110&0 $\times 10^{3}$ &  0&14503 $\times 10^{25}$ \\
+     7&0 $\times 10^{-20}$  & 79&0 $\times 10^{3}$  &120&0 $\times 10^{3}$ &  0&12662 $\times 10^{25}$ \\
+    10&0 $\times 10^{-20}$  &100&0 $\times 10^{3}$  &160&0 $\times 10^{3}$ &  0&11410 $\times 10^{25}$  \\
+    20&0 $\times 10^{-20}$  &200&0 $\times 10^{3}$  &260&0 $\times 10^{3}$ &  0&10705 $\times 10^{25}$  \\
+    30&0 $\times 10^{-20}$  &290&0 $\times 10^{3}$  &330&0 $\times 10^{3}$ &  0&099800 $\times 10^{25}$  \\
+    50&0 $\times 10^{-20}$  &420&0 $\times 10^{3}$  &450&0 $\times 10^{3}$ &  0&085410 $\times 10^{25}$  \\
+    80&0 $\times 10^{-20}$  &530&0 $\times 10^{3}$  &640&0 $\times 10^{3}$ &  0&069481 $\times 10^{25}$  \\
+   100&0 $\times 10^{-20}$  &590&0 $\times 10^{3}$  &710&0 $\times 10^{3}$ &  0&061820 $\times 10^{25}$   \\             
+    \bottomrule
+    \end{tabular}
+   \end{threeparttable}
+\end{table}
+%
 
 
 %
@@ -448,6 +486,10 @@ Also, we can fit a polynomial through the experimental data outlined in in Chapt
 %
 where $N_{\rm n}$ is the number density of the neutrals in $m^{-3}$ and $T_{\rm e}$ is the electron temperature in K.
 The latter equation can be used in the range $1000~{\rm K} \le T_{\rm e} \le 57900 ~{\rm K}$ with a relative error on the mobility not exceeding 20\%. In the range $287~{\rm K} \le T_{\rm e} < 1000~{\rm K}$, the relative error is less than 30\%. 
+
+\subsection{Electron Mobility}
+
+The electron mobility can be obtained from the drift velocity obtained experimentally, as shown in Table \ref{tab:electrondriftvelocities}.
 
 
 \subsection{Ion Mobility}

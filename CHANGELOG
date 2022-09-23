@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 SEP 23a
+  * in model/transport/doc/report.tex
+    - added a table on the experimentally-determined drift velocities in N2 and O2
+    
+
 2022 SEP 16a
   * in model/share/chem_share.c
     - Updated add_to_W_*_Lindemann and add_to_dW_*_Lindemann functions to handle the case where 
