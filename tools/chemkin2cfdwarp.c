@@ -332,6 +332,9 @@ int main(int argc, char **argv) {
 
 		print_function_header(run, output);
 		build_current_function(run, input, output);
+    if (run == 2 || run == 3) {
+      fprintf(output, "  }\n");
+    }
 		fprintf(output, "}\n\n");
     }
     
@@ -434,16 +437,16 @@ int check_fitted_form(char Line_str[]) {
 }
 void print_function_header(int run, FILE* output) {       // print function header based on current run  
     if (run == 0) {
-        fprintf(output, "void add_W_Ionization_CHEMKIN ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {\n  double N[ns];\n  long k, specM;\n  spec_t X;\n\n  for ( k = 0; k < ns; k++ ) {\n  \tX[k] = rhok[k] / _calM (k) * 1.0e-6;\t\t/* mole/cm^3 */\n  }\n\n");
+        fprintf(output, "void find_W_CHEMKIN ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {\n  double eff;\n  long k, specM;\n  spec_t X;\n\n  for ( k = 0; k < ns; k++ ) {\n    X[k] = rhok[k] / _calM (k) * 1.0e-6;    /* mole/cm^3 */\n    W[k] = 0.0;\n  }\n");
     }
     if (run == 1) {
-        fprintf(output, "/* Verify the validity of the dW terms at node i=10, j=10 using the command ./test -r control.wrp -node 10 10 dSchemdU\n * Make sure to verify the dW terms over a wide range of temperatures and mass fractions\n * Note that the verification using ./test is done by comparing the analytical expressions to numerical derivatives\n * The numerical derivatives depend strongly on the values given to Uref[] within Cycle()\n */\n\nvoid add_dW_dx_Ionization_CHEMKIN ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec2_t dWdrhok, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {\n  long k, s, specM;\n  double kf, dkfdTe, dkfdT, dkfdTv;\n  spec_t X;\n\n  for ( k = 0; k < ns; k++ ) {\n  \tX[k] = rhok[k] / _calM (k) * 1.0e-6;\t\t/* mole/cm^3 */\n  }\n\n\n  /* find properties needed by add_to_dW* functions in proper units */\n\n");
+        fprintf(output, "void find_dW_dx_CHEMKIN ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {\n  long s, k, specM;\n  double eff;\n  spec_t X;\n\n  for ( k = 0; k < ns; k++ ) {\n    X[k] = rhok[k] / _calM (k) * 1.0e-6;    /* mole/cm^3 */\n  }\n\n  for ( s = 0; s < ns; s++ ) {\n    dWdT[s] = 0.0;\n    dWdTe[s] = 0.0;\n    dWdTv[s] = 0.0;\n    dWdQbeam[s] = 0.0;\n    for ( k = 0; k < ns; k++) {\n      dWdrhok[s][k] = 0.0;\n    }\n  }\n");
     }
     if (run == 2) {
-        fprintf(output, "void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei) {\n  double theta;\n  long specM;\n\n  *Qei = 0.0;\n\n  switch (gl->model.chem.IONIZATIONMODEL) {\n  \tcase IONIZATIONMODEL_CHEMKIN:\n");
+        fprintf(output, "void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei) {\n  double theta;\n  long specM;\n\n  *Qei = 0.0;\n\n  switch (gl->model.chem.IONIZATIONMODEL) {\n    case IONIZATIONMODEL_CHEMKIN:\n");
     }
     if (run == 3) {
-        fprintf(output, "void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe) {\n  double theta;\n  long spec, specM;\n\n  for ( spec = 0; spec < ns; spec++ )\n  \tdQeidrhok[spec] = 0.0;\n\n  *dQeidTe = 0.0;\n\n  switch (gl->model.chem.IONIZATIONMODEL) {\n  \tcase IONIZATIONMODEL_CHEMKIN:\n");
+        fprintf(output, "void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe) {\n  double theta;\n  long spec, specM;\n\n  for ( spec = 0; spec < ns; spec++ )\n    dQeidrhok[spec] = 0.0;\n\n  *dQeidTe = 0.0;\n\n  switch (gl->model.chem.IONIZATIONMODEL) {\n    case IONIZATIONMODEL_CHEMKIN:\n");
     }
 }
 
@@ -1189,7 +1192,7 @@ void print_elements_add_ionization(char oldLine[], char prevLine[], char lastLin
     if (M >= 0) {
         while (cap >= 0) {
             k = 0;
-            fprintf(output, "\n\t\t\t\tcase spec");
+            fprintf(output, "\n        case spec");
             while (body[b][k] != '\0') {
                 fprintf(output, "%c", body[b][k]);
                 k++;
@@ -1204,16 +1207,16 @@ void print_elements_add_ionization(char oldLine[], char prevLine[], char lastLin
             fprintf(output, "; break;");
             cap--, b++;;
         }
-        fprintf(output, "\n\t\t\t\tdefault: eff = 1.0;\n\t\t\t}\n");
+        fprintf(output, "\n        default: eff = 1.0;\n      }\n");
     }
     for (j = 0; j < numR; j++) { // printing reaction names
         if (j == 0) {
             if (M == -5 || M >= 0) {
                 if (run == 0) {
                     if (way == 2)
-                        fprintf(output, "\t\t\tadd_to_W_fwbw_%dr%dp", numR, numP);
+                        fprintf(output, "      add_to_W_fwbw_%dr%dp", numR, numP);
                     else if (way == 1)
-                        fprintf(output, "\t\t\tadd_to_W_fw_%dr%dp", numR, numP);
+                        fprintf(output, "      add_to_W_fw_%dr%dp", numR, numP);
                     if (ind == 1 && w != 0)
                         fprintf(output, "_fit4_Lindemann("); // printing fit information
                     else if (w != 0)
@@ -1223,9 +1226,9 @@ void print_elements_add_ionization(char oldLine[], char prevLine[], char lastLin
                 }
                 if (run == 1) {
                     if (way == 2)
-                        fprintf(output, "\t\t\tadd_to_dW_fwbw_%dr%dp", numR, numP);
+                        fprintf(output, "      add_to_dW_fwbw_%dr%dp", numR, numP);
                     else if (way == 1)
-                        fprintf(output, "\t\t\tadd_to_dW_fw_%dr%dp", numR, numP);
+                        fprintf(output, "      add_to_dW_fw_%dr%dp", numR, numP);
                     if (ind == 1 && w != 0)
                         fprintf(output, "_fit4_Lindemann("); // printing fit information
                     else if (w != 0)
@@ -1269,24 +1272,24 @@ void print_output_line(char oldLine[], char prevLine[], char lastLine[], char ne
             step = 0;
         if (run == 0) { // Begin printing first function
             if (step == 0 || step == 1) {
-                fprintf(output, "  if (IONIZATIONREACTION[%d])", tot); // begin printing information in output file
+                fprintf(output, "\n  if (REACTION[%d])", tot); // begin printing information in output file
             }
             if (step == 1 || M == -5)
-                fprintf(output, "\t{\n");
+                fprintf(output, "  {\n");
             else
                 fprintf(output, "\n");
             if (M >= 0 && ply == 1)
-                fprintf(output, "\t  for (specM = 0; specM < ns; specM++) {\n\t\t\tswitch (specM) {");
+                fprintf(output, "    for (specM = 0; specM < ns; specM++) {\n      switch (specM) {");
             else if (M == -5 && ply == 1)
-                fprintf(output, "\t  for (specM = 0; specM < ns; specM++) {\n");
+                fprintf(output, "    for (specM = 0; specM < ns; specM++) {\n");
             if (M >= 0 && ply == -1)
-                fprintf(output, "\t  for (spec = 0; spec < ns; spec++) {\n\t\t\tswitch (specM) {");
+                fprintf(output, "    for (spec = 0; spec < ns; spec++) {\n      switch (specM) {");
             else if (M == -5 && ply == -1)
-                fprintf(output, "\t  for (spec = 0; spec < ns; spec++) {\n");
+                fprintf(output, "    for (spec = 0; spec < ns; spec++) {\n");
             if (way == 2 && M == -3)
-                fprintf(output, "\t  add_to_W_fwbw_%dr%dp", numR, numP);
+                fprintf(output, "    add_to_W_fwbw_%dr%dp", numR, numP);
             else if (way == 1 && M == -3)
-                fprintf(output, "\t  add_to_W_fw_%dr%dp", numR, numP);
+                fprintf(output, "    add_to_W_fw_%dr%dp", numR, numP);
             if (ind == 1 && M == -3 && h == 0)
                 fprintf(output, "_fit4("); // printing fit information
             else if (M == -3 && h == 0)
@@ -1305,28 +1308,28 @@ void print_output_line(char oldLine[], char prevLine[], char lastLine[], char ne
             else
                 fprintf(output, "T, X, W);");
             if (M == -3)
-                fprintf(output, "\n\n");
+                fprintf(output, "\n");
         }
         else if (run == 1) {
             if (step == 0 || step == 1) {
-                fprintf(output, "  if (IONIZATIONREACTION[%d])", tot); // begin printing information in output file
+                fprintf(output, "\n  if (REACTION[%d])", tot); // begin printing information in output file
             }
             if (step == 1 || M == -5)
-                fprintf(output, "\t{\n");
+                fprintf(output, "  {\n");
             else
                 fprintf(output, "\n");
             if (M >= 0 && ply == 1)
-                fprintf(output, "\t  for (specM = 0; specM < ns; specM++) {\n\t\t\tswitch (specM) {");
+                fprintf(output, "    for (specM = 0; specM < ns; specM++) {\n      switch (specM) {");
             else if (M == -5 && ply == 1)
-                fprintf(output, "\t  for (specM = 0; specM < ns; specM++) {\n");
+                fprintf(output, "    for (specM = 0; specM < ns; specM++) {\n");
             if (M >= 0 && ply == -1)
-                fprintf(output, "\t  for (spec = 0; spec < ns; spec++) {\n\t\t\tswitch (specM) {");
+                fprintf(output, "    for (spec = 0; spec < ns; spec++) {\n      switch (specM) {");
             else if (M == -5 && ply == -1)
-                fprintf(output, "\t  for (spec = 0; spec < ns; spec++) {\n");
+                fprintf(output, "    for (spec = 0; spec < ns; spec++) {\n");
             if (way == 2 && M == -3)
-                fprintf(output, "\t  add_to_dW_fwbw_%dr%dp", numR, numP);
+                fprintf(output, "    add_to_dW_fwbw_%dr%dp", numR, numP);
             else if (way == 1 && M == -3)
-                fprintf(output, "\t  add_to_dW_fw_%dr%dp", numR, numP);
+                fprintf(output, "    add_to_dW_fw_%dr%dp", numR, numP);
             if (ind == 1 && M == -3 && h == 0)
                 fprintf(output, "_fit4("); // printing fit information
             else if (M == -3 && h == 0)
@@ -1345,17 +1348,17 @@ void print_output_line(char oldLine[], char prevLine[], char lastLine[], char ne
             else
                 fprintf(output, "T, X, dWdT, dWdrhok);");
             if (M == -3)
-                fprintf(output, "\n\n");
+                fprintf(output, "\n");
         }
         else if (run == 2 && Q != 0) {
-            fprintf(output, "  \t\tif (IONIZATIONREACTION[%d])\n", tot);
-            fprintf(output, "  \t\t\tadd_to_Qei(spec");                  // printing find_Qei functions
+            fprintf(output, "      if (REACTION[%d])\n", tot);
+            fprintf(output, "        add_to_Qei(spec");                  // printing find_Qei functions
             print_info_find_Qei(oldLine, prevLine, numR, numP, ind, output, newLine, lastLine, Q, e, run, reaction);
 
         }
         else if (run == 3 && Q != 0) {
-            fprintf(output, "  \t\tif (IONIZATIONREACTION[%d])\n", tot);
-            fprintf(output, "  \t\t\tadd_to_dQei(spec");                // printing find_Qei functions
+            fprintf(output, "      if (REACTION[%d])\n", tot);
+            fprintf(output, "        add_to_dQei(spec");                // printing find_Qei functions
             print_info_find_Qei(oldLine, prevLine, numR, numP, ind, output, newLine, lastLine, Q, e, run, reaction);
 
         }
@@ -1363,9 +1366,7 @@ void print_output_line(char oldLine[], char prevLine[], char lastLine[], char ne
     }
     if (run == 0 || run == 1) {
         if (M != -3)
-            fprintf(output, "\n\t  }\n\n");
-        if (M != -3 && M != -5)
-            fprintf(output, "  }\n\n");
+            fprintf(output, "\n    }\n  }\n");
     }
 }
 
@@ -1455,7 +1456,7 @@ int check_reaction_current_line(char Line_str[], int* way, int* tot, FILE* outpu
     }
     if (Line_str[0] == '!' && num == 1) {
         num = 0;
-        fprintf(output, "\n  \t\t\t// ************ERROR: Reaction #%d ignored on line %d due to commenting out.\n\n", *tot, loc);
+        fprintf(output, "\n        // ************ERROR: Reaction #%d ignored on line %d due to commenting out.\n\n", *tot, loc);
         return num;
     }
     if (num == 1)
@@ -1623,7 +1624,7 @@ int check_process(char Line[], int tot, int loc, FILE* output, int num) {
         return -2;
     else if (word[i] == 'T' && word[i + 1] == 'R' && word[i + 2] == 'O' && word[i + 3] == 'E') {
         if (num == 1) {
-            fprintf(output, "\n  \t\t\t// **********WARNING: Reaction #%d on line %d specifies the \"%s\" process but we here use the \"Lindemann\" process instead:\n\n", tot, loc, word);
+            fprintf(output, "\n        // **********WARNING: Reaction #%d on line %d specifies the \"%s\" process but we here use the \"Lindemann\" process instead:\n\n", tot, loc, word);
         }
         return 0;
     }
@@ -1632,7 +1633,7 @@ int check_process(char Line[], int tot, int loc, FILE* output, int num) {
     for (i = 0; i < 44; i++)
         if (strcmp(word, wordbank[i]) == 0)
             return 10;
-    fprintf(output, "\n  \t// ************ERROR: Reaction #%d ignored on line %d due to unknown process: \"%s\".\n\n", tot, loc, word);
+    fprintf(output, "\n    // ************ERROR: Reaction #%d ignored on line %d due to unknown process: \"%s\".\n\n", tot, loc, word);
 
     return 1;
 

@@ -8,6 +8,7 @@
 #define _FLUID_N2VIBMODEL FALSE
 #define _FLUID_EENERGY FALSE
 #define _FLUID_ACTIONNAME "NavierStokes"
+#define _FLUID_FBODY_QADD
 #define fluxmom ns
 #define fluxet (ns+nd)
 #define defaultinitvartypefluid 5
