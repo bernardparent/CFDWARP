@@ -7,6 +7,22 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 SEP 30a
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - in write_model_fluid_template(), added template for calls to heat point and body forces
+    - in read_model_fluid_actions_2(), added call to read_model_fluid_actions_Fbody_Qadd()
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Sstar(), added source terms for the body forces and heat points
+  * in model/thermo/_generic/thermo.c
+    - added species: C3H6, CH2CO, CH3CHO, C3H5
+  * in model/thermo/_generic/thermo.hh
+    - added species: C3H6, CH2CO, CH3CHO, C3H5 to species map
+  * in model/thermo/_generic/enthalpy.c
+    - added McBride polynomial coefficients for species: C3H6, CH2CO, CH3CHO, C3H5
+  * in model/transport/_Dixon-Lewis/transport.c
+    - added transport properties for species: C3H6, CH2CO, CH3CHO, C3H5
+    
+
 2022 SEP 28a
   * in model/chem/_C2H4_Air_Plasma_30s/zettervall2017.c
     - used chemkin2cfdwarp to populate the functions 

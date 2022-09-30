@@ -77,8 +77,8 @@ Sandia National Laboratories, "A Fortran Computer Code Package for the Evaluatio
 Sandia National Laboratories: SAND86-8246 Update/Revision, 1998
 CFDWARP/model/transport/ref/SAND86-8246.pdf
 
-the transport properties of CHO, H2CO, C4H8O, C6H12O, C8H16, and C12H24
-are calculated as           HCO, CH2O, C4H8, C2H5OC2H5, C6H12, and C6H12 respectively
+the transport properties of CHO, H2CO, C4H8O, C6H12O, C8H16, C3H5 and C12H24
+are calculated as           HCO, CH2O, C4H8, C2H5OC2H5, C6H12, C3H6 and C6H12 respectively
 
 */
 
@@ -158,6 +158,10 @@ const static double Peps[SMAP_NS]=
    224.7E+0,    /* C2H4+   !! fixed to the one of C2H4 */
    498.0,       /* HCO */
    150.0,       /* HCCO */
+   266.8,       /* C3H6 */
+   436.0,       /* CH2CO */
+   436.0,       /* CH3CHO */
+   266.8,       /* C3H5 */  /* !! unknown value: fixed to the one of C3H6 */
   };
 
 
@@ -231,6 +235,10 @@ const static double Psig[SMAP_NS]=
    0.4163E+0,   /* C2H4+   !! fixed to the one of C2H4*/
    0.359e0,     /* HCO */
    0.25e0,      /* HCCO */
+   0.4982e0,    /* C3H6 */
+   0.3970e0,    /* CH2CO */
+   0.3970e0,    /* CH3CHO */
+   0.4982e0,    /* C3H5 */ /* !! fixed to the one of C3H6 */
   };
 
 static double _Omega11(double T, double eps){
