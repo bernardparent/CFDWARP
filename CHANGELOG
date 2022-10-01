@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 01a
+  * in model/chem/_C2H4_Air_Plasma_30s/chem.c
+    - removed constants TEFROMEOVERN, TEMIN, TEMAX and added them within write_model_chem_template()
+    - in write_model_chem_template(), added the flag QEI_TERMS
+    - in find_dQei_dx() and find_Qei(), added all electron impact reactions from from_Igor_v3.txt
+    
+
 2022 SEP 30a
   * in model/fluid/_Navier-Stokes_plasma/fluid.c
     - in write_model_fluid_template(), added template for calls to heat point and body forces
