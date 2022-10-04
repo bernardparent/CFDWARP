@@ -45,7 +45,7 @@ int reaction_class(char Line[], int reaction);
  *      = 3 when both Kelvin and Molecules are specified
  *      = reaction when there is no change from the previous reaction class      */
 
-int check_process(char Line[], int tot, int loc, FILE* output, int num);
+int check_process(char Line[], int tot, int loc, FILE* output, int num, int run);
 // This function checks a reaction to see if there are any unrecognizable processes it cannot compute such as "LOW" and "TROE"
 /* Input parameters:
  *   1. Line[] - the current line being checked for unknown processes
@@ -246,7 +246,7 @@ int check_fitted_form(char Line_str[]);
   *      = 0 when reaction is standard fit
   *      = 1 when reaction is form fit      */
 
-int check_reaction_current_line(char Line_str[], int* way, int* tot, FILE* output, int loc);
+int check_reaction_current_line(char Line_str[], int* way, int* tot, FILE* output, int loc, int run);
 // This functions checks a line for a reaction and also the direction of the reaction
 /* Input parameters:
  *   1. Line_str[] - the current line of input being searched for a reaction
@@ -277,7 +277,7 @@ int number_of_products(char Line_str[]);
  /* Output parameters:
   *   1. (returned int) num - the number of products present in the reaction */
 
-int check_M_reaction(char oldLine[], char prevLine[], char lastLine[], char newLine[], int tot, int loc, FILE* output, int* ply);
+int check_M_reaction(char oldLine[], char prevLine[], char lastLine[], char newLine[], int tot, int loc, FILE* output, int* ply, int run);
 // This function determines whether or not a reaction includes a third body and then determines how many steps are necessary to build each reaction substitution
 /* Input parameters:
  *   1. oldLine[], prevLine[] - the current reaction line being searched and the following line of information from the input file   */
@@ -328,14 +328,12 @@ int main(int argc, char **argv) {
 	FILE* output = fopen(outfile, "w");
   
   
-	for (run = 0; run != 4; run++) {              // Begin cycle for creating functions in output file
+	for (run = -1; run != 4; run++) {              // Begin cycle for creating functions in output file
 
 		print_function_header(run, output);
 		build_current_function(run, input, output);
-    if (run == 2 || run == 3) {
-      fprintf(output, "  }\n");
-    }
-		fprintf(output, "}\n\n");
+    if (run != -1)
+      fprintf(output, "}\n\n");
     }
     
   fclose(input);
@@ -440,13 +438,13 @@ void print_function_header(int run, FILE* output) {       // print function head
         fprintf(output, "void find_W_CHEMKIN ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {\n  double eff;\n  long k, specM;\n  spec_t X;\n\n  for ( k = 0; k < ns; k++ ) {\n    X[k] = rhok[k] / _calM (k) * 1.0e-6;    /* mole/cm^3 */\n    W[k] = 0.0;\n  }\n");
     }
     if (run == 1) {
-        fprintf(output, "void find_dW_dx_CHEMKIN ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {\n  long s, k, specM;\n  double eff;\n  spec_t X;\n\n  for ( k = 0; k < ns; k++ ) {\n    X[k] = rhok[k] / _calM (k) * 1.0e-6;    /* mole/cm^3 */\n  }\n\n  for ( s = 0; s < ns; s++ ) {\n    dWdT[s] = 0.0;\n    dWdTe[s] = 0.0;\n    dWdTv[s] = 0.0;\n    dWdQbeam[s] = 0.0;\n    for ( k = 0; k < ns; k++) {\n      dWdrhok[s][k] = 0.0;\n    }\n  }\n");
+        fprintf(output, "void find_dW_dx_CHEMKIN ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {\n  long s, k, specM;\n  double eff;\n  spec_t X;\n\n  for ( k = 0; k < ns; k++ ) {\n    X[k] = rhok[k] / _calM (k) * 1.0e-6;    /* mole/cm^3 */\n  }\n\n  for ( s = 0; s < ns; s++ ) {\n    dWdT[s] = 0.0;\n    dWdTe[s] = 0.0;\n    dWdTv[s] = 0.0;\n    dWdQbeam[s] = 0.0;\n    for ( k = 0; k < ns; k++) {\n      dWdrhok[s][k] = 0.0;\n    }\n  }\n");
     }
     if (run == 2) {
-        fprintf(output, "void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei) {\n  double theta;\n  long specM;\n\n  *Qei = 0.0;\n\n  switch (gl->model.chem.IONIZATIONMODEL) {\n    case IONIZATIONMODEL_CHEMKIN:\n");
+        fprintf(output, "void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei) {\n  double theta;\n  long specM;\n\n  *Qei = 0.0;\n\n");
     }
     if (run == 3) {
-        fprintf(output, "void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe) {\n  double theta;\n  long spec, specM;\n\n  for ( spec = 0; spec < ns; spec++ )\n    dQeidrhok[spec] = 0.0;\n\n  *dQeidTe = 0.0;\n\n  switch (gl->model.chem.IONIZATIONMODEL) {\n    case IONIZATIONMODEL_CHEMKIN:\n");
+        fprintf(output, "void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe) {\n  double theta;\n  long spec, specM;\n\n  for ( spec = 0; spec < ns; spec++ )\n    dQeidrhok[spec] = 0.0;\n\n  *dQeidTe = 0.0;\n\n");
     }
 }
 
@@ -1076,7 +1074,7 @@ void print_elements_add_ionization(char oldLine[], char prevLine[], char lastLin
         n = 0;
         if (M >= 0 || M == -5) {
             while (capp >= 0) {
-                if (check_process(prevLine, tot, loc, output, 0) == 10) {
+                if (check_process(prevLine, tot, loc, output, 0, run) == 10) {
 
                     while (prevLine[n] != '/' && M >= 0) {
                         while (prevLine[n] == ' ' || prevLine[n] == '\t' || prevLine[n] == '\n')
@@ -1112,7 +1110,7 @@ void print_elements_add_ionization(char oldLine[], char prevLine[], char lastLin
                     capp--, k = 0;
                     b++;
                 }
-                else if (check_process(lastLine, tot, loc, output, 0) == 10) {
+                else if (check_process(lastLine, tot, loc, output, 0, run) == 10) {
 
                     while (lastLine[n] != '/' && M >= 0) {
                         while (lastLine[n] == ' ' || lastLine[n] == '\t' || lastLine[n] == '\n')
@@ -1148,7 +1146,7 @@ void print_elements_add_ionization(char oldLine[], char prevLine[], char lastLin
                     capp--, k = 0;
                     b++;
                 }
-                else if (check_process(newLine, tot, loc, output, 0) == 10) {
+                else if (check_process(newLine, tot, loc, output, 0, run) == 10) {
 
                     while (newLine[n] != '/' && M >= 0) {
                         while (newLine[n] == ' ' || newLine[n] == '\t' || newLine[n] == '\n')
@@ -1351,14 +1349,14 @@ void print_output_line(char oldLine[], char prevLine[], char lastLine[], char ne
                 fprintf(output, "\n");
         }
         else if (run == 2 && Q != 0) {
-            fprintf(output, "      if (REACTION[%d])\n", tot);
-            fprintf(output, "        add_to_Qei(spec");                  // printing find_Qei functions
+            fprintf(output, "  if (REACTION[%d])\n", tot);
+            fprintf(output, "    add_to_Qei(spec");                  // printing find_Qei functions
             print_info_find_Qei(oldLine, prevLine, numR, numP, ind, output, newLine, lastLine, Q, e, run, reaction);
 
         }
         else if (run == 3 && Q != 0) {
-            fprintf(output, "      if (REACTION[%d])\n", tot);
-            fprintf(output, "        add_to_dQei(spec");                // printing find_Qei functions
+            fprintf(output, "  if (REACTION[%d])\n", tot);
+            fprintf(output, "    add_to_dQei(spec");                // printing find_Qei functions
             print_info_find_Qei(oldLine, prevLine, numR, numP, ind, output, newLine, lastLine, Q, e, run, reaction);
 
         }
@@ -1403,14 +1401,14 @@ void build_current_function(int run, FILE* input, FILE* output) {
             loc = loc;
         reaction = reaction_class(oldLine, reaction);
         Q = 0, way = 10, e = 0, check = 0, ind = 0, h = 0;
-        check = check_reaction_current_line(oldLine, &way, &tot, output, loc);
+        check = check_reaction_current_line(oldLine, &way, &tot, output, loc, run);
         if (check == 1 || check == 3) {
-            flag1 = check_process(oldLine, tot, loc, output, 1);                     // flag a reaction as unreadable if any of the information lines
-            flag2 = check_process(prevLine, tot, loc, output, 1);                    // contain unrecognizable processes
+            flag1 = check_process(oldLine, tot, loc, output, 1, run);                     // flag a reaction as unreadable if any of the information lines
+            flag2 = check_process(prevLine, tot, loc, output, 1, run);                    // contain unrecognizable processes
             if (flag2 != 3 && flag2 != 1) {
-                flag3 = check_process(lastLine, tot, loc, output, 1);
+                flag3 = check_process(lastLine, tot, loc, output, 1, run);
                 if (flag3 != 3 && flag3 != 1)
-                    flag4 = check_process(newLine, tot, loc, output, 1);
+                    flag4 = check_process(newLine, tot, loc, output, 1, run);
             }
             if (flag1 == 1 || flag2 == 1 || flag3 == 1 || flag4 == 1)
                 check = 0;
@@ -1423,22 +1421,30 @@ void build_current_function(int run, FILE* input, FILE* output) {
         }
         if (check == 1 || check == 3) {
             check_all_indicators_formfit_electrontemperature_Q(oldLine, prevLine, lastLine, newLine, &ind, &e, &Q);
-            M = check_M_reaction(oldLine, prevLine, lastLine, newLine, tot, loc, output, &ply);
+            M = check_M_reaction(oldLine, prevLine, lastLine, newLine, tot, loc, output, &ply, run);
             if (M >= 0)
                 loc = loc;
             numR = number_of_reactants(oldLine);
             numP = number_of_products(oldLine);
-            print_output_line(oldLine, prevLine, lastLine, newLine, ind, e, Q, way, tot, run, numR, numP, output, M, reaction, h, loc, ply);
+            if (run != -1)
+              print_output_line(oldLine, prevLine, lastLine, newLine, ind, e, Q, way, tot, run, numR, numP, output, M, reaction, h, loc, ply);
         }
         strcpy(oldLine, prevLine); // shifts line storage to next line
         strcpy(prevLine, lastLine);
         strcpy(lastLine, newLine);
 
     }
+    if (run == -1) {
+      fprintf(output, "const static bool REACTION[%d] = {\n", tot+1);
+      for (int num = 0; num < tot+1; num++) {
+        fprintf(output,"  TRUE, /* reaction[%d] */\n", num);
+      }
+      fprintf(output, "};\n\n");
+    }
 }
 
 
-int check_reaction_current_line(char Line_str[], int* way, int* tot, FILE* output, int loc) {
+int check_reaction_current_line(char Line_str[], int* way, int* tot, FILE* output, int loc, int run) {
     int i, num = 0;
     for (i = 0; Line_str[i] != '\n' && Line_str[i] != '\r'; i++) {              // determines the presence of a reaction by "=>" or "<=>"
         if (Line_str[i] == '=' && Line_str[i + 1] == '>' && Line_str[i - 1] == '<') {
@@ -1456,7 +1462,8 @@ int check_reaction_current_line(char Line_str[], int* way, int* tot, FILE* outpu
     }
     if (Line_str[0] == '!' && num == 1) {
         num = 0;
-        fprintf(output, "\n        // ************ERROR: Reaction #%d ignored on line %d due to commenting out.\n\n", *tot, loc);
+        if (run != -1)
+          fprintf(output, "\n        // ************ERROR: Reaction #%d ignored on line %d due to commenting out.\n\n", *tot, loc);
         return num;
     }
     if (num == 1)
@@ -1481,7 +1488,7 @@ int check_reaction_current_line(char Line_str[], int* way, int* tot, FILE* outpu
     return num; // returns 0 if there is no reaction and 1 if there is a reaction
 }
 
-int check_M_reaction(char oldLine[], char prevLine[], char lastLine[], char newLine[], int tot, int loc, FILE* output, int* ply) {
+int check_M_reaction(char oldLine[], char prevLine[], char lastLine[], char newLine[], int tot, int loc, FILE* output, int* ply, int run) {
     int i = 0, j = 0, k = 0, M = 0, m = 0;
     char reactants[10][12]; // create a string array to hold reactant names
     for (j = 0; oldLine[i] != '='; j++) {
@@ -1547,7 +1554,7 @@ int check_M_reaction(char oldLine[], char prevLine[], char lastLine[], char newL
             }
         }
         if (M == 1 || M == -1) {
-            if (check_process(prevLine, tot, loc, output, 0) == 10) {
+            if (check_process(prevLine, tot, loc, output, 0, run) == 10) {
                 for (i = 0; prevLine[i] != '\n' && prevLine[i] != '\r'; i++) {
                     if (prevLine[i] == '/')
                         count = count + 1;
@@ -1557,7 +1564,7 @@ int check_M_reaction(char oldLine[], char prevLine[], char lastLine[], char newL
                     if (count == 0)
                         M = -4;
             }
-            else if (check_process(lastLine, tot, loc, output, 0) == 10) {
+            else if (check_process(lastLine, tot, loc, output, 0, run) == 10) {
                 for (i = 0; lastLine[i] != '\n' && lastLine[i] != '\r'; i++) {
                     if (lastLine[i] == '/')
                         count = count + 1;
@@ -1567,7 +1574,7 @@ int check_M_reaction(char oldLine[], char prevLine[], char lastLine[], char newL
                     if (count == 0)
                         M = -4;
             }
-            else if (check_process(newLine, tot, loc, output, 0) == 10) {
+            else if (check_process(newLine, tot, loc, output, 0, run) == 10) {
                 for (i = 0; newLine[i] != '\n' && newLine[i] != '\r'; i++) {
                     if (newLine[i] == '/')
                         count = count + 1;
@@ -1588,7 +1595,7 @@ int check_M_reaction(char oldLine[], char prevLine[], char lastLine[], char newL
 
 }
 
-int check_process(char Line[], int tot, int loc, FILE* output, int num) {
+int check_process(char Line[], int tot, int loc, FILE* output, int num, int run) {
     char word[12];
     char wordbank[44][15] = { "E", "N2", "N2(A3Sigma)", "N2(B3Pi)", "N2(ap1Sigma)", "N2(C3Pi)", "N2+", "O2", "O2+", "N", "O", "O(1D)", "O(1S)", "C2H4+", "AR", "HE", "H", "H2", "OH", "HO2", "H2O", "H2O2", "CO", "CO2", "HCO", "CH3", "CH4", "C2H6", "CH2O", "C2H5", "CH2", "CH3O", "CH2OH", "CH", "C2H2", "C2H4", "C2H3", "CH3OH", "CH3HCO", "C2H", "CH2CO", "HCCO", "NO", "END" };
     int i, k = 0;
@@ -1623,7 +1630,7 @@ int check_process(char Line[], int tot, int loc, FILE* output, int num) {
     else if (word[i] == 'L' && word[i + 1] == 'O' && word[i + 2] == 'W')
         return -2;
     else if (word[i] == 'T' && word[i + 1] == 'R' && word[i + 2] == 'O' && word[i + 3] == 'E') {
-        if (num == 1) {
+        if (num == 1 && run != -1) {
             fprintf(output, "\n        // **********WARNING: Reaction #%d on line %d specifies the \"%s\" process but we here use the \"Lindemann\" process instead:\n\n", tot, loc, word);
         }
         return 0;
@@ -1633,7 +1640,8 @@ int check_process(char Line[], int tot, int loc, FILE* output, int num) {
     for (i = 0; i < 44; i++)
         if (strcmp(word, wordbank[i]) == 0)
             return 10;
-    fprintf(output, "\n    // ************ERROR: Reaction #%d ignored on line %d due to unknown process: \"%s\".\n\n", tot, loc, word);
+    if (run != -1)
+      fprintf(output, "\n    // ************ERROR: Reaction #%d ignored on line %d due to unknown process: \"%s\".\n\n", tot, loc, word);
 
     return 1;
 

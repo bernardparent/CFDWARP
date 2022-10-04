@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 03a
+  * in tools/chemkin2cfdwarp.c
+    - made improvements
+    
+
 2022 OCT 01a
   * in model/chem/_C2H4_Air_Plasma_30s/chem.c
     - removed constants TEFROMEOVERN, TEMIN, TEMAX and added them within write_model_chem_template()
