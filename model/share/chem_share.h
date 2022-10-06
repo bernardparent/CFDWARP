@@ -316,6 +316,58 @@ void add_to_dW_fw_2r4p_fit4(int specR1, int specR2,
 
 
 /*
+ Note : kf  = k0/(1+k0*X[specR2]/kinf)
+        with kinf determined from Ainf, ninf, Einf
+             k0 determined from A0, n0, E0
+ Units:
+ A0 in cm^3 (mole s)^(-1) K^(-n0) 
+ Ainf in s^(-1) K^(-ninf)
+ Einf,E0 in cal/mole
+ T in Kelvin
+ X in mole/cm3
+ W in kg m^(-3) s^(-1)
+*/ 
+
+void add_to_W_fw_2r2p_Lindemann(int specR1, int specR2, 
+                                int specP1, int specP2,
+                                double Ainf,  double ninf , double Einf, 								
+                                double A0, double n0, double E0, 
+							                	double T,  spec_t X, spec_t W);
+
+void add_to_W_bw_2r2p_Lindemann(int specR1, int specR2, 
+                                int specP1, int specP2,
+                                double Ainf, double ninf, double Einf, 
+                                double A0,  double n0 , double E0, 								
+                                double T, spec_t X, spec_t W);
+
+void add_to_W_fwbw_2r2p_Lindemann(int specR1, int specR2,
+                                  int specP1, int specP2,
+                                  double Ainf, double ninf, double Einf, 
+                                  double A0,  double n0 , double E0, 								
+                                  double T, spec_t X, spec_t W);
+
+void add_to_dW_fw_2r2p_Lindemann(int specR1, int specR2, 
+                                 int specP1, int specP2,
+                                 double Ainf, double ninf, double Einf, 
+                                 double A0, double n0, double E0,
+                                 double T, spec_t X, 
+                                 spec_t dWdT, spec2_t dWdrhok);
+
+void add_to_dW_bw_2r2p_Lindemann(int specR1, int specR2,
+                                 int specP1, int specP2,
+                                 double Ainf, double ninf, double Einf, 
+                                 double A0, double n0, double E0,
+                                 double T, spec_t X, 
+                                 spec_t dWdT, spec2_t dWdrhok);
+
+void add_to_dW_fwbw_2r2p_Lindemann(int specR1, int specR2, 
+                                   int specP1, int specP2,
+                                   double Ainf, double ninf, double Einf, 
+                                   double A0, double n0, double E0,
+                                   double T, spec_t X, 
+                                   spec_t dWdT, spec2_t dWdrhok);
+
+/*
  Note : kf  = k0/(1+k0*X[specR3]/kinf)
         with kinf determined from Ainf, ninf, Einf
              k0 determined from A0, n0, E0

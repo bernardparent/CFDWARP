@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 06a
+  * in model/share/chem_share.c
+    - added add_to_*_*_2r2p_Lindemann() functions
+  * in model/share/chem_share.h
+    - listed add_to_*_*_2r2p_Lindemann() functions
+  * in model/thermo/_generic/thermo.c
+    - added species: C3H7, H2CC, CH2CHO
+  * in model/thermo/_generic/thermo.hh
+    - added species: C3H7, H2CC, CH2CHO to species map
+  * in model/thermo/_generic/enthalpy.c
+    - added McBride polynomial coefficients for species: C3H7, H2CC, CH2CHO
+  * in model/transport/_Dixon-Lewis/transport.c
+    - added transport properties for species: C3H7, H2CC, CH2CHO
+
+
 2022 OCT 05a
   * in model/fluid/doc/Transport_Equations/report.tex
     - fixed some small typos in the equations relating to charged species heat fluxes 

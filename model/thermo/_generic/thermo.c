@@ -118,6 +118,9 @@ const static speciesname_t speciesname[SMAP_NS]=
    "CH2CO",
    "CH3CHO",
    "C3H5",
+   "C3H7",
+   "H2CC",
+   "CH2CHO",
   };
 
 
@@ -207,6 +210,9 @@ const static double calM[SMAP_NS]=
    42.03668E-3,    /*CH2CO */
    44.05256E-3,    /*CH3CHO */
    41.07180E-3,    /*C3H5 */
+   43.08768E-3,    /*C3H7 */
+   26.03728E-3,    /*H2CC */
+   43.04522E-3,    /*CH2CHO */
   };
 
 
@@ -284,6 +290,9 @@ const static long ck[SMAP_NS]=
    0,  /* CH2CO */
    0,  /* CH3CHO */
    0,  /* C3H5 */
+   0,  /* C3H7 */
+   0,  /* H2CC */
+   0,  /* CH2CHO */
   };
   
 const static long numatoms[SMAP_NS]=
@@ -359,6 +368,9 @@ const static long numatoms[SMAP_NS]=
    5,  /* CH2CO */
    7,  /* CH3CHO */
    8,  /* C3H5 */
+   10, /* C3H7 */
+   4,  /* H2CC */
+   6,  /* CH2CHO */
   }; 
   
 

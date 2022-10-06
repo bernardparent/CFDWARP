@@ -95,10 +95,15 @@ RODRIGUEZ FUENTES, Felipe Martin
 
   - contributed to model/transport/_Gupta-Yos
 
-  - implemented add_to_W_fw_3r2p_Lindemann(), add_to_W_fw_2r3p_Lindemann(), 
-    add_to_dW_fw_3r2p_Lindemann(), add_to_dW_fw_2r3p_Lindemann() in model/share/chem_share.c
-
+  - implementation of add_to_*_2r2p_Lindemann(), add_to_*_3r2p_Lindemann(), add_to_*_2r3p_Lindemann()
+    functions in model/share/chem_share.c
+    
+  - addition of ethylene combustion related species in model/thermo/_generic
+  
   - added model/chem/_C2H4_Air_23s/
+
+  - added chemical solvers model/chem/_C2H4_Air_23s/zettervall2017.c, model/chem/_C2H4_Air_23s/konnov2009.c, 
+    model/chem/_C2H4_Air_23s/usc32.c
     
     
 SCHWARTZENTRUBER, Thomas E.
