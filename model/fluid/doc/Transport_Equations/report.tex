@@ -1329,7 +1329,7 @@ or,
   \vec{V}^{k}_j=\vec{V}^{\rm n}_j - \mu_{\rm e} \vec{E}^{k}_j -\frac{\mu_{k}}{|C_{k}| N_{k}} \frac{\partial P_{k}}{\partial x_j} 
 \end{equation}
 % 
-Expand the electron pressure:
+Expand the pressure gradient term:
 %
 \begin{equation}
   \vec{V}^{k}_j=\vec{V}^{\rm n}_j - \mu_{k} \vec{E}^{k}_j 
@@ -2268,7 +2268,6 @@ First, sum the energy transport equation for the charged species Eq.\ (\ref{eqn:
 \sum_{r=1}^\ncs \frac{\partial }{\partial t}\rho_r (e_r+h_r^\circ) 
 + \sum_{r=1}^\ncs \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_r \vec{V}^r_j (h_r+h_r^\circ) 
 = 
-- \sum_{r=1}^\ncs \sum_{i=1}^{3}\frac{\partial q_i^r}{\partial x_i}
 - \sum_{r=1}^\ncs Q_{r} \alb\mfd
 -\sum_{r=1}^\ncs \sum_{i=1}^3 \vec{F}_i^r \vec{V}_i^{{\rm n}-r} 
 + \sum_{i=1}^3 \sum_{r=1}^\ncs  C_r N_r  \vec{V}^r_i \vec{E}_i
@@ -2288,7 +2287,6 @@ Thus:
 \sum_{r=1}^\ncs \frac{\partial }{\partial t}\rho_r (e_r+h_r^\circ) 
 + \sum_{r=1}^\ncs \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_r \vec{V}^r_j (h_r+h_r^\circ) 
 = 
-- \sum_{r=1}^\ncs \sum_{i=1}^{3}\frac{\partial q_i^r}{\partial x_i}
 - \sum_{r=1}^\ncs Q_{r}\alb\mfd
 -\sum_{r=1}^\ncs \sum_{i=1}^3 \vec{F}_i^r \vec{V}_i^{{\rm n}-r} 
 + \vec{E}\cdot\vec{J}
@@ -2303,7 +2301,6 @@ Add the latter to Eq.\ (\ref{eqn:eneutrals7}):
 + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\sum_{k=1}^\ns \rho_k \vec{V}^k_j (h_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}\vec{V}^{\rm n}_j|\vec{V}^{\rm n}|^2 \right)
 = \alb\mfd
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
-- \sum_{r=1}^\ncs \sum_{i=1}^{3}\frac{\partial q_i^r}{\partial x_i}
 +\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
 +\frac{1}{2}|\vec{V}^{\rm n}|^2 \sum_{k=1}^\nns W_k
 + \vec{E}\cdot\vec{J}
@@ -2320,7 +2317,6 @@ Then add Eq.\ (\ref{eqn:ev1}) to the latter:
 + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\rho_{\rm N_2} \vec{V}_j^{\rm N_2} \ev + \sum_{k=1}^\ns \rho_k \vec{V}^k_j (h_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}\vec{V}^{\rm n}_j|\vec{V}^{\rm n}|^2 \right)
 = \alb\mfd
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
-- \sum_{r=1}^\ncs \sum_{i=1}^{3}\frac{\partial q_i^r}{\partial x_i}
 -\sum_{i=1}^{3}\frac{\partial q_i^{\rm v}}{\partial x_i}
 +\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
 +\frac{1}{2}|\vec{V}^{\rm n}|^2 \sum_{k=1}^\nns W_k
@@ -2349,7 +2345,6 @@ Thus:
  \alb\mfd
 =
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
-- \sum_{r=1}^\ncs \sum_{i=1}^{3}\frac{\partial q_i^r}{\partial x_i}
 -\sum_{i=1}^{3}\frac{\partial q_i^{\rm v}}{\partial x_i}\alb\mfd
 +\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
 +\frac{1}{2}|\vec{V}^{\rm n}|^2 \sum_{k=1}^\nns W_k
@@ -2390,31 +2385,6 @@ From the latter, it is apparent that such a term is proportional to the mass of 
 After substituting Eq.\ (\ref{eqn:etotal2}) into Eq.\ (\ref{eqn:etotal1}), we obtain the total energy equation applicable to a weakly-ionized plasma and which collapses to the standard form of the total energy equation for a mixture of gases in the absence of electromagnetic fields:
 %
 \begin{equation}
-\begin{array}{l}\mfd
- \frac{\partial }{\partial t}\left(\rho_{\rm N_2} \ev+\sum_{k=1}^\ns \rho_k (e_k+h_k^\circ)+\frac{1}{2}\rho|\vec{V}^{\rm n}|^2 \right) \alb\mfd
-+ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\rho_{\rm N_2} \vec{V}_j^{\rm N_2} \ev + \sum_{k=1}^\ns \rho_k \vec{V}^k_j (h_k+h_k^\circ)+\frac{1}{2}\rho \vec{V}^{\rm n}_j|\vec{V}^{\rm n}|^2 \right)
- \alb\mfd
-=
--\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
-- \sum_{r=1}^\ncs \sum_{i=1}^{3}\frac{\partial q_i^r}{\partial x_i}
--\sum_{i=1}^{3}\frac{\partial q_i^{\rm v}}{\partial x_i}
-+\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
-+ \vec{E}\cdot\vec{J}
-+ Q_{\rm b}
-\end{array}
-\label{eqn:etotal3}
-\end{equation}
-%  
-We can further simplify the latter by noting that for a weakly-ionized gas in which all heavy particules (neutrals and ions) share the same temperature, the heat diffusion flux  of the ions can be neglected compared to the one of the neutrals. Thus the heat flux of the charged species reduces to the one of the electrons only:
-%
-\begin{equation}
-\sum_{r=1}^\ncs \sum_{i=1}^{3}\frac{\partial q_i^r}{\partial x_i}\approx
- \sum_{i=1}^{3}\frac{\partial q_i^{\rm e}}{\partial x_i}
-\end{equation}
-%
-After substituting the latter in the former:
-%
-\begin{equation}
 \frameeqn{
 \begin{array}{l}\mfd
  \frac{\partial }{\partial t}\left(\rho_{\rm N_2} \ev+\sum_{k=1}^\ns \rho_k (e_k+h_k^\circ)+\frac{1}{2}\rho|\vec{V}^{\rm n}|^2 \right) \alb\mfd
@@ -2422,7 +2392,6 @@ After substituting the latter in the former:
  \alb\mfd
 =
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
--  \sum_{i=1}^{3}\frac{\partial q_i^{\rm e}}{\partial x_i}
 -\sum_{i=1}^{3}\frac{\partial q_i^{\rm v}}{\partial x_i}
 +\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
 + \vec{E}\cdot\vec{J}
@@ -2442,7 +2411,6 @@ We can rewrite differently:
  \alb\mfd
 =
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
--  \sum_{i=1}^{3}\frac{\partial q_i^{\rm e}}{\partial x_i}
 -\sum_{i=1}^{3}\frac{\partial q_i^{\rm v}}{\partial x_i}
 +\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
 + \vec{E}\cdot\vec{J}
@@ -2469,7 +2437,6 @@ Thus:
  \alb\mfd
 =
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
--  \sum_{i=1}^{3}\frac{\partial q_i^{\rm e}}{\partial x_i}
 -\sum_{i=1}^{3}\frac{\partial q_i^{\rm v}}{\partial x_i}
 +\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
 + \vec{E}\cdot\vec{J}
@@ -2499,7 +2466,6 @@ After substituting the latter in the former and rearranging, we get:
 \right)\alb\mfd
 =
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
--  \sum_{i=1}^{3}\frac{\partial q_i^{\rm e}}{\partial x_i}
 -\sum_{i=1}^{3}\frac{\partial q_i^{\rm v}}{\partial x_i}
 +\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
 + \vec{E}\cdot\vec{J}
@@ -2522,7 +2488,8 @@ where the mixture pressure $P$ includes the partial pressures of all neutral and
 + \sum_{j=1}^3 \sum_{k=1}^\ns  \frac{\partial }{\partial x_j} \left(
   \beta_k^{\rm c} w_k (\vec{V}^k_j-\vec{V}^{\rm n}_j) \frac{(h_k+h_k^\circ)}{e_{\rm t}} \rho e_{\rm t} 
 \right)
--\sum_{i=1}^{3}\frac{\partial }{\partial x_i}\left(\kappa \frac{\partial T}{\partial x_i} + \kappa_{\rm e} \frac{\partial T_{\rm e}}{\partial x_i}+ \kappa_{\rm v} \frac{\partial T_{\rm v}}{\partial x_i}\right)
+-\sum_{i=1}^{3}\frac{\partial }{\partial x_i}\left(\kappa_{\rm n} \frac{\partial T}{\partial x_i} 
++ \kappa_{\rm v} \frac{\partial T_{\rm v}}{\partial x_i}\right)
 \alb\mfd
 =
  \sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
@@ -2692,7 +2659,7 @@ The Favre-averaged form of the total energy equation (\ref{eqn:etotal8}) can be 
 + \sum_{j=1}^3 \sum_{k=1}^\ns  \frac{\partial }{\partial x_j} \left(
   \beta_k^{\rm c} w_k (\vec{V}^k_j-\vec{V}^{\rm n}_j) \frac{(h_k+h_k^\circ)}{e_{\rm t}^\star} \rho e_{\rm t}^\star 
 \right)\alb\mfd
--\sum_{i=1}^{3}\frac{\partial }{\partial x_i}\left(\kappa^\star \frac{\partial T}{\partial x_i} + \kappa_{\rm e} \frac{\partial T_{\rm e}}{\partial x_i}+ \kappa_{\rm v}^\star \frac{\partial T_{\rm v}}{\partial x_i}
+-\sum_{i=1}^{3}\frac{\partial }{\partial x_i}\left(\kappa_{\rm n}^\star \frac{\partial T}{\partial x_i} + \kappa_{\rm v}^\star \frac{\partial T_{\rm v}}{\partial x_i}
 + \visc_{k}^\star \frac{\partial k}{\partial x_i}\right)
 \alb\mfd
 =
@@ -3135,8 +3102,6 @@ or we can write $D$ in diagonal form with no loss in generality:
          \delta_{ij} \visc_{k}^\star & \textrm{if $k=\ns+4$ and $r=\ns +5$} \alb
 
          \delta_{ij} \kappa_{\rm v}^\star & \textrm{if $k=\ns+4$ and $r=\ns +7$} \alb
-
-         \delta_{ij} \kappa_{\rm e} & \textrm{if $k=\ns+4$ and $r=\ns +8$} \alb
 
          \delta_{ij} \visc_{k}^\star & \textrm{if $k=\ns+5$ and $r=\ns +5$} \alb
 

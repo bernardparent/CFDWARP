@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 05a
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - fixed some small typos in the equations relating to charged species heat fluxes 
+      (this was already fixed in the code, but had not been fixed in the documentation)
+  * in model/transport/doc/report.tex
+    - added drift velocities from Tarasenko
+  
+
 2022 OCT 03a
   * in tools/chemkin2cfdwarp.c
     - made improvements
