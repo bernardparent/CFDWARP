@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 06b
+  * in bin/*wrp
+    - updated files with NavierStokesPlasma() module to include recent constants added to the model
+      
+
 2022 OCT 06a
   * in model/share/chem_share.c
     - added add_to_*_*_2r2p_Lindemann() functions

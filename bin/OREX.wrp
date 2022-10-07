@@ -283,6 +283,9 @@ Model(
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=YES;
+    INCLUDE_E_EFFECTS_ON_ION_MOBILITY=FALSE;
+    INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY=FALSE;
+    SCHOTTKY_EFFECT=FALSE;
     REACTING=YES;
     emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
     sigmadiv=1e-10; {S/m}
@@ -297,6 +300,12 @@ Model(
     chiemin=1e-12;  chiemax=1.0;    {min and max electron molar fraction}
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
     AXISYMMETRIC=YES;
+    SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
+    SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
+    {
+    AddHeatPoint(0.0{x,m},0.0{y,m}, 0.1{radius,m}, 0.0{W/m});
+    }
+    HEAT_DEPOSITED_TO_ELECTRONS=FALSE;
   );
   AirPlasma11s(
     CHEMMODEL=CHEMMODEL_DUNNKANG1973;
