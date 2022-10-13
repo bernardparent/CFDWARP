@@ -26,90 +26,127 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <exm.h>
 #include "share.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-int chkarg ( int argc, char **argv, char *arg ) {
-  int cnt, tmp;
-  tmp = 0;
-  for ( cnt = 1; cnt < argc; cnt++ ) {
-    if ( strcmp ( argv[cnt], arg ) == 0 ) {
-      tmp = cnt;
-    }
-  }
+
+
+typedef struct {
+  double TyoverTx;
+  double gamma;
+} arg2_t;
+
+
+static double _errfunct2 ( void *arg, double Ms ) {
+  double tmp, TyoverTx, gamma;
+  gamma=( ( arg2_t * ) arg )->gamma;
+  TyoverTx=(2.0*gamma/(gamma+1.0)*Ms*Ms-(gamma-1.0)/(gamma+1.0))*((gamma-1.0)/(gamma+1.0)+2.0/(gamma+1.0)/Ms/Ms);
+  tmp = TyoverTx - ( ( arg2_t * ) arg )->TyoverTx;
   return ( tmp );
 }
 
+
+void find_Ms ( double TyoverTx, double gamma, double *Ms ) {
+  long IFLAG;
+  arg2_t arg;
+  arg.TyoverTx = TyoverTx;
+  arg.gamma=gamma;
+  *Ms = EXM_find_root_zero_in ( &( _errfunct2 ), &arg, 1.0e0, 20.0e0, 1.0e-12, 1.0e-12, &IFLAG );
+  if ( IFLAG == 4 ) {
+    fprintf ( stderr, "couldn't find root in find_Ms, exiting..\n" );
+    exit ( 1 );
+  }
+}
+
+
 int main ( int argc, char **argv ) {
-  bool validOptions, l_flag, m_flag;
-  double U1, U2, U3, T1, T2, T3, gamma, Rgas, Pdynamic, L, P1, P2, P3, Ms, M1, M2, M3, W1,
-    mdot, altitude, W2, W3;
+  bool VALIDOPTIONS=TRUE;
+  double tmp, Ms, U0, P0, M0, T0, H1, W0, gamma, Rgas, Pdyn, U, P, T, H, W, M,
+         mdot, altitude, PyoverPx, TyoverTx, Te, cp, Pstag, Pstag0;
+  long cnt,numshock;
+  char *options;
+  int RET;
+  options = NULL;
+  
+  if (process_flag_double(argc, argv, "-M", &M0)!=2) VALIDOPTIONS=FALSE;
+  if (process_flag_double(argc, argv, "-W", &W0)!=2) VALIDOPTIONS=FALSE;
+  if (process_flag_double(argc, argv, "-Pdyn", &Pdyn)!=2) VALIDOPTIONS=FALSE;
+  if (process_flag_double(argc, argv, "-Te", &Te)!=2) VALIDOPTIONS=FALSE;
+  if (process_flag_long(argc, argv, "-shocks", &numshock)!=2) VALIDOPTIONS=FALSE;  
+  if (process_flag_double(argc, argv, "-gamma", &tmp)==2) gamma=tmp; else gamma=1.4;
+  if (process_flag_double(argc, argv, "-Rgas", &tmp)==2) Rgas=tmp; else Rgas=287.0;
 
-  /* take care of the command line options */
-  validOptions = FALSE;
-  m_flag = FALSE;
-  l_flag = FALSE;
-
-  if ( chkarg ( argc, argv, "-M" ) != 0 ) {
-    m_flag = TRUE;
-    sscanf ( argv[chkarg ( argc, argv, "-M" ) + 1], "%lg", &M1 );
-  }
-  if ( chkarg ( argc, argv, "-L" ) != 0 ) {
-    l_flag = TRUE;
-    sscanf ( argv[chkarg ( argc, argv, "-L" ) + 1], "%lg", &L );
-  }
-  if ( chkarg ( argc, argv, "-Pdyn" ) != 0 ) {
-    l_flag = TRUE;
-    sscanf ( argv[chkarg ( argc, argv, "-Pdyn" ) + 1], "%lg", &Pdynamic );
-  }
-  if ( chkarg ( argc, argv, "-T3" ) != 0 ) {
-    l_flag = TRUE;
-    sscanf ( argv[chkarg ( argc, argv, "-T3" ) + 1], "%lg", &T3 );
-  }
-  if ( m_flag && l_flag ) {
-    validOptions = TRUE;
-  }
-
-  if ( !validOptions ) {
+  if ( !VALIDOPTIONS ) {
     fprintf ( stderr, "\nFlags:\n\n"
-              "Flag  \tArg                              \tArg Type \tRequired? \n"
+              "Flag   \tArg                              \tArg Type \tRequired? \n"
               "----------------------------------------------------------------------------\n"
-              "-M   \t<flight Mach number [m/s]>       \tdouble   \tY\n"
-              "-Pdyn\t<flight dynamic pressure [Pa]>   \tdouble   \tY\n"
-              "-T3  \t<temperature at inlet exit [K]>  \tdouble   \tY\n"
-              "-L   \t<length of the inlet [m]>        \tdouble   \tY\n" "\n\n" );
+              "-M     \t<flight Mach number [m/s]>       \tdouble   \tY\n"
+              "-Pdyn  \t<flight dynamic pressure [Pa]>   \tdouble   \tY\n"
+              "-Te    \t<temperature at inlet exit [K]>  \tdouble   \tY\n"
+              "-shocks\t<number of shocks>               \tdouble   \tY\n"
+              "-W     \t<height of the inlet [m]>        \tdouble   \tY\n"
+              "-gamma \t<ratio of specific heats>        \tdouble   \tN\n"
+              "-Rgas  \t<gas constant [J/kgK]>           \tdouble   \tN\n"
+               "\n\n"
+              "Eg.: ./inlet -M 7.0 -Pdyn 66000 -Te 1000 -shocks 2 -W 1.0\n"
+              "\n\n");
+    exit (EXIT_FAILURE);
+  }
+  
+  RET = find_remaining_options ( argc, argv, &options );
+  if ( RET >= 1 ) {
+    fprintf ( stderr, "\n\nThe following command line options could not be processed:\n%s\n\n", options );
+    exit (EXIT_FAILURE);
+  }
+    
+  cp=gamma/(gamma-1.0)*Rgas;
+  P0 = 2.0e0 * Pdyn / gamma / pow ( M0, 2.0 );
+  FindTandHfromPstdatm ( P0, &altitude, &T0 );
+  U0 = M0 * sqrt ( gamma * Rgas * T0 );
+  H1=0.5*U0*U0+cp*T0;    
+  TyoverTx=pow(Te/T0,1.0/numshock); 
+  find_Ms ( TyoverTx, gamma, &Ms) ;
+  PyoverPx=2.0*gamma/(gamma+1.0)*Ms*Ms-(gamma-1.0)/(gamma+1.0);
+  M0=U0/sqrt(gamma*Rgas*T0);
+  Pstag0=P0*pow(1.0+(gamma-1.0)/2.0*M0*M0,gamma/(gamma-1.0));
 
-  } else {
-    gamma = 1.4e0;
-    Rgas = 287.06e0;
-    FindExtCompInletProps ( M1, L, Rgas,
-                            T3, Pdynamic, gamma,
-                            &T1, &T2, &P1, &P2, &P3, &Ms, &M2, &M3, &W1, &mdot, &altitude );
-
-    U1 = M1 * sqrt ( gamma * Rgas * T1 );
-    U2 = M2 * sqrt ( gamma * Rgas * T2 );
-    U3 = M3 * sqrt ( gamma * Rgas * T3 );
-    W2 = W1 * ( P1 / T1 * U1 ) / ( P2 / T2 * U2 );
-    W3 = W2 * ( P2 / T2 * U2 ) / ( P3 / T3 * U3 );
-
-    printf ( "Altitude [m]  : %E\n"
+  mdot=W0*U0*P0/T0/Rgas;
+  fprintf ( stdout,
+             "Altitude [m]  : %E\n"
              "Ms            : %E\n"
              "mdot [kg/ms]  : %E\n"
-             "W1 [m]        : %E\n"
-             "W2 [m]        : %E\n"
-             "W3 [m]        : %E\n"
-             "M1            : %E\n"
-             "M2            : %E\n"
-             "M3            : %E\n"
-             "U1 [m/s]      : %E\n"
-             "U2 [m/s]      : %E\n"
-             "U3 [m/s]      : %E\n"
-             "P1 [Pa]       : %E\n"
-             "P2 [Pa]       : %E\n" 
-             "P3 [Pa]       : %E\n" 
-             "T1 [K]        : %E\n" 
-             "T2 [K]        : %E\n" 
-             "T3 [K]        : %E\n" ,
-             altitude, Ms, mdot, W1, W2, W3, M1, M2, M3, U1, U2, U3, P1, P2, P3, T1, T2, T3 );
+             "gamma         : %E\n"
+             "Rgas [J/kgK]  : %E\n",
+             altitude, Ms, mdot, gamma, Rgas );
+    
+  fprintf (stdout, "\n"
+              "W0 [m]      : %E\n"
+              "P0 [Pa]     : %E\n"
+              "T0 [K]      : %E\n"
+              "U0 [m/s]    : %E\n"
+              "M0          : %E\n"
+              "Pstag0 [Pa] : %E\n",
+             W0, P0, T0, U0, M0, Pstag0 );
+
+  for (cnt=1; cnt<=numshock; cnt++){
+    // total enthalpy is conserved through the shocks
+    H=H1;
+    // all shocks have equal strength so T2/T0=T3/T2=T4/T3 etc
+    T=pow(TyoverTx,(double)cnt)*T0;
+    P=pow(PyoverPx,(double)cnt)*P0;
+    U=sqrt((H-cp*T)*2.0);
+    M=U/sqrt(gamma*Rgas*T);
+    Pstag=P*pow(1.0+(gamma-1.0)/2.0*M*M,gamma/(gamma-1.0));
+    W = W0 * ( P0 / T0 * U0 ) / ( P / T * U );
+    fprintf (stdout, "\n"
+              "W%ld [m]      : %E\n"
+              "P%ld [Pa]     : %E\n"
+              "T%ld [K]      : %E\n"
+              "U%ld [m/s]    : %E\n"
+              "M%ld          : %E\n"
+              "Pstag%ld [Pa] : %E\n",
+             cnt,W, cnt,P, cnt,T, cnt,U, cnt,M, cnt,Pstag );
   }
 
-  return ( 0 );
+  return ( EXIT_SUCCESS );
 }

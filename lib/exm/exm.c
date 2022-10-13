@@ -1874,6 +1874,27 @@ int process_flag_int(int argc, char **argv, char *flag, int *arg){
   return(RET);
 }
 
+
+int process_flag_long(int argc, char **argv, char *flag, long *arg){
+  int RET;
+  int flagrank; 
+  int eos=EOS;
+  flagrank=argrank(argc,argv,flag);
+  if (flagrank!=0) {
+    if (argc<=flagrank+1) EXM_fatal_error("Missing argument after flag %s.",flag);
+    if (sscanf(argv[flagrank+1], "%ld%n", arg,&eos)!=1 || argv[flagrank+1][eos]!=EOS) {
+      EXM_fatal_error("Expecting long integer argument after %s flag.",flag);
+    }
+    strcpy(argv[flagrank+0],"\0");
+    strcpy(argv[flagrank+1],"\0");
+    RET=2;
+  } else {
+    RET=0;
+  }
+  return(RET);
+}
+
+
 int process_flag_double(int argc, char **argv, char *flag, double *arg){
   int RET;
   int flagrank; 

@@ -29,7 +29,7 @@ compressionfan.c             finds the x and y position of a prandtl-meyer compr
                              
 equilairplasma.c             outputs the molar fractions of air in thermochemical equilibrium
 
-inlet.c                      finds properties in a 2-oblique-shock Oswatitch supersonic 
+inlet.c                      finds properties in a n-oblique-shock Oswatitch supersonic 
                              inlet 
 
 inletgeom.c                  finds an external compression inlet geometry given the two 

@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 12a
+  * in lib/exm/exm.c
+    - added function process_flag_long
+  * in tools/inlet.c
+    - complete rewrite so that it can be used specifying any number of shocks 
+
+
 2022 OCT 06b
   * in bin/*wrp
     - updated files with NavierStokesPlasma() module to include recent constants added to the model
