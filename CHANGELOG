@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 13a
+  * in tools/inlet.c
+    - added output of turning angle and shock angle for every shock
+    
+
 2022 OCT 12a
   * in lib/exm/exm.c
     - added function process_flag_long

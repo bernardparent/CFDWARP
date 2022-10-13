@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2001 Bernard Parent
+Copyright 2001,2022 Bernard Parent
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -62,8 +62,8 @@ void find_Ms ( double TyoverTx, double gamma, double *Ms ) {
 int main ( int argc, char **argv ) {
   bool VALIDOPTIONS=TRUE;
   double tmp, Ms, U0, P0, M0, T0, H1, W0, gamma, Rgas, Pdyn, U, P, T, H, W, M,
-         mdot, altitude, PyoverPx, TyoverTx, Te, cp, Pstag, Pstag0;
-  long cnt,numshock;
+         mdot, altitude, PyoverPx, TyoverTx, Te, cp, Pstag, Pstag0, Wold, Mold, phi, delta;
+  long numshock,cnt;
   char *options;
   int RET;
   options = NULL;
@@ -112,23 +112,26 @@ int main ( int argc, char **argv ) {
 
   mdot=W0*U0*P0/T0/Rgas;
   fprintf ( stdout,
-             "Altitude [m]  : %E\n"
-             "Ms            : %E\n"
-             "mdot [kg/ms]  : %E\n"
-             "gamma         : %E\n"
-             "Rgas [J/kgK]  : %E\n",
+             "Altitude: %E m\n"
+             "Ms      : %E\n"
+             "mdot    : %E kg/sm\n"
+             "gamma   : %E\n"
+             "Rgas    : %E J/kgK\n",
              altitude, Ms, mdot, gamma, Rgas );
     
   fprintf (stdout, "\n"
-              "W0 [m]      : %E\n"
-              "P0 [Pa]     : %E\n"
-              "T0 [K]      : %E\n"
-              "U0 [m/s]    : %E\n"
-              "M0          : %E\n"
-              "Pstag0 [Pa] : %E\n",
+              "W0      : %E m\n"
+              "P0      : %E Pa\n"
+              "T0      : %E K\n"
+              "U0      : %E m/s\n"
+              "M0      : %E\n"
+              "Pstag0  : %E Pa\n",
              W0, P0, T0, U0, M0, Pstag0 );
-
+  M=M0;
+  W=W0;
   for (cnt=1; cnt<=numshock; cnt++){
+    Mold=M;
+    Wold=W;
     // total enthalpy is conserved through the shocks
     H=H1;
     // all shocks have equal strength so T2/T0=T3/T2=T4/T3 etc
@@ -137,15 +140,22 @@ int main ( int argc, char **argv ) {
     U=sqrt((H-cp*T)*2.0);
     M=U/sqrt(gamma*Rgas*T);
     Pstag=P*pow(1.0+(gamma-1.0)/2.0*M*M,gamma/(gamma-1.0));
+    // mass conservation yields flow height W
     W = W0 * ( P0 / T0 * U0 ) / ( P / T * U );
+    // find shock angle
+    phi=asin(Ms/Mold);
+    // find turning angle
+    delta=phi-asin(W/Wold*sin(phi));
     fprintf (stdout, "\n"
-              "W%ld [m]      : %E\n"
-              "P%ld [Pa]     : %E\n"
-              "T%ld [K]      : %E\n"
-              "U%ld [m/s]    : %E\n"
-              "M%ld          : %E\n"
-              "Pstag%ld [Pa] : %E\n",
-             cnt,W, cnt,P, cnt,T, cnt,U, cnt,M, cnt,Pstag );
+              "W%ld      : %E m\n"
+              "P%ld      : %E Pa\n"
+              "T%ld      : %E K\n"
+              "U%ld      : %E m/s\n"
+              "M%ld      : %E\n"
+              "Pstag%ld  : %E Pa\n"
+              "phi%ld%ld   : %E deg\n"
+              "delta%ld%ld : %E deg\n",
+             cnt,W, cnt,P, cnt,T, cnt,U, cnt,M, cnt,Pstag, cnt-1,cnt,phi/pi*180.0, cnt-1,cnt,delta/pi*180.0 );
   }
 
   return ( EXIT_SUCCESS );
