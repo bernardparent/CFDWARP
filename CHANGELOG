@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 14b
+  * in src/common.c
+    - in find_zone_intersection() and find_zone_from_argum() made sure ks,ke are given a value 
+      even in 2D. This should not make any difference when running the code but eliminates a
+      warning in valgrind
+
+
 2022 OCT 14a
   * in cycle/share/cycle_share.c
     - in process_code_runtime(), set Runtimearg.CFLinit to -1.0

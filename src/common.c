@@ -1532,11 +1532,15 @@ int find_zone_intersection(zone_t zone1, zone_t zone2, zone_t *zoneint){
   zoneint->is=max(zone2.is,zone1.is);
   zoneint->ie=min(zone2.ie,zone1.ie);
   if (zoneint->is>zoneint->ie) retval=1;
+  zoneint->js=0;
+  zoneint->je=0;
 #ifdef _2DL
   zoneint->js=max(zone2.js,zone1.js);
   zoneint->je=min(zone2.je,zone1.je);
   if (zoneint->js>zoneint->je) retval=2;
 #endif
+  zoneint->ks=0;
+  zoneint->ke=0;
 #ifdef _3DL
   zoneint->ks=max(zone2.ks,zone1.ks);
   zoneint->ke=min(zone2.ke,zone1.ke);
@@ -1922,7 +1926,8 @@ void find_zone_from_argum(char *argum, long startpos, gl_t *gl, SOAP_codex_t *co
     SOAP_fatal_error(codex,"Zone boundaries invalid: ie (%ld) can not be greater than domain_all.ie (%ld).",zone->ie,gl->domain_all.ie);
   if (zone->is<gl->domain_all.is)
     SOAP_fatal_error(codex,"Zone boundaries invalid: is (%ld) can not be less than domain_all.is (%ld).",zone->is,gl->domain_all.is);
-  
+  zone->js=0;
+  zone->je=0;
 #ifdef _2DL
   zone->js=SOAP_get_argum_long(codex,argum,startpos+1);
   zone->je=SOAP_get_argum_long(codex,argum,startpos+1+nd);
@@ -1933,6 +1938,8 @@ void find_zone_from_argum(char *argum, long startpos, gl_t *gl, SOAP_codex_t *co
   if (zone->js<gl->domain_all.js)
     SOAP_fatal_error(codex,"Zone boundaries invalid: js (%ld) can not be less than domain_all.js (%ld).",zone->js,gl->domain_all.js);
 #endif
+  zone->ks=0;
+  zone->ke=0;
 #ifdef _3DL
   zone->ks=SOAP_get_argum_long(codex,argum,startpos+2);
   zone->ke=SOAP_get_argum_long(codex,argum,startpos+2+nd);
