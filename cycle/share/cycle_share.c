@@ -1400,6 +1400,7 @@ void process_code_runtime(np_t *np, gl_t *gl, char *code_runtime, SOAP_codex_t *
   Runtimearg.POSTMODULE=FALSE;
   Runtimearg.CYCLEMODULE=FALSE;
   Runtimearg.RESETITERCOUNT=FALSE;
+  Runtimearg.CFLinit=-1.0; //setting CFLinit to an invalid value will not change the CFL
   Runtimearg.VERBOSE=FALSE;
   Runtimearg.gl_post=*gl;
   Runtimearg.domain_post=gl->domain;

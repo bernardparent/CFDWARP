@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 14a
+  * in cycle/share/cycle_share.c
+    - in process_code_runtime(), set Runtimearg.CFLinit to -1.0
+  * in src/control.c
+    - in readcontrol_actions(), set readcontrolarg.CFLinit=CFLinit
+  * in src/control.h
+    - in read_control(), added CFLinit to the list of arguments
+  * in src/main.c
+    - in write_options(), added the option -CFL to reset the CFL number
+    - in  main(), process the flag -CFL and read in CFLinit, and then add CFLinit to the 
+      arguments of read_control()
+      
+
 2022 OCT 13a
   * in tools/inlet.c
     - added output of turning angle and shock angle for every shock

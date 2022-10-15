@@ -110,163 +110,163 @@ const static longstr_t bibname[numbib]=
   };
 
 const static longstr_t bib[numbib]=
-  {//parent2002a
+  {//1 parent2002a
    "B Parent and JP Sislian. \"The Use of Domain Decomposition in Accelerating the Convergence of Quasihyperbolic Systems\", Journal of Computational Physics 179:140-169, 2002.",
 
-   //parent2011a
+   //2 parent2011a
    "B Parent, MN Shneider, and SO Macheret. \"Generalized Ohm's Law and Potential Equation in Computational Weakly-Ionized Plasmadynamics\", Journal of Computational Physics 230:1439-1453, 2011.",
 
-   //parent2012a
+   //3 parent2012a
    "B Parent. \"Positivity-Preserving High-Resolution Schemes for Systems of Conservation Laws\", Journal of Computational Physics 231:173-189, 2012.",
 
-   //parent2013a
+   //4 parent2013a
    "B Parent. \"Positivity-Preserving Flux Difference Splitting Schemes\", Journal of Computational Physics 243:194-209, 2013.",
 
-   //parent2014a
+   //5 parent2014a
    "B Parent, SO Macheret, and MN Shneider. \"Electron and Ion Transport Equations in Computational Weakly-Ionized Plasmadynamics\", Journal of Computational Physics 259:51-69, 2014.",
 
-   //parent2015a
+   //6 parent2015a
    "B Parent. \"Multidimensional Flux Difference Splitting Schemes\", AIAA Journal 53:1936-1948, 2015.",
 
-   //parent2015b
+   //7 parent2015b
    "B Parent, SO Macheret, and MN Shneider. \"Modeling Weakly-Ionized Plasmas in Magnetic Field: A New Computationally-Efficient Approach\", Journal of Computational Physics 300:779-799, 2015.",
 
-   //parent2016a
+   //8 parent2016a
    "B Parent, MN Shneider, and SO Macheret. \"Detailed Modeling of Plasmas for Computational Aerodynamics\", AIAA Journal, 54:898-911, 2016.",
 
-   //mcbride2002a
+   //9 mcbride2002a
    "BJ McBride, MJ Zehe, and S Gordon. \"NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species\", NASA TP 2002-211556, 2002.",
 
-   //maccormack2001a
+   //10 maccormack2001a
    "RW MacCormack. \"Iterative Modified Approximate Factorization\", Computers and Fluids 30:917-925, 2001.",
 
-   //bardina1994a
+   //11 bardina1994a
    "JE Bardina, \"Three-Dimensional Navier-Stokes Method with Two-Equation Turbulence Models for Efficient Numerical Simulation of Hypersonic Flows\", AIAA-94-2950, 1994.",
 
-   //briley1980a
+   //12 briley1980a
    "WR Briley and H McDonald. \"On the Structure and Use of Linearized Block Implicit Schemes\", Journal of Computational Physics 34:54-73, 1980.",
 
-   //maccormack1997a
+   //13 maccormack1997a
    "RW MacCormack. \"A New Implicit Algorithm for Fluid Flow\", 13th Computational Fluid Dynamics Conference, AIAA Paper 97-2100, 1997.",
 
-   //beam1976a
+   //14 beam1976a
    "RM Beam and RF Warming. \"An Implicit Finite-Difference Algorithm for Hyperbolic Systems in Conservation-Law-Form\", Journal of Computational Physics 22:87-110, 1976.",
 
-   //steger1981a
+   //15 steger1981a
    "JL Steger and RF Warming. \"Flux Vector Splitting of the Inviscid Gasdynamic Equations with Application to Finite-Difference Methods\", Journal of Computational Physics 40:263-293, 1981.",
 
-   //anderson1986a
+   //16 anderson1986a
    "WK Anderson, JL Thomas, and B Van Leer. \"Comparison of Finite Volume Flux Vector Splittings for the Euler Equations\", AIAA Journal 24:1453-1460, 1986.",
 
-   //vanleer1974a
+   //17 vanleer1974a
    "B Van Leer. \"Towards the Ultimate Conservation Scheme II. Monotonicity and Conservation Combined in a Second-Order Scheme\", Journal of Computational Physics 14:361-370, 1974.",
 
-   //roe1981a
+   //18 roe1981a
    "PL Roe. \"Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes\", Journal of Computational Physics 43:357-372, 1981.",
 
-   //yee1990a
+   //19 yee1990a
    "HC Yee, GH Klopfer, and JL Montagne. \"High-Resolution Shock-Capturing Schemes for Inviscid and Viscous Hypersonic Flows\", Journal of Computational Physics 88:31-61, 1990.",
 
-   //parent2016b
+   //20 parent2016b
    "B Parent. \"Multidimensional High Resolution Schemes for Viscous Hypersonic Flows\", AIAA Journal, 55:141-152, 2017.",
 
-   //parent2018a
+   //21 parent2018a
    "B Parent. \"Positivity-Preserving Dual Time Stepping Schemes for Gas Dynamics\", Journal of Computational Physics 361:391-411, 2018.",
 
-   //jachimowski1988a
+   //22 jachimowski1988a
    "CJ Jachimowski. \"An Analytical Study of the Hydrogen-Air Reaction Mechanism With Application To Scramjet Combustion\", NASA TP-2791, 1988.",
 
-   //yungster1994a
+   //23 yungster1994a
    "S Yungster and MJ Rabinowitz. \"Computation of Shock-Induced Combustion Using a Detailed Methane-Air Mechanism\", Journal of Propulsion and Power 10:609-617, 1994.",
 
-   //kundu1999a
+   //24 kundu1999a
    "KP Kundu, PF Penko, and TJ VanOverbeke. \"A Practical Mechanism for Computing Combustion in Gas Turbine Engines\", 35th Joint Propulsion Conference and Exhibit, AIAA Paper 99-2218, 1999.",
 
-   //jiang1996a
+   //25 jiang1996a
    "G Jiang and CW Shu. \"Efficient Implementation of Weighted ENO Schemes\", Journal of Computational Physics 126:202-228, 1996.",
 
-   //liu1994a
+   //26 liu1994a
    "XD Liu, S Osher, and T Chan. \"Weighted Essentially Non-Oscillatory Schemes\", Journal of Computational Physics, 115:200-212, 1994.",
 
-   //bardina1987a
+   //27 bardina1987a
    "J Bardina and CK Lombard. \"Three Dimensional Hypersonic Flow Simulations with the CSCM Implicit Upwind Navier-Stokes Method\", Proceedings of the 8th Computational Fluid Dynamics Conference, AIAA Paper 87-1114, 1987.",
 
-   //peaceman155a
+   //28 peaceman155a
    "DW Peaceman and HH Rachford. \"The Numerical Solution of Parabolic and Elliptic Differential Equations\", J. Soc. Ind. Appl. Math. 3:28-41, 1955.",
 
-   //balsara2000a
+   //29 balsara2000a
    "DS Balsara and CW Shu. \"Monotonicity Preserving Weighted Essentially Non-Oscillatory Schemes with Increasingly High Order of Accuracy\", Journal of Computational Physics 160:405-452, 2000.",
 
-   //dunn1973a
+   //30 dunn1973a
    "MG Dunn and SW Kang. \"Theoretical and Experimental Studies of Reentry Plasmas\", NASA CR-2232, 1973.",
 
-   //balsara2009a
+   //31 balsara2009a
    "DS Balsara, T Rumpf, M Dumbser, CD Munz. \"Efficient, High Accuracy ADER-WENO Schemes for Hydrodynamics and Divergence-free Magnetohydrodynamics\", Journal of Computational Physics 228:2480-2516, 2009.",
 
-   //balsara2016a
+   //32 balsara2016a
    "DS Balsara, S Garain, and CW Shu. \"An Efficient Class of WENO schemes with Adaptive Order\", Journal of Computational Physics 326:780-804, 2016.",
 
-   //levy2000a
+   //33 levy2000a
    "D Levy, G Puppo, and G Russo. \"Compact Central WENO Schemes for Multidimensional Conservation Laws\", SIAM Journal of Scientific Computing 22:656-672, 2000.",
 
-   //dumbser2007a
+   //34 dumbser2007a
    "M Dumbser and M Kaser. \"Arbitrary High Order Non-oscillatory Finite Volume Schemes on Unstructured Meshes for Linear Hyperbolic Systems\", Journal of Computational Physics, 221:693-723, 2007.",
 
-   //gottlieb1998a
+   //35 gottlieb1998a
    "S Gottlieb and CW Shu. \"Total Variation Diminishing Runge Kutta Schemes\", Mathematics of Computation, 67:73-85, 1998.",
 
-   //young1950a
+   //36 young1950a
    "DM Young. \"Iterative Methods for Solving Partial Difference Equations of Elliptic Type\", PhD thesis, Harvard University, May 1950.",
 
-   //frankel1950a
+   //37 frankel1950a
    "S Frankel, \"Convergence Rates of Iterative Treatments of Partial Differential Equations\", Mathematics of Computation 4:56-75, 1950.",
 
-   //gnoffo2004a
+   //38 gnoffo2004a
    "P Gnoffo and  JA White. \"Computational Aerothermodynamic Simulation Issues on Unstructured Grids\", 37th AIAA Thermophysics Conference, AIAA Paper 2004-2371, 2004.",
 
-   //parent2017a
+   //39 parent2017a
    "B Parent. \"Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows\", AIAA Journal, 55:141-152, 2017.",
 
-   //parent2019a
+   //40 parent2019a
    "B Parent. \"Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler Equations\", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.",
    
-   //lenard1964a
+   //41 lenard1964a
    "M Lenard. \"Ionization of Cesium and Sodium Contaminated Air in the Hypersonic Slender Body Boundary Layer\", General Electric Missile and Space Division Technical Report R64SD22, 1964.",
    
-   //park1993a
+   //42 park1993a
    "C Park. \"Review of Chemical-Kinetic Problems of Future NASA Missions, I: Earth Entries,\" Journal of Thermophysics and Heat Transfer 7:385-398, 1993.",
    
-   //park1994a
+   //43 park1994a
    "C Park, JT Howe, and RL Jaffe, \"Review of Chemical-Kinetic Problems of Future NASA Missions, II; Mars Entries,\" Journal of Thermophysics and Heat Transfer, 8:9-12, 1994.",
    
-   //smith1999a
+   //44 smith1999a
    "G Smith, D Golden, M Frenklach, N Moriarty, B Eiteneer, B Goldenberg, C Bowman, R Hanson, S Song, W Gardiner, V Lissianski, and Q Zhiwei, \"GRIMech 3.0, Chemical Kinetic Mechanism\", 1999.",
 
-   //boyd2007a
+   //45 boyd2007a
    "ID Boyd, \"Modeling of associative ionization reactions in hypersonic rarefied flows,\" Physics of Fluids 19:096102, 2007.",
 
-   //farbar2013a
+   //46 farbar2013a
    "E Farbar, ID Boyd, and A Martin. \"Numerical Prediction of Hypersonic Flowfields Including Effects of Electron Translational Nonequilibrium\", Journal of Thermophysics and Heat Transfer, 24:593-606, 2013.",
    
-   //parent2007a
+   //47 parent2007a
    "B Parent, SO Macheret, MN Shneider and N Harada. \"Numerical Study of an Electron-Beam-Confined Faraday Accelerator\", Journal of Propulsion and Power, 23(5):1023-1032, 2007.",
    
-   //kim2021a 
+   //48 kim2021a 
    "Kim, Jae Gang, and Sung Min Jo. \"Modification of chemical-kinetic parameters for 11-air species in re-entry flows.\" International Journal of Heat and Mass Transfer 169:120950, 2021.",
 
-   //parent2022a 
+   //49 parent2022a 
    "Parent, B. and Thoguluva Rajendran, P. and Omprakas, A.. \"Electron Losses in Hypersonic Flows.\" Physics of Fluids 34:016110, 2022.",
    
-   //zettervall2017a 
+   //50 zettervall2017a 
    "Zettervall, N., Fureby, C., and Nilsson, E. J., \"Small skeletal kinetic reaction mechanism for ethylene–air combustion.\" Energy and Fuels 31(12):14138–14149, 2017.",
    
-   //dixonlewis1984a
+   //51 dixonlewis1984a
    "Dixon-Lewis, G., \"Computer Modelling of Combustor Reactions\", Springer Verlag, 1984.",
 
-   //gupta1990a
+   //52 gupta1990a
    "Gupta, RN, Yos, JM, Thompson, RA. and Lee, KP, \"A review of reaction rates and thermodynamic and transport properties for an 11-species air model for chemical and thermal nonequilibrium calculations to 30000 K\", NASA Reference Publication 1232, 1990.",
    
-   //capitelli2015a
+   //53 capitelli2015a
    "Capitelli, M. and Bruno, D. and Larrichiuta, A. \"Fundamental Aspects of Plasma Chemical Physics, Transport\", Springer, 2015",
   };
 
@@ -1247,6 +1247,9 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
       wfprintf(stdout,"done;\n");
     }
     ((readcontrolarg_t *)codex->action_args)->module_level++;
+    if (((readcontrolarg_t *)codex->action_args)->CFLinit>0.0) {
+      ((readcontrolarg_t *)codex->action_args)->gl->CFL=((readcontrolarg_t *)codex->action_args)->CFLinit;
+    }
     if (((readcontrolarg_t *)codex->action_args)->RESETITERCOUNT) {
        ((readcontrolarg_t *)codex->action_args)->gl->iter=1;
        ((readcontrolarg_t *)codex->action_args)->gl->effiter_U=0.0;
@@ -1331,7 +1334,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
 
 
 void read_control(char *control_filename, input_t input, bool CYCLEMODULE, bool POSTMODULE, bool GRIDONLY,
-                 bool RESETITERCOUNT, np_t **np, gl_t *gl){
+                 bool RESETITERCOUNT, double CFLinit, np_t **np, gl_t *gl){
   SOAP_codex_t codex;
   long i,j,k,spec;
   readcontrolarg_t readcontrolarg;
@@ -1364,6 +1367,7 @@ void read_control(char *control_filename, input_t input, bool CYCLEMODULE, bool 
   readcontrolarg.GRIDONLY=GRIDONLY;
   readcontrolarg.CYCLEMODULE=CYCLEMODULE;
   readcontrolarg.RESETITERCOUNT=RESETITERCOUNT;
+  readcontrolarg.CFLinit=CFLinit;
   readcontrolarg.input=&input;
   readcontrolarg.module_level=0;
   code=(char *)malloc(sizeof(char));

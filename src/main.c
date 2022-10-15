@@ -59,6 +59,7 @@ void write_options ( FILE * outputfile ) {
   write_hline ( outputfile, line_width, 2 );
   write_options_row ( outputfile, "Flag", "Argument(s)", "Description", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_hline ( outputfile, line_width, 2 );
+  write_options_row ( outputfile, "-CFL", "double", "Reset CFL number", line_width, LENGTH_COL1, LENGTH_COL2 );
 #ifdef DISTMPI
   sprintf(tmpstr,"%d int",nd);
   write_options_row ( outputfile, "-dom", tmpstr, "Number of MPI domains in each dimension", line_width, LENGTH_COL1, LENGTH_COL2 );
@@ -161,6 +162,7 @@ int main ( int argc, char **argv ) {
   gl_t gl, glpost;
   zone_t postzone;
   double *xcut;
+  double CFLinit;
   long i, j, k, node_i, node_j, node_k, node_bw, numcut;
   char *control_filename, *post_filename, *postprocessor;
   bool INPUTBINARY, FOUNDCUT, WRITECONTROL, QUICK, OUTPUTBINARY, OUTPUTBINARYMPI, OUTPUTNODETYPE, OUTPUTPOSTMODULE, CYCLEMODULE,
@@ -252,6 +254,9 @@ int main ( int argc, char **argv ) {
     gl.NOSHORTTHREADS = FALSE;
 #endif
 
+  CFLinit=-1.0;
+  process_flag_double ( argc, argv, "-CFL", &CFLinit );
+    
   if ( process_flag_string ( argc, argv, "-r", &control_filename ) )
     READCONTROL = TRUE;
   if ( process_flag_string ( argc, argv, "-w", &control_filename ) )
@@ -414,7 +419,7 @@ int main ( int argc, char **argv ) {
     //if (QUICK) CYCLEMODULE=FALSE; else CYCLEMODULE=TRUE;
     if (GRIDONLY) CYCLEMODULE=FALSE; else CYCLEMODULE=TRUE;
     //CYCLEMODULE = TRUE;
-    read_control ( control_filename, input, CYCLEMODULE, OUTPUTPOSTMODULE, GRIDONLY, RESETITERCOUNT, &np, &gl );
+    read_control ( control_filename, input, CYCLEMODULE, OUTPUTPOSTMODULE, GRIDONLY, RESETITERCOUNT, CFLinit, &np, &gl );
     if ( !QUICK ) {
       gl.CONVERGED = FALSE;
       signal ( SIGUSR1, &signal_1 );

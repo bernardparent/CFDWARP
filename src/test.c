@@ -1147,7 +1147,7 @@ int main ( int argc, char **argv ) {
     if ( process_flag_string ( argc, argv, "-i", &input.name ) )
       input.READDATAFILE = TRUE;
 
-    read_control ( control_filename, input, TRUE, FALSE, FALSE, FALSE, &npArray, &gl );
+    read_control ( control_filename, input, TRUE, FALSE, FALSE, FALSE, -1.0, &npArray, &gl );
     resume_nodes_only_in_zone_and_update_bdry_nodes ( npArray, &gl, gl.domain );
     update_bdry_nodes ( npArray, &gl, gl.domain );
 

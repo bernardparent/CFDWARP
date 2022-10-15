@@ -16,6 +16,7 @@ typedef struct {
   gl_t gl_post;
   zone_t domain_post;
   input_t *input;
+  double CFLinit;
   bool VERBOSE,POSTMODULE,CYCLEMODULE,RESETITERCOUNT,GRIDONLY;
   //bool EXTRANODE;
   long module_level;
@@ -28,7 +29,7 @@ void read_control_functions(char *functionname, char **argum,
 void write_control(char *filename);
 
 void read_control(char *control_filename, input_t input, bool CYCLEMODULE, bool POSTMODULE, bool GRIDONLY,
-                 bool RESETITERCOUNT, np_t **np, gl_t *gl);
+                 bool RESETITERCOUNT, double CFLinit, np_t **np, gl_t *gl);
 
 double _x_DISTMPI_compatible(np_t *np, gl_t *gl, long i, long j, long k, long dim);
 
