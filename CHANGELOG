@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 17a
+  * in tools/chemkin2cfdwarp.c
+    - fixed a few bugs and added code to read in the species from the CHEMKIN file
+    
+    
 2022 OCT 14b
   * in src/common.c
     - in find_zone_intersection() and find_zone_from_argum() made sure ks,ke are given a value 
