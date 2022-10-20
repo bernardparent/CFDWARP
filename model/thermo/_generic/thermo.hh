@@ -3,7 +3,7 @@
 
 #define THERMO_P_REF 100000.0
 
-#define SMAP_NS 74
+#define SMAP_NS 77
 
 #define SMAP_eminus   0
 #define SMAP_O2       1
@@ -72,11 +72,14 @@
 #define SMAP_C2H4plus   64
 #define SMAP_HCO     65
 #define SMAP_HCCO    66
-#define SMAP_C3H6    67
+#define SMAP_C3H6p    67
 #define SMAP_CH2CO   68
 #define SMAP_CH3CHO  69
 #define SMAP_C3H5    70
-#define SMAP_C3H7    71
+#define SMAP_C3H7n   71
 #define SMAP_H2CC    72
-#define SMAP_CH2CHO  73
+#define SMAP_CH2S    73
+#define SMAP_CH3CO   74
+#define SMAP_C3H4p   75
+#define SMAP_C3H3p1  76
 

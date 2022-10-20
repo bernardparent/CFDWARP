@@ -114,13 +114,16 @@ const static speciesname_t speciesname[SMAP_NS]=
    "C2H4+",
    "HCO",
    "HCCO",
-   "C3H6",
+   "C3H6p",
    "CH2CO",
    "CH3CHO",
    "C3H5",
-   "C3H7",
+   "C3H7n",
    "H2CC",
-   "CH2CHO",
+   "CH2(S)",
+   "CH3CO",
+   "C3H4p",
+   "C3H3p1"
   };
 
 
@@ -206,13 +209,16 @@ const static double calM[SMAP_NS]=
    28.0526E-3,     /*C2H4+*/
    29.01804E-3,    /*HCO*/
    41.02874E-3,    /*HCCO */
-   42.07974E-3,    /*C3H6 */
+   42.07974E-3,    /*C3H6p */
    42.03668E-3,    /*CH2CO */
    44.05256E-3,    /*CH3CHO */
    41.07180E-3,    /*C3H5 */
-   43.08768E-3,    /*C3H7 */
+   43.08768E-3,    /*C3H7n */
    26.03728E-3,    /*H2CC */
-   43.04522E-3,    /*CH2CHO */
+   14.02658E-3,    /*CH2(S) */
+   43.04462E-3,    /*CH3CO */
+   40.06386E-3,    /*C3H4p */
+   39.05592E-3,    /*C3H3p1 */   
   };
 
 
@@ -286,13 +292,16 @@ const static long ck[SMAP_NS]=
    1,  /* C2H4+ */
    0,  /* HCO */
    0,  /* HCCO */
-   0,  /* C3H6 */
+   0,  /* C3H6p */
    0,  /* CH2CO */
    0,  /* CH3CHO */
    0,  /* C3H5 */
-   0,  /* C3H7 */
+   0,  /* C3H7n */
    0,  /* H2CC */
-   0,  /* CH2CHO */
+   0,    /*CH2(S) */
+   0,    /*CH3CO */
+   0,    /*C3H4p */
+   0,    /*C3H3p1 */   
   };
   
 const static long numatoms[SMAP_NS]=
@@ -364,13 +373,16 @@ const static long numatoms[SMAP_NS]=
    6,  /*C2H4+ */
    3,  /* HCO */
    4,  /* HCCO */
-   9,  /* C3H6 */
+   9,  /* C3H6p */
    5,  /* CH2CO */
    7,  /* CH3CHO */
    8,  /* C3H5 */
-   10, /* C3H7 */
+   10, /* C3H7n */
    4,  /* H2CC */
-   6,  /* CH2CHO */
+   3,    /*CH2(S) */
+   6,    /*CH3CO */
+   7,    /*C3H4p */
+   6,    /*C3H3p1 */   
   }; 
   
 

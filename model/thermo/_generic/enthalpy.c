@@ -2797,7 +2797,7 @@ const static double Pa[SMAP_NS][3][11]=
       }
     },
 
-/* species HCCO
+/* species HCCO, Ketenyl
    pos 0: Tmin lower range limit
    pos 1: Tmax upper range limit
    pos 2-8: a1,a2,...,a7
@@ -2845,7 +2845,7 @@ const static double Pa[SMAP_NS][3][11]=
       }
     },
     
-/* species C3H6
+/* species C3H6p, propylene
    pos 0: Tmin lower range limit
    pos 1: Tmax upper range limit
    pos 2-8: a1,a2,...,a7
@@ -2893,7 +2893,7 @@ const static double Pa[SMAP_NS][3][11]=
       }
     },    
     
-/* species CH2CO
+/* species CH2CO, ketene
    pos 0: Tmin lower range limit
    pos 1: Tmax upper range limit
    pos 2-8: a1,a2,...,a7
@@ -2941,7 +2941,7 @@ const static double Pa[SMAP_NS][3][11]=
       }
     },    
     
-/* species CH3CHO
+/* species CH3CHO, ethanal
    pos 0: Tmin lower range limit
    pos 1: Tmax upper range limit
    pos 2-8: a1,a2,...,a7
@@ -3037,7 +3037,7 @@ const static double Pa[SMAP_NS][3][11]=
       }
     },  
 
-/* species C3H7, n-propyl radical
+/* species C3H7n, n-propyl radical
    pos 0: Tmin lower range limit
    pos 1: Tmax upper range limit
    pos 2-8: a1,a2,...,a7
@@ -3133,7 +3133,7 @@ const static double Pa[SMAP_NS][3][11]=
       }
     },      
     
-/* species CH2CHO, vinoxy radical
+/* species CH3CO, acetyl
    pos 0: Tmin lower range limit
    pos 1: Tmax upper range limit
    pos 2-8: a1,a2,...,a7
@@ -3178,6 +3178,153 @@ const static double Pa[SMAP_NS][3][11]=
         2.044663903E-15,
         6.380088410E+04,
        -1.215350925E+02
+      }
+    },    
+
+
+/* species CH2(S)
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +200.0e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+        0.0,
+        0.0,
+        3.13501686E+00,
+        2.89593926E-03,
+       -8.16668090E-07,
+        1.13572697E-10,
+       -6.36262835E-15,
+        5.05040504E+04,
+        4.06030621E+00 
+      },
+      {
+       +1000.0e0,            /* Tmin [K] */ 
+       +6000.0e0-dTrangemin, /* Tmax [K] */
+        0.0,
+        0.0,
+        4.19331325E+00,
+       -2.33105184E-03,
+        8.15676451E-06,
+       -6.62985981E-09,
+        1.93233199E-12,
+        5.03662246E+04,
+       -7.46734310E-01
+      },
+      {
+       +6000.0e0-dTrangemin,  /* Tmin [K] */
+       +6000.0e0,             /* Tmax [K] */
+        0.0,
+        0.0,
+        4.19331325E+00,
+       -2.33105184E-03,
+        8.15676451E-06,
+       -6.62985981E-09,
+        1.93233199E-12,
+        5.03662246E+04,
+       -7.46734310E-01
+      }
+    },    
+
+
+
+/* species C3H4p, propyne
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +200.0e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       -3.563884400E+04,
+        8.328139100E+02,
+       -4.073759440E+00,
+        4.113929610E-02,
+       -4.470444950E-05,
+        2.847458197E-08,
+       -7.695298240E-12,
+        1.710206236E+04,
+        4.516720950E+01
+      },
+      {
+       +1000.0e0,            /* Tmin [K] */ 
+       +6000.0e0-dTrangemin, /* Tmax [K] */
+       3.710441420E+06,
+       -1.489145507E+04,
+        2.732397127E+01,
+       -2.645264770E-03,
+        4.858300350E-07,
+       -4.794128480E-11,
+        1.964338121E-15,
+        1.104898462E+05,
+        -1.567992462E+02
+      },
+      {
+       +6000.0e0-dTrangemin,  /* Tmin [K] */
+       +6000.0e0,             /* Tmax [K] */
+       3.710441420E+06,
+       -1.489145507E+04,
+        2.732397127E+01,
+       -2.645264770E-03,
+        4.858300350E-07,
+       -4.794128480E-11,
+        1.964338121E-15,
+        1.104898462E+05,
+        -1.567992462E+02
+      }
+    },    
+
+/* species C3H3p1 1-propynl
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/    
+    {
+      {
+       +200.0e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       -6.505859350E+04,
+        1.350858921E+03,
+       -5.825433930E+00,
+        3.756610480E-02,
+       -3.734903340E-05,
+        2.117676603E-08,
+       -5.139113250E-12,
+        4.656510530E+04,
+        5.781477550E+01
+      },
+      {
+       +1000.0e0,            /* Tmin [K] */ 
+       +6000.0e0-dTrangemin, /* Tmax [K] */
+       4.550654870E+06,
+       -1.640574172E+04,
+        2.712605991E+01,
+       -4.474600380E-03,
+        1.037712415E-06,
+       -1.250211369E-10,
+        6.026582050E-15,
+        1.534087662E+05,
+       -1.565931809E+02
+      },
+      {
+       +6000.0e0-dTrangemin,  /* Tmin [K] */
+       +6000.0e0,             /* Tmax [K] */
+       4.550654870E+06,
+       -1.640574172E+04,
+        2.712605991E+01,
+       -4.474600380E-03,
+        1.037712415E-06,
+       -1.250211369E-10,
+        6.026582050E-15,
+        1.534087662E+05,
+       -1.565931809E+02
       }
     },    
       

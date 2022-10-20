@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 20a
+  * moved model/chem/_C2H4_Air_Plasma_30s/ to model/chem/_C2H4_Air_Plasma_36s/
+  * in model/thermo/_generic/enthalpy.c, model/thermo/_generic/thermo.c, and
+    model/transport/_Dixon-Lewis/transport.c
+    - removed species CH2CHO
+    - renamed species C3H6 to C3H6p
+    - renamed species C3H7 to C3H7n
+    - added species CH2(S), CH3CO, C3H4p, C3H3p1
+    
+
 2022 OCT 17a
   * in tools/chemkin2cfdwarp.c
     - fixed a few bugs and added code to read in the species from the CHEMKIN file

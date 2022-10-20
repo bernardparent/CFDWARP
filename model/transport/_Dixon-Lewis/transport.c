@@ -158,13 +158,16 @@ const static double Peps[SMAP_NS]=
    224.7E+0,    /* C2H4+   !! fixed to the one of C2H4 */
    498.0,       /* HCO */
    150.0,       /* HCCO */
-   266.8,       /* C3H6 */
+   266.8,       /* C3H6p */
    436.0,       /* CH2CO */
    436.0,       /* CH3CHO */
    266.8,       /* C3H5 */  /* !! unknown value: fixed to the one of C3H6 */
-   266.8,       /* C3H7 */
+   266.8,       /* C3H7n */ 
    231.8,       /* H2CC */
-   436.0,       /* CH2CHO */ /* !! unknown value: fixed to the one of CH3CHO */
+   144.0,       /* CH2(S) */ /* !! unknown value: fixed to the one of CH2 */
+   436.0,       /* CH3CO */
+   252.0,       /* C3H4p */
+   252.0,       /* C3H3p1 */
   };
 
 
@@ -238,14 +241,18 @@ const static double Psig[SMAP_NS]=
    0.4163E+0,   /* C2H4+   !! fixed to the one of C2H4*/
    0.359e0,     /* HCO */
    0.25e0,      /* HCCO */
-   0.4982e0,    /* C3H6 */
+   0.4982e0,    /* C3H6p */
    0.3970e0,    /* CH2CO */
    0.3970e0,    /* CH3CHO */
-   0.4982e0,    /* C3H5 */ /* !! fixed to the one of C3H6 */
-   0.4982e0,    /* C3H7 */
+   0.4982e0,    /* C3H5 */ /* !! fixed to the one of C3H6p */
+   0.4982e0,    /* C3H7n */ 
    0.4033e0,    /* H2CC */
-   0.3970e0,    /* CH2CHO */ /* !! unknown value: fixed to the one of CH3CHO */
+   0.3800E+0,   /* CH2(S) */ /* !! fixed to the one of CH2 */
+   0.397E0,     /* CH3CO */
+   0.476E0,     /* C3H4p */
+   0.476E0,     /* C3H3p1 */
   };
+
 
 static double _Omega11(double T, double eps){
   double tmp;

@@ -3,10 +3,14 @@ echo "Removing proprietary directory .././model/chem/_C12H23_Cs_Air_Plasma_21s"
 rm -rf .././model/chem/_C12H23_Cs_Air_Plasma_21s 
 cp -a _proprietary .././model/chem/_C12H23_Cs_Air_Plasma_21s 
 ( printf "current C12H23_Cs_Air_Plasma_21s\nEND" ) > .././model/chem/_C12H23_Cs_Air_Plasma_21s/.config 
-echo "Removing proprietary directory .././model/chem/_C2H4_Air_Plasma_30s"
-rm -rf .././model/chem/_C2H4_Air_Plasma_30s 
-cp -a _proprietary .././model/chem/_C2H4_Air_Plasma_30s 
-( printf "current C2H4_Air_Plasma_30s\nEND" ) > .././model/chem/_C2H4_Air_Plasma_30s/.config 
+echo "Removing proprietary directory .././model/chem/_C2H4_Air_30s"
+rm -rf .././model/chem/_C2H4_Air_30s 
+cp -a _proprietary .././model/chem/_C2H4_Air_30s 
+( printf "current C2H4_Air_30s\nEND" ) > .././model/chem/_C2H4_Air_30s/.config 
+echo "Removing proprietary directory .././model/chem/_C2H4_Air_Plasma_36s"
+rm -rf .././model/chem/_C2H4_Air_Plasma_36s 
+cp -a _proprietary .././model/chem/_C2H4_Air_Plasma_36s 
+( printf "current C2H4_Air_Plasma_36s\nEND" ) > .././model/chem/_C2H4_Air_Plasma_36s/.config 
 echo "Removing proprietary directory .././model/chem/_Cs_Air_Plasma_11s"
 rm -rf .././model/chem/_Cs_Air_Plasma_11s 
 cp -a _proprietary .././model/chem/_Cs_Air_Plasma_11s 
