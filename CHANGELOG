@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 21b
+  * in model/chem
+    - added _C2H4_Air_3s_0r
+  * in model/fluid/_Favre-Reynolds_Tv
+    - modified fluid.c, fluid.hh, fluid_source.c to add heat addition Qadd and Fbody forces
+  * in model/share/fluid_share.c
+    - in find_Sheatforces(), fixed a bug that was introduced in 22oct20b: the body forces and heat
+      addition should not be multiplied by Omega
+      
+
 2022 OCT 21a
   * in model/chem/_C2H4_Air_Plasma_36s/chem.c
     - added COMBUSTIONMODEL_ZETTERVALL2017B

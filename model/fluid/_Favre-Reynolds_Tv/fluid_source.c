@@ -102,7 +102,7 @@ void find_Schem(np_t *np, gl_t *gl, long l, flux_t S){
 
 
 void find_Sstar(np_t *np, gl_t *gl, long l, flux_t S){
-  flux_t Schem,St_norm,St_comp,Saxisymmetric,Svib;
+  flux_t Schem,St_norm,St_comp,Saxisymmetric,Svib,Sheatforces;
   long flux;
 
   if (gl->model.fluid.REACTING) find_Schem(np,gl,l,Schem);
@@ -113,11 +113,12 @@ void find_Sstar(np_t *np, gl_t *gl, long l, flux_t S){
     else set_vector_to_zero(St_comp);
   find_Svib(np, gl, l, Svib);
   find_Saxi(np, gl, l, Saxisymmetric);
+  find_Sheatforces(np, gl, l, Sheatforces);
 
   for (flux=0; flux<nf; flux++){
     S[flux]=_Omega(np[l],gl)*(
             Saxisymmetric[flux]+St_norm[flux]+
-            St_comp[flux]+Schem[flux]+Svib[flux]
+            St_comp[flux]+Schem[flux]+Svib[flux]+Sheatforces[flux]
             );
   }
 }

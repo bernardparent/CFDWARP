@@ -152,12 +152,12 @@ void read_disc_fluid_actions(char *actionname, char **argum, SOAP_codex_t *codex
 void find_Sheatforces(np_t *np, gl_t *gl, long l, flux_t S){
   long dim;
   set_vector_to_zero(S);
-  S[fluxet]+=np[l].bs->Qadd*_Omega(np[l],gl);
+  S[fluxet]+=np[l].bs->Qadd;
   if (!np[l].bs->FBODY) fatal_error("Body forces not initialized properly within Model(). Exiting.");
   if (!np[l].bs->QADD) fatal_error("Head addition not initialized properly within Model(). Exiting.");
   for (dim=0; dim<nd; dim++) {
-    S[fluxmom+dim]+=np[l].bs->Fbody[dim]*_Omega(np[l],gl);
-    S[fluxet]+=np[l].bs->Fbody[dim]*_V(np[l],dim)*_Omega(np[l],gl);
+    S[fluxmom+dim]+=np[l].bs->Fbody[dim];
+    S[fluxet]+=np[l].bs->Fbody[dim]*_V(np[l],dim);
   }  
 }
 
