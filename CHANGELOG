@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 21a
+  * in model/chem/_C2H4_Air_Plasma_36s/chem.c
+    - added COMBUSTIONMODEL_ZETTERVALL2017B
+  * in model/chem/_C2H4_Air_Plasma_36s/
+    - added zettervall2017b.c
+  
+
 2022 OCT 20b
   * in model/fluid/_Favre-Reynolds/fluid_source.c, model/fluid/_Navier-Stokes/fluid_source.c,
     model/fluid/_Navier-Stokes_perfect/fluid_source.c, model/fluid/_Navier-Stokes_plasma/fluid_source.c
