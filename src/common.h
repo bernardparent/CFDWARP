@@ -405,6 +405,9 @@ typedef struct {
 #ifndef NDEBUG
   bool TSEMF_UPDATED;
 #endif
+#ifdef _FLUID_FBODY_QADD
+   bool FBODY,QADD;   
+#endif
 
 } npbs_t;
 

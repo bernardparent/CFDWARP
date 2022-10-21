@@ -11,6 +11,7 @@
   #define TEST_VANISH 1.0e0
 #endif
 
+void find_Sheatforces(np_t *np, gl_t *gl, long l, flux_t S);
 
 void read_model_fluid_actions_Fbody_Qadd(char *actionname, char **argum, SOAP_codex_t *codex);
 

@@ -945,6 +945,10 @@ void create_node(np_t *np, long i, long j, long k){
   np->bs->tsemfnode=NULL;
   np->bs->tsemfnodenum=0;
 #endif
+#ifdef _FLUID_FBODY_QADD
+  np->bs->FBODY=FALSE;
+  np->bs->QADD=FALSE;
+#endif
 #ifdef MLOCK
   if (!(mlock(np->bs,sizeof(npbs_t)) &&
           mlock(np->wk,sizeof(npwk_t)) &&

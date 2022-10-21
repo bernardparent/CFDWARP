@@ -36,19 +36,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void find_Sstar(np_t *np, gl_t *gl, long l, flux_t S){
   long flux;
   long dim;
-  flux_t Saxi;
+  flux_t Saxi,Sheatforces;
 
   for (flux=0; flux<nf; flux++){
     S[flux]=0.0;
   }
-  S[nd+1]=np[l].bs->Qadd*_Omega(np[l],gl);
-  for (dim=0; dim<nd; dim++) {
-    S[1+dim]=np[l].bs->Fbody[dim]*_Omega(np[l],gl);
-    S[1+nd]+=np[l].bs->Fbody[dim]*_V(np[l],dim)*_Omega(np[l],gl);
-  }
-
+  find_Sheatforces(np, gl, l, Sheatforces);
   find_Saxi(np,gl,l,Saxi);
-  for (flux=0; flux<nf; flux++) S[flux]+=_Omega(np[l],gl)*(Saxi[flux]);
+  for (flux=0; flux<nf; flux++) S[flux]+=_Omega(np[l],gl)*(Saxi[flux]+Sheatforces[flux]);
 }
 
 

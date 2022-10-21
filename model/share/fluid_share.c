@@ -148,6 +148,20 @@ void read_disc_fluid_actions(char *actionname, char **argum, SOAP_codex_t *codex
 
 
 #ifdef _FLUID_FBODY_QADD
+
+void find_Sheatforces(np_t *np, gl_t *gl, long l, flux_t S){
+  long dim;
+  set_vector_to_zero(S);
+  S[fluxet]+=np[l].bs->Qadd*_Omega(np[l],gl);
+  if (!np[l].bs->FBODY) fatal_error("Body forces not initialized properly within Model(). Exiting.");
+  if (!np[l].bs->QADD) fatal_error("Head addition not initialized properly within Model(). Exiting.");
+  for (dim=0; dim<nd; dim++) {
+    S[fluxmom+dim]+=np[l].bs->Fbody[dim]*_Omega(np[l],gl);
+    S[fluxet]+=np[l].bs->Fbody[dim]*_V(np[l],dim)*_Omega(np[l],gl);
+  }  
+}
+
+
 void read_model_fluid_actions_Fbody_Qadd(char *actionname, char **argum, SOAP_codex_t *codex){
   long i,j,k,dim;
   zone_t zone;
@@ -171,6 +185,7 @@ void read_model_fluid_actions_Fbody_Qadd(char *actionname, char **argum, SOAP_co
     for_ijk(zone,is,js,ks,ie,je,ke){
           if (is_node_in_zone(i, j, k, gl->domain_lim)){
             (*np)[_ai(gl,i,j,k)].bs->Qadd=SOAP_get_argum_double(codex,*argum,2*nd);
+            (*np)[_ai(gl,i,j,k)].bs->QADD=TRUE;
           }
     }
     codex->ACTIONPROCESSED=TRUE;    
@@ -185,6 +200,7 @@ void read_model_fluid_actions_Fbody_Qadd(char *actionname, char **argum, SOAP_co
     for_ijk(zone,is,js,ks,ie,je,ke){
           if (is_node_in_zone(i, j, k, gl->domain_lim)){
             for (dim=0; dim<nd; dim++) (*np)[_ai(gl,i,j,k)].bs->Fbody[dim]=SOAP_get_argum_double(codex,*argum,2*nd+dim);
+            (*np)[_ai(gl,i,j,k)].bs->FBODY=TRUE;
           }
     }
     codex->ACTIONPROCESSED=TRUE;

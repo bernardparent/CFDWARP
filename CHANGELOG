@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 20b
+  * in model/fluid/_Favre-Reynolds/fluid_source.c, model/fluid/_Navier-Stokes/fluid_source.c,
+    model/fluid/_Navier-Stokes_perfect/fluid_source.c, model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Sstar(), added call to find_Sheatforces() and modified function accordingly
+  * in model/share/fluid_share.c
+    - added function find_Sheatforces()
+    - in read_model_fluid_actions_Fbody_Qadd(), added (*np)[_ai(gl,i,j,k)].bs->QADD=TRUE
+      and (*np)[_ai(gl,i,j,k)].bs->FBODY=TRUE; for all nodes where the body forces and
+      heat added is initialized
+  * in src/common.c
+    - in create_node(), added np->bs->FBODY=FALSE; and np->bs->QADD=FALSE;
+  * in src/common.h
+    - in npbs_t, added bool FBODY,QADD
+    
+
 2022 OCT 20a
   * moved model/chem/_C2H4_Air_Plasma_30s/ to model/chem/_C2H4_Air_Plasma_36s/
   * in model/thermo/_generic/enthalpy.c, model/thermo/_generic/thermo.c, and

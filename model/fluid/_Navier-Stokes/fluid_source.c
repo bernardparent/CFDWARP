@@ -54,25 +54,17 @@ static void find_Schem(np_t *np, gl_t *gl, long l, flux_t S){
 
 
 void find_Sstar(np_t *np, gl_t *gl, long l, flux_t S){
-  flux_t Schem,Saxisymmetric;
-  long flux,dim;
+  flux_t Schem,Saxisymmetric,Sheatforces;
+  long flux;
 
   if (gl->model.fluid.REACTING) find_Schem(np,gl,l,Schem);
     else set_vector_to_zero(Schem);
   find_Saxi(np, gl, l, Saxisymmetric);
-
+  find_Sheatforces(np, gl, l, Sheatforces);
   for (flux=0; flux<nf; flux++){
-    S[flux]=_Omega(np[l],gl)*(Saxisymmetric[flux]+Schem[flux]);
-  }
-
-  S[ns+nd]+=np[l].bs->Qadd*_Omega(np[l],gl);
-  for (dim=0; dim<nd; dim++) {
-    S[ns+dim]+=np[l].bs->Fbody[dim]*_Omega(np[l],gl);
-    S[ns+nd]+=np[l].bs->Fbody[dim]*_V(np[l],dim)*_Omega(np[l],gl);
+    S[flux]=_Omega(np[l],gl)*(Saxisymmetric[flux]+Schem[flux]+Sheatforces[flux]);
   }
 }
-
-
 
 
 static void find_dSchem_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
