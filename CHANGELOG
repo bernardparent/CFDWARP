@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 21c
+  * in model/fluid/_Favre-Reynolds_plasma
+    - modified fluid.c, fluid.hh, fluid_source.c to add heat addition Qadd and Fbody forces
+
+
 2022 OCT 21b
   * in model/chem
     - added _C2H4_Air_3s_0r
