@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 23a
+  * in tools/inlet.c
+    - added stagnation temperatures to the output 
+    
+
 2022 OCT 21d
   * in model/fluid/_Favre-Reynolds_plasma/fluid.c
     - in find_Kstar_interface(), fixed a bug: the turbulence contribution to kappa was not included
