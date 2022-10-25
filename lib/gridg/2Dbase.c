@@ -913,7 +913,7 @@ static double _x(GRIDG_xygrid_t grid, long dim){
 
 /* this function finds the x,y coordinates of "ghost nodes" located outside the grid
    limits by "mirroring" the inner within the grid with respect to the boundary plane */ 
-static void find_xy_on_ghost_nodes(GRIDG_xygrid_t *grid, GRIDG_gl2d_t gl){
+void find_xy_on_ghost_nodes(GRIDG_xygrid_t *grid, GRIDG_gl2d_t gl){
   long dim,i,j;
   EXM_vec3D_t pa,pb,pc,pp_o,pp_m;
 
@@ -1020,7 +1020,7 @@ void GRIDG_read_grid_2D_from_file(char *filename, GRIDG_gl2d_t *gl2d, GRIDG_xygr
   read_RX_grid(filename, "Grid", &RXGrid2D, &GRIDG_write_grid_2D_to_file,
              &actionsarg2D, VERBOSE);
   verify_all_nodes_initialized(*gl2d, *xygrid);  
-  find_xy_on_ghost_nodes(*xygrid, *gl2d);
+  //find_xy_on_ghost_nodes(*xygrid, *gl2d);
 }
 
 
@@ -1038,7 +1038,7 @@ void GRIDG_read_grid_2D_from_argum(char *argum, SOAP_codex_t *codex, GRIDG_gl2d_
   codex->function_args=&actionsarg2D;
   SOAP_process_code(argum, codex, SOAP_VARS_KEEP_ALL);
   verify_all_nodes_initialized(*gl2d, *xygrid);
-  find_xy_on_ghost_nodes(*xygrid, *gl2d);
+  //find_xy_on_ghost_nodes(*xygrid, *gl2d);
 }
 
 

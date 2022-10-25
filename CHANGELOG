@@ -6,6 +6,16 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2022 OCT 24a
+  * in lib/gridg/2Dbase.c 
+    - in GRIDG_read_grid_2D_from_argum and GRIDG_read_grid_2D_from_file, removed call to
+      find_xy_on_ghost_nodes(). This is not needed anymore and leads to an assert error when 
+      building certain types of meshes.
+  * in lib/gridg/3Dbase.c 
+    - in GRIDG_read_grid_3D_from_argum and GRIDG_read_grid_3D_from_file, removed call to
+      find_xyz_on_ghost_nodes(). This is not needed anymore and leads to an assert error when 
+      building certain types of meshes.
+
 
 2022 OCT 23a
   * in tools/inlet.c
