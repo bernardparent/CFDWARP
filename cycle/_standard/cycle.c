@@ -64,7 +64,7 @@ void write_runtime_template(FILE **controlfile){
 #endif
   ",TSEMF_SOR,500); {optional extra parameters:  tsemfmethod [TSEMF_ADI, TSEMF_DDADI, TSEMF_IMAF, etc] and numsubiter_tsemf [default: 4] if supported}\n"
 #endif
-  "    printf(\"%%6.2f %%6ld %%9.3f   %%E (%%4ld"
+  "    printf(\"%%6.2f %%6ld %%9.3f   %%E (%%2ld %%4ld"
 #ifdef _2DL
                   ",%%4ld"
 #endif
@@ -83,7 +83,7 @@ void write_runtime_template(FILE **controlfile){
                   ")"
 #endif
                   "  %%s\\n\",\n"
-  "           CFL,iter,effiter_U,ximax,i_ximax,\n"
+  "           CFL,iter,effiter_U,ximax,flux_ximax,i_ximax,\n"
   "           "
 #ifdef _2DL
                   "j_ximax,"

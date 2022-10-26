@@ -1003,6 +1003,7 @@ bool resume_node(np_t *np){
                          xi is read later on in cycle_share.c in find_ximax,
                          xi is sometimes not a numerical quantity. Need to
                          understand why this is so.. */
+    np->wk->flux_xi=-1;
     np->status='A';
 #ifdef ZONETHREADS
     thread_lock_init(&(np->wk->lock), THREADTYPE_ZONE);

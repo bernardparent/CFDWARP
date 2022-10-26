@@ -126,11 +126,10 @@ Bdry(
     All(BDRY_OUTFLOWSUPERSONIC1);
     Plane("i",is,BDRY_SYMMETRICAL1);
     Plane("i",ie,BDRY_SYMMETRICAL1);
-    Plane("j",js,BDRY_CYLINDERSURFACE);
-    Plane("j",je,BDRY_FREESTREAM1, Vx,Vy,P);
+    Plane("j",js,BDRY_CYLINDERSURFACE,T);
+    Plane("j",je,BDRY_FREESTREAM1, Vx,Vy,P,T);
     
-{    Param(is,js,ie,je, BDRY_FREESTREAM1, Vx,Vy,P,T);
-}    for(j,js+1,je-1,
+    for(j,js+1,je-1,
       Link(ie,j, is+1,j);
       Link(ie-1,j, is,j);
     );
@@ -152,7 +151,8 @@ Bdry(
  
 Model(
   NavierStokesPerfect(
-    kappa=0.03;     {W/mK}
+    ETAMODEL=ETAMODEL_CONSTANT;     
+    Pr=0.71;    
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e1;     Tmax=6.0e3;    {K}
     AXISYMMETRIC=FALSE;
@@ -296,8 +296,8 @@ Cycle(
     );
     CFL=min(CFL*1.03,1.5);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
-    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
-           CFL,iter,effiter_U,ximax,i_ximax,
+    printf("%6.2f %6ld %9.3f   %E (%2ld,%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,flux_ximax,i_ximax,
            j_ximax,clipinfo);
   );
 );

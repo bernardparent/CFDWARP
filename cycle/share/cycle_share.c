@@ -1228,6 +1228,9 @@ void update_runtime_codex_xi_from_gl(gl_t *gl, SOAP_codex_t *codex){
   ximaxrank.rank=rank;
   MPI_Allreduce(&ximaxrank, &ximaxrank_max, 1, MPI_DOUBLE_INT, MPI_MAXLOC, MPI_COMM_WORLD);
   add_double_to_codex(codex,"ximax",ximaxrank_max.ximax);
+  ijk_ximax=gl->flux_ximax;
+  MPI_Bcast(&ijk_ximax,1,MPI_LONG,ximaxrank_max.rank,MPI_COMM_WORLD);
+  add_int_to_codex(codex,"flux_ximax",ijk_ximax);
   ijk_ximax=gl->i_ximax;
   MPI_Bcast(&ijk_ximax,1,MPI_LONG,ximaxrank_max.rank,MPI_COMM_WORLD);
   add_int_to_codex(codex,"i_ximax",ijk_ximax);
@@ -1262,6 +1265,7 @@ void update_runtime_codex_xi_from_gl(gl_t *gl, SOAP_codex_t *codex){
 #endif//_3DL
 #else//DISTMPI
   add_double_to_codex(codex,"ximax",gl->ximax);
+  add_int_to_codex(codex,"flux_ximax",gl->flux_ximax);
   add_int_to_codex(codex,"i_ximax",gl->i_ximax);
 #ifdef EMFIELD
   add_double_to_codex(codex,"ximax_emfield",gl->ximax_emfield);
@@ -1460,6 +1464,7 @@ void find_ximax(np_t *np, gl_t *gl, zone_t zone, int IJK_UPDATE){
           if (xi>=gl->ximax) {
             gl->ximax=xi;
             if (IJK_UPDATE==IJK_UPDATE_YES) {
+              gl->flux_ximax=np[_ai(gl,i,j,k)].wk->flux_xi;
               gl->i_ximax=i;
               gl->j_ximax=j;
               gl->k_ximax=k;
@@ -1974,19 +1979,22 @@ void check_residual(np_t *np, gl_t *gl, zone_t zone){
 }
 
 
-double _xi(np_t np, gl_t *gl, flux_t Res){
+void find_xi(np_t np, gl_t *gl, flux_t Res, double *xi, long *flux_xi){
   long flux;
-  double xi,xitmp;
+  double xitmp;
   assert_np(np,is_node_resumed(np));
-  xi=0.0;
+  *xi=0.0;
+  *flux_xi=-1;
   for (flux=0; flux<nf; flux++) {
     xitmp=fabs(Res[flux]/_Omega(np,gl)/gl->cycle.fluid.Uref[flux]);
-    xi=max(xi,xitmp);
+    if (xitmp>*xi) {
+      *xi=max(*xi,xitmp);
+      *flux_xi=flux;
+    }
     if (isnan(xitmp)){
-      fatal_error("problem computing xitmp in function _xi() in cycle_share.c;\n   xitmp=%E\n   Res[%ld]=%E\n   Omega=%E\n   Uref[%ld]=%E\n",xitmp,flux,Res[flux],_Omega(np,gl),flux,gl->cycle.fluid.Uref[flux]);
+      fatal_error("problem computing xitmp in function find_xi() in cycle_share.c;\n   xitmp=%E\n   Res[%ld]=%E\n   Omega=%E\n   Uref[%ld]=%E\n",xitmp,flux,Res[flux],_Omega(np,gl),flux,gl->cycle.fluid.Uref[flux]);
     } 
   }
-  return(xi);
 }
 
 

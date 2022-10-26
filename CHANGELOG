@@ -6,6 +6,29 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2022 OCT 25a
+  * in cycle/_*/cycle.c
+    - in write_runtime_template(), added the parameter flux_ximax
+  * in cycle/res/_generic/res.c
+    - in update_residual(), calls find_xi() instead of _xi()
+  * in cycle/share/cycle_share.c
+    - in update_runtime_codex_xi_from_gl(), made modifications for flux_ximax
+    - renamed function _xi() to find_xi() 
+    - in find_xi(), added flux_xi as a parameter
+  * in model/share/fluid_share.c
+    - in find_init_mass_fraction_templates() and find_init_molar_fraction_templates()
+      added code so that w_default or chi_default is not added when the species are limited
+      to O2 and N2
+  * in src/common.c
+    - in resume_node(), added initialization of flux_xi to -1
+  * in src/common.h
+    - in gl_t added flux_ximax
+    - in npwk_t added flux_xi
+  * in src/main.c
+    - in main(), added gl.flux_ximax to the output when OUTPUTRESIDUAL is called
+    
+
 2022 OCT 24a
   * in lib/gridg/2Dbase.c 
     - in GRIDG_read_grid_2D_from_argum and GRIDG_read_grid_2D_from_file, removed call to

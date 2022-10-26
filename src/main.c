@@ -459,7 +459,7 @@ int main ( int argc, char **argv ) {
       if ( OUTPUTRESIDUAL ) {
         wfprintf ( stdout, "Finding maximum residual..\n" );
         check_residual ( np, &gl, gl.domain );
-        wfprintf ( stdout, "ximax=%E (%ld" if2DL ( ", %ld" ) if3DL ( ", %ld" ) ")\n", gl.ximax, gl.i_ximax
+        wfprintf ( stdout, "ximax=%E (%ld, %ld" if2DL ( ", %ld" ) if3DL ( ", %ld" ) ")\n", gl.ximax, gl.flux_ximax, gl.i_ximax
 #ifdef _2DL
                    , gl.j_ximax
 #endif

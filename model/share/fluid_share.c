@@ -2252,12 +2252,14 @@ void find_init_mass_fraction_templates(char **specstr1, char **specstr2){
   *specstr2=(char *)realloc(*specstr2,1000*sizeof(char));
   #if (defined(specN2) && defined(specO2))
     strcpy(*specstr1,
-    "    Species(\"O2\", \"N2\", \"default\");\n"
+    "    Species(\"O2\", \"N2\"");
+    if (ns>2) strcat(*specstr1,", \"default\");\n"); else strcpy(*specstr1,");\n");
+    strcat(*specstr1,
     "    w_O2=0.235;\n"
-    "    w_N2=0.765;\n"
-    "    w_default=1e-30;\n"
-    );  
-    strcpy(*specstr2, ",w_O2,w_N2,w_default");
+    "    w_N2=0.765;\n");
+    if (ns>2) strcat(*specstr1,"    w_default=1e-30;\n");
+    strcat(*specstr2, ",w_O2,w_N2");
+    if (ns>2) strcat(*specstr2, ",w_default");
   #endif
   #if (defined(specN2) && !defined(specO2))
     strcpy(*specstr1,
@@ -2348,12 +2350,14 @@ void find_init_molar_fraction_templates(char **specstr1, char **specstr2){
     "    chi_N2=0.79;\n"
     );
     strcat(*specstr1,chargedstr1);
-    strcat(*specstr1,
-    "    chi_default=1e-30;\n"
-    );  
+    if (ns>2){
+      strcat(*specstr1,
+      "    chi_default=1e-30;\n"
+      );
+    }
     strcpy(*specstr2, ",chi_O2,chi_N2");
     strcat(*specstr2, chargedstr2);
-    strcat(*specstr2, ",chi_default");
+    if (ns>2) strcat(*specstr2, ",chi_default");
   #endif
   #if (defined(specN2) && !defined(specO2))
     strcpy(*specstr1,

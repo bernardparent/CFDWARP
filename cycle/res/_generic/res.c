@@ -434,7 +434,7 @@ void update_residual(np_t *np, gl_t *gl, long theta, long ls, long le){
 
 
   for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)) {
-    np[l].wk->xi=_xi(np[l],gl,np[l].wk->Res);
+    find_xi(np[l],gl,np[l].wk->Res,&(np[l].wk->xi),&(np[l].wk->flux_xi));
     if (theta==0){
       thread_lock_global_set(gl, THREADTYPE_LOOP);
       gl->effiter_R+=1.0/(double)(gl->nn);

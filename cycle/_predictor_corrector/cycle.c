@@ -57,7 +57,7 @@ void write_runtime_template(FILE **controlfile){
   );
   wfprintf(*controlfile,
   "    UpdateFluid(dt);\n"
-  "    printf(\"%%E %%6ld %%9.3f   %%E (%%4ld"
+  "    printf(\"%%E %%6ld %%9.3f   %%E (%%2ld %%4ld"
 #ifdef _2DL
                   ",%%4ld"
 #endif
@@ -66,7 +66,7 @@ void write_runtime_template(FILE **controlfile){
 #endif
                   ")"
                   "  %%s\\n\",\n"
-  "           time,iter,effiter_U,ximax,i_ximax,\n"
+  "           time,iter,effiter_U,ximax,flux_ximax,i_ximax,\n"
   "           "
 #ifdef _2DL
                   "j_ximax,"

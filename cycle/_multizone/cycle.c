@@ -86,7 +86,7 @@ void write_runtime_template(FILE **controlfile){
   );
 
   wfprintf(*controlfile,
-  "    printf(\"%%6.2f %%6ld %%9.3f   %%E (%%4ld"
+  "    printf(\"%%6.2f %%6ld %%9.3f   %%E (%%2ld %%4ld"
 #ifdef _2DL
                   ",%%4ld"
 #endif
@@ -105,7 +105,7 @@ void write_runtime_template(FILE **controlfile){
                   ")"
 #endif
 		    "%%s \\n\",\n"
-  "           CFL,iter,effiter_U,ximax,i_ximax,\n"
+  "           CFL,iter,effiter_U,ximax,flux_ximax,i_ximax,\n"
   "           "
 #ifdef _2DL
                   "j_ximax,"

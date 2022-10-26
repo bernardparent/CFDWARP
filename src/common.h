@@ -211,7 +211,7 @@ typedef struct {
   double Lc,relaxEMF;
   long tsemfmethod,numsubiter_tsemf;
 #endif
-  long i_ximax,j_ximax,k_ximax;
+  long flux_ximax,i_ximax,j_ximax,k_ximax;
 #if defined(UNSTEADY)
   double time,dt;
 #endif
@@ -253,6 +253,7 @@ typedef struct {
 /* the np working variables */
 typedef struct {
    double xi,dtau;
+   long flux_xi;
    flux_t Res;
 
    /* zone threading lock */

@@ -71,7 +71,7 @@ void write_runtime_template(FILE **controlfile){
   );
 
   wfprintf(*controlfile,
-  "    printf(\"%%6.2f %%4ld %%4ld %%6ld %%9.3f   %%E (%%4ld"
+  "    printf(\"%%6.2f %%4ld %%4ld %%6ld %%9.3f   %%E (%%2ld %%4ld"
 #ifdef _2DL
                ",%%4ld"
 #endif
@@ -90,7 +90,7 @@ void write_runtime_template(FILE **controlfile){
                   ")"
 #endif
 		  "  %%s \\n\",\n"
-  "           CFL,window.is,window.ie,iter,effiter_U,ximax,i_ximax,\n"
+  "           CFL,window.is,window.ie,iter,effiter_U,ximax,flux_ximax,i_ximax,\n"
   "           "
 #ifdef _2DL
                "j_ximax,"
@@ -144,6 +144,7 @@ static void resize_marching_window(np_t *np, gl_t *gl, zone_t oldwindow, zone_t 
           if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)) {
             assert(is_node_resumed(np[_ai(gl,i,j,k)]));
             np[_ai(gl,i,j,k)].wk->xi=0.0e0;
+            np[_ai(gl,i,j,k)].wk->flux_xi=0;
             for (flux=0; flux<nf; flux++) np[_ai(gl,i,j,k)].wk->Res[flux]=0.0e0;
           }
         }

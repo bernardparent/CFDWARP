@@ -113,7 +113,7 @@ void free_multizone(multizone_t *multizone);
 
 void exchange_U(np_t *np, gl_t *gl);
 
-double _xi(np_t np, gl_t *gl, flux_t Res);
+void find_xi(np_t np, gl_t *gl, flux_t Res, double *xi, long *flux_xi);
 
 void find_constant_dtau(np_t *np, gl_t *gl, long l, double *dtau);
 
