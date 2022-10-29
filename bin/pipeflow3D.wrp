@@ -1,0 +1,383 @@
+{
+  _______________________________________________________________________________________________
+
+                                           C F D W A R P
+
+                                CFD Code for Plasma & Reactive Flow
+  _______________________________________________________________________________________________
+
+  Version                          22oct25a
+  Compiler                         gcc 8.3.0 with OPENMP threads with assertions
+  Compiled on                      Oct 28 2022 at 15:42:28
+  Cycle Strategy                   Standard
+  Fluid Relaxation                 Block ADI [1,2]
+  EM Field Relaxation              None
+  Convection Discretization        Reconstruction-Evolution MUSCL with flux FVS [3], FDS [5],
+                                   and primitive interpolation TVD [4], WENO [7], CWENO [9],
+                                   AOWENO [8], and eigenvalue conditioning HARTEN, GNOFFO [10],
+                                   PECLET [11], PASCAL [6], and PARENT positivity-preserving
+                                   filter [12]
+  Temporal Discretization          Steady-State
+  Fluid Model                      Navier-Stokes Perfect Gas
+  Thermodynamic Model              Perfect Gas
+  Chemical Model                   Air 1 species 0 reaction
+  EM Field Model                   None
+  Beam Model                       None
+  Number of Dimensions             3
+  Number of Flux Components        5
+  _______________________________________________________________________________________________
+
+  [1]  WR Briley and H McDonald. "On the Structure and Use of Linearized Block Implicit
+       Schemes", Journal of Computational Physics 34:54-73, 1980.
+  [2]  RM Beam and RF Warming. "An Implicit Finite-Difference Algorithm for Hyperbolic Systems
+       in Conservation-Law-Form", Journal of Computational Physics 22:87-110, 1976.
+  [3]  JL Steger and RF Warming. "Flux Vector Splitting of the Inviscid Gasdynamic Equations
+       with Application to Finite-Difference Methods", Journal of Computational Physics 40:263-
+       293, 1981.
+  [4]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume Flux Vector
+       Splittings for the Euler Equations", AIAA Journal 24:1453-1460, 1986.
+  [5]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes", Journal
+       of Computational Physics 43:357-372, 1981.
+  [6]  B Parent. "Positivity-Preserving Dual Time Stepping Schemes for Gas Dynamics", Journal of
+       Computational Physics 361:391-411, 2018.
+  [7]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes", Journal of
+       Computational Physics 126:202-228, 1996.
+  [8]  DS Balsara, S Garain, and CW Shu. "An Efficient Class of WENO schemes with Adaptive
+       Order", Journal of Computational Physics 326:780-804, 2016.
+  [9]  M Dumbser and M Kaser. "Arbitrary High Order Non-oscillatory Finite Volume Schemes on
+       Unstructured Meshes for Linear Hyperbolic Systems", Journal of Computational Physics,
+       221:693-723, 2007.
+  [10] P Gnoffo and  JA White. "Computational Aerothermodynamic Simulation Issues on
+       Unstructured Grids", 37th AIAA Thermophysics Conference, AIAA Paper 2004-2371, 2004.
+  [11] B Parent. "Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows", AIAA
+       Journal, 55:141-152, 2017.
+  [12] B Parent. "Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler
+       Equations", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.
+
+
+}
+
+ 
+
+
+
+mf=1.0;
+
+is=1;
+ie=is+round(mf*30);
+
+ks=1;
+km1=ks+round(20*mf);
+km2=km1+round(12*mf);
+ke=km2+round(20*mf);
+js=1;
+jm1=js+round(20*mf);
+jm2=jm1+round(12*mf);
+je=jm2+round(20*mf);
+
+
+D=1.0;  {diameter of the pipe in meters}
+L=2.0;  {length of the pipe in meters}
+
+
+W=D/4;  {width of the inner square within the pipe}
+W2=sin(pi/4)*D; {maximum width of sections on bottom, top, left and right of the inner square}
+
+
+Grid(
+  Size(is,js,ks, ie,je,ke);
+
+  {tmp grid at i=is}
+  Corners(is,js,ks, is,je,ke, 0,-D/2,-D/2, 0,D/2,D/2 );
+  JoinCorners(is,js,ks, is,je,ke,  NO,0.5,1,1, EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
+
+  {grid the 'square' section in center of circle}
+  Corners(is,jm1,km1, is,jm2,km2, 0,-W/2,-W/2, 0,W/2,W/2 );
+  JoinCorners(is,jm1,km1, is,jm2,km2,  NO,0.5,1,1, EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
+
+  {grid on left of square section (is to im1)}
+  for (j,jm1,jm2,
+    theta=(j-jm1)/(jm2-jm1)*pi/2-pi/4;
+    Point(is,j,ks, 0,sin(theta)*D/2,-cos(theta)*D/2);
+  );
+  Join(is,jm1,ks, is,jm2,km1, k, EG,0.5,1,1);
+
+
+  {grid on right of square section (im2 to ie)}
+  for (j,jm1,jm2,
+    theta=(j-jm1)/(jm2-jm1)*pi/2-pi/4;
+    Point(is,j,ke, 0,sin(theta)*D/2,cos(theta)*D/2);
+  );
+  Join(is,jm1,km2, is,jm2,ke, k, GE,0.5,1,1);
+   
+  
+  {grid on bottom of square section (js to jm1)}
+  for (k,km1,km2,
+    theta=(k-km1)/(km2-km1)*pi/2-pi/4;
+    Point(is,js,k, 0,-cos(theta)*D/2,sin(theta)*D/2);
+  );
+  Join(is,js,km1, is,jm1,km2, j, EG,0.5,1,1);
+
+
+  {grid on top of square section (jm2 to je)}
+  for (k,km1,km2,
+    theta=(k-km1)/(km2-km1)*pi/2-pi/4;
+    Point(is,je,k, 0,cos(theta)*D/2,sin(theta)*D/2);
+  );
+  Join(is,jm2,km1, is,je,km2, j, GE,0.5,1,1);
+    
+  
+  {lower left quadrant fix}
+  for (k,ks,km1-1,
+    Point(is,k,km1-1, 0,_y(is,jm1+1,k),_z(is,jm1+1,k));
+  );
+
+  {lower right quadrant fix}
+  for (k,ks,km1-1,
+    Point(is,k,km2+1,0,_y(is,jm1+1,ke-(k-ks)),_z(is,jm1+1,ke-(k-ks)));
+  );
+  
+  {top left quadrant fix}
+  for (k,ks,km1-1,
+    Point(is,je-(k-ks),km1-1,0,_y(is,jm2-1,k),_z(is,jm2-1,k));
+  );
+
+  {top right quadrant fix}
+  for (k,ks,km1-1,
+    Point(is,je-(k-ks),km2+1,0,_y(is,jm2-1,ke-(k-ks)),_z(is,jm2-1,ke-(k-ks)));
+  );
+
+  {make the 4 quadrants which will be cut out in Bdry() "disappear" by making them very small
+   NOTE: the following 4 Scale() calls are not necessary and won't make any difference in paraview 
+         but it does make the mesh look better in tecplot by hiding the regions that are cut out. 
+         To make things look even better in tecplot, use Plot->Blanking->Value Blanking and hide 
+         the cells where the pressure is less than 1 Pa (the cut out cells)}
+  Scale(is,js,ks,is,jm1-1,km1-2, 0,-W/2,-W/2,1e-5,1e-5,1e-5);
+  Scale(is,js,km2+2,is,jm1-1,ke, 0,-W/2,W/2,1e-5,1e-5,1e-5);
+  Scale(is,jm2+1,ks,is,je,km1-2, 0,W/2,-W/2,1e-5,1e-5,1e-5);
+  Scale(is,jm2+1,km2+2,is,je,ke, 0,W/2,W/2,1e-5,1e-5,1e-5);
+    
+  
+
+  {Copy i=is mesh to i=ie, translate, and join them}
+  Copy(is,js,ks,is,je,ke, ie,js,ks);
+  Translate(ie,js,ks,ie,je,ke, L,0,0);
+  Join(is,js,ks,ie,je,ke, i, EE,0.5,1,1);
+);
+
+
+
+Bdry(
+  NavierStokesPerfect(
+    {
+    _________________________________________________________________________________________
+
+    Boundary Condition Type    ID    Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC      0     Inflow, supersonic
+    BDRY_OUTFLOWSUPERSONIC1    1     Outflow, supersonic, 1o
+    BDRY_SYMMETRICAL1          2     Symmetrical, 1o
+    BDRY_SYMMETRICAL2          3     Symmetrical, 2o
+    BDRY_SYMMETRICAL3          8     Symmetrical, 3o
+    BDRY_WALLTFIXED1           4     Wall, T specified, 1o, param Twall
+    BDRY_WALLTFIXED2           a     Wall, T specified, 2o, param Twall
+    BDRY_WALLADIABATIC1        5     Wall, adiabatic, 1o
+    BDRY_WALLADIABATIC2        b     Wall, adiabatic, 2o
+    BDRY_INFLOWSUBSONIC1       6     Subsonic Inflow 1o (Constant Tstag, Pstag at inflow)
+    BDRY_OUTFLOWSUBSONIC1      7     Subsonic Outflow 1o (Constant P at outflow)
+    BDRY_FREESTREAM1           9     Freestream, 1o, params Vx,Vy,Vz, P, T
+    _________________________________________________________________________________________
+    }
+    {lower left quadrant cut}
+    Cut(is,js,ks,ie,jm1,km1-1);
+    {lower right quadrant cut}
+    Cut(is,js,km2+1,ie,jm1,ke);
+    {top left quadrant cut}
+    Cut(is,jm2,ks,ie,je,km1-1);
+    {top right quadrant cut}
+    Cut(is,jm2,km2+1,ie,je,ke);
+    All(BDRY_SYMMETRICAL1);
+
+    for (i,is+1,ie-1,
+      {lower left quadrant links}
+      for (k,ks+1,km1-1,
+        Link(i,jm1,k,i,k,km1);
+        Link(i,jm1+1,k,i,k,km1-1);
+      );
+
+      {lower right quadrant links}
+      for (k,ks+1,km1-1,
+        Link(i,jm1,ke-(k-ks),i,k,km2);
+        Link(i,jm1+1,ke-(k-ks),i,k,km2+1);
+      );
+
+      {top left quadrant links}
+      for (k,ks+1,km1-1,
+        Link(i,jm2,k,i,je-(k-ks),km1);
+        Link(i,jm2-1,k,i,je-(k-ks),km1-1);
+      );
+
+      {top right quadrant links}
+      for (k,ks+1,km1-1,
+        Link(i,jm2,ke-(k-ks),i,je-(k-ks),km2);
+        Link(i,jm2-1,ke-(k-ks),i,je-(k-ks),km2+1);
+      );
+
+    );
+
+    Plane("i",is,BDRY_INFLOWSUPERSONIC);
+    Plane("i",ie,BDRY_OUTFLOWSUPERSONIC1);
+    {
+    Cut(is,js,ks,  ie,je,ke);
+    Region(is,js,ks,  ie,je,ke,  BDRY_INFLOWSUPERSONIC);
+    Link(i1,j1,k1,  i2,j2,k2);
+    }
+  );
+);
+ 
+ 
+Model(
+  NavierStokesPerfect(
+    gamma=1.4;
+    R=286.0;        {J/kgK }
+    ETAMODEL=ETAMODEL_CONSTANT;     
+    eta=1.716e-5;       {kg/ms}
+    Pr=0.71;     
+    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
+    Tmin=1.0e1;     Tmax=26.0e3;    {K}
+    SetBodyForce(is,js,ks, ie,je,ke, 0.0{N/m3},0.0{N/m3},0.0{N/m3});
+    SetHeatDeposited(is,js,ks, ie,je,ke, 0.0 {W/m3});
+    {
+    AddHeatPoint(0.0{x,m},0.0{y,m},0.0{z,m}, 0.1{radius,m}, 0.0{W});
+    }
+  );
+);
+
+
+Init(
+  NavierStokesPerfect(
+    {
+    _______________________________________________________________________________________
+
+    Initial Condition Type       Parameters
+    _______________________________________________________________________________________
+
+    INIT_TYPE1                   V[1]..V[nd],  P,  T     
+    INIT_TYPE2                   M[1]..M[nd],  P,  T     
+    INIT_TYPE3                   V[1]..V[nd],  P,  rho   
+    _______________________________________________________________________________________
+    }
+    Mx=2;
+    My=-0.2;
+    Mz=0;
+    P=10000; {Pa}
+    T=300; {K}
+    All(INIT_TYPE2,Mx,My,Mz,P,T);
+    {
+    Bdry(BDRY_WALLTFIXED1, INIT_TYPE2, Mx,My,Mz,P,T);
+    Region(is,js,ks,  ie,je,ke,  INIT_TYPE2, Mx,My,Mz,P,T);
+    }
+  );
+);
+
+
+Disc(
+  NavierStokesPerfect(
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.2e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.85;
+    AOWENO_gammahi=0.85;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
+    POSFILTER=POSFILTER_PARENT;
+    POSFILTER_numiter=4;
+  );
+);
+
+
+Cycle(
+  NavierStokesPerfect(
+    xiverge=1e-3;  {residual convergence threshold}
+    rhoref=1.0;  {reference density in kg/m3}
+    aref=300.0;  {reference sound speed in m/s}
+    Uref[1]=rhoref;            
+    for (dim,1,numdim,
+      Uref[1+dim]=rhoref*aref;
+    );
+    Uref[2+numdim]=rhoref*aref*aref;
+  );
+  SteadyState(
+    if (mod(iter,50)==0,
+      WriteDataFile(outputfilename);
+    );
+    sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
+    if (iter==1,
+      CFL=0.01;
+    );
+    CFL=min(CFL*1.02,1.5);
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
+    printf("%6.2f %6ld %9.3f   %E (%2ld %4ld,%4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,flux_ximax,i_ximax,
+           j_ximax,k_ximax,clipinfo);
+  );
+);
+
+
+Post(
+  xstation[1]=0.1; {m}
+  xstation[2]=0.2; {m}
+  xstation[3]=0.3; {m}
+  numsteps=300;
+  qmin=1.0; {m/s, as small a value as possible}
+  Pback_min=400; {Pa}
+  Pback_max=40000; {Pa}
+  Aback=1.0; {m2}
+  for (cnt,1,3,
+    XSTATION_Set(xstation[cnt]);
+    Pback=XSTATION_Pback(Aback, Pback_min, Pback_max, numsteps, qmin);
+    Fpot=XSTATION_Fpot(Pback, numsteps, qmin);
+    mdot=XSTATION_mdot();
+    Tstag=XSTATION_Tstag();
+    Pstag=XSTATION_Pstag(numsteps);
+    Pstar=XSTATION_Pstar();
+    T=XSTATION_T();
+    q=XSTATION_q();
+    rho=XSTATION_rho();
+    htstar=XSTATION_htstar();
+    fprintf(postfilename,"x      = %E m\n"
+           "Pback  = %E Pa\n"
+           "Fpot   = %E Ns/kg\n"
+           "mdot   = %E kg/s\n"
+           "htstar = %E J/kg\n"
+           "Tstag  = %E K\n"
+           "Pstag  = %E Pa\n"
+           "Pstar  = %E Pa\n"
+           "T      = %E K\n"
+           "q      = %E m/s\n"
+           "rho    = %E kg/m3\n\n"
+           ,xstation[cnt],Pback,Fpot,mdot,htstar,Tstag,Pstag,Pstar,T,q,rho);
+  );
+  fprintf(postfilename,"\n");
+  for (dim,1,3,
+    Area[dim]=_Area(is,js,ks, ie,je,ke, dim,BDRY_WALLTFIXED1);
+    Fshear[dim]=_Fshear(is,js,ks, ie,je,ke, dim,BDRY_WALLTFIXED1);
+    Fpressure[dim]=_Fpressure(is,js,ks, ie,je,ke, dim,BDRY_WALLTFIXED1);
+  );
+  fprintf(postfilename,"Fshear    = (%+E,%+E,%+E) N\n",Fshear[1],Fshear[2],Fshear[3]);
+  fprintf(postfilename,"Fpressure = (%+E,%+E,%+E) N\n",Fpressure[1],Fpressure[2],Fpressure[3]);
+  fprintf(postfilename,"Qheat     = %+E W\n",_Qheat(is,js,ks, ie,je,ke, BDRY_WALLTFIXED1));
+  fprintf(postfilename,"metotal   = %+E J\n",_metotal(is,js,ks, ie,je,ke));
+  fprintf(postfilename,"m         = %+E J\n",_m(is,js,ks, ie,je,ke));
+  fprintf(postfilename,"\n");
+  {
+  POSTGRIDONLY=FALSE;
+  WritePostFile(is,js,ks, ie,je,ke, "post.01", "tecplot", POSTGRIDONLY);
+  }
+);

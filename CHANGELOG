@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 OCT 28a
+  * in cycle/share/cycle_share.c
+    - in update_linked_nodes(), fixed a bug that occurred when using MPI and nodes linked together
+      through the Bdry(Link()) command: when the linked inner nodes were not aligned with the linked
+      boundary nodes along the same axis (either i, j, of k), the function update_linked_nodes()
+      did not link the proper nodes together
+    - in update_runtime_codex_xi_from_gl(), added 1 to flux_ximax before sending it to the codex
+      variables so that flux_ximax of 1 corresponds to the 1st component of the vector not the 2nd
+  * in bin
+    - added pipeflow3D.wrp
+    - renamed circle.wrp to cylinderinnerflow2D.wrp 
+    - renamed cylinder_in_freestream.wrp to cylindercrossflow2D.wrp
+    
+
 2022 OCT 25a
   * in cycle/_*/cycle.c
     - in write_runtime_template(), added the parameter flux_ximax

@@ -143,24 +143,31 @@ dtheta=0.1/180*pi;
 
 
 
+INITSTRATEGY_P=1;
+INITSTRATEGY_RE=2;
+INITSTRATEGY=INITSTRATEGY_P;
 
-CASE=2;
+CASE=3;
+
 
 if (CASE==1,
     Minf=23.9;
     Re=1.95e4/Rin;
+    Pinf=19.962; {Pa}
     {altitude: 61 km}
 );
 
 if (CASE==2,
     Minf=25.9;
     Re=6.28e3/Rin;
+    Pinf=4.844; {Pa}
     {altitude: 71 km}
 );
    
 if (CASE==3,
     Minf=28.3;
     Re=1.59e3/Rin;
+    Pinf=0.8937; {Pa}
     {altitude: 81 km}
 );
 
@@ -391,6 +398,11 @@ Model(
     psimin=1e-10;   psimax=9.9e99; {1/s}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain}
     AXISYMMETRIC=YES;
+    SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
+    SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
+    {
+    AddHeatPoint(0.0{x,m},0.0{y,m}, 0.1{radius,m}, 0.0{W/m});
+    }
   );
   NavierStokes(
     DIFFUSION=YES;
@@ -400,6 +412,11 @@ Model(
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-50;
     AXISYMMETRIC=YES;
+    SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
+    SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
+    {
+    AddHeatPoint(0.0{x,m},0.0{y,m}, 0.1{radius,m}, 0.0{W/m});
+    }
   );
   NavierStokesPlasma(
     TEMODEL=TEMODEL_TRANSPORT;
@@ -432,7 +449,7 @@ Model(
     HEAT_DEPOSITED_TO_ELECTRONS=FALSE;
   );
   AirPlasma11s(
-    CHEMMODEL=CHEMMODEL_DUNNKANG1973;
+    CHEMMODEL=CHEMMODEL_PARENTPARK2021;
     ADDITIONALREACTION=FALSE; {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE generally}
     QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}
@@ -477,7 +494,13 @@ Init(
     k=1e-6;
     psi=1000;
 
-    All(INIT_TYPE3,Minf,0,Re,T,w_O2,w_N2,w_default,k,psi,Tv);
+    if (INITSTRATEGY==INITSTRATEGY_RE,
+      All(INIT_TYPE3,Minf,0,Re,T,w_O2,w_N2,w_default,k,psi,Tv);
+    );
+    if (INITSTRATEGY==INITSTRATEGY_P,
+      All(INIT_TYPE2,Minf,0,Pinf,T,w_O2,w_N2,w_default,k,psi,Tv);
+    );
+    
     {
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default,k,psi,Tv);
     Region(is,js,  ie,je, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default,k,psi,Tv);
@@ -504,7 +527,13 @@ Init(
     w_N2=0.765;
     w_default=1e-30;
     
-    All(INIT_TYPE3,Minf,0,Re,T,w_O2,w_N2,w_default);
+    if (INITSTRATEGY==INITSTRATEGY_RE,
+      All(INIT_TYPE3,Minf,0,Re,T,w_O2,w_N2,w_default);
+    );
+    if (INITSTRATEGY==INITSTRATEGY_P,
+      All(INIT_TYPE2,Minf,0,Pinf,T,w_O2,w_N2,w_default);
+    );
+
 
     {
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default);
@@ -531,7 +560,13 @@ Init(
     w_O2=0.235;
     w_N2=0.765;
     w_default=1e-30;
-    All(INIT_TYPE3,Minf,0,Re,T,w_O2,w_N2,w_default,Tv,Te);
+    if (INITSTRATEGY==INITSTRATEGY_RE,
+      All(INIT_TYPE3,Minf,0,Re,T,w_O2,w_N2,w_default,Tv,Te);
+    );
+    if (INITSTRATEGY==INITSTRATEGY_P,
+      All(INIT_TYPE2,Minf,0,Pinf,T,w_O2,w_N2,w_default,Tv,Te);
+    );
+
     {
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE6,Vx,Vy,P,T,chi_O2,chi_N2,chi_eminus,chi_default,Tv,Te);
     Region(is,js,  ie,je, INIT_TYPE6,Vx,Vy,P,T,chi_O2,chi_N2,chi_eminus,chi_default,Tv,Te);

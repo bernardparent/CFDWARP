@@ -448,6 +448,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   double *sendvars;
   int *recvproc;
   int cntproc;
+  bool FOUND;
   zone_t zone;
 
   zone=gl->domain;
@@ -562,7 +563,6 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   numsend=cntsend;
 
 
-
   /* send nodes in block one proc at a time */
   
   do {
@@ -618,7 +618,6 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
     MPI_Recv(&numsendvars,1,MPI_LONG,thisproc,0,MPI_COMM_WORLD,&MPI_Status1);
     sendvars=(double *)realloc(sendvars,numsendvars*sizeof(double));
     MPI_Recv(sendvars,numsendvars,MPI_DOUBLE,thisproc,0,MPI_COMM_WORLD,&MPI_Status1);
-
     cntsend=0;
     for_ijk(zone,is,js,ks,ie,je,ke){
           if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL) && is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL)){
@@ -629,11 +628,17 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
             rank1=_node_rank(gl, _i_all(l1,gl,0), _i_all(l1,gl,1), _i_all(l1,gl,2));
             if (rank1!=rank2 && rank2==thisrank){
               if (thisproc==rank1){
+                cntsend=0;
+                FOUND=FALSE;
+                do {
+                  if (mod(l2,DOUBLE_INT_MAX)==(long)sendvars[cntsend+numvars]) FOUND=TRUE;
+                   else cntsend+=numvars+1;
+                } while (!FOUND && cntsend<numsendvars);
+                if (!FOUND) fatal_error("Problem finding node number passed by MPI. "); 
                 for (flux=0; flux<numvars; flux++) mpivars[flux]=sendvars[cntsend+flux];
-                cntsend+=numvars;
+                
 #ifndef NDEBUG
-                assert(mod(l2,DOUBLE_INT_MAX)==(long)sendvars[cntsend]);
-                cntsend++;
+                assert(mod(l2,DOUBLE_INT_MAX)==(long)sendvars[cntsend+numvars]);                
 #endif
                 l=_l_from_l_all(gl,l2);
                 assert(is_node_bdry(np[l],TYPELEVEL));
@@ -1228,7 +1233,7 @@ void update_runtime_codex_xi_from_gl(gl_t *gl, SOAP_codex_t *codex){
   ximaxrank.rank=rank;
   MPI_Allreduce(&ximaxrank, &ximaxrank_max, 1, MPI_DOUBLE_INT, MPI_MAXLOC, MPI_COMM_WORLD);
   add_double_to_codex(codex,"ximax",ximaxrank_max.ximax);
-  ijk_ximax=gl->flux_ximax;
+  ijk_ximax=gl->flux_ximax+1;
   MPI_Bcast(&ijk_ximax,1,MPI_LONG,ximaxrank_max.rank,MPI_COMM_WORLD);
   add_int_to_codex(codex,"flux_ximax",ijk_ximax);
   ijk_ximax=gl->i_ximax;
@@ -1265,7 +1270,7 @@ void update_runtime_codex_xi_from_gl(gl_t *gl, SOAP_codex_t *codex){
 #endif//_3DL
 #else//DISTMPI
   add_double_to_codex(codex,"ximax",gl->ximax);
-  add_int_to_codex(codex,"flux_ximax",gl->flux_ximax);
+  add_int_to_codex(codex,"flux_ximax",gl->flux_ximax+1);
   add_int_to_codex(codex,"i_ximax",gl->i_ximax);
 #ifdef EMFIELD
   add_double_to_codex(codex,"ximax_emfield",gl->ximax_emfield);
