@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 1998-2000 Bernard Parent.
+Copyright 1998-2000,2022 Bernard Parent.
 Copyright 2002 Derrick C. Alexander.
 
 Redistribution and use in source and binary forms, with or without modification, are
@@ -536,207 +536,138 @@ static void JoinFaces_argum(char **argum, SOAP_codex_t *codex, GRIDG_gl3d_t gl3d
 }
 
 
-/* algorithm by Derrick Alexander */
+static double _distance(GRIDG_gl3d_t gl3d, GRIDG_xyzgrid_t *xyz, long l1, long l2){
+  double dist;
+  dist=sqrt(sqr(xyz[l2].x-xyz[l1].x)
+           +sqr(xyz[l2].y-xyz[l1].y)
+           +sqr(xyz[l2].z-xyz[l1].z));
+  return(dist);
+}
+
+
 void Plane(GRIDG_gl3d_t gl3d, GRIDG_xyzgrid_t *xyz, SOAP_codex_t *codex,
-            long i1, long j1, long k1, long i2, long j2, long k2){
-  long i,j,k,cnt;
-  double ax_y,ax_z,ay_x,ay_z,az_x,az_y;
-  double fx_top,fx_bottom,fx_left,fx_right,fy_start,fy_end,fy_bottom,fy_top,
-         fz_left,fz_right,fz_start,fz_end;
-  double y1,y2,x1,x2,z1,z2;
-  double li1,li2,lj1,lj2,lk1,lk2,idiff,jdiff,kdiff;
+           long i1, long j1, long k1, long i2, long j2, long k2){
   bool VALID;
+  long dim1,dim2,l1,l2,l11,l12,l22,l21,cnt1,cnt2,l;
+  double fact;
+  EXM_vec3D_t vec21start,vec21end,vec21,vecstart,vecend,vecstartrot,vecendrot;
+  EXM_mat3x3_t Rstart,Rend;
+  double scalestart,scaleend;
 
   VALID=FALSE;
-
-  if (k1==k2) {
+  l11=0; //avoid compiler warning 
+  l12=0; //avoid compiler warning
+  l21=0; //avoid compiler warning
+  l22=0; //avoid compiler warning
+  if (k2==k1){
     VALID=TRUE;
-    for (cnt=1; cnt<4; cnt++){
-      for (i=i1+1; i<i2; i++){
-        for (j=j1+1; j<j2; j++){
-          k=k1;
-
-          if (!xyz[GRIDG_ai3(gl3d,i1,j,k)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. Plane command failed.",i1,j,k);
-          }
-          if (!xyz[GRIDG_ai3(gl3d,i2,j,k)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. Plane command failed.",i2,j,k);
-          }
-          if (!xyz[GRIDG_ai3(gl3d,i,j1,k)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. Plane command failed.",i,j1,k);
-          }
-          if (!xyz[GRIDG_ai3(gl3d,i,j2,k)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. Plane command failed.",i,j2,k);
-          }
-
-          if (cnt==1) {
-            az_x=0.5;
-            az_y=0.5;
-          } else {
-            li1=sqrt(sqr(x(i,j,k)-x(i1,j,k))+sqr(y(i,j,k)-y(i1,j,k))+sqr(z(i,j,k)-z(i1,j,k)));
-            li2=sqrt(sqr(x(i,j,k)-x(i2,j,k))+sqr(y(i,j,k)-y(i2,j,k))+sqr(z(i,j,k)-z(i2,j,k)));
-
-            lj1=sqrt(sqr(x(i,j,k)-x(i,j1,k))+sqr(y(i,j,k)-y(i,j1,k))+sqr(z(i,j,k)-z(i,j1,k)));
-            lj2=sqrt(sqr(x(i,j,k)-x(i,j2,k))+sqr(y(i,j,k)-y(i,j2,k))+sqr(z(i,j,k)-z(i,j2,k)));
-
-            if (li1<=li2) idiff=li1; else idiff=li2;
-            if (lj1<=lj2) jdiff=lj1; else jdiff=lj2;
-
-            az_x=jdiff/(idiff+jdiff);
-            az_y=1.0e0-az_x;
-          }
-
-          /* x factors */
-          fx_left=  (x(i ,j1,k )-x(i1,j1,k ))/(x(i2,j1,k )-x(i1,j1,k ));
-          fx_right= (x(i ,j2,k )-x(i1,j2,k ))/(x(i2,j2,k )-x(i1,j2,k ));
-          /* y factors */
-          fy_start= (y(i1,j ,k )-y(i1,j1,k ))/(y(i1,j2,k )-y(i1,j1,k ));
-          fy_end=   (y(i2,j ,k )-y(i2,j1,k ))/(y(i2,j2,k )-y(i2,j1,k ));
-
-          y1=(fy_end-fy_start)*(fx_right-fx_left)*(-y(i,j1,k))+y(i,j1,k);
-          y2=((fy_end-fy_start)*fx_left+fy_start)*(y(i,j2,k)-y(i,j1,k));
-          y(i,j,k)=(y1+y2)/(1.0e0-(fy_end-fy_start)*(fx_right-fx_left));
-
-          x1=(y(i,j,k)-y(i,j1,k))*(fx_right-fx_left)/(y(i,j2,k)-y(i,j1,k))+fx_left;
-          x(i,j,k)=x1*(x(i2,j,k)-x(i1,j,k))+x(i1,j,k);
-
-          z1=az_y*((z(i,j2,k)-z(i,j1,k))*(y(i,j,k)-y(i,j1,k))/(y(i,j2,k)-y(i,j1,k))+z(i,j1,k));
-          z2=az_x*((z(i2,j,k)-z(i1,j,k))*(x(i,j,k)-x(i1,j,k))/(x(i2,j,k)-x(i1,j,k))+z(i1,j,k));
-          z(i,j,k)=z1+z2;
-          xyz[GRIDG_ai3(gl3d,i,j,k)].INIT=TRUE;
-        }   /* j */
-      }   /* i */
-    }   /* cnt */
-  }   /* k1=k2 */
-
-
-  if (i1==i2) {
+    dim1=0;
+    dim2=1;  
+    l11=GRIDG_ai3(gl3d, i1,  j1,  k1);
+    l12=GRIDG_ai3(gl3d, i1,  j2,  k1);
+    l21=GRIDG_ai3(gl3d, i2,  j1,  k1);
+    l22=GRIDG_ai3(gl3d, i2,  j2,  k1);
+  }
+  if (j2==j1){
     VALID=TRUE;
-    for (cnt=1; cnt<4; cnt++){
-      for (j=j1+1; j<j2; j++){
-        for (k=k1+1; k<k2; k++){
-          i=i1;
-
-          if (!xyz[GRIDG_ai3(gl3d,i,j,k1)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. Plane command failed.",i,j,k1);
-          }
-          if (!xyz[GRIDG_ai3(gl3d,i,j,k2)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. Plane command failed.",i,j,k2);
-          }
-          if (!xyz[GRIDG_ai3(gl3d,i,j1,k)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. Plane command failed.",i,j1,k);
-          }
-          if (!xyz[GRIDG_ai3(gl3d,i,j2,k)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. Plane command failed.",i,j2,k);
-          }
-
-
-          if (cnt==1) {
-            ax_y=0.5;
-            ax_z=0.5;
-          } else {
-            lj1=sqrt(sqr(x(i,j,k)-x(i,j1,k))+sqr(y(i,j,k)-y(i,j1,k))+sqr(z(i,j,k)-z(i,j1,k)));
-            lj2=sqrt(sqr(x(i,j,k)-x(i,j2,k))+sqr(y(i,j,k)-y(i,j2,k))+sqr(z(i,j,k)-z(i,j2,k)));
-
-            lk1=sqrt(sqr(x(i,j,k)-x(i,j,k1))+sqr(y(i,j,k)-y(i,j,k1))+sqr(z(i,j,k)-z(i,j,k1)));
-            lk2=sqrt(sqr(x(i,j,k)-x(i,j,k2))+sqr(y(i,j,k)-y(i,j,k2))+sqr(z(i,j,k)-z(i,j,k2)));
-
-            if (lj1<=lj2) jdiff=lj1; else jdiff=lj2;
-            if (lk1<=lk2) kdiff=lk1; else kdiff=lk2;
-
-            ax_y=kdiff/(jdiff+kdiff);
-            ax_z=1.0e0-ax_y;
-          }
-
-          /* y factors */
-          fy_bottom= (y(i,j ,k1 )-y(i,j1,k1 ))/(y(i,j2,k1 )-y(i,j1,k1 ));
-          fy_top=    (y(i,j ,k2 )-y(i,j1,k2 ))/(y(i,j2,k2 )-y(i,j1,k2 ));
-          /* z factors */
-          fz_left=   (z(i,j1,k  )-z(i,j1,k1 ))/(z(i,j1,k2 )-z(i,j1,k1 ));
-          fz_right=  (z(i,j2,k  )-z(i,j2,k1 ))/(z(i,j2,k2 )-z(i,j2,k1 ));
-
-          z1=(fz_right-fz_left)*(fy_top-fy_bottom)*(-z(i,j,k1))+z(i,j,k1);
-          z2=((fz_right-fz_left)*fy_bottom+fz_left)*(z(i,j,k2)-z(i,j1,k1));
-          z(i,j,k)=(z1+z2)/(1.0e0-(fz_right-fz_left)*(fy_top-fy_bottom));
-
-          y1=(z(i,j,k)-z(i,j,k1))*(fy_top-fy_bottom)/(z(i,j,k2)-z(i,j,k1))+fy_bottom;
-          y(i,j,k)=y1*(y(i,j2,k)-y(i,j1,k))+y(i,j1,k);
-
-          x1=ax_y*((x(i,j2,k)-x(i,j1,k))*(y(i,j,k)-y(i,j1,k))/(y(i,j2,k)-y(i,j1,k))+x(i,j1,k));
-          x2=ax_z*((x(i,j,k2)-x(i,j,k1))*(z(i,j,k)-z(i,j,k1))/(z(i,j,k2)-z(i,j,k1))+x(i,j,k1));
-          x(i,j,k)=x1+x2;
-          xyz[GRIDG_ai3(gl3d,i,j,k)].INIT=TRUE;
-        }   /* k */
-      }   /* j */
-    }   /* cnt */
-  }   /* i1=i2 */
-
-
-  if (j1==j2) {
+    dim1=0;
+    dim2=2;  
+    l11=GRIDG_ai3(gl3d, i1,  j1,  k1);
+    l12=GRIDG_ai3(gl3d, i1,  j1,  k2);
+    l21=GRIDG_ai3(gl3d, i2,  j1,  k1);
+    l22=GRIDG_ai3(gl3d, i2,  j1,  k2);
+  }
+  if (i2==i1){
     VALID=TRUE;
-    for (cnt=1; cnt<4; cnt++){
-      for (i=i1+1; i<i2; i++){
-        for (k=k1+1; k<k2; k++){
-          j=j1;
-
-          if (!xyz[GRIDG_ai3(gl3d,i1,j,k)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. Plane command failed.",i1,j,k);
-          }
-          if (!xyz[GRIDG_ai3(gl3d,i2,j,k)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. Plane command failed.",i2,j,k);
-          }
-          if (!xyz[GRIDG_ai3(gl3d,i,j,k1)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. Plane command failed.",i,j,k1);
-          }
-          if (!xyz[GRIDG_ai3(gl3d,i,j,k2)].INIT){
-            SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) not yet initialized. Plane command failed.",i,j,k2);
-          }
-
-          if (cnt==1) {
-            ay_x=0.5;
-            ay_z=0.5;
-          } else {
-            li1=sqrt(sqr(x(i,j,k)-x(i1,j,k))+sqr(y(i,j,k)-y(i1,j,k))+sqr(z(i,j,k)-z(i1,j,k)));
-            li2=sqrt(sqr(x(i,j,k)-x(i2,j,k))+sqr(y(i,j,k)-y(i2,j,k))+sqr(z(i,j,k)-z(i2,j,k)));
-
-            lk1=sqrt(sqr(x(i,j,k)-x(i,j,k1))+sqr(y(i,j,k)-y(i,j,k1))+sqr(z(i,j,k)-z(i,j,k1)));
-            lk2=sqrt(sqr(x(i,j,k)-x(i,j,k2))+sqr(y(i,j,k)-y(i,j,k2))+sqr(z(i,j,k)-z(i,j,k2)));
-
-            if (li1<=li2) idiff=li1; else idiff=li2;
-            if (lk1<=lk2) kdiff=lk1; else kdiff=lk2;
-
-            ay_x=kdiff/(idiff+kdiff);
-            ay_z=1.0e0-ay_x;
-          }
-
-          /* x factors */
-          fx_bottom= (x(i,j,k1 )-x(i1,j,k1 ))/(x(i2,j,k1 )-x(i1,j,k1 ));
-          fx_top=    (x(i,j,k2 )-x(i1,j,k2 ))/(x(i2,j,k2 )-x(i1,j,k2 ));
-          /* z factors */
-          fz_start=  (z(i1,j,k  )-z(i1,j,k1 ))/(z(i1,j,k2 )-z(i1,j,k1 ));
-          fz_end=    (z(i2,j,k  )-z(i2,j,k1 ))/(z(i2,j,k2 )-z(i2,j,k1 ));
-
-          z1=(fz_end-fz_start)*(fx_top-fx_bottom)*(-z(i,j,k1))+z(i,j,k1);
-          z2=((fz_end-fz_start)*fx_bottom+fz_start)*(z(i,j,k2)-z(i,j1,k1));
-          z(i,j,k)=(z1+z2)/(1.0e0-(fz_end-fz_start)*(fx_top-fx_bottom));
-
-          x1=(z(i,j,k)-z(i,j,k1))*(fx_top-fx_bottom)/(z(i,j,k2)-z(i,j,k1))+fx_bottom;
-          x(i,j,k)=x1*(x(i2,j,k)-x(i1,j,k))+x(i1,j,k);
-
-          y1=ay_x*((y(i2,j,k)-y(i1,j,k))*(x(i,j,k)-x(i1,j,k))/(x(i2,j,k)-x(i1,j,k))+y(i1,j,k));
-          y2=ay_z*((y(i,j,k2)-y(i,j,k1))*(z(i,j,k)-z(i,j,k1))/(z(i,j,k2)-z(i,j,k1))+y(i,j,k1));
-          y(i,j,k)=y1+y2;
-          xyz[GRIDG_ai3(gl3d,i,j,k)].INIT=TRUE;
-        }   /* k */
-      }   /* i */
-    }   /* cnt */
-  }   /* j1=j2 */
-
+    dim1=1;
+    dim2=2;  
+    l11=GRIDG_ai3(gl3d, i1,  j1,  k1);
+    l12=GRIDG_ai3(gl3d, i1,  j1,  k2);
+    l21=GRIDG_ai3(gl3d, i1,  j2,  k1);
+    l22=GRIDG_ai3(gl3d, i1,  j2,  k2);
+  }
   if (!VALID){
     SOAP_fatal_error(codex,"When using the Plane() command, either set i1=i2 or j1=j2 or k1=k2.");
   }
+  
+  // test node numbering
+  /*
+  long i,j,k;
+  for (i=gl3d.is; i<gl3d.ie; i++){
+    for (j=gl3d.js; j<gl3d.je; j++){
+     for (k=gl3d.ks; k<gl3d.ke; k++){
+       l=GRIDG_ai3(gl3d,i,j,k);
+       GRIDG_find_ijk_from_l(gl3d, l, &i2, &j2, &k2); 
+       if (i!=i2 || j!=j2 || k!=k2) SOAP_fatal_error(codex,"Problem i=%ld j=%ld k=%ld i2=%ld j2=%ld k2=%ld\n",i,j,k,i2,j2,k2);
+     }
+    }
+  }
+  */
+  
+  // check if nodes have been initialized around the plane 
+  for (cnt1=0; GRIDG_al3(gl3d,l11,dim1,cnt1+1)!=l21; cnt1++) {    
+    l=GRIDG_al3(gl3d,l11,dim1,cnt1);
+    GRIDG_find_ijk_from_l(gl3d, l, &i2, &j2, &k2);
+    if (!xyz[l].INIT) 
+      SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) needs to be initialized prior to calling Plane().\n",i2,j2,k2);
+    l=GRIDG_al3(gl3d,l12,dim1,cnt1);
+    GRIDG_find_ijk_from_l(gl3d, l, &i2, &j2, &k2);
+    if (!xyz[l].INIT) 
+      SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) needs to be initialized prior to calling Plane().\n",i2,j2,k2);
+  }
+  for (cnt2=0; GRIDG_al3(gl3d,l11,dim2,cnt2+1)!=l12; cnt2++) {    
+    l=GRIDG_al3(gl3d,l11,dim2,cnt2);
+    GRIDG_find_ijk_from_l(gl3d, l, &i2, &j2, &k2);
+    if (!xyz[l].INIT) 
+      SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) needs to be initialized prior to calling Plane().\n",i2,j2,k2);
+    l=GRIDG_al3(gl3d,l21,dim2,cnt2);
+    GRIDG_find_ijk_from_l(gl3d, l, &i2, &j2, &k2);
+    if (!xyz[l].INIT) 
+      SOAP_fatal_error(codex,"Node (%ld,%ld,%ld) needs to be initialized prior to calling Plane().\n",i2,j2,k2);
+  }
 
+
+  vec21start[0]=xyz[l12].x-xyz[l11].x;
+  vec21start[1]=xyz[l12].y-xyz[l11].y;
+  vec21start[2]=xyz[l12].z-xyz[l11].z;
+  vec21end[0]=xyz[l22].x-xyz[l21].x;
+  vec21end[1]=xyz[l22].y-xyz[l21].y;
+  vec21end[2]=xyz[l22].z-xyz[l21].z;
+
+  for (cnt1=1; GRIDG_al3(gl3d,l11,dim1,cnt1)!=l21; cnt1++){
+    l1=GRIDG_al3(gl3d,l11,dim1,cnt1);
+    l2=GRIDG_al3(gl3d,l12,dim1,cnt1);
+    fact=_distance(gl3d,xyz,l1,l11)/(1e-20+_distance(gl3d,xyz,l21,l11));
+    vec21[0]=xyz[l2].x-xyz[l1].x;
+    vec21[1]=xyz[l2].y-xyz[l1].y;
+    vec21[2]=xyz[l2].z-xyz[l1].z;
+    assert(EXM_vector_magnitude(vec21start)!=0.0);
+    assert(EXM_vector_magnitude(vec21end)!=0.0);
+    assert(EXM_vector_magnitude(vec21)!=0.0);
+    scalestart=EXM_vector_magnitude(vec21)/EXM_vector_magnitude(vec21start);
+    scaleend=EXM_vector_magnitude(vec21)/EXM_vector_magnitude(vec21end);
+    EXM_find_rotation_matrix(vec21start, vec21, Rstart);
+    EXM_find_rotation_matrix(vec21end, vec21, Rend);
+
+    for (cnt2=1; GRIDG_al3(gl3d,l1,dim2,cnt2)!=l2; cnt2++){
+      vecstart[0]=xyz[GRIDG_al3(gl3d,l11,dim2,cnt2)].x-xyz[l11].x;
+      vecstart[1]=xyz[GRIDG_al3(gl3d,l11,dim2,cnt2)].y-xyz[l11].y;
+      vecstart[2]=xyz[GRIDG_al3(gl3d,l11,dim2,cnt2)].z-xyz[l11].z;
+      EXM_multiply_matrix_vector(Rstart,vecstart,vecstartrot);  
+      vecend[0]=xyz[GRIDG_al3(gl3d,l21,dim2,cnt2)].x-xyz[l21].x;
+      vecend[1]=xyz[GRIDG_al3(gl3d,l21,dim2,cnt2)].y-xyz[l21].y;
+      vecend[2]=xyz[GRIDG_al3(gl3d,l21,dim2,cnt2)].z-xyz[l21].z;
+      EXM_multiply_matrix_vector(Rend,vecend,vecendrot);  
+
+      xyz[GRIDG_al3(gl3d,l1,dim2,cnt2)].x=xyz[l1].x+(1.0-fact)*vecstartrot[0]*scalestart+fact*vecendrot[0]*scaleend;
+      xyz[GRIDG_al3(gl3d,l1,dim2,cnt2)].y=xyz[l1].y+(1.0-fact)*vecstartrot[1]*scalestart+fact*vecendrot[1]*scaleend;
+      xyz[GRIDG_al3(gl3d,l1,dim2,cnt2)].z=xyz[l1].z+(1.0-fact)*vecstartrot[2]*scalestart+fact*vecendrot[2]*scaleend;
+
+      xyz[GRIDG_al3(gl3d,l1,dim2,cnt2)].INIT=TRUE;    
+    }
+  }  
 }
+
 
 static void Plane_argum(char **argum, SOAP_codex_t *codex, GRIDG_gl3d_t gl3d, GRIDG_xyzgrid_t *xyzgrid){
   long i1,j1,k1,i2,j2,k2;
@@ -748,7 +679,6 @@ static void Plane_argum(char **argum, SOAP_codex_t *codex, GRIDG_gl3d_t gl3d, GR
   verify_zone_validity(i1, j1, k1, i2, j2, k2, gl3d, codex);
   Plane(gl3d, xyzgrid, codex, i1, j1, k1, i2, j2, k2);
 }
-
 
 
 void Translate3D(GRIDG_gl3d_t gl3d, GRIDG_xyzgrid_t *xyzgrid, SOAP_codex_t *codex,

@@ -33,11 +33,15 @@ typedef struct {
   long is,ie;
 } GRIDG_gl1d_t;
 
+long GRIDG_al3(GRIDG_gl3d_t gl, long l, long dim, long offset);
+
 long GRIDG_ai3(GRIDG_gl3d_t gl, long i, long j, long k);
 
 long GRIDG_ai2(GRIDG_gl2d_t gl, long i, long j);
 
 long GRIDG_ai1(GRIDG_gl1d_t gl, long i);
+
+void GRIDG_find_ijk_from_l(GRIDG_gl3d_t gl, long l, long *i, long *j, long *k);
 
 void GRIDG_read_grid_1D_from_file(char *filename, GRIDG_gl1d_t *gl1d, GRIDG_xgrid_t **xgrid,
                 bool VERBOSE, bool *Problem);

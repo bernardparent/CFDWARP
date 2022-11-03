@@ -64,24 +64,29 @@
 mf=1.0;
 
 is=1;
-ie=is+round(mf*30);
+ie=is+round(mf*60);
+
+nouter=round(20*mf);
+ninner=round(20*mf);
 
 ks=1;
-km1=ks+round(20*mf);
-km2=km1+round(12*mf);
-ke=km2+round(20*mf);
-js=1;
-jm1=js+round(20*mf);
-jm2=jm1+round(12*mf);
-je=jm2+round(20*mf);
+km1=ks+nouter;
+km2=km1+ninner;
+ke=km2+nouter;
+js=ks;
+jm1=km1;
+jm2=km2;
+je=ke;
 
 
 D=1.0;  {diameter of the pipe in meters}
 L=2.0;  {length of the pipe in meters}
 
 
-W=D/4;  {width of the inner square within the pipe}
+W=D/3;  {width of the inner square within the pipe}
 W2=sin(pi/4)*D; {maximum width of sections on bottom, top, left and right of the inner square}
+squarefactor=1.0; {set to 100 to get a true inner square and to 0 to transform the inner square into
+                   an inner circle}
 
 
 Grid(
@@ -91,9 +96,18 @@ Grid(
   Corners(is,js,ks, is,je,ke, 0,-D/2,-D/2, 0,D/2,D/2 );
   JoinCorners(is,js,ks, is,je,ke,  NO,0.5,1,1, EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
 
-  {grid the 'square' section in center of circle}
+  {grid the 'inner square' section in center of circle}
   Corners(is,jm1,km1, is,jm2,km2, 0,-W/2,-W/2, 0,W/2,W/2 );
   JoinCorners(is,jm1,km1, is,jm2,km2,  NO,0.5,1,1, EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
+
+  {make the inner square more like a circle}
+  Roff=W/2*squarefactor;
+  W3=1.0001*((W/2)^2+(W/2+Roff)^2);
+  Equation(is,jm1,km1,is,jm1,km2,y,y=Roff-sqrt(W3-z^2));
+  Equation(is,jm2,km1,is,jm2,km2,y,y=-Roff+sqrt(W3-z^2));
+  Equation(is,jm1,km1,is,jm2,km1,z,z=Roff-sqrt(W3-y^2));
+  Equation(is,jm1,km2,is,jm2,km2,z,z=-Roff+sqrt(W3-y^2));
+  Plane(is,jm1,km1,is,jm2,km2);
 
   {grid on left of square section (is to im1)}
   for (j,jm1,jm2,

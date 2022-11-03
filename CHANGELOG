@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 NOV 03a
+  * in lib/exm/exm.c
+    - in EXM_angle_between_vectors(), now calls EXM_normalize_vector()
+    - added EXM_normalize_vector()
+    - added EXM_find_rotation_matrix()
+    - added EXM_multiply_matrix_vector()
+  * in lib/gridg/3Dbase.c
+    - added function _distance()
+    - rewrote entirely the function Plane() in general form using the rotation matrix; fixes
+      issues we had previously with this function
+  * in lib/gridg/share.c
+    - added GRIDG_al3()
+    - added GRIDG_find_ijk_from_l()
+    
+
 2022 OCT 28a
   * in cycle/share/cycle_share.c
     - in update_linked_nodes(), fixed a bug that occurred when using MPI and nodes linked together

@@ -1350,6 +1350,7 @@ void EXM_display_vector(EXM_vec3D_t pp){
   printf("x=%E  y=%E  z=%E \n",pp[0],pp[1],pp[2]);
 }
 
+
 double EXM_dot_product(EXM_vec3D_t vec1, EXM_vec3D_t vec2){
   double sum;
   long dim;
@@ -1361,13 +1362,13 @@ double EXM_dot_product(EXM_vec3D_t vec1, EXM_vec3D_t vec2){
   return(sum);
 }
 
+
 void EXM_cross_product(EXM_vec3D_t vec1, EXM_vec3D_t vec2, EXM_vec3D_t prod){
 
   prod[0]=vec1[1]*vec2[2]-vec1[2]*vec2[1];
   prod[1]=vec1[2]*vec2[0]-vec1[0]*vec2[2];
   prod[2]=vec1[0]*vec2[1]-vec1[1]*vec2[0];
 }
-
 
 
 double EXM_vector_magnitude(EXM_vec3D_t vec){
@@ -1384,8 +1385,63 @@ double EXM_vector_magnitude(EXM_vec3D_t vec){
 
 double EXM_angle_between_vectors(EXM_vec3D_t vec1, EXM_vec3D_t vec2){
   double theta;
-  theta=acos(EXM_dot_product(vec1,vec2)/EXM_vector_magnitude(vec1)/EXM_vector_magnitude(vec2));
+  EXM_vec3D_t vec1norm,vec2norm;
+  EXM_normalize_vector(vec1, vec1norm);
+  EXM_normalize_vector(vec2, vec2norm);
+  theta=acos(EXM_dot_product(vec1norm,vec2norm));
   return(theta);
+}
+
+
+void EXM_normalize_vector(EXM_vec3D_t vec, EXM_vec3D_t vecnorm){
+  long dim;
+  double vecmag;
+  vecmag=EXM_vector_magnitude(vec);
+  assert(vecmag!=0.0);
+  for (dim=0; dim<3; dim++) vecnorm[dim]=vec[dim]/vecmag;
+}
+
+
+/* rotation matrix that rotates vec1 into vec2 such that vec2norm=R * vec1norm */
+void EXM_find_rotation_matrix(EXM_vec3D_t vec1, EXM_vec3D_t vec2, EXM_mat3x3_t R){
+  double theta,costheta,sintheta;
+  EXM_vec3D_t s,snorm;
+  theta=EXM_angle_between_vectors(vec1, vec2);
+  EXM_cross_product(vec1, vec2, s);
+  if (EXM_vector_magnitude(s)!=0.0) {
+    EXM_normalize_vector(s,snorm);
+  } else {
+    snorm[0]=0.0; 
+    snorm[1]=0.0; 
+    snorm[2]=0.0;
+  }
+  costheta=cos(theta);
+  sintheta=sin(theta);
+  
+  // from https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
+  // https://math.stackexchange.com/questions/4025666/how-to-rotate-a-vector-in-3d-space-around-arbitrary-axis
+  R[0][0]=costheta+sqr(snorm[0])*(1.0-costheta);
+  R[0][1]=snorm[0]*snorm[1]*(1.0-costheta)-snorm[2]*sintheta;
+  R[0][2]=snorm[0]*snorm[2]*(1.0-costheta)+snorm[1]*sintheta;
+  
+  R[1][0]=snorm[1]*snorm[0]*(1.0-costheta)+snorm[2]*sintheta;
+  R[1][1]=costheta+sqr(snorm[1])*(1.0-costheta);
+  R[1][2]=snorm[1]*snorm[2]*(1.0-costheta)-snorm[0]*sintheta;
+  
+  R[2][0]=snorm[2]*snorm[0]*(1.0-costheta)-snorm[1]*sintheta;
+  R[2][1]=snorm[2]*snorm[1]*(1.0-costheta)+snorm[0]*sintheta;
+  R[2][2]=costheta+sqr(snorm[2])*(1.0-costheta);
+}
+
+
+void EXM_multiply_matrix_vector(EXM_mat3x3_t mat, EXM_vec3D_t vec, EXM_vec3D_t res){
+  long row,col;
+  for (row=0; row<3; row++){
+    res[row]=0.0;
+    for (col=0; col<3; col++){
+      res[row]+=mat[row][col]*vec[col];
+    }
+  }
 }
 
 

@@ -61,21 +61,25 @@
 
 mf=1.0;
 
+ninner=round(12*mf);
+nouter=round(20*mf);
+
 is=1;
-im1=is+round(20*mf);
-im2=im1+round(12*mf);
-ie=im2+round(20*mf);
-js=1;
-jm1=js+round(20*mf);
-jm2=jm1+round(12*mf);
-je=jm2+round(20*mf);
+im1=is+nouter;
+im2=im1+ninner;
+ie=im2+nouter;
+js=is;
+jm1=im1;
+jm2=im2;
+je=ie;
 
 
 D=1.0;  {diameter of the cylinder in meters}
 W=D/4;  {width of the inner square within the cylinder}
 L=2.0;  {length of the cylinder in meters}
 W2=sin(pi/4)*D; {maximum width of sections on bottom, top, left and right of the inner square}
-
+squarefactor=0.5; {set to 100 to get a true inner square and to 0 to transform the inner square into
+                   an inner circle}
 
 Grid(
   Size(is,js, ie,je);
@@ -88,6 +92,15 @@ Grid(
   Corners(im1,jm1, im2,jm2, -W/2,-W/2, W/2,W/2 );
   JoinCorners(im1,jm1, im2,jm2,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
 
+  {make the inner square more like a circle}
+  Roff=W/2*squarefactor;
+  W3=1.0001*((W/2)^2+(W/2+Roff)^2);
+  Equation(im1,jm1,im2,jm1,y,y=Roff-sqrt(W3-x^2));
+  Equation(im1,jm2,im2,jm2,y,y=-Roff+sqrt(W3-x^2));
+  Equation(im1,jm1,im1,jm2,x,x=Roff-sqrt(W3-y^2));
+  Equation(im2,jm1,im2,jm2,x,x=-Roff+sqrt(W3-y^2));
+  JoinFaces(im1,jm1,im2,jm2);
+  
   {grid on left of square section (is to im1)}
   for (j,jm1,jm2,
     theta=(j-jm1)/(jm2-jm1)*pi/2-pi/4;
@@ -139,6 +152,16 @@ Grid(
   for (i,is,im1-1,
     Point(im2+1,je-(i-is),_x(ie-(i-is),jm2-1),_y(ie-(i-is),jm2-1));
   );
+
+  {make the 4 quadrants which will be cut out in Bdry() "disappear" by making them very small
+   NOTE: the following 4 Scale() calls are not necessary and won't make any difference in paraview 
+         but it does make the mesh look better in tecplot by hiding the regions that are cut out. 
+         To make things look even better in tecplot, use Plot->Blanking->Value Blanking and hide 
+         the cells where the pressure is less than 1 Pa (the cut out cells)}
+  Scale(is,js,im1-2,jm1-1, -W/2,-W/2,1e-5,1e-5);
+  Scale(im2+2,js,ie,jm1-1, W/2,-W/2,1e-5,1e-5);
+  Scale(is,jm2+1,im1-2,je, -W/2,W/2,1e-5,1e-5);
+  Scale(im2+2,jm2+1,ie,je, W/2,W/2,1e-5,1e-5);
 
 );
 

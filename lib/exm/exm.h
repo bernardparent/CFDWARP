@@ -22,6 +22,7 @@
 typedef unsigned char bool;
 
 typedef double EXM_vec3D_t[3];
+typedef double EXM_mat3x3_t[3][3];
 
 #ifndef tan
   #define tan(a)   (sin(a)/cos(a))
@@ -170,6 +171,12 @@ void EXM_cross_product(EXM_vec3D_t vec1, EXM_vec3D_t vec2, EXM_vec3D_t prod);
 double EXM_vector_magnitude(EXM_vec3D_t vec);
 
 double EXM_angle_between_vectors(EXM_vec3D_t vec1, EXM_vec3D_t vec2);
+
+void EXM_normalize_vector(EXM_vec3D_t vec, EXM_vec3D_t vecnorm);
+
+void EXM_find_rotation_matrix(EXM_vec3D_t vec1, EXM_vec3D_t vec2, EXM_mat3x3_t R);
+
+void EXM_multiply_matrix_vector(EXM_mat3x3_t mat, EXM_vec3D_t vec, EXM_vec3D_t res);
 
 double EXM_area_quadrilateral(EXM_vec3D_t A, EXM_vec3D_t B, EXM_vec3D_t C, EXM_vec3D_t D);
 

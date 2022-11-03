@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 1998-2000 Bernard Parent
+Copyright 1998-2000,2022 Bernard Parent
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -39,10 +39,38 @@ typedef struct {
 
 long GRIDG_ai3(GRIDG_gl3d_t gl, long i, long j, long k) {
   long ii;
-  ii=(i-gl.is+1)*(gl.je-gl.js+3)+(j-gl.js+1);
+  ii=(i-gl.is+1);
+  ii=ii*(gl.je-gl.js+3)+(j-gl.js+1);
   ii=ii*(gl.ke-gl.ks+3)+(k-gl.ks+1);
   return(ii);
 }
+
+
+long GRIDG_al3(GRIDG_gl3d_t gl, long l, long dim, long offset) {
+  long ii;
+  
+  ii=l+offset;
+  if (dim==0) {
+    ii=l+offset*(gl.je-gl.js+3)
+               *(gl.ke-gl.ks+3);
+  }
+  if (dim==1) {
+    ii=l+offset*(gl.ke-gl.ks+3);
+  }
+  
+  return(ii);
+}
+
+
+void GRIDG_find_ijk_from_l(GRIDG_gl3d_t gl, long l, long *i, long *j, long *k){
+    *k=mod(l,gl.ke-gl.ks+3)+gl.ks-1;
+    *j=mod(l/(gl.ke-gl.ks+3),(gl.je-gl.js+3))
+          +gl.js-1;
+    *i=(l/(gl.ke-gl.ks+3))/(gl.je-gl.js+3)
+          +gl.is-1;
+}
+
+
 
 long GRIDG_ai2(GRIDG_gl2d_t gl, long i, long j) {
   long ii;
