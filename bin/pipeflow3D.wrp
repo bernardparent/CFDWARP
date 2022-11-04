@@ -258,8 +258,8 @@ Model(
     ETAMODEL=ETAMODEL_CONSTANT;     
     eta=1.716e-5;       {kg/ms}
     Pr=0.71;     
-    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
-    Tmin=1.0e1;     Tmax=26.0e3;    {K}
+    Pmin=100;    Pmax=9.9e99;   {Pa}
+    Tmin=200;     Tmax=26.0e3;    {K}
     SetBodyForce(is,js,ks, ie,je,ke, 0.0{N/m3},0.0{N/m3},0.0{N/m3});
     SetHeatDeposited(is,js,ks, ie,je,ke, 0.0 {W/m3});
     {

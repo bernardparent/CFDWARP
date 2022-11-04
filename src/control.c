@@ -594,6 +594,7 @@ double _x_DISTMPI_local(np_t *np, gl_t *gl, SOAP_codex_t *codex, long i, long j,
   zone_t domain_local;
   find_zone_intersection(gl->domain_lim,gl->domain_all,&domain_local);
 
+
   if (i<domain_local.is || i>domain_local.ie
 #ifdef _2DL
       || j<domain_local.js || j>domain_local.je

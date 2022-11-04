@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 NOV 03b
+  * in src/bdry.c
+    - in read_bdry(), fixed a bug related to the call of the functions _x(), _y(),
+      _x_global(), _y_global() in the module Bdry() when using MPI.
+      
+
 2022 NOV 03a
   * in lib/exm/exm.c
     - in EXM_angle_between_vectors(), now calls EXM_normalize_vector()

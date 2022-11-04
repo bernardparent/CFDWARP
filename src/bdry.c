@@ -1179,15 +1179,20 @@ void read_bdry(char *argum, SOAP_codex_t *codex){
 
   gl=((readcontrolarg_t *)codex->action_args)->gl;
 
+
+
 #ifdef DISTMPI
   np_t **np_old;
   gl_t gl_all;
+  npbs_t *tmp;
   zone_t window_old,domain_lim_old,domain_all_old,domain_old;
   domain_lim_old=gl->domain_lim;
   domain_all_old=gl->domain_all;
   domain_old=gl->domain;
   window_old=gl->window;
   gl_all=*gl;
+
+
   init_data_structure(&np, &gl_all, gl->domain_all, gl->domain_all);
   gl->domain_lim=gl_all.domain_lim;
   gl->domain=gl_all.domain;
@@ -1196,6 +1201,21 @@ void read_bdry(char *argum, SOAP_codex_t *codex){
   gl->window=gl_all.window;
   np_old=((readcontrolarg_t *)codex->action_args)->np;
   ((readcontrolarg_t *)codex->action_args)->np=&np;
+
+  for_ijk(domain_old,is,js,ks,ie,je,ke){
+    gl->domain=domain_old;
+    gl->domain_lim=domain_lim_old;
+    gl->domain_lim_all=domain_all_old;
+    gl->domain_all=domain_all_old;    
+    tmp=(*np_old)[_ai(gl,i,j,k)].bs;
+    gl->domain_lim=gl_all.domain_lim;
+    gl->domain=gl_all.domain;
+    gl->domain_all=gl_all.domain_all;
+    gl->domain_lim_all=gl_all.domain_lim;
+    np[_ai(gl,i,j,k)].bs=tmp;
+  }
+  
+  
 #else
   np=*(((readcontrolarg_t *)codex->action_args)->np);
   gl->domain_lim_all=gl->domain_lim;
