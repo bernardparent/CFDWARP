@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 NOV 04a
+  * in src/control.c
+    - in read_control_functions(), removed calls to _x_DISTMPI_local(), _y_DISTMPI_local(),
+      _z_DISTMPI_local() and replaced them by calls to _x_DISTMPI_global()
+    - calls to _x_global() in the control file are now deprecated. Use _x() instead
+     
+
 2022 NOV 03b
   * in src/bdry.c
     - in read_bdry(), fixed a bug related to the call of the functions _x(), _y(),

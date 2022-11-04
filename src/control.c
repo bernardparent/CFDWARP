@@ -605,9 +605,7 @@ double _x_DISTMPI_local(np_t *np, gl_t *gl, SOAP_codex_t *codex, long i, long j,
      ) SOAP_fatal_error(codex,"Function _%c() has been called with i=%ld,j=%ld,k=%ld that is out of bounds. "
                    "Make sure that domain.is<=i<=domain.ie, domain.js<=j<=domain.je, domain.ks<=k<=domain.ke "
                    "where 'domain' refers to the zone accessible by one MPI process. "
-                   "Although seldom necessary, to access x,y,z outside of the domain, use the "
-                   "_x_global(), _y_global, _z_global() functions [DON'T USE THE *_global() FUNCTIONS UNLESS ABSOLUTELY "
-                   "NECESSARY AS THIS WILL SLOW DOWN THE CODE WHEN USING MPI]." ,(int)'x'+dim,i,j,k);
+                   ,(int)'x'+dim,i,j,k);
   x=_x(np[_ai(gl,i,j,k)],dim);
   
   return(x);
@@ -661,10 +659,10 @@ void read_control_functions(char *functionname, char **argum,
     }
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
   }
-  if (strcmp(functionname,"_x")==0) sprintf(*returnstr,"%E",_x_DISTMPI_local(*np,gl,codex,i,j,k,0));
-  if (strcmp(functionname,"_y")==0) sprintf(*returnstr,"%E",_x_DISTMPI_local(*np,gl,codex,i,j,k,1));
-  if (strcmp(functionname,"_x_global")==0) sprintf(*returnstr,"%E",_x_DISTMPI_global(*np,gl,codex,i,j,k,0));
-  if (strcmp(functionname,"_y_global")==0) sprintf(*returnstr,"%E",_x_DISTMPI_global(*np,gl,codex,i,j,k,1));
+  if (strcmp(functionname,"_x")==0) sprintf(*returnstr,"%E",_x_DISTMPI_global(*np,gl,codex,i,j,k,0));
+  if (strcmp(functionname,"_y")==0) sprintf(*returnstr,"%E",_x_DISTMPI_global(*np,gl,codex,i,j,k,1));
+  if (strcmp(functionname,"_x_global")==0) SOAP_fatal_error(codex,"The function _x_global() is deprecated. Use _x() instead.");
+  if (strcmp(functionname,"_y_global")==0) SOAP_fatal_error(codex,"The function _y_global() is deprecated. Use _y() instead.");
 #endif
 #ifdef _3D
   if (strcmp(functionname,"_x")==0 || strcmp(functionname,"_y")==0 || strcmp(functionname,"_z")==0
@@ -675,12 +673,12 @@ void read_control_functions(char *functionname, char **argum,
     }
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
   }
-  if (strcmp(functionname,"_x")==0) sprintf(*returnstr,"%E",_x_DISTMPI_local(*np,gl,codex,i,j,k,0));
-  if (strcmp(functionname,"_y")==0) sprintf(*returnstr,"%E",_x_DISTMPI_local(*np,gl,codex,i,j,k,1));
-  if (strcmp(functionname,"_z")==0) sprintf(*returnstr,"%E",_x_DISTMPI_local(*np,gl,codex,i,j,k,2));
-  if (strcmp(functionname,"_x_global")==0) sprintf(*returnstr,"%E",_x_DISTMPI_global(*np,gl,codex,i,j,k,0));
-  if (strcmp(functionname,"_y_global")==0) sprintf(*returnstr,"%E",_x_DISTMPI_global(*np,gl,codex,i,j,k,1));
-  if (strcmp(functionname,"_z_global")==0) sprintf(*returnstr,"%E",_x_DISTMPI_global(*np,gl,codex,i,j,k,2));
+  if (strcmp(functionname,"_x")==0) sprintf(*returnstr,"%E",_x_DISTMPI_global(*np,gl,codex,i,j,k,0));
+  if (strcmp(functionname,"_y")==0) sprintf(*returnstr,"%E",_x_DISTMPI_global(*np,gl,codex,i,j,k,1));
+  if (strcmp(functionname,"_z")==0) sprintf(*returnstr,"%E",_x_DISTMPI_global(*np,gl,codex,i,j,k,2));
+  if (strcmp(functionname,"_x_global")==0) SOAP_fatal_error(codex,"The function _x_global() is deprecated. Use _x() instead.");
+  if (strcmp(functionname,"_y_global")==0) SOAP_fatal_error(codex,"The function _y_global() is deprecated. Use _y() instead.");
+  if (strcmp(functionname,"_z_global")==0) SOAP_fatal_error(codex,"The function _z_global() is deprecated. Use _z() instead.");
 #endif
 
   if (strcmp(functionname,"_Omega")==0) {
