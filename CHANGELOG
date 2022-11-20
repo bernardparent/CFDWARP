@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 NOV 20a
+  * in cycle/tsemf/_GS/tsemf.c
+    - in update_dUstar_emfield_SOR2_node(), added "long i,j,k;" when NDEBUG is not defined
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - Started improving the section on the electron energy loss function
+  * in tools/chemkin2cfdwarp.c
+    - made various improvements so that the species names are stored in RAM and not in a file
+
+
 2022 NOV 04a
   * in src/control.c
     - in read_control_functions(), removed calls to _x_DISTMPI_local(), _y_DISTMPI_local(),

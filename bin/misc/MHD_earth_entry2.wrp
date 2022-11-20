@@ -6,9 +6,10 @@
                                 CFD Code for Plasma & Reactive Flow
   _______________________________________________________________________________________________
 
-  Version                          20dec08a
+  Version                          22nov04a
   Compiler                         gcc 8.3.0 with OPENMP threads with distributed memory MPI
-  Compiled on                      Dec 15 2020 at 14:32:44
+                                   with assertions
+  Compiled on                      Nov  7 2022 at 21:44:51
   Cycle Strategy                   Standard
   Fluid Relaxation                 Block DDADI [2,1]
   EM Field Relaxation              Implicit schemes based on approximate factorization including
@@ -20,10 +21,12 @@
                                    preserving filter [14]
   Temporal Discretization          Steady-State
   Fluid Model                      Navier-Stokes with drift-diffusion plasma model [15]
-  Thermodynamic Model              NASA Glenn Polynomials [16]
-  Chemical Model                   Air Plasma 11s Dunn-Kang [17], Park [19], Lenard [18], Boyd
-                                   [20]
-  EM Field Model                   Electric field potential and fixed magnetic field [21,22]
+  Thermodynamic Model              NASA Glenn Polynomials [16].
+  Transport Model                  Gupta-Yos [17]
+  Chemical Model                   Air Plasma 11s Dunn-Kang [18], Park [20], Lenard [19], Boyd
+                                   [21], Farbar [22], Parent-Dunn and Parent-Park and Parent
+                                   [24], Kim [23]
+  EM Field Model                   Electric field potential and fixed magnetic field [25,26]
   Beam Model                       None
   Number of Dimensions             2
   Number of Flux Components        16
@@ -67,19 +70,30 @@
        Aerodynamics", AIAA Journal, 54:898-911, 2016.
   [16] BJ McBride, MJ Zehe, and S Gordon. "NASA Glenn Coefficients for Calculating Thermodynamic
        Properties of Individual Species", NASA TP 2002-211556, 2002.
-  [17] MG Dunn and SW Kang. "Theoretical and Experimental Studies of Reentry Plasmas", NASA CR-
+  [17] Gupta, RN, Yos, JM, Thompson, RA. and Lee, KP, "A review of reaction rates and
+       thermodynamic and transport properties for an 11-species air model for chemical and
+       thermal nonequilibrium calculations to 30000 K", NASA Reference Publication 1232, 1990.
+  [18] MG Dunn and SW Kang. "Theoretical and Experimental Studies of Reentry Plasmas", NASA CR-
        2232, 1973.
-  [18] M Lenard. "Ionization of Cesium and Sodium Contaminated Air in the Hypersonic Slender
+  [19] M Lenard. "Ionization of Cesium and Sodium Contaminated Air in the Hypersonic Slender
        Body Boundary Layer", General Electric Missile and Space Division Technical Report
        R64SD22, 1964.
-  [19] C Park. "Review of Chemical-Kinetic Problems of Future NASA Missions, I: Earth Entries,"
+  [20] C Park. "Review of Chemical-Kinetic Problems of Future NASA Missions, I: Earth Entries,"
        Journal of Thermophysics and Heat Transfer 7:385-398, 1993.
-  [20] ID Boyd, "Modeling of associative ionization reactions in hypersonic rarefied flows,"
+  [21] ID Boyd, "Modeling of associative ionization reactions in hypersonic rarefied flows,"
        Physics of Fluids 19:096102, 2007.
-  [21] B Parent, MN Shneider, and SO Macheret. "Generalized Ohm's Law and Potential Equation in
+  [22] E Farbar, ID Boyd, and A Martin. "Numerical Prediction of Hypersonic Flowfields Including
+       Effects of Electron Translational Nonequilibrium", Journal of Thermophysics and Heat
+       Transfer, 24:593-606, 2013.
+  [23] Kim, Jae Gang, and Sung Min Jo. "Modification of chemical-kinetic parameters for 11-air
+       species in re-entry flows." International Journal of Heat and Mass Transfer 169:120950,
+       2021.
+  [24] Parent, B. and Thoguluva Rajendran, P. and Omprakas, A.. "Electron Losses in Hypersonic
+       Flows." Physics of Fluids 34:016110, 2022.
+  [25] B Parent, MN Shneider, and SO Macheret. "Generalized Ohm's Law and Potential Equation in
        Computational Weakly-Ionized Plasmadynamics", Journal of Computational Physics 230:1439-
        1453, 2011.
-  [22] B Parent, SO Macheret, and MN Shneider. "Modeling Weakly-Ionized Plasmas in Magnetic
+  [26] B Parent, SO Macheret, and MN Shneider. "Modeling Weakly-Ionized Plasmas in Magnetic
        Field: A New Computationally-Efficient Approach", Journal of Computational Physics
        300:779-799, 2015.
 
@@ -87,8 +101,8 @@
 }
 
 
-Bz=0.09; {Tesla}
-mf=1.0; 
+Bz=0.07; {Tesla}
+mf=2.0; 
 gamma=0.1e0;    {secondary emission coefficient}
 Twall=3000;     {wall temperature everywhere}
 workfunct=2.7; {2.7, 4.6, and 1e99 eV}
@@ -231,7 +245,13 @@ Model(
     AXISYMMETRIC=NO;
     INCLUDE_E_EFFECTS_ON_ION_MOBILITY=YES;
     INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY=NO;
-    SCHOTTKY_EFFECT=NO;
+    SCHOTTKY_EFFECT=YES;
+    SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
+    SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
+    {
+    AddHeatPoint(0.0{x,m},0.0{y,m}, 0.1{radius,m}, 0.0{W/m});
+    }
+    HEAT_DEPOSITED_TO_ELECTRONS=FALSE;
   );
   AirPlasma11s(
     CHEMMODEL=CHEMMODEL_PARENT2023;
@@ -340,7 +360,7 @@ Disc(
     AOWENO_gammahi=0.999;
     INTERPOL=INTERPOL_TVD2_VANLEER;
     EIGENVALCOND=EIGENVALCOND_PECLET;
-    POSFILTER=POSFILTER_PARENT;
+    POSFILTER=POSFILTER_NONE;
     POSFILTER_numiter=4;
   );
   CDFplus(
@@ -404,39 +424,29 @@ Cycle(
     if (iter==1,
       CFL=0.001;
     );
-    CFLmax=0.3;
-    if(iter<2000, CFLmax=0.3;);
-    if(iter<1500, CFLmax=0.2;);
-    if(iter<1000, CFLmax=0.2;);
-    if(iter<500, CFLmax=0.1;);
-    CFLmax=0.5;
+    CFLmax=0.1;
+    
     CFL=min(CFL*1.02,CFLmax);
 
     
     Model(
       EpotentialBfixed(
-        SetMagneticField(is,js, ie,je, 0,0,min(Bz,Bz*iter/(mf*2000))); 
+        SetMagneticField(is,js, ie,je, 0,0,min(Bz,Bz*iter/(mf*500))); 
       );
     );
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
-    Lc=1000e44;      {characteristic length scale in meters used to solve the emfield equation}
+    Lc=1e-2;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
-    if (iter>10,
-       UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,30);
-       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,200);
-       UpdateEMField(Lc,relaxEMF,TSEMF_DDADI);
-       UpdateEMField(Lc,relaxEMF,TSEMF_SOR,200);
-    );
+    UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,3);
     system("date");
-{    UpdateEMField(Lc,relaxEMF,TSEMF_NEWTON);}
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
   );
 
   DualTimeStepping(
-    tmax=10e-6;    {simulation time span in seconds}
-    dt=tmax/300;   {physical time step in seconds}
+    tmax=110e-6+2*3e-4;    {simulation time span in seconds}
+    dt=2e-6/mf;   {physical time step in seconds}
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
@@ -452,7 +462,7 @@ Cycle(
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
-    if (iter>30,
+    if (iter>50,
       IncreaseTimeLevel();
       WriteDataFile(outputfilename"."round(time/dt));
       printf("dt=%E time=%Es\n",dt,time);

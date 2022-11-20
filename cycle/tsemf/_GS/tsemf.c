@@ -150,6 +150,7 @@ void update_dUstar_emfield_SOR2_node(np_t *np, gl_t *gl, long plane, long planet
 
 
 #ifndef NDEBUG
+      long i,j,k;
       find_ijk_from_l(gl,l,&i,&j,&k);
       switch (SOR_SWEEP){
         case SOR_SWEEP_FORWARD:

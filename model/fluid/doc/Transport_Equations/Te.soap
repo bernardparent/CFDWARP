@@ -1,0 +1,25 @@
+#!/usr/local/bin/soap
+
+
+Te=150000;
+
+kN2_Te=2.6261E-8*Te^0.1420*exp(-536330/Te);
+
+Estar=1e-22;
+FOUND=FALSE;
+cnt=1;
+while(!FOUND && cnt<10000,
+  kN2_Estar=min(exp(2.5576E-4*ln(Estar)^3+2.6112E-80*ln(Estar)^49),1.2640E-7);
+  Estar=Estar*1.002;
+  if (kN2_Estar>kN2_Te, 
+    FOUND=TRUE;
+  );
+  cnt=cnt+1;
+);
+if (cnt>9999, printf("PROBLEM"); );
+
+Estar2=interpolate(INTERPOLATE_CUBICSPLINEMONOTONE,0,0.003e-20,287,0.003E-20,318,0.005e-20,359,0.007E-20,430,0.01e-20,1024,0.03e-20,1639,0.05e-20,2048,0.07e-20,2866,0.1e-20,6233,0.3e-20,7907,0.5e-20,9449,0.7e-20,11257,1e-20,17199,3e-20,20338,5e-20,21498,7e-20,26140,10e-20,46874,20e-20,57904,30e-20,1e8,30e-20,Te);
+
+
+printf("kN2_Te=%E  kN2_Estar=%E\n",kN2_Te,kN2_Estar);
+printf("Te=%E  Estar=%E  Estar2=%E\n",Te,Estar,Estar2);

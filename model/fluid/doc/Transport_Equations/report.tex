@@ -2041,9 +2041,160 @@ or,
 % 
 
 
-
-
 \section{Electron Energy Loss Function}
+
+
+
+Let us start from the electron energy transport equation:
+%
+\begin{equation}
+\frac{\partial }{\partial t}\rho_{\rm e} e_{\rm e} + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_{\rm e} \vec{V}^{\rm e}_j h_{\rm e} 
+-\sum_{i=1}^{3}\frac{\partial }{\partial x_i}\kappa_{\rm e}\frac{\partial T_{\rm e}}{\partial x_i}
+= 
+ W_{\rm e} e_{\rm e}
++   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
+- Q_{\rm e-n}
+- Q_{\rm ei}
+\end{equation}
+%
+Consider the energy transport equation in the ``local approximation'', where the plasma has uniform properties (with no spatial gradients) and is at steady-state. Then, the latter becomes:
+%
+\begin{equation}
+0
+= 
+ W_{\rm e} e_{\rm e}
++   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
+- Q_{\rm e-n}
+- Q_{\rm ei}
+\end{equation}
+%
+Then, from noting that electron mass conservation equation would yield $W_{\rm e}=0$ at steady-state for a uniform plasma:
+%
+\begin{equation}
+0
+= 
+   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
+- Q_{\rm e-n}
+- Q_{\rm ei}
+\end{equation}
+%
+But $\vec{E} \cdot \vec{V}^{\rm e}=(\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot \vec{V}^{\rm e}$:
+%
+\begin{equation}
+0
+= 
+   C_{\rm e} N_{\rm e} (\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot \vec{V}^{\rm e}  
+- Q_{\rm e-n}
+- Q_{\rm ei}
+\end{equation}
+%
+Substitute $Q_{\rm en}$ from Eq.\ (\ref{eqn:Qen}):
+%
+\begin{equation}
+0
+= 
+   C_{\rm e} N_{\rm e} (\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot \vec{V}^{\rm e}  
+- \frac{3 N_{\rm e}k_{\rm B} (T_{\rm e}-T_{\rm v})  |C_{\rm e}| \zeta_{\rm e}}{2 m_{\rm e}\mu_{\rm e}}
+- Q_{\rm ei}
+\end{equation}
+%
+where  $\zeta_{\rm e}$ is the electron energy loss coefficient which we wish to determine here in a similar manner as done in Ref.\ \cite{misc:1995:boeuf}. After isolating $\zeta_{\rm e}$ in the latter, we obtain:
+%
+\begin{equation}
+  \zeta_{\rm e}   
+=  
+ \frac{2 m_{\rm e} \mu_{\rm e}}{3 |C_{\rm e}| N_{\rm e} k_{\rm B} (T_{\rm e}-T_{\rm v}) }
+\left(  C_{\rm e} N_{\rm e} (\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot \vec{V}^{\rm e}
+ - Q_{\rm ei}\right)
+\label{eqn:zetae}
+ \end{equation}
+%
+In the ``local approximation'',  the electron velocity can be taken from Eq.\ (\ref{eqn:Vcharged}) neglecting the pressure gradients:
+%
+\begin{equation}
+  \vec{V}^{\rm e}=\vec{V}^{\rm n} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right)
+\label{eqn:zetae_Ve}
+\end{equation}
+% 
+Substitute the latter in Eq.\ (\ref{eqn:zetae}):
+%
+\begin{equation}
+  \zeta_{\rm e}  
+=  
+ \frac{2 m_{\rm e} \mu_{\rm e}}{3 |C_{\rm e}| N_{\rm e} k_{\rm B} (T_{\rm e}-T_{\rm v}) }
+\left( C_{\rm e} N_{\rm e} \left(\vec{E} + \vec{V^{\rm e}} \times \vec{B}\right)\cdot \left(\vec{V}^{\rm n} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right)\right)
+ - Q_{\rm ei}\right)
+ \end{equation}
+%
+Because the magnitude of the neutrals velocity can be assumed small compared to the magnitude of the electron velocity, the electron energy loss function becomes:
+%
+\begin{equation}
+  \zeta_{\rm e}  
+=  
+ \frac{2 m_{\rm e} \mu_{\rm e}}{3 |C_{\rm e}| N_{\rm e} k_{\rm B} (T_{\rm e}-T_{\rm v}) }
+\left(  -N_{\rm e} \mu_{\rm e} C_{\rm e} |\vec{E}+\vec{V}^{\rm e}\times \vec{B}|^2
+ - Q_{\rm ei}\right)
+ \end{equation}
+%
+or, noting that $C_e = -e$:
+%
+\begin{equation}
+  \zeta_{\rm e}  
+=  
+ \frac{2 m_{\rm e} \mu_{\rm e}}{3 e N_{\rm e} k_{\rm B} (T_{\rm e}-T_{\rm v}) }
+\left(  N_{\rm e} N^2 \mu_{\rm e} e \left(\frac{|\vec{E}+\vec{V}^{\rm e}\times \vec{B}|}{N}\right)^2
+ - Q_{\rm ei}\right)
+ \end{equation}
+%
+Also, we can define the reduced electric field in the electron frame as 
+%
+\begin{equation}
+E^\star\equiv \frac{|\vec{E}+\vec{V}^{\rm e}\times \vec{B}|}{N}
+\end{equation}
+%
+Then
+%
+\begin{equation}
+\frameeqn{
+  \zeta_{\rm e}  
+=  
+ \frac{2 m_{\rm e} \mu_{\rm e} N}{3  k_{\rm B} (T_{\rm e}-T_{\rm v}) }
+\left( N \mu_{\rm e}  \left(E^\star(T_{\rm e})\right)^2
+ - \frac{Q_{\rm ei}}{e N_{\rm e} N}\right)
+}
+\label{eqn:zetae}
+ \end{equation}
+%
+In the latter, $E^\star$ should be determined directly from the electron temperature (local approximation). Thus, $E^\star=E^\star(T_{\rm e})$. Of course, the curve fits based on experimental data available for $E^\star$ as a function of $T_{\rm e}$ (or vice-versa) must include all electron energy loss-gain processes including those due to electron-impact (the ones part of the $Q_{\rm ei}$ term).    
+
+Then, we note that $\mu_e N$ is only function of electron temperature in the limit of a weakly-ionized plasma (neglecting Coulomb collisions). Also, we note that $Q_{\rm ei}/(N_e N)$ is also function of electron temperature and mass fractions of neutrals or ions, but not of electron mass fraction. Thus, $\zeta_e$ is mostly function of electron temperature with a weak dependence on other terms. 
+
+Now, recall the expression for $Q_{\rm en}$ in Eq.\ (\ref{eqn:Qen}):
+%
+\begin{equation}
+  Q_{\rm e-n} = \frac{3 N_{\rm e} k_{\rm B} (T_{\rm e}-T_{\rm v})  |C_{\rm e}| \zeta_{\rm e}}{2 m_{\rm e}\mu_{\rm e}}
+\end{equation}
+%
+Substitute $\zeta_{\rm e}$ from (\ref{eqn:zetae}) in the latter:
+%
+\begin{equation}
+  Q_{\rm e-n} =  N_{\rm e}   |C_{\rm e}|  N
+\left( N \mu_{\rm e}  \left(E^\star(T_{\rm e})\right)^2
+ - \frac{Q_{\rm ei}}{e N_{\rm e} N}\right)
+\end{equation}
+%
+Simplify:
+%
+\begin{equation}
+  Q_{\rm e-n} =  N_{\rm e}   |C_{\rm e}|  N^2
+  \mu_{\rm e}  \left(E^\star(T_{\rm e})\right)^2
+ - Q_{\rm ei}
+\end{equation}
+%
+
+
+
+\section{Electron Energy Loss Function (Old)}
 
 
 
