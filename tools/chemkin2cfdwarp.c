@@ -56,7 +56,7 @@ int check_process(char Line[], int tot, int loc, FILE* output, int num, int run,
 
 void write_species(FILE* input, char* species, int* loc);
 
-void build_current_function(int run, FILE* input, FILE* output);
+int build_current_function(int run, FILE* input, FILE* output);
 // This function builds the appropriate function based on the current cycle run and the given information from the input file then prints it to the output file
 /* Input parameters:
  *   1. run - the indicator for which function is currently being built
@@ -295,9 +295,9 @@ int main(int argc, char **argv) {
   char *inpfile, *outfile;
   bool VALIDOPTIONS = TRUE;
   char *options;
-  int RET, run;
+  int RET, run, i;
   options = NULL;
-  
+  i = 1;
   
   inpfile =(char *)malloc(400*sizeof(char));
   outfile =(char *)malloc(400*sizeof(char));
@@ -333,7 +333,11 @@ int main(int argc, char **argv) {
 	for (run = -1; run != 4; run++) {              // Begin cycle for creating functions in output file
 
 		print_function_header(run, output);
-		build_current_function(run, input, output);
+		i = build_current_function(run, input, output);
+    if (i == 0) {
+      fprintf(stderr, "\n\nERROR\nThe following input file does not provide a species list:\n%s\n\n", inpfile);
+      exit (EXIT_FAILURE);
+    }
     if (run != -1)
       fprintf(output, "\n}\n\n");
     }
@@ -1388,24 +1392,32 @@ void check_all_indicators_formfit_electrontemperature_Q(char oldLine[], char pre
     }
 }
 
-void build_current_function(int run, FILE* input, FILE* output) {
-    char newLine[1000], oldLine[1000], prevLine[1000], lastLine[1000], word[1000];
-    char species[1000];
-    char* ptr;
+int build_current_function(int run, FILE* input, FILE* output) {
+        
+    char *species, *newLine, *oldLine, *prevLine, *lastLine, *word;
+    char *ptr;
+    
+    species = (char *)malloc(600*sizeof(char));
+    newLine = (char *)malloc(1000*sizeof(char));
+    oldLine = (char *)malloc(1000*sizeof(char));
+    prevLine = (char *)malloc(1000*sizeof(char));
+    lastLine = (char *)malloc(1000*sizeof(char));
+    word = (char *)malloc(1000*sizeof(char));
+    
     ptr = &species[0];
+    
     int loc = 0, numR = 0, numP = 0, tot = 0, ind = 0, check = 0, e = 0, way = 10, Q = 0, M = 0, flag1 = 0, flag2 = 0, flag3 = 0, flag4 = 0, reaction = 0, h = 0, ply = 0, i = 0;
 
     rewind(input);
     fgets(oldLine, 1000, input);
     fgets(prevLine, 1000, input);
     fgets(lastLine, 1000, input);
-    if (run == -1)
-        species[0] = 'L';
-
+    species[0] = 'L';
+    
     while (fgets(newLine, 1000, input) != NULL) {  // searches each line until the end of the document
         loc++;
         flag1 = 0, flag2 = 0, flag3 = 0, flag4 = 0;
-        if (run == -1 && species[0] == 'L') {
+        if (species[0] == 'L') {
           for (i = 0; newLine[i] != '\r' && newLine[i] != '\n' && newLine[i] != ' '; i++) {
             word[i] = newLine[i];
           }
@@ -1447,6 +1459,15 @@ void build_current_function(int run, FILE* input, FILE* output) {
         strcpy(prevLine, lastLine);
         strcpy(lastLine, newLine);
     }
+    if (species[0] == 'L') {
+      free ( lastLine );
+      free ( oldLine );
+      free ( prevLine );
+      free ( newLine );
+      free ( word );
+      free ( species );
+      return 0;
+    }
     if (run == -1) {
       fprintf(output, "const static bool REACTION[%d] = {\n", tot+1);
       for (int num = 0; num < tot+1; num++) {
@@ -1454,6 +1475,13 @@ void build_current_function(int run, FILE* input, FILE* output) {
       }
       fprintf(output, "};\n\n");
     }
+    free ( lastLine );
+    free ( oldLine );
+    free ( prevLine );
+    free ( newLine );
+    free ( word );
+    free ( species );
+    return 1;
 }
 
 
@@ -1649,21 +1677,24 @@ int check_process(char Line[], int tot, int loc, FILE* output, int num, int run,
     }
     else if (word[i] == '\0')
         return 0;
-    i = 0;
-    int j = 0;
-    char wordbank[30];
-    while (species[j] != '\0') {
+    
+    if (run != -1) {
       i = 0;
-      while (species[j] != ' ' && species[j] != '\0') {
-        wordbank[i] = species[j];
-        i++, j++;
+      int j = 0;
+      char wordbank[30];
+      while (species[j] != '\0') {
+        i = 0;
+        while (species[j] != ' ' && species[j] != '\0') {
+          wordbank[i] = species[j];
+          i++, j++;
+        }
+        if (species[j] == ' ') {
+          wordbank[i] = '\0';
+          j++;
+        }
+        if ((strcmp(word, wordbank) == 0) || (strcmp(word, "END") == 0))
+          return 10;
       }
-      if (species[j] == ' ') {
-        wordbank[i] = '\0';
-        j++;
-      }
-      if ((strcmp(word, wordbank) == 0) || (strcmp(word, "END") == 0))
-        return 10;
     }
     if (run != -1) {
       fprintf(output, "\n        // ************ERROR: Reaction #%d ignored on line %d due to unknown process or element: \"%s\".", tot, loc, word);

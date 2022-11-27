@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 NOV 26a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - in find_post_variable_name_fluid() and find_post_variable_value_fluid(), added the electron
+      and ion mobilities
+  * in model/fluid/_Navier-Stokes_plasma/fluid.hh
+    - added ncs to totalpostvarfluid
+  * in tools/chemkin2cfdwarp.c
+    - made improvements
+    
+
 2022 NOV 20a
   * in cycle/tsemf/_GS/tsemf.c
     - in update_dUstar_emfield_SOR2_node(), added "long i,j,k;" when NDEBUG is not defined
