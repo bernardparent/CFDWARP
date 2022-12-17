@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2022 DEC 16a
+  * in model/chem/_Air_Plasma_11s/
+    - added thoguluva2023.c and thoguluva2023.h
+  * in model/chem/_Air_Plasma_11s/chem.c and model/chem/_Air_Plasma_11s/chem.hh
+    - incorporated the thoguluva2023 model
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - added the thoguluva2023 model documentation
+  * in model/chem/_C2H4_Air_Plasma_36s/
+    - added from_Igor_v4.txt
+  
+
 2022 NOV 26a
   * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
     - in find_post_variable_name_fluid() and find_post_variable_value_fluid(), added the electron
