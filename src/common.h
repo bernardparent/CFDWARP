@@ -491,6 +491,8 @@ void set_vector_to_zero(flux_t S);
 
 void add_two_matrices(sqmat_t A, sqmat_t B, sqmat_t C);
 
+void subtract_two_matrices(sqmat_t A, sqmat_t B, sqmat_t C);
+
 void copy_matrix(sqmat_t AA, sqmat_t BB);
 
 void copy_vector(flux_t AA, flux_t BB);

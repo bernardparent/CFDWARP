@@ -40,12 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MUSCLVARS MUSCLVARS2
 
 
-/* EIGENSET1 is the original eigenstructure used in CFDWARP during my PhD and postdoc years
-   EIGENSET2 is the new eigenstructure which permits the solution to be both positivity-preserving
-             and high-resolution (by preventing any of the characteristic variables to become zero */ 
+/* EIGENSET1 yields the same eigenvalues and eigenvectors as those specified in "The Use of
+   Domain Decomposition in Accelerating the Convergence of Quasi-Hyperbolic Systems, by Parent and Sislian,
+   JCP, 2002. Guarantees no singular point in alpha or L but yields alpha=0 for some flux components (positivity preserving) Note: in 3D, there is a singular point in L
+   EIGENSET2 guarantees no singular point in alpha, R, or L, and yields all non-zero alphas (positivity-preserving) Note: in 3D, there is a singular point in L
+ */ 
 
 
-/* When using eigenset2, rearrange metrics when a singularity occurs within the left eigenvector
+/* When using EIGENSET2, rearrange metrics when a singularity occurs within the left eigenvector
    matrix. Only rearrange the metrics part of the left and right eigenvectors and leave the metrics
    of the eigenvalues as they are. */
 #define EIGENSET1 1

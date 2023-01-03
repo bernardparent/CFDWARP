@@ -701,6 +701,19 @@ void add_two_matrices(sqmat_t A, sqmat_t B, sqmat_t C){
   }
 }
 
+
+
+void subtract_two_matrices(sqmat_t A, sqmat_t B, sqmat_t C){
+  long row,col;
+
+  for (row=0; row<nf; row++) {
+    for (col=0; col<nf; col++) {
+       C[row][col]=A[row][col]-B[row][col];
+    }
+  }
+}
+
+
 void copy_matrix(sqmat_t AA, sqmat_t BB){
   long row,col;
 
@@ -897,8 +910,8 @@ void invert_matrix_partial_pivoting(sqmat_t mattmp, sqmat_t mat2){
 
 
 void invert_matrix(sqmat_t mattmp, sqmat_t mat2){
-  invert_matrix_gaussian_elimination(mattmp,mat2);
-  //invert_matrix_partial_pivoting(mattmp,mat2);
+  //invert_matrix_gaussian_elimination(mattmp,mat2);
+  invert_matrix_partial_pivoting(mattmp,mat2);
 }
 
 

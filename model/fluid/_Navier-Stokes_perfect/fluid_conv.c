@@ -37,48 +37,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MUSCLVARS MUSCLVARS2
 
 
-/* EIGENSET=1 yields the eigenvectors recommended by mathematica (positivity-preserving)  
-   EIGENSET=2 yields the same eigenvalues and eigenvectors as those specified in "The Use of
+/* EIGENSET0 yields the eigenvectors recommended by mathematica (positivity-preserving)  
+   EIGENSET1 yields the same eigenvalues and eigenvectors as those specified in "The Use of
    Domain Decomposition in Accelerating the Convergence of Quasi-Hyperbolic Systems, by Parent and Sislian,
    JCP, 2002. Guarantees no singular point in alpha or L but yields alpha=0 for some flux components (positivity preserving) Note: in 3D, there is a singular point in L
-   EIGENSET=3 guarantees no singular point in alpha, R, or L, and yields all non-zero alphas (positivity-preserving) Note: in 3D, there is a singular point in L
-   EIGENSET=11 is a mix of the eigenvectors of EIGENSET#1 and EIGENSET#2
+   EIGENSET2 guarantees no singular point in alpha, R, or L, and yields all non-zero alphas (positivity-preserving) Note: in 3D, there is a singular point in L
+   EIGENSET11 is a mix of the eigenvectors of EIGENSET#1 and EIGENSET#2
               (only coded in 2D, and not positivity-preserving)
-   EIGENSET=12 has singular point in alpha (division by Vstar) (not positivity-preserving, only coded in 2D) 
-   EIGENSET=13 yields the same eigenvectors as EIGENSET=2 but with the first and second column interchanged
+   EIGENSET12 has singular point in alpha (division by Vstar) (not positivity-preserving, only coded in 2D) 
+   EIGENSET13 yields the same eigenvectors as EIGENSET=2 but with the first and second column interchanged
               (positivity-preserving, but only coded in 2D)
 */
 
-/* When using eigenset3, rearrange metrics when a singularity occurs within the left eigenvector
+/* When using EIGENSET2, rearrange metrics when a singularity occurs within the left eigenvector
    matrix. Only rearrange the metrics part of the left and right eigenvectors and leave the metrics
    of the eigenvalues as they are. */
 
-#define EIGENSET 3
+#define EIGENSET0 0
+#define EIGENSET1 1
+#define EIGENSET2 2
+#define EIGENSET11 11
+#define EIGENSET12 12
+#define EIGENSET13 13
+#define EIGENSET EIGENSET2
 
 
-static void rearrange_metrics_EIGENSET_3(metrics_t *metrics){
-
-#ifdef _3D
-  double tol,X1,X2,X3,Xmax;
-  long Xmaxindex;
-
-  tol=5e-2;
-
-  X1=metrics->X[0];
-  X2=metrics->X[1];
-  X3=metrics->X[2];
-  
-  Xmax=max(fabs(X1),max(fabs(X2),fabs(X3)));
-  assert(Xmax!=0.0);
-  Xmaxindex=0;
-  if (fabs(X1)>=fabs(X2) && fabs(X1)>=fabs(X3)) Xmaxindex=0;
-  if (fabs(X2)>=fabs(X1) && fabs(X2)>=fabs(X3)) Xmaxindex=1;
-  if (fabs(X3)>=fabs(X1) && fabs(X3)>=fabs(X2)) Xmaxindex=2;
-  if (fabs(X1+X2+X3)<Xmax*tol) {
-     metrics->X[Xmaxindex]=metrics->X[Xmaxindex]*(1.0+tol-fabs(X1+X2+X3)/(Xmax));
-  }
-#endif
-}
 
 
 
@@ -353,7 +336,7 @@ void find_Lambda_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t lamb
   assert(sum>=0.0e0);
   sum=sqrt(sum);
   a=_a_from_jacvars(jacvars);
-  if (EIGENSET==1){
+  if (EIGENSET==EIGENSET0){
     lambda[nd][nd]=Vstar-a*sum;
     lambda[nd+1][nd+1]=Vstar+a*sum;
   } else {
@@ -375,7 +358,7 @@ void find_Linv_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
   double denom,l11,l21,l31,l12,l22,l32;
 #endif
 
-  if (EIGENSET==3) rearrange_metrics_EIGENSET_3(&metrics);
+  if (EIGENSET==EIGENSET2) rearrange_metrics_eigenset2(&metrics);
 
 
   g=jacvars.gamma;
@@ -392,7 +375,7 @@ void find_Linv_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
   Xmag2=(X1*X1 + X2*X2);
   Vstar=u*X1 + v*X2;
 
-  if (EIGENSET==1) {
+  if (EIGENSET==EIGENSET0) {
     R[0][0]=X1;
     R[0][1]=-v*X1 + u*X2;
     R[0][2]=2.0*(g - 1.0)*Xmag2;
@@ -415,7 +398,7 @@ void find_Linv_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
   }
 
 
-  if (EIGENSET==11) {
+  if (EIGENSET==EIGENSET11) {
     assert(Xmag!=0.0e0);
     R[0][0]=X1;
     R[0][1]=0.0e0;
@@ -437,7 +420,7 @@ void find_Linv_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
 
   }
 
-  if (EIGENSET==12){
+  if (EIGENSET==EIGENSET12){
     R[0][0]=X2;
     R[0][1]=X1;
     R[0][2]=1.0;
@@ -456,7 +439,7 @@ void find_Linv_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
     R[3][3]=a*a/(-1.0 + g) + q2/2.0 - (a*Vstar)/Xmag;
   }
 
-  if (EIGENSET==14){
+  if (EIGENSET==EIGENSET14){
     R[0][0]=X2;
     R[0][1]=X1;
     R[0][2]=1.0e0;
@@ -475,7 +458,7 @@ void find_Linv_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
     R[3][3]=a*a/(-1.0 + g) + 1.0/2.0*q2 - (a*(u*X1 + v*X2))/Xmag;
    }
 
-  if (EIGENSET==3){
+  if (EIGENSET==EIGENSET2){
     R[0][0]=1.0e0;
     R[0][1]=1.0e0;
     R[0][2]=1.0e0;
@@ -495,7 +478,7 @@ void find_Linv_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
   }
 
 
-  if (EIGENSET==2) {
+  if (EIGENSET==EIGENSET1) {
     R[0][0]=1.0e0;
     R[0][1]=0.0e0;
     R[0][2]=1.0e0;
@@ -516,7 +499,7 @@ void find_Linv_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
 
 
 
-  if (EIGENSET==13){
+  if (EIGENSET==EIGENSET13){
     R[0][0]=0.0e0;
     R[0][1]=1.0e0;
     R[0][2]=1.0e0;
@@ -551,7 +534,7 @@ void find_Linv_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
   Xmag2=(X1*X1 + X2*X2 + X3*X3);
   Vstar=u*X1 + v*X2 + w*X3;
 
-  if (EIGENSET==1){
+  if (EIGENSET==EIGENSET0){
     R[0][0]=2.0*X1; 
     R[0][1]=-2.0*w*X1 + 2.0*u*X3;
     R[0][2]=-2.0*v*X1 + 2.0*u*X2;
@@ -583,7 +566,7 @@ void find_Linv_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
     R[4][4]=2.0*a2*Xmag2 + (g - 1.0)*(q2*Xmag2 + 2.0*Vstar*a*Xmag);
   }
 
-  if (EIGENSET==2){
+  if (EIGENSET==EIGENSET1){
     denom = sqrt(sqr(X3 - X2) + sqr(X1 - X3) + sqr(X2 - X1))/Xmag;
     assert(denom!=0.0e0);
     l11 = (X3 - X2)/Xmag/denom;
@@ -621,7 +604,7 @@ void find_Linv_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
 
   }
 
-  if (EIGENSET==3){
+  if (EIGENSET==EIGENSET2){
     R[0][0]=1.0e0;
     R[0][1]=1.0e0;
     R[0][2]=1.0e0;
@@ -677,7 +660,7 @@ void find_LUstar_from_jacvars(jacvars_t jacvars,  metrics_t metrics, flux_t LUst
   double Omega,rho,u,v,w,X1,X2,X3,Xmag2,q2,g;
 #endif
 
-  if (EIGENSET==3) rearrange_metrics_EIGENSET_3(&metrics);
+  if (EIGENSET==EIGENSET2) rearrange_metrics_eigenset2(&metrics);
 
 
   FOUND=FALSE;
@@ -692,35 +675,35 @@ void find_LUstar_from_jacvars(jacvars_t jacvars,  metrics_t metrics, flux_t LUst
   X1=metrics.X[0];
   X2=metrics.X[1];
   Vstar=u*X1 + v*X2;
-  if (EIGENSET==2){
+  if (EIGENSET==EIGENSET1){
     LUstar[0]=Omega*(-1.0+g)*rho/(g);
     LUstar[1]=0.0;
     LUstar[2]=Omega*rho/(2.0*g);
     LUstar[3]=Omega*rho/(2.0*g);
     FOUND=TRUE;
   }
-  if (EIGENSET==3){
+  if (EIGENSET==EIGENSET2){
     LUstar[0]=Omega*(-1.0+g)*rho/(2.0*g);
     LUstar[1]=Omega*(-1.0+g)*rho/(2.0*g);
     LUstar[2]=Omega*rho/(2.0*g);
     LUstar[3]=Omega*rho/(2.0*g);
     FOUND=TRUE;
   }
-  if (EIGENSET==12){
+  if (EIGENSET==EIGENSET12){
     LUstar[0]=Omega*(-1.0+g)*rho*v/g/notzero(Vstar,1e-50);
     LUstar[1]=Omega*(-1.0+g)*rho*u/g/notzero(Vstar,1e-50);
     LUstar[2]=Omega*rho/2.0/g;
     LUstar[3]=Omega*rho/2.0/g;
     FOUND=TRUE;
   }
-  if (EIGENSET==14){
+  if (EIGENSET==EIGENSET14){
     LUstar[0]=Omega*(-1.0+g)*rho/g/notzero(X1+X2,1e-50);
     LUstar[1]=Omega*(-1.0+g)*rho/g/notzero(X1+X2,1e-50);
     LUstar[2]=Omega*rho/2.0/g;
     LUstar[3]=Omega*rho/2.0/g;
     FOUND=TRUE;
   }
-  if (EIGENSET==13){
+  if (EIGENSET==EIGENSET13){
     LUstar[0]=0.0e0;
     LUstar[1]=Omega*(-1.0+g)*rho/(g);
     LUstar[2]=Omega*rho/(2.0*g);
@@ -752,7 +735,7 @@ void find_LUstar_from_jacvars(jacvars_t jacvars,  metrics_t metrics, flux_t LUst
     LUstar[4]=Omega*rho/(4.0*(-1.0 + g)*g*Xmag2);
     FOUND=TRUE;
   }
-  if (EIGENSET==2){
+  if (EIGENSET==EIGENSET1){
     LUstar[0]=Omega*(-1.0+g)*rho/(g);
     LUstar[1]=0.0;
     LUstar[2]=0.0;
@@ -760,7 +743,7 @@ void find_LUstar_from_jacvars(jacvars_t jacvars,  metrics_t metrics, flux_t LUst
     LUstar[4]=Omega*rho/(2.0*g);
     FOUND=TRUE;
   }
-  if (EIGENSET==3){
+  if (EIGENSET==EIGENSET2){
     LUstar[0]=Omega*((-1.0 + g)*rho)/(3.0*g);
     LUstar[1]=Omega*((-1.0 + g)*rho)/(3.0*g);
     LUstar[2]=Omega*((-1.0 + g)*rho)/(3.0*g);
@@ -791,7 +774,7 @@ void find_L_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t L){
 #endif
 
 
-  if (EIGENSET==3) rearrange_metrics_EIGENSET_3(&metrics);
+  if (EIGENSET==EIGENSET2) rearrange_metrics_eigenset2(&metrics);
 
   g=jacvars.gamma;
   a2=jacvars.a2;
@@ -807,7 +790,7 @@ void find_L_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t L){
   Xmag2=(X1*X1 + X2*X2);
   Vstar=u*X1 + v*X2;
 
-  if (EIGENSET==1){
+  if (EIGENSET==EIGENSET0){
     L[0][0]=(-(-1.0 + g)*q2*q2*Xmag2 + 
       2.0*a2*(4.0*u*v*X1*X2 + u*u*(X1*X1 - X2*X2) + 
       v*v*(-X1*X1 + X2*X2)))/notzero(2.0*a2*(u*u*X1 - v*v*X1 + 2.0*u*v*X2)*Xmag2,1e-50);
@@ -837,7 +820,7 @@ void find_L_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t L){
     L[3][3]=1.0/notzero(4.0*a2*Xmag2,1e-50);
   }
   
-  if (EIGENSET==2) {
+  if (EIGENSET==EIGENSET1) {
     L[0][0]=(2.0*a*a - (-1.0 + g)*(u*u + v*v))/(2.0*a*a);
     L[0][1]=((-1.0 + g)*u)/(a*a);
     L[0][2]=((-1.0 + g)*v)/(a*a);
@@ -859,7 +842,7 @@ void find_L_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t L){
     L[3][3]=(-1.0 + g)/(2.0*a*a);
   }
 
-  if (EIGENSET==3){
+  if (EIGENSET==EIGENSET2){
     L[0][0]=(2.0*a2 - (-1.0 + g)*q2 + (2.0*a*(v*X1 - u*X2))/Xmag)/(4.0*a2);
     L[0][1]=-((u - g*u - (a*X2)/Xmag)/(2.0*a2));
     L[0][2]=-((v - g*v + (a*X1)/Xmag)/(2.0*a2));
@@ -879,7 +862,7 @@ void find_L_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t L){
   }
 
 
-  if (EIGENSET==11) {
+  if (EIGENSET==EIGENSET11) {
 L[0][0]=(2.0* a*a - (-1.0 + g)*(u*u + v*v))/notzero(2.0*a*a*X1,1e-50);
 L[0][1]=((-1.0 + g)*u)/notzero(a*a*X1,1e-50);
 L[0][2]=((-1 + g)*v)/notzero(a*a*X1,1e-50);
@@ -902,7 +885,7 @@ L[3][2]=(v - g*v - (a*X2)/Xmag)/(2.0*a*a);
 L[3][3]=(-1.0 + g)/(2.0*a*a);
   }
 
-  if (EIGENSET==12) {
+  if (EIGENSET==EIGENSET12) {
 
 L[0][0]=-(-2.0* a2* u*X1*X2 - 
       2.0* a2* v*X2*X2 + (-1.0 + g)*u*u*v*Xmag2 + (-1.0 + 
@@ -932,7 +915,7 @@ L[3][3]=(-1.0 + g)/(2.0* a2);
 
   }
 
-  if (EIGENSET==14){
+  if (EIGENSET==EIGENSET14){
     L[0][0]=(2.0* a *X1* (-v *X1 + u *X2) + 
   2.0* a2*Xmag2 - (-1.0 + g)*q2*Xmag2)/(
   2.0* a2*(X1*X1*X1 + X1*X1*X2 + X1*X2*X2 + 
@@ -975,7 +958,7 @@ L[3][3]=(-1.0 + g)/(2.0* a2);
   }
   
 
-  if (EIGENSET==13){
+  if (EIGENSET==EIGENSET13){
     L[0][0]=(v*X1 - u*X2)/a/Xmag;
     L[0][1]=X2/Xmag/a;
     L[0][2]=-(X1/Xmag/a);
@@ -1011,7 +994,7 @@ L[3][3]=(-1.0 + g)/(2.0* a2);
   Xmag2=(X1*X1 + X2*X2 + X3*X3);
   Vstar=u*X1 + v*X2 + w*X3;
 
-  if (EIGENSET==1){
+  if (EIGENSET==EIGENSET0){
 L[0][0]=(-(-1.0 + g)*q2*q2*Xmag2 + 
    2.0*a2*(4.0*v*w*X2*X3 + 4.0*u*X1*(v*X2 + w*X3) + 
       u*u*(X1*X1 - X2*X2 - X3*X3) - w*w*(X1*X1 + X2*X2 - X3*X3) - 
@@ -1079,7 +1062,7 @@ L[4][4]=1.0/(4.0*a2*Xmag2);
 
 
 
-  if (EIGENSET==2){
+  if (EIGENSET==EIGENSET1){
     L[0][0]=(2.0*a*a - (-1.0 + g)*q2)/(2.0*a2);
     L[0][1]=((-1.0 + g)*u)/a2;
     L[0][2]=((-1.0 + g)*v)/a2;
@@ -1127,7 +1110,7 @@ L[4][4]=1.0/(4.0*a2*Xmag2);
 
   
 
-  if (EIGENSET==3) {
+  if (EIGENSET==EIGENSET2) {
     L[0][0]=(2.0*a2*(X1*X1*X1 + X2*X2*X2 + X2*X2*X3 + X2*X3*X3 + X3*X3*X3 + X1*X1*(X2 + X3) + 
         X1*(X2*X2 + X3*X3)) - (-1.0 + g)*q2*(X1*X1*X1 + X2*X2*X2 + 
         X2*X2*X3 + X2*X3*X3 + X3*X3*X3 + X1*X1*(X2 + X3) + 

@@ -493,7 +493,7 @@ void test_Linv ( np_t * np, gl_t * gl, long lL, long lR, long theta ) {
 
 void test_L ( np_t * np, gl_t * gl, long lL, long lR, long theta ) {
   sqmat_t Linv, L, Mult;
-// sqmar_t Lnum;
+  sqmat_t Lnum,deltaL;
   jacvars_t jacvarsL, jacvarsR, jacvars;
   metrics_t metrics;
 
@@ -510,20 +510,25 @@ void test_L ( np_t * np, gl_t * gl, long lL, long lR, long theta ) {
   find_jacvars ( np[lR], gl, metrics, theta, &jacvarsR );
   find_jacvars_at_interface_from_jacvars ( jacvarsL, jacvarsR, gl, theta, metrics, AVERAGING_ROE, &jacvars );
 
-  find_Linv_from_jacvars ( jacvars, metrics, Linv );
   find_L_from_jacvars ( jacvars, metrics, L );
+  find_Linv_from_jacvars ( jacvars, metrics, Linv );
+
+  invert_matrix(Linv,Lnum);
+  printf("L Analytical (found from the L subroutine)  \n");
+  display_matrix(L);
+  printf("L Numerical (found from the Linv subroutine - inverted) \n");
+  display_matrix(Lnum);
+  subtract_two_matrices(L,Lnum,deltaL);
+  printf("L Analytical minus L Numerical \n");
+  display_matrix(deltaL);
+
   multiply_matrix_and_matrix ( Linv, L, Mult );
 
   printf ( "Linv*L Analytical \n" );
   display_matrix ( Mult );
+  
 
-/*
-   invert_matrix(Linv,Lnum);
-   printf("L Analytical (found from the L subroutine)  \n");
-   display_matrix(L);
-   printf("L Numerical (found from the Linv subroutine - inverted) \n");
-   display_matrix(Lnum);
-*/
+
 }
 
 

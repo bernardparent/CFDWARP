@@ -367,7 +367,7 @@ void write_license ( FILE * outputfile ) {
   if (outputfile!=stdout) linewidth=MAX_LINE_WIDTH;
 
   wfprintf(outputfile,"\n");
-  sprintf(linestr,"  Copyright 1998-2022 Bernard Parent\n"
+  sprintf(linestr,"  Copyright 1998-2023 Bernard Parent\n"
                   "  Copyright 2002-2007 Derrick C. Alexander\n"
                   "  Copyright 2001-2002 Jason Etele\n"
                   "  Copyright 2002 Thomas E. Schwartzentruber\n"

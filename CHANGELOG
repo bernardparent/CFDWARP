@@ -7,6 +7,23 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JAN 02a
+  * in model/fluid/_Favre-Reynolds/fluid_conv.c
+    - changed some comments related to EIGENSET
+  * in model/fluid/_Navier-Stokes/fluid_conv.c
+    - added find_Linv_from_jacvars_eigenset1(), find_L_from_jacvars_eigenset1()
+  * in model/fluid/_Navier-Stokes_perfect/fluid_conv.c
+    - renamed eigenset 1 to 0, 2 to 1, and 3 to 2
+    - deleted rearrange_metrics_EIGENSET_3(); now calls rearrange_metrics_eigenset2() instead
+  * in src/common.c
+    - added subtract_two_matrices()
+    - in invert_matrix(), now calls invert_matrix_partial_pivoting() instead of 
+      invert_matrix_gaussian_elimination()
+    - in write_license(), changed the copyright years
+  * in src/test.c
+    - in test_L(), added comparison between L analytical and L numerical obtained from Linv
+  
+
 2022 DEC 16a
   * in model/chem/_Air_Plasma_11s/
     - added thoguluva2023.c and thoguluva2023.h
