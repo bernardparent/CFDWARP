@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JAN 02b
+  * in model/chem/_C2H4_Air_Plasma_36s/chem.c
+    - implemented version 4 of the Adamovich model
+
+
 2023 JAN 02a
   * in model/fluid/_Favre-Reynolds/fluid_conv.c
     - changed some comments related to EIGENSET
