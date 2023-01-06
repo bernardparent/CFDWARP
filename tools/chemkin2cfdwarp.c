@@ -43,27 +43,50 @@ int reaction_class(char Line[], int reaction);
  *      = 1 when only Kelvin is specified
  *      = 2 when only Molecules is specified
  *      = 3 when both Kelvin and Molecules are specified
- *      = reaction when there is no change from the previous reaction class      */
+ *      = reaction  --  when there is no change from the previous reaction class      */
 
 int check_process(char Line[], int tot, int loc, FILE* output, int num, int run, char* species);
-// This function checks a reaction to see if there are any unrecognizable processes it cannot compute such as "LOW" and "TROE"
+// This function checks a reaction to see if there are any unrecognizable processes it cannot compute such as "LOW" and "TROE". This function also classifies much of a reaction by determing how many information lines are given after a reaction is listed in the input file. 
 /* Input parameters:
- *   1. Line[] - the current line being checked for unknown processes
- *   2. tot - the total number of reactions thus far
+ *   1. Line[] - the current input line being checked for unknown processes
+ *   2. tot - the total number of reactions thus far 
  *   3. loc - the current line location of the reaction under examination
+ *   4. run - the indicator for which function is currently being built (here it is used to avoid printing an error during run = -1)
+ *    = -1 when building REACTION[]
+ *    = 0 when building find_W_CHEMKIN()
+ *    = 1 when building find_dW_dx_CHEMKIN ()
+ *    = 2 when building find_Qei()
+ *    = 3 when building find_dQei_dx
+ *   5. num - the indicator for whether Line[] is being checked for processes or within another function such as print_elements_add_ionization or check_M_reaction
+ *      = 0  when being used within print_elements_add_ionization or check_M_reaction
+ *      = 1  when processes are being checked in build_current_function
+ *   6. species - the list of species to be compared with known processes
  * Output parameters:
- *   1. output file - the function outputs an error to the output file in the form of a comment if there are unrecognizable processes */
+ *   1. output file - the function outputs an error to the output file in the form of a comment if there are unrecognizable processes 
+ *   2. Return integer - the returned integer specifies the type of line in the input
+ *      = -2 when there is a "LOW" process specified
+ *      = 0 when line is commented out or a known process is read
+ *      = 1 when there is an unrecognizeable process specified
+ *      = 2 when there is a "HIGH" process specified
+ *      = 3 when there is a reaction is read
+ *      = 10 when there is a species read     */
 
-void write_species(FILE* input, char* species, int* loc);
+void write_species(FILE* input, char** species, int* loc);
+// This function builds a species list when prompted by "SPECIES" in the input file. The species list is built in a memory allocated character array  char* p and the address of this character array is stored in char** species which is then able to be returned from the function and allow for species list recovery.
+/* Input parameters:
+ *   1. input file - the file to retrieve new lines of data from
+ *   2. loc - the current line location of the input under examination (updated value returned)
+ *   3. species - the character array to build the species list  */
 
 int build_current_function(int run, FILE* input, FILE* output);
 // This function builds the appropriate function based on the current cycle run and the given information from the input file then prints it to the output file
 /* Input parameters:
  *   1. run - the indicator for which function is currently being built
- *    = 1 when building add_W_Ionization_CHEMKIN()
- *    = 2 when building add_dW_dx_Ionization_CHEMKIN()
- *    = 3 when building find_Qei()
- *    = 4 when building find_dQei_dx
+ *    = -1 when building REACTION[]
+ *    = 0 when building find_W_CHEMKIN()
+ *    = 1 when building find_dW_dx_CHEMKIN ()
+ *    = 2 when building find_Qei()
+ *    = 3 when building find_dQei_dx
  *   2. input file - the file to retrieve new lines of data from */
  /* Output parameters:
   *   1. output file - the function built is printed to the output file */
@@ -72,11 +95,12 @@ int build_current_function(int run, FILE* input, FILE* output);
 void print_function_header(int run, FILE* output);
 // This function prints the appropriate function header based on the current run, prior to data retrieval
 /* Input parameters:
- *   1. run - the indicator for the current function being built
- *    = 1 when building add_W_Ionization_CHEMKIN()
- *    = 2 when building add_dW_dx_Ionization_CHEMKIN()
- *    = 3 when building find_Qei()
- *    = 4 when building find_dQei_dx */
+ *   1. run - the indicator for which function is currently being built
+ *    = -1 when building REACTION[]
+ *    = 0 when building find_W_CHEMKIN()
+ *    = 1 when building find_dW_dx_CHEMKIN ()
+ *    = 2 when building find_Qei()
+ *    = 3 when building find_dQei_dx */
  /* Output parameters:
   *   1. output file - the function headers are printed in the output file */
 
@@ -94,7 +118,9 @@ void check_all_indicators_formfit_electrontemperature_Q(char oldLine[], char pre
   *      = 1 when reaction uses electron temperature
   *   3. Q - the indicator for a Qei reaction
   *      = 0 when reaction does not have "EXCI" value
-  *      = 1 when reaction does have "EXCI" value   */
+  *      = 1 when reaction does have "EXCI" value on the fourth line of information
+  *      = 2 when reaction does have "EXCI" value on the second line of information
+  *      = 3 when reaction does have "EXCI" value on the third line of information   */
 
 void print_output_line(char oldLine[], char prevLine[], char lastLine[], char newLine[], int ind, int e, int Q, int way, int tot, int run, int numR, int numP, FILE* output, int M, int reaction, int h, int loc, int ply, char* species);
 // This function prints the necessary output lines according to the reaction information provided and the current function being built
@@ -107,52 +133,83 @@ void print_output_line(char oldLine[], char prevLine[], char lastLine[], char ne
  *      = 0 when reaction uses gas temperature
  *      = 1 when reaction uses electron temperature
  *   4. Q - the indicator for a Qei reaction
- *      = 0 when reaction does not have "EXCI" value
- *      = 1 when reaction does have "EXCI" value
+  *      = 0 when reaction does not have "EXCI" value
+  *      = 1 when reaction does have "EXCI" value on the fourth line of information
+  *      = 2 when reaction does have "EXCI" value on the second line of information
+  *      = 3 when reaction does have "EXCI" value on the third line of information  
  *   5. way - the indicator for a reaction that runs forwards or backwards
  *      = 1 when reaction is forward
  *      = 2 when reaction is forward and backward
- *   6. run - the indicator for what function is currently being built
- *    = 1 when building add_W_Ionization_CHEMKIN()
- *    = 2 when building add_dW_dx_Ionization_CHEMKIN()
- *    = 3 when building find_Qei()
- *    = 4 when building find_dQei_dx
+ *   6. run - the indicator for which function is currently being built
+ *    = -1 when building REACTION[]
+ *    = 0 when building find_W_CHEMKIN()
+ *    = 1 when building find_dW_dx_CHEMKIN ()
+ *    = 2 when building find_Qei()
+ *    = 3 when building find_dQei_dx
  *   7. tot - the indicator for total number of reactions detected thus far, +1 for every new reaction
  *   8. numR - the number of reactants in the reaction
  *   9. numP - the number of products  in the reaction
- *   10. reaction - the reaction class of the output being built
+ *   10. M - the indicator for the presence of a third body reaction or the number of necessary third body substitutions if yes
+ *   11. reaction - the reaction class of the output being built
  *      = 0 when no reaction class is specified
  *      = 1 when only Kelvin is specified
  *      = 2 when only Molecules is specified
- *      = 3 when both Kelvin and Molecules are specified  */
+ *      = 3 when both Kelvin and Molecules are specified 
+ *   12. h - the indicator for HIGH/LOW process and what line it is located on
+ *   13. loc - the current line location of the input under examination
+ *   14. ply - the indicator for a third body presence in the reaction, regardless of substitutions
+ *   15. species - the species list to be used in third body reactions and process comparisons
+ *  */
  /* Output parameters:
   *   1. output file - the appropriate output lines for each function are printed to the output file */
 
 
-void print_elements_add_ionization(char oldLine[], char prevLine[], char lastLine[], char newLine[], FILE* output, int numR, int numP, int step, int M, int ind, int run, int way, int tot, int loc, int w, char* species);
-// This function prints the elements on the add Ionization functions
+void print_elements_chemkin(char oldLine[], char prevLine[], char lastLine[], char newLine[], FILE* output, int numR, int numP, int step, int M, int ind, int run, int way, int tot, int loc, int w, char* species);
+// This function prints the elements on the find_W_CHEMKIN functions
 /* Input parameters:
- *   1. oldLine[] - the current reaction line being searched
+ *   1. oldLine[], prevLine[], lastLine[], newLine[] - the current reaction line being searched and the following 3 lines of information from the input file
  *   2. numR - the number of reactants in the reaction
- *   3. numP - the number of products in the reaction */
+ *   3. numP - the number of products in the reaction 
+ *   4. step - the current iteration of substitution steps made for a third body reaction
+ *   5. M - the number of subsitutions necessary or an indicator of a third body reaction
+ *   6. ind - the indicator for form fit or standard fit
+ *      = 0 when reaction is standard fit
+ *      = 1 when reaction is form fit
+ *   7. run - the indicator for which function is currently being built
+ *    = -1 when building REACTION[]
+ *    = 0 when building find_W_CHEMKIN()
+ *    = 1 when building find_dW_dx_CHEMKIN ()
+ *    = 2 when building find_Qei()
+ *    = 3 when building find_dQei_dx 
+ *   8. way - the indicator for a reaction that runs forwards or backwards
+ *      = 1 when reaction is forward
+ *      = 2 when reaction is forward and backward
+ *   9. tot - the indicator for total number of reactions detected thus far, +1 for every new reaction
+ *   10. loc - the current line location of the input under examination
+ *   11. w - this is an indicator for high or low processes and which order to print variables 
+ *   12. species - the species list to be used in third body reactions and process comparisons */
  /* Output parameters:
   *   1. output file - the elements for a reaction added in the add_Ionization functions is printed to the output file  */
 
 
-void print_numbers_add_ionization(char oldLine[], char prevLine[], char lastLine[], char newLine[], int numR, int numP, int ind, FILE* output, int step, int M, int reaction, int w);
-// This function prints the data numbers for the add_Ionization functions
+void print_numbers_chemkin(char oldLine[], char prevLine[], char lastLine[], char newLine[], int numR, int numP, int ind, FILE* output, int step, int M, int reaction, int w);
+// This function prints the data numbers for the find_W_CHEMKIN functions
 /* Input parameters:
- *   1. oldLine[], prevLine[] - the current reaction line being searched and the following line of information from the input file
+ *   1. oldLine[], prevLine[], lastLine[], newLine[] - the current reaction line being searched and the following 3 lines of information from the input file
  *   2. numR - the number of reactants in the reaction
  *   3. numP - the number of products in the reaction
- *   4. ind - the indicator for form fit or standard fit
+ *   4. step - the current iteration of substitution steps made for a third body reaction
+ *   5. ind - the indicator for form fit or standard fit
  *      = 0 when reaction is standard fit
  *      = 1 when reaction is form fit
- *   5. reaction - the reaction class of the output being built
+ *   6. reaction - the reaction class of the output being built
  *      = 0 when no reaction class is specified
  *      = 1 when only Kelvin is specified
  *      = 2 when only Molecules is specified
- *      = 3 when both Kelvin and Molecules are specified  */
+ *      = 3 when both Kelvin and Molecules are specified  
+ *   7. M - the number of subsitutions necessary or an indicator of a third body reaction
+ *   8. reaction - the reaction class of the output being built
+ *   9. w - this is an indicator for high or low processes and which order to print variables   */
  /* Output parameters:
   *   1. output file - the data numbers for a reaction in the add_Ionization functions are printed to the output file  */
 
@@ -167,16 +224,19 @@ void print_info_find_Qei(char oldLine[], char prevLine[], int numR, int numP, in
  *      = 0 when reaction is standard fit
  *      = 1 when reaction is form fit
  *   5. Q - the indicator for a Qei reaction
- *      = 0 when reaction does not have "EXCI" value
- *      = 1 when reaction does have "EXCI" value
+  *      = 0 when reaction does not have "EXCI" value
+  *      = 1 when reaction does have "EXCI" value on the fourth line of information
+  *      = 2 when reaction does have "EXCI" value on the second line of information
+  *      = 3 when reaction does have "EXCI" value on the third line of information  
  *   6. e - the indicator for an electron temp reaction
  *      = 0 when reaction uses gas temperature
  *      = 1 when reaction uses electron temperature
- *   7. run - the indicator for what function is currently being built
- *    = 1 when building add_W_Ionization_CHEMKIN()
- *    = 2 when building add_dW_dx_Ionization_CHEMKIN()
- *    = 3 when building find_Qei()
- *    = 4 when building find_dQei_dx
+ *   7. run - the indicator for which function is currently being built
+ *    = -1 when building REACTION[]
+ *    = 0 when building find_W_CHEMKIN()
+ *    = 1 when building find_dW_dx_CHEMKIN ()
+ *    = 2 when building find_Qei()
+ *    = 3 when building find_dQei_dx
  *   8. reaction - the reaction class of the output being built
  *      = 0 when no reaction class is specified
  *      = 1 when only Kelvin is specified
@@ -195,11 +255,12 @@ void print_numbers_find_Qei(char oldLine[], char prevLine[], int numR, int numP,
  *   4. ind - the indicator for form fit or standard fit
  *      = 0 when reaction is standard fit
  *      = 1 when reaction is form fit
- *   5. run - the indicator for what function is currently being built
- *    = 1 when building add_W_Ionization_CHEMKIN()
- *    = 2 when building add_dW_dx_Ionization_CHEMKIN()
- *    = 3 when building find_Qei()
- *    = 4 when building find_dQei_dx
+ *   5. run - the indicator for which function is currently being built
+ *    = -1 when building REACTION[]
+ *    = 0 when building find_W_CHEMKIN()
+ *    = 1 when building find_dW_dx_CHEMKIN ()
+ *    = 2 when building find_Qei()
+ *    = 3 when building find_dQei_dx
  *   6. reaction - the reaction class of the output being built
  *      = 0 when no reaction class is specified
  *      = 1 when only Kelvin is specified
@@ -240,7 +301,7 @@ int check_electron_temperature(char line[]);
 
 
 int check_fitted_form(char Line_str[]);
-// This function classifies a reaction between fitted and standard form
+// This function classifies a reaction between fitted and standard form and returns an integer indicating the classification
 /* Input parameters:
  *   1. Line_str[] - the current line being searched for "FIT"   */
  /* Output parameters:
@@ -252,7 +313,13 @@ int check_reaction_current_line(char Line_str[], int* way, int* tot, FILE* outpu
 // This functions checks a line for a reaction and also the direction of the reaction
 /* Input parameters:
  *   1. Line_str[] - the current line of input being searched for a reaction
- *   2. loc - the indicator for the location of the line within the input file being searched */
+ *   2. loc - the indicator for the location of the line within the input file being searched
+ *   3. run - the indicator for which function is currently being built (here it is used to avoid printing an error during run = -1)
+ *    = -1 when building REACTION[]
+ *    = 0 when building find_W_CHEMKIN()
+ *    = 1 when building find_dW_dx_CHEMKIN ()
+ *    = 2 when building find_Qei()
+ *    = 3 when building find_dQei_dx */
  /* Output parameters:
   *   1. way - the indicator for a forward or backward reaction
   *      = 1 when reaction is forward
@@ -282,11 +349,24 @@ int number_of_products(char Line_str[]);
 int check_M_reaction(char oldLine[], char prevLine[], char lastLine[], char newLine[], int tot, int loc, FILE* output, int* ply, int run, char* species);
 // This function determines whether or not a reaction includes a third body and then determines how many steps are necessary to build each reaction substitution
 /* Input parameters:
- *   1. oldLine[], prevLine[] - the current reaction line being searched and the following line of information from the input file   */
+ *   1. oldLine[], prevLine[], lastLine[], newLine[] - the current reaction line being searched and the following lines of information from the input file   
+ *   2. tot - the total number of reactions detected thus far
+ *   3. loc - the indicator for the location of the line within the input file being searched
+ *   4. ply - this hold the M indicator during the function and only indicates the presence of a third body reaction
+ *   5. run - the indicator for which function is currently being built
+ *    = -1 when building REACTION[]
+ *    = 0 when building find_W_CHEMKIN()
+ *    = 1 when building find_dW_dx_CHEMKIN ()
+ *    = 2 when building find_Qei()
+ *    = 3 when building find_dQei_dx 
+ *   6. species - the list of species to be compared with known processes   */
  /* Output parameters:
-  *   1. (returned int) M - the indicator for a reaction with a third body
-  *       = -2 when there is no third body or the third body does not have specified element substitutions
+  *   1. output file - if a reaction is ignored or unreadable an error is printed to the output file
+  *   2. (returned int) M - the indicator for a reaction with a third body
+  *       = -2 when there is no third body
+  *       = -4 for the third body does not have specified element substitutions
   *       = int > 0 when there is a third body with specified elements/factors, the int represents how many different elements are present  */
+
 
 
 
@@ -1394,17 +1474,14 @@ void check_all_indicators_formfit_electrontemperature_Q(char oldLine[], char pre
 
 int build_current_function(int run, FILE* input, FILE* output) {
         
-    char *species, *newLine, *oldLine, *prevLine, *lastLine, *word;
-    char *ptr;
-    
-    species = (char *)malloc(600*sizeof(char));
+    char *newLine, *oldLine, *prevLine, *lastLine, *word, *species;
+    species = (char*)malloc(sizeof(char)*1);
     newLine = (char *)malloc(1000*sizeof(char));
     oldLine = (char *)malloc(1000*sizeof(char));
     prevLine = (char *)malloc(1000*sizeof(char));
     lastLine = (char *)malloc(1000*sizeof(char));
     word = (char *)malloc(1000*sizeof(char));
     
-    ptr = &species[0];
     
     int loc = 0, numR = 0, numP = 0, tot = 0, ind = 0, check = 0, e = 0, way = 10, Q = 0, M = 0, flag1 = 0, flag2 = 0, flag3 = 0, flag4 = 0, reaction = 0, h = 0, ply = 0, i = 0;
 
@@ -1414,7 +1491,7 @@ int build_current_function(int run, FILE* input, FILE* output) {
     fgets(lastLine, 1000, input);
     species[0] = 'L';
     
-    while (fgets(newLine, 1000, input) != NULL) {  // searches each line until the end of the document
+    while (fgets(newLine, 1000, input) != NULL) {
         loc++;
         flag1 = 0, flag2 = 0, flag3 = 0, flag4 = 0;
         if (species[0] == 'L') {
@@ -1423,22 +1500,23 @@ int build_current_function(int run, FILE* input, FILE* output) {
           }
           word[i] = '\0';
           if (strcmp(word, "SPECIES") == 0) {
-            write_species(input, species, &loc);
+            free (species);
+            write_species(input, &species, &loc);
           }
         }
         reaction = reaction_class(oldLine, reaction);
         Q = 0, way = 10, e = 0, check = 0, ind = 0, h = 0;
         check = check_reaction_current_line(oldLine, &way, &tot, output, loc, run);
-        if (check == 1 || check == 3) {
-            flag1 = check_process(oldLine, tot, loc, output, 1, run, ptr);                     // flag a reaction as unreadable if any of the information lines
-            flag2 = check_process(prevLine, tot, loc, output, 1, run, ptr);                    // contain unrecognizable processes
-            if (flag2 != 3 && flag2 != 1) {
-                flag3 = check_process(lastLine, tot, loc, output, 1, run, ptr);
-                if (flag3 != 3 && flag3 != 1) {
-                    flag4 = check_process(newLine, tot, loc, output, 1, run, ptr);
+        if (check == 1) {
+            flag1 = check_process(oldLine, tot, loc, output, 1, run, species);
+            flag2 = check_process(prevLine, tot, loc, output, 1, run, species);
+            if (flag2 != 3 && flag2 != 1) { 
+                flag3 = check_process(lastLine, tot, loc, output, 1, run, species); 
+                if (flag3 != 3 && flag3 != 1) { 
+                    flag4 = check_process(newLine, tot, loc, output, 1, run, species);
                   }
             }
-            if (flag1 == 1 || flag2 == 1 || flag3 == 1 || flag4 == 1)
+            if (flag1 == 1 || flag2 == 1 || flag3 == 1 || flag4 == 1) 
                 check = 0;
             if (flag2 == 2 || flag2 == -2)
                 h = flag2 / 2;
@@ -1447,15 +1525,15 @@ int build_current_function(int run, FILE* input, FILE* output) {
             if (flag4 == 2 || flag4 == -2)
                 h = flag4 / 2 * 3;
         }
-        if (check == 1 || check == 3) {
+        if (check == 1) {
             check_all_indicators_formfit_electrontemperature_Q(oldLine, prevLine, lastLine, newLine, &ind, &e, &Q);
-            M = check_M_reaction(oldLine, prevLine, lastLine, newLine, tot, loc, output, &ply, run, ptr);
+            M = check_M_reaction(oldLine, prevLine, lastLine, newLine, tot, loc, output, &ply, run, species);
             numR = number_of_reactants(oldLine);
             numP = number_of_products(oldLine);
             if (run != -1)
-              print_output_line(oldLine, prevLine, lastLine, newLine, ind, e, Q, way, tot, run, numR, numP, output, M, reaction, h, loc, ply, ptr);
+              print_output_line(oldLine, prevLine, lastLine, newLine, ind, e, Q, way, tot, run, numR, numP, output, M, reaction, h, loc, ply, species);
         }
-        strcpy(oldLine, prevLine); // shifts line storage to next line
+        strcpy(oldLine, prevLine);
         strcpy(prevLine, lastLine);
         strcpy(lastLine, newLine);
     }
@@ -1755,21 +1833,29 @@ int reaction_class(char Line[], int reaction) {
                                                             // returns 1 if only Kelvin is specified, returns 2 if only molecules is specified, returns 3 if both are specified
 }
 
-void write_species(FILE* input, char* species, int* loc) {
-  char line[500];
+void write_species(FILE* input, char** species, int* loc) {
+  char line[500]; 
   int i = 0, j = 0;
   fgets(line, 500, input);
   *loc = *loc + 1;
+  char *p; 
+  p = (char*)malloc(sizeof(char));
   while (line[0] != 'E' || line[1] != 'N' || line[2] != 'D') {
-    if (line[0] != '!' && line[0] != '\n' && line[0] != '\r' && line[0] != ' ' && line[0] != '\t') {
-      while (line[i] != '\n' && line[i] != '\t' && line[i] != '\r') {
+    if (line[0] != '!' && line[0] != '\n' && line[0] != '\r') {
+      while (line[i] != '\n' && line[i] != '\r') {
         while (line[i] != ' ' && line[i] != '\n' && line[i] != '\t' && line[i] != '\r') {
-          species[j] = line[i];
+          p = (char*) realloc(p, (j+1)*sizeof(char));
+          p[j] = line[i];
           i++, j++;
         }
-        species[j] = ' ';
-        j++;
-        if (line[i] == ' ') {
+        if (i != 0) {
+          if (line[i-1] != ' ' && line[i-1] != '\t') {
+            p = (char *) realloc(p, (j+1)*sizeof(char));
+            p[j] = ' ';
+            j++;
+          }
+        }
+        if (line[i] == ' ' || line[i] == '\t') {
           while (line[i] == ' ' || line[i] == '\t')
             i++;
         }
@@ -1779,5 +1865,7 @@ void write_species(FILE* input, char* species, int* loc) {
     fgets(line, 500, input);
     *loc = *loc + 1;
   }
-  species[j] = '\0';
+  p = (char *) realloc (p, (j+1)*sizeof(char));
+  p[j] = '\0';
+  *species = p;                                           // Set the species pointer to the local variable and the returned address will reflect the list changes
 }

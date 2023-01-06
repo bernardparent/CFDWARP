@@ -302,5 +302,4 @@ void find_dUstar_dUprime_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqma
 
 bool is_node_bdry_no_cross(np_t np, int TYPELEVEL);
 
-
 #endif /* _MODEL_H */

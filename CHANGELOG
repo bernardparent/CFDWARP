@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JAN 05a
+  * in model/share/fluid_share.c
+    - in condition_Lambda_plus_minus_Harten(), condition_Lambda_plus_minus_Peclet(), 
+      condition_Lambda_plus_minus_Pascal(), condition_Lambda_plus_minus_Parent(), 
+      condition_Lambda_plus_minus_Gnoffo(), removed the eigenvalue conditioning related to zeta2
+    - added function condition_Lambda_plus_minus_zetaA2() which conditions the eigenvalues
+      to ensure that the eigenvalues of the waves are within same order of magnitude as the 
+      spectral radius and, if not, blend them with Steger-Warming Eigenvalues
+    - in condition_Lambda_plus_minus(), added a call to condition_Lambda_plus_minus_zetaA2()
+  * in tools/chemkin2cfdwarp.c
+    - improved the coding related to pointers, reallocs, and mallocs 
+      
+
 2023 JAN 02b
   * in model/chem/_C2H4_Air_Plasma_36s/chem.c
     - implemented version 4 of the Adamovich model
