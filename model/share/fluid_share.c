@@ -1701,11 +1701,13 @@ void condition_Lambda_plus_minus_zetaA2(np_t *np, gl_t *gl, long lp0, long theta
   aref=max(ap0,ap1);
   Vref=max(fabs(Vp0),fabs(Vp1));
   for (flux=0; flux<nf; flux++) FACTCOMMON[flux]=TRUE;
+/*
 #ifdef _FLUID_PLASMA
   for (flux=0; flux<nf; flux++) {
     if (flux<ncs) FACTCOMMON[flux]=FALSE;
   }
 #endif
+*/
   factcommon=1.0;
   for (flux=0; flux<nf; flux++){
     fact[flux]=min(1.0,(Vref+aref/max(jacvarsp0.zetaA2,1e-99))/max(max(Lambdaplus[flux][flux],-Lambdaminus[flux][flux]),1e-99));
@@ -2261,7 +2263,7 @@ void find_init_mass_fraction_templates(char **specstr1, char **specstr2){
     "    w_O2=0.235;\n"
     "    w_N2=0.765;\n");
     if (ns>2) strcat(*specstr1,"    w_default=1e-30;\n");
-    strcat(*specstr2, ",w_O2,w_N2");
+    strcpy(*specstr2, ",w_O2,w_N2");
     if (ns>2) strcat(*specstr2, ",w_default");
   #endif
   #if (defined(specN2) && !defined(specO2))

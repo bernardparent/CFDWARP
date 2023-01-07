@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JAN 06a
+  * in model/share/fluid_share.c
+    - in condition_Lambda_plus_minus_zetaA2(), commented out special treatment for the charged species
+      fluxes; now deals with charged species fluxes as other fluxes
+    - in find_init_mass_fraction_templates(), fixed a bug related to writing the default control
+      file (using the -w flag) when both the O2 and N2 species are present in the chemical solver
+      
+
 2023 JAN 05a
   * in model/share/fluid_share.c
     - in condition_Lambda_plus_minus_Harten(), condition_Lambda_plus_minus_Peclet(), 
