@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BDRY_WALLADIABATIC1 6
 #define BDRY_SLIPWALL1 12
 #define BDRY_FREESTREAM1 2
+#define BDRY_WALLTFIXEDINJECTION1 17
 
 
 void write_bdry_fluid_template(FILE **controlfile){
@@ -69,6 +70,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    BDRY_SYMMETRICAL2                 %c   Symmetrical, 2nd order\n"
     "    BDRY_SYMMETRICAL1                 %c   Symmetrical, 1st order\n"
     "    BDRY_WALLTFIXED1                  %c   Wall, T specified, param Twall\n"
+    "    BDRY_WALLTFIXEDINJECTION1         %c   Wall, T specified, param Twall, specCs,mdotCs[kg/m2s], ...\n"
     "    BDRY_WALLADIABATIC1               %c   Wall, Adiabatic\n"
     "    BDRY_SLIPWALL1                    %c   Slip wall, 1st order, Adiabatic\n"
     "    BDRY_FREESTREAM1                  %c   Freestream, 1o, params Vx,Vy,"if3DL("Vz,")" P, T\n"
@@ -92,7 +94,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "  );\n",_bdry_ID(BDRY_INFLOWSUPERSONIC),_bdry_ID(BDRY_INFLOWSUBSONIC1),
              _bdry_ID(BDRY_INFLOWSUBSONICMASSFLOWFIXED1),_bdry_ID(BDRY_OUTFLOWSUPERSONIC1),
              _bdry_ID(BDRY_OUTFLOWSUBSONIC1),_bdry_ID(BDRY_OUTFLOWSUBSONICMFIXED1),
-             _bdry_ID(BDRY_SYMMETRICAL2),_bdry_ID(BDRY_SYMMETRICAL1),_bdry_ID(BDRY_WALLTFIXED1),
+             _bdry_ID(BDRY_SYMMETRICAL2),_bdry_ID(BDRY_SYMMETRICAL1),_bdry_ID(BDRY_WALLTFIXED1),_bdry_ID(BDRY_WALLTFIXEDINJECTION1),
              _bdry_ID(BDRY_WALLADIABATIC1),_bdry_ID(BDRY_SLIPWALL1),_bdry_ID(BDRY_FREESTREAM1)
   );
 }
@@ -108,6 +110,7 @@ void add_bdry_types_fluid_to_codex(SOAP_codex_t *codex){
   add_int_to_codex(codex,"BDRY_SYMMETRICAL1", BDRY_SYMMETRICAL1  );
   add_int_to_codex(codex,"BDRY_SYMMETRICAL2", BDRY_SYMMETRICAL2  );
   add_int_to_codex(codex,"BDRY_WALLTFIXED1", BDRY_WALLTFIXED1  );
+  add_int_to_codex(codex,"BDRY_WALLTFIXEDINJECTION1", BDRY_WALLTFIXEDINJECTION1  );
   add_int_to_codex(codex,"BDRY_WALLADIABATIC1",  BDRY_WALLADIABATIC1 );
   add_int_to_codex(codex,"BDRY_SLIPWALL1", BDRY_SLIPWALL1  );
   add_int_to_codex(codex,"BDRY_FREESTREAM1",   BDRY_FREESTREAM1);
@@ -315,11 +318,12 @@ static void update_bdry_freestream(np_t *np, gl_t *gl, long lA, long lB, long lC
 
 static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
                             long theta, long thetasgn,
-                            bool ADIABATIC, bool BDRYDIRECFOUND, int ACCURACY){
+                            bool ADIABATIC, bool INJECTION, bool BDRYDIRECFOUND, int ACCURACY){
   spec_t wwall;
   double kwall,psiwall,Twall,Pwall;
   long dim,spec;
   dim_t Vwall;
+  spec_t nukA,nukB;
   bool ref_flag;
 
   if (ADIABATIC) {
@@ -336,6 +340,15 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
   for (spec=0; spec<ns; spec++){
     wwall[spec]=_f_symmetry(ACCURACY,_w(np[lB],spec),_w(np[lC],spec));
   }
+
+  if (INJECTION) {
+    for (spec=0; spec<ns; spec++){
+      nukA[spec]=_nustar(np,lA,gl,spec);
+      nukB[spec]=_nustar(np,lB,gl,spec); 
+    }
+    update_w_V_at_injection_wall(np, gl, lA, lB, lC, nukA, nukB, 1, np[lA].numbdryparam-1, wwall, Vwall);
+  }
+
   for (spec=0; spec<ncs; spec++) 
     wwall[spec]=0.0;
 
@@ -370,7 +383,11 @@ void update_bdry_fluid(np_t *np, gl_t *gl, long lA, long lB, long lC, long lD, l
     break;
 
     case BDRY_WALLTFIXED1:
-      update_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, FALSE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
+      update_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, FALSE, FALSE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
+    break;
+
+    case BDRY_WALLTFIXEDINJECTION1:
+      update_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, FALSE, TRUE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
     break;
 
     case BDRY_OUTFLOWSUBSONIC1:
@@ -378,7 +395,7 @@ void update_bdry_fluid(np_t *np, gl_t *gl, long lA, long lB, long lC, long lD, l
     break;
 
     case BDRY_WALLADIABATIC1: 
-      update_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, TRUE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
+      update_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, TRUE, FALSE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
     break;
     
     case BDRY_INFLOWSUBSONIC1:

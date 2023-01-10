@@ -326,6 +326,7 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
   spec_t wwall;
   double kwall,psiwall,Twall,Tvwall,Pwall;
   long dim,spec,specneutral;
+  spec_t nukA,nukB;
   dim_t Vwall;
   bool ref_flag;
 
@@ -350,7 +351,14 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
     wwall[spec]=_f_symmetry(ACCURACY,_w(np[lB],spec),_w(np[lC],spec));
   }
 
-  if (INJECTION) update_w_V_at_injection_wall(np, gl, lA, lB, lC, Twall, Twall, 1, np[lA].numbdryparam-1, wwall, Vwall);
+  if (INJECTION) {
+    for (spec=0; spec<ns; spec++){
+      nukA[spec]=_nustar(np,lA,gl,spec);
+      nukB[spec]=_nustar(np,lB,gl,spec); 
+    }
+    update_w_V_at_injection_wall(np, gl, lA, lB, lC, nukA, nukB, 1, np[lA].numbdryparam-1, wwall, Vwall);
+  }
+
 
   if (gl->model.fluid.SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL ){
     for (spec=0; spec<ncs; spec++){

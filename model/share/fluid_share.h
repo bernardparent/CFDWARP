@@ -172,8 +172,8 @@ double _w_product_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long l
 
 void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, long theta, long thetasgn, double Twall, double Tewall, long paramstart, long paramend, spec_t wwall);
 
-void update_w_V_at_injection_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, double Twall, double Tewall, 
-                                  long paramstart, long paramend, spec_t wwall, dim_t Vwall);
 
+void update_w_V_at_injection_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, spec_t nukA, spec_t nukB, 
+                                  long paramstart, long paramend, spec_t wwall, dim_t Vwall);
 
 #endif /* _FLUID_SHARE_H */

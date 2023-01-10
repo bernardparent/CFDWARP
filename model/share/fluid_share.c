@@ -2688,11 +2688,11 @@ void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, l
 }
 
 
-void update_w_V_at_injection_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, double Twall, double Tewall, 
+void update_w_V_at_injection_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, spec_t nukA, spec_t nukB, 
                                   long paramstart, long paramend, spec_t wwall, dim_t Vwall){
   long dim,spec,numinj,inj;
-  double sum,mdot,mdottot,dwall,eta,kappa;
-  spec_t nuk,nukA,nukB,rhok;
+  double sum,mdot,mdottot,dwall;
+  spec_t nuk;
   dim_t n;
   assert(is_node_bdry(np[lA],TYPELEVEL_FLUID_WORK));
 
@@ -2701,10 +2701,6 @@ void update_w_V_at_injection_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
   }
   dwall=_distance_between_near_bdry_node_and_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK);
 
-  for (spec=0; spec<ns; spec++) rhok[spec]=wwall[spec]*_rho(np[lB]);
-  find_nuk_eta_kappa(rhok,Twall,Tewall,nukB,&eta,&kappa);
-  for (spec=0; spec<ns; spec++) rhok[spec]=wwall[spec]*_rho(np[lA]);
-  find_nuk_eta_kappa(rhok,Twall,Tewall,nukA,&eta,&kappa);
   for (spec=0; spec<ns; spec++) nuk[spec]=0.5*(nukB[spec]+nukA[spec]);
   
   //fatal_error("\n param=%ld",np[lA].numbdryparam);

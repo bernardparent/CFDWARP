@@ -302,6 +302,7 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
   spec_t wwall;
   double Twall,Pwall;
   long dim,spec,specneutral;
+  spec_t nukA,nukB;
   bool ref_flag;
   dim_t Vwall;
 
@@ -322,7 +323,14 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
   }
 
   if (CATALYTIC) update_w_at_catalytic_wall(np, gl, lA, lB, lC, theta, thetasgn, Twall, Twall, 1, np[lA].numbdryparam-1, wwall);
-  if (INJECTION) update_w_V_at_injection_wall(np, gl, lA, lB, lC, Twall, Twall, 1, np[lA].numbdryparam-1, wwall, Vwall);
+
+  if (INJECTION) {
+    for (spec=0; spec<ns; spec++){
+      nukA[spec]=_nu(np[lA],gl,spec);
+      nukB[spec]=_nu(np[lB],gl,spec); 
+    }
+    update_w_V_at_injection_wall(np, gl, lA, lB, lC, nukA, nukB, 1, np[lA].numbdryparam-1, wwall, Vwall);
+  }
   
   for (spec=0; spec<ncs; spec++){
     // set ion and electron densities to zero at the surface

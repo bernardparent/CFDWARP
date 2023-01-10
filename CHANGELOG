@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JAN 09a
+  * in model/share/fluid_share.c
+    - changed parameters to update_w_V_at_injection_wall() to include nukA and nukB and not Twall
+      and Tewall
+  * in model/fluid/_Favre-Reynolds/fluid_bdry.c
+    - added BDRY_WALLTFIXEDINJECTION1
+  * in model/fluid/_Favre-Reynolds_Tv/fluid_bdry.c, model/fluid/_Navier-Stokes/fluid_bdry.c, 
+    model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - in update_bdry_wall(), updated call to update_w_V_at_injection_wall() so that it is function
+      of nukA and nukB
+      
+
 2023 JAN 06a
   * in model/share/fluid_share.c
     - in condition_Lambda_plus_minus_zetaA2(), commented out special treatment for the charged species
