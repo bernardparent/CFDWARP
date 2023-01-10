@@ -61,8 +61,6 @@ const static bool REACTION[32]=
    TRUE, /* reaction 27 */
    TRUE, /* reaction 28 */
    TRUE, /* reaction 29 */
-   TRUE, /* reaction 30 */
-   TRUE, /* reaction 31 */
   };
 
 #define specEND -1
@@ -793,12 +791,12 @@ void find_dW_dx_Kim2021 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
     if (T < 20000.0)
       {
         kb=_kb_polynomial(2, -1.673e-1, -1.390, -1.656e-1, -1.551, -1.102e-4, 8.4000e12, 0.0, 19400.0*R, Tblim);
-        dkbdT=_dkbdT_polynomial(2, -1.673e-1, -1.390, -1.656e-1, -1.551, -1.102e-4, 8.4000e12, 0.0, 19450.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(2, -1.673e-1, -1.390, -1.656e-1, -1.551, -1.102e-4, 8.4000e12, 0.0, 19400.0*R, Tblim);
       }
       else
       {
         kb=_kb_polynomial(2, 1.744e-2, -1.563, 2.354e-1, -1.233, -3.250e-1, 8.4000e12, 0.0, 19400.0*R, Tblim); 
-        dkbdT=_dkbdT_polynomial(2, 1.744e-2, -1.563, 2.354e-1, -1.233, -3.250e-1, 8.4000e12, 0.0, 19450.0*R, Tblim);
+        dkbdT=_dkbdT_polynomial(2, 1.744e-2, -1.563, 2.354e-1, -1.233, -3.250e-1, 8.4000e12, 0.0, 19400.0*R, Tblim);
       }
       
       dkbdTe=0.0;

@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JAN 10a
+  * in model/chem/_Air_Plasma_11s/
+    - added option to use reaction rates based on BOLSIG+ data in thoguluva2023.c
+    - fixed a typo in find_dW_dx_Kim2021() for reaction 12 in kim2021.c and removed redundant lines of code
+    
+    
 2023 JAN 09a
   * in model/share/fluid_share.c
     - changed parameters to update_w_V_at_injection_wall() to include nukA and nukB and not Twall
