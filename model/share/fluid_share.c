@@ -2258,7 +2258,7 @@ void find_init_mass_fraction_templates(char **specstr1, char **specstr2){
   #if (defined(specN2) && defined(specO2))
     strcpy(*specstr1,
     "    Species(\"O2\", \"N2\"");
-    if (ns>2) strcat(*specstr1,", \"default\");\n"); else strcpy(*specstr1,");\n");
+    if (ns>2) strcat(*specstr1,", \"default\");\n"); else strcat(*specstr1,");\n");
     strcat(*specstr1,
     "    w_O2=0.235;\n"
     "    w_N2=0.765;\n");

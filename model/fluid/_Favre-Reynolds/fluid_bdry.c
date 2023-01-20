@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BDRY_SLIPWALL1 12
 #define BDRY_FREESTREAM1 2
 #define BDRY_WALLTFIXEDINJECTION1 17
+#define BDRY_INFLOWINJECTION1 18
 
 
 void write_bdry_fluid_template(FILE **controlfile){
@@ -64,6 +65,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    BDRY_INFLOWSUPERSONIC             %c   Inflow, supersonic\n"
     "    BDRY_INFLOWSUBSONIC1              %c   Inflow, subsonic, Tstag, Pstag fixed\n"
     "    BDRY_INFLOWSUBSONICMASSFLOWFIXED1 %c   Inflow, subsonic, Pstag, Massflow/Area fixed\n"
+    "    BDRY_INFLOWINJECTION1             %c   Inflow, param Tstag, specCs,mdotCs[kg/m2s], ...\n"
     "    BDRY_OUTFLOWSUPERSONIC1           %c   Outflow, supersonic\n"
     "    BDRY_OUTFLOWSUBSONIC1             %c   Outflow, subsonic, P fixed\n"
     "    BDRY_OUTFLOWSUBSONICMFIXED1       %c   Outflow, subsonic, M fixed\n"
@@ -92,7 +94,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    Link(i1" if2DL(",j1") if3DL(",k1") ",  i2" if2DL(",j2") if3DL(",k2") ");\n"
     "    }\n"
     "  );\n",_bdry_ID(BDRY_INFLOWSUPERSONIC),_bdry_ID(BDRY_INFLOWSUBSONIC1),
-             _bdry_ID(BDRY_INFLOWSUBSONICMASSFLOWFIXED1),_bdry_ID(BDRY_OUTFLOWSUPERSONIC1),
+             _bdry_ID(BDRY_INFLOWSUBSONICMASSFLOWFIXED1),_bdry_ID(BDRY_INFLOWINJECTION1),_bdry_ID(BDRY_OUTFLOWSUPERSONIC1),
              _bdry_ID(BDRY_OUTFLOWSUBSONIC1),_bdry_ID(BDRY_OUTFLOWSUBSONICMFIXED1),
              _bdry_ID(BDRY_SYMMETRICAL2),_bdry_ID(BDRY_SYMMETRICAL1),_bdry_ID(BDRY_WALLTFIXED1),_bdry_ID(BDRY_WALLTFIXEDINJECTION1),
              _bdry_ID(BDRY_WALLADIABATIC1),_bdry_ID(BDRY_SLIPWALL1),_bdry_ID(BDRY_FREESTREAM1)
@@ -104,6 +106,7 @@ void add_bdry_types_fluid_to_codex(SOAP_codex_t *codex){
   add_int_to_codex(codex,"BDRY_INFLOWSUPERSONIC",   BDRY_INFLOWSUPERSONIC);
   add_int_to_codex(codex,"BDRY_INFLOWSUBSONIC1",   BDRY_INFLOWSUBSONIC1);
   add_int_to_codex(codex,"BDRY_INFLOWSUBSONICMASSFLOWFIXED1",  BDRY_INFLOWSUBSONICMASSFLOWFIXED1 );
+  add_int_to_codex(codex,"BDRY_INFLOWINJECTION1",  BDRY_INFLOWINJECTION1 );
   add_int_to_codex(codex,"BDRY_OUTFLOWSUPERSONIC1",  BDRY_OUTFLOWSUPERSONIC1 );
   add_int_to_codex(codex,"BDRY_OUTFLOWSUBSONIC1",  BDRY_OUTFLOWSUBSONIC1 );
   add_int_to_codex(codex,"BDRY_OUTFLOWSUBSONICMFIXED1",  BDRY_OUTFLOWSUBSONICMFIXED1 );
@@ -111,6 +114,7 @@ void add_bdry_types_fluid_to_codex(SOAP_codex_t *codex){
   add_int_to_codex(codex,"BDRY_SYMMETRICAL2", BDRY_SYMMETRICAL2  );
   add_int_to_codex(codex,"BDRY_WALLTFIXED1", BDRY_WALLTFIXED1  );
   add_int_to_codex(codex,"BDRY_WALLTFIXEDINJECTION1", BDRY_WALLTFIXEDINJECTION1  );
+  add_int_to_codex(codex,"BDRY_INFLOWINJECTION1", BDRY_INFLOWINJECTION1  );
   add_int_to_codex(codex,"BDRY_WALLADIABATIC1",  BDRY_WALLADIABATIC1 );
   add_int_to_codex(codex,"BDRY_SLIPWALL1", BDRY_SLIPWALL1  );
   add_int_to_codex(codex,"BDRY_FREESTREAM1",   BDRY_FREESTREAM1);
@@ -362,6 +366,69 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
 }
 
 
+
+static void update_bdry_inflow_injection(np_t *np, gl_t *gl, long lA, long lB, long lC,
+                                         long theta, long thetasgn,
+                                         bool BDRYDIRECFOUND, int ACCURACY){
+  spec_t wwall;
+  double Rk,cpk,rhowall,Tstag,kwall,psiwall,Twall,Pwall,mdot;
+  long dim,spec,specinj;
+  dim_t Vwall,n;
+  spec_t nukA,nukB;
+  bool ref_flag;
+
+//  Twall=_f_symmetry(ACCURACY,_T(np[lB],gl),_T(np[lC],gl));
+  Tstag=_bdry_param(np,gl,lA,0,TYPELEVEL_FLUID_WORK);
+  specinj=round(_bdry_param(np,gl,lA,1,TYPELEVEL_FLUID_WORK))-1;
+  mdot=_bdry_param(np,gl,lA,2,TYPELEVEL_FLUID_WORK);
+
+  
+  if (!find_unit_vector_normal_to_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK, n)) 
+    fatal_error("Problem finding unit normal vector in update_bdry_inflow_injection()");
+  
+  
+  Pwall=_Pstar(np[lB],gl);
+
+/*
+  Twall=Tstag-Vwallmag2/(2.0*cp);
+  (mdot/rhowall)=Vwallmag;
+  Twall=Tstag-sqr(mdot/rhowall)/(2.0*cp);
+  Pwall/(R*Twall)=rhowall;
+  Twall=Tstag-sqr(mdot*(R*Twall)/Pwall)/(2.0*cp);
+  sqr(Twall)*sqr(mdot*R/Pwall)/(2.0*cp)+Twall-Tstag=0;
+  a*T^2+b*T+c=0;
+  a=sqr(mdot*R/Pwall)/(2.0*cp);
+  b=1
+  c=-Tstag
+  Twall=(-b+sqrt(b*b-4*a*c))/(2*a);
+  Twall=(-1.0+sqrt(1.0+4*sqr(mdot*R/Pwall)/(2.0*cp)*Tstag))/(2*sqr(mdot*R/Pwall)/(2.0*cp));
+*/
+  Rk=kB/_m(specinj);
+  cpk=_cpk_from_T_equilibrium(specinj, _T(np[lA],gl));
+  Twall=(-1.0+sqrt(1.0+4.0*sqr(mdot*Rk/Pwall)/(2.0*cpk)*Tstag))/(2.0*sqr(mdot*Rk/Pwall)/(2.0*cpk));
+  
+  rhowall=Pwall/Rk/Twall;
+  for (dim=0; dim<nd; dim++){
+    Vwall[dim]=n[dim]*mdot/rhowall;
+  }
+
+  for (spec=0; spec<ns; spec++){
+    if (spec==specinj) wwall[spec]=1.0; 
+      else wwall[spec]=1e-99;
+  }
+
+
+
+  reformat_w(gl,wwall,"_bdry",&ref_flag);
+  kwall=_k(np[lB]);
+  psiwall=_psi(np[lB]);
+
+
+  find_U_2(np, lA,gl,wwall,Vwall,Pwall,Twall,kwall,psiwall);
+}
+
+
+
 bool is_node_bdry_symmetry_plane_fluid(np_t np){
   double RET;
   if (is_node_bdry(np,TYPELEVEL_FLUID) && (_node_type(np,TYPELEVEL_FLUID)==BDRY_SYMMETRICAL1 
@@ -431,6 +498,12 @@ void update_bdry_fluid(np_t *np, gl_t *gl, long lA, long lB, long lC, long lD, l
     case BDRY_FREESTREAM1:
       if (BDRYDIRECFOUND)
         update_bdry_freestream(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
+      else update_bdry_outflow(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
+    break;
+
+    case BDRY_INFLOWINJECTION1:
+      if (BDRYDIRECFOUND)
+        update_bdry_inflow_injection(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
       else update_bdry_outflow(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
     break;
 

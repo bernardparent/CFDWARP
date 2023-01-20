@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JAN 20a
+  * in tools/chemkin2cfdwarp.c
+    - fixed some realloc bugs
+  * in model/share/fluid_share.c
+    - in find_init_mass_fraction_templates(), fixed a bug related to strcpy which should be strcat
+  * in src/bdry.c
+    - added function unlink_nodes_in_zone() taken from the Unlink() command
+    - in read_bdry_actions(), now calls unlink_nodes_in_zone() when the Cut() command is called
+  * in model/chem/_Air_Plasma_11s/thoguluva2023.c
+    - changed EXPON_TTV from 0.5 to 0.75
+  * in model/fluid/_Favre-Reynolds/fluid_bdry.c
+    - added BDRY_INFLOWINJECTION1, and update_bdry_inflow_injection()
+
+
 2023 JAN 10a
   * in model/chem/_Air_Plasma_11s/
     - added option to use reaction rates based on BOLSIG+ data in thoguluva2023.c

@@ -71,12 +71,14 @@ int check_process(char Line[], int tot, int loc, FILE* output, int num, int run,
  *      = 3 when there is a reaction is read
  *      = 10 when there is a species read     */
 
+
 void write_species(FILE* input, char** species, int* loc);
 // This function builds a species list when prompted by "SPECIES" in the input file. The species list is built in a memory allocated character array  char* p and the address of this character array is stored in char** species which is then able to be returned from the function and allow for species list recovery.
 /* Input parameters:
  *   1. input file - the file to retrieve new lines of data from
- *   2. loc - the current line location of the input under examination (updated value returned)
- *   3. species - the character array to build the species list  */
+ *   2. loc - the current line location of the input under examination (updated value returned) */
+/* Output parameters:
+ *   1. species - returns the pointer to the character array of the species list */
 
 int build_current_function(int run, FILE* input, FILE* output);
 // This function builds the appropriate function based on the current cycle run and the given information from the input file then prints it to the output file
@@ -1475,12 +1477,13 @@ void check_all_indicators_formfit_electrontemperature_Q(char oldLine[], char pre
 int build_current_function(int run, FILE* input, FILE* output) {
         
     char *newLine, *oldLine, *prevLine, *lastLine, *word, *species;
+    
     species = (char*)malloc(sizeof(char)*1);
     newLine = (char *)malloc(1000*sizeof(char));
     oldLine = (char *)malloc(1000*sizeof(char));
     prevLine = (char *)malloc(1000*sizeof(char));
     lastLine = (char *)malloc(1000*sizeof(char));
-    word = (char *)malloc(1000*sizeof(char));
+    word = (char *)malloc(200*sizeof(char));
     
     
     int loc = 0, numR = 0, numP = 0, tot = 0, ind = 0, check = 0, e = 0, way = 10, Q = 0, M = 0, flag1 = 0, flag2 = 0, flag3 = 0, flag4 = 0, reaction = 0, h = 0, ply = 0, i = 0;
@@ -1489,9 +1492,15 @@ int build_current_function(int run, FILE* input, FILE* output) {
     fgets(oldLine, 1000, input);
     fgets(prevLine, 1000, input);
     fgets(lastLine, 1000, input);
+    
+    oldLine = (char *)realloc(oldLine, (strlen(oldLine) + 1) * sizeof(char));
+    prevLine = (char *)realloc(prevLine, (strlen(prevLine) + 1) * sizeof(char));    
+    lastLine = (char *)realloc(lastLine, (strlen(lastLine) + 1) * sizeof(char));    
+
     species[0] = 'L';
     
     while (fgets(newLine, 1000, input) != NULL) {
+        newLine = (char *)realloc(newLine, (strlen(newLine) + 1) * sizeof(char));
         loc++;
         flag1 = 0, flag2 = 0, flag3 = 0, flag4 = 0;
         if (species[0] == 'L') {
@@ -1533,9 +1542,16 @@ int build_current_function(int run, FILE* input, FILE* output) {
             if (run != -1)
               print_output_line(oldLine, prevLine, lastLine, newLine, ind, e, Q, way, tot, run, numR, numP, output, M, reaction, h, loc, ply, species);
         }
+        oldLine = (char *)realloc(oldLine, (strlen(prevLine) + 1) * sizeof(char));
         strcpy(oldLine, prevLine);
+        
+        prevLine = (char *)realloc(prevLine, (strlen(lastLine) + 1) * sizeof(char));
         strcpy(prevLine, lastLine);
+            
+        lastLine = (char *)realloc(lastLine, (strlen(newLine) + 1) * sizeof(char));    
         strcpy(lastLine, newLine);
+        
+        newLine = (char *)realloc(newLine, 1000 * sizeof(char));
     }
     if (species[0] == 'L') {
       free ( lastLine );
@@ -1838,20 +1854,19 @@ void write_species(FILE* input, char** species, int* loc) {
   int i = 0, j = 0;
   fgets(line, 500, input);
   *loc = *loc + 1;
-  char *p; 
-  p = (char*)malloc(sizeof(char));
+  (*species) = (char*)malloc(1*sizeof(char));
   while (line[0] != 'E' || line[1] != 'N' || line[2] != 'D') {
     if (line[0] != '!' && line[0] != '\n' && line[0] != '\r') {
       while (line[i] != '\n' && line[i] != '\r') {
         while (line[i] != ' ' && line[i] != '\n' && line[i] != '\t' && line[i] != '\r') {
-          p = (char*) realloc(p, (j+1)*sizeof(char));
-          p[j] = line[i];
+          (*species) = (char*) realloc(*species, (j+1)*sizeof(char));
+          (*species)[j] = line[i];
           i++, j++;
         }
         if (i != 0) {
           if (line[i-1] != ' ' && line[i-1] != '\t') {
-            p = (char *) realloc(p, (j+1)*sizeof(char));
-            p[j] = ' ';
+            (*species) = (char *) realloc(*species, (j+1)*sizeof(char));
+            (*species)[j] = ' ';
             j++;
           }
         }
@@ -1865,7 +1880,7 @@ void write_species(FILE* input, char** species, int* loc) {
     fgets(line, 500, input);
     *loc = *loc + 1;
   }
-  p = (char *) realloc (p, (j+1)*sizeof(char));
-  p[j] = '\0';
-  *species = p;                                           // Set the species pointer to the local variable and the returned address will reflect the list changes
+  (*species) = (char *) realloc (*species, (j+1)*sizeof(char));
+  (*species)[j] = '\0';                                       // Set the species pointer to the local variable and the returned address will reflect the list changes
 }
+

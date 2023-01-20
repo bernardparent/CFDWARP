@@ -61,6 +61,50 @@ void write_bdry_template(FILE **controlfile){
 }
 
 
+void unlink_nodes_in_zone(np_t **np, gl_t *gl, zone_t zone, int TYPELEVEL){
+  long l1,l2,i,j,k;
+  for_ijk(zone,is,js,ks,ie,je,ke){
+          l1=_ai(gl,i,j,k);
+          if (is_node_link((*np)[l1],TYPELEVEL) && is_node_bdry((*np)[l1],TYPELEVEL)){
+            assert(is_node_bdry((*np)[l1],TYPELEVEL));
+            l2=_node_link((*np)[l1],0,TYPELEVEL);
+            switch (TYPELEVEL){   
+              case TYPELEVEL_FLUID: 
+                //(*np)[l1].link=LINK_NONE;
+                free((*np)[l1].linkarray);
+                (*np)[l1].linkarray=NULL;
+                (*np)[l1].numlink=0;
+                //(*np)[l2].link=LINK_NONE;
+                free((*np)[l2].linkarray);
+                (*np)[l2].linkarray=NULL;
+                (*np)[l2].numlink=0;
+#ifdef DISTMPI
+                free((*np)[l1].linkmusclvars);
+                free((*np)[l2].linkmusclvars);
+                (*np)[l1].linkmusclvars=NULL;
+                (*np)[l2].linkmusclvars=NULL;
+#endif
+              break;
+#ifdef EMFIELD
+              case TYPELEVEL_EMFIELD: 
+                //(*np)[l1].link_emf=LINK_NONE;
+                free((*np)[l1].linkarray_emf);
+                (*np)[l1].linkarray_emf=NULL;
+                (*np)[l1].numlink_emf=0;
+                //(*np)[l2].link_emf=LINK_NONE;
+                free((*np)[l2].linkarray_emf);
+                (*np)[l2].linkarray_emf=NULL;
+                (*np)[l2].numlink_emf=0;
+              break;
+#endif
+              default:
+                fatal_error("TYPELEVEL must be wither TYPELEVEL_FLUID or TYPELEVEL_EMFIELD in unlink_nodes_in_zone().");
+            }
+          }
+    }
+    
+}
+
 
 void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
   np_t **np;
@@ -375,45 +419,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
                              "in Unlink() part of Bdry(). Arguments: %s .",*argum);
     }
     find_zone_from_argum(*argum, 0, gl, codex, &zone);
-    for_ijk(zone,is,js,ks,ie,je,ke){
-          l1=_ai(gl,i,j,k);
-          if (is_node_link((*np)[l1],TYPELEVEL) && is_node_bdry((*np)[l1],TYPELEVEL)){
-            assert(is_node_bdry((*np)[l1],TYPELEVEL));
-            l2=_node_link((*np)[l1],0,TYPELEVEL);
-            switch (TYPELEVEL){   
-              case TYPELEVEL_FLUID: 
-                //(*np)[l1].link=LINK_NONE;
-                free((*np)[l1].linkarray);
-                (*np)[l1].linkarray=NULL;
-                (*np)[l1].numlink=0;
-                //(*np)[l2].link=LINK_NONE;
-                free((*np)[l2].linkarray);
-                (*np)[l2].linkarray=NULL;
-                (*np)[l2].numlink=0;
-#ifdef DISTMPI
-                free((*np)[l1].linkmusclvars);
-                free((*np)[l2].linkmusclvars);
-                (*np)[l1].linkmusclvars=NULL;
-                (*np)[l2].linkmusclvars=NULL;
-#endif
-              break;
-#ifdef EMFIELD
-              case TYPELEVEL_EMFIELD: 
-                //(*np)[l1].link_emf=LINK_NONE;
-                free((*np)[l1].linkarray_emf);
-                (*np)[l1].linkarray_emf=NULL;
-                (*np)[l1].numlink_emf=0;
-                //(*np)[l2].link_emf=LINK_NONE;
-                free((*np)[l2].linkarray_emf);
-                (*np)[l2].linkarray_emf=NULL;
-                (*np)[l2].numlink_emf=0;
-              break;
-#endif
-              default:
-                fatal_error("TYPELEVEL must be wither TYPELEVEL_FLUID or TYPELEVEL_EMFIELD in read_bdry_actions(), Unlink.");
-            }
-          }
-    }
+    unlink_nodes_in_zone(np,gl,zone,TYPELEVEL);
     codex->ACTIONPROCESSED=TRUE;
   }
 
@@ -426,6 +432,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
          if3DL(|| zone.ke-zone.ks<2)
        ) SOAP_fatal_error(codex,"A Cut() command must create a cut with a bandwidth of at least 3 nodes along each dimension.");
     zone=_zone_intersection(zone,gl->domain_all);
+    unlink_nodes_in_zone(np, gl, zone, TYPELEVEL);
     update_node_type(*np,gl,TYPELEVEL,NODETYPE_BDRY, zone);
     update_node_type(*np,gl,TYPELEVEL,NODETYPE_UNUSED, _zone_expansion(zone,-1));
     codex->ACTIONPROCESSED=TRUE;
