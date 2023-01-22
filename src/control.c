@@ -649,11 +649,12 @@ static void find_surface_area_given_metrics(np_t np, gl_t *gl, metrics_t metrics
 
 
 
-void integrate_area_on_bdry(np_t *np, gl_t *gl, zone_t zone, dim_t Awall, long BDRYTYPE){
+void integrate_area_on_bdry(np_t *np, gl_t *gl, zone_t zone, dim_t Area, double *AreaMag, long BDRYTYPE){
   long i,j,k,dim;
   long l,theta,thetasgn;
   flux_t tmpp1h;
   metrics_t metrics;
+  double sum;
 #ifdef DISTMPI
   int rank;
   double tempsum;
@@ -665,8 +666,8 @@ void integrate_area_on_bdry(np_t *np, gl_t *gl, zone_t zone, dim_t Awall, long B
   MPI_Barrier(MPI_COMM_WORLD);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
-  for (dim=0; dim<nd; dim++) Awall[dim]=0.0;
-
+  for (dim=0; dim<nd; dim++) Area[dim]=0.0;
+  *AreaMag=0.0;
   for_ijk(zone,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
 #ifdef DISTMPI
@@ -678,19 +679,25 @@ void integrate_area_on_bdry(np_t *np, gl_t *gl, zone_t zone, dim_t Awall, long B
                     find_metrics_at_interface(np, gl, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, &metrics);
                   else find_metrics_at_interface(np, gl, _al(gl,l,theta,-1), _al(gl,l,theta,+0), theta, &metrics);
                   find_surface_area_given_metrics(np[l], gl, metrics, theta, tmpp1h);
-              for (dim=0; dim<nd; dim++) Awall[dim]+=tmpp1h[dim];
+              for (dim=0; dim<nd; dim++) Area[dim]+=tmpp1h[dim];
+              sum=0.0;
+              for (dim=0; dim<nd; dim++) sum+=sqr(tmpp1h[dim]);
+              (*AreaMag)+=sqrt(sum);
             }
           }
 #ifdef DISTMPI
         }
 #endif
   }
-  /* here sum up all the contributions in Fwall_shear from the different processes */
+  /* here sum up all the contributions from the different processes */
 #ifdef DISTMPI
   for (dim=0; dim<nd; dim++) {
-    MPI_Allreduce(&(Awall[dim]), &tempsum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-    Awall[dim]=tempsum;
+    MPI_Allreduce(&(Area[dim]), &tempsum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    Area[dim]=tempsum;
   }
+  MPI_Allreduce(AreaMag, &tempsum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+  *AreaMag=tempsum;
+  
 #endif
 }
 
@@ -700,6 +707,7 @@ void read_control_functions(char *functionname, char **argum,
   np_t **np;
   gl_t *gl;
   long i,j,k,dim,BDRYTYPE_SURFACE;
+  double AreaMag;
   zone_t zone;
   dim_t Area;
   int eos=EOS;
@@ -768,10 +776,23 @@ void read_control_functions(char *functionname, char **argum,
     dim--;
     if (dim<0 || dim>=nd) SOAP_fatal_error(codex,"The specified dimension is not within range when calling _Area().");
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
-    integrate_area_on_bdry(*np, gl, zone, Area, BDRYTYPE_SURFACE);
+    integrate_area_on_bdry(*np, gl, zone, Area, &AreaMag, BDRYTYPE_SURFACE);
     sprintf(*returnstr,"%E",Area[dim]);
   }
   
+
+  if (strcmp(functionname,"_AreaMag")==0) {
+    if (SOAP_number_argums(*argum)!=2*nd+1) SOAP_fatal_error(codex,"_Area() expects the following arguments: the zone limits [is,js,"if3D("ks,")" ie,je"if3D(",ke")"],  and the boundary condition type of the surface [eg. BDRY_WALLTFIXED1, BDRY_SYMMETRICAL1, etc].");
+    SOAP_substitute_all_argums(argum,codex);
+    find_zone_from_argum(*argum, 0, gl, codex, &zone);
+    BDRYTYPE_SURFACE=SOAP_get_argum_long(codex,*argum,2*nd);
+//    printf("zone=%ld %ld %ld  %ld %ld %ld\n",zone.is,zone.js,zone.ks,zone.ie,zone.je,zone.ke);
+//    printf("dim=%ld  BDRYTYPE_SURFACE=%ld\n",dim,BDRYTYPE_SURFACE);
+    
+    *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
+    integrate_area_on_bdry(*np, gl, zone, Area, &AreaMag, BDRYTYPE_SURFACE);
+    sprintf(*returnstr,"%E",AreaMag);
+  }
   
   
   

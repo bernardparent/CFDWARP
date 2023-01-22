@@ -1890,7 +1890,7 @@ static void read_post_functions(char *functionname, char **argum,
   np_t *np;
   gl_t gl;
   double Pback,Pback_min,Pback_max,Aback;
-  double wstoichio1,wstoichio2;
+  double wstoichio1,wstoichio2,AreaMag;
   long rank1,rank2;
   long numsteps;
   long dim, BDRYTYPE_SURFACE;
@@ -2017,7 +2017,7 @@ static void read_post_functions(char *functionname, char **argum,
     dim--;
     if (dim<0 || dim>=nd) SOAP_fatal_error(codex,"The specified dimension is not within range when calling _Area().");
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
-    integrate_area_on_bdry(np, &gl, *domain_post, Area, BDRYTYPE_SURFACE);
+    integrate_area_on_bdry(np, &gl, *domain_post, Area, &AreaMag, BDRYTYPE_SURFACE);
     sprintf(*returnstr,"%E",Area[dim]);
   }
 
