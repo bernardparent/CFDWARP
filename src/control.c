@@ -641,11 +641,67 @@ double _Omega_DISTMPI_global(np_t *np, gl_t *gl, long i, long j, long k){
 }
 
 
+static void find_surface_area_given_metrics(np_t np, gl_t *gl, metrics_t metrics, long theta, dim_t A){
+  long dim;
+  for (dim=0; dim<nd; dim++)
+    A[dim]=fabs(metrics.Omega*metrics.X2[theta][dim]);
+}
+
+
+
+void integrate_area_on_bdry(np_t *np, gl_t *gl, zone_t zone, dim_t Awall, long BDRYTYPE){
+  long i,j,k,dim;
+  long l,theta,thetasgn;
+  flux_t tmpp1h;
+  metrics_t metrics;
+#ifdef DISTMPI
+  int rank;
+  double tempsum;
+#endif
+
+  if (!gl->METRICS_INITIALIZED) fatal_error("Need to initialize metrics before integrating area on boundary nodes.");
+
+#ifdef DISTMPI
+  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+#endif
+  for (dim=0; dim<nd; dim++) Awall[dim]=0.0;
+
+  for_ijk(zone,is,js,ks,ie,je,ke){
+        l=_ai(gl,i,j,k);
+#ifdef DISTMPI
+        if (_node_rank(gl,i,j,k)==rank) {
+#endif
+          if (_node_type(np[l], TYPELEVEL_FLUID)==BDRYTYPE) {
+            if (find_bdry_direc(np, gl, l, TYPELEVEL_FLUID, &theta, &thetasgn)) {
+	              if (thetasgn>0)
+                    find_metrics_at_interface(np, gl, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, &metrics);
+                  else find_metrics_at_interface(np, gl, _al(gl,l,theta,-1), _al(gl,l,theta,+0), theta, &metrics);
+                  find_surface_area_given_metrics(np[l], gl, metrics, theta, tmpp1h);
+              for (dim=0; dim<nd; dim++) Awall[dim]+=tmpp1h[dim];
+            }
+          }
+#ifdef DISTMPI
+        }
+#endif
+  }
+  /* here sum up all the contributions in Fwall_shear from the different processes */
+#ifdef DISTMPI
+  for (dim=0; dim<nd; dim++) {
+    MPI_Allreduce(&(Awall[dim]), &tempsum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    Awall[dim]=tempsum;
+  }
+#endif
+}
+
+
 void read_control_functions(char *functionname, char **argum,
                             char **returnstr, SOAP_codex_t *codex){
   np_t **np;
   gl_t *gl;
-  long i,j,k;
+  long i,j,k,dim,BDRYTYPE_SURFACE;
+  zone_t zone;
+  dim_t Area;
   int eos=EOS;
   np=((readcontrolarg_t *)codex->action_args)->np;
   gl=((readcontrolarg_t *)codex->action_args)->gl;
@@ -699,6 +755,27 @@ void read_control_functions(char *functionname, char **argum,
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
     sprintf(*returnstr,"%E",_Omega_DISTMPI_global(*np,gl,i,j,k));
   }
+  
+  
+  if (strcmp(functionname,"_Area")==0) {
+    if (SOAP_number_argums(*argum)!=2*nd+2) SOAP_fatal_error(codex,"_Area() expects the following arguments: the zone limits [is,js,"if3D("ks,")" ie,je"if3D(",ke")"], the dimension [1..3], and the boundary condition type of the surface [eg. BDRY_WALLTFIXED1, BDRY_SYMMETRICAL1, etc].");
+    SOAP_substitute_all_argums(argum,codex);
+    find_zone_from_argum(*argum, 0, gl, codex, &zone);
+    dim=SOAP_get_argum_long(codex,*argum,2*nd);
+    BDRYTYPE_SURFACE=SOAP_get_argum_long(codex,*argum,2*nd+1);
+//    printf("zone=%ld %ld %ld  %ld %ld %ld\n",zone.is,zone.js,zone.ks,zone.ie,zone.je,zone.ke);
+//    printf("dim=%ld  BDRYTYPE_SURFACE=%ld\n",dim,BDRYTYPE_SURFACE);
+    dim--;
+    if (dim<0 || dim>=nd) SOAP_fatal_error(codex,"The specified dimension is not within range when calling _Area().");
+    *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
+    integrate_area_on_bdry(*np, gl, zone, Area, BDRYTYPE_SURFACE);
+    sprintf(*returnstr,"%E",Area[dim]);
+  }
+  
+  
+  
+  
+  
 }
 
 
@@ -761,6 +838,12 @@ void find_metrics_on_all_nodes(np_t *np, gl_t *gl, zone_t zone){
 #endif
   bool UPDATED;
 
+
+#ifdef DISTMPI
+  zone=_zone_intersection(gl->domain_all,_zone_expansion(gl->domain,+hbw_mem_fluid_metrics));
+#endif
+
+
 #ifdef EMFIELD
   TYPELEVEL=TYPELEVEL_EMFIELD;
 #else
@@ -798,7 +881,6 @@ void find_metrics_on_all_nodes(np_t *np, gl_t *gl, zone_t zone){
           }
         }
   }
-
 
   /* then do the boundary nodes */
   /* note: we should use BDRYMETRICS_CENTERED instead of BDRYMETRICS_NORMAL on symmetry planes
@@ -886,7 +968,51 @@ void find_metrics_on_all_nodes(np_t *np, gl_t *gl, zone_t zone){
         }
   }
   gl->METRICS_INITIALIZED=TRUE;
+
   //display_node_type_window(stdout, np, gl, TYPELEVEL, 1, 15, 1, 20);
+  
+#ifdef DISTMPI
+  double metrics[nd*nd+1];
+  long dim2;
+  int rank,proc;
+//    wfprintf(stdout,"[broadcasting]");
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &proc);
+    MPI_Barrier(MPI_COMM_WORLD);
+#ifdef EMFIELD
+    TYPELEVEL=TYPELEVEL_EMFIELD;
+#else
+    TYPELEVEL=TYPELEVEL_FLUID;
+#endif
+    for_ijk (gl->domain_all,is,js,ks,ie,je,ke){
+          if (rank==_node_rank(gl, i, j, k) && is_node_valid((np)[_ai(gl,i,j,k)],TYPELEVEL)) {
+            metrics[0]=(np)[_ai(gl,i,j,k)].bs->Omega;
+            for (dim=0; dim<nd; dim++) {
+              for (dim2=0; dim2<nd; dim2++) {
+                metrics[1+dim*nd+dim2]=(np)[_ai(gl,i,j,k)].bs->X[dim][dim2];
+              }
+            }
+          }
+          MPI_Bcast_Node(metrics,nd*nd+1,MPI_DOUBLE,_node_rank(gl,i,j,k),MPI_COMM_WORLD,i,j,k,gl);
+          if (is_node_in_zone(i,j,k,gl->domain_lim) && is_node_valid((np)[_ai(gl,i,j,k)],TYPELEVEL)) {
+            (np)[_ai(gl,i,j,k)].bs->Omega=metrics[0];
+            for (dim=0; dim<nd; dim++) {
+              for (dim2=0; dim2<nd; dim2++) {
+                (np)[_ai(gl,i,j,k)].bs->X[dim][dim2]=metrics[1+dim*nd+dim2];
+              }
+            }              
+          }
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
+
+/*  if (is_node_in_zone(5,23,0,gl->domain_lim)){
+    //printf("V=%E\n",_V((*np)[_ai(gl,5,24,0)],0));
+    //printf("Vstar=%E\n",_Vstar((*np)[_ai(gl,5,24,0)],1));
+    //printf("X=%E\n",_X((*np)[_ai(gl,5,23,0)],0,0)); 
+  }*/
+
+#endif
+
 }
 
 
@@ -1159,50 +1285,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
       fatal_error("The Grid%ldd() module was not found.",nd);
     wfprintf(stdout,"Bdry..");
     read_bdry(*argum, codex);
-#ifdef DISTMPI
-    find_metrics_on_all_nodes((*np), gl, _zone_intersection(gl->domain_all,_zone_expansion(gl->domain,+hbw_mem_fluid_metrics)));
-#else
     find_metrics_on_all_nodes((*np), gl, gl->domain);
-#endif
-#ifdef DISTMPI
-    double metrics[nd*nd+1];
-    long dim,dim2;
-    int TYPELEVEL;
-//    wfprintf(stdout,"[broadcasting]");
-    MPI_Barrier(MPI_COMM_WORLD);
-#ifdef EMFIELD
-    TYPELEVEL=TYPELEVEL_EMFIELD;
-#else
-    TYPELEVEL=TYPELEVEL_FLUID;
-#endif
-    for_ijk (gl->domain_all,is,js,ks,ie,je,ke){
-          if (rank==_node_rank(gl, i, j, k) && is_node_valid((*np)[_ai(gl,i,j,k)],TYPELEVEL)) {
-            metrics[0]=(*np)[_ai(gl,i,j,k)].bs->Omega;
-            for (dim=0; dim<nd; dim++) {
-              for (dim2=0; dim2<nd; dim2++) {
-                metrics[1+dim*nd+dim2]=(*np)[_ai(gl,i,j,k)].bs->X[dim][dim2];
-              }
-            }
-          }
-          MPI_Bcast_Node(metrics,nd*nd+1,MPI_DOUBLE,_node_rank(gl,i,j,k),MPI_COMM_WORLD,i,j,k,gl);
-          if (is_node_in_zone(i,j,k,gl->domain_lim) && is_node_valid((*np)[_ai(gl,i,j,k)],TYPELEVEL)) {
-            (*np)[_ai(gl,i,j,k)].bs->Omega=metrics[0];
-            for (dim=0; dim<nd; dim++) {
-              for (dim2=0; dim2<nd; dim2++) {
-                (*np)[_ai(gl,i,j,k)].bs->X[dim][dim2]=metrics[1+dim*nd+dim2];
-              }
-            }              
-          }
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
-
-/*  if (is_node_in_zone(5,23,0,gl->domain_lim)){
-    //printf("V=%E\n",_V((*np)[_ai(gl,5,24,0)],0));
-    //printf("Vstar=%E\n",_Vstar((*np)[_ai(gl,5,24,0)],1));
-    //printf("X=%E\n",_X((*np)[_ai(gl,5,23,0)],0,0)); 
-  }*/
-
-#endif
 
     wfprintf(stdout,"done;\n");
     ((readcontrolarg_t *)codex->action_args)->module_level++;

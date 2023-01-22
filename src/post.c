@@ -1122,60 +1122,6 @@ static void integrate_Qbeam(np_t *np, gl_t *gl, zone_t zone, double *Qbeam){
 
 
 
-
-
-static void find_surface_area_given_metrics(np_t np, gl_t *gl, metrics_t metrics, long theta, dim_t A){
-  long dim;
-  for (dim=0; dim<nd; dim++)
-    A[dim]=fabs(metrics.Omega*metrics.X2[theta][dim]);
-}
-
-
-
-static void integrate_area_on_bdry(np_t *np, gl_t *gl, zone_t zone,
-                                      dim_t Awall, long BDRYTYPE){
-  long i,j,k,dim;
-  long l,theta,thetasgn;
-  flux_t tmpp1h;
-  metrics_t metrics;
-#ifdef DISTMPI
-  int rank;
-  double tempsum;
-#endif
-
-#ifdef DISTMPI
-  MPI_Barrier(MPI_COMM_WORLD);
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-#endif
-  for (dim=0; dim<nd; dim++) Awall[dim]=0.0;
-
-  for_ijk(zone,is,js,ks,ie,je,ke){
-        l=_ai(gl,i,j,k);
-#ifdef DISTMPI
-        if (_node_rank(gl,i,j,k)==rank) {
-#endif
-          if (_node_type(np[l], TYPELEVEL_FLUID)==BDRYTYPE) {
-            if (find_bdry_direc(np, gl, l, TYPELEVEL_FLUID, &theta, &thetasgn)) {
-	              if (thetasgn>0)
-                    find_metrics_at_interface(np, gl, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, &metrics);
-                  else find_metrics_at_interface(np, gl, _al(gl,l,theta,-1), _al(gl,l,theta,+0), theta, &metrics);
-                  find_surface_area_given_metrics(np[l], gl, metrics, theta, tmpp1h);
-              for (dim=0; dim<nd; dim++) Awall[dim]+=tmpp1h[dim];
-            }
-          }
-#ifdef DISTMPI
-        }
-#endif
-  }
-  /* here sum up all the contributions in Fwall_shear from the different processes */
-#ifdef DISTMPI
-  for (dim=0; dim<nd; dim++) {
-    MPI_Allreduce(&(Awall[dim]), &tempsum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-    Awall[dim]=tempsum;
-  }
-#endif
-}
-
 #if (fluxmom >=0)
 static void integrate_shear_force_on_bdry(np_t *np, gl_t *gl, zone_t zone,
                                              dim_t Fwall_shear, long BDRYTYPE){

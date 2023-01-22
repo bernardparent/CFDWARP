@@ -39,5 +39,6 @@ void write_license ( FILE * outputfile );
 
 void  write_hline(FILE *outputfile, long indent, long width);
 
+void find_metrics_on_all_nodes(np_t *np, gl_t *gl, zone_t zone);
 
 #endif /* _CONTROL_H */

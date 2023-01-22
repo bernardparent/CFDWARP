@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JAN 21a
+  * in src/post.c
+    - removed integrate_area_on_bdry() and find_surface_area_given_metrics()
+  * in src/control.c
+    - added find_surface_area_given_metrics() and integrate_area_on_bdry()
+    - in read_control_functions(), added function "_Area()"
+    - in find_metrics_on_all_nodes(), added MPI code to broadcast the metrics
+    - in readcontrol_actions(), removed MPI code broadcasting the metrics and moved it to 
+      find_metrics_on_all_nodes()
+      
+
 2023 JAN 20a
   * in tools/chemkin2cfdwarp.c
     - fixed some realloc bugs
