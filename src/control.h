@@ -41,4 +41,6 @@ void  write_hline(FILE *outputfile, long indent, long width);
 
 void find_metrics_on_all_nodes(np_t *np, gl_t *gl, zone_t zone);
 
+void integrate_area_on_bdry(np_t *np, gl_t *gl, zone_t zone, dim_t Awall, long BDRYTYPE);
+
 #endif /* _CONTROL_H */

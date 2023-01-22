@@ -16,6 +16,8 @@ char _bdry_ID(long nodetype);
 */
 void read_bdry(char *argum, SOAP_codex_t *codex);
 
+void read_bdrymod(char *argum, SOAP_codex_t *codex);
+
 /* given the pointer to the controlfile file, this appends to the
    file a template Bdry(); to specify the boundary nodes
 */

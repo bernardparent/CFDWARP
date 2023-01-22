@@ -659,7 +659,7 @@ void integrate_area_on_bdry(np_t *np, gl_t *gl, zone_t zone, dim_t Awall, long B
   double tempsum;
 #endif
 
-  if (!gl->METRICS_INITIALIZED) fatal_error("Need to initialize metrics before integrating area on boundary nodes.");
+  if (!gl->METRICS_INITIALIZED) fatal_error("Need to initialize metrics (which occurs at the end of the Bdry() module) before integrating area on boundary nodes.");
 
 #ifdef DISTMPI
   MPI_Barrier(MPI_COMM_WORLD);
@@ -1304,6 +1304,16 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     }
     codex->ACTIONPROCESSED=TRUE;
   }
+
+  if (strcmp(actionname,"BdryMod")==0 && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
+    if (((readcontrolarg_t *)codex->action_args)->module_level<2)
+      fatal_error("Need to call Bdry() before BdryMod()."); 
+    wfprintf(stdout,"BdryMod..");
+    read_bdrymod(*argum, codex);
+    wfprintf(stdout,"done;\n");
+    codex->ACTIONPROCESSED=TRUE;
+  }
+
   if (strcmp(actionname,ControlActionName_Model)==0 && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
     if (((readcontrolarg_t *)codex->action_args)->module_level!=2)
       fatal_error("The Bdry() module was not found.");

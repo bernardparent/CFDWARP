@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JAN 22a
+  * in src/control.c
+    - in readcontrol_actions(), added the action BdryMod
+  * in src/bdry.c
+    - added read_bdrymod_actions() and read_bdrymod()
+    
+
 2023 JAN 21a
   * in src/post.c
     - removed integrate_area_on_bdry() and find_surface_area_given_metrics()
