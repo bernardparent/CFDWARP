@@ -78,10 +78,10 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    BDRY_FREESTREAM1                  %c   Freestream, 1o, params Vx,Vy,"if3DL("Vz,")" P, T\n"
     "    _________________________________________________________________________________________\n"
     "    }\n"
-    "    All(BDRY_WALLTFIXED1);\n"
+    "    Twall=300.0; {K}\n"
+    "    All(BDRY_WALLTFIXED1,Twall);\n"
     "    Plane(\"i\",is,BDRY_INFLOWSUPERSONIC);\n"
     "    Plane(\"i\",ie,BDRY_OUTFLOWSUPERSONIC1);\n"
-    "    Twall=300.0; {K}\n"
     "    Plane(\"j\",js,BDRY_WALLTFIXED1,Twall);\n"
     "    Plane(\"j\",je,BDRY_WALLTFIXED1,Twall);\n"
 #ifdef _3D
@@ -89,9 +89,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    Plane(\"k\",ke,BDRY_SYMMETRICAL2);\n"
 #endif
     "    {\n"
-    "    Cut(is" if2DL(",js") if3DL(",ks") ",  ie" if2DL(",je") if3DL(",ke") ");\n"
     "    Region(is" if2DL(",js") if3DL(",ks") ",  ie" if2DL(",je") if3DL(",ke") ",  BDRY_INFLOWSUPERSONIC);\n"
-    "    Link(i1" if2DL(",j1") if3DL(",k1") ",  i2" if2DL(",j2") if3DL(",k2") ");\n"
     "    }\n"
     "  );\n",_bdry_ID(BDRY_INFLOWSUPERSONIC),_bdry_ID(BDRY_INFLOWSUBSONIC1),
              _bdry_ID(BDRY_INFLOWSUBSONICMASSFLOWFIXED1),_bdry_ID(BDRY_INFLOWINJECTION1),_bdry_ID(BDRY_OUTFLOWSUPERSONIC1),

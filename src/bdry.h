@@ -16,12 +16,19 @@ char _bdry_ID(long nodetype);
 */
 void read_bdry(char *argum, SOAP_codex_t *codex);
 
-void read_bdrymod(char *argum, SOAP_codex_t *codex);
+void read_block(char *argum, SOAP_codex_t *codex);
+
+void write_block_template(FILE **controlfile);
 
 /* given the pointer to the controlfile file, this appends to the
    file a template Bdry(); to specify the boundary nodes
 */
 void write_bdry_template(FILE **controlfile);
+
+/* given the pointer to the controlfile file, this appends to the
+   file a template Block(); to specify the boundary nodes
+*/
+void write_block_template(FILE **controlfile);
 
 /* in the zone defined by zone, the nodes' types are updated
    according to the type specified. If TYPELEVEL is set to TYPELEVEL_FLUID_WORK,

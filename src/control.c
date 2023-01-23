@@ -546,6 +546,7 @@ void write_control(char *filename){
 #ifdef _2D
     GRIDG_write_grid_2D_to_file(&controlfile);
 #endif
+    write_block_template(&controlfile);
     write_bdry_template(&controlfile);
     write_model_template(&controlfile);
     write_init_template(&controlfile);
@@ -660,7 +661,7 @@ void integrate_area_on_bdry(np_t *np, gl_t *gl, zone_t zone, dim_t Area, double 
   double tempsum;
 #endif
 
-  if (!gl->METRICS_INITIALIZED) fatal_error("Need to initialize metrics (which occurs at the end of the Bdry() module) before integrating area on boundary nodes.");
+  if (!gl->METRICS_INITIALIZED) fatal_error("Need to initialize metrics (which occurs at the end of the Block() module) before integrating area on boundary nodes.");
 
 #ifdef DISTMPI
   MPI_Barrier(MPI_COMM_WORLD);
@@ -747,7 +748,7 @@ void read_control_functions(char *functionname, char **argum,
 
   if (strcmp(functionname,"_Omega")==0) {
     if (!gl->METRICS_INITIALIZED){
-      SOAP_fatal_error(codex,"Function _Omega() can not be called prior to the initialization of the metrics at the end of the Bdry() module.");
+      SOAP_fatal_error(codex,"Function _Omega() can not be called prior to the initialization of the metrics at the end of the Block() module.");
     }
     SOAP_substitute_all_argums(argum,codex);
 #ifdef _2D
@@ -1301,11 +1302,11 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
 
   }
 
-  if (strcmp(actionname,"Bdry")==0 && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
+  if (strcmp(actionname,"Block")==0 && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
     if (((readcontrolarg_t *)codex->action_args)->module_level!=1)
-      fatal_error("The Grid%ldd() module was not found.",nd);
-    wfprintf(stdout,"Bdry..");
-    read_bdry(*argum, codex);
+      fatal_error("The Grid() module was not found.");
+    wfprintf(stdout,"Block..");
+    read_block(*argum, codex);
     find_metrics_on_all_nodes((*np), gl, gl->domain);
 
     wfprintf(stdout,"done;\n");
@@ -1326,17 +1327,18 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     codex->ACTIONPROCESSED=TRUE;
   }
 
-  if (strcmp(actionname,"BdryMod")==0 && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
-    if (((readcontrolarg_t *)codex->action_args)->module_level<2)
-      fatal_error("Need to call Bdry() before BdryMod()."); 
-    wfprintf(stdout,"BdryMod..");
-    read_bdrymod(*argum, codex);
+  if (strcmp(actionname,"Bdry")==0 && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
+    if (((readcontrolarg_t *)codex->action_args)->module_level!=2)
+      fatal_error("The Block() module was not found.");
+    wfprintf(stdout,"Bdry..");
+    read_bdry(*argum, codex);
     wfprintf(stdout,"done;\n");
+    ((readcontrolarg_t *)codex->action_args)->module_level++;
     codex->ACTIONPROCESSED=TRUE;
   }
 
   if (strcmp(actionname,ControlActionName_Model)==0 && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
-    if (((readcontrolarg_t *)codex->action_args)->module_level!=2)
+    if (((readcontrolarg_t *)codex->action_args)->module_level!=3)
       fatal_error("The Bdry() module was not found.");
     wfprintf(stdout,"%s..",ControlActionName_Model);
     read_model(*argum, codex);
@@ -1344,8 +1346,9 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     ((readcontrolarg_t *)codex->action_args)->module_level++;
     codex->ACTIONPROCESSED=TRUE;
   }
+  
   if (strcmp(actionname,"Init")==0  && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
-    if (((readcontrolarg_t *)codex->action_args)->module_level!=3)
+    if (((readcontrolarg_t *)codex->action_args)->module_level!=4)
       fatal_error("The %s() module was not found.",ControlActionName_Model);
     input=((readcontrolarg_t *)codex->action_args)->input;
     if (input->INTERPOLATION){
@@ -1399,7 +1402,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     codex->ACTIONPROCESSED=TRUE;
   }
   if (strcmp(actionname,"Disc")==0  && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
-    if (((readcontrolarg_t *)codex->action_args)->module_level!=4)
+    if (((readcontrolarg_t *)codex->action_args)->module_level!=5)
       fatal_error("The Init() module was not found.");
     wfprintf(stdout,"Disc..");
     read_disc(*argum, codex);
@@ -1408,7 +1411,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     codex->ACTIONPROCESSED=TRUE;
   }
   if (strcmp(actionname,"Cycle")==0 && ((readcontrolarg_t *)codex->action_args)->CYCLEMODULE) {
-    if (((readcontrolarg_t *)codex->action_args)->module_level!=5)
+    if (((readcontrolarg_t *)codex->action_args)->module_level!=6)
       fatal_error("The Disc() module was not found.");
     wfprintf(stdout,"Cycle..");
     read_cycle(*argum, codex);
@@ -1417,7 +1420,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     codex->ACTIONPROCESSED=TRUE;
   }
   if (strcmp(actionname,"Post")==0 && ((readcontrolarg_t *)codex->action_args)->POSTMODULE) {
-    if (((readcontrolarg_t *)codex->action_args)->module_level!=6)
+    if (((readcontrolarg_t *)codex->action_args)->module_level!=7)
       fatal_error("The Cycle() module was not found.");
     wfprintf(stdout,"Post..");
     read_post(*argum, codex);
@@ -1545,11 +1548,11 @@ void read_control(char *control_filename, input_t input, bool CYCLEMODULE, bool 
     /* we need to set gl->nn to a value prior to ProcessCode or gl->effiter_R will not be updated correctly in the function  update_residual() part of the file res.c when called by the cycle module PRIOR to the first iteration*/
 
   SOAP_process_code(code, &codex, SOAP_VARS_KEEP_ALL);
-  if (readcontrolarg.module_level!=7 && POSTMODULE)
+  if (readcontrolarg.module_level!=8 && POSTMODULE)
     fatal_error("The Post() module was not found.");
-  if (readcontrolarg.module_level!=6 && CYCLEMODULE && !POSTMODULE)
+  if (readcontrolarg.module_level!=7 && CYCLEMODULE && !POSTMODULE)
     fatal_error("The Cycle() module was not found.");
-  if (readcontrolarg.module_level!=5 && !CYCLEMODULE && !POSTMODULE && !GRIDONLY)
+  if (readcontrolarg.module_level!=6 && !CYCLEMODULE && !POSTMODULE && !GRIDONLY)
     fatal_error("The Disc() module was not found.");
 //  if (readcontrolarg.module_level!=4 && !CYCLEMODULE  && !POSTMODULE)
 //    fatal_error("The Init() module was not found.");

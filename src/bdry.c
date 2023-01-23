@@ -61,6 +61,35 @@ void write_bdry_template(FILE **controlfile){
 }
 
 
+
+void write_block_template(FILE **controlfile){
+  wfprintf(*controlfile,"\n\n");
+  wfprintf(*controlfile,
+  "Block(\n");
+  wfprintf(*controlfile,
+  "  %s(\n",_FLUID_ACTIONNAME);
+  wfprintf(*controlfile,
+    "    {\n"
+    "    Cut(is" if2DL(",js") if3DL(",ks") ",  ie" if2DL(",je") if3DL(",ke") ");\n"
+    "    Link(i1" if2DL(",j1") if3DL(",k1") ",  i2" if2DL(",j2") if3DL(",k2") ");\n"
+    "    }\n"
+    "  );\n");
+#ifdef EMFIELD
+  wfprintf(*controlfile,
+  "  %s(\n",_EMFIELD_ACTIONNAME
+  );
+  wfprintf(*controlfile,
+  "    {\n"
+  "    Cut(is" if2DL(",js") if3DL(",ks") ",  ie" if2DL(",je") if3DL(",ke") ");\n"
+  "    Link(i1" if2DL(",j1") if3DL(",k1") ",  i2" if2DL(",j2") if3DL(",k2") ");\n"
+  "    }\n"
+  "  );\n");
+#endif
+  wfprintf(*controlfile,
+  ");\n");
+}
+
+
 void unlink_nodes_in_zone(np_t **np, gl_t *gl, zone_t zone, int TYPELEVEL){
   long l1,l2,i,j,k;
   for_ijk(zone,is,js,ks,ie,je,ke){
@@ -107,7 +136,7 @@ void unlink_nodes_in_zone(np_t **np, gl_t *gl, zone_t zone, int TYPELEVEL){
 
 
 
-void read_bdrymod_actions(char *action, char **argum, SOAP_codex_t *codex){
+void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
   np_t **np;
   gl_t *gl;
   zone_t zone;
@@ -118,10 +147,12 @@ void read_bdrymod_actions(char *action, char **argum, SOAP_codex_t *codex){
 #ifdef _3DL 
   long ks,ke;
 #endif
+  long BCtypes[nd*2];
 
 
   double *bdryparam;
   long TYPELEVEL,param;
+  int eos=EOS;
 
   np=((readcontrolarg_t *)codex->action_args)->np;
   gl=((readcontrolarg_t *)codex->action_args)->gl;
@@ -293,17 +324,71 @@ void read_bdrymod_actions(char *action, char **argum, SOAP_codex_t *codex){
     codex->ACTIONPROCESSED=TRUE;
   }
 
+  if (strcmp(action,"Faces")==0) {
+    SOAP_substitute_all_argums(argum, codex);
+#ifdef _1D
+    if (sscanf(*argum,"%ld,%ld%n",&BCtypes[0],&BCtypes[1],&eos)!=2
+#endif
+#ifdef _2D
+    if (sscanf(*argum,"%ld,%ld,%ld,%ld%n",&BCtypes[0],&BCtypes[1],&BCtypes[2],&BCtypes[3],&eos)!=4 
+#endif
+#ifdef _3D
+    if (sscanf(*argum,"%ld,%ld,%ld,%ld,%ld,%ld%n",&BCtypes[0],&BCtypes[1],&BCtypes[2],&BCtypes[3],&BCtypes[4],&BCtypes[5],&eos)!=6
+#endif
+      || (*argum)[eos]!=EOS){
+      SOAP_fatal_error(codex,"One or more argument(s) could not be read properly "
+                             "in Faces() part of Bdry(). Arguments: %s .",*argum);
+    }
+
+    zone=gl->domain_all;
+    zone.ie=zone.is;
+    update_node_type(*np,gl,TYPELEVEL,BCtypes[0],zone);
+    zone=gl->domain_all;
+    zone.is=zone.ie;
+    update_node_type(*np,gl,TYPELEVEL,BCtypes[1], zone);
+#ifdef _2DL
+    zone=gl->domain_all;
+    zone.je=zone.js;
+    update_node_type(*np,gl,TYPELEVEL,BCtypes[2], zone);
+    zone=gl->domain_all;
+    zone.js=zone.je;
+    update_node_type(*np,gl,TYPELEVEL,BCtypes[3], zone);
+#endif
+#ifdef _3DL
+    zone=gl->domain_all;
+    zone.ke=zone.ks;
+    update_node_type(*np,gl,TYPELEVEL,BCtypes[4], zone);
+    zone=gl->domain_all;
+    zone.ks=zone.ke;
+    update_node_type(*np,gl,TYPELEVEL,BCtypes[5], zone);
+#endif
+    codex->ACTIONPROCESSED=TRUE;
+  }
+
+
+  if (strcmp(action,"Cut")==0) {
+    fatal_error("The Cut() command should be called within Block(), not within Bdry().");
+  }  
+
+  if (strcmp(action,"Link")==0) {
+    fatal_error("The Link() command should be called within Block(), not within Bdry().");
+  }  
+
+  if (strcmp(action,"Unlink")==0) {
+    fatal_error("The Unlink() command should be called within Block(), not within Bdry().");
+  }  
+
   free(bdryparam);
 }
 
 
 
-void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
+void read_block_actions(char *action, char **argum, SOAP_codex_t *codex){
   np_t **np;
   gl_t *gl;
   zone_t zone;
   short linkdim,linkdimsgn;
-  long numparam,BCtype,i,j,k,is,ie,i1,i2,k1,k2,j1,j2,l1,l2;
+  long is,ie,i1,i2,k1,k2,j1,j2,l1,l2;
 #ifdef _2DL 
   long js,je;
 #endif
@@ -312,15 +397,12 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
 #endif
 
 
-  double *bdryparam;
-  long BCtypes[nd*2];
-  long TYPELEVEL,param;
+  long TYPELEVEL;
   int eos=EOS;
 
   np=((readcontrolarg_t *)codex->action_args)->np;
   gl=((readcontrolarg_t *)codex->action_args)->gl;
   TYPELEVEL=((readcontrolarg_t *)codex->action_args)->TYPELEVEL;
-  bdryparam=(double *)malloc(sizeof(double));
 
 #ifdef EMFIELD
   if (strcmp(action,_EMFIELD_ACTIONNAME)==0){
@@ -340,146 +422,6 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
     SOAP_process_code(*argum, codex, SOAP_VARS_CLEAN_ADDED);
     codex->ACTIONPROCESSED=TRUE;
   }
-
-  if (strcmp(action,"All")==0) {
-    SOAP_substitute_all_argums(argum, codex);
-    BCtype=SOAP_get_argum_long(codex,*argum,0);
-    numparam=SOAP_number_argums(*argum)-1;
-    if (numparam>0){
-      bdryparam=(double *)realloc(bdryparam,numparam*sizeof(double));
-      for (param=0; param<numparam; param++) bdryparam[param]=SOAP_get_argum_double(codex,*argum,1+param);
-    }                 
-    for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
-      if (is_node_bdry((*np)[_ai(gl,i,j,k)],TYPELEVEL)){
-        update_node_type((*np),gl,TYPELEVEL,BCtype,_zone_from_point(i,j,k));
-        if (numparam>0){
-          if ((*np)[_ai(gl,i,j,k)].bdryparam==NULL){
-            (*np)[_ai(gl,i,j,k)].bdryparam=(double *)malloc(numparam*sizeof(double));
-          } else {
-            (*np)[_ai(gl,i,j,k)].bdryparam=(double *)realloc((*np)[_ai(gl,i,j,k)].bdryparam,numparam*sizeof(double));
-          }
-          for (param=0; param<numparam; param++){
-            (*np)[_ai(gl,i,j,k)].bdryparam[param]=bdryparam[param];
-          }
-          (*np)[_ai(gl,i,j,k)].numbdryparam=numparam;        
-        }
-      }
-    }
-    codex->ACTIONPROCESSED=TRUE;
-  }
-
-
-  if (strcmp(action,"Region")==0) {
-    SOAP_substitute_all_argums(argum, codex);
-    #ifdef _2D
-      if (sscanf(*argum,"%ld,%ld,%ld,%ld,%ld",&is,&js,&ie,&je,&BCtype)!=5){
-    #endif
-    #ifdef _3D
-      if (sscanf(*argum,"%ld,%ld,%ld,%ld,%ld,%ld,%ld",&is,&js,&ks,&ie,&je,&ke,&BCtype)!=7){
-    #endif
-      SOAP_fatal_error(codex,"One or more argument(s) could not be read properly "
-                             "in Region() part of Bdry(). Arguments: %s .",*argum);
-    }
-    numparam=SOAP_number_argums(*argum)-(nd*2+1);
-    if (numparam>0){
-      bdryparam=(double *)realloc(bdryparam,numparam*sizeof(double));
-      for (param=0; param<numparam; param++) bdryparam[param]=SOAP_get_argum_double(codex,*argum,(nd*2+1)+param);
-    }                 
-    find_zone_from_argum(*argum, 0, gl, codex, &zone);
-    for_ijk(zone,is,js,ks,ie,je,ke){
-      if (is_node_bdry((*np)[_ai(gl,i,j,k)],TYPELEVEL)){
-        update_node_type((*np),gl,TYPELEVEL,BCtype,_zone_from_point(i,j,k));
-        if (numparam>0){
-          if ((*np)[_ai(gl,i,j,k)].bdryparam==NULL){
-            (*np)[_ai(gl,i,j,k)].bdryparam=(double *)malloc(numparam*sizeof(double));
-          } else {
-            (*np)[_ai(gl,i,j,k)].bdryparam=(double *)realloc((*np)[_ai(gl,i,j,k)].bdryparam,numparam*sizeof(double));
-          }
-          for (param=0; param<numparam; param++){
-            (*np)[_ai(gl,i,j,k)].bdryparam[param]=bdryparam[param];
-          }
-          (*np)[_ai(gl,i,j,k)].numbdryparam=numparam;        
-        }
-      }
-    }
-    codex->ACTIONPROCESSED=TRUE;
-  }
-
-  char planedim;
-  long planeloc;
-  if (strcmp(action,"Plane")==0) {
-    SOAP_substitute_all_argums(argum, codex);
-      if (sscanf(*argum,"\"%c\",%ld,%ld",&planedim,&planeloc,&BCtype)!=3){
-      SOAP_fatal_error(codex,"One or more argument(s) could not be read properly "
-                             "in Plane() part of Bdry(). Arguments: %s .",*argum);
-    }
-    numparam=SOAP_number_argums(*argum)-3;
-    if (numparam>0){
-      bdryparam=(double *)realloc(bdryparam,numparam*sizeof(double));
-      for (param=0; param<numparam; param++) bdryparam[param]=SOAP_get_argum_double(codex,*argum,3+param);
-    }
-    zone=gl->domain_lim;
-    switch (planedim){
-      case 'i':
-        zone.is=planeloc;
-        zone.ie=planeloc;
-      break; 
-      case 'j':
-        zone.js=planeloc;
-        zone.je=planeloc;      
-      break; 
-#ifdef _3D
-      case 'k':
-        zone.ks=planeloc;
-        zone.ke=planeloc;      
-      break; 
-#endif
-      default:
-        fatal_error("In Bdry(), planedim can not be set to %c.",planedim);
-    }
-    for_ijk(zone,is,js,ks,ie,je,ke){
-      if (is_node_bdry((*np)[_ai(gl,i,j,k)],TYPELEVEL)){
-        update_node_type((*np),gl,TYPELEVEL,BCtype,_zone_from_point(i,j,k));
-        if (numparam>0){
-          if ((*np)[_ai(gl,i,j,k)].bdryparam==NULL){
-            (*np)[_ai(gl,i,j,k)].bdryparam=(double *)malloc(numparam*sizeof(double));
-          } else {
-            (*np)[_ai(gl,i,j,k)].bdryparam=(double *)realloc((*np)[_ai(gl,i,j,k)].bdryparam,numparam*sizeof(double));
-          }
-          for (param=0; param<numparam; param++){
-            (*np)[_ai(gl,i,j,k)].bdryparam[param]=bdryparam[param];
-          }
-          (*np)[_ai(gl,i,j,k)].numbdryparam=numparam;        
-        }
-      }
-    }
-    codex->ACTIONPROCESSED=TRUE;
-  }
-
-
-  if (strcmp(action,"Param")==0) {
-    SOAP_substitute_all_argums(argum, codex);
-    find_zone_from_argum(*argum, 0, gl, codex, &zone);
-    BCtype=SOAP_get_argum_long(codex,*argum,2*nd);
-    numparam=SOAP_number_argums(*argum)-2*nd-1;
-    bdryparam=(double *)realloc(bdryparam,numparam*sizeof(double));
-    for (param=0; param<numparam; param++) bdryparam[param]=SOAP_get_argum_double(codex,*argum,2*nd+param+1);
-    for_ijk(zone,is,js,ks,ie,je,ke){
-          if (_node_type((*np)[_ai(gl,i,j,k)],TYPELEVEL)==BCtype){
-            if ((*np)[_ai(gl,i,j,k)].bdryparam==NULL){
-              (*np)[_ai(gl,i,j,k)].bdryparam=(double *)malloc(numparam*sizeof(double));
-            } else {
-              (*np)[_ai(gl,i,j,k)].bdryparam=(double *)realloc((*np)[_ai(gl,i,j,k)].bdryparam,numparam*sizeof(double));
-            }
-            for (param=0; param<numparam; param++){
-              (*np)[_ai(gl,i,j,k)].bdryparam[param]=bdryparam[param];
-            }
-            (*np)[_ai(gl,i,j,k)].numbdryparam=numparam;
-          }
-    }
-    codex->ACTIONPROCESSED=TRUE;
-  }
-
 
 
   if (strcmp(action,"Link")==0) {
@@ -592,7 +534,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
       break;
 #endif
       default:
-         fatal_error("TYPELEVEL must be wither TYPELEVEL_FLUID or TYPELEVEL_EMFIELD in read_bdry_actions(), Link.");
+         fatal_error("TYPELEVEL must be wither TYPELEVEL_FLUID or TYPELEVEL_EMFIELD in read_block_actions(), Link.");
     }
     codex->ACTIONPROCESSED=TRUE;
   }
@@ -630,47 +572,6 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
     codex->ACTIONPROCESSED=TRUE;
   }
 
-  if (strcmp(action,"Faces")==0) {
-    SOAP_substitute_all_argums(argum, codex);
-#ifdef _1D
-    if (sscanf(*argum,"%ld,%ld%n",&BCtypes[0],&BCtypes[1],&eos)!=2
-#endif
-#ifdef _2D
-    if (sscanf(*argum,"%ld,%ld,%ld,%ld%n",&BCtypes[0],&BCtypes[1],&BCtypes[2],&BCtypes[3],&eos)!=4 
-#endif
-#ifdef _3D
-    if (sscanf(*argum,"%ld,%ld,%ld,%ld,%ld,%ld%n",&BCtypes[0],&BCtypes[1],&BCtypes[2],&BCtypes[3],&BCtypes[4],&BCtypes[5],&eos)!=6
-#endif
-      || (*argum)[eos]!=EOS){
-      SOAP_fatal_error(codex,"One or more argument(s) could not be read properly "
-                             "in Faces() part of Bdry(). Arguments: %s .",*argum);
-    }
-
-    zone=gl->domain_all;
-    zone.ie=zone.is;
-    update_node_type(*np,gl,TYPELEVEL,BCtypes[0],zone);
-    zone=gl->domain_all;
-    zone.is=zone.ie;
-    update_node_type(*np,gl,TYPELEVEL,BCtypes[1], zone);
-#ifdef _2DL
-    zone=gl->domain_all;
-    zone.je=zone.js;
-    update_node_type(*np,gl,TYPELEVEL,BCtypes[2], zone);
-    zone=gl->domain_all;
-    zone.js=zone.je;
-    update_node_type(*np,gl,TYPELEVEL,BCtypes[3], zone);
-#endif
-#ifdef _3DL
-    zone=gl->domain_all;
-    zone.ke=zone.ks;
-    update_node_type(*np,gl,TYPELEVEL,BCtypes[4], zone);
-    zone=gl->domain_all;
-    zone.ks=zone.ke;
-    update_node_type(*np,gl,TYPELEVEL,BCtypes[5], zone);
-#endif
-    codex->ACTIONPROCESSED=TRUE;
-  }
-  free(bdryparam);
 }
 
 
@@ -1371,7 +1272,7 @@ static void validate_inner_nodes(np_t *np, gl_t *gl, zone_t zone, int TYPELEVEL)
 
 
 
-void read_bdry(char *argum, SOAP_codex_t *codex){
+void read_block(char *argum, SOAP_codex_t *codex){
   np_t *np;
   gl_t *gl;
   long i,j,k;
@@ -1453,14 +1354,14 @@ void read_bdry(char *argum, SOAP_codex_t *codex){
 #endif
   ((readcontrolarg_t *)codex->action_args)->TYPELEVEL=TYPELEVEL_FLUID;
   codex->ACTION=TRUE;
-  codex->action=&read_bdry_actions;
+  codex->action=&read_block_actions;
   SOAP_process_code(argum, codex, SOAP_VARS_KEEP_ALL);
 
-  if (!gl->BDRY_FLUID_READ) fatal_error("The fluid module %s was not found within Bdry().",_FLUID_ACTIONNAME);
+  if (!gl->BDRY_FLUID_READ) fatal_error("The fluid module %s was not found within Block().",_FLUID_ACTIONNAME);
   adjust_node_type(np, gl, gl->domain_lim, TYPELEVEL_FLUID);
   validate_inner_nodes(np, gl, gl->domain, TYPELEVEL_FLUID);
 #ifdef EMFIELD
-  if (!gl->BDRY_EMFIELD_READ) fatal_error("The emfield module %s was not found within Bdry().",_EMFIELD_ACTIONNAME);
+  if (!gl->BDRY_EMFIELD_READ) fatal_error("The emfield module %s was not found within Block().",_EMFIELD_ACTIONNAME);
   adjust_node_type(np, gl, gl->domain_lim, TYPELEVEL_EMFIELD);
   validate_inner_nodes(np, gl, gl->domain, TYPELEVEL_EMFIELD);
 #endif
@@ -1558,7 +1459,7 @@ void read_bdry(char *argum, SOAP_codex_t *codex){
 
 
 
-void read_bdrymod(char *argum, SOAP_codex_t *codex){
-  codex->action=&read_bdrymod_actions;
+void read_bdry(char *argum, SOAP_codex_t *codex){
+  codex->action=&read_bdry_actions;
   SOAP_process_code(argum, codex, SOAP_VARS_CLEAN_ADDED);
 }

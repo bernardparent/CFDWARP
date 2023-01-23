@@ -80,10 +80,10 @@ void write_bdry_fluid_template(FILE **controlfile){
 #endif
     "    _________________________________________________________________________________________\n"
     "    }\n"
-    "    All(BDRY_OUTFLOWSUPERSONIC1);\n"
+    "    Twall=300.0; {K}\n"
+    "    All(BDRY_WALLTFIXED1,Twall);\n"
     "    Plane(\"i\",is,BDRY_INFLOWSUPERSONIC);\n"
     "    Plane(\"i\",ie,BDRY_OUTFLOWSUPERSONIC1);\n"
-    "    Twall=300.0; {K}\n"
     "    Plane(\"j\",js,BDRY_WALLTFIXED1,Twall);\n"
     "    Plane(\"j\",je,BDRY_WALLTFIXED1,Twall);\n"
 #ifdef _3D
@@ -91,9 +91,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    Plane(\"k\",ke,BDRY_SYMMETRICAL2);\n"
 #endif
     "    {\n"
-    "    Cut(is" if2DL(",js") if3DL(",ks") ",  ie" if2DL(",je") if3DL(",ke") ");\n"
     "    Region(is" if2DL(",js") if3DL(",ks") ",  ie" if2DL(",je") if3DL(",ke") ",  BDRY_INFLOWSUPERSONIC);\n"
-    "    Link(i1" if2DL(",j1") if3DL(",k1") ",  i2" if2DL(",j2") if3DL(",k2") ");\n"
 #if defined(UNSTEADY)
 #ifdef _3D
     "    Param(is,js,ks,  ie,je,ke,  BDRY_INFLOWFLUCTUATING, N_modes{number of disturbance modes},\n    beta{spanwise wavenumber}, omega{angular frequency of disturbance},\n    ifoblique{0 for 2D wave and 1 for 3D oblique wave}, Vx_baseflow,Re_Vx_shapefunction,\n    Im_Vx_shapefunction, Vy_baseflow,Re_Vy_shapefunction,Im_Vy_shapefunction, Vz_baseflow,\n    Re_Vz_shapefunction,Im_Vz_shapefunction, rho_baseflow,Re_rho_shapefunction,\n    Im_rho_shapefunction, T_baseflow,Re_T_shapefunction,Im_T_shapefunction); {N_modes sets of\n    beta...Im_T_shapefunction to be input}\n"

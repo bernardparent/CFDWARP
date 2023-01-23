@@ -7,6 +7,22 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JAN 22c
+  * in src/bdry.c
+    - made various changes so that read_bdrymod is now read_bdry and read_bdry is now read_block
+    - added write_block_template() which includes templates for Cut() and Link()
+  * in src/control.c
+    - in write_control(), added call to write_block_template()
+    - in readcontrol_actions(), made changes to accomodate the change read_bdrymod->read_bdry
+      and read_bdry->read_block
+  * in model/fluid/_*/fluid_bdry.c
+    - in write_bdry_fluid_template(), removed Cut() and Link() templates
+    - in write_bdry_fluid_template(), changed the All() BC to BDRY_WALLTFIXED1 and added Twall=300;
+      on the preceding line
+  * in model/emfield/_Epotential/emfield.c
+    - in write_bdry_emfield_template(), removed Cut() and Link() templates
+
+
 2023 JAN 22b
   * in src/control.c
     - in integrate_area_on_bdry(), added the parameter AreaMag and code needed to compute AreaMag
