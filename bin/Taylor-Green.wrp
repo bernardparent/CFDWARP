@@ -102,23 +102,25 @@ mu_0=rho0*V0*L/1600;
 
 
 Ldom=L*2*pi/(ie-is-1)*(ie-is);
+
+
 Grid(
   Size(is,js,ks, ie,je,ke);
   Corners(is,js,ks, ie,je,ke, 0,0,0, Ldom,Ldom,Ldom);
   JoinCorners(is,js,ks, ie,je,ke,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0,  EE,0.5e0,1.0e0,1.0e0);
 );
 
-Bdry(
+
+Block(
   NavierStokesPerfect(
-	All(BDRY_OUTFLOWSUPERSONIC1);
     for (i,is+1,ie-1,
       for (j,js+1,je-1,
         Link(i,j,ks,i,j,ke-1,3);
         Link(i,j,ks+1,i,j,ke,3);
       );
     );
-      for (k,ks+1,ke-1,
-	for (i,is+1,ie-1,
+    for (k,ks+1,ke-1,
+      for (i,is+1,ie-1,
         Link(i,js+1,k,i,je,k,2);
         Link(i,js,k,i,je-1,k,2);
       );
@@ -129,9 +131,16 @@ Bdry(
         Link(is+1,j,k, ie,j,k,1);
       );
     );
-
   );
 );
+
+
+Bdry(
+  NavierStokesPerfect(
+    All(BDRY_OUTFLOWSUPERSONIC1);
+  );
+);
+
 
 Model(
   NavierStokesPerfect(

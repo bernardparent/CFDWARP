@@ -161,6 +161,19 @@ Grid(
 );
 
 
+
+Block(
+  NavierStokesPerfect(    
+    for (i,is+1,ie-1,
+      for (j,js+1,je-1,
+        Link(i,j,ks+1,i,j,ke);
+        Link(i,j,ks,i,j,ke-1);
+      );
+    );
+  );
+);
+
+
 Bdry(
   NavierStokesPerfect(
     {
@@ -187,18 +200,6 @@ Bdry(
     Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLTFIXED1,BDRY_OUTFLOWSUPERSONIC1,  BDRY_SYMMETRICAL2,BDRY_SYMMETRICAL2);
     
     Plane("j",js,BDRY_WALLTFIXED1,Twall);
-    for (i,is+1,ie-1,
-      for (j,js+1,je-1,
-        Link(i,j,ks+1,i,j,ke);
-        Link(i,j,ks,i,j,ke-1);
-      );
-    );
-    {
-    Cut(is,js,ks,  ie,je,ke);
-    Region(is,js,ks,  ie,je,ke,  BDRY_INFLOWSUPERSONIC);
-    Link(i1,j1,k1,  i2,j2,k2);
-    Param(is,js,ks,  ie,je,ke,  BDRY_FREESTREAM1, Vx,Vy,Vz,P,T);
-    }
   );
 );
  
@@ -244,7 +245,7 @@ Init(
     den_profile[1]=1E-6;{doesn't take effect: will be replaced by value at wall}
 	flag=0;
     for(j,js+1,je,
-	  y=_y_global(1,j,1);
+	  y=_y(1,j,1);
 	  if(flag==0,
 	    vel_profile[j]=(3.80507337626901E+15*y^5-1.61299239768002E+12*y^4+1.14565790143603E+08*y^3+7.37488485403774E+05*y^2+1.54657986330626E+00
 *y)/(3.12094964218140E+12*y^5-1.79357558919418E+09*y^4+1.01732458800873E+06*y^3-3.20126031135779E+02*y^2+4.28937718377614E-01*y);
@@ -262,7 +263,7 @@ Init(
 
 	flag=0;
     for(j,js+1,je,
-	  y=_y_global(1,j,1);
+	  y=_y(1,j,1);
 	  if(flag==0,
 	    den_profile[j]=(494594121395.75*y^5+508676499.243329*y^4-1134734.94671323*y^3+1060.15479630791*y^2-0.288269060313963*y)/(4271751239518.71*y^5+12507040376.2409*y^4-28585405.390141*y^3+26199.8863484573*y^2-6.82710958171928*y);
 		profileused=j;

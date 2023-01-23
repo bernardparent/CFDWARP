@@ -74,6 +74,13 @@ Grid(
 );
 
 
+
+Block(
+  NavierStokesPerfect(
+  );
+);
+
+
 Bdry(
   NavierStokesPerfect(
     {
@@ -97,12 +104,6 @@ Bdry(
     _________________________________________________________________________________________
     }
     All(BDRY_INFLOWSUPERSONIC);
-    {
-    Cut(is,js,ks,  ie,je,ke);
-    Region(is,js,ks,  ie,je,ke,  BDRY_INFLOWSUPERSONIC);
-    Link(i1,j1,k1,  i2,j2,k2);
-    Param(is,js,ks,  ie,je,ke,  BDRY_FREESTREAM1, Vx,Vy,Vz,P,T);
-    }
   );
 );
  

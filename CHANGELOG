@@ -6,6 +6,18 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2023 JAN 23a
+  * in bin/Keller-Kloker.wrp, bin/Leblanc.wrp, bin/Noh2D.wrp, bin/Noh3D.wrp, bin/OREX.wrp, bin/RAM-C-II.wrp,
+    bin/Ringleb.wrp, bin/Schulein.wrp, bin/Sedov.wrp, bin/Sod.wrp, bin/Starikovskii.wrp, bin/Taylor-Green.wrp
+    bin/Titarev-Toro.wrp, bin/Woodward-Colella_blast_wave.wrp, bin/Woodward-Colella_forward_step.wrp, 
+    bin/cylindercrossflow2D.wrp, bin/cylinderinnerflow2D.wrp, bin/pipeflow3D.wrp
+    - made modifications to the control files so that they can be run with the latest CFDWARP
+  * in model/fluid/_Navier-Stokes_perfect/fluid_conv.c
+    - added a missing #define EIGENSET14 14 at the beginning of the file that was preventing
+      compilation
+  * in model/fluid/_Navier-Stokes_perfect/fluid_source.c
+    - in find_Sstar(), got rid of unneeded long dim;
+    
 
 2023 JAN 22c
   * in src/bdry.c

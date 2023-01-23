@@ -181,28 +181,8 @@ Grid(
 
 
 
-Bdry(
+Block(
   NavierStokesPerfect(
-    {
-    _________________________________________________________________________________________
-
-    Boundary Condition Type    ID    Description
-    _________________________________________________________________________________________
-
-    BDRY_INFLOWSUPERSONIC      0     Inflow, supersonic
-    BDRY_OUTFLOWSUPERSONIC1    1     Outflow, supersonic, 1o
-    BDRY_SYMMETRICAL1          2     Symmetrical, 1o
-    BDRY_SYMMETRICAL2          3     Symmetrical, 2o
-    BDRY_SYMMETRICAL3          8     Symmetrical, 3o
-    BDRY_WALLTFIXED1           4     Wall, T specified, 1o, param Twall
-    BDRY_WALLTFIXED2           a     Wall, T specified, 2o, param Twall
-    BDRY_WALLADIABATIC1        5     Wall, adiabatic, 1o
-    BDRY_WALLADIABATIC2        b     Wall, adiabatic, 2o
-    BDRY_INFLOWSUBSONIC1       6     Subsonic Inflow 1o (Constant Tstag, Pstag at inflow)
-    BDRY_OUTFLOWSUBSONIC1      7     Subsonic Outflow 1o (Constant P at outflow)
-    BDRY_FREESTREAM1           9     Freestream, 1o, params Vx,Vy,Vz, P, T
-    _________________________________________________________________________________________
-    }
     {lower left quadrant cut}
     Cut(is,js,ks,ie,jm1,km1-1);
     {lower right quadrant cut}
@@ -211,7 +191,6 @@ Bdry(
     Cut(is,jm2,ks,ie,je,km1-1);
     {top right quadrant cut}
     Cut(is,jm2,km2+1,ie,je,ke);
-    All(BDRY_SYMMETRICAL1);
 
     for (i,is+1,ie-1,
       {lower left quadrant links}
@@ -240,13 +219,35 @@ Bdry(
 
     );
 
+  );
+);
+
+
+Bdry(
+  NavierStokesPerfect(
+    {
+    _________________________________________________________________________________________
+
+    Boundary Condition Type    ID    Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC      0     Inflow, supersonic
+    BDRY_OUTFLOWSUPERSONIC1    1     Outflow, supersonic, 1o
+    BDRY_SYMMETRICAL1          2     Symmetrical, 1o
+    BDRY_SYMMETRICAL2          3     Symmetrical, 2o
+    BDRY_SYMMETRICAL3          8     Symmetrical, 3o
+    BDRY_WALLTFIXED1           4     Wall, T specified, 1o, param Twall
+    BDRY_WALLTFIXED2           a     Wall, T specified, 2o, param Twall
+    BDRY_WALLADIABATIC1        5     Wall, adiabatic, 1o
+    BDRY_WALLADIABATIC2        b     Wall, adiabatic, 2o
+    BDRY_INFLOWSUBSONIC1       6     Subsonic Inflow 1o (Constant Tstag, Pstag at inflow)
+    BDRY_OUTFLOWSUBSONIC1      7     Subsonic Outflow 1o (Constant P at outflow)
+    BDRY_FREESTREAM1           9     Freestream, 1o, params Vx,Vy,Vz, P, T
+    _________________________________________________________________________________________
+    }
+    All(BDRY_SYMMETRICAL1);
     Plane("i",is,BDRY_INFLOWSUPERSONIC);
     Plane("i",ie,BDRY_OUTFLOWSUPERSONIC1);
-    {
-    Cut(is,js,ks,  ie,je,ke);
-    Region(is,js,ks,  ie,je,ke,  BDRY_INFLOWSUPERSONIC);
-    Link(i1,j1,k1,  i2,j2,k2);
-    }
   );
 );
  

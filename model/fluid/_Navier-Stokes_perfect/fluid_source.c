@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void find_Sstar(np_t *np, gl_t *gl, long l, flux_t S){
   long flux;
-  long dim;
   flux_t Saxi,Sheatforces;
 
   for (flux=0; flux<nf; flux++){

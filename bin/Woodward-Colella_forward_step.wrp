@@ -93,6 +93,13 @@ Grid(
 );
 
 
+Block(
+  NavierStokesPerfect(
+    Cut(im,js,  ie,jm);
+  );
+);
+
+
 Bdry(
   NavierStokesPerfect(
     {
@@ -112,9 +119,6 @@ Bdry(
     BDRY_OUTFLOWSUBSONIC1      7        Subsonic Outflow 1o (Constant P at outflow)
     _________________________________________________________________________________________
     }
-    { first, create cuts in the computational domain; a cut is a region 
-     which is not computed by the solver }
-    Cut(im,js,  ie,jm);
     { second, apply a default boundary condition (BC) type to all boundary nodes }
     All(BDRY_SYMMETRICAL2{BC type});
     { impose BC type at faces i=is, i=ie, j=js, j=je}

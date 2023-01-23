@@ -211,6 +211,14 @@ Grid(
 );
 
 
+Block(
+  NavierStokesPlasma(
+  );
+  Epotential(
+  );
+
+);
+
 
 Bdry(
   NavierStokesPlasma(
@@ -246,11 +254,6 @@ Bdry(
     Plane("j",je,BDRY_INFLOWSUPERSONIC);
     Region(is,je,  im1-1,je, BDRY_OUTFLOWSUPERSONIC1);
     Region(im4+1,je,  ie,je,  BDRY_OUTFLOWSUPERSONIC1);
-    {
-    Cut(is,js,  ie,je);
-    Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
-    Link(i1,j1,  i2,j2);
-    }
   );
   Epotential(
     {
@@ -266,12 +269,6 @@ Bdry(
 
     }
     All(BDRYEMF_DIELECTRIC);
-    {
-    Faces(BDRYEMF_ELECTRODE,BDRYEMF_ELECTRODE,  BDRYEMF_DIELECTRIC,BDRYEMF_DIELECTRIC);
-    Cut(is,js,  ie,je);
-    Region(is,js,  ie,je,  BDRYEMF_ELECTRODE);
-    Link(i1,j1,  i2,j2);
-    }
   );
 
 );

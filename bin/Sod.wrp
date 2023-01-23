@@ -98,32 +98,37 @@ Grid(
 );
 
 
+Block(
+  NavierStokesPerfect(
+  );
+);
+
+
 Bdry(
   NavierStokesPerfect(
     {
-    ******************************************************************  
-    * Fluid Flow Boundary Conditions Types:                             
-    ******************************************************************  
-    *  0   : Inflow, supersonic                                         
-    *  1   : Outflow, supersonic                                        
-    *  2   : Slip wall, 1st order                                       
-    *  3   : Slip wall, 2nd order                                       
-    *  4   : Wall, T specified                                          
-    *  5   : Wall, adiabatic                                            
-    *  6   : Subsonic Inflow (Constant Tstag, Pstag at inflow)           
-    *  7   : Subsonic Outflow (Constant P at outflow)                   
-    *  104 : Wall, T specified, flux at the interface set to bdry flux  
-    ******************************************************************  
+    _________________________________________________________________________________________
+
+    Boundary Condition Type    ID    Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC      0     Inflow, supersonic
+    BDRY_OUTFLOWSUPERSONIC1    1     Outflow, supersonic, 1o
+    BDRY_SYMMETRICAL1          2     Symmetrical, 1o
+    BDRY_SYMMETRICAL2          3     Symmetrical, 2o
+    BDRY_SYMMETRICAL3          8     Symmetrical, 3o
+    BDRY_WALLTFIXED1           4     Wall, T specified, 1o, param Twall
+    BDRY_WALLTFIXED2           a     Wall, T specified, 2o, param Twall
+    BDRY_WALLADIABATIC1        5     Wall, adiabatic, 1o
+    BDRY_WALLADIABATIC2        b     Wall, adiabatic, 2o
+    BDRY_INFLOWSUBSONIC1       6     Subsonic Inflow 1o (Constant Tstag, Pstag at inflow)
+    BDRY_OUTFLOWSUBSONIC1      7     Subsonic Outflow 1o (Constant P at outflow)
+    BDRY_FREESTREAM1           9     Freestream, 1o, params Vx,Vy, P, T
+    _________________________________________________________________________________________
     }
-    { first, create cuts in the computational domain; a cut is a region 
-     which is not computed by the solver }
-    { Cut(10{is},10{js},  17{ie},17{je});}
-    { second, apply a default boundary condition (BC) type to all boundary nodes }
-    All(3{BC type});
-    { impose BC type at faces i=is, i=ie, j=js, j=je}
-    Faces(0,1,  2,2);
-    { apply BC type only to the boundary nodes in a specific region of the computational domain}
-    { Region(10{is},10{js},  17{ie},17{je},  3{BC type});}
+
+    All(BDRY_SYMMETRICAL2);
+    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_SYMMETRICAL1,BDRY_SYMMETRICAL1);
   );
 );
  
@@ -137,31 +142,28 @@ Model(
     Pmin=1.0e-20;    Pmax=9.9e99;   {min and max pressure allowed in the domain in Pa}
     Tmin=1.0e-20;     Tmax=6.0e4;    {min and max temperature allowed in the domain in K}    
     AXISYMMETRIC=FALSE;
+    SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
+    SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
   );
 );
  
  
 Init(
-    NavierStokesPerfect(
-      {
-      ************************************************************
-      *Initial Conditions Types:                                  
-      ************************************************************
-      *1, V[1]..V[nd],  P,  T     
-      *2, M[1]..M[nd],  P,  T     
-      ************************************************************
-      }
-      { Init all nodes in the domain}
-      All(1,uL,0,PL,TL);
-      Region(im,js,ie,je, 1,uR,0,PR,TR); 
-      {
-        { Init bdry nodes numbered 3}
-        Bdry(3, 2, Mx,My,P,T);
-        { Init nodes in region}
-        Region(is,js,  ie,je,
-         2, Mx,My,P,T);
-      }
-    );
+  NavierStokesPerfect(
+    {
+    _______________________________________________________________________________________
+
+    Initial Condition Type       Parameters
+    _______________________________________________________________________________________
+
+    INIT_TYPE1                   V[1]..V[nd],  P,  T     
+    INIT_TYPE2                   M[1]..M[nd],  P,  T     
+    INIT_TYPE3                   V[1]..V[nd],  P,  rho   
+    _______________________________________________________________________________________
+    }
+    All(INIT_TYPE1,uL,0,PL,TL);
+    Region(im,js,ie,je, INIT_TYPE1,uR,0,PR,TR); 
+  );
 );
 
 
@@ -189,7 +191,7 @@ Disc(
   );
   TVDRK(
     METHOD=METHOD_TVDRK2;
-  );
+  );  
 );
 
 

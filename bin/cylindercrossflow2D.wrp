@@ -100,7 +100,43 @@ Grid(
   Join(is,jm, ie,je,  j,  GE,0.8e0,1.0e0,1.0e0);
 );
 
+
+
+Block(
+  NavierStokesPerfect(
+    {
+    _________________________________________________________________________________________
+
+    Boundary Condition Type    ID    Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC      0     Inflow, supersonic
+    BDRY_OUTFLOWSUPERSONIC1    1     Outflow, supersonic, 1o
+    BDRY_SYMMETRICAL1          2     Symmetrical, 1o (can be used as a "slip wall")
+    BDRY_SYMMETRICAL2          3     Symmetrical, 2o (can be used as a "slip wall")
+    BDRY_SYMMETRICAL3          8     Symmetrical, 3o (can be used as a "slip wall")
+    BDRY_WALLTFIXED1            4     Wall, T specified
+    BDRY_WALLADIABATIC1         5     Wall, adiabatic
+    BDRY_INFLOWSUBSONIC1       6     Subsonic Inflow 1o (Constant Tstag, Pstag at inflow)
+    BDRY_OUTFLOWSUBSONIC1      7     Subsonic Outflow 1o (Constant P at outflow)
+    BDRY_FREESTREAM1           9     Freestream, 1o, params Vx,Vy, P, T
+    _________________________________________________________________________________________
+    }
+    
+    for(j,js+1,je-1,
+      Link(ie,j, is+1,j);
+      Link(ie-1,j, is,j);
+    );
+    Unlink(is,js,ie,je);
+    for(j,js+1,je-1,
+      Link(ie,j, is+1,j);
+      Link(ie-1,j, is,j);
+    );
+  );
+);
+
 BDRY_CYLINDERSURFACE=0;
+
 
 Bdry(
   NavierStokesPerfect(
@@ -129,19 +165,8 @@ Bdry(
     Plane("j",js,BDRY_CYLINDERSURFACE,T);
     Plane("j",je,BDRY_FREESTREAM1, Vx,Vy,P,T);
     
-    for(j,js+1,je-1,
-      Link(ie,j, is+1,j);
-      Link(ie-1,j, is,j);
-    );
-    Unlink(is,js,ie,je);
-    for(j,js+1,je-1,
-      Link(ie,j, is+1,j);
-      Link(ie-1,j, is,j);
-    );
     {
-    Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
-    Link(i1,j1,  i2,j2);
     Vx=300;{m/s}  Vy=0;{m/s}  P=100000;{Pa}  T=300;{K}
     Param(is,js,  ie,je,  BDRY_FREESTREAM1, Vx,Vy,P,T);
     }

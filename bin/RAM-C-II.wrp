@@ -237,6 +237,17 @@ Grid(
 );
 
 
+Block(
+  NavierStokes(
+  );
+  FavreReynoldsTv(
+  );
+  NavierStokesPlasma(
+  );
+  Epotential(
+  );
+);
+
 
 
 Bdry(
@@ -270,11 +281,6 @@ Bdry(
     Plane("j",je,BDRY_INFLOWSUPERSONIC,Twall);
     Region(is,js,  im1,js,  BDRY_SLIPWALL1);
     Region(im4,js,  ie,js,  BDRY_SLIPWALL1);
-    {
-    Cut(is,js,  ie,je);
-    Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
-    Link(i1,j1,  i2,j2);
-    }
   );
   FavreReynoldsTv(
     {
@@ -305,11 +311,6 @@ Bdry(
     Plane("j",je,BDRY_INFLOWSUPERSONIC,Twall);
     Region(is,js,  im1,js,  BDRY_SLIPWALL1);
     Region(im4,js,  ie,js,  BDRY_SLIPWALL1);
-    {
-    Cut(is,js,  ie,je);
-    Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
-    Link(i1,j1,  i2,j2);
-    }
   );
   NavierStokesPlasma(
     {
@@ -344,11 +345,6 @@ Bdry(
     Plane("j",je,BDRY_INFLOWSUPERSONIC,Twall);
     Region(is,js,  im1,js,  BDRY_SLIPWALL1);
     Region(im4,js,  ie,js,  BDRY_SLIPWALL1);
-    {
-    Cut(is,js,  ie,je);
-    Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
-    Link(i1,j1,  i2,j2);
-    }
   );
   Epotential(
     {
@@ -364,12 +360,6 @@ Bdry(
 
     }
     All(BDRYEMF_DIELECTRIC);
-    {
-    Faces(BDRYEMF_ELECTRODE,BDRYEMF_ELECTRODE,  BDRYEMF_DIELECTRIC,BDRYEMF_DIELECTRIC);
-    Cut(is,js,  ie,je);
-    Region(is,js,  ie,je,  BDRYEMF_ELECTRODE);
-    Link(i1,j1,  i2,j2);
-    }
   );
 
 );

@@ -193,6 +193,16 @@ Grid(
 );
 
 
+Block(
+  NavierStokesPlasma(
+    Cut(is,js2,  ie,js4);
+  );
+  Epotential(
+    Cut(is2,js2,  is4,js3);
+  );
+);
+
+
 
 Bdry(
   NavierStokesPlasma(
@@ -216,14 +226,9 @@ Bdry(
     BDRY_SLIPWALL1                     12      Slip wall, Adiabatic, 1o
     _________________________________________________________________________________________
     }
-    Cut(is,js2,  ie,js4);
     Twall=300.0;
     gammaeminus=0.1;
     All(BDRY_WALLTFIXED1,Twall,gammaeminus);
-    {
-    Cut(is,js,  ie,je);
-    Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
-    }
   );
   Epotential(
     {
@@ -239,17 +244,8 @@ Bdry(
 
     }
     All(BDRYEMF_DIELECTRIC);
-    {cut below the exposed electrode}
-    Cut(is2,js2,  is4,js3);
-    All(BDRYEMF_DIELECTRIC);
-
     Region(is2,js3,  is4,js3,  BDRYEMF_ELECTRODE);
     Region(is4,js2,  is5,js2,  BDRYEMF_ELECTRODE);
-
-    {
-    Cut(is,js,  ie,je);
-    Region(is,js,  ie,je,  BDRYEMF_ELECTRODE);
-    }
   );
 );
  

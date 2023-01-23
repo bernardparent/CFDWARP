@@ -12517,6 +12517,12 @@ if (mf==4,
 );
 
 
+Block(
+  NavierStokesPerfect(
+  );
+);
+
+
 Bdry(
   NavierStokesPerfect(
     {
@@ -12536,10 +12542,6 @@ Bdry(
     _________________________________________________________________________________________
     }
     All(BDRY_INFLOWSUPERSONIC);
-    {
-    Cut(is,js,  ie,je);
-    Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
-    }
   );
 );
  
