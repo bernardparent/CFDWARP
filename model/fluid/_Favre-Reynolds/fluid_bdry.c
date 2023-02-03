@@ -65,7 +65,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    BDRY_INFLOWSUPERSONIC             %c   Inflow, supersonic\n"
     "    BDRY_INFLOWSUBSONIC1              %c   Inflow, subsonic, Tstag, Pstag fixed\n"
     "    BDRY_INFLOWSUBSONICMASSFLOWFIXED1 %c   Inflow, subsonic, Pstag, Massflow/Area fixed\n"
-    "    BDRY_INFLOWINJECTION1             %c   Inflow, param Tstag, specCs,mdotCs[kg/m2s], ...\n"
+    "    BDRY_INFLOWINJECTION1             %c   Inflow, param Tstag, Pstag, specCs \n"
     "    BDRY_OUTFLOWSUPERSONIC1           %c   Outflow, supersonic\n"
     "    BDRY_OUTFLOWSUBSONIC1             %c   Outflow, subsonic, P fixed\n"
     "    BDRY_OUTFLOWSUBSONICMFIXED1       %c   Outflow, subsonic, M fixed\n"
@@ -365,14 +365,13 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
 
 
 
-static void update_bdry_inflow_injection(np_t *np, gl_t *gl, long lA, long lB, long lC,
+static void update_bdry_inflow_injection_old(np_t *np, gl_t *gl, long lA, long lB, long lC,
                                          long theta, long thetasgn,
                                          bool BDRYDIRECFOUND, int ACCURACY){
   spec_t wwall;
   double Rk,cpk,rhowall,Tstag,kwall,psiwall,Twall,Pwall,mdot;
   long dim,spec,specinj;
   dim_t Vwall,n;
-  spec_t nukA,nukB;
   bool ref_flag;
 
 //  Twall=_f_symmetry(ACCURACY,_T(np[lB],gl),_T(np[lC],gl));
@@ -420,6 +419,70 @@ static void update_bdry_inflow_injection(np_t *np, gl_t *gl, long lA, long lB, l
   reformat_w(gl,wwall,"_bdry",&ref_flag);
   kwall=_k(np[lB]);
   psiwall=_psi(np[lB]);
+
+
+  find_U_2(np, lA,gl,wwall,Vwall,Pwall,Twall,kwall,psiwall);
+}
+
+
+
+
+static void update_bdry_inflow_injection(np_t *np, gl_t *gl, long lA, long lB, long lC,
+                                         long theta, long thetasgn,
+                                         bool BDRYDIRECFOUND, int ACCURACY){
+  spec_t wwall;
+  double Rk,cpk,gammak,Mwall,Tstag,Pstag,kwall,psiwall,Twall,Pwall;
+  long dim,spec,specinj;
+  dim_t Vwall,n;
+  bool ref_flag;
+
+//  Twall=_f_symmetry(ACCURACY,_T(np[lB],gl),_T(np[lC],gl));
+  Tstag=_bdry_param(np,gl,lA,0,TYPELEVEL_FLUID_WORK);
+  Pstag=_bdry_param(np,gl,lA,1,TYPELEVEL_FLUID_WORK);
+  specinj=round(_bdry_param(np,gl,lA,2,TYPELEVEL_FLUID_WORK))-1;
+
+  
+  if (!find_unit_vector_normal_to_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK, n)) 
+    fatal_error("Problem finding unit normal vector in update_bdry_inflow_injection()");
+  
+  
+  Pwall=_Pstar(np[lB],gl);
+
+  Rk=kB/_m(specinj);
+  cpk=_cpk_from_T_equilibrium(specinj, _T(np[lA],gl));
+  gammak=cpk/(cpk-Rk);
+  
+  // first assume choking at the injection point (M=1)
+  Mwall=1.0;
+  Pwall=Pstag/pow(1.0+(gammak-1.0)/2.0,gammak/(gammak-1.0));
+  // check if choking is possible; if not, set the pressure at the boundary equal to the pressure nearby
+  if (Pwall<_Pstar(np[lC],gl)){
+    Pwall=min(Pstag,_Pstar(np[lC],gl));
+    // find Mach number at the wall knowing the pressure and stagnation pressure
+    if ((pow(Pstag/Pwall,(gammak-1.0)/gammak)-1.0)*2.0/(gammak-1.0)<0.0) {
+      wfprintf(stderr,"\n\n gammak=%E  Pstag=%E  Pwall=%E \n\n",gammak,Pstag,Pwall);
+    }
+    assert_np(np[lA],(pow(Pstag/Pwall,(gammak-1.0)/gammak)-1.0)*2.0/(gammak-1.0)>=0.0);
+    Mwall=sqrt((pow(Pstag/Pwall,(gammak-1.0)/gammak)-1.0)*2.0/(gammak-1.0));
+    assert_np(np[lA],Mwall<1.0);
+  }
+  
+
+  Twall=Tstag/(1.0+(gammak-1.0)/2.0*sqr(Mwall));
+  for (dim=0; dim<nd; dim++){
+    Vwall[dim]=n[dim]*Mwall*sqrt(gammak*Rk*Twall);
+  }
+
+  for (spec=0; spec<ns; spec++){
+    if (spec==specinj) wwall[spec]=1.0; 
+      else wwall[spec]=1e-99;
+  }
+
+
+
+  reformat_w(gl,wwall,"_bdry",&ref_flag);
+  kwall=1.0e-10;
+  psiwall=100.0*Mwall*sqrt(gammak*Rk*Twall); 
 
 
   find_U_2(np, lA,gl,wwall,Vwall,Pwall,Twall,kwall,psiwall);

@@ -1020,7 +1020,7 @@ void GRIDG_read_grid_2D_from_file(char *filename, GRIDG_gl2d_t *gl2d, GRIDG_xygr
   read_RX_grid(filename, "Grid", &RXGrid2D, &GRIDG_write_grid_2D_to_file,
              &actionsarg2D, VERBOSE);
   verify_all_nodes_initialized(*gl2d, *xygrid);  
-  //find_xy_on_ghost_nodes(*xygrid, *gl2d);
+  find_xy_on_ghost_nodes(*xygrid, *gl2d);
 }
 
 
@@ -1038,7 +1038,7 @@ void GRIDG_read_grid_2D_from_argum(char *argum, SOAP_codex_t *codex, GRIDG_gl2d_
   codex->function_args=&actionsarg2D;
   SOAP_process_code(argum, codex, SOAP_VARS_KEEP_ALL);
   verify_all_nodes_initialized(*gl2d, *xygrid);
-  //find_xy_on_ghost_nodes(*xygrid, *gl2d);
+  find_xy_on_ghost_nodes(*xygrid, *gl2d);
 }
 
 

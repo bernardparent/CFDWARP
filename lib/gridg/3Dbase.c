@@ -1447,7 +1447,7 @@ void GRIDG_read_grid_3D_from_file(char *filename, GRIDG_gl3d_t *gl3d, GRIDG_xyzg
   read_RX_grid(filename, "Grid", &RXGrid3D, &GRIDG_write_grid_3D_to_file,
              &actionsarg3D, VERBOSE);
   verify_all_nodes_initialized(*gl3d, *xyzgrid);  
-  //find_xyz_on_ghost_nodes(*xyzgrid, *gl3d);
+  find_xyz_on_ghost_nodes(*xyzgrid, *gl3d);
 }
 
 
@@ -1465,5 +1465,5 @@ void GRIDG_read_grid_3D_from_argum(char *argum, SOAP_codex_t *codex, GRIDG_gl3d_
   codex->function_args=&actionsarg3D;
   SOAP_process_code(argum, codex, SOAP_VARS_KEEP_ALL);
   verify_all_nodes_initialized(*gl3d, *xyzgrid);  
-  //find_xyz_on_ghost_nodes(*xyzgrid, *gl3d);
+  find_xyz_on_ghost_nodes(*xyzgrid, *gl3d);
 }

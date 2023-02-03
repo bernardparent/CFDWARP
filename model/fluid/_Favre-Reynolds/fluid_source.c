@@ -52,7 +52,7 @@ static void find_Schem(np_t *np, gl_t *gl, long l, flux_t S){
 
 void find_Sstar(np_t *np, gl_t *gl, long l, flux_t S){
   flux_t Schem,St_norm,St_comp,Saxisymmetric,Sheatforces;
-  long flux,dim;
+  long flux;
 
   if (gl->model.fluid.REACTING) find_Schem(np,gl,l,Schem);
     else set_vector_to_zero(Schem);

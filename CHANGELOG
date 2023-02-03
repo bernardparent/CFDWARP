@@ -6,6 +6,22 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2023 FEB 03a
+  * in lib/gridg/2Dbase.c
+    - in GRIDG_read_grid_2D_from_file(), GRIDG_read_grid_2D_from_argum(), uncommented calls to
+      find_xy_on_ghost_nodes -> needed to do the x station cuts within Post() module
+  * in lib/gridg/3Dbase.c
+    - in GRIDG_read_grid_3D_from_file(), GRIDG_read_grid_3D_from_argum(), uncommented calls to
+      find_xyz_on_ghost_nodes -> needed to do the x station cuts within Post() module
+  * in model/chem/_Air_Plasma_11s/thoguluva2023.c
+    - changed EXPON_TTV from 0.75 to 0.8
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - In the section "Electron Energy Loss Function", fixed a mistake in the first equation: the
+      electron thermal diffusion term should not be there because this term is included within the
+      convection term when the convection velocity includes diffusion
+      
+
 2023 JAN 23a
   * in bin/Keller-Kloker.wrp, bin/Leblanc.wrp, bin/Noh2D.wrp, bin/Noh3D.wrp, bin/OREX.wrp, bin/RAM-C-II.wrp,
     bin/Ringleb.wrp, bin/Schulein.wrp, bin/Sedov.wrp, bin/Sod.wrp, bin/Starikovskii.wrp, bin/Taylor-Green.wrp

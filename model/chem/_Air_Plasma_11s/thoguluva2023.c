@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/thermo/_thermo.h>
 #include <model/share/chem_share.h>
 
-#define EXPON_TTV 0.75
+#define EXPON_TTV 0.8
 #define BOLSIGREACTIONS TRUE
 
 /* set all reactions to true except for testing purposes */
