@@ -238,13 +238,9 @@ Grid(
 
 
 Block(
-  NavierStokes(
+  Fluid(
   );
-  FavreReynoldsTv(
-  );
-  NavierStokesPlasma(
-  );
-  Epotential(
+  EMField(
   );
 );
 

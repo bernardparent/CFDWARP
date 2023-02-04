@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 FEB 03b
+  * in src/bdry.c
+    - in write_block_template() and read_block_actions(), changed the name of _EMFIELD_ACTIONNAME
+      to EMField and the name of _FLUID_ACTIONNAME to Fluid
+  * in bin/*wrp
+    - fixed the wrp files so they can be read with the latest src/bdry.c Block() action
+    
+
 2023 FEB 03a
   * in lib/gridg/2Dbase.c
     - in GRIDG_read_grid_2D_from_file(), GRIDG_read_grid_2D_from_argum(), uncommented calls to

@@ -99,7 +99,7 @@ Grid(
 
 
 Block(
-  NavierStokesPerfect(
+  Fluid(
   );
 );
 

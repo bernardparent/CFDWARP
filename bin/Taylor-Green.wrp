@@ -112,7 +112,7 @@ Grid(
 
 
 Block(
-  NavierStokesPerfect(
+  Fluid(
     for (i,is+1,ie-1,
       for (j,js+1,je-1,
         Link(i,j,ks,i,j,ke-1,3);

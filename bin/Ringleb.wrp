@@ -12518,7 +12518,7 @@ if (mf==4,
 
 
 Block(
-  NavierStokesPerfect(
+  Fluid(
   );
 );
 

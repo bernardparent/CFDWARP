@@ -67,7 +67,7 @@ void write_block_template(FILE **controlfile){
   wfprintf(*controlfile,
   "Block(\n");
   wfprintf(*controlfile,
-  "  %s(\n",_FLUID_ACTIONNAME);
+  "  %s(\n","Fluid");
   wfprintf(*controlfile,
     "    {\n"
     "    Cut(is" if2DL(",js") if3DL(",ks") ",  ie" if2DL(",je") if3DL(",ke") ");\n"
@@ -76,7 +76,7 @@ void write_block_template(FILE **controlfile){
     "  );\n");
 #ifdef EMFIELD
   wfprintf(*controlfile,
-  "  %s(\n",_EMFIELD_ACTIONNAME
+  "  %s(\n","EMField"
   );
   wfprintf(*controlfile,
   "    {\n"
@@ -405,9 +405,9 @@ void read_block_actions(char *action, char **argum, SOAP_codex_t *codex){
   TYPELEVEL=((readcontrolarg_t *)codex->action_args)->TYPELEVEL;
 
 #ifdef EMFIELD
-  if (strcmp(action,_EMFIELD_ACTIONNAME)==0){
+  if (strcmp(action,"EMField")==0){
     gl->BDRY_EMFIELD_READ=TRUE;
-    if (((readcontrolarg_t *)codex->action_args)->VERBOSE)  wfprintf(stdout,"%s..",_EMFIELD_ACTIONNAME);
+    if (((readcontrolarg_t *)codex->action_args)->VERBOSE)  wfprintf(stdout,"%s..","EMField");
     ((readcontrolarg_t *)codex->action_args)->TYPELEVEL=TYPELEVEL_EMFIELD;
     add_bdry_types_emfield_to_codex(codex);
     SOAP_process_code(*argum, codex, SOAP_VARS_CLEAN_ADDED);
@@ -415,9 +415,9 @@ void read_block_actions(char *action, char **argum, SOAP_codex_t *codex){
     codex->ACTIONPROCESSED=TRUE;
   }
 #endif
-  if (strcmp(action,_FLUID_ACTIONNAME)==0){
+  if (strcmp(action,"Fluid")==0){
     gl->BDRY_FLUID_READ=TRUE;
-    if (((readcontrolarg_t *)codex->action_args)->VERBOSE)  wfprintf(stdout,"%s..",_FLUID_ACTIONNAME);
+    if (((readcontrolarg_t *)codex->action_args)->VERBOSE)  wfprintf(stdout,"%s..","Fluid");
     add_bdry_types_fluid_to_codex(codex);
     SOAP_process_code(*argum, codex, SOAP_VARS_CLEAN_ADDED);
     codex->ACTIONPROCESSED=TRUE;

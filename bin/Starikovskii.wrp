@@ -194,10 +194,10 @@ Grid(
 
 
 Block(
-  NavierStokesPlasma(
+  Fluid(
     Cut(is,js2,  ie,js4);
   );
-  Epotential(
+  EMField(
     Cut(is2,js2,  is4,js3);
   );
 );

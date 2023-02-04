@@ -94,7 +94,7 @@ Grid(
 
 
 Block(
-  NavierStokesPerfect(
+  Fluid(
     Cut(im,js,  ie,jm);
   );
 );

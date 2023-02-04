@@ -182,7 +182,7 @@ Grid(
 
 
 Block(
-  NavierStokesPerfect(
+  Fluid(
     {lower left quadrant cut}
     Cut(is,js,ks,ie,jm1,km1-1);
     {lower right quadrant cut}
