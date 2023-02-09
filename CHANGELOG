@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 FEB 09a
+  * in model/chem/_C2H4_Air_Plasma_36s/chem.c
+    - fixed bug IONIZATIONREACTION[67] is now IONIZATIONREACTION[79]
+  * in src/bdry.c
+    - in read_block(), improved the error messages
+  
+
 2023 FEB 03b
   * in src/bdry.c
     - in write_block_template() and read_block_actions(), changed the name of _EMFIELD_ACTIONNAME

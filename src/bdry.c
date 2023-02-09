@@ -1357,11 +1357,11 @@ void read_block(char *argum, SOAP_codex_t *codex){
   codex->action=&read_block_actions;
   SOAP_process_code(argum, codex, SOAP_VARS_KEEP_ALL);
 
-  if (!gl->BDRY_FLUID_READ) fatal_error("The fluid module %s was not found within Block().",_FLUID_ACTIONNAME);
+  if (!gl->BDRY_FLUID_READ) fatal_error("The module Fluid was not found within Block().");
   adjust_node_type(np, gl, gl->domain_lim, TYPELEVEL_FLUID);
   validate_inner_nodes(np, gl, gl->domain, TYPELEVEL_FLUID);
 #ifdef EMFIELD
-  if (!gl->BDRY_EMFIELD_READ) fatal_error("The emfield module %s was not found within Block().",_EMFIELD_ACTIONNAME);
+  if (!gl->BDRY_EMFIELD_READ) fatal_error("The module EMField was not found within Block().");
   adjust_node_type(np, gl, gl->domain_lim, TYPELEVEL_EMFIELD);
   validate_inner_nodes(np, gl, gl->domain, TYPELEVEL_EMFIELD);
 #endif
