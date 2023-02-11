@@ -705,17 +705,17 @@ bool is_multiple_bdry_direc(np_t *np, gl_t *gl, long l_A, int TYPELEVEL){
 }
 
 
-
 void update_node_type(np_t *np, gl_t *gl, int TYPELEVEL, long type, zone_t zone){
   long i,j,k;
-  zone=_zone_intersection(zone,gl->domain_lim);
-  for_ijk(zone,is,js,ks,ie,je,ke){
+  if (is_zone_intersecting_zone(zone, gl->domain_lim)) { 
+    zone=_zone_intersection(zone,gl->domain_lim);
+    for_ijk(zone,is,js,ks,ie,je,ke){
         if (TYPELEVEL==TYPELEVEL_FLUID) np[_ai(gl,i,j,k)].type=type;
         if (TYPELEVEL==TYPELEVEL_FLUID_WORK) np[_ai(gl,i,j,k)].type_wk=type;
 #ifdef EMFIELD
         if (TYPELEVEL==TYPELEVEL_EMFIELD) np[_ai(gl,i,j,k)].type_emf=type;
 #endif
-
+    }
   }
 }
 

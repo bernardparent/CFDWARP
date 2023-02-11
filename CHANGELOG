@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 FEB 10a
+  * in src/bdry.c
+    - in update_node_type(), fixed a bug: need to call is_zone_intersecting_zone() before
+      calling _zone_intersection()
+      
+
 2023 FEB 09a
   * in model/chem/_C2H4_Air_Plasma_36s/chem.c
     - fixed bug IONIZATIONREACTION[67] is now IONIZATIONREACTION[79]
