@@ -583,9 +583,11 @@ bool find_bdry_direc(np_t *np, gl_t *gl, long l_A, int TYPELEVEL,
   long dim;
   bool FOUND;
 
+  assert(is_node_bdry(np[l_A],TYPELEVEL));
   FOUND=FALSE;
   *theta=0;
   *thetasgn=+1;
+  
 //  for (dim=nd-1; dim>=0; dim--){
   for (dim=0; dim<nd; dim++){
     if (is_node_inner(np[_al(gl,l_A,dim,+1)],TYPELEVEL) && is_node_inner(np[_al(gl,l_A,dim,+2)],TYPELEVEL)) {
@@ -617,6 +619,16 @@ bool find_bdry_direc(np_t *np, gl_t *gl, long l_A, int TYPELEVEL,
     }
   }
   return(FOUND);
+}
+
+
+bool is_node_bdry_with_single_direc(np_t *np, gl_t *gl, long l, int TYPELEVEL){
+  bool RET;
+  RET=FALSE;
+  if (is_node_bdry(np[l],TYPELEVEL)){
+    if (!is_multiple_bdry_direc(np, gl, l, TYPELEVEL)) RET=TRUE;
+  }
+  return(RET);
 }
 
 
@@ -694,7 +706,7 @@ void find_link_direc_old(np_t *np, gl_t *gl, long llink, long lbdry, int TYPELEV
 bool is_multiple_bdry_direc(np_t *np, gl_t *gl, long l_A, int TYPELEVEL){
   long dim,cnt;
   bool MULTIPLEBDRY;
-
+  assert(is_node_bdry(np[l_A],TYPELEVEL));
   cnt=0;
   for (dim=0; dim<nd; dim++){
     if (is_node_inner(np[_al(gl,l_A,dim,+1)],TYPELEVEL) && is_node_inner(np[_al(gl,l_A,dim,+2)],TYPELEVEL)) cnt++;

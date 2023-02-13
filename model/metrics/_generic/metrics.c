@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <model/metrics/_metrics.h>
 #include <lib/exm/exm.h>
+#include <src/bdry.h>
 
 
 double _Omega(np_t np, gl_t *gl){
@@ -357,11 +358,10 @@ void find_metrics_at_node(np_t *np, gl_t *gl, long l,
 
 // finds the unit normal vector perpendicular to the boundary surface and pointing towards the fluid
 bool find_unit_vector_normal_to_boundary_plane(np_t *np, gl_t *gl, long lA, long lB, long lC, int TYPELEVEL, dim_t n){
-  long cnt,nodefound,lA2,lA3,dim,bdrytype,iA,jA,kA,iB,jB,kB;
+  long cnt,nodefound,lA2,lA3,dim,iA,jA,kA,iB,jB,kB;
   EXM_vec3D_t vecA2,vecA3,vecB,vecnormal;
   double vecmag;
   nodefound=1;
-  bdrytype=_node_type(np[lA], TYPELEVEL);
   assert(is_node_bdry(np[lA], TYPELEVEL));
   
   // first check if lB is perpendicular to the surface along the generalized coordinates (can't deal with a corner node here)
@@ -382,7 +382,7 @@ bool find_unit_vector_normal_to_boundary_plane(np_t *np, gl_t *gl, long lA, long
   lA2=0; // to prevent compiler warning
   lA3=0; // to prevent compiler warning
   for (dim=0; dim<nd; dim++){
-    if (_node_type(np[_al(gl,lA,dim,+1)], TYPELEVEL)==bdrytype){
+    if (is_node_bdry_with_single_direc(np,gl,_al(gl,lA,dim,+1), TYPELEVEL)){
       switch (nodefound){
         case 1: 
           lA2=_al(gl,lA,dim,+1); 
@@ -395,7 +395,7 @@ bool find_unit_vector_normal_to_boundary_plane(np_t *np, gl_t *gl, long lA, long
       }
       
     } else {
-      if (_node_type(np[_al(gl,lA,dim,-1)], TYPELEVEL)==bdrytype){
+      if (is_node_bdry_with_single_direc(np,gl,_al(gl,lA,dim,-1), TYPELEVEL)){
         switch (nodefound){
           case 1: 
             lA2=_al(gl,lA,dim,-1); 

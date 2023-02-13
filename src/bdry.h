@@ -68,6 +68,8 @@ bool find_bdry_direc(np_t *np, gl_t *gl, long l_A, int TYPELEVEL, long *theta,
 void find_link_direc(np_t *np, gl_t *gl, long llink, long lbdry, int TYPELEVEL,
                      long *theta, long *thetasgn);
 
+bool is_node_bdry_with_single_direc(np_t *np, gl_t *gl, long l, int TYPELEVEL);
+
 bool is_multiple_bdry_direc(np_t *np, gl_t *gl, long l_A, int TYPELEVEL);
 
 /* for all nodes in zone, adjust the nodes' type: i.e. make sure that

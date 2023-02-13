@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 FEB 12a
+  * in model/metrics/_generic/metrics.c
+    - in find_unit_vector_normal_to_boundary_plane(), now uses is_node_bdry_with_single_direc()
+      to determine valid nearby bdry nodes instead of probing for bdry nodes with the same
+      bdry node type as given by _node_type(np[lA], TYPELEVEL)
+  * in src/bdry.c
+    - added is_node_bdry_with_single_direc()
+    - in is_multiple_bdry_direc() and in find_bdry_direc(), added 
+      assert(is_node_bdry(np[l_A],TYPELEVEL));
+  
+
 2023 FEB 10a
   * in src/bdry.c
     - in update_node_type(), fixed a bug: need to call is_zone_intersecting_zone() before
