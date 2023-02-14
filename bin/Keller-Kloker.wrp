@@ -197,9 +197,14 @@ Bdry(
     _________________________________________________________________________________________
     }
     All(BDRY_OUTFLOWSUPERSONIC1);
-    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_WALLTFIXED1,BDRY_OUTFLOWSUPERSONIC1,  BDRY_SYMMETRICAL2,BDRY_SYMMETRICAL2);
     
+    Plane("i",is,BDRY_INFLOWSUPERSONIC);
+    Plane("i",ie,BDRY_OUTFLOWSUPERSONIC1);
     Plane("j",js,BDRY_WALLTFIXED1,Twall);
+    Plane("j",je,BDRY_OUTFLOWSUPERSONIC1);
+    Plane("k",ks,BDRY_SYMMETRICAL2);
+    Plane("k",ke,BDRY_SYMMETRICAL2);
+    
   );
 );
  

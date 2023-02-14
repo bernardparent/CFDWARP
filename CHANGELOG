@@ -6,6 +6,12 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2023 FEB 14b
+  * in bin
+    - fixed several wrp files so that the Faces() call is replaced by Plane() calls
+    
+
 2023 FEB 14a
   * in src/bdry.c
     - in read_bdry_actions(), got rid of the action Faces() which should be replaced in the 
