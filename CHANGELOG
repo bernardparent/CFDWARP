@@ -6,6 +6,11 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2023 FEB 14a
+  * in src/bdry.c
+    - in read_bdry_actions(), got rid of the action Faces() which should be replaced in the 
+      control files by the Plane() commands
+      
 
 2023 FEB 13a
   * in cycle/tsemf/_AF/tsemf.c

@@ -147,12 +147,10 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
 #ifdef _3DL 
   long ks,ke;
 #endif
-  long BCtypes[nd*2];
 
 
   double *bdryparam;
   long TYPELEVEL,param;
-  int eos=EOS;
 
   np=((readcontrolarg_t *)codex->action_args)->np;
   gl=((readcontrolarg_t *)codex->action_args)->gl;
@@ -325,44 +323,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
   }
 
   if (strcmp(action,"Faces")==0) {
-    SOAP_substitute_all_argums(argum, codex);
-#ifdef _1D
-    if (sscanf(*argum,"%ld,%ld%n",&BCtypes[0],&BCtypes[1],&eos)!=2
-#endif
-#ifdef _2D
-    if (sscanf(*argum,"%ld,%ld,%ld,%ld%n",&BCtypes[0],&BCtypes[1],&BCtypes[2],&BCtypes[3],&eos)!=4 
-#endif
-#ifdef _3D
-    if (sscanf(*argum,"%ld,%ld,%ld,%ld,%ld,%ld%n",&BCtypes[0],&BCtypes[1],&BCtypes[2],&BCtypes[3],&BCtypes[4],&BCtypes[5],&eos)!=6
-#endif
-      || (*argum)[eos]!=EOS){
-      SOAP_fatal_error(codex,"One or more argument(s) could not be read properly "
-                             "in Faces() part of Bdry(). Arguments: %s .",*argum);
-    }
-
-    zone=gl->domain_lim;
-    zone.ie=zone.is;
-    update_node_type(*np,gl,TYPELEVEL,BCtypes[0],zone);
-    zone=gl->domain_all;
-    zone.is=zone.ie;
-    update_node_type(*np,gl,TYPELEVEL,BCtypes[1], zone);
-#ifdef _2DL
-    zone=gl->domain_all;
-    zone.je=zone.js;
-    update_node_type(*np,gl,TYPELEVEL,BCtypes[2], zone);
-    zone=gl->domain_all;
-    zone.js=zone.je;
-    update_node_type(*np,gl,TYPELEVEL,BCtypes[3], zone);
-#endif
-#ifdef _3DL
-    zone=gl->domain_all;
-    zone.ke=zone.ks;
-    update_node_type(*np,gl,TYPELEVEL,BCtypes[4], zone);
-    zone=gl->domain_all;
-    zone.ks=zone.ke;
-    update_node_type(*np,gl,TYPELEVEL,BCtypes[5], zone);
-#endif
-    codex->ACTIONPROCESSED=TRUE;
+    fatal_error("The Faces() command is deprecated. Use the Plane() commands instead.");
   }
 
 
@@ -730,6 +691,8 @@ void update_node_type(np_t *np, gl_t *gl, int TYPELEVEL, long type, zone_t zone)
     }
   }
 }
+
+
 
 
 void copy_base_to_work_node_type(np_t *np, gl_t *gl, zone_t zone){
