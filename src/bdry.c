@@ -340,7 +340,7 @@ void read_bdry_actions(char *action, char **argum, SOAP_codex_t *codex){
                              "in Faces() part of Bdry(). Arguments: %s .",*argum);
     }
 
-    zone=gl->domain_all;
+    zone=gl->domain_lim;
     zone.ie=zone.is;
     update_node_type(*np,gl,TYPELEVEL,BCtypes[0],zone);
     zone=gl->domain_all;

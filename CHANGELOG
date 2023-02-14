@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 FEB 13a
+  * in cycle/tsemf/_AF/tsemf.c
+    - in update_dUstar_emfield_IMAF(), added a is_node_bdry() before
+      calling find_bdry_direc()
+  * in model/emfield/_Epotential/emfield.c
+    - in find_linearization_coefficients_bdry_node_emfield(), added 
+      assert(is_node_bdry(np[lA],TYPELEVEL_EMFIELD))
+  * in src/bdry.c
+    - in read_bdry_actions(), in calling Faces(), zone should be set first to zone=gl->domain_lim
+      instead of zone=gl->domain_all
+      
+
 2023 FEB 12a
   * in model/metrics/_generic/metrics.c
     - in find_unit_vector_normal_to_boundary_plane(), now uses is_node_bdry_with_single_direc()
@@ -67,7 +79,7 @@ ________________________________________________________________________________
     - in find_Sstar(), got rid of unneeded long dim;
     
 
-2023 JAN 22c
+2023 JAN 22c Bad
   * in src/bdry.c
     - made various changes so that read_bdrymod is now read_bdry and read_bdry is now read_block
     - added write_block_template() which includes templates for Cut() and Link()
@@ -83,7 +95,7 @@ ________________________________________________________________________________
     - in write_bdry_emfield_template(), removed Cut() and Link() templates
 
 
-2023 JAN 22b
+2023 JAN 22b Good
   * in src/control.c
     - in integrate_area_on_bdry(), added the parameter AreaMag and code needed to compute AreaMag
     - in read_control_functions(), added function _AreaMag()
@@ -91,7 +103,7 @@ ________________________________________________________________________________
     - in read_post_functions(), changed call to integrate_area_on_bdry() to include AreaMag
     
 
-2023 JAN 22a
+2023 JAN 22a Good
   * in src/control.c
     - in readcontrol_actions(), added the action BdryMod
   * in src/bdry.c
@@ -109,7 +121,7 @@ ________________________________________________________________________________
       find_metrics_on_all_nodes()
       
 
-2023 JAN 20a
+2023 JAN 20a Good
   * in tools/chemkin2cfdwarp.c
     - fixed some realloc bugs
   * in model/share/fluid_share.c
