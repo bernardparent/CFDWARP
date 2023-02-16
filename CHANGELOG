@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 FEB 15a
+  * in model/chem/_C2H4_Air_Plasma_36s/
+    - rearranged the files significantly so that the combustion model is not
+      separated from the plasma model anymore; all the reactions are now rather stored in
+      one file: adamovich2023d.c
+    - fixed a bug related to the Lindeman reactions which were not implemented correctly in
+      the 4th version of the Adamovich model 
+  
+
 2023 FEB 14b
   * in bin
     - fixed several wrp files so that the Faces() call is replaced by Plane() calls
