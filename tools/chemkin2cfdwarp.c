@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
 
-Copyright 2022 Spencer LaFoley
+Copyright 2022, 2023 Spencer LaFoley
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -57,8 +57,8 @@ int check_process(char Line[], int tot, int loc, FILE* output, int num, int run,
  *    = 1 when building find_dW_dx_CHEMKIN ()
  *    = 2 when building find_Qei()
  *    = 3 when building find_dQei_dx
- *   5. num - the indicator for whether Line[] is being checked for processes or within another function such as print_elements_add_ionization or check_M_reaction
- *      = 0  when being used within print_elements_add_ionization or check_M_reaction
+ *   5. num - the indicator for whether Line[] is being checked for processes or within another function such as print_elements_chemkin or check_M_reaction
+ *      = 0  when being used within print_elements_chemkin or check_M_reaction
  *      = 1  when processes are being checked in build_current_function
  *   6. species - the list of species to be compared with known processes
  * Output parameters:
@@ -191,7 +191,7 @@ void print_elements_chemkin(char oldLine[], char prevLine[], char lastLine[], ch
  *   11. w - this is an indicator for high or low processes and which order to print variables 
  *   12. species - the species list to be used in third body reactions and process comparisons */
  /* Output parameters:
-  *   1. output file - the elements for a reaction added in the add_Ionization functions is printed to the output file  */
+  *   1. output file - the elements for a reaction added in the _chemkin functions is printed to the output file  */
 
 
 void print_numbers_chemkin(char oldLine[], char prevLine[], char lastLine[], char newLine[], int numR, int numP, int ind, FILE* output, int step, int M, int reaction, int w);
@@ -213,7 +213,7 @@ void print_numbers_chemkin(char oldLine[], char prevLine[], char lastLine[], cha
  *   8. reaction - the reaction class of the output being built
  *   9. w - this is an indicator for high or low processes and which order to print variables   */
  /* Output parameters:
-  *   1. output file - the data numbers for a reaction in the add_Ionization functions are printed to the output file  */
+  *   1. output file - the data numbers for a reaction in the add_chemkin functions are printed to the output file  */
 
 void print_info_find_Qei(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output, char newLine[], char lastLine[], int Q, int e, int run, int reaction);
 // This function prints information on the find Qei functions such as primary element, numbers, fit, etc
@@ -635,7 +635,7 @@ void print_info_find_Qei(char oldLine[], char prevLine[], int numR, int numP, in
     }
 }
 
-void print_numbers_add_ionization(char oldLine[], char prevLine[], char lastLine[], char newLine[], int numR, int numP, int ind, FILE* output, int step, int M, int reaction, int w) {
+void print_numbers_chemkin(char oldLine[], char prevLine[], char lastLine[], char newLine[], int numR, int numP, int ind, FILE* output, int step, int M, int reaction, int w) {
     char numsF[6][12], numsS[3][12], extra[3][12];
     int pow = 0;
     if (w != 0) {
@@ -1060,7 +1060,7 @@ void print_numbers_find_Qei(char oldLine[], char prevLine[], int numR, int numP,
     fprintf(output, "\n");
 }
 
-void print_elements_add_ionization(char oldLine[], char prevLine[], char lastLine[], char newLine[], FILE* output, int numR, int numP, int step, int M, int ind, int run, int way, int tot, int loc, int w, char* species) {
+void print_elements_chemkin(char oldLine[], char prevLine[], char lastLine[], char newLine[], FILE* output, int numR, int numP, int step, int M, int ind, int run, int way, int tot, int loc, int w, char* species) {
     int i = 0, j = 0, k = 0, n = 0, m = 0, b = 0;
     char reactants[10][12], factor[10][15], body[10][15]; // create a string array to hold reactant names and factor info for third bodies
     for (j = 0; oldLine[i] != '='; j++) {
@@ -1384,11 +1384,11 @@ void print_output_line(char oldLine[], char prevLine[], char lastLine[], char ne
                 fprintf(output, "_fit4_Lindemann(");
             else if (M == -3 && h != 0)
                 fprintf(output, "_Lindemann(");
-            print_elements_add_ionization(oldLine, prevLine, lastLine, newLine, output, numR, numP, step, M, ind, run, way, tot, loc, h, species);
+            print_elements_chemkin(oldLine, prevLine, lastLine, newLine, output, numR, numP, step, M, ind, run, way, tot, loc, h, species);
             step++;
             if (M == -3 || M == -5)
                 step = 0;
-            print_numbers_add_ionization(oldLine, prevLine, lastLine, newLine, numR, numP, ind, output, step, M, reaction, h);
+            print_numbers_chemkin(oldLine, prevLine, lastLine, newLine, numR, numP, ind, output, step, M, reaction, h);
             if (e == 1) // printing temperature Te vs T information
                 fprintf(output, "Te, X, W);");
             else
@@ -1424,11 +1424,11 @@ void print_output_line(char oldLine[], char prevLine[], char lastLine[], char ne
                 fprintf(output, "_fit4_Lindemann(");
             else if (M == -3 && h != 0)
                 fprintf(output, "_Lindemann(");
-            print_elements_add_ionization(oldLine, prevLine, lastLine, newLine, output, numR, numP, step, M, ind, run, way, tot, loc, h, species);
+            print_elements_chemkin(oldLine, prevLine, lastLine, newLine, output, numR, numP, step, M, ind, run, way, tot, loc, h, species);
             step++;
             if (M == -3 || M == -5)
                 step = 0;
-            print_numbers_add_ionization(oldLine, prevLine, lastLine, newLine, numR, numP, ind, output, step, M, reaction, h);
+            print_numbers_chemkin(oldLine, prevLine, lastLine, newLine, numR, numP, ind, output, step, M, reaction, h);
             if (e == 1) // printing temperature Te vs T information
                 fprintf(output, "Te, X, dWdTe, dWdrhok);");
             else
@@ -1633,16 +1633,14 @@ int check_M_reaction(char oldLine[], char prevLine[], char lastLine[], char newL
         }
         else {
             while (oldLine[i] != ' ' && oldLine[i] != '\n' && oldLine[i] != '\r') {
+                if (oldLine[i] == '(' || oldLine[i] == ')')
+                    i++;
                 if (k != 0 && oldLine[i] == '(')
                     break;
                 if (k != 0 && oldLine[i] == '+' && oldLine[i - 1] != '(' && oldLine[i - 1] != ')')
                     break;
                 if (oldLine[i] == '+' && oldLine[i - 1] != '(' && oldLine[i - 1] != ')' && oldLine[i + 1] != '(' && oldLine[i + 1] != ')' && oldLine[i] != '=')
                     break;
-                if (oldLine[i] == '(' || oldLine[i] == ')') {
-                    reactants[j][k] = oldLine[i];
-                    i++, k++;
-                }
                 else if (oldLine[i] == '<' || oldLine[i] == '>' || oldLine[i] == '=') {
                     break;
                 }
@@ -1651,9 +1649,9 @@ int check_M_reaction(char oldLine[], char prevLine[], char lastLine[], char newL
                     i = i + 1, k = k + 1;
                 }
             }
-            if (oldLine[i] == '+' && (oldLine[i + 1] == ' ' || oldLine[i + 1] == '\t')) {
+            if (oldLine[i] == '+' && (oldLine[i + 1] == ' ' || oldLine[i + 1] == '\t' || oldLine[i + 1] == '(')) {
                 m = i + 1;
-                while (oldLine[m] == ' ' || oldLine[m] == '\t') {
+                while (oldLine[m] == ' ' || oldLine[m] == '\t' || oldLine[m] == '(' || oldLine[m] == ')') {
                     m++;
                 }
                 if (oldLine[m] == '+' || oldLine[m] == '<' || oldLine[m] == '=') {
@@ -1675,7 +1673,7 @@ int check_M_reaction(char oldLine[], char prevLine[], char lastLine[], char newL
                 reactants[j][0] = 'e', reactants[j][1] = 'm', reactants[j][2] = 'i', reactants[j][3] = 'n', reactants[j][4] = 'u', reactants[j][5] = 's', reactants[j][6] = '\0';
             if (reactants[j][0] == '(' && reactants[j][1] == '+' && reactants[j][2] == 'M' && reactants[j][3] == ')')
                 M = 1;
-            if (reactants[j][0] == 'M' && reactants[j][1] == '\0')              // determine if any include an M third body
+            if (reactants[j][0] == 'M' && (reactants[j][1] == '\0' || reactants[j][1] == ' '))              // determine if any include an M third body
                 M = 1;
         }
     }
@@ -1742,7 +1740,7 @@ int check_process(char Line[], int tot, int loc, FILE* output, int num, int run,
     if (Line[i] == '!')
         return 0;
     while (Line[i] != '\n' && Line[i] != '\r' && Line[i] != '/') {
-        while (Line[i] == ' ')
+        while (Line[i] == ' ' || Line[i] == '\t')
             i++;
         if (Line[i] == '/' || Line[i] == '\n' || Line[i] == '\r')
             break;

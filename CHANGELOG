@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 FEB 16a
+  * in model/chem/_C2H4_Air_Plasma_36s/chem.c
+    - found a bug in find_dQei_dx(): !gl->model.chem.ADJUSTED_* should be gl->model.chem.ADJUSTED_*
+  * in tools/chemkin2cfdwarp.c
+    - fixed two bugs related to the Lindeman reactions
+    
+
 2023 FEB 15a
   * in model/chem/_C2H4_Air_Plasma_36s/
     - rearranged the files significantly so that the combustion model is not
