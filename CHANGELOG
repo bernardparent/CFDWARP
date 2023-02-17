@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 FEB 16b
+  * in model/chem/_C2H4_Air_Plasma_36s/chem.c
+    - added CHEMMODEL_ADAMOVICH2023C
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - in write_model_fluid_template(), read_model_fluid_actions(), added QENSOURCETERMS
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Se() and find_dSe_dU_transport() added code to remove Qen when QENSOURCETERMS is set
+      to FALSE
+  
+
 2023 FEB 16a
   * in model/chem/_C2H4_Air_Plasma_36s/chem.c
     - found a bug in find_dQei_dx(): !gl->model.chem.ADJUSTED_* should be gl->model.chem.ADJUSTED_*
@@ -106,7 +116,7 @@ ________________________________________________________________________________
     - in find_Sstar(), got rid of unneeded long dim;
     
 
-2023 JAN 22c Bad
+2023 JAN 22c 
   * in src/bdry.c
     - made various changes so that read_bdrymod is now read_bdry and read_bdry is now read_block
     - added write_block_template() which includes templates for Cut() and Link()
@@ -122,7 +132,7 @@ ________________________________________________________________________________
     - in write_bdry_emfield_template(), removed Cut() and Link() templates
 
 
-2023 JAN 22b Good
+2023 JAN 22b
   * in src/control.c
     - in integrate_area_on_bdry(), added the parameter AreaMag and code needed to compute AreaMag
     - in read_control_functions(), added function _AreaMag()
@@ -130,7 +140,7 @@ ________________________________________________________________________________
     - in read_post_functions(), changed call to integrate_area_on_bdry() to include AreaMag
     
 
-2023 JAN 22a Good
+2023 JAN 22a
   * in src/control.c
     - in readcontrol_actions(), added the action BdryMod
   * in src/bdry.c
@@ -148,7 +158,7 @@ ________________________________________________________________________________
       find_metrics_on_all_nodes()
       
 
-2023 JAN 20a Good
+2023 JAN 20a
   * in tools/chemkin2cfdwarp.c
     - fixed some realloc bugs
   * in model/share/fluid_share.c
