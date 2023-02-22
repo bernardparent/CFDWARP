@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 FEB 21a
+  * in model/chem/_C2H4_Air_Plasma_36s/adamovich2023c.c
+    - fixed bugs in 1r1p reactions
+  * in model/chem/_C2H4_Air_Plasma_36s/adamovich2023d.c
+    - updated all reactions using latest chemkin2cfdwarp program
+  * in model/share/emfield_share.c
+    - in _E_dot_J(), now calls find_E(np[l],gl,E); instead of find_E_smoothed(np, gl, l, E);
+      --> find_E_smoothed() lead to sanitizer complaining when using MPI
+  * in tools/chemkin2cfdwarp.c
+    - fixed a bug related to calA and reactions with 1 or 3 reactants
+    
+
 2023 FEB 16b
   * in model/chem/_C2H4_Air_Plasma_36s/chem.c
     - added CHEMMODEL_ADAMOVICH2023C

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
 
-Copyright 2022, 2023 Spencer LaFoley
+Copyright 2022 Spencer LaFoley
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -807,7 +807,7 @@ void print_numbers_chemkin(char oldLine[], char prevLine[], char lastLine[], cha
                 fprintf(output, "%c", numsF[j][i]);
             }
             if (j == 0 && (reaction == 2 || reaction == 3))
-                fprintf(output, "*calA, ");
+                fprintf(output, "*powint(calA, %d), ", numR - 1);
             else if (j == 2 && (reaction == 1 || reaction == 3))
                 fprintf(output, "*Rchem, ");
             else if (j > 2 && (reaction == 1 || reaction == 3)) {
@@ -858,7 +858,7 @@ void print_numbers_chemkin(char oldLine[], char prevLine[], char lastLine[], cha
                 for (i = 0; extra[j][i] != '\0'; i++)
                     fprintf(output, "%c", extra[j][i]);           // print standard form numbers
                 if (j == 0 && (reaction == 2 || reaction == 3))
-                    fprintf(output, "*calA, ");
+                    fprintf(output, "*powint(calA, %d), ", numR - 1);
                 else if (j == 2 && (reaction == 1 || reaction == 3))
                     fprintf(output, "*Rchem, ");
                 else if (j > 2 && (reaction == 1 || reaction == 3)) {
@@ -876,7 +876,7 @@ void print_numbers_chemkin(char oldLine[], char prevLine[], char lastLine[], cha
             for (i = 0; numsS[j][i] != '\0'; i++)
                 fprintf(output, "%c", numsS[j][i]);           // print standard form numbers
             if (j == 0 && (reaction == 2 || reaction == 3))
-                fprintf(output, "*calA, ");
+                fprintf(output, "*powint(calA, %d), ", numR - 1);
             else if (j == 2 && (reaction == 1 || reaction == 3))
                 fprintf(output, "*Rchem, ");
             else if (j > 2 && (reaction == 1 || reaction == 3)) {
@@ -894,7 +894,7 @@ void print_numbers_chemkin(char oldLine[], char prevLine[], char lastLine[], cha
                 for (i = 0; extra[j][i] != '\0'; i++)
                     fprintf(output, "%c", extra[j][i]);           // print standard form numbers
                 if (j == 0 && (reaction == 2 || reaction == 3))
-                    fprintf(output, "*calA, ");
+                    fprintf(output, "*powint(calA, %d), ", numR - 1);
                 else if (j == 2 && (reaction == 1 || reaction == 3))
                     fprintf(output, "*Rchem, ");
                 else if (j > 2 && (reaction == 1 || reaction == 3)) {
@@ -978,7 +978,7 @@ void print_numbers_find_Qei(char oldLine[], char prevLine[], int numR, int numP,
                 fprintf(output, "%c", numsF[j][i]);
             }
             if (j == 0 && (reaction == 2 || reaction == 3))
-                fprintf(output, "*calA, ");
+                fprintf(output, "*powint(calA, %d), ", numR - 1);
             else if (j == 2 && (reaction == 1 || reaction == 3))
                 fprintf(output, "*Rchem, ");
             else if (j > 2 && (reaction == 1 || reaction == 3)) {
@@ -992,9 +992,9 @@ void print_numbers_find_Qei(char oldLine[], char prevLine[], int numR, int numP,
 
         }
         if (e == 1)
-            fprintf(output, ", Te)/calA");
+            fprintf(output, ", Te)/powint(calA, %d)", numR - 1);
         else
-            fprintf(output, ", T)/calA");
+            fprintf(output, ", T)/powint(calA, %d)", numR - 1);
         if (run == 2 && j == 6)
             fprintf(output, ", rhok, Qei);\n");
         else if (run == 3 && j == 6)
@@ -1035,7 +1035,7 @@ void print_numbers_find_Qei(char oldLine[], char prevLine[], int numR, int numP,
             for (i = 0; numsS[j][i] != '\0'; i++)
                 fprintf(output, "%c", numsS[j][i]);           // print numbers of standard reaction
             if (j == 0 && (reaction == 2 || reaction == 3))
-                fprintf(output, "*calA, ");
+                fprintf(output, "*powint(calA, %d), ", numR - 1);
             else if (j == 2 && (reaction == 1 || reaction == 3))
                 fprintf(output, "*Rchem, ");
             else if (j > 2 && (reaction == 1 || reaction == 3)) {
@@ -1049,9 +1049,9 @@ void print_numbers_find_Qei(char oldLine[], char prevLine[], int numR, int numP,
 
         }
         if (e == 1)
-            fprintf(output, ", Te)/calA");
+            fprintf(output, ", Te)/powint(calA, %d)", numR - 1);
         else
-            fprintf(output, ", T)/calA");
+            fprintf(output, ", T)/powint(calA, %d)", numR - 1);
         if (run == 2 && j == 3)
             fprintf(output, ", rhok, Qei);\n");
         else if (run == 3 && j == 3)
