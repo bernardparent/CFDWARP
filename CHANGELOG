@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 FEB 22a
+  * in model/chem/_C2H4_Air_Plasma_36s/chem.c
+    - added the CHEMMODEL_TEST1 option
+  * in model/chem/_C2H4_Air_Plasma_36s/
+    - added test1.c and test1.h which were obtained from thermal_ignition_test1.chemkin given
+      by Adamovich
+
+
 2023 FEB 21a
   * in model/chem/_C2H4_Air_Plasma_36s/adamovich2023c.c
     - fixed bugs in 1r1p reactions
