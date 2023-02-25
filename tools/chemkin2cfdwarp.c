@@ -529,10 +529,10 @@ void print_function_header(int run, FILE* output) {       // print function head
         fprintf(output, "void find_dW_dx_CHEMKIN ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {\n  long s, k, specM;\n  double eff;\n  spec_t X;\n\n  for ( k = 0; k < ns; k++ ) {\n    X[k] = rhok[k] / _calM (k) * 1.0e-6;    /* mole/cm^3 */\n  }\n\n  for ( s = 0; s < ns; s++ ) {\n    dWdT[s] = 0.0;\n    dWdTe[s] = 0.0;\n    dWdTv[s] = 0.0;\n    dWdQbeam[s] = 0.0;\n    for ( k = 0; k < ns; k++) {\n      dWdrhok[s][k] = 0.0;\n    }\n  }\n");
     }
     if (run == 2) {
-        fprintf(output, "void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei) {\n  double theta;\n  long specM;\n\n  *Qei = 0.0;\n\n");
+        fprintf(output, "void find_Qei_CHEMKIN(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei) {\n  long specM;\n\n  *Qei = 0.0;\n\n");
     }
     if (run == 3) {
-        fprintf(output, "void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe) {\n  double theta;\n  long spec, specM;\n\n  for ( spec = 0; spec < ns; spec++ )\n    dQeidrhok[spec] = 0.0;\n\n  *dQeidTe = 0.0;\n\n");
+        fprintf(output, "void find_dQei_dx_CHEMKIN(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe) {\n  long spec, specM;\n\n  for ( spec = 0; spec < ns; spec++ )\n    dQeidrhok[spec] = 0.0;\n\n  *dQeidTe = 0.0;\n\n");
     }
 }
 

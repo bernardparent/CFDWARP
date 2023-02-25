@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 FEB 24a
+  * in tools/chemkin2cfdwarp.c
+    - some improvements
+    
+
 2023 FEB 22a
   * in model/chem/_C2H4_Air_Plasma_36s/chem.c
     - added the CHEMMODEL_TEST1 option
