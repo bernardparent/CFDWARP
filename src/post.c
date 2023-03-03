@@ -2162,7 +2162,7 @@ static void read_post_actions(char *action, char **argum, SOAP_codex_t *codex){
         free (*np_post);
       }
 /*  Uncomment the following to get rid of a memory error reported
- *   (not yet tested sufficiently)
+ *   (not yet tested sufficiently) */
       if(gl->model.clipnamenum < gl_post->model.clipnamenum){
         for (cnt=gl->model.clipnamenum; cnt < gl_post->model.clipnamenum; cnt++)
           free(gl_post->model.clipname[cnt]);
@@ -2171,7 +2171,7 @@ static void read_post_actions(char *action, char **argum, SOAP_codex_t *codex){
         gl->model.clipnum = (clipnum_t *)
           realloc(gl_post->model.clipnum,gl->model.clipnamenum*sizeof(clipnum_t));
       }
-*/
+
       xcut=(double *)malloc(numcut*sizeof(double));
       for (cnt=0; cnt<numcut; cnt++) xcut[cnt]=SOAP_get_argum_double(codex,*argum,cnt);
       create_domain_of_cuts_along_x(*np, gl, np_post, gl_post, xcut, numcut);

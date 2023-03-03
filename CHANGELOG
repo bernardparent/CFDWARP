@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 MAR 02a
+  * in src/post.c
+    - in read_post_actions(), uncommented the code below (not yet tested sufficiently)
+      (this fixes memory allocation issues when calling Xstation in the Post() module
+      
+
 2023 FEB 24a
   * in tools/chemkin2cfdwarp.c
     - some improvements
