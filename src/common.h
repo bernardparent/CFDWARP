@@ -284,7 +284,7 @@ typedef struct {
    chargedspec_t Nkmem;
    chargedspec_t Pkmem;
    chargedspec_t kappacmem;
-   double Nmem,Nnmem;
+   double Nmem,Nnmem,kappanmem;
 #endif
 
 #ifdef _FLUID_NAVIERSTOKESPERFECT

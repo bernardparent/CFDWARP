@@ -125,6 +125,4 @@ double _ionizationpot(long spec);
 
 double _numatoms(long spec);
 
-double _cpk_from_T(long spec, double T);
-
 #endif /* _THERMO_H */

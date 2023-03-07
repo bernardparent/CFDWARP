@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 MAR 07a
+  * in model/fluid/_*_plasma/fluid.c
+    - renamed kappamem by kappanmem
+  * in model/thermo/_thermo.h
+    - deleted _cpk_from_T(long spec, double T)
+  * in model/transport/_Dixon-Lewis/transport.c
+    - in _kappak_from_T(), now calls _cpk_from_T_equilibrium() instead of _cpk_from_T()
+  * in src/common.h
+    - in npwk_t, added kappanmem
+  * in model/thermo/_generic/
+    - added enthalpy_sai.c (temporary file which is used to isolate a bug)
+    
+
 2023 MAR 02a
   * in src/post.c
     - in read_post_actions(), uncommented the code below (not yet tested sufficiently)

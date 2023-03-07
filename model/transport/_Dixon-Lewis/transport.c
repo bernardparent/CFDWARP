@@ -352,7 +352,7 @@ static double _kappak_from_T(long spec, double T){
     case SPECIES_NEUTRAL:
       if (_numatoms(spec)>1) {
         kappak=15.0e0/4.0e0*calR/_calM(spec)*etak*
-                  (0.115e0+0.354e0*_calM(spec)*_cpk_from_T(spec,T)/calR);
+                  (0.115e0+0.354e0*_calM(spec)*_cpk_from_T_equilibrium(spec,T)/calR);
       } else {
         kappak=15.0e0/4.0e0*calR/_calM(spec)*etak;
       }  
