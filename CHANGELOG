@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 MAR 07b
+  * renamed
+    - _a_from_w_T() to _a_from_w_T_equilibrium()
+    - _cp_from_w_T() to _cp_from_w_T_equilibrium()
+  * in model/fluid/_*_plasma/fluid.c
+    - in _kappan(), call _cp_from_w_T_neutrals_equilibrium() instead of _cp_from_w_T()
+    - in find_prim_fluid_mem(), call _cp_from_w_T_neutrals_equilibrium() instead of _cp_from_w_T()
+  * in model/thermo/_generic/thermo.c
+    - added _cp_from_w_T_equilibrium() and _cp_from_w_T_neutrals_equilibrium()
+    - in _a_from_w_T_equilibrium(), changed the call from _cp_from_w_T() to _cp_from_w_T_equilibrium()
+      
+
 2023 MAR 07a
   * in model/fluid/_*_plasma/fluid.c
     - renamed kappamem by kappanmem

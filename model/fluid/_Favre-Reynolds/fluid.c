@@ -343,7 +343,7 @@ double _athermo(np_t np, gl_t *gl) {
     for (spec=0; spec<ns; spec++){
       w[spec]=np.bs->U[spec]/rho;
     }
-    ret=_a_from_w_T(w,T);
+    ret=_a_from_w_T_equilibrium(w,T);
     assert_np(np,ret>0.0e0);
   }
   return(ret);
@@ -445,7 +445,7 @@ double _kappa(np_t *np, long l, gl_t *gl) {
     T=_T(np[l],gl);
     find_w(np[l],w);
     find_rhok(np[l],rhok);
-    cp=_cp_from_w_T(w,T);
+    cp=_cp_from_w_T_equilibrium(w,T);
     find_nuk_eta_kappa(rhok, T, T, nu, &eta, &kappa);
     ret=cp*_eta(np,l,gl)/( /* Prandtl number */(_eta(np,l,gl))/(kappa)*cp );
 
@@ -841,7 +841,7 @@ void find_prim_fluid_mem(np_t *np, long l, gl_t *gl, double P, double T){
     w[spec]=np[l].bs->U[spec]/sum1;
   }
   /* reformat_w(w,&ref_flag); */
-  np[l].wk->athermomem=_a_from_w_T(w,T);
+  np[l].wk->athermomem=_a_from_w_T_equilibrium(w,T);
   assert_np(np[l],np[l].wk->athermomem>0.0e0);
   rho=_rho_from_w_P_T(w,P,T);
   np[l].wk->rhomem=rho;
@@ -853,7 +853,7 @@ void find_prim_fluid_mem(np_t *np, long l, gl_t *gl, double P, double T){
   }
   for (spec=0; spec<ns; spec++) rhok[spec]=rho*w[spec];
   find_nuk_eta_kappa(rhok, T,  T, np[l].wk->numem, &(np[l].wk->etamem), &(np[l].wk->kappamem));
-  np[l].wk->kappamem=_cp_from_w_T(w,T)*np[l].wk->etamem/( /* Prandtl number */(np[l].wk->etamem)/(np[l].wk->kappamem)*(_cp_from_w_T(w,T)) );
+  np[l].wk->kappamem=_cp_from_w_T_equilibrium(w,T)*np[l].wk->etamem/( /* Prandtl number */(np[l].wk->etamem)/(np[l].wk->kappamem)*(_cp_from_w_T_equilibrium(w,T)) );
 
   k=_k(np[l]);
   psitilde=_psitilde(np[l],gl);

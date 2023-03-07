@@ -31,14 +31,15 @@ long _Charge_number(long spec);
 
 double _s(long spec);
 
-double _cp_from_w_T(spec_t w, double T);
+double _cp_from_w_T_equilibrium(spec_t w, double T);
 
+double _cp_from_w_T_neutrals_equilibrium(spec_t w, double T);
 
 double _cpk_from_T_equilibrium(long spec, double T);
 
 double _R(spec_t w);
 
-double _a_from_w_T(spec_t w,  double T);
+double _a_from_w_T_equilibrium(spec_t w,  double T);
 
 double _e_from_w_T(spec_t w, double T);
 

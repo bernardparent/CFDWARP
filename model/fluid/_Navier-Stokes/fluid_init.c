@@ -163,7 +163,7 @@ void init_node_2(np_t *np, long l, gl_t *gl, initvar_t initvar){
   Init2.P=values[nd];
   Init2.T=values[nd+1];
   for (spec=0; spec<ns; spec++) Init2.w[spec]=values[nd+2+spec];
-  a=_a_from_w_T(Init2.w,Init2.T);
+  a=_a_from_w_T_equilibrium(Init2.w,Init2.T);
   for (dim=0; dim<nd; dim++) Init2.V[dim]=values[dim]*a;
   find_U_init_2(np, l, gl, Init2);
 }
@@ -182,7 +182,7 @@ void init_node_3(np_t *np, long l, gl_t *gl, initvar_t initvar){
   Init2.T=values[nd+1];
   Re=values[nd];
   for (spec=0; spec<ns; spec++) Init2.w[spec]=values[nd+2+spec];
-  a=_a_from_w_T(Init2.w,Init2.T);
+  a=_a_from_w_T_equilibrium(Init2.w,Init2.T);
   sum=0.0e0;
   for (dim=0; dim<nd; dim++){
     Init2.V[dim]=values[dim]*a;
@@ -227,7 +227,7 @@ void init_node_4(np_t *np, long l, gl_t *gl, initvar_t initvar){
   Mk[2]=M_flight*sin(phi);
 #endif
   for (spec=0; spec<ns; spec++) Init2.w[spec]=values[nd+2+spec];
-  a=_a_from_w_T(Init2.w,Init2.T);
+  a=_a_from_w_T_equilibrium(Init2.w,Init2.T);
   for (dim=0; dim<nd; dim++) Init2.V[dim]=Mk[dim]*a;
   find_U_init_2(np, l, gl, Init2);
 }

@@ -284,7 +284,7 @@ double _gamma(np_t np, gl_t *gl){
   double cp,R,gamma;
 
   find_w(np,w);
-  cp=_cp_from_w_T(w, _T(np,gl));
+  cp=_cp_from_w_T_equilibrium(w, _T(np,gl));
   R=_R(w);
   gamma=cp/(cp-R);
   return(gamma);
@@ -499,7 +499,7 @@ void find_w_V_P_T_bdry_inflow_reservoir(np_t *np, gl_t *gl, long lA, long lB, lo
   find_w(np[lA],w);
   *T=_T(np[lA],gl);
   /* first, find gamma at the boundary */
-  cp=_cp_from_w_T(w, *T);
+  cp=_cp_from_w_T_equilibrium(w, *T);
   R=_R(w);
   gam=(cp)/(cp-R);
 
@@ -575,7 +575,7 @@ void find_w_V_P_T_bdry_inflow_reservoir_2(np_t *np, gl_t *gl, long lA, long lB, 
   find_w(np[lA],w);
   *T=_T(np[lA],gl);
   /* first, find gamma at the boundary */
-  cp=_cp_from_w_T(w, *T);
+  cp=_cp_from_w_T_equilibrium(w, *T);
   R=_R(w);
   gam=(cp)/(cp-R);
 
@@ -664,7 +664,7 @@ double _kappav (np_t *np, long l, gl_t *gl) {
   Tv=_Tv(np[l]);
   T=_T(np[l],gl);
   find_w(np[l],w);
-  cp=_cp_from_w_T(w,T);
+  cp=_cp_from_w_T_equilibrium(w,T);
   Pr=_eta(np,l,gl)*cp/_kappa(np,l,gl);
   kappav=w[specN2]*(_eta(np,l,gl)/Pr)*_dev_dTv_from_Tv(Tv);  
   return(kappav);
@@ -825,7 +825,7 @@ double _kappastar (np_t *np, long l, gl_t *gl) {
   spec_t w;
   T=_T(np[l],gl);
   find_w(np[l],w);
-  cp=_cp_from_w_T(w,T);
+  cp=_cp_from_w_T_equilibrium(w,T);
   kappastar=_kappa(np,l,gl)+cp*_etat(np,l,gl)/gl->model.fluid.Prt;
   return(kappastar);
 }
@@ -886,7 +886,7 @@ double _kappavstar (np_t *np, long l, gl_t *gl) {
   Tv=_Tv(np[l]);
   T=_T(np[l],gl);
   find_w(np[l],w);
-  cp=_cp_from_w_T(w,T);
+  cp=_cp_from_w_T_equilibrium(w,T);
   Pr=_eta(np,l,gl)*cp/_kappa(np,l,gl);
   kappavstar=w[specN2]*(_eta(np,l,gl)/Pr+_etat(np,l,gl)/gl->model.fluid.Prt)*_dev_dTv_from_Tv(Tv);  
   return(kappavstar);

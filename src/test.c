@@ -745,7 +745,7 @@ void test_cp ( double Tmin, double Tmax, double dT ) {
       w[speceminus]=1e-20;
 #endif
       w[spec] = 1.0;
-      Cp = _cp_from_w_T ( w, T );
+      Cp = _cp_from_w_T_equilibrium ( w, T );
       wfprintf ( stdout, "%+12.5E ", Cp );
     }
     wfprintf ( stdout, "\n" );

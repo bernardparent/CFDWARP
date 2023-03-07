@@ -496,15 +496,39 @@ double _s(long spec){
   return(sk);  
 }
 
-
-
-
-double _cp_from_w_T(spec_t w, double T){
+static double _cp_from_w_T(spec_t w, double T){
   double cpmix;
   long spec;
   cpmix=0.0e0;
   for (spec=0; spec<ns; spec++){
     cpmix=cpmix+w[spec]*_cpk_from_T(spec,T);
+  }
+  return(cpmix);
+}
+
+
+
+double _cp_from_w_T_equilibrium(spec_t w, double T){
+  double cpmix;
+  long spec;
+  cpmix=0.0e0;
+  for (spec=0; spec<ns; spec++){
+    cpmix=cpmix+w[spec]*_cpk_from_T_equilibrium(spec,T);
+  }
+  return(cpmix);
+}
+
+
+double _cp_from_w_T_neutrals_equilibrium(spec_t w, double T){
+  double cpmix,wneutralsum;
+  long spec;
+  wneutralsum=0.0;
+  for (spec=0; spec<ns; spec++) if (speciestype[spec]==SPECIES_NEUTRAL) {
+    wneutralsum+=w[spec];
+  }
+  cpmix=0.0e0;
+  for (spec=0; spec<ns; spec++) if (speciestype[spec]==SPECIES_NEUTRAL){
+    cpmix+=w[spec]/wneutralsum*_cpk_from_T_equilibrium(spec,T);
   }
   return(cpmix);
 }
@@ -595,10 +619,10 @@ double _T_from_w_rho_P(spec_t w, double rho, double P){
 
 
 
-double _a_from_w_T(spec_t w,  double T) {
+double _a_from_w_T_equilibrium(spec_t w,  double T) {
   double tmp,cpmix,Rmix;
 
-  cpmix=_cp_from_w_T(w,T);
+  cpmix=_cp_from_w_T_equilibrium(w,T);
   Rmix=_R(w);
   assert((cpmix-Rmix)!=0.0e0);
   assert(Rmix*cpmix*T/(cpmix-Rmix)>=0.0e0);
