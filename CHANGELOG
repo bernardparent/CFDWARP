@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 MAR 07c
+  * in model/thermo/_generic/thermo.c
+    - fixed a small error in the molecular weight of C2H
+    
+
 2023 MAR 07b
   * renamed
     - _a_from_w_T() to _a_from_w_T_equilibrium()
