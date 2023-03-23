@@ -529,16 +529,12 @@ double _chi_eminus(double T, double P){
 int main (int argc, char **argv) {
   double T,P,Tbegin,Tend,Tincrem;
   bool validOptions = TRUE;
-  char filename[255];
-  FILE *filepointer;
   
   if (chkarg (argc, argv, "-Tbegin") == 0)
     validOptions = FALSE;       //check if argument flags exist
   if (chkarg (argc, argv, "-Tend") == 0)
     validOptions = FALSE;
   if (chkarg (argc, argv, "-P") == 0)
-    validOptions = FALSE;
-  if (chkarg (argc, argv, "-filename") == 0)
     validOptions = FALSE;
 
   if (chkarg (argc, argv, "-Tbegin") != 0) {
@@ -567,40 +563,50 @@ int main (int argc, char **argv) {
              "-Tend              \tend of temperature range, Kelvin        \tdouble       \tY\n"
              "-Tincrem           \tincrement in temperature, Kelvin        \tdouble       \tY\n"
              "-P                 \tpressure, atm                           \tdouble       \tY\n"
-             "-filename          \tname of the output text file            \tstring       \tY\n"
              "Eg: \n"
-             "equilairplasma -Tbegin 1000.0 -Tend 60000.0 -Tincrem 1000.0 -P 1.0 -filename eqchi.txt\nwill output the equilibrium air-plasma molar fractions over the temperature range 1000-60000 K\n"
-             "for a pressure of 1 atm to the file eqchi.txt .\n");
+             "equilairplasma -Tbegin 1000.0 -Tend 60000.0 -Tincrem 1000.0 -P 1.0 \nwill output the equilibrium air-plasma molar fractions over the temperature range 1000-60000 K\n"
+             "for a pressure of 1 atm to stdout .\n");
     exit (1);
   }
 
-  sscanf (argv[chkarg (argc, argv, "-filename") + 1], "%s", filename);    //get the values corresponding to flags
   sscanf (argv[chkarg (argc, argv, "-Tbegin") + 1], "%lg", &Tbegin);
   sscanf (argv[chkarg (argc, argv, "-Tend") + 1], "%lg", &Tend);
   sscanf (argv[chkarg (argc, argv, "-Tincrem") + 1], "%lg", &Tincrem);
   sscanf (argv[chkarg (argc, argv, "-P") + 1], "%lg", &P);
 
-  int filename_length;
-  filename_length=strlen(filename);
-  if (filename_length>250){
-    printf
-      ("Output file name is too long. Please ensure that the length of the filename does not exceed 250 characters. Aborting.\n");
-    exit (1);
-  }
   printf("Pressure = %g atm. Temperature range is %g to %g K.\n",P,Tbegin,Tend);
   if(P<=1E-2 || P>=1E2) fprintf (stderr, "Ensure that the pressure lies between 0.01 and 100 atm. Aborting.\n");
   for(T=Tbegin;T<=Tend;T=T+Tincrem){
     if(T<=49.9 || T>=60000.1) fprintf (stderr, "Ensure that the temperatures lie between 50 and 60000 K. Aborting.\n");
   }
-  filepointer=fopen(filename,"w");
-  fprintf(filepointer,"T,K\tN2\tN2+\tN\tN+\tN++\tN+++\tN++++\tO2\tO2+\tO2-\tO\tO-\tO+\tO++\tO+++\tO++++\tNO\tNO+\te-\n");
-  for(T=Tbegin;T<=Tend;T=T+Tincrem){
-    fprintf (filepointer,"%.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E\n",T,_chi_N2(T,P),_chi_N2plus(T,P),_chi_N(T,P),_chi_Nplus(T,P),_chi_Nplusplus(T,P),_chi_Nplusplusplus(T,P),_chi_Nplusplusplusplus(T,P),_chi_O2(T,P),_chi_O2plus(T,P),_chi_O2minus(T,P),_chi_O(T,P),_chi_Ominus(T,P),_chi_Oplus(T,P),_chi_Oplusplus(T,P),_chi_Oplusplusplus(T,P),_chi_Oplusplusplusplus(T,P),_chi_NO(T,P),_chi_NOplus(T,P),_chi_eminus(T,P));
+  if (Tbegin==Tend){
+    fprintf(stdout,"T          = %E K\n",T);
+    fprintf(stdout,"chi_N2     = %E \n",_chi_N2(T,P));
+    fprintf(stdout,"chi_N2+    = %E \n",_chi_N2plus(T,P));
+    fprintf(stdout,"chi_N      = %E \n",_chi_N(T,P));
+    fprintf(stdout,"chi_N+     = %E \n",_chi_Nplus(T,P));
+    fprintf(stdout,"chi_N++    = %E \n",_chi_Nplusplus(T,P));
+    fprintf(stdout,"chi_N+++   = %E \n",_chi_Nplusplusplus(T,P));
+    fprintf(stdout,"chi_N++++  = %E \n",_chi_Nplusplusplusplus(T,P));
+    fprintf(stdout,"chi_O2     = %E \n",_chi_O2(T,P));
+    fprintf(stdout,"chi_O2+    = %E \n",_chi_O2plus(T,P));
+    fprintf(stdout,"chi_O2-    = %E \n",_chi_O2minus(T,P));
+    fprintf(stdout,"chi_O      = %E \n",_chi_O(T,P));
+    fprintf(stdout,"chi_O-     = %E \n",_chi_Ominus(T,P));
+    fprintf(stdout,"chi_O+     = %E \n",_chi_Oplus(T,P));
+    fprintf(stdout,"chi_O++    = %E \n",_chi_Oplusplus(T,P));
+    fprintf(stdout,"chi_O+++   = %E \n",_chi_Oplusplusplus(T,P));
+    fprintf(stdout,"chi_O++++  = %E \n",_chi_Oplusplusplusplus(T,P));
+    fprintf(stdout,"chi_NO     = %E \n",_chi_NO(T,P));
+    fprintf(stdout,"chi_NO+    = %E \n",_chi_NOplus(T,P));
+    fprintf(stdout,"chi_e-     = %E \n",_chi_eminus(T,P));
+  } else {
+    fprintf(stdout,"T,K\tN2\tN2+\tN\tN+\tN++\tN+++\tN++++\tO2\tO2+\tO2-\tO\tO-\tO+\tO++\tO+++\tO++++\tNO\tNO+\te-\n");
+    for(T=Tbegin;T<=Tend;T=T+Tincrem){
+      fprintf (stdout,"%.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E %.14E\n",T,_chi_N2(T,P),_chi_N2plus(T,P),_chi_N(T,P),_chi_Nplus(T,P),_chi_Nplusplus(T,P),_chi_Nplusplusplus(T,P),_chi_Nplusplusplusplus(T,P),_chi_O2(T,P),_chi_O2plus(T,P),_chi_O2minus(T,P),_chi_O(T,P),_chi_Ominus(T,P),_chi_Oplus(T,P),_chi_Oplusplus(T,P),_chi_Oplusplusplus(T,P),_chi_Oplusplusplusplus(T,P),_chi_NO(T,P),_chi_NOplus(T,P),_chi_eminus(T,P));
+    }
   }
   
-  if (filepointer != NULL)
-    fclose (filepointer);
-  printf ("Molar fractions written to %s. Done.\n", filename);
   
   return (0);
 }

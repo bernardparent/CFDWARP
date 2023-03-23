@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 MAR 22a
+  * in model/emfield/_Epotential*/emfield.c
+    - in write_bdry_emfield_template(), deleted the call to Faces() within the template (obsolete)
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - in write_model_fluid_template() and read_model_fluid_actions(), added variable emissivity
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - added functions find_Srad() and find_dSrad_dU()
+    - in find_Sstar(), added call to find_Srad()
+    - in find_dSstar_dUstar(), added call to find_dSrad_dU()
+  * in tools/equilairplasma.c
+    - git rid of the option filename
+    - now outputs to the screen, not to a file
+    - when Tbegin=Tend, changed the output format for better readability
+    
+
 2023 MAR 07c
   * in model/thermo/_generic/thermo.c
     - fixed a small error in the molecular weight of C2H
