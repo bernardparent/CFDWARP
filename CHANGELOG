@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 MAR 25a
+  * in src/control.c
+    - in readcontrol_actions(), added a call to find_metrics_on_all_nodes() after the Bdry()
+      module is read to update the metrics of the symmetry nodes
+  * in src/init.c
+    - in reorder_initvar_species(), fixed bug related to the special case where "default" is the 
+      last species specified in Init() and the number of species listed in Init() is equal to the
+      number of species in the chemical solver
+  
+
 2023 MAR 22a
   * in model/emfield/_Epotential*/emfield.c
     - in write_bdry_emfield_template(), deleted the call to Faces() within the template (obsolete)

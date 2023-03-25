@@ -46,8 +46,15 @@ static void reorder_initvar_species(gl_t *gl, initvar_t initvar, long specstart)
     for (spec=0; spec<ns; spec++) N[spec]=initvar[specstart+gl->nsinit-1];
     specinitmax=gl->nsinit-1;
   } else {
-    specinitmax=gl->nsinit;
+    if (gl->initspecies[gl->nsinit-1]==INITSPECIES_DEFAULT){
+      // set last species density to the default
+      N[ns-1]=initvar[specstart+gl->nsinit-1];
+      specinitmax=gl->nsinit-1;
+    } else {
+      specinitmax=gl->nsinit;
+    }
   }
+
     
   // set the given densities
   for (specinit=0; specinit<specinitmax; specinit++){

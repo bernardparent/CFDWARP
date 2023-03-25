@@ -1332,6 +1332,8 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
       fatal_error("The Block() module was not found.");
     wfprintf(stdout,"Bdry..");
     read_bdry(*argum, codex);
+    // need to adjust metrics on symmetry nodes, so recalculate them after imposing the BCs
+    find_metrics_on_all_nodes((*np), gl, gl->domain);
     wfprintf(stdout,"done;\n");
     ((readcontrolarg_t *)codex->action_args)->module_level++;
     codex->ACTIONPROCESSED=TRUE;
