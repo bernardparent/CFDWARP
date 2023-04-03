@@ -7,6 +7,10 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 APR 02a
+  * changed C2H4AirPlasma30s to C2H4AirPlasma36s
+
+
 2023 MAR 25a
   * in src/control.c
     - in readcontrol_actions(), added a call to find_metrics_on_all_nodes() after the Bdry()
