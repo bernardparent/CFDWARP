@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 APR 04a
+  * in model/chem/_Air_Plasma_11s/parent2023.c
+    - deleted reactions 26-28
+    - changed reactions 24-25 to Park (1990) instead of BOLSIG
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - in Parent (2023) model, deleted reactions 26-28 and changed reactions 24-25 to Park (1990)
+    
+
 2023 APR 02a
   * changed C2H4AirPlasma30s to C2H4AirPlasma36s
 
