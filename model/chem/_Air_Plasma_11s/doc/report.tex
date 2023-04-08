@@ -904,7 +904,7 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 \fontsizetable
 \begin{center}
 \begin{threeparttable}
-\tablecaption{Parent (2023) 11-species high-temperature air model. }
+\tablecaption{Parent (2023) 11-species high-temperature air model. \cite{pof:2022:parent}}
 \begin{tabular}{ccccccc} 
 \toprule
 No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$ & $n$ & $E$, cal/mole~\tnote{(a)}\\ 
@@ -956,17 +956,23 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 
 23 & $\rm NO^+ + N \rightleftarrows N_2^+ + O $  & $T$ & $T$ & 7.2 $\cdot$ 10$^{13}$  & 0.00 & $35500 \, R$  \\
 
-24 & $\rm O + e^- \rightleftarrows O^+ + e^- + e^- $ & $T_{\rm e}$ & $T_{\rm e}$ & 3.9 $\times$ 10$^{33}$  & $-3.78$ & $158500 \cdot R$ \\
 
-25 & $\rm N + e^- \rightleftarrows N^+ + e^- + e^- $ & $T_{\rm e}$ & $T_{\rm e}$ & 2.5 $\times$ 10$^{34}$  & $-3.82$ & $168600 \cdot R$ \\
+24 & $\rm O + e^- \rightleftarrows O^+ + e^- + e^- $ & $T_{\rm e}$  & $T_{\rm e}$ & 6.37 $\cdot$ 10$^{16}$  & $0.0029$ & $477190 \, R$  \\
 
+25 & $\rm N + e^- \rightleftarrows N^+ + e^- + e^- $ & $T_{\rm e}$ & $T_{\rm e}$ & 1.06 $\cdot$ 10$^{18}$  & $-0.2072$ & $629700 \, R$ \\
+
+26 & $\rm O_2 + e^- \rightleftarrows O_2^+ + e^- + e^-$ &$T_{\rm e}$ &$T_{\rm e}$ & 2.33 $\cdot$ 10$^{16}$ & $0.1166$ & $567360\, R$ \\
+
+27 & $\rm N_2 + e^- \rightleftarrows N_2^+ + e^- + e^-$ &$T_{\rm e}$ &$T_{\rm e}$ & 1.58 $\cdot$ 10$^{16}$ & $0.1420$ & $536330\, R$ \\
+
+28 & $\rm NO + e^- \rightleftarrows NO^+ + e^- + e^-$ &$T_{\rm e}$ &$T_{\rm e}$ & 5.63 $\cdot$ 10$^{18}$ & $-0.2607$ & $686030\, R$ \\
 
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
 \item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol. $A$ has units of $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$. $E$ has units of cal/mole. The rate is given by $A T^n \exp(-E/RT).$
 \item[{b}] $\rm M_1=N,~O,~N^+,~O^+$; $\rm M_2=N_2,~O_2,~NO,~N_2^+,~O_2^+,~NO^+$; $\rm M_3= N,~O,~NO,~N^+,~O^+$; $\rm M_4=N_2,O_2,N_2^+,~O_2^+,~NO^+$.
-\item[{c}] The backward reaction rates are calculated using equilibrium constant. The reaction rates for 10, 11, and 12 are taken from \cite{pf:2007:boyd}. Reaction 8 is taken from \cite{jcp:1997:bose} and reaction 9 from \cite{jcp:1996:bose}. Other reactions are taken from \cite{book:1990:park}.
+\item[{c}] The backward reaction rates are calculated using equilibrium constant. The reaction rates for 10, 11, and 12 are taken from \cite{pf:2007:boyd}. Reaction 8 is taken from \cite{jcp:1997:bose} and reaction 9 from \cite{jcp:1996:bose}. The reactions 24--28 are taken from \cite{pof:2022:parent}.  Other reactions are taken from \cite{book:1990:park}.
 \end{tablenotes}
 \label{tab:parent2023}
 \end{threeparttable}

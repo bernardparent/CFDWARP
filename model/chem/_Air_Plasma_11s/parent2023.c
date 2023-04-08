@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define EXPON_TVTE 0.0
 
 /* set all reactions to true except for testing purposes */
-const static bool REACTION[26]=
+const static bool REACTION[29]=
   {
    TRUE, /* reaction 0 */
    TRUE, /* reaction 1 */
@@ -60,6 +60,9 @@ const static bool REACTION[26]=
    TRUE, /* reaction 23 */
    TRUE, /* reaction 24 */
    TRUE, /* reaction 25 */
+   TRUE, /* reaction 26 */
+   TRUE, /* reaction 27 */
+   TRUE, /* reaction 28 */
   };
 
 #define specEND -1
@@ -220,13 +223,24 @@ void find_W_Parent2023 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
   }
 
   if (REACTION[24]) {
-    add_to_W_fwbw_2r3p ( specO, speceminus, specOplus, speceminus, speceminus, 3.9e33, -3.78, 158500.0*R, Te, X, W );
+    add_to_W_fwbw_2r3p ( specO, speceminus, specOplus, speceminus, speceminus, 6.37e16, 0.0029, 477190.0*R, Te, X, W );
   }
 
   if (REACTION[25]){
-    add_to_W_fwbw_2r3p ( specN, speceminus, specNplus, speceminus, speceminus, 2.5e34, -3.82, 168600.0*R, Te, X, W );
+    add_to_W_fwbw_2r3p ( specN, speceminus, specNplus, speceminus, speceminus, 1.06e18, -0.2072, 629700.0*R, Te, X, W );
   }
 
+  if (REACTION[26]){
+    add_to_W_fwbw_2r3p ( specO2, speceminus, specO2plus, speceminus, speceminus, 2.33e16, 0.1166, 567360.0*R, Te, X, W );
+  }
+
+  if (REACTION[27]){
+    add_to_W_fwbw_2r3p ( specN2, speceminus, specN2plus, speceminus, speceminus, 1.58e16, 0.1420, 536330.0*R, Te, X, W );
+  }
+
+  if (REACTION[28]){
+    add_to_W_fwbw_2r3p ( specNO, speceminus, specNOplus, speceminus, speceminus, 5.63e18, -0.2607, 686030.0*R, Te, X, W );
+  }
 
 
 }
@@ -390,12 +404,25 @@ void find_dW_dx_Parent2023 ( gl_t *gl, spec_t rhok, double T, double Te, double 
   }
 
   if (REACTION[24]) {
-    add_to_dW_fwbw_2r3p ( specO, speceminus, specOplus, speceminus, speceminus, 3.9e33, -3.78, 158500.0*R, Te, X, dWdTe, dWdrhok );
+    add_to_dW_fwbw_2r3p ( specO, speceminus, specOplus, speceminus, speceminus, 6.37e16, 0.0029, 477190.0*R, Te, X, dWdTe, dWdrhok );
   }
 
   if (REACTION[25]){
-    add_to_dW_fwbw_2r3p ( specN, speceminus, specNplus, speceminus, speceminus, 2.5e34, -3.82, 168600.0*R, Te, X, dWdTe, dWdrhok );
+    add_to_dW_fwbw_2r3p ( specN, speceminus, specNplus, speceminus, speceminus, 1.06e18, -0.2072, 629700.0*R, Te, X, dWdTe, dWdrhok );
   }
+
+  if (REACTION[26]){
+    add_to_dW_fwbw_2r3p ( specO2, speceminus, specO2plus, speceminus, speceminus, 2.33e16, 0.1166, 567360.0*R, Te, X, dWdTe, dWdrhok );
+  }
+
+  if (REACTION[27]){
+    add_to_dW_fwbw_2r3p ( specN2, speceminus, specN2plus, speceminus, speceminus, 1.58e16, 0.1420, 536330.0*R, Te, X, dWdTe, dWdrhok );
+  }
+
+  if (REACTION[28]){
+    add_to_dW_fwbw_2r3p ( specNO, speceminus, specNOplus, speceminus, speceminus, 5.63e18, -0.2607, 686030.0*R, Te, X, dWdTe, dWdrhok );
+  }
+
 
 
   for (spec=0; spec<ns; spec++){
@@ -417,9 +444,15 @@ void find_dW_dx_Parent2023 ( gl_t *gl, spec_t rhok, double T, double Te, double 
 void find_Qei_Parent2023(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
 
     if (REACTION[24]) 
-      add_to_Qei(specO,_ionizationpot(specO), 3.9e33/calA*pow(Te,-3.78)*exp(-158500.0/Te), rhok, Qei);
+      add_to_Qei(specO,_ionizationpot(specO), 6.37e16/calA*pow(Te,0.0029)*exp(-477190.0/Te), rhok, Qei);
     if (REACTION[25]) 
-      add_to_Qei(specN,_ionizationpot(specN), 2.5e34/calA*pow(Te,-3.82)*exp(-168600.0/Te), rhok, Qei);
+      add_to_Qei(specN,_ionizationpot(specN), 1.06e18/calA*pow(Te,-0.2072)*exp(-629700.0/Te), rhok, Qei);
+    if (REACTION[26]) 
+      add_to_Qei(specO2,_ionizationpot(specO2), 2.33e16/calA*pow(Te,0.1166)*exp(-567360.0/Te), rhok, Qei);
+    if (REACTION[27]) 
+      add_to_Qei(specN2,_ionizationpot(specN2), 1.58e16/calA*pow(Te,0.1420)*exp(-536330.0/Te), rhok, Qei);
+    if (REACTION[28]) 
+      add_to_Qei(specNO,_ionizationpot(specNO), 5.63e18/calA*pow(Te,-0.2607)*exp(-686030.0/Te), rhok, Qei);
  
 }
 
@@ -428,8 +461,14 @@ void find_Qei_Parent2023(gl_t *gl, spec_t rhok, double Estar, double Te, double 
 void find_dQei_dx_Parent2023(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
 
     if (REACTION[24]) 
-      add_to_dQei(specO,_ionizationpot(specO), 3.9e33/calA*pow(Te,-3.78)*exp(-158500.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(specO,_ionizationpot(specO), 6.37e16/calA*pow(Te,0.0029)*exp(-477190.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
     if (REACTION[25]) 
-      add_to_dQei(specN,_ionizationpot(specN), 2.5e34/calA*pow(Te,-3.82)*exp(-168600.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(specN,_ionizationpot(specN), 1.06e18/calA*pow(Te,-0.2072)*exp(-629700.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
+    if (REACTION[26]) 
+      add_to_dQei(specO2,_ionizationpot(specO2), 2.33e16/calA*pow(Te,0.1166)*exp(-567360.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
+    if (REACTION[27]) 
+      add_to_dQei(specN2,_ionizationpot(specN2), 1.58e16/calA*pow(Te,0.1420)*exp(-536330.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
+    if (REACTION[28]) 
+      add_to_dQei(specNO,_ionizationpot(specNO), 5.63e18/calA*pow(Te,-0.2607)*exp(-686030.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
 
 }
