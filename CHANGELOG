@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 APR 21a
+  * in model/chem/_C2H4_Air_Plasma_36s/
+    - added adamovich2023e.c
+  * in model/chem/_C2H4_Air_Plasma_36s/chem.c
+    - added calls to adamovich2023e
+    
+
 2023 APR 07a
   * in model/chem/_Air_Plasma_11s/parent2023.c
     - reverted to 23apr02a version
