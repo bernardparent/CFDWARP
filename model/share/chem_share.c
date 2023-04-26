@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define Kcmin 1.0e-40
 
-
+#define TREF_EXCI 298.0
 
 /* kf in cm^3 s^(-1) 
    N in cm^(-3)
@@ -2712,7 +2712,40 @@ void add_to_dQei(long spec, double exci, double kf, double dkfdTe, spec_t rhok, 
 }
 
 
+/* find excitation energy in eV using the difference in enthalpy of formation */
+double _exci_2r2p(long react1, long react2, long prod1, long prod2){
+  double exci;
+  // find excitation energy needed per one particule in J 
+  exci=_hk_from_T_equilibrium(prod1, TREF_EXCI)*_m(prod1)+_hk_from_T_equilibrium(prod2, TREF_EXCI)*_m(prod2)
+      -_hk_from_T_equilibrium(react1, TREF_EXCI)*_m(react1)-_hk_from_T_equilibrium(react2, TREF_EXCI)*_m(react2);
+  // convert J to eV
+  exci=exci*6.242e18;
+  return(exci);
+}
 
 
+/* find excitation energy in eV using the difference in enthalpy of formation */
+double _exci_2r3p(long react1, long react2, long prod1, long prod2, long prod3){
+  double exci;
+  // find excitation energy needed per one particule in J 
+  exci=_hk_from_T_equilibrium(prod1, TREF_EXCI)*_m(prod1)+_hk_from_T_equilibrium(prod2, TREF_EXCI)*_m(prod2)
+      +_hk_from_T_equilibrium(prod3, TREF_EXCI)*_m(prod3)
+      -_hk_from_T_equilibrium(react1, TREF_EXCI)*_m(react1)-_hk_from_T_equilibrium(react2, TREF_EXCI)*_m(react2);
+  // convert J to eV
+  exci=exci*6.242e18;
+  return(exci);
+}
+
+/* find excitation energy in eV using the difference in enthalpy of formation */
+double _exci_2r4p(long react1, long react2, long prod1, long prod2, long prod3, long prod4){
+  double exci;
+  // find excitation energy needed per one particule in J 
+  exci=_hk_from_T_equilibrium(prod1, TREF_EXCI)*_m(prod1)+_hk_from_T_equilibrium(prod2, TREF_EXCI)*_m(prod2)
+      +_hk_from_T_equilibrium(prod3, TREF_EXCI)*_m(prod3)+_hk_from_T_equilibrium(prod4, TREF_EXCI)*_m(prod4)
+      -_hk_from_T_equilibrium(react1, TREF_EXCI)*_m(react1)-_hk_from_T_equilibrium(react2, TREF_EXCI)*_m(react2);
+  // convert J to eV
+  exci=exci*6.242e18;
+  return(exci);
+}
 
 #endif

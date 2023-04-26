@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 APR 25a
+  * in model/thermo/_generic/enthalpy.c
+    - fixed a mistake in the C2H4+ polynomial for the enthalpy
+  * in model/share/chem_share.c
+    - added functions _exci_2r2p(), _exci_2r3p(), _exci_2r4p()
+  * in model/chem/_C2H4_Air_Plasma_36s/adamovich2023e.c
+    - changed find_dQei_dx_Adamovich2023e() and find_Qei_Adamovich2023e() so that they obtain
+      the excitation energy from _exci_2r2p(), _exci_2r3p(), _exci_2r4p()
+      
+
 2023 APR 21a
   * in model/chem/_C2H4_Air_Plasma_36s/
     - added adamovich2023e.c

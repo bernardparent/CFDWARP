@@ -521,4 +521,14 @@ void add_to_dQei(long spec, double exci, double kf, double dkfdTe, spec_t rhok, 
 
 void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam);
 
+
+/* find excitation energy in eV using the difference in enthalpy of formation */
+double _exci_2r2p(long react1, long react2, long prod1, long prod2);
+
+/* find excitation energy in eV using the difference in enthalpy of formation */
+double _exci_2r3p(long react1, long react2, long prod1, long prod2, long prod3);
+
+/* find excitation energy in eV using the difference in enthalpy of formation */
+double _exci_2r4p(long react1, long react2, long prod1, long prod2, long prod3, long prod4);
+
 #endif /* _CHEM_SHARE_H */
