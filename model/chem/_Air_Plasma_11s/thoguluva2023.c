@@ -364,9 +364,15 @@ void find_W_Thoguluva2023 ( gl_t *gl, spec_t rhok, double T, double Te, double T
     else add_to_W_fw_2r3p ( specN, speceminus,   specNplus, speceminus, speceminus, 2.50e034, -3.820, 168600.0*R, Te, X, W );
     
     if (Te < 20000.0)
-        kb=_kb_polynomial2(3, -1.217, -3.006, -2.354, -1.675e1, -2.195e-3, 2.50e034, -3.820, 168600.0*R, Teblim);
-      else
-        kb=_kb_polynomial2(3, 1.103, 2.700, 7.541, -2.188e1, -2.910, 2.50e034, -3.820, 168600.0*R, Teblim); 
+    {
+      if(BOLSIGREACTIONS) kb=_kb_polynomial2(3, -1.217, -3.006, -2.354, -1.675e1, -2.195e-3, 1.0457e10, 1.2093, 238969.0*R, Teblim);
+      else kb=_kb_polynomial2(3, -1.217, -3.006, -2.354, -1.675e1, -2.195e-3, 2.50e034, -3.820, 168600.0*R, Teblim);
+	}
+    else
+    {
+      if(BOLSIGREACTIONS) kb=_kb_polynomial2(3, 1.103, 2.700, 7.541, -2.188e1, -2.910, 1.0457e10, 1.2093, 238969.0*R, Teblim); 
+      else kb=_kb_polynomial2(3, 1.103, 2.700, 7.541, -2.188e1, -2.910, 2.50e034, -3.820, 168600.0*R, Teblim); 
+    }
         
       add_to_W_3r2p ( speceminus, speceminus, specNplus,  speceminus, specN, kb , N, W);
       
@@ -377,9 +383,15 @@ void find_W_Thoguluva2023 ( gl_t *gl, spec_t rhok, double T, double Te, double T
     else add_to_W_fw_2r3p ( specO, speceminus,   specOplus, speceminus, speceminus, 3.90e033, -3.78, 158500.0*R, Te, X, W );
     
     if (Te < 20000.0)
-        kb=_kb_polynomial2(3, -2.660e-1, -5.390, -1.747, -1.575e1, -7.662e-4, 3.90e033, -3.78, 158500.0*R, Teblim);
-      else
-        kb=_kb_polynomial2(3, 1.789, 1.711e1, 1.527e1, -4.975e1, 9.411, 3.90e033, -3.78, 158500.0*R, Teblim); 
+    {
+      if(BOLSIGREACTIONS) kb=_kb_polynomial2(3, -2.660e-1, -5.390, -1.747, -1.575e1, -7.662e-4, 8.4196e10, 1.075, 225952.0*R, Teblim);
+      else kb=_kb_polynomial2(3, -2.660e-1, -5.390, -1.747, -1.575e1, -7.662e-4, 3.90e033, -3.78, 158500.0*R, Teblim);
+	}
+    else
+    {
+      if(BOLSIGREACTIONS) kb=_kb_polynomial2(3, 1.789, 1.711e1, 1.527e1, -4.975e1, 9.411, 8.4196e10, 1.075, 225952.0*R, Teblim); 
+      else kb=_kb_polynomial2(3, -2.660e-1, -5.390, -1.747, -1.575e1, -7.662e-4, 3.90e033, -3.78, 158500.0*R, Teblim);
+	}
         
       add_to_W_3r2p ( speceminus, speceminus, specOplus,  speceminus, specO, kb , N, W);
       
@@ -864,19 +876,35 @@ void find_dW_dx_Thoguluva2023 ( gl_t *gl, spec_t rhok, double T, double Te, doub
     else add_to_dW_fw_2r3p ( specN, speceminus,   specNplus, speceminus, speceminus, 2.50e034, -3.820, 168600.0*R, Te, X, dWdTe, dWdrhok);
     
     if (Te < 20000.0)
-      {
+    {
+	  if(BOLSIGREACTIONS)
+	  {
+        kb=_kb_polynomial2(3, -1.217, -3.006, -2.354, -1.675e1, -2.195e-3, 1.0457e10, 1.2093, 238969.0*R, Teblim);
+        dkbdTe=_dkbdT_polynomial2(3, -1.217, -3.006, -2.354, -1.675e1, -2.195e-3, 1.0457e10, 1.2093, 238969.0*R, Teblim);
+	  }
+	  else
+	  {
         kb=_kb_polynomial2(3, -1.217, -3.006, -2.354, -1.675e1, -2.195e-3, 2.50e034, -3.820, 168600.0*R, Teblim);
         dkbdTe=_dkbdT_polynomial2(3, -1.217, -3.006, -2.354, -1.675e1, -2.195e-3, 2.50e034, -3.820, 168600.0*R, Teblim);
+	  }
+    }
+    else
+    {
+	  if(BOLSIGREACTIONS)
+	  {
+        kb=_kb_polynomial2(3, 1.103, 2.700, 7.541, -2.188e1, -2.910, 1.0457e10, 1.2093, 238969.0*R, Teblim); 
+        dkbdTe=_dkbdT_polynomial2(3, 1.103, 2.700, 7.541, -2.188e1, -2.910, 1.0457e10, 1.2093, 238969.0*R, Teblim);
       }
       else
       {
         kb=_kb_polynomial2(3, 1.103, 2.700, 7.541, -2.188e1, -2.910, 2.50e034, -3.820, 168600.0*R, Teblim); 
-        dkbdTe=_dkbdT_polynomial2(3, 1.103, 2.700, 7.541, -2.188e1, -2.910, 2.50e034, -3.820, 168600.0*R, Teblim);
+        dkbdTe=_dkbdT_polynomial2(3, 1.103, 2.700, 7.541, -2.188e1, -2.910, 2.50e034, -3.820, 168600.0*R, Teblim);		
       }
+    }
       
-      dkbdT=0.0;
-      dkbdTv=0.0;
-      add_to_dW_3r2p ( speceminus, speceminus, specNplus,  speceminus, specN,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
+    dkbdT=0.0;
+    dkbdTv=0.0;
+    add_to_dW_3r2p ( speceminus, speceminus, specNplus,  speceminus, specN,  kb , N, dkbdT, dkbdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe);
      
   }
 
@@ -885,15 +913,31 @@ void find_dW_dx_Thoguluva2023 ( gl_t *gl, spec_t rhok, double T, double Te, doub
     else add_to_dW_fw_2r3p ( specO, speceminus,   specOplus, speceminus, speceminus, 3.90e033, -3.78, 158500.0*R, Te, X, dWdTe, dWdrhok);
     
     if (Te < 20000.0)
+    {
+	  if(BOLSIGREACTIONS)
+	  {
+        kb=_kb_polynomial2(3, -2.660e-1, -5.390, -1.747, -1.575e1, -7.662e-4, 8.4196e10, 1.075, 225952.0*R, Teblim);
+        dkbdTe=_dkbdT_polynomial2(3, -2.660e-1, -5.390, -1.747, -1.575e1, -7.662e-4, 8.4196e10, 1.075, 225952.0*R, Teblim);
+      }
+      else
       {
         kb=_kb_polynomial2(3, -2.660e-1, -5.390, -1.747, -1.575e1, -7.662e-4, 3.90e033, -3.78, 158500.0*R, Teblim);
-        dkbdTe=_dkbdT_polynomial2(3, -2.660e-1, -5.390, -1.747, -1.575e1, -7.662e-4, 3.90e033, -3.78, 158500.0*R, Teblim);
+        dkbdTe=_dkbdT_polynomial2(3, -2.660e-1, -5.390, -1.747, -1.575e1, -7.662e-4, 3.90e033, -3.78, 158500.0*R, Teblim);	  
+	  }
+    }
+    else
+    {
+	  if(BOLSIGREACTIONS)
+	  {
+        kb=_kb_polynomial2(3, 1.789, 1.711e1, 1.527e1, -4.975e1, 9.411, 8.4196e10, 1.075, 225952.0*R, Teblim); 
+        dkbdTe=_dkbdT_polynomial2(3, 1.789, 1.711e1, 1.527e1, -4.975e1, 9.411, 8.4196e10, 1.075, 225952.0*R, Teblim);
       }
       else
       {
         kb=_kb_polynomial2(3, 1.789, 1.711e1, 1.527e1, -4.975e1, 9.411, 3.90e033, -3.78, 158500.0*R, Teblim); 
-        dkbdTe=_dkbdT_polynomial2(3, 1.789, 1.711e1, 1.527e1, -4.975e1, 9.411, 3.90e033, -3.78, 158500.0*R, Teblim);
-      }
+        dkbdTe=_dkbdT_polynomial2(3, 1.789, 1.711e1, 1.527e1, -4.975e1, 9.411, 3.90e033, -3.78, 158500.0*R, Teblim);  
+	  }
+    }
       
       dkbdT=0.0;
       dkbdTv=0.0;

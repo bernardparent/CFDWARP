@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 APR 27a
+  * in tools/chemkin2cfdwarp.c
+    - added capability to find electron excitation energy when not specified using the _exci_*() 
+      functions
+  * in model/chem/_Air_Plasma_11s/thoguluva2023.c
+    - fixed some bugs related to the backward rates not being determined properly when setting 
+      the BOLSIGREACTIONS flag to TRUE
+      
+    
 2023 APR 25a
   * in model/thermo/_generic/enthalpy.c
     - fixed a mistake in the C2H4+ polynomial for the enthalpy

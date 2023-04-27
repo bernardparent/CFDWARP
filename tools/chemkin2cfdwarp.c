@@ -119,6 +119,7 @@ void check_all_indicators_formfit_electrontemperature_Q(char oldLine[], char pre
   *      = 0 when reaction uses gas temperature
   *      = 1 when reaction uses electron temperature
   *   3. Q - the indicator for a Qei reaction
+  *      = -2 when reaction does have "EXCI" value that is not specified
   *      = 0 when reaction does not have "EXCI" value
   *      = 1 when reaction does have "EXCI" value on the fourth line of information
   *      = 2 when reaction does have "EXCI" value on the second line of information
@@ -135,6 +136,7 @@ void print_output_line(char oldLine[], char prevLine[], char lastLine[], char ne
  *      = 0 when reaction uses gas temperature
  *      = 1 when reaction uses electron temperature
  *   4. Q - the indicator for a Qei reaction
+ *       = -2 when reaction does have "EXCI" value that is not specified
   *      = 0 when reaction does not have "EXCI" value
   *      = 1 when reaction does have "EXCI" value on the fourth line of information
   *      = 2 when reaction does have "EXCI" value on the second line of information
@@ -215,7 +217,7 @@ void print_numbers_chemkin(char oldLine[], char prevLine[], char lastLine[], cha
  /* Output parameters:
   *   1. output file - the data numbers for a reaction in the add_chemkin functions are printed to the output file  */
 
-void print_info_find_Qei(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output, char newLine[], char lastLine[], int Q, int e, int run, int reaction);
+void print_info_find_Qei(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output, char newLine[], char lastLine[], int Q, int e, int run, int reaction, int tot);
 // This function prints information on the find Qei functions such as primary element, numbers, fit, etc
 /* Input parameters:
  *   1. oldLine[], prevLine[], lastLine[], newLine[] - the current reaction line being searched and the following three lines of information from
@@ -226,6 +228,7 @@ void print_info_find_Qei(char oldLine[], char prevLine[], int numR, int numP, in
  *      = 0 when reaction is standard fit
  *      = 1 when reaction is form fit
  *   5. Q - the indicator for a Qei reaction
+ *       = -2 when reaction does have "EXCI" value that is not specified
   *      = 0 when reaction does not have "EXCI" value
   *      = 1 when reaction does have "EXCI" value on the fourth line of information
   *      = 2 when reaction does have "EXCI" value on the second line of information
@@ -243,7 +246,8 @@ void print_info_find_Qei(char oldLine[], char prevLine[], int numR, int numP, in
  *      = 0 when no reaction class is specified
  *      = 1 when only Kelvin is specified
  *      = 2 when only Molecules is specified
- *      = 3 when both Kelvin and Molecules are specified  */
+ *      = 3 when both Kelvin and Molecules are specified 
+ *   9. tot - total number of reacitons */
  /* Output parameters:
   *   1. output file - the information for a reaction in the find_Qei functions is printed to the output file  */
 
@@ -289,7 +293,8 @@ int check_Q(char line[]);
  /* Output parameters:
   *   1. (returned int) ind - the indicator for a reaction to be included in find_Qei function
   *      = 0 when reaction does not have "EXCI" value
-  *      = 1 when reaction does have "EXCI" value  */
+  *      = 1 when reaction does have "EXCI" value 
+  *      = 2 when reaction does have EXCI value but it is not provided */
 
 
 int check_electron_temperature(char line[]);
@@ -540,12 +545,20 @@ int check_Q(char line[]) {
     int i = 0, ind = 0;                 // searches line for "EXCI"
 
     for (i = 0; line[i] != '\0'; i++) {
+        if (i != 0 && line[i-1] == '!' && line[i] == 'E' && line[i + 1] == 'X' && line[i + 2] == 'C' && line[i + 3] == 'I') {
+            ind = 2;
+            break;
+          }
+        if (line[i] == '!' && line[i+1] != 'E') {
+            ind = 0;
+            break;
+          }
         if (line[i] == 'E' && line[i + 1] == 'X' && line[i + 2] == 'C' && line[i + 3] == 'I') {
             ind = 1;
             break;
-        }
+          }
     }
-    return ind;             // returns 1 if "EXCI" is present, returns 0 if not
+    return ind;             // returns 1 if "EXCI" is present, returns 0 if not, returns 2 for not provided EXCI value
 }
 
 void print_Qei_value(char line[], FILE* output) {
@@ -570,7 +583,7 @@ void print_Qei_value(char line[], FILE* output) {
     fprintf(output, ", ");
 }
 
-void print_info_find_Qei(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output, char newLine[], char lastLine[], int Q, int e, int run, int reaction) {
+void print_info_find_Qei(char oldLine[], char prevLine[], int numR, int numP, int ind, FILE* output, char newLine[], char lastLine[], int Q, int e, int run, int reaction, int tot) {
     int i = 0, j = 0, k = 0, m = 0;
     char reactants[10][12]; // create a string array to hold reactant names
     for (j = 0; oldLine[i] != '='; j++) {
@@ -611,6 +624,64 @@ void print_info_find_Qei(char oldLine[], char prevLine[], int numR, int numP, in
                 reactants[j][k - 1] = 'p', reactants[j][k] = 'l', reactants[j][k + 1] = 'u', reactants[j][k + 2] = 's', reactants[j][k + 3] = '\0';
         }
     }
+    char products[10][12]; // create a string array to hold product names
+    i = 0, j = 0;
+    while (oldLine[i] != '=')
+        i++;
+    i++;
+    if (oldLine[i] == '>')
+        i++;
+    while (oldLine[i + 2] != '.' && oldLine[i + 2] != 'e') {
+        k = 0;
+        if (oldLine[i] == '\t')
+            i++;
+        else if (oldLine[i] == ' ')
+            i++;
+        else if (oldLine[i] == '+')
+            i++;
+        else if (oldLine[i] == '(' || oldLine[i] == ')') {
+            oldLine[i] = ' ';
+            i++;
+        }
+        else {
+            while (oldLine[i] != ' ' && oldLine[i] != '\t' && oldLine[i] != '+') {
+                if (oldLine[i] == '(' || oldLine[i] == ')')
+                    i++;
+                else {
+                    products[j][k] = oldLine[i];
+                    i++, k++;
+                }
+            }
+            if (oldLine[i] == '+' && (oldLine[i + 1] == ' ' || oldLine[i + 1] == '\t')) {
+                m = i + 1;
+                while (oldLine[m] == ' ' || oldLine[m] == '\t') {
+                    m++;
+                }
+                if (oldLine[m] == '+' || oldLine[m] == '<' || oldLine[m] == '=') {
+                    products[j][k] = oldLine[i];
+                    k++, i++;
+                }
+            }
+            else if (oldLine[i] == '+' && oldLine[i + 1] != ' ' && oldLine[i + 1] != '\t') {
+                if (oldLine[i + 1] == '+' || oldLine[i + 1] == '<' || oldLine[i + 1] == '=') {
+                    products[j][k] = oldLine[i];
+                    k++, i++;
+                }
+            }
+            products[j][k] = '\0';
+            if (products[j][0] == 'E' && products[j][1] == '\0')
+                products[j][0] = 'e', products[j][1] = 'm', products[j][2] = 'i', products[j][3] = 'n', products[j][4] = 'u', products[j][5] = 's', products[j][6] = '\0';
+            if (products[j][k - 1] == '+' && products[j][k] == '\0')
+                products[j][k - 1] = 'p', products[j][k] = 'l', products[j][k + 1] = 'u', products[j][k + 2] = 's', products[j][k + 3] = '\0';
+            k = 0;
+            j++;
+        }
+    }
+    
+    
+    fprintf(output, "  if (REACTION[%d])\n", tot);
+    fprintf(output, "    add_to_Qei(spec");                  // printing find_Qei functions
+    
     for (j = 0; j < numR; j++) {
         if (reactants[j][0] == 'e' && reactants[j][1] == 'm') // print primary element from reactant
             j++;
@@ -625,6 +696,28 @@ void print_info_find_Qei(char oldLine[], char prevLine[], int numR, int numP, in
         print_Qei_value(prevLine, output);
     if (Q == 3)
         print_Qei_value(lastLine, output);
+    if (Q == -2) {
+      fprintf(output, "_exci_%dr%dp(spec", numR, numP);
+      for (j = 0; j < numR; j++) {
+        i = 0;
+        while (reactants[j][i] != '\0') {
+          fprintf(output, "%c", reactants[j][i]);
+          i++;
+        }
+        fprintf(output, ", spec");
+      }
+      for (j = 0; j < numP; j++) {
+        i = 0;
+        while (products[j][i] != '\0') {
+          fprintf(output, "%c", products[j][i]);
+          i++;
+        }
+        if (j != numP - 1)
+          fprintf(output, ", spec");
+        else if (j == numP - 1)
+          fprintf(output, "), ");
+        }
+    }
     if (ind == 1) { // printing fitted form numbers
         fprintf(output, "_kf_fit4(");
         print_numbers_find_Qei(oldLine, prevLine, numR, numP, ind, output, run, reaction, e);
@@ -1437,15 +1530,13 @@ void print_output_line(char oldLine[], char prevLine[], char lastLine[], char ne
                 fprintf(output, "\n");
         }
         else if (run == 2 && Q != 0) {
-            fprintf(output, "  if (REACTION[%d])\n", tot);
-            fprintf(output, "    add_to_Qei(spec");                  // printing find_Qei functions
-            print_info_find_Qei(oldLine, prevLine, numR, numP, ind, output, newLine, lastLine, Q, e, run, reaction);
+            print_info_find_Qei(oldLine, prevLine, numR, numP, ind, output, newLine, lastLine, Q, e, run, reaction, tot);
 
         }
         else if (run == 3 && Q != 0) {
             fprintf(output, "  if (REACTION[%d])\n", tot);
             fprintf(output, "    add_to_dQei(spec");                // printing find_Qei functions
-            print_info_find_Qei(oldLine, prevLine, numR, numP, ind, output, newLine, lastLine, Q, e, run, reaction);
+            print_info_find_Qei(oldLine, prevLine, numR, numP, ind, output, newLine, lastLine, Q, e, run, reaction, tot);
 
         }
 
@@ -1472,6 +1563,8 @@ void check_all_indicators_formfit_electrontemperature_Q(char oldLine[], char pre
             if (check_Q(lastLine) == 1)
                 *Q = 3;
     }
+    if (*ind == 1 && *Q == 0)
+      *Q = -2;                              // For fit reactions there should be a EXCI value, thus *Q = -2 if there is none provided or commented out
 }
 
 int build_current_function(int run, FILE* input, FILE* output) {
@@ -1735,6 +1828,8 @@ int check_process(char Line[], int tot, int loc, FILE* output, int num, int run,
     for (i = 0; Line[i] != '\n' && Line[i] != '\r'; i++) {              // determines the presence of a reaction by "=>" or "<=>"
         if (Line[i] == '=')
             return 3;
+        if (Line[i] == '!')
+            return 0;
     }
     i = 0;
     if (Line[i] == '!')
