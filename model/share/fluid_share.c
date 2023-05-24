@@ -2620,7 +2620,7 @@ double _w_product_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long l
       VnormalR-=n[dim2]*_X(np[lB],dim,dim2)*_nu(np[lB],gl,specR)*0.5*(_w(np[_al(gl,lB,dim,+1)],specR)-_w(np[_al(gl,lB,dim,-1)],specR));  
     }
   }
-
+  assert(isfinite(VnormalR));
 #ifdef _FLUID_PLASMA
   EXM_vec3D_t VionRB;
   if (specR<ncs){
@@ -2639,18 +2639,23 @@ double _w_product_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long l
   for (dim=0; dim<nd; dim++) {
     for (dim2=0; dim2<nd; dim2++){
       if (dim==theta){
-        VnormalP-=factprodreact*thetasgn*n[dim2]*0.5*(_X(np[lB],dim,dim2)*_nu(np[lB],gl,specP)+_X(np[lA],dim,dim2)*_nu(np[lA],gl,specP))*_w(np[lB],specP);
-        coeffwA-=-factprodreact*thetasgn*n[dim2]*0.5*(_X(np[lB],dim,dim2)*_nu(np[lB],gl,specP)+_X(np[lA],dim,dim2)*_nu(np[lA],gl,specP));
+        VnormalP-=factprodreact*(double)thetasgn*n[dim2]*0.5*(_X(np[lB],dim,dim2)*_nu(np[lB],gl,specP)+_X(np[lA],dim,dim2)*_nu(np[lA],gl,specP))*_w(np[lB],specP);
+        coeffwA-=-factprodreact*(double)thetasgn*n[dim2]*0.5*(_X(np[lB],dim,dim2)*_nu(np[lB],gl,specP)+_X(np[lA],dim,dim2)*_nu(np[lA],gl,specP));
       } else { 
         VnormalP-=factprodreact*n[dim2]*_X(np[lB],dim,dim2)*_nu(np[lB],gl,specP)*0.5*(_w(np[_al(gl,lB,dim,+1)],specP)-_w(np[_al(gl,lB,dim,-1)],specP));   
       }
     }
   }
+  if (coeffwA==0.0){
+    return(_w(np[lB],specP));     
+  }
+  assert(isfinite(VnormalP));
+  assert(isfinite(coeffwA));
   // idea is that VnormalP+coeffwA*wA=-VnormalR
   // thus: wA=(-VnormalR-VnormalP)/coeffwA
   wP=max(0.0,min(1.0,(-VnormalR-VnormalP)/coeffwA));
   
-  
+  assert(isfinite(wP));
   return(wP);
 }
 

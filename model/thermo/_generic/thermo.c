@@ -621,10 +621,19 @@ double _T_from_w_rho_P(spec_t w, double rho, double P){
 
 double _a_from_w_T_equilibrium(spec_t w,  double T) {
   double tmp,cpmix,Rmix;
+  long spec;
 
   cpmix=_cp_from_w_T_equilibrium(w,T);
   Rmix=_R(w);
   assert((cpmix-Rmix)!=0.0e0);
+  if  (!(Rmix*cpmix*T/(cpmix-Rmix)>=0.0e0)){
+    for (spec=0; spec<ns; spec++){
+      wfprintf(stderr,"w[%ld]=%E\n",spec,w[spec]); 
+    }
+    wfprintf(stderr,"Rmix=%E\n",Rmix); 
+    wfprintf(stderr,"cpmix=%E\n",cpmix); 
+    wfprintf(stderr,"T=%E\n",T); 
+  }
   assert(Rmix*cpmix*T/(cpmix-Rmix)>=0.0e0);
   tmp=sqrt(Rmix*cpmix*T/(cpmix-Rmix));
   return(tmp);

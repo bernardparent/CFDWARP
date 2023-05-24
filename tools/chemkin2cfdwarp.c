@@ -316,6 +316,15 @@ int check_fitted_form(char Line_str[]);
   *      = 0 when reaction is standard fit
   *      = 1 when reaction is form fit      */
 
+int check_input(FILE* input);
+// This function is to check whether or not the input file is a valid input file
+/* Input parameters:
+ *   1. input - the input file being examined   */
+ /* Output parameters:
+  *   1. (returned int) result - the indicator for fitted form or standard form
+  *      = 0 when it is not a valid input file
+  *      = 1 when it is a valid input file     */
+
 int check_reaction_current_line(char Line_str[], int* way, int* tot, FILE* output, int loc, int run);
 // This functions checks a line for a reaction and also the direction of the reaction
 /* Input parameters:
@@ -414,9 +423,12 @@ int main(int argc, char **argv) {
     fprintf ( stderr, "\n\nThe following input file could not be found:\n%s\n\n", inpfile );
     exit (EXIT_FAILURE);
   }
-	FILE* output = fopen(outfile, "w");
-  
-  
+	
+  if (check_input(input) == 0) {
+    fprintf ( stderr, "\n\nThe following input file was not a valid input file. If the input file is valid, check for a missing SPECIES list \n%s\n\n", inpfile );
+    exit (EXIT_FAILURE);
+  }
+  FILE* output = fopen(outfile, "w");
 	for (run = -1; run != 4; run++) {              // Begin cycle for creating functions in output file
 
 		print_function_header(run, output);
@@ -428,7 +440,8 @@ int main(int argc, char **argv) {
     if (run != -1)
       fprintf(output, "\n}\n\n");
     }
-    
+  
+  
   fclose(input);
 	fclose(output);
   }
@@ -678,9 +691,14 @@ void print_info_find_Qei(char oldLine[], char prevLine[], int numR, int numP, in
         }
     }
     
-    
-    fprintf(output, "  if (REACTION[%d])\n", tot);
-    fprintf(output, "    add_to_Qei(spec");                  // printing find_Qei functions
+    if (run == 2) {
+      fprintf(output, "  if (REACTION[%d])\n", tot);
+      fprintf(output, "    add_to_Qei(spec");                  // printing find_Qei functions
+    }
+    else if (run == 3) {
+      fprintf(output, "  if (REACTION[%d])\n", tot);
+      fprintf(output, "    add_to_dQei(spec");                  // printing find_Qei functions
+    }
     
     for (j = 0; j < numR; j++) {
         if (reactants[j][0] == 'e' && reactants[j][1] == 'm') // print primary element from reactant
@@ -1534,8 +1552,6 @@ void print_output_line(char oldLine[], char prevLine[], char lastLine[], char ne
 
         }
         else if (run == 3 && Q != 0) {
-            fprintf(output, "  if (REACTION[%d])\n", tot);
-            fprintf(output, "    add_to_dQei(spec");                // printing find_Qei functions
             print_info_find_Qei(oldLine, prevLine, numR, numP, ind, output, newLine, lastLine, Q, e, run, reaction, tot);
 
         }
@@ -1975,5 +1991,51 @@ void write_species(FILE* input, char** species, int* loc) {
   }
   (*species) = (char *) realloc (*species, (j+1)*sizeof(char));
   (*species)[j] = '\0';                                       // Set the species pointer to the local variable and the returned address will reflect the list changes
+}
+
+int check_input(FILE* input) {
+    char *newLine, *word, *species;
+    int i = 0;
+    int loc = 0;
+    
+    species = (char*)malloc(sizeof(char)*1);
+    newLine = (char *)malloc(1000*sizeof(char));
+    word = (char *)malloc(200*sizeof(char));
+    
+    rewind(input);
+    
+    
+    species[0] = 'L';
+    
+    if (input == NULL)
+      return 0;
+    while (fgets(newLine, 1000, input) != NULL) {
+        loc++;
+        newLine = (char *)realloc(newLine, (strlen(newLine) + 1) * sizeof(char));
+        if (species[0] == 'L') {
+          for (i = 0; newLine[i] != '\r' && newLine[i] != '\n' && newLine[i] != ' '; i++) {
+            word[i] = newLine[i];
+          }
+          word[i] = '\0';
+          if (strcmp(word, "SPECIES") == 0) {
+            free (species);
+            write_species(input, &species, &loc);
+          }
+        }
+        
+        
+        newLine = (char *)realloc(newLine, 1000 * sizeof(char));
+    }
+    if (species[0] == 'L') {
+        free ( newLine );
+        free ( word );
+        free ( species );
+        return 0;
+      }
+    free ( newLine );
+    free ( word );
+    free ( species );
+    
+    return 1;
 }
 

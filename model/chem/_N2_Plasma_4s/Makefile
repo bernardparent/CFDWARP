@@ -5,9 +5,9 @@ CCFLAGSLOCAL = $(CFLAGSCFD) -I../../../lib/include -I../../../.
 
 ####### Files
 
-HEADERS =   chem.h 
-SOURCES =   chem.c 
-OBJECTS =   chem.o 
+HEADERS =   chem.h macheret2007.h
+SOURCES =   chem.c macheret2007.c
+OBJECTS =   chem.o macheret2007.o
 TARGETS  = ../_chem.a
 
 
@@ -20,7 +20,9 @@ src: $(OBJECTS)
 arc: 
 	( rm -f $(TARGETS) ; ar cqs $(TARGETS) *.o )                        
 
-cleanall: clean
+cleanall:
+	( cd doc ; make clean )
+	( make clean )
 
 	
 

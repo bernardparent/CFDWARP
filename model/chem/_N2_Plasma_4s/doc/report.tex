@@ -1,0 +1,149 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{bm}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{multirow}
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\ordi}{{\rm d}}
+%\let\vec\bf
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\mfa}{\scriptscriptstyle}
+\newcommand{\mfb}{\scriptstyle}
+\newcommand{\mfc}{\textstyle}
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\hlinex}{\vspace{-0.34cm}~~\\ \hline \vspace{-0.31cm}~~\\}
+\newcommand{\hlinextop}{\vspace{-0.46cm}~~\\ \hline \hline \vspace{-0.32cm}~~\\}
+\newcommand{\hlinexbot}{\vspace{-0.37cm}~~\\ \hline \hline \vspace{-0.50cm}~~\\}
+\newcommand{\tablespacing}{\vspace{-0.4cm}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{0.9}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\author{
+  Bernard Parent
+}
+
+\email{
+  bparent@arizona.edu
+}
+
+\department{
+  Aerospace and Mechanical Engineering
+}
+
+\institution{
+  University of Arizona
+}
+
+\title{Four Species N2 Plasma Kinetics 
+}
+
+\date{
+  May 2023
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+%  \tableofcontents
+%  \makenomenclature
+%  \listoftables
+%%  \listoffigures
+
+
+
+
+
+
+
+
+
+
+
+
+%
+\begin{table}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Macheret (2007) 4-species 5-reactions air plasma chemical model.\tnote{a}}
+    \label{tab:macheret}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}lll}
+    \toprule
+    No.&Reaction\tnote{(b)} & Rate Coefficient  & Refs. \\
+    \midrule
+    1  & $\rm e^- + N_2   \rightarrow N_2^+ + e^- + e^-$  
+       &  ${\rm exp}(-0.0105809\cdot {\rm ln}^2 E^\star - 2.40411\cdot 10^{-75} \cdot {\rm ln}^{46}E^\star)$~cm$^3$/s
+       & \cite{jcp:2014:parent} \\
+    2 & $\rm e^-+N_2^+ \rightarrow N + N$  
+       & $2.8 \cdot 10^{-7} \cdot (300/T_{\rm e})^{0.5}  $ cm$^3$/s 
+       & \cite{misc:1992:kossyi}\\
+    3  & $\rm N_2 \rightarrow e^- + N_2^+$   
+       & $1.8 \cdot 10^{17} \cdot Q_{\rm b}^\star$ 1/s 
+       & \cite{book:1982:bychkov}\\
+    4  & $\rm N_2 + M_1 \rightarrow 2 N + M_1$   
+       & $5.0 \cdot 10^{-8} \cdot \exp(-113200/T) (1-\exp(-3354/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    5  & $\rm N + N + M_2 \rightarrow N_2 + M_2$   
+       & $8.27 \cdot 10^{-34} \cdot \exp(500/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    \bottomrule
+    \end{tabular*}
+\begin{tablenotes}
+\item[{a}] Notation and units: $E^\star$ is the reduced effective electric field in the electron reference frame ($E^\star\equiv|\vec{E}+\vec{V}^{\rm e}\times \vec{B}|/N$) in units of V$\cdot$m$^2$; $T_{\rm e}$ is the electron temperature in Kelvin; $T$ is the neutrals temperature in Kelvin; $Q^\star_{\rm b}$ is the ratio in Watts between the electron beam power per unit volume $Q_{\rm b}$ and the total number density of the plasma $N$  ($Q^\star_{\rm b}\equiv Q_{\rm b}/N$).
+\item[{b}] $\rm M_1=~N_2$
+\item[~] $\rm M_2=~N_2,~N$
+\end{tablenotes}
+   \end{threeparttable}
+\end{table}
+%
+
+
+
+%insert a few newpages here to make sure the refs section follows the tables
+~
+\newpage
+
+
+
+\bibliographystyle{warpdoc}
+\bibliography{all}
+
+
+\end{document}
+
+
+

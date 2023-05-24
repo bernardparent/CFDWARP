@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 MAY 23a
+  * in model/thermo/_generic/thermo.c
+    - in _a_from_w_T_equilibrium(), added some debug info when (Rmix*cpmix*T/(cpmix-Rmix)<0
+  * deleted model/chem/_N2_Plasma_3s_3r
+  * added model/chem/_N2_Plasma_4s/
+  * in model/share/fluid_share.c
+    - in _w_product_at_catalytic_wall(), fixed a bug: when coeffwA==0, should return w at node lB
+      thus added  "if (coeffwA==0.0) return(_w(np[lB],specP));"     
+  * in tools/chemkin2cfdwarp.c
+    - fixed a few bugs
+    
+
 2023 APR 27a
   * in tools/chemkin2cfdwarp.c
     - added capability to find electron excitation energy when not specified using the _exci_*() 
