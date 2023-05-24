@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 MAY 24a
+  * in src/init.c
+    - in reorder_initvar_species() and read_init_actions_fluid(), fixed a bug related 
+      to the default species treatment. Also improved code so that the default species can be
+      located anywhere within the species list, not just at the end of the species list.
+       
+
 2023 MAY 23a
   * in model/thermo/_generic/thermo.c
     - in _a_from_w_T_equilibrium(), added some debug info when (Rmix*cpmix*T/(cpmix-Rmix)<0

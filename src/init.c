@@ -31,7 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define INITSPECIES_DEFAULT -1
 
 static void reorder_initvar_species(gl_t *gl, initvar_t initvar, long specstart){
-  long flux,spec,specinit,specinitmax;
+  long flux,spec,specinit;
+  double initdefault;
+  bool FOUNDDEFAULT;
   spec_t N;
   if (gl->nsinit!=ns){
     // move values up to make space for missing species
@@ -42,25 +44,29 @@ static void reorder_initvar_species(gl_t *gl, initvar_t initvar, long specstart)
       //printf("flux=%ld  ns=%ld  gl->nsinit=%ld\n",flux,ns,gl->nsinit);
       initvar[flux]=initvar[flux-(ns-gl->nsinit)]; 
     } 
-    // set all densities to the default
-    for (spec=0; spec<ns; spec++) N[spec]=initvar[specstart+gl->nsinit-1];
-    specinitmax=gl->nsinit-1;
-  } else {
-    if (gl->initspecies[gl->nsinit-1]==INITSPECIES_DEFAULT){
-      // set last species density to the default
-      N[ns-1]=initvar[specstart+gl->nsinit-1];
-      specinitmax=gl->nsinit-1;
-    } else {
-      specinitmax=gl->nsinit;
-    }
   }
 
+  FOUNDDEFAULT=FALSE;
+  // find the default
+  for (specinit=0; specinit<gl->nsinit; specinit++){
+    if (gl->initspecies[specinit]==INITSPECIES_DEFAULT){
+      FOUNDDEFAULT=TRUE;
+      initdefault=initvar[specstart+specinit];
+    }
+  }
+  
+  if (FOUNDDEFAULT){
+    // set all densities to the default
+    for (spec=0; spec<ns; spec++) N[spec]=initdefault;
+  }
     
   // set the given densities
-  for (specinit=0; specinit<specinitmax; specinit++){
-    assert(gl->initspecies[specinit]<ns);
-    assert(gl->initspecies[specinit]>=0);
-    N[gl->initspecies[specinit]]=initvar[specstart+specinit];
+  for (specinit=0; specinit<gl->nsinit; specinit++){
+    if (gl->initspecies[specinit]!=INITSPECIES_DEFAULT){
+      assert(gl->initspecies[specinit]<ns);
+      assert(gl->initspecies[specinit]>=0);
+      N[gl->initspecies[specinit]]=initvar[specstart+specinit];
+    }
   }
     
   //put the densities back into initvar
@@ -100,11 +106,14 @@ void reformat_initvar_species_fractions(gl_t *gl, initvar_t initvar_orig, initva
 }
 
 void verify_positivity_of_determinative_property(initvar_t initvar, long row_start, long row_end){
-  long row; 
+  long row,row2; 
 
   for (row=row_start; row<=row_end; row++){
     if (initvar[row]<=0.0) {
 #ifdef _RESCONV_POSITIVITY_PRESERVING
+      for (row2=row_start; row2<=row_end; row2++){
+        wfprintf(stderr,"initvar[%ld]=%E\n",row2,initvar[row2]); 
+      }
       fatal_error("Init variable #%ld must be set to a positive value when a positivity-preserving spatial discretization method is specified. It is now set to %E.", row+1,initvar[row]);
 #endif
     }
@@ -236,7 +245,7 @@ void read_init_actions_fluid(char *actionname, char **argum, SOAP_codex_t *codex
   zone_t zone;
   long spec,nsinit,specinit;
   char *specnameinit,*specname;
-  bool FOUND;
+  bool FOUND,FOUNDDEFAULT;
 
   np=((readcontrolarg_t *)codex->action_args)->np;
   gl=((readcontrolarg_t *)codex->action_args)->gl;
@@ -315,10 +324,11 @@ void read_init_actions_fluid(char *actionname, char **argum, SOAP_codex_t *codex
   
   if (ns>1 && strcmp(actionname,"Species")==0) {
     nsinit=SOAP_number_argums(*argum);
-    if (nsinit>ns) SOAP_fatal_error(codex,"Number of species within Species() can not be higher than the number of species in the chemical solver.");
+    if (nsinit>ns) SOAP_fatal_error(codex,"Number of species within Species() including 'default' can not be higher than the number of species in the chemical solver.");
     gl->nsinit=nsinit;
     specnameinit=(char *)malloc(sizeof(char));
     specname=(char *)malloc(sizeof(char));
+    FOUNDDEFAULT=FALSE;
     for (specinit=0; specinit<nsinit; specinit++) {
       SOAP_get_argum_string(codex, &specnameinit, *argum, specinit);
       FOUND=FALSE;
@@ -332,13 +342,13 @@ void read_init_actions_fluid(char *actionname, char **argum, SOAP_codex_t *codex
       if (strcmp("default",specnameinit)==0){
         gl->initspecies[specinit]=INITSPECIES_DEFAULT;
         FOUND=TRUE; 
+        FOUNDDEFAULT=TRUE;
       }
       if (!FOUND) {
         SOAP_fatal_error(codex,"Species %s invalid within Species(). Set it to one of the species within the chemical solver or to 'default'.",specnameinit);
       }
     }
-    if (gl->nsinit<ns && gl->initspecies[gl->nsinit-1]!=INITSPECIES_DEFAULT) SOAP_fatal_error(codex,"The last species within Species() must be set to 'default'.");
-
+    if (gl->nsinit<ns && !FOUNDDEFAULT) SOAP_fatal_error(codex,"When the number of species listed within Species() is less than the number of species in the chemical solver, one of the species listed must necessarily be 'default'.",ns);
     free(specnameinit);
     free(specname);    
     codex->ACTIONPROCESSED=TRUE;
