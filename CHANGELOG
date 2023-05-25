@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 MAY 24b
+  * in model/chem/_N2_Plasma_4s/chem.c and model/chem/_N2_Plasma_4s/doc/report.tex
+    - added the chemical solver PARENT2023B
+  * in model/chem/_N2_Plasma_4s
+    - added parent2023b.c and parent2023b.h
+    
+
 2023 MAY 24a
   * in src/init.c
     - in reorder_initvar_species() and read_init_actions_fluid(), fixed a bug related 

@@ -133,6 +133,50 @@ abstract
 
 
 
+
+
+%
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Parent (2023b) 4-species low-temperature N2 plasma chemical model.}
+\begin{tabular}{cccccccccc} 
+\toprule
+~&~&\multicolumn{4}{c}{Forward reaction} & \multicolumn{4}{c}{Backward reaction} \\
+ \cmidrule(lr){3-6}\cmidrule(lr){7-10}
+\multicolumn{2}{c}{Reaction} & $T$ & $A$ & $n$ & $E$ & $T$  & $A$ & $n$ & $E$ \\ 
+\midrule
+1 & $\rm N_2 + M_1 \rightleftarrows N + N + M_1$ & $T$   & 3.0 $\cdot$ 10$^{22}$  & $-1.6$ & $113200 \, R$  & $T$ &\multicolumn{3}{c}{Equilibrium constant} \\
+
+2 & $\rm N_2 + M_2 \rightleftarrows N + N + M_2$ & $T$  & 7.0 $\cdot$ 10$^{21}$  & $-1.6$ & $113200 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}  \\
+
+3 & $\rm N_2 + e^- \rightleftarrows N + N + e^-$ & $T_{\rm e}$ & 3.0 $\cdot$ 10$^{24}$  & $-1.6$ & $113200 \, R$ & $T_{\rm e}$ & \multicolumn{3}{c}{Equilibrium constant} \\
+
+
+4 & $\rm N + N \rightleftarrows N_2^+ + e^- $ & $T$ & 2.0 $\cdot$ 10$^{13}$  & 0 & $67700 \, R$ & $T_{\rm e}$ &  $4.65 \cdot 10^{17}$ & $-0.2493$ & $7\, R$ \\
+
+
+5 & $\rm N_2 + e^- \rightleftarrows N_2^+ + e^- + e^-$ &\multicolumn{4}{c}{$\min\left(k_{\rm i},~{\rm exp}(-0.0105809\cdot {\rm ln}^2 E^\star - 2.40411\cdot 10^{-75} \cdot {\rm ln}^{46}E^\star)\right)$~cm$^3$/s} 
+                                          &$T_{\rm e}$ & $2.2 \cdot 10^{40}$  & $-4.5$  & 0\\
+
+6 & $\rm N_2 \rightarrow e^- + N_2^+$   
+       & $1.8 \cdot 10^{17} \cdot Q_{\rm b}^\star$ 1/s \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol. $A$ has units of $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$. $E$ has units of cal/mole. The rate is given by $A T^n \exp(-E/RT).$ The reduced electric field $E^\star$ has units of V~m$^2$.
+\item[{b}] $\rm M_1=N$; $\rm M_2=N_2,~N_2^+$.
+\item[{c}] The forward rate for reaction 4 is taken from \cite{pf:2007:boyd}. The backward rate for reaction 4 is found using BOLSIG+ \cite{psst:2005:hagelaar,jap:2021:abdoulanziz}. The backward reactions for 5 is taken from \cite{nasa:1973:dunn}. The forward reactions 5 is found from \cite{jcp:2014:parent}. Other reactions are taken from \cite{book:1990:park}. The Townsend ionization rate at very high electric fields $k_{\rm i}=E^\star\cdot(1.875\cdot 10^6 \cdot (-\ln (E^\star)-30)^4+6\cdot 10^{26}\cdot E^\star)\cdot \exp(-7.3\cdot 10^{-19}/E^\star - 5.474\cdot 10^{16}\cdot E^\star)$ is obtained from \cite{ps:2005:tarasenko}. Reaction 6 is taken from \cite{book:1982:bychkov} where $Q^\star_{\rm b}$ is the ratio in Watts between the electron beam power per unit volume $Q_{\rm b}$ and the total number density of the plasma $N$  ($Q^\star_{\rm b}\equiv Q_{\rm b}/N$)
+\end{tablenotes}
+\label{tab:parent2023b}
+\end{threeparttable}
+\end{center}
+\end{table}
+%
+
+
+
 %insert a few newpages here to make sure the refs section follows the tables
 ~
 \newpage
