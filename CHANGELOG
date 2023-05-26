@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 MAY 25a
+  * in model/fluid/_*_plasma/fluid.c
+    - in _mu(), added the E field adjustment everytime _mu is called even when starting from mumem
+    - in find_prim_fluid_mem(), took away the E field adjustment to mumem
+  * in model/chem/_N2_Plasma_4s
+    - added parent2023.c
+  * in model/chem/_N2_Plasma_4s/chem.c
+    - added modifications to call parent2023 scheme
+  * in model/beam/.config
+    - changed ebeam_fixed from experimental to non-experimental
+    
+
 2023 MAY 24b
   * in model/chem/_N2_Plasma_4s/chem.c and model/chem/_N2_Plasma_4s/doc/report.tex
     - added the chemical solver PARENT2023B
