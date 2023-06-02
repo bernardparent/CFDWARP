@@ -905,8 +905,11 @@ double _s_from_w_T(spec_t w, double T){
 
 
 
-/* fraction of electron joule heating that is consumed in nitrogen vibrational energy */ 
-double _zetav_from_Te(double Te){
+/* fraction of electron joule heating that is consumed in nitrogen vibrational energy 
+ * Aleksandrov, N. L., Vysikailo, F. I., Islamov, R. S., Kochetov, I. V., Napartovich, A. P., and Pevgov, V. G., “Electron
+Distribution Function in 4:1 N2-O2 Mixture,” High Temperature, Vol. 19, No. 1, 1981, pp. 17–21.
+ * */ 
+double _zetav_from_Te_Aleksandrov(double Te){
   double etav;
   double k[11],Tepower[11];
   long cnt;
@@ -921,7 +924,7 @@ double _zetav_from_Te(double Te){
   k[8]=-3.1981279E-34;
   k[9]=+2.0887979E-39;
   k[10]=-5.8381036E-45;
-  Te=max(0.0,Te);
+  Te=max(300.0,Te);
   Te=min(60000.0,Te);
   Tepower[0]=1.0;
   Tepower[1]=Te;

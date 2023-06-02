@@ -25,7 +25,7 @@
 
   double _E_dot_J(np_t *np, gl_t *gl, long l);
 
-  double _E_dot_J_recast(np_t *np, gl_t *gl, long l);
+  double _E_dot_J_recast(np_t *np, gl_t *gl, long l, double workfact, double heatfact);
 
   double _E_dot_Je_over_mueNe(np_t *np, gl_t *gl, long l);
 

@@ -7,6 +7,29 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JUN 01a
+  * in bin
+    - added MHD_generator_ebeam.wrp
+  * in cycle/share/tsemf_share.c
+    - in update_dUstar_emfield_ADI(), added some asserts
+  * in cycle/tsemf/_AF/tsemf.c
+    - in update_dUstar_emfield_DDADI(), added some asserts
+  * in model/emfield/_Epotential-Bfixed/emfield.c
+    - in find_linearization_coefficients_bdry_node_emfield(), added one assert
+  * in model/fluid/_Favre-Reynolds_plasma/fluid_source.c
+    - in find_Semfield(), now calls _zetav_from_Te_Aleksandrov() instead of _zetav_from_Te()
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - removed emfieldworkheatfact and added emfieldworkfact and emfieldheatfact
+    - added N2VIBJOULEHEATINGMODEL
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Semfield(), added N2VIBJOULEHEATINGMODEL
+    - in find_Semfield(), now calls _E_dot_J_recast() instead of _E_dot_J()
+  * in model/share/emfield_share.c
+    - in _E_dot_J_recast(), added parameters heatfact and workfact
+  * in model/thermo/_generic/thermo.c
+    - in _zetav_from_Te(), now make Te at least 300K instead of at least 0K.
+    
+
 2023 MAY 25a
   * in model/fluid/_*_plasma/fluid.c
     - in _mu(), added the E field adjustment everytime _mu is called even when starting from mumem

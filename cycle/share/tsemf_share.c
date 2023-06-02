@@ -103,11 +103,13 @@ void update_dUstar_emfield_ADI(np_t *np, gl_t *gl, long theta, long ls, long le)
 
 
     tdma[0].val[0]=0.0;
+    assert(is_node_bdry(np[_l_minus_one(ls,gl,theta)],TYPELEVEL_EMFIELD));
     find_linearization_coefficients_bdry_node_emfield(np, gl, _l_minus_one(ls,gl,theta), theta, +1,
                        flux, _node_type(np[_l_minus_one(ls,gl,theta)], TYPELEVEL_EMFIELD),
 	  	     &(tdma[0].val[1]), &(tdma[0].val[2]), &(tdma[0].val[3]));
 
     tdma[jj+1].val[2]=0.0;
+    assert(is_node_bdry(np[_l_plus_one(le,gl,theta)],TYPELEVEL_EMFIELD));
     find_linearization_coefficients_bdry_node_emfield(np, gl, _l_plus_one(le,gl,theta), theta, -1,
                      flux, _node_type(np[_l_plus_one(le,gl,theta)], TYPELEVEL_EMFIELD),
 		     &(tdma[jj+1].val[1]), &(tdma[jj+1].val[0]), &(tdma[jj+1].val[3]));
