@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+
+2023 JUN 03a
+  * in tools
+    - added atten.c
+  * in model/share/transport_share.c
+    - in _mue_from_Nn_Ni_Te_rhok(), changed how the electron temperature is clipped at 300K; in
+      the past, the clipping applied to both the electron-ion and electron-neutral collisions; now
+      it applies only to the electron-neutral collisions
+
+
 2023 JUN 01a
   * in bin
     - added MHD_generator_ebeam.wrp

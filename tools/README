@@ -11,6 +11,9 @@ ________________________________________________________________________________
 1. C TOOLS* 
 
 
+atten.c                      finds the EM wave attenuation in a plasma layer given the plasma
+                             densities, temperature, and thickness
+                             
 average.c                    reads the data from various input files and outputs the 
                              averaged values to an output file
 
