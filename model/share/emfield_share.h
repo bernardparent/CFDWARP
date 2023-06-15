@@ -59,4 +59,10 @@
 
   void find_Jk_from_Jk_at_interfaces(np_t *np, gl_t *gl, long l, long spec, EXM_vec3D_t Jk);
 
+  double _dPkdXj_interface(np_t *np, gl_t *gl, long l, long i, long j, long k);
+
+  double _dNkdXj_interface(np_t *np, gl_t *gl, long l, long i, long j, long k);
+
+  double _Jemfstar_interface(np_t *np, gl_t *gl, metrics_t metrics, long l, long i);
+
 #endif /* _EMFIELD_SHARE_H */

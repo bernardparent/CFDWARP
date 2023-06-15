@@ -2195,7 +2195,7 @@ void update_prim_emfield_mem_in_zone_4(np_t *np, gl_t *gl, long theta, long ls, 
         find_dtau_emfield(np,gl,l,flux,&(np[l].bs->dtauemfield[flux]));  
         np[l].bs->coeffp0sum[flux]=0.0;
         for (dim=0; dim<nd; dim++){
-          find_linearization_coefficients_inner_node_emfield(np, gl, l, dim, flux, &(np[l].bs->coeffm1[dim][flux]), &(np[l].bs->coeffp0[dim][flux]), &(np[l].bs->coeffp1[dim][flux]));
+          find_linearization_coefficients_inner_node_emfield_interface(np, gl, l, dim, flux, &(np[l].bs->coeffm1[dim][flux]), &(np[l].bs->coeffp0[dim][flux]), &(np[l].bs->coeffp1[dim][flux]));
           np[l].bs->coeffp0sum[flux]+=np[l].bs->coeffp0[dim][flux];
         }
       }

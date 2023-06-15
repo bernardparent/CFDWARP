@@ -7,6 +7,37 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JUN 15a
+  * renamed find_linearization_coefficients_inner_node_emfield() 
+    to find_linearization_coefficients_inner_node_emfield_interface()
+  * in cycle/share/tsemf_share.c
+    - added  update_dUstar_emfield_Newton_ij_3() which calls the new function
+      find_linearization_coefficients_inner_node_emfield()
+    - in update_dUstar_emfield_Newton_ij(), now calls update_dUstar_emfield_Newton_ij_3()
+  * in lib/exm/exm.c
+    - added EXM_al3() and EXM_all3()
+    - rewrote EXM_ai3()
+  * in model/emfield
+    - copied _Epotential-Bfixed to _Epotential-Bfixed_old
+  * in model/emfield/_Epotential/emfield.c
+    - in find_linearization_coefficients_bdry_node_emfield(), got rid of the DIREC_FOUND condition
+      when finding the linearization coefficients for BDRYEMF_EXTRAPOLATED1 and BDRYEMF_DIELECTRIC
+    - added find_linearization_coefficients_inner_node_emfield()
+    - in update_bdry_emfield(), changed the BC from ACCURACY_SECONDORDER to ACCURACY_FIRSTORDER
+  * in model/emfield/_Epotential-Bfixed/emfield.c
+    - in find_linearization_coefficients_bdry_node_emfield(), got rid of the DIREC_FOUND condition
+      when finding the linearization coefficients for BDRYEMF_EXTRAPOLATED1 and BDRYEMF_DIELECTRIC
+    - added find_linearization_coefficients_inner_node_emfield()
+    - in update_bdry_emfield(), changed the BC from ACCURACY_SECONDORDER to ACCURACY_FIRSTORDER
+    - added find_Jstar_emf_interface()
+    - added _Jstar_interface_local()
+    - added _Jtstar_interface_local()
+    - in find_J(), find_Fstar_interface_emfield(), find_prim_emfield_mem_3()
+      now calls _Jtstar_interface_local() instead of _Jtstar_interface()
+    - in read_disc_emfield_actions(), added new variable CURRENTEMFSTENCIL
+  * in tools/atten.c
+    - made improvements
+    
 
 2023 JUN 03a
   * in tools

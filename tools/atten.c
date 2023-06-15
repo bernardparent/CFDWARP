@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2023 Bernard Parent
+Copyright 2023 Igor Adamovich and Bernard Parent
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -31,14 +31,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Computer Physics Communications 175 (2006) 545-552   (for non-magnetized plasma only)
 
-
+// based on atten.for from Igor Adamovich
 
 int main ( int argc, char **argv ) {
   bool VALIDOPTIONS=TRUE;
   char *options;
   int RET;
   double e,ame,eps0,ccc,x,Ne,fcoll,anu,fom,omega,omegap,rab1,rab2,rab3,rab4,rab5;
-  double b,absorp1,absorp2,absorp3,att1,att2,att3;
+  double b,absorp1,att1;
   double muen,mue,muei,lnlambda,Nn,Ni,Te;
 
 
@@ -55,12 +55,12 @@ int main ( int argc, char **argv ) {
     fprintf ( stderr, "\nFlags:\n\n"
               "Flag   \tArg                              \tArg Type \tRequired? \n"
               "----------------------------------------------------------------------------\n"
-              "-t     \t<slab thickness [m]>             \tdouble   \tY\n"
+              "-t     \t<plasma thickness [m]>           \tdouble   \tY\n"
               "-Te    \t<electron temperature [K]>       \tdouble   \tY\n"
-              "-f     \t<wave frequency [Hz]>            \tdouble   \tY\n"
+              "-f     \t<EM wave frequency [Hz]>         \tdouble   \tY\n"
               "-Ne    \t<electron number density [1/m3]> \tdouble   \tY\n"
               "-Nn    \t<neutrals number density [1/m3]> \tdouble   \tY\n"
-              "-Ni     \t<ion number density [1/m3]>     \tdouble   \tN\n"
+              "-Ni    \t<ion number density [1/m3]>      \tdouble   \tN\n"
                "\n\n"
               "Eg.: ./atten -t 0.01 -Ne 1e18 -Nn 1e23 -Te 10000 -f 1e9\n"
               "\n\n");
@@ -84,6 +84,7 @@ int main ( int argc, char **argv ) {
   anu= fcoll * 1.0e9;
     
   // find collision frequency anu from mobility in 1/s */
+  // see Table 8.1 in Plasma Modeling Methods and applications (Second Edition) CHAPTER 8 Drift-diffusion models and methods
   lnlambda=23.0-log(sqrt(Ne/1e6)*pow(Te/11600.0,-1.5));
   muen=3.74e19*exp(33.5/sqrt(log(max(300.0,Te))))/Nn;
   muei=9.5e16*(pow(Te,1.5))/Ni/lnlambda;
@@ -102,13 +103,12 @@ int main ( int argc, char **argv ) {
 
   b=sqr(omega/ccc) * (rab4-rab5)/2.0;
 
+// See Eq. (11) in Computer Physics Communications 175 (2006) 545-552 
   absorp1=sqrt(b);
-  absorp2=sqr(omegap)/ccc/anu;
-  absorp3=sqr(omegap)*anu/ccc/sqr(omega);
+//  absorp2=sqr(omegap)/ccc/anu;
+//  absorp3=sqr(omegap)*anu/ccc/sqr(omega);
 
   att1=exp(-absorp1*x);
-  att2=exp(-absorp2*x);
-  att3=exp(-absorp3*x);
 
 
   printf("Ne                     = %E 1/m3\n",Ne);
@@ -121,9 +121,7 @@ int main ( int argc, char **argv ) {
   printf("mue                    = %E m2/Vs\n",mue);
   printf("e- collision frequency = %E Hz\n",anu);
   printf("EM wave frequency      = %E Hz\n",fom);
-  printf("I/I0, att1^2           = %E\n",sqr(att1));
-  printf("att2^2                 = %E\n",sqr(att2));
-  printf("att3^2                 = %E\n",sqr(att3));
+  printf("I/I0                   = %E\n",sqr(att1));
 
 
   return ( EXIT_SUCCESS );

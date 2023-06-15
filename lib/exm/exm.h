@@ -92,6 +92,10 @@ long EXM_ai2(EXM_gl2D_t gl2d, long i, long j);
 
 long EXM_ai1(EXM_gl1D_t gl1d, long i);
 
+long EXM_al3(EXM_gl3D_t gl, long l, long theta, long offset);
+
+long EXM_all3(EXM_gl3D_t gl, long l, long theta1, long offset1, long theta2, long offset2);
+
 double EXM_find_root_zero_in(double(*FUNCT)(void *, double), void *arg_ptr,
               double minval, double maxval,
               double relerr, double abserr, long *IFLAG);

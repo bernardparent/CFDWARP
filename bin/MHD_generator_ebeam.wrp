@@ -214,7 +214,9 @@ Model(
     INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY=NO; 
     SCHOTTKY_EFFECT=NO;
     emissivity=0.0;            {emissivity coefficient of the gas mixture needed for radiation heat transfer}
-    emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
+    emfieldworkfact=1.0;   {factor multiplying the emfield work and heat source terms}
+    emfieldheatfact=1.0;
+    N2VIBJOULEHEATINGMODEL=N2VIBJOULEHEATINGMODEL_ALEKSANDROV;
     sigmadiv=1e-10; {S/m}
     etdiv=1e-1;     {J/kg}
     Pmin=5000;    Pmax=9.9e99;   {Pa}
@@ -337,6 +339,7 @@ Disc(
   );
   EpotentialBfixed(
     POTENTIAL=POTENTIAL_OHMBASED;
+    CURRENTEMFSTENCIL=CURRENTEMFSTENCIL_STANDARD;
     Ediv=1e99;        {set to a small positive value for upwinding of pressure gradients, and 
                        to a large positive value for standard differencing; upwinding can lead
                        to convergence hangs of the potential equation while central differences
@@ -402,13 +405,18 @@ Cycle(
     if (mod(iter,50)==0,
       WriteDataFile(outputfilename);
     );
-    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
+    sigma1=0.1;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     PRECONDITIONER=PRECON_LOCALTIMESTEP;
     if (iter==1,
       CFL=0.002;
     );
-    CFL=min(CFL*1.08,0.7);
+    if (iter<400,
+      CFLmax=0.2;
+    ,{else}
+      CFLmax=0.3;
+    );
+    CFL=min(CFL*1.08,CFLmax);
     UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2);
     Lc=1e-3;  {characteristic length scale used to solve the emfield equation}
     relaxEMF=0.8;  {relaxation factor forced on the update of the emfield variables}
@@ -418,6 +426,8 @@ Cycle(
       {UpdateEMField(Lc,relaxEMF,TSEMF_DDADI);}
       UpdateEMField(Lc,relaxEMF,TSEMF_ADI);
     );
+
+{    UpdateEMField(Lc*100,relaxEMF,TSEMF_NEWTON);}
     system("date");
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,

@@ -94,7 +94,7 @@ void update_dUstar_emfield_ADI(np_t *np, gl_t *gl, long theta, long ls, long le)
       jj++;
 
       find_dtau_emfield(np,gl,l,flux,&dtau);
-      find_linearization_coefficients_inner_node_emfield(np, gl, l, theta, flux, &(tdma[jj].val[0]), &(tdma[jj].val[1]), &(tdma[jj].val[2]));
+      find_linearization_coefficients_inner_node_emfield_interface(np, gl, l, theta, flux, &(tdma[jj].val[0]), &(tdma[jj].val[1]), &(tdma[jj].val[2]));
 
       tdma[jj].val[1]+=1.0/dtau;
       tdma[jj].val[3]=np[l].bs->dUstaremfield[flux]/dtau;
@@ -830,8 +830,8 @@ void update_dUstar_emfield_Newton_ij_1(np_t *np, gl_t *gl, long k, long flux, zo
       l=_ai(gl,i,j,k);
       if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) {
         if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) {
-          find_linearization_coefficients_inner_node_emfield(np, gl, l, 0, flux, &C_im1, &C_ip0, &C_ip1);
-          find_linearization_coefficients_inner_node_emfield(np, gl, l, 1, flux, &C_jm1, &C_jp0, &C_jp1);
+          find_linearization_coefficients_inner_node_emfield_interface(np, gl, l, 0, flux, &C_im1, &C_ip0, &C_ip1);
+          find_linearization_coefficients_inner_node_emfield_interface(np, gl, l, 1, flux, &C_jm1, &C_jp0, &C_jp1);
 
           find_dtau_emfield(np,gl,l,flux,&dtau); 
           /* i+0,j+0 */
@@ -954,8 +954,8 @@ void update_dUstar_emfield_Newton_ij_2(np_t *np, gl_t *gl, long k, long flux, zo
         /* for inner node */
         if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) {
 
-          find_linearization_coefficients_inner_node_emfield(np, gl, l, 0, flux, &C_im1, &C_ip0, &C_ip1);
-          find_linearization_coefficients_inner_node_emfield(np, gl, l, 1, flux, &C_jm1, &C_jp0, &C_jp1);
+          find_linearization_coefficients_inner_node_emfield_interface(np, gl, l, 0, flux, &C_im1, &C_ip0, &C_ip1);
+          find_linearization_coefficients_inner_node_emfield_interface(np, gl, l, 1, flux, &C_jm1, &C_jp0, &C_jp1);
 
           find_dtau_emfield(np,gl,l,flux,&dtau); 
 
@@ -1054,17 +1054,172 @@ void update_dUstar_emfield_Newton_ij_2(np_t *np, gl_t *gl, long k, long flux, zo
 }
 
 
+
+
+
+/* exact inversion with the bandwidth corresponding to ie-is */
+void update_dUstar_emfield_Newton_ij_3(np_t *np, gl_t *gl, long k, long flux, zone_t zone){
+  long line,i,j,hbw,l;
+  double C_ip1,C_im1,C_ip0,C_jp0,C_jp1,C_jm1,dtau;
+  double *xdma;
+  EXM_gl2D_t xdmagl;
+  bool DIREC_FOUND;
+  long theta,thetasgn;
+  double *coeff;
+  EXM_gl3D_t coeffgl;
+  
+  xdmagl.is=0;
+  xdmagl.ie=(zone.ie-zone.is+1)*2+1+2;
+  xdmagl.js=0;
+  xdmagl.je=(zone.je-zone.js+1)
+           *(zone.ie-zone.is+1)-1;
+  hbw=(xdmagl.ie-xdmagl.is+1)/2-1;
+  xdma=(double *)malloc((xdmagl.je-xdmagl.js+1)*(xdmagl.ie-xdmagl.is+1)*sizeof(double));
+
+  /* set it up */
+  /* init xdma */
+  for (i=xdmagl.is; i<=xdmagl.ie; i++){
+    for (j=xdmagl.js; j<=xdmagl.je; j++){
+      xdma[EXM_ai2(xdmagl,i,j)]=0.0;
+    }
+  }
+  line=0;
+  coeff=(double *)malloc(50*sizeof(double));
+  for_2DL(j,zone.js,zone.je){
+    for_1DL(i,zone.is,zone.ie){
+      /* for inner node */
+      l=_ai(gl,i,j,k);
+      if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) {
+        if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) {
+          find_dtau_emfield(np,gl,l,flux,&dtau);           
+          if (FALSE){
+          find_linearization_coefficients_inner_node_emfield_interface(np, gl, l, 0, flux, &C_im1, &C_ip0, &C_ip1);
+          find_linearization_coefficients_inner_node_emfield_interface(np, gl, l, 1, flux, &C_jm1, &C_jp0, &C_jp1);
+          /* i+0,j+0 */
+          xdma[EXM_ai2(xdmagl,hbw,line)]=C_ip0+C_jp0+1.0/dtau;
+          /* i-1,j+0 */ 
+          xdma[EXM_ai2(xdmagl,hbw-1,line)]=C_im1;
+          /* i+1,j+0 */ 
+          xdma[EXM_ai2(xdmagl,hbw+1,line)]=C_ip1;
+          /* i+0,j-1 */ 
+          xdma[EXM_ai2(xdmagl,hbw-hbw+1,line)]=C_jm1;
+          /* i+0,j+1 */ 
+          xdma[EXM_ai2(xdmagl,hbw+hbw-1,line)]=C_jp1;
+          }
+
+          if (TRUE){
+          find_linearization_coefficients_inner_node_emfield(np, gl, l, coeff, &coeffgl);
+          /* i+0,j+0 */
+          xdma[EXM_ai2(xdmagl,hbw,line)]=coeff[EXM_ai3(coeffgl,0,0,0)]+1.0/dtau;
+          /* i-1,j+0 */ 
+          xdma[EXM_ai2(xdmagl,hbw-1,line)]=coeff[EXM_ai3(coeffgl,-1,0,0)];
+          /* i+1,j+0 */ 
+          xdma[EXM_ai2(xdmagl,hbw+1,line)]=coeff[EXM_ai3(coeffgl,+1,0,0)];
+          /* i+0,j-1 */ 
+          xdma[EXM_ai2(xdmagl,hbw-hbw+1,line)]=coeff[EXM_ai3(coeffgl,+0,-1,0)];
+          /* i+0,j+1 */ 
+          xdma[EXM_ai2(xdmagl,hbw+hbw-1,line)]=coeff[EXM_ai3(coeffgl,+0,+1,0)];
+          /* i+1,j+1 */
+          xdma[EXM_ai2(xdmagl,hbw+hbw-1+1,line)]=coeff[EXM_ai3(coeffgl,+1,+1,0)];
+          /* i-1,j+1 */
+          xdma[EXM_ai2(xdmagl,hbw+hbw-1-1,line)]=coeff[EXM_ai3(coeffgl,-1,+1,0)];
+          /* i+1,j-1 */ 
+          xdma[EXM_ai2(xdmagl,hbw-hbw+1+1,line)]=coeff[EXM_ai3(coeffgl,+1,-1,0)];
+          /* i-1,j-1 */ 
+          xdma[EXM_ai2(xdmagl,hbw-hbw+1-1,line)]=coeff[EXM_ai3(coeffgl,-1,-1,0)];
+          }
+
+          xdma[EXM_ai2(xdmagl,xdmagl.ie,line)]=np[_ai(gl,i,j,k)].bs->dUstaremfield[flux]/dtau;           
+        } else {
+          xdma[EXM_ai2(xdmagl,hbw,line)]=1.0;
+          DIREC_FOUND=find_bdry_direc(np, gl, l, TYPELEVEL_EMFIELD, &theta, &thetasgn);              
+          if (DIREC_FOUND && theta==0) {
+            find_linearization_coefficients_bdry_node_emfield(np, gl, l, theta, thetasgn, flux, 
+                                   _node_type(np[_ai(gl,i,j,k)], TYPELEVEL_EMFIELD), 
+                                   &(xdma[EXM_ai2(xdmagl,hbw,line)]), 
+                                   &(xdma[EXM_ai2(xdmagl,hbw+thetasgn,line)]),
+                                   &(xdma[EXM_ai2(xdmagl,xdmagl.ie,line)]));
+          } else {
+            if (DIREC_FOUND && theta==1) {
+              find_linearization_coefficients_bdry_node_emfield(np, gl, l, theta, thetasgn, flux, 
+                                   _node_type(np[_ai(gl,i,j,k)], TYPELEVEL_EMFIELD), 
+                                   &(xdma[EXM_ai2(xdmagl,hbw,line)]), 
+                                   &(xdma[EXM_ai2(xdmagl,hbw+thetasgn*(hbw-1),line)]),
+                                   &(xdma[EXM_ai2(xdmagl,xdmagl.ie,line)]));
+            } else {
+              if (is_node_inner(np[_ai(gl,i+1,j+1,k)], TYPELEVEL_EMFIELD)) {
+                find_linearization_coefficients_bdry_node_emfield(np, gl, _ai(gl,i,j,k), 0, +0, flux, 
+                                   _node_type(np[_ai(gl,i,j,k)], TYPELEVEL_EMFIELD), 
+                                   &(xdma[EXM_ai2(xdmagl,hbw,line)]), 
+                                   &(xdma[EXM_ai2(xdmagl,hbw+hbw,line)]),
+                                   &(xdma[EXM_ai2(xdmagl,xdmagl.ie,line)]));
+              } else {
+                if (is_node_inner(np[_ai(gl,i-1,j+1,k)], TYPELEVEL_EMFIELD)) {
+                  find_linearization_coefficients_bdry_node_emfield(np, gl, _ai(gl,i,j,k), 0, +0, flux, 
+                                   _node_type(np[_ai(gl,i,j,k)], TYPELEVEL_EMFIELD), 
+                                   &(xdma[EXM_ai2(xdmagl,hbw,line)]), 
+                                   &(xdma[EXM_ai2(xdmagl,hbw+hbw-2,line)]),
+                                   &(xdma[EXM_ai2(xdmagl,xdmagl.ie,line)]));
+                } else {
+                  if (is_node_inner(np[_ai(gl,i+1,j-1,k)], TYPELEVEL_EMFIELD)) {
+                    find_linearization_coefficients_bdry_node_emfield(np, gl, _ai(gl,i,j,k), 0, +0, flux, 
+                                   _node_type(np[_ai(gl,i,j,k)], TYPELEVEL_EMFIELD), 
+                                   &(xdma[EXM_ai2(xdmagl,hbw,line)]), 
+                                   &(xdma[EXM_ai2(xdmagl,hbw-hbw+2,line)]),
+                                   &(xdma[EXM_ai2(xdmagl,xdmagl.ie,line)]));
+                  } else {
+                    if (is_node_inner(np[_ai(gl,i-1,j-1,k)], TYPELEVEL_EMFIELD)) {
+                      find_linearization_coefficients_bdry_node_emfield(np, gl, _ai(gl,i,j,k), 0, +0, flux, 
+                                   _node_type(np[_ai(gl,i,j,k)], TYPELEVEL_EMFIELD), 
+                                   &(xdma[EXM_ai2(xdmagl,hbw,line)]), 
+                                   &(xdma[EXM_ai2(xdmagl,hbw-hbw,line)]),
+                                   &(xdma[EXM_ai2(xdmagl,xdmagl.ie,line)]));
+                    } else {
+                      //printf("Problem in update_dUstar_emfield_XDMA at node (%ld,%ld,%ld)\n",i,j,k);
+                      xdma[EXM_ai2(xdmagl,hbw,line)]=1.0;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } else {
+        xdma[EXM_ai2(xdmagl,hbw,line)]=1.0;
+      } 
+      line++;
+    }
+  }
+  EXM_solve_XDMA(xdma, xdmagl);
+  line=0;
+  /* update dUstar */
+  for_2DL(j,zone.js,zone.je){
+    for_1DL(i,zone.is,zone.ie){
+      if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
+        np[_ai(gl,i,j,k)].bs->dUstaremfield[flux]=xdma[EXM_ai2(xdmagl,xdmagl.ie,line)]
+                               /xdma[EXM_ai2(xdmagl,hbw,line)];
+      }
+      line++;
+    }
+  }
+  free(coeff);
+  free(xdma);
+}
+
+
 void update_dUstar_emfield_Newton_ij(np_t *np, gl_t *gl, long k, long flux, zone_t zone){
   /* first check if zone is valid */
   if (zone.js!=gl->domain_all.js || zone.je!=gl->domain_all.je
    || zone.is!=gl->domain_all.is || zone.ie!=gl->domain_all.ie) {
     fatal_error("The tsemf time stepping Newton_ij can not be used if the domain is split along i or j with MPI.");
   }
+  /*
   if (zone.je-zone.js<zone.ie-zone.is) {
     update_dUstar_emfield_Newton_ij_2(np, gl, k, flux, zone);
   } else {
     update_dUstar_emfield_Newton_ij_1(np, gl, k, flux, zone);
-  }
+  }*/
+  update_dUstar_emfield_Newton_ij_3(np, gl, k, flux, zone);
 }
 
 
@@ -1105,8 +1260,8 @@ void update_dUstar_emfield_Newton_jk(np_t *np, gl_t *gl, long i, long flux, zone
       l=_ai(gl,i,j,k);
 	  if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) {
         if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) {
-          find_linearization_coefficients_inner_node_emfield(np, gl, l, 2, flux, &C_km1, &C_kp0, &C_kp1);
-          find_linearization_coefficients_inner_node_emfield(np, gl, l, 1, flux, &C_jm1, &C_jp0, &C_jp1);
+          find_linearization_coefficients_inner_node_emfield_interface(np, gl, l, 2, flux, &C_km1, &C_kp0, &C_kp1);
+          find_linearization_coefficients_inner_node_emfield_interface(np, gl, l, 1, flux, &C_jm1, &C_jp0, &C_jp1);
           find_dtau_emfield(np,gl,l,flux,&dtau); 
           /* k+0,j+0 */
           xdma[EXM_ai2(xdmagl,hbw,line)]=C_kp0+C_jp0+1.0/dtau;
