@@ -247,6 +247,9 @@ typedef struct {
 #if defined(POSIXTHREADS) || defined(OPENMPTHREADS)
   bool NOSHORTTHREADS;
 #endif
+#ifdef _TSEMF_STORE_COEFFICIENTS
+  EXM_gl3D_t tsemfcoeffzone;
+#endif
 } gl_t;
 
 
@@ -336,8 +339,9 @@ typedef struct {
 
 #ifdef _TSEMF_STORE_COEFFICIENTS
    fluxemfield_t coeffm1[nd],coeffp0[nd],coeffp1[nd];
-   fluxemfield_t coeffp0sum;
+   fluxemfield_t coeffp0sum;   
    fluxemfield_t dtauemfield;
+   fluxemfield_t tsemfcoeff[27];
 #endif
 
 #if (defined(_TSEMF_IMAF) || defined(_TSEMF_IMAF_ADI))

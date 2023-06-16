@@ -163,15 +163,26 @@ void update_dUstar_emfield_SOR_node(np_t *np, gl_t *gl, long l, long flux, int S
 #ifndef NDEBUG
   long i,j,k;
 #endif
+  long ioffset,joffset,koffset;
 
   if (is_node_valid(np[l],TYPELEVEL_EMFIELD)) { 
 	if (is_node_inner(np[l],TYPELEVEL_EMFIELD)) {
       // for inner node 
       sum=-np[l].bs->Resemfield[flux];
-      for (dim=0; dim<nd; dim++){
-        sum-=np[l].bs->coeffp1[dim][flux]*np[_al(gl,l,dim,+1)].bs->dUstaremfield[flux]
-            +np[l].bs->coeffm1[dim][flux]*np[_al(gl,l,dim,-1)].bs->dUstaremfield[flux];
+//      for (dim=0; dim<nd; dim++){
+//        sum-=np[l].bs->coeffp1[dim][flux]*np[_al(gl,l,dim,+1)].bs->dUstaremfield[flux]
+//            +np[l].bs->coeffm1[dim][flux]*np[_al(gl,l,dim,-1)].bs->dUstaremfield[flux];
+//      }
+      
+      for_1DL (ioffset,gl->tsemfcoeffzone.is,gl->tsemfcoeffzone.ie){
+        for_2DL (joffset,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
+          for_3DL (koffset,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
+            if (!(ioffset==0 && joffset==0 && koffset==0))
+              sum-=np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,ioffset,joffset,0)][flux]*np[_all(gl,l,0,ioffset,1,joffset)].bs->dUstaremfield[flux];
+          }
+        }
       }
+      
 #ifndef NDEBUG
       find_ijk_from_l(gl,l,&i,&j,&k);
       switch (SOR_SWEEP){
@@ -205,7 +216,8 @@ void update_dUstar_emfield_SOR_node(np_t *np, gl_t *gl, long l, long flux, int S
       }
 #endif
       dtau=np[l].bs->dtauemfield[flux];
-      RHS=(1.0-gl->relaxEMF)*np[l].bs->dUstaremfield[flux]+gl->relaxEMF/(np[l].bs->coeffp0sum[flux]+1.0/dtau)*sum;
+//      RHS=(1.0-gl->relaxEMF)*np[l].bs->dUstaremfield[flux]+gl->relaxEMF/(np[l].bs->coeffp0sum[flux]+1.0/dtau)*sum;
+      RHS=(1.0-gl->relaxEMF)*np[l].bs->dUstaremfield[flux]+gl->relaxEMF/(np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,0,0,0)][flux]+1.0/dtau)*sum;
       np[l].bs->dUstaremfield[flux]=RHS; 
     } else {
       // for bdry node  
@@ -704,6 +716,7 @@ void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
 void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, zone_t zone, int SOR_SWEEP, long iter){
   long j,k,l,dim,theta,thetasgn;
   double sum,RHS,Cp0,Cp1,dtau;
+  long ioffset,joffset,koffset;
 
   for_2DL(j,zone.js,zone.je){
     for_3DL(k,zone.ks,zone.ke){
@@ -719,15 +732,25 @@ void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, z
           fatal_error("SOR_SWEEP must be set to either SOR_SWEEP_FORWARD or SOR_SWEEP_BACKWARD in update_dUstar_emfield_SOR_istation.");
       }
       if (is_node_valid(np[l],TYPELEVEL_EMFIELD)) { 
-	    if (is_node_inner(np[l],TYPELEVEL_EMFIELD)) {
+        if (is_node_inner(np[l],TYPELEVEL_EMFIELD)) {
           /* for inner node */
           sum=-np[l].bs->Resemfield[flux];
-          for (dim=0; dim<nd; dim++){
-            sum-=np[l].bs->coeffp1[dim][flux]*np[_al(gl,l,dim,+1)].bs->dUstaremfield[flux]
-                +np[l].bs->coeffm1[dim][flux]*np[_al(gl,l,dim,-1)].bs->dUstaremfield[flux];
+//          for (dim=0; dim<nd; dim++){
+//            sum-=np[l].bs->coeffp1[dim][flux]*np[_al(gl,l,dim,+1)].bs->dUstaremfield[flux]
+//                +np[l].bs->coeffm1[dim][flux]*np[_al(gl,l,dim,-1)].bs->dUstaremfield[flux];
+//          }
+          for_1DL (ioffset,gl->tsemfcoeffzone.is,gl->tsemfcoeffzone.ie){
+            for_2DL (joffset,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
+              for_3DL (koffset,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
+                if (!(ioffset==0 && joffset==0 && koffset==0))
+                  sum-=np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,ioffset,joffset,0)][flux]*np[_all(gl,l,0,ioffset,1,joffset)].bs->dUstaremfield[flux];
+              }
+            }
           }
+
           dtau=np[l].bs->dtauemfield[flux];
-          RHS=(1.0-gl->relaxEMF)*np[l].bs->dUstaremfield[flux]+gl->relaxEMF/(np[l].bs->coeffp0sum[flux]+1.0/dtau)*sum;
+//          RHS=(1.0-gl->relaxEMF)*np[l].bs->dUstaremfield[flux]+gl->relaxEMF/(np[l].bs->coeffp0sum[flux]+1.0/dtau)*sum;
+          RHS=(1.0-gl->relaxEMF)*np[l].bs->dUstaremfield[flux]+gl->relaxEMF/(np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,0,0,0)][flux]+1.0/dtau)*sum;
           np[l].bs->dUstaremfield[flux]=RHS;
         } else {
           /* for bdry node */ 
