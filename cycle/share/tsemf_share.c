@@ -178,7 +178,7 @@ void update_dUstar_emfield_SOR_node(np_t *np, gl_t *gl, long l, long flux, int S
         for_2DL (joffset,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
           for_3DL (koffset,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
             if (!(ioffset==0 && joffset==0 && koffset==0))
-              sum-=np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,ioffset,joffset,0)][flux]*np[_all(gl,l,0,ioffset,1,joffset)].bs->dUstaremfield[flux];
+              sum-=np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,ioffset,joffset,koffset)][flux]*np[_alll(gl,l,0,ioffset,1,joffset,2,koffset)].bs->dUstaremfield[flux];
           }
         }
       }
@@ -713,6 +713,7 @@ void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
 
 #else //not DISTMPI
 
+
 void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, zone_t zone, int SOR_SWEEP, long iter){
   long j,k,l,dim,theta,thetasgn;
   double sum,RHS,Cp0,Cp1,dtau;
@@ -743,7 +744,7 @@ void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, z
             for_2DL (joffset,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
               for_3DL (koffset,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
                 if (!(ioffset==0 && joffset==0 && koffset==0))
-                  sum-=np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,ioffset,joffset,0)][flux]*np[_all(gl,l,0,ioffset,1,joffset)].bs->dUstaremfield[flux];
+                  sum-=np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,ioffset,joffset,koffset)][flux]*np[_alll(gl,l,0,ioffset,1,joffset,2,koffset)].bs->dUstaremfield[flux];
               }
             }
           }

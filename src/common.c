@@ -221,7 +221,7 @@ long _i_all(long l_all, gl_t *gl, long dim){
 
 long _al(gl_t *gl, long l, long theta, long offset) {
   long ii;
-  assert(theta<nd);
+  if (theta>=nd && offset!=0) fatal_error("offset must be equal to 0 if theta>=nd in _al().");
   ii=l+offset;
 #ifdef _2D
   if (theta==0) ii=l+offset*(gl->domain_lim.je-gl->domain_lim.js+1);
@@ -1727,10 +1727,9 @@ zone_t _domain_lim_from_domain(zone_t domain, gl_t *gl){
 int _node_rank(gl_t *gl, long i, long j, long k){
   int rank;
   zone_t domainlim;
-
-
   if (!gl->DISTDOMAIN) return(0);
   domainlim=_domain_lim_from_domain(gl->domain_all, gl);
+  assert(is_node_in_zone(i,j,k,domainlim));
 
 #ifdef _2D
   rank=(i-domainlim.is)*gl->numdomain_i/(domainlim.ie-domainlim.is+2)
