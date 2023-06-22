@@ -339,7 +339,7 @@ Disc(
   );
   EpotentialBfixed(
     POTENTIAL=POTENTIAL_OHMBASED;
-    CURRENTEMFSTENCIL=CURRENTEMFSTENCIL_STANDARD;
+    CURRENTEMFSTENCIL=CURRENTEMFSTENCIL_DELTAVK;
     Ediv=1e99;        {set to a small positive value for upwinding of pressure gradients, and 
                        to a large positive value for standard differencing; upwinding can lead
                        to convergence hangs of the potential equation while central differences
@@ -421,13 +421,14 @@ Cycle(
     Lc=1e-3;  {characteristic length scale used to solve the emfield equation}
     relaxEMF=0.8;  {relaxation factor forced on the update of the emfield variables}
     subiter_tsemf=4;
-    for (cnt,0,0,
-      {UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,subiter_tsemf);}
-      {UpdateEMField(Lc,relaxEMF,TSEMF_DDADI);}
-      UpdateEMField(Lc,relaxEMF,TSEMF_SOR,100);
-    );
+    {for (cnt,0,0,
+      UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,subiter_tsemf);
+      UpdateEMField(Lc,relaxEMF,TSEMF_DDADI);
+      {UpdateEMField(Lc,relaxEMF,TSEMF_SOR,100);}
+    );}
 
-{    UpdateEMField(Lc*100,relaxEMF,TSEMF_NEWTON);}
+    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,200);
+{      UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,1200);}
     system("date");
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,

@@ -7,6 +7,24 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JUN 22a
+  * in src/common.h
+    - in np_t, changed fluxemfield_t tsemfcoeff[27] to fluxemfield_t tsemfcoeff[125]
+  * in model/emfield/_Epotential-Bfixed/emfield.c
+    - added find_DeltaVk_not_phi()
+    - added find_DeltaVk_phi()
+    - added find_Jstar_emf_interface_DELTAVK()
+    - renamed find_Jstar_emf_interface() to find_Jstar_emf_interface_STANDARD()
+    - rewrote find_Jstar_emf_interface() so it calls either find_Jstar_emf_interface_DELTAVK()
+      or find_Jstar_emf_interface_STANDARD()
+    - added find_linearization_coefficients_inner_node_emfield_DELTAVK()
+    - renamed find_linearization_coefficients_inner_node_emfield() to
+      find_linearization_coefficients_inner_node_emfield_STANDARD()
+    - rewrote find_linearization_coefficients_inner_node_emfield() so that it calls either 
+      find_linearization_coefficients_inner_node_emfield_DELTAVK() 
+      or find_linearization_coefficients_inner_node_emfield_STANDARD()
+
+
 2023 JUN 17a
   * in cycle/share/tsemf_share.c
     - in update_dUstar_emfield_SOR_node(), fixed a bug related to koffset 
