@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JUN 23a
+  * in cycle/share/tsemf_share.c
+    - in update_dUstar_emfield_SOR_node(), added a condition that checks if the node is valid
+      before summing the neighbor nodes values
+    - in update_dUstar_emfield_SOR_forward() and update_dUstar_emfield_SOR_backward(), modified 
+      the MPI exchange of data using exlap so that it is valid when the linearization coefficients 
+      cover more than a 3x3x3 subdomain
+
+
 2023 JUN 22a
   * in src/common.h
     - in np_t, changed fluxemfield_t tsemfcoeff[27] to fluxemfield_t tsemfcoeff[125]
