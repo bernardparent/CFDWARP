@@ -275,7 +275,6 @@ void runtime_actions_cycle_specific(char *actionname, char **argum, SOAP_codex_t
 void init_cycle(char *argum, SOAP_codex_t *codexcontrol){
   np_t **np;
   gl_t *gl;
-
   np=((readcontrolarg_t *)codexcontrol->action_args)->np;
   gl=((readcontrolarg_t *)codexcontrol->action_args)->gl;
 #ifdef EMFIELD

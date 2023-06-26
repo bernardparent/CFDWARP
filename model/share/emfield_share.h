@@ -11,6 +11,8 @@
 
   double _Jtstar_interface(np_t *np, gl_t *gl, metrics_t metrics, long l, long i);
 
+  double _Jdispstar_interface(np_t *np, gl_t *gl, metrics_t metrics, long l, long i);
+
   void find_J_at_node_from_Jstar_at_interfaces(np_t *np, gl_t *gl, long l, double(*_Jstar_funct)(np_t *, gl_t *, metrics_t, long, long), EXM_vec3D_t J);
 
   void find_Ee_for_Townsend_ionization(np_t *np, gl_t *gl, long l, EXM_vec3D_t E);

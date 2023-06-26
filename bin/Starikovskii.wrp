@@ -258,9 +258,12 @@ Model(
     N2VIBJOULEHEATING=YES;
     INCLUDE_E_EFFECTS_ON_ION_MOBILITY=FALSE;
     INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY=FALSE;
+    N2VIBJOULEHEATINGMODEL=N2VIBJOULEHEATINGMODEL_ALEKSANDROV;
     SCHOTTKY_EFFECT=FALSE;    
     REACTING=YES;
-    emfieldworkheatfact=1.0;
+    emfieldworkfact=1.0;
+    emfieldheatfact=1.0;
+    emissivity=0.0;
     sigmadiv=1e-18; {S/m}
     etdiv=1e-1;     {J/kg}
     Pmin=1.0e3;    Pmax=9.9e99;   {Pa}
@@ -280,6 +283,7 @@ Model(
     AddHeatPoint(0.0{x,m},0.0{y,m}, 0.1{radius,m}, 0.0{W/m});
     }
     HEAT_DEPOSITED_TO_ELECTRONS=FALSE;
+    QENSOURCETERMS=TRUE;
   );
   AirPlasma11s(
     CHEMMODEL=CHEMMODEL_BOYD2007;
