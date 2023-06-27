@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JUN 26b
+  * in model/fluid/_Favre-Reynolds_plasma/fluid_bdry.c
+    - in update_bdry_wall(), fixed a bug with illegal memory space reading:
+      now calls find_U_2() only when BDRYDIRECFOUND is TRUE; otherwise,
+      calls update_bdry_outflow; 
+  * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - in write_bdry_fluid_template(), added param BDRY_WALLADIABATIC1 to BDRY_WALLADIABATIC1
+    - in update_bdry_wall(), fixed an issue with BDRY_WALLADIABATIC1 which has only 1 parameter
+      (not 2)
+    - in update_bdry_wall() fixed a bug with illegal memory space reading: 
+      now calls find_U_2() only when BDRYDIRECFOUND is TRUE; otherwise,
+      calls update_bdry_outflow
+
+
 2023 JUN 26a
   * in model/share/emfield_share.h
     - added missing function _Jdispstar_interface()
