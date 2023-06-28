@@ -368,6 +368,9 @@ typedef struct {
    double sigmamem,Eemagsmoothedmem;
    dim_t Esmoothedmem;
 #endif
+#ifdef _EMFIELD_TEST
+   EXM_vec3D_t E;
+#endif
 #ifdef _BEAM_EBEAM_FIXED
    double Qbeam;
 #endif
@@ -402,7 +405,7 @@ typedef struct {
    flux_t Lambda_S_minus;
 #endif
 #ifdef _TSEMF_SOR2
-  double *tsemfcoeff;
+  double *tsemfcoeff2;
   long *tsemfnode;
   long tsemfnodenum;
   double tsemf_rhs;

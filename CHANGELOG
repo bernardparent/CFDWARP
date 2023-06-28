@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JUN 27a
+  * in cycle/tsemf/_GS/tsemf.c
+    - renamed np->bs->tsemfcoeff used by SOR2 to np->bs->tsemfcoeff2 because tsemfcoeff is used 
+      by SOR
+  * in model/emfield/_Epotential*/emfield.hh
+    - added #define EMFIELD_SHARE
+  * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - in write_bdry_fluid_template(), added gammaeminus to the All(BDRY_WALLTFIXED1) template
+  * in model/share/emfield_share.c
+    - changed #ifdef EMFIELD to #ifdef EMFIELD_SHARE
+  * in model/emfield
+    - added _test emfield method that can be used with the non-plasma fluid modules
+    
+
 2023 JUN 26b
   * in model/fluid/_Favre-Reynolds_plasma/fluid_bdry.c
     - in update_bdry_wall(), fixed a bug with illegal memory space reading:

@@ -47,15 +47,15 @@ static void add_to_tsemf_coefficients(np_t *np, long l, double coeff){
   do {
     if (np->bs->tsemfnode[cnt]==l){
       FOUND=TRUE;
-      np->bs->tsemfcoeff[cnt]+=coeff;
+      np->bs->tsemfcoeff2[cnt]+=coeff;
     }
     cnt++;
   } while(cnt<np->bs->tsemfnodenum);
   if (!FOUND){
-    np->bs->tsemfcoeff=(double *)realloc(np->bs->tsemfcoeff,(1+np->bs->tsemfnodenum)*sizeof(double));
+    np->bs->tsemfcoeff2=(double *)realloc(np->bs->tsemfcoeff2,(1+np->bs->tsemfnodenum)*sizeof(double));
     np->bs->tsemfnode=(long *)realloc(np->bs->tsemfnode,(1+np->bs->tsemfnodenum)*sizeof(long));
     np->bs->tsemfnode[np->bs->tsemfnodenum]=l;
-    np->bs->tsemfcoeff[np->bs->tsemfnodenum]=coeff;
+    np->bs->tsemfcoeff2[np->bs->tsemfnodenum]=coeff;
     np->bs->tsemfnodenum+=1;
   }
 }
@@ -72,10 +72,10 @@ static void init_dUstar_emfield_SOR2(np_t *np, gl_t *gl, long flux, zone_t zone)
           assert_np(np[l],is_node_valid(np[l],TYPELEVEL_EMFIELD));
           np[l].bs->dUstaremfield[flux]=0.0;
 	      if (is_node_inner(np[l],TYPELEVEL_EMFIELD)) {
-            np[l].bs->tsemfcoeff=(double *)realloc(np[l].bs->tsemfcoeff,sizeof(double));
+            np[l].bs->tsemfcoeff2=(double *)realloc(np[l].bs->tsemfcoeff2,sizeof(double));
             np[l].bs->tsemfnode=(long *)realloc(np[l].bs->tsemfnode,sizeof(long));
             np[l].bs->tsemfnode[0]=l;
-            np[l].bs->tsemfcoeff[0]=np[l].bs->coeffp0sum[flux];
+            np[l].bs->tsemfcoeff2[0]=np[l].bs->coeffp0sum[flux];
             np[l].bs->tsemfnodenum=1;
             np[l].bs->tsemf_rhs=-np[l].bs->Resemfield[flux];
 
@@ -139,10 +139,10 @@ void update_dUstar_emfield_SOR2_node(np_t *np, gl_t *gl, long plane, long planet
         for (cnt=1; cnt<np[l].bs->tsemfnodenum; cnt++) {
           l2=np[l].bs->tsemfnode[cnt];
           assert(is_node_valid(np[l2],TYPELEVEL_EMFIELD));
-          sum-=np[l].bs->tsemfcoeff[cnt]*np[l2].bs->dUstaremfield[flux];
+          sum-=np[l].bs->tsemfcoeff2[cnt]*np[l2].bs->dUstaremfield[flux];
         }
         dtau=np[l].bs->dtauemfield[flux];
-        RHS=(1.0-gl->relaxEMF)*np[l].bs->dUstaremfield[flux]+gl->relaxEMF/(np[l].bs->tsemfcoeff[0]+1.0/dtau)*sum;
+        RHS=(1.0-gl->relaxEMF)*np[l].bs->dUstaremfield[flux]+gl->relaxEMF/(np[l].bs->tsemfcoeff2[0]+1.0/dtau)*sum;
 
       }
 
@@ -907,10 +907,10 @@ static void update_dUstar_emfield_SOR2_istation(np_t *np, gl_t *gl, long flux, l
             for (cnt=1; cnt<np[l].bs->tsemfnodenum; cnt++) {
               l2=np[l].bs->tsemfnode[cnt];
               assert(is_node_valid(np[l2],TYPELEVEL_EMFIELD));
-              sum-=np[l].bs->tsemfcoeff[cnt]*np[l2].bs->dUstaremfield[flux];
+              sum-=np[l].bs->tsemfcoeff2[cnt]*np[l2].bs->dUstaremfield[flux];
             }
             dtau=np[l].bs->dtauemfield[flux];
-            RHS=(1.0-gl->relaxEMF)*np[l].bs->dUstaremfield[flux]+gl->relaxEMF/(np[l].bs->tsemfcoeff[0]+1.0/dtau)*sum;
+            RHS=(1.0-gl->relaxEMF)*np[l].bs->dUstaremfield[flux]+gl->relaxEMF/(np[l].bs->tsemfcoeff2[0]+1.0/dtau)*sum;
 
           }
           np[l].bs->dUstaremfield[flux]=RHS;

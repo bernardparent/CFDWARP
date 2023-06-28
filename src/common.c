@@ -954,7 +954,7 @@ void create_node(np_t *np, long i, long j, long k){
   np->type_emf=-2;
 #endif
 #ifdef _TSEMF_SOR2
-  np->bs->tsemfcoeff=NULL;
+  np->bs->tsemfcoeff2=NULL;
   np->bs->tsemfnode=NULL;
   np->bs->tsemfnodenum=0;
 #endif
