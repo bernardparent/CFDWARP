@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JUN 28a
+  * in model/emfield/_Epotential/emfield.c
+    - changed the function find_linearization_coefficients_inner_node_emfield() so that it uses
+      _sigma_interface() instead of calculating it from the mobilities; this fixes a bug when
+      the emfield cut is not at the same location as the fluid cut
+  * in model/emfield/_Epotential-Bfixed/emfield.c
+    - in find_linearization_coefficients_inner_node_emfield_DELTAVK(), fixed a bug: a "-=" operator
+      should rather be a "+=" operator
+       
+
 2023 JUN 27a
   * in cycle/tsemf/_GS/tsemf.c
     - renamed np->bs->tsemfcoeff used by SOR2 to np->bs->tsemfcoeff2 because tsemfcoeff is used 
