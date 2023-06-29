@@ -520,7 +520,7 @@ void find_linearization_coefficients_inner_node_emfield(np_t *np, gl_t *gl, long
             coeff[EXM_al3(*coeffgl,coefflL,j,+1)]-=(double)inter*sigmaint*metrics.X2[j][n]*metrics.X2[theta][n]*0.25*metrics.Omega/_Omega(np[_al(gl,lL,j,+1)],gl);
             coeff[EXM_al3(*coeffgl,coefflL,j,-1)]+=(double)inter*sigmaint*metrics.X2[j][n]*metrics.X2[theta][n]*0.25*metrics.Omega/_Omega(np[_al(gl,lL,j,-1)],gl);
             coeff[EXM_all3(*coeffgl,coefflL,j,+1,theta,+1)]-=(double)inter*sigmaint*metrics.X2[j][n]*metrics.X2[theta][n]*0.25*metrics.Omega/_Omega(np[_all(gl,lL,j,+1,theta,+1)],gl);
-            coeff[EXM_all3(*coeffgl,coefflL,j,-1,theta,+1)]-=(double)inter*sigmaint*metrics.X2[j][n]*metrics.X2[theta][n]*0.25*metrics.Omega/_Omega(np[_all(gl,lL,j,-1,theta,+1)],gl);
+            coeff[EXM_all3(*coeffgl,coefflL,j,-1,theta,+1)]+=(double)inter*sigmaint*metrics.X2[j][n]*metrics.X2[theta][n]*0.25*metrics.Omega/_Omega(np[_all(gl,lL,j,-1,theta,+1)],gl);
           } else {
 //            *Jstar+=-sigmaint*metrics.X2[j][n]*metrics.X2[theta][n]*(_phi(np[_al(gl,lL,j,+1)],gl)-_phi(np[_al(gl,lL,j,+0)],gl));
             coeff[EXM_al3(*coeffgl,coefflL,j,+1)]-=(double)inter*sigmaint*metrics.X2[j][n]*metrics.X2[theta][n]*metrics.Omega/_Omega(np[_al(gl,lL,j,+1)],gl);
