@@ -1112,7 +1112,7 @@ const static double Pa[SMAP_NS][3][11]=
 
 
 /* 
-   species CHO
+   species HCO
    pos 0: Tmin lower range limit
    pos 1: Tmax upper range limit
    pos 2-8: a1,a2,...,a7
@@ -1143,7 +1143,7 @@ const static double Pa[SMAP_NS][3][11]=
 
 
 /* 
-   species CH2O
+   species HCHO
    pos 0: Tmin lower range limit
    pos 1: Tmax upper range limit
    pos 2-8: a1,a2,...,a7
@@ -2750,53 +2750,6 @@ const static double Pa[SMAP_NS][3][11]=
       }
     },
 
-/* species HCO
-   pos 0: Tmin lower range limit
-   pos 1: Tmax upper range limit
-   pos 2-8: a1,a2,...,a7
-   pos 9-10: b1,b2
-*/    
-    {
-      {
-       +200.0e0,         /* Tmin [K] */ 
-       +1000.0e0,        /* Tmax [K] */
-       -1.189851887E+04,
-        2.151536111E+02,
-        2.730224028E+00,
-        1.806516108E-03,
-        4.984300570E-06,
-       -5.814567920E-09,
-        1.869689894E-12,
-        2.905755640E+03,
-        1.136772540E+01
-      },
-      {
-       +1000.0e0,            /* Tmin [K] */ 
-       +6000.0e0-dTrangemin, /* Tmax [K] */
-        6.949606120E+05,
-       -3.656223380E+03,
-        9.604731170E+00,
-       -1.117129278E-03,
-        2.875328019E-07,
-       -3.626247740E-11,
-        1.808329595E-15,
-        2.543704440E+04,
-       -3.582473720E+01
-      },
-      {
-       +6000.0e0-dTrangemin,  /* Tmin [K] */
-       +6000.0e0,             /* Tmax [K] */
-        6.949606120E+05,
-       -3.656223380E+03,
-        9.604731170E+00,
-       -1.117129278E-03,
-        2.875328019E-07,
-       -3.626247740E-11,
-        1.808329595E-15,
-        2.543704440E+04,
-       -3.582473720E+01
-      }
-    },
 
 /* species HCCO, Ketenyl
    pos 0: Tmin lower range limit

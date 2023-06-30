@@ -72,8 +72,8 @@ const static speciesname_t speciesname[SMAP_NS]=
    "CH3",
    "CH4",
    "H2O2",
-   "CHO",
-   "CH2O",
+   "HCO",
+   "HCHO",
    "CH3O",
    "C2H3",
    "C2H4",
@@ -112,7 +112,6 @@ const static speciesname_t speciesname[SMAP_NS]=
    "O(1D)",
    "O(1S)",
    "C2H4+",
-   "HCO",
    "HCCO",
    "C3H6p",
    "CH2CO",
@@ -167,8 +166,8 @@ const static double calM[SMAP_NS]=
    15.03452E-3,   /* CH3*/
    16.04246E-3,   /* CH4 */
    34.01468E-3,   /*H2O2*/
-   29.01804E-3,   /*CHO */
-   30.02598E-3,   /*CH2O*/
+   29.01804E-3,   /*HCO */
+   30.02598E-3,   /*HCHO*/
    31.03392E-3,   /*CH3O*/
    27.04522E-3,   /*C2H3*/
    28.05316E-3,   /*C2H4*/
@@ -207,7 +206,6 @@ const static double calM[SMAP_NS]=
    15.9994e-3,     /* O(1D) */
    15.9994e-3,     /* O(1S) */
    28.0526E-3,     /*C2H4+*/
-   29.01804E-3,    /*HCO*/
    41.02874E-3,    /*HCCO */
    42.07974E-3,    /*C3H6p */
    42.03668E-3,    /*CH2CO */
@@ -250,8 +248,8 @@ const static long ck[SMAP_NS]=
    0,  /* CH3*/
    0,  /* CH4 */
    0,  /*H2O2*/
-   0,  /*CHO */
-   0,  /*CH2O*/
+   0,  /*HCO */
+   0,  /*HCHO*/
    0,  /*CH3O*/
    0,  /*C2H3*/
    0,  /*C2H4*/
@@ -290,7 +288,6 @@ const static long ck[SMAP_NS]=
    0,     /* O(1D) */
    0,      /* O(1S) */
    1,  /* C2H4+ */
-   0,  /* HCO */
    0,  /* HCCO */
    0,  /* C3H6p */
    0,  /* CH2CO */
@@ -331,8 +328,8 @@ const static long numatoms[SMAP_NS]=
    4,  /* CH3*/
    5,  /* CH4 */
    4,  /*H2O2*/
-   3,  /*CHO */
-   4,  /*CH2O*/
+   3,  /*HCO */
+   4,  /*HCHO*/
    5,  /*CH3O*/
    5,  /*C2H3*/
    6,  /*C2H4*/
@@ -371,7 +368,6 @@ const static long numatoms[SMAP_NS]=
    1,     /* O(1D) */
    1,      /* O(1S) */
    6,  /*C2H4+ */
-   3,  /* HCO */
    4,  /* HCCO */
    9,  /* C3H6p */
    5,  /* CH2CO */

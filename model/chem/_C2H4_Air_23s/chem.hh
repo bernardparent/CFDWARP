@@ -35,6 +35,8 @@
 #define SPECIES_IONMINUS 3
 
 
+#define SMAP_CHO SMAP_HCO
+#define SMAP_CH2O SMAP_HCHO
 /*
 Species ordering:
 1. Electrons

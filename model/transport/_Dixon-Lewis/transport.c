@@ -77,8 +77,8 @@ Sandia National Laboratories, "A Fortran Computer Code Package for the Evaluatio
 Sandia National Laboratories: SAND86-8246 Update/Revision, 1998
 CFDWARP/model/transport/ref/SAND86-8246.pdf
 
-the transport properties of CHO, H2CO, C4H8O, C6H12O, C8H16, C3H5 and C12H24
-are calculated as           HCO, CH2O, C4H8, C2H5OC2H5, C6H12, C3H6 and C6H12 respectively
+the transport properties of  C4H8O, C6H12O, C8H16, C3H5 and C12H24
+are calculated as            C4H8, C2H5OC2H5, C6H12, C3H6 and C6H12 respectively
 
 */
 
@@ -116,8 +116,8 @@ const static double Peps[SMAP_NS]=
    144.0e0,     /* CH3*/
    148.6e0,     /* CH4 */
    289.3E+0,    /*H2O2*/
-   498.0E+0,    /*CHO */
-   498.0E+0,    /*CH2O*/
+   498.0E+0,    /*HCO */
+   498.0E+0,    /*HCHO*/
    417.0E+0,    /*CH3O*/
    209.0E+0,    /*C2H3*/
    224.7E+0,    /*C2H4*/
@@ -156,7 +156,6 @@ const static double Peps[SMAP_NS]=
    106.7,       /* O(1D) */  /* !! unknown value: fixed to the one of O */
    106.7,       /* O(1S) */  /* !! unknown value: fixed to the one of O */
    224.7E+0,    /* C2H4+   !! fixed to the one of C2H4 */
-   498.0,       /* HCO */
    150.0,       /* HCCO */
    266.8,       /* C3H6p */
    436.0,       /* CH2CO */
@@ -199,8 +198,8 @@ const static double Psig[SMAP_NS]=
    0.3800E+0,   /* CH3*/
    0.3758E+0,   /* CH4 */
    0.4196E+0,   /*H2O2*/
-   0.3590E+0,   /*CHO */
-   0.3590E+0,   /*CH2O*/
+   0.3590E+0,   /*HCO */
+   0.3590E+0,   /*HCHO*/
    0.3690E+0,   /*CH3O*/
    0.4100E+0,   /*C2H3*/
    0.4163E+0,   /*C2H4*/
@@ -239,7 +238,6 @@ const static double Psig[SMAP_NS]=
    0.34e0,      /* O(1D) */   /* !! fixed to the one of O */
    0.34e0,      /* O(1S) */   /* !! fixed to the one of O */
    0.4163E+0,   /* C2H4+   !! fixed to the one of C2H4*/
-   0.359e0,     /* HCO */
    0.25e0,      /* HCCO */
    0.4982e0,    /* C3H6p */
    0.3970e0,    /* CH2CO */
