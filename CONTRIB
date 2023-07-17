@@ -56,6 +56,8 @@ LAFOLEY, Spencer
   
   - addition of tools/chemkin2cfdwarp.c
   
+  - fixed a bug in the Lindermann functions within model/share/chem_share.c 
+  
   
 LEE, Jaehyuk
 

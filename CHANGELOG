@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JUL 17a
+  * in model/share/chem_share.c
+    - in add_to_dW_fw_2r3p_Lindemann() and add_to_dW_fw_3r2p_Lindemann(), rewrote dkfdX2
+      and dkfdT so that they can be used at very low temperatures; note that they lead to NaNs at
+      temperatures less than 300K because the terms on the denominator went beyond the IEEE double
+      precision limit for small numbers
+      
+
 2023 JUN 30a
   * in model/chem/_C2H4_Air_23s/chem.hh and model/chem/_C2H4_Air_Plasma_36s/chem.hh
     - mapped SMAP_CHO to SMAP_HCO
