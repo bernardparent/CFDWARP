@@ -7,6 +7,25 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JUL 20a
+  * in model/share/chem_share.c
+    - Added functions add_to_W_2r4p, and add_to_dW_2r4p
+  * in model/share/chem_share.h
+    - Listed functions add_to_W_2r4p, and add_to_dW_2r4p
+  * in model/transport/_Dixon-Lewis/transport.c
+    - added species NH3, NH2, NH4+, NH3+, NH2+, and NH4
+  * in model/thermo/_generic/thermo.c
+    - added species NH3, NH2, NH4+, NH3+, NH2+, and NH4
+  * in model/thermo/_generic/thermo.c
+    - added ionizationenergy for NH3 under _ionizationpot()
+  * in model/thermo/_generic/thermo.hh
+    - added species NH3, NH2, NH4+, NH3+, NH2+, and NH4
+  * in model/thermo/_generic/enthalpy.c
+    - added species NH3, NH2, NH4+, NH3+, NH2+, and NH4
+  * in model/chem/
+    - added _NH3_Plasma_10s/
+  
+  
 2023 JUL 17a
   * in model/share/chem_share.c
     - in add_to_dW_fw_2r3p_Lindemann() and add_to_dW_fw_3r2p_Lindemann(), rewrote dkfdX2

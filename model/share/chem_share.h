@@ -21,6 +21,10 @@ void add_to_W_2r3p ( int specR1, int specR2,
                      int specP1, int specP2, int specP3,
                      double kf, spec_t N, spec_t W);
 
+void add_to_W_2r4p ( int specR1, int specR2,
+                     int specP1, int specP2, int specP3, int specP4,
+                     double kf, spec_t N, spec_t W);                     
+
 
 /* kf in cm^6 s^(-1) 
    N in cm^(-3)
@@ -71,6 +75,9 @@ void add_to_dW_2r2p ( int specR1, int specR2, int specP1, int specP2, double kf,
 
 
 void add_to_dW_2r3p ( int specR1, int specR2, int specP1, int specP2, int specP3, double kf, spec_t N, 
+                      double dkfdT, double dkfdTv, double dkfdTe, spec2_t dWdrhok, spec_t dWdT, spec_t dWdTv, spec_t dWdTe);
+
+void add_to_dW_2r4p ( int specR1, int specR2, int specP1, int specP2, int specP3, int specP4, double kf, spec_t N, 
                       double dkfdT, double dkfdTv, double dkfdTe, spec2_t dWdrhok, spec_t dWdT, spec_t dWdTv, spec_t dWdTe);
 
 /* kf in cm^6 s^(-1) 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
 Copyright 2018-2020 Bernard Parent
-Copyright 2020 Ajjay Omprakas
+Copyright 2020-2023 Ajjay Omprakas
 Copyright 2021-2022 Prasanna Thoguluva Rajendran
 
 Redistribution and use in source and binary forms, with or without modification, are
@@ -80,6 +80,22 @@ void add_to_W_2r3p ( int specR1, int specR2,
   W[specP3]+=Wp/ calA * _calM(specP3) * 1.0e6;                            
 }
 
+/* kf in cm^3 s^(-1) 
+   N in cm^(-3)
+   W in kg m^(-3) s^(-1)
+*/
+void add_to_W_2r4p ( int specR1, int specR2,
+                     int specP1, int specP2, int specP3, int specP4,
+                     double kf, spec_t N, spec_t W){
+  double Wp;
+  Wp=kf*N[specR1]*N[specR2];
+  W[specR1]-=Wp/ calA * _calM(specR1) * 1.0e6;
+  W[specR2]-=Wp/ calA * _calM(specR2) * 1.0e6;
+  W[specP1]+=Wp/ calA * _calM(specP1) * 1.0e6;
+  W[specP2]+=Wp/ calA * _calM(specP2) * 1.0e6;                            
+  W[specP3]+=Wp/ calA * _calM(specP3) * 1.0e6;  
+  W[specP4]+=Wp/ calA * _calM(specP4) * 1.0e6;                          
+}
 
 
 /* kf in cm^6 s^(-1) 
@@ -247,6 +263,59 @@ void add_to_dW_2r3p ( int specR1, int specR2, int specP1, int specP2, int specP3
   dWdrhok[specP3][specR2]+=kf*N[specR1]* _calM(specP3) / _calM(specR2);
 }
 
+/* kf in cm^3 s^(-1) 
+   N in cm^(-3)
+   dkfdT in cm^3 s^(-1) K^(-1)
+   dkfdTv in cm^3 s^(-1) K^(-1)
+   dkfdTe in cm^3 s^(-1) K^(-1)
+   dWdrhok in s^(-1)
+   dWdT in kg m^(-3) s^(-1) K^(-1)
+   dWdTv in kg m^(-3) s^(-1) K^(-1)
+   dWdTe in kg m^(-3) s^(-1) K^(-1)
+*/
+void add_to_dW_2r4p ( int specR1, int specR2, int specP1, int specP2, int specP3, int specP4, double kf, spec_t N, 
+                      double dkfdT, double dkfdTv, double dkfdTe, spec2_t dWdrhok, spec_t dWdT, spec_t dWdTv, spec_t dWdTe){
+  
+  dWdTe[specR1]-=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specR1) * 1.0e6;
+  dWdTe[specR2]-=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specR2) * 1.0e6;
+  dWdTe[specP1]+=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specP1) * 1.0e6;
+  dWdTe[specP2]+=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specP2) * 1.0e6;
+  dWdTe[specP3]+=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specP3) * 1.0e6;
+  dWdTe[specP4]+=dkfdTe*N[specR1]*N[specR2]/ calA * _calM(specP4) * 1.0e6;
+  
+  dWdTv[specR1]-=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specR1) * 1.0e6;
+  dWdTv[specR2]-=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specR2) * 1.0e6;
+  dWdTv[specP1]+=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specP1) * 1.0e6;
+  dWdTv[specP2]+=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specP2) * 1.0e6;
+  dWdTv[specP3]+=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specP3) * 1.0e6;
+  dWdTv[specP4]+=dkfdTv*N[specR1]*N[specR2]/ calA * _calM(specP4) * 1.0e6;
+  
+  dWdT[specR1]-=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specR1) * 1.0e6;
+  dWdT[specR2]-=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specR2) * 1.0e6;
+  dWdT[specP1]+=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specP1) * 1.0e6;
+  dWdT[specP2]+=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specP2) * 1.0e6;
+  dWdT[specP3]+=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specP3) * 1.0e6;
+  dWdT[specP4]+=dkfdT*N[specR1]*N[specR2]/ calA * _calM(specP4) * 1.0e6;
+  
+  
+  dWdrhok[specR1][specR1]-=kf*N[specR2];
+  dWdrhok[specR1][specR2]-=kf*N[specR1]* _calM(specR1) / _calM(specR2);
+
+  dWdrhok[specR2][specR1]-=kf*N[specR2]* _calM(specR2) / _calM(specR1);
+  dWdrhok[specR2][specR2]-=kf*N[specR1];
+  
+  dWdrhok[specP1][specR1]+=kf*N[specR2]* _calM(specP1) / _calM(specR1);
+  dWdrhok[specP1][specR2]+=kf*N[specR1]* _calM(specP1) / _calM(specR2);
+
+  dWdrhok[specP2][specR1]+=kf*N[specR2]* _calM(specP2) / _calM(specR1);
+  dWdrhok[specP2][specR2]+=kf*N[specR1]* _calM(specP2) / _calM(specR2);
+
+  dWdrhok[specP3][specR1]+=kf*N[specR2]* _calM(specP3) / _calM(specR1);
+  dWdrhok[specP3][specR2]+=kf*N[specR1]* _calM(specP3) / _calM(specR2);
+
+  dWdrhok[specP4][specR1]+=kf*N[specR2]* _calM(specP4) / _calM(specR1);
+  dWdrhok[specP4][specR2]+=kf*N[specR1]* _calM(specP4) / _calM(specR2);
+}
 
 
 /* kf in cm^6 s^(-1) 

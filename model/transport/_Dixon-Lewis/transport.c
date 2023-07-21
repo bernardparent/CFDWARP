@@ -5,6 +5,7 @@ Copyright 1998-2018,2020,2022 Bernard Parent
 Copyright 2020 Aaron Trinh
 Copyright 2001 Jason Etele
 Copyright 2000 Giovanni Fusina
+Copyright 2023 Ajjay Omprakas
 
 
 Redistribution and use in source and binary forms, with or without modification, are
@@ -167,6 +168,12 @@ const static double Peps[SMAP_NS]=
    436.0,       /* CH3CO */
    252.0,       /* C3H4p */
    252.0,       /* C3H3p1 */
+   558.3,       /* NH3 */
+   558.3,       /* NH2 */   /* !! unknown value: fixed to the one of NH3 */
+   558.3,       /* NH4+ */   /* !! unknown value: fixed to the one of NH3 */
+   558.3,       /* NH3+ */   /* !! unknown value: fixed to the one of NH3 */
+   558.3,       /* NH2+ */   /* !! unknown value: fixed to the one of NH3 */
+   558.3,       /* NH4 */   /* !! unknown value: fixed to the one of NH3 */
   };
 
 
@@ -249,6 +256,12 @@ const static double Psig[SMAP_NS]=
    0.397E0,     /* CH3CO */
    0.476E0,     /* C3H4p */
    0.476E0,     /* C3H3p1 */
+   0.290E0,     /* NH3 */ 
+   0.290E0,     /* NH2 */   /* !! unknown value: fixed to the one of NH3 */
+   0.290E0,     /* NH4+ */    /* !! unknown value: fixed to the one of NH3 */
+   0.290E0,     /* NH3+ */    /* !! unknown value: fixed to the one of NH3 */
+   0.290E0,     /* NH2+ */    /* !! unknown value: fixed to the one of NH3 */
+   0.290E0,     /* NH4 */    /* !! unknown value: fixed to the one of NH3 */
   };
 
 

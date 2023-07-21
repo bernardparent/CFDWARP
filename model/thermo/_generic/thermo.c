@@ -5,6 +5,7 @@ Copyright 1998-2018,2020 Bernard Parent
 Copyright 2020 Aaron Trinh
 Copyright 2001 Jason Etele
 Copyright 2000 Giovanni Fusina
+Copyright 2023 Ajjay Omprakas
 
 
 Redistribution and use in source and binary forms, with or without modification, are
@@ -122,7 +123,13 @@ const static speciesname_t speciesname[SMAP_NS]=
    "CH2(S)",
    "CH3CO",
    "C3H4p",
-   "C3H3p1"
+   "C3H3p1",
+   "NH3",
+   "NH2",
+   "NH4+",
+   "NH3+",
+   "NH2+",
+   "NH4",
   };
 
 
@@ -216,7 +223,13 @@ const static double calM[SMAP_NS]=
    14.02658E-3,    /*CH2(S) */
    43.04462E-3,    /*CH3CO */
    40.06386E-3,    /*C3H4p */
-   39.05592E-3,    /*C3H3p1 */   
+   39.05592E-3,    /*C3H3p1 */
+   17.0305E-3,    /*NH3 */ 
+   16.0226E-3,    /*NH2 */
+   18.0379E-3,    /*NH4+ */
+   17.0300E-3,    /*NH3+ */
+   16.0220E-3,    /*NH2+ */
+   18.0385E-3,    /*NH4 */ 
   };
 
 
@@ -298,7 +311,13 @@ const static long ck[SMAP_NS]=
    0,    /*CH2(S) */
    0,    /*CH3CO */
    0,    /*C3H4p */
-   0,    /*C3H3p1 */   
+   0,    /*C3H3p1 */
+   0,    /*NH3 */
+   0,    /*NH2 */ 
+   +1,    /*NH4+ */
+   +1,    /*NH3+ */ 
+   +1,    /*NH2+ */
+   0,    /*NH4 */
   };
   
 const static long numatoms[SMAP_NS]=
@@ -378,7 +397,13 @@ const static long numatoms[SMAP_NS]=
    3,    /*CH2(S) */
    6,    /*CH3CO */
    7,    /*C3H4p */
-   6,    /*C3H3p1 */   
+   6,    /*C3H3p1 */ 
+   4,    /*NH3 */ 
+   3,    /*NH2 */
+   5,    /*NH4+ */
+   4,    /*NH3+ */
+   3,    /*NH2+ */ 
+   5,    /*NH4 */
   }; 
   
 
@@ -1149,6 +1174,9 @@ double _ionizationpot(long k){
     break;
     case SMAP_N:
       ionizationenergy=2.330e-18;
+    break;
+    case SMAP_NH3:
+      ionizationenergy=1.634e-18;
     break;
     default:
       ionizationenergy=0.0;
