@@ -69,6 +69,7 @@ void write_options ( FILE * outputfile ) {
   write_options_row ( outputfile, "-im", "string", "Input binary (MPI) data file (EXPERIMENTAL)", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-ia", "string", "Input ascii data file", line_width, LENGTH_COL1, LENGTH_COL2 );
   write_options_row ( outputfile, "-ii", "string", "Input interpolation data file", line_width, LENGTH_COL1, LENGTH_COL2 );
+  write_options_row ( outputfile, "-imap", "string", "Input interpolation variables to be mapped", line_width, LENGTH_COL1, LENGTH_COL2 );  
 #ifdef UNSTEADY
   write_options_row ( outputfile, "-i1", "string", "Input time level minus 1 binary data file",
                       line_width, LENGTH_COL1, LENGTH_COL2 );
@@ -157,6 +158,7 @@ void fatal_error_if_options_remaining ( int argc, char **argv ) {
   free ( options );
 }
 
+
 int main ( int argc, char **argv ) {
   np_t *np, *nppost;
   gl_t gl, glpost;
@@ -204,6 +206,7 @@ int main ( int argc, char **argv ) {
   input.BINARYMPI = FALSE;
   input.ASCII = FALSE;
   input.INTERPOLATION = FALSE;
+  input.INTERPOLATIONMAP = FALSE;
   INPUTBINARY=FALSE;
   OUTPUTBINARY = FALSE;
   OUTPUTBINARYMPI = FALSE;
@@ -231,6 +234,7 @@ int main ( int argc, char **argv ) {
   control_filename = NULL;
   post_filename = NULL;
   input.name = NULL;
+  input.interpolationvarsmap = NULL;
   gl.output_filename = NULL;
   gl.post_filename = NULL;
   postprocessor = ( char * ) malloc ( 10 * sizeof ( char ) );
@@ -295,6 +299,12 @@ int main ( int argc, char **argv ) {
     input.INTERPOLATION = TRUE;
     input.READDATAFILE = TRUE;
   }
+  if ( process_flag_string ( argc, argv, "-imap", &input.interpolationvarsmap ) ) {
+    input.INTERPOLATIONMAP = TRUE;
+  }
+
+  if (!input.INTERPOLATION && input.INTERPOLATIONMAP) fatal_error("Before the '-imap' flag is specified, CFDWARP must be called with the '-ii' flag.");
+
   if (INPUTBINARY+input.BINARYMPI+input.ASCII+input.INTERPOLATION>1) fatal_error("CFDWARP can not input more than one data file.");
 
   if ( process_flag_string ( argc, argv, "-o", &gl.output_filename ) )
@@ -591,6 +601,7 @@ int main ( int argc, char **argv ) {
   free ( control_filename );
   free ( post_filename );
   free ( input.name );
+  free ( input.interpolationvarsmap );
   free ( gl.output_filename );
   free ( gl.post_filename );
   free ( argint );

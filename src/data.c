@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DATATYPE_BINARY 1
 #define DATATYPE_ASCII 2
 
+#define INITVARTYPE_FLUID 1
+#define INITVARTYPE_EMFIELD 2
+
 #ifdef _3DL
   #define SUBZONE_DESIRED_WIDTH 40
 #else
@@ -40,6 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #define MIN_NUMSUBZONE_PER_THREAD 3
+
+typedef struct {
+  long newindex;
+  double newvalue;
+} mapvar_t;  
 
 long _ai_mpidatafile(gl_t *gl, long i, long j, long k) {
   long ii;
@@ -1068,7 +1076,7 @@ void read_data_file(input_t input, np_t *np, gl_t *gl){
       read_data_file_binary_ascii(input.name, np, gl, 0, DATATYPE_ASCII);
     }
     else if (input.INTERPOLATION){
-      read_data_file_interpolation(input.name, np, gl);
+      read_data_file_interpolation(input, np, gl);
     }
     else if (input.BINARYMPI) {
       read_data_file_mpi(input.name, np, gl, 0);
@@ -1285,22 +1293,118 @@ bool is_data_point_in_domain(dim_t x_file, dim_t xmin, dim_t xmax, double radius
 }
 
 
-void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
+void find_interpolation_map(char* initvar_str_userinput, char* initvar_str_file, long numvars, long* numvars_file, mapvar_t map[], int INITVARTYPE){
+  long cnt, cntr, cntp, numvars_userinput; 
+  bool FOUND_FILE, FOUND_USERINPUT, FOUND_WDEFAULT, FOUND_NAME;
+  char **initvar_names_file = NULL;
+  char **initvar_names_userinput = NULL;
+  initvarname_t *initvar_names;
+  *numvars_file = 0;
+
+  initvar_names = (initvarname_t *) malloc(sizeof(initvarname_t) * numvars * sizeof(char));
+  switch (INITVARTYPE) {
+    case INITVARTYPE_FLUID:
+      find_default_initvar_name(initvar_names); break;
+    case INITVARTYPE_EMFIELD:
+#ifdef EMFIELD
+      find_default_initvar_name_emfield(initvar_names); break;  
+#endif 
+    default: fatal_error("INITVARTYPE must be either INITVARTYPE_FLUID or INITVARTYPE_EMFIELD.");
+    }
+
+  find_words_from_string(initvar_str_file, " ", &initvar_names_file, numvars_file);
+  find_words_from_string(initvar_str_userinput, ",= ", &initvar_names_userinput, &numvars_userinput);
+
+  /* loop through the current set of variable names */
+  for (cnt=0; cnt<numvars; cnt++) {
+    map[cnt].newvalue=0;
+    map[cnt].newindex=-1;
+    FOUND_FILE = FALSE;
+    FOUND_USERINPUT = FALSE;
+    FOUND_WDEFAULT = FALSE;
+
+
+    /* 1. loop to match current and read variable names, then map */
+    for (cntr=0; cntr<*numvars_file; cntr++) {
+      if (strcmp(initvar_names[cnt], initvar_names_file[cntr])==0){
+        FOUND_FILE=TRUE;
+        map[cnt].newindex=cntr;
+      } 
+    }
+
+    /* 2a. loop to match input and current variables, then map */
+    for (cntr=0; cntr<numvars_userinput; cntr+=2) {
+      if (strcmp(initvar_names[cnt],initvar_names_userinput[cntr])==0) {
+        if (FOUND_USERINPUT) fatal_error("Problem reading string after -imap. Variable %s can only be declared once.",initvar_names[cnt]);
+        FOUND_USERINPUT=TRUE;
+        if (sscanf(initvar_names_userinput[cntr+1],"%lg",&map[cnt].newvalue)==1) {
+          // found a double value to be assigned to the variable
+          map[cnt].newindex=-1;
+        } else {
+          /* 2b. a variable name is expected because no double value is assigned  */
+          FOUND_NAME=FALSE;
+          for (cntp=0; cntp<*numvars_file; cntp++) {
+            if (strcmp(initvar_names_file[cntp],initvar_names_userinput[cntr+1])==0) {
+              FOUND_NAME=TRUE;
+              map[cnt].newindex=cntp;
+            } 
+          }
+          if (!FOUND_NAME) fatal_error("Problem reading assigned value to %s in -imap input. Not a valid double or datafile variable name.",initvar_names[cnt]);      
+        }   
+      }
+    }
+
+    /* 3. check if w_default is present and assign its value to species not found in interpolation file */
+    if (!FOUND_USERINPUT && !FOUND_FILE) {
+      for (cntr=0; cntr<numvars_userinput; cntr+=2) {
+        if (strcmp("w_default",initvar_names_userinput[cntr])==0 && strncmp(initvar_names[cnt],"w_",2)==0) {
+          FOUND_WDEFAULT = TRUE;
+          if (sscanf(initvar_names_userinput[cntr+1],"%lg",&map[cnt].newvalue)!=1) fatal_error("Problem reading assigned w_default value in -imap input. Not a valid double.");
+        }
+      }
+    }
+
+    /* check if a variable within memory is not present in read variables and was not given a value by user
+      (it wasn't found in input, nor in the interpolation file variables, and isn't a species assigned to w_default) */
+    if (!FOUND_USERINPUT && !FOUND_FILE && !FOUND_WDEFAULT) fatal_error("Variable %s was not found in the data file and was not given a value after the -imap flag.",initvar_names[cnt]);  
+      
+    if (map[cnt].newindex==-1) wfprintf(stdout,"Setting variable %s = %lg everywhere;\n", initvar_names[cnt], map[cnt].newvalue); 
+  } 
+
+  for (cnt=0; cnt<*numvars_file; cnt++) free(initvar_names_file[cnt]); 
+  for (cnt=0; cnt<numvars_userinput; cnt++) free(initvar_names_userinput[cnt]);
+  free(initvar_names_file); 
+  free(initvar_names_userinput); 
+  free(initvar_names);
+}
+
+
+double _map_interpolation_var(initvar_t initvars_file, mapvar_t map[], long count){
+  double tmp;
+  tmp = map[count].newvalue;
+  if (map[count].newindex!=-1) tmp = initvars_file[map[count].newindex];
+  return(tmp);
+}
+
+
+void read_data_file_interpolation(input_t input, np_t *np, gl_t *gl){  
   FILE *datafile;
-  char data_format_str[100];
+  char data_format_str[100], initvar_fluid_str_file[500], initvar_emfield_str_file[500];
   long i,j,k,l_file,cnt,dim,cntzone;
-  long numsubzone, numflux_read,numspec_read,numdim_read,numnodes;
+  long numsubzone, numflux_read,numspec_read,numdim_read,numnodes,numvars_fluid_file;
   double tmp_dt,tmp_time;
   double *weight,*radiusmax2_file,thisweight;
   zone_t *subzone;
   dim_t *xmin,*xmax;
   initvar_t *initvar;
-  initvar_t *initvar_file;
+  //initvar_t *initvar_file;
   zone_t zone;
   long numsubzone_desired;
 #ifdef EMFIELD
+  bool ISREAD_EMFIELD = FALSE;
+  long numvars_emfield_file;
   initvar_emfield_t *initvar_emfield;
-  initvar_emfield_t *initvar_emfield_file;
+ // initvar_emfield_t *initvar_emfield_file;
 #endif
   bool FORMAT001;
   dim_t *dx1_file,*x_file;
@@ -1320,7 +1424,6 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
   MPI_Comm_size(MPI_COMM_WORLD, &numproc);
   MPI_Barrier(MPI_COMM_WORLD);
 #endif
-
   weight=(double *)malloc(sizeof(double)*(gl->domain_lim.ie+4) 
 #ifdef _2DL 
     *(gl->domain_lim.je+4)
@@ -1341,12 +1444,16 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
     );
 #endif
 
-  datafile = fopen(filename, "r");
+  datafile = fopen(input.name, "r");
   if (datafile==NULL)
-    fatal_error("Having problems opening interpolation datafile %s.",filename);
+    fatal_error("Having problems opening interpolation datafile %s.",input.name);
 
 /* first do the fluid properties */
 
+  mapvar_t *map_fluid = (mapvar_t*)malloc(numinitvar * sizeof(mapvar_t));
+#ifdef EMFIELD  
+  mapvar_t *map_emfield = (mapvar_t*)malloc(numinitvar_emfield * sizeof(mapvar_t));
+#endif  
   initvar=(initvar_t *)malloc(sizeof(initvar_t)*(gl->domain_lim.ie+4) 
 #ifdef _2DL 
     *(gl->domain_lim.je+4)
@@ -1363,17 +1470,23 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
     }
   }
   data_format_str[16]=EOS;
-  wfprintf(stdout,"Reading interpolation data file %s ",filename);
+  wfprintf(stdout,"Reading interpolation data file %s ",input.name);
   FORMAT001=FALSE;  
   if (strcmp("WARPINTFORMAT001",data_format_str)==0) {
-    wfprintf(stdout,"in CFDWARP format 001..");
+    wfprintf(stdout,"in CFDWARP format 001..\n");
     FORMAT001=TRUE;
   }
 
   if (FORMAT001) {
-      if (fscanf(datafile," numnodes=%ld nf=%ld nd=%ld ns=%ld windowis=%ld windowie=%ld iter=%ld effiter_U=%lg effiter_R=%lg CFL=%lg time=%lg dt=%lg%*[^\n]",
+      if (fscanf(datafile," numnodes=%ld nf=%ld nd=%ld ns=%ld windowis=%ld windowie=%ld iter=%ld effiter_U=%lg effiter_R=%lg CFL=%lg time=%lg dt=%lg vars_fluid=\"%[^\"]\" vars_emfield=\"%[^\"]\"%*[^\n]",
              &numnodes,&numflux_read,&numdim_read,&numspec_read,&(gl->window.is),&(gl->window.ie),
-             &(gl->iter),&(gl->effiter_U),&(gl->effiter_R),&(gl->CFL),&(tmp_time),&tmp_dt)!=12) fatal_error("Problem reading interpolation data file.");
+             &(gl->iter),&(gl->effiter_U),&(gl->effiter_R),&(gl->CFL),&(tmp_time),&tmp_dt,initvar_fluid_str_file,initvar_emfield_str_file)!=14) fatal_error("Problem reading interpolation data file.");
+
+        find_interpolation_map(input.interpolationvarsmap, initvar_fluid_str_file, numinitvar, &numvars_fluid_file, map_fluid, INITVARTYPE_FLUID);
+#ifdef EMFIELD
+        find_interpolation_map(input.interpolationvarsmap, initvar_emfield_str_file, numinitvar_emfield, &numvars_emfield_file, map_emfield, INITVARTYPE_EMFIELD);
+        if (strcmp(initvar_emfield_str_file,"NONE")!=0) ISREAD_EMFIELD = TRUE;
+#endif            
 
 #ifdef UNSTEADY
       gl->time=tmp_time;
@@ -1382,14 +1495,15 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 
     fgetc(datafile);
     if (numdim_read!=nd) fatal_error("Number of dimensions read (%ld) does not equal current number of dimensions (%ld).",numdim_read,nd);
-    if (numspec_read!=ns) fatal_error("Number of species read (%ld) does not equal current number of species (%ld).",numspec_read,ns);
-    if (numflux_read!=nf) fatal_error("Number of fluxes read (%ld) does not equal current number of fluxes (%ld).",numflux_read,nf);
+   // if (numspec_read!=ns) fatal_error("Number of species read (%ld) does not equal current number of species (%ld).",numspec_read,ns);
+   // if (numflux_read!=nf) fatal_error("Number of fluxes read (%ld) does not equal current number of fluxes (%ld).",numflux_read,nf);
   } else {
     fatal_error("Interpolation file format unknown.");
   }
 
   /* read data and store in ram */
-  initvar_file=(initvar_t *)malloc(numnodes*sizeof(initvar_t));
+  //initvar_file=(initvar_t *)malloc(numnodes*sizeof(initvar_t));
+  double(*initvar_file)[numvars_fluid_file] = malloc(numnodes*numvars_fluid_file*sizeof(double));
   x_file=(dim_t *)malloc(numnodes*sizeof(dim_t));
   dx1_file=(dim_t *)malloc(numnodes*sizeof(dim_t));
 #ifdef _2DL
@@ -1401,7 +1515,7 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
   radiusmax2_file=(double *)malloc(numnodes*sizeof(double));
   for (l_file=0; l_file<numnodes; l_file++){
     cnterror=0;
-    if (fread(initvar_file[l_file], sizeof(initvar_t), 1, datafile)!=1) cnterror++;
+    if (fread(initvar_file[l_file], numvars_fluid_file*sizeof(double), 1, datafile)!=1) cnterror++;
     if (fread(x_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
     if (fread(dx1_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
 #ifdef _2DL
@@ -1495,7 +1609,7 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
                   if (thisweight>1e-99) {
                     weight[_ai(gl,i,j,k)]+=thisweight;
                     for (cnt=0; cnt<numinitvar; cnt++) 
-                      initvar[_ai(gl,i,j,k)][cnt]+=thisweight*initvar_file[l_file][cnt];
+                      initvar[_ai(gl,i,j,k)][cnt]+=thisweight*_map_interpolation_var(initvar_file[l_file],map_fluid,cnt);
                   }
 #ifdef OPENMPTHREADS 
                   omp_unset_lock(&(nodelock[_ai(gl,i,j,k)]));
@@ -1523,6 +1637,7 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 
   free(initvar);
   free(initvar_file);
+  free(map_fluid);
 
 /* second do the emfield properties */
 #ifdef EMFIELD
@@ -1536,7 +1651,7 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 #endif
     );
 
-
+if (ISREAD_EMFIELD) {
   for (cnt=0; cnt<16; cnt++){
     if (fscanf(datafile,"%c",&(data_format_str[cnt]))!=1){
       fatal_error("Problem with fscanf in emfield part of read_data_file_interpolation().");
@@ -1555,16 +1670,17 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
     }
     fgetc(datafile);
     if (numdim_read!=nd) fatal_error("Number of dimensions read (%ld) does not equal current number of dimensions (%ld).",numdim_read,nd);
-    if (numflux_read!=nfe) fatal_error("Number of fluxes read (%ld) does not equal current number of emfield fluxes (%ld).",numflux_read,nfe);
+    //if (numflux_read!=nfe) fatal_error("Number of fluxes read (%ld) does not equal current number of emfield fluxes (%ld).",numflux_read,nfe);
     gl->Lc=1.0e0;
 
   } else {
     fatal_error("Interpolation file format unknown for EMfield variables.");
   }
-
-
+}
   /* read data and store in ram */
-  initvar_emfield_file=(initvar_emfield_t *)malloc(numnodes*sizeof(initvar_emfield_t));
+  double(*initvar_emfield_file)[numvars_emfield_file] = malloc(numnodes*numvars_emfield_file*sizeof(double));
+  //initvar_emfield_file=(initvar_emfield_t *)malloc(numnodes*sizeof(initvar_emfield_t));
+if (ISREAD_EMFIELD) {
   x_file=(dim_t *)realloc(x_file,numnodes*sizeof(dim_t));
   dx1_file=(dim_t *)realloc(dx1_file,numnodes*sizeof(dim_t));
 #ifdef _2DL
@@ -1577,7 +1693,7 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 
   for (l_file=0; l_file<numnodes; l_file++){
     cnterror=0;
-    if (fread(initvar_emfield_file[l_file], sizeof(initvar_emfield_t), 1, datafile)!=1) cnterror++;
+    if (fread(initvar_emfield_file[l_file], numvars_emfield_file*sizeof(double), 1, datafile)!=1) cnterror++;
     if (fread(x_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
     if (fread(dx1_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
 #ifdef _2DL
@@ -1599,7 +1715,7 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
       );
     radiusmax2_file[l_file]*=1.1;
   }
-
+}
   for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
         weight[_ai(gl,i,j,k)]=0.0e0;
         for (cnt=0; cnt<numinitvar_emfield; cnt++) (initvar_emfield[_ai(gl,i,j,k)])[cnt]=0.0;
@@ -1651,7 +1767,7 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
                   if (thisweight>1e-99) {
                     weight[_ai(gl,i,j,k)]+=thisweight;
                     for (cnt=0; cnt<numinitvar_emfield; cnt++) 
-                      initvar_emfield[_ai(gl,i,j,k)][cnt]+=thisweight*initvar_emfield_file[l_file][cnt];
+                      initvar_emfield[_ai(gl,i,j,k)][cnt]+=thisweight*_map_interpolation_var(initvar_emfield_file[l_file],map_emfield,cnt);
                   }
 #ifdef OPENMPTHREADS 
                   omp_unset_lock(&(nodelock[_ai(gl,i,j,k)]));
@@ -1677,7 +1793,7 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
         }
   }
   free(initvar_emfield);
-
+  free(map_emfield);
   free(initvar_emfield_file);
 #endif //EMFIELD
   free(subzone);
@@ -1719,6 +1835,7 @@ void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
   FILE *datafile;
   long i,j,k,cnt;
+  initvarname_t *initvar_names;
   dim_t dx1,x;
 #ifdef _2DL
   dim_t dx2;
@@ -1806,7 +1923,25 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
       tmp_time=0.0;
       tmp_dt=dt_steady;
 #endif
-      wfprintf(datafile,"WARPINTFORMAT001 numnodes=%ld nf=%ld nd=%ld ns=%ld windowis=%ld windowie=%ld iter=%ld effiter_U=%E effiter_R=%E CFL=%E time=%E dt=%E\n",numnodes,nf,nd, ns,gl->window.is,gl->window.ie,gl->iter,effiter_U,effiter_R,gl->CFL,tmp_time,tmp_dt);
+      wfprintf(datafile,"WARPINTFORMAT001 numnodes=%ld nf=%ld nd=%ld ns=%ld windowis=%ld windowie=%ld iter=%ld effiter_U=%E effiter_R=%E CFL=%E time=%E dt=%E ",numnodes,nf,nd, ns,gl->window.is,gl->window.ie,gl->iter,effiter_U,effiter_R,gl->CFL,tmp_time,tmp_dt);
+      wfprintf(datafile,"vars_fluid=\"");
+      initvar_names = (initvarname_t *) malloc(sizeof(initvarname_t) * numinitvar * sizeof(char));   
+      find_default_initvar_name(initvar_names); 
+      for (cnt=0; cnt<numinitvar; cnt++) {
+        wfprintf(datafile,"%s ", initvar_names[cnt]);   
+      }
+      wfprintf(datafile,"\"");   
+      wfprintf(datafile," vars_emfield=\"");
+#ifdef EMFIELD           
+      initvar_names = (initvarname_t *) malloc(sizeof(initvarname_t) * numinitvar_emfield * sizeof(char));   
+      find_default_initvar_name_emfield(initvar_names);            
+      for (cnt=0; cnt<numinitvar_emfield; cnt++) {
+        wfprintf(datafile,"%s ", initvar_names[cnt]);   
+      }
+      wfprintf(datafile,"\"\n");
+#else
+      wfprintf(datafile,"NONE\"\n");
+#endif
     } else {
 #ifdef EMFIELD
       wfprintf(datafile,"WARPINTFORMAT001 numnodes_emfield=%ld nfe=%ld nd=%ld Lc=%E effiter_U_emfield=%E effiter_R_emfield=%E\n",numnodes,nfe,nd,gl->Lc,effiter_U_emfield,effiter_R_emfield);
@@ -1956,5 +2091,6 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
   wfprintf(stdout,"done.\n");
 
   free(NODEVALID);
+  free(initvar_names);
 }
 

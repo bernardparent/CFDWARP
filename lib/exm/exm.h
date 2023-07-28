@@ -225,6 +225,9 @@ char *strind(char *str, int indent);
    and indent the number of indented characters (either negative or positive)  */
 char *strwrpind(char *str, int width, int indent);
 
+/* split a string into words separated by delimiters, count them, and store them in an array of words */
+void find_words_from_string(char* input_string, char* delimiters, char*** words, long int* numwords);
+
 /* find the current terminal window size in characters */
 void find_terminal_window_size(int *width, int *height);
 

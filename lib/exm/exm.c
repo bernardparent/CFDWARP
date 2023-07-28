@@ -1876,6 +1876,39 @@ char *strwrpind(char *str, int width, int indent){
   return str;
 }
 
+/* split an input string into words separated by delimiters in given delimiters 
+   string, count them, and store them in an array of words */
+void find_words_from_string(char* str, char* delimiters, char*** words, long int* numwords){
+  int start= 0;
+  int end = 0;
+  int isdelimiter = 0;
+  *numwords = 0;
+  
+  if (str==NULL) str = " ";
+  for (int i = 0; i <= strlen(str); i++) {
+    for (int j = 0; j < strlen(delimiters); j++) {
+      if (str[i] == delimiters[j] || str[i] == '\0') {
+        isdelimiter = 1;
+      }    
+    }
+    if (isdelimiter) {
+      if (end > start) {
+        int wordlength = end - start;
+        /* realloc array as more words are added, then allocate memory for each new word */
+        *words = (char **)realloc(*words, (*numwords + 1) * sizeof(char *));
+        (*words)[*numwords] = (char *)malloc((wordlength + 1) * sizeof(char));
+        strncpy((*words)[*numwords], str + start, wordlength);
+        (*words)[*numwords][wordlength] = '\0';
+        (*numwords)++;
+      }
+      start = i + 1;
+      end = i + 1;
+    } else {
+      end++;
+    }
+    isdelimiter = 0;
+  }
+}
 
 void find_terminal_window_size(int *width, int *height){
   struct winsize w;

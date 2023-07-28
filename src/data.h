@@ -5,7 +5,8 @@
 
 typedef struct {
   char *name;
-  bool READDATAFILE,BINARYMPI,ASCII,INTERPOLATION;
+  char *interpolationvarsmap; 
+  bool READDATAFILE,BINARYMPI,ASCII,INTERPOLATION, INTERPOLATIONMAP;
   #ifdef UNSTEADY
     char *name_m1;
     bool M1,MM1;
@@ -19,6 +20,7 @@ typedef struct {
     #endif
   #endif
 } input_t;
+
 
 long _ai_mpidatafile(gl_t *gl, long i, long j, long k);
 
@@ -38,7 +40,7 @@ void read_data_file_ascii(char *filename, np_t *np, gl_t *gl, long level);
 
 void write_data_file_ascii(char *filename, np_t *np, gl_t *gl);
 
-void read_data_file_interpolation(char *filename, np_t *np, gl_t *gl);
+void read_data_file_interpolation(input_t input, np_t *np, gl_t *gl);
 
 void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl);
 

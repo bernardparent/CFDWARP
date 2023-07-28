@@ -201,6 +201,7 @@ double _T(np_t np, gl_t *gl);
 
 void find_default_initvar(np_t *np, gl_t *gl, long l, initvar_t initvar);
 
+void find_default_initvar_name(initvarname_t *initvar_name);
 
 #ifdef EMFIELD
 
@@ -235,6 +236,8 @@ void find_dSstar_dUstar_emfield(np_t *np, gl_t *gl, long l, long flux, double *C
 void init_node_emfield(np_t np, gl_t *gl, long inittype, initvar_emfield_t values);
 
 void find_default_initvar_emfield(np_t *np, gl_t *gl, long l, initvar_emfield_t initvar);
+
+void find_default_initvar_name_emfield(initvarname_t *initvar_name_emfield);
 
 void find_dFstar_dUstar_interface_emfield(np_t *np, gl_t *gl, long lL, long lR, long i, long flux, 
                                        double *dFstardUstarLL, double *dFstardUstarL, 

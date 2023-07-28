@@ -7,6 +7,31 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JUL 27a
+  * in lib/exm/exm.c
+    - added find_words_from_string()
+  * in src/common.h
+    - added the type initvarname_t
+  * in src/data.c
+    - added find_interpolation_map()
+    - added _map_interpolation_var()
+    - in read_data_file_interpolation() made changes to deal with mapping of interpolation
+      variables
+    - in write_data_file_interpolation() added the names of the variables to the interpolation
+      file
+  * in src/data.h
+    - in input_t, added *interpolationvarsmap and INTERPOLATIONMAP variables
+  * in src/main.c
+    - in write_options(), added the option -imap
+    - in main(), added code for the -imap option
+  * in model/_model.h
+    - added find_default_initvar_name() and find_default_initvar_name_emfield()
+  * in model/emfield/*/emfield.c
+    - added find_default_initvar_name_emfield()
+  * in model/fluid/_*/fluid_init.c and model/fluid/_drift-diffusion/fluid.c
+    - added find_default_initvar_name()
+  
+
 2023 JUL 20a
   * in model/share/chem_share.c
     - Added functions add_to_W_2r4p, and add_to_dW_2r4p

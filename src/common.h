@@ -191,6 +191,7 @@ typedef double dim2_t[nd][nd];
 
 typedef double sqmat_t[nf][nf];
 typedef double initvar_t[numinitvar];
+typedef char initvarname_t[100];
 #ifdef EMFIELD
   typedef double initvar_emfield_t[numinitvar_emfield];
 #endif

@@ -154,6 +154,17 @@ void init_node_fluid(np_t *np, long l, gl_t *gl, long inittype, initvar_t initva
 }
 
 
+void find_default_initvar_name(initvarname_t *initvar_name){
+  long dim,spec;
+  initvarname_t string;
+
+  for (dim=0; dim<nd; dim++){
+    sprintf(string,"V[%ld]",dim);
+    strcpy(initvar_name[dim],string);
+  }
+  strcpy(initvar_name[nd],"P");
+  strcpy(initvar_name[nd+1],"T");
+} 
 
 /* find initvar (the type of initvar must match defaultinitvartypefluid) */
 void find_default_initvar(np_t *np, gl_t *gl, long l, initvar_t initvar){

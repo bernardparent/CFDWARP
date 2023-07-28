@@ -186,6 +186,10 @@ void find_default_initvar_emfield(np_t *np, gl_t *gl, long l, initvar_emfield_t 
 }
 
 
+void find_default_initvar_name_emfield(initvarname_t *initvar_name_emfield){
+  strcpy(initvar_name_emfield[0],"phi");
+}
+
 void read_disc_emfield_actions(char *actionname, char **argum, SOAP_codex_t *codex){
   gl_t *gl=((readcontrolarg_t *)codex->action_args)->gl;
   gl->DISC_EMFIELD_READ=TRUE;  
@@ -737,8 +741,6 @@ double _xi_emfield(np_t np, gl_t *gl, fluxemfield_t Res){
   xiphi=fabs(Res[0]/_Omega(np,gl)/gl->cycle.emfield.Uref[0]);
   return(xiphi);
 }
-
-
 
 void find_post_variable_name_emfield(long varnum, char *varname){
   switch (varnum) {
