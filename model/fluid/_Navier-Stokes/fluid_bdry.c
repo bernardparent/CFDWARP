@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BDRY_FREESTREAM1 2
 #define BDRY_WALLTFIXEDCATALYTIC1 17
 #define BDRY_WALLTFIXEDINJECTION1 18
+#define BDRY_INFLOWINJECTION1 19
 
 
 void write_bdry_fluid_template(FILE **controlfile){
@@ -65,6 +66,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    BDRY_INFLOWSUPERSONIC             %c   Inflow, supersonic\n"
     "    BDRY_INFLOWSUBSONIC1              %c   Inflow, subsonic, Tstag, Pstag fixed, 1o\n"
     "    BDRY_INFLOWSUBSONICMASSFLOWFIXED1 %c   Inflow, subsonic, Pstag, Massflow/Area fixed, 1o\n"
+    "    BDRY_INFLOWINJECTION1             %c   Inflow, param Tstag, Pstag, specCs \n"
     "    BDRY_OUTFLOWSUPERSONIC1           %c   Outflow, supersonic, 1o\n"
     "    BDRY_OUTFLOWSUBSONIC1             %c   Outflow, subsonic, P fixed, 1o\n"
     "    BDRY_OUTFLOWSUBSONICMFIXED1       %c   Outflow, subsonic, M fixed, 1o\n"
@@ -92,7 +94,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    Region(is" if2DL(",js") if3DL(",ks") ",  ie" if2DL(",je") if3DL(",ke") ",  BDRY_INFLOWSUPERSONIC);\n"
     "    }\n"
     "  );\n",_bdry_ID(BDRY_INFLOWSUPERSONIC),_bdry_ID(BDRY_INFLOWSUBSONIC1),
-             _bdry_ID(BDRY_INFLOWSUBSONICMASSFLOWFIXED1),_bdry_ID(BDRY_OUTFLOWSUPERSONIC1),
+             _bdry_ID(BDRY_INFLOWSUBSONICMASSFLOWFIXED1),_bdry_ID(BDRY_INFLOWINJECTION1),_bdry_ID(BDRY_OUTFLOWSUPERSONIC1),
              _bdry_ID(BDRY_OUTFLOWSUBSONIC1),_bdry_ID(BDRY_OUTFLOWSUBSONICMFIXED1),
              _bdry_ID(BDRY_SYMMETRICAL2),_bdry_ID(BDRY_SYMMETRICAL1),_bdry_ID(BDRY_WALLTFIXED1),_bdry_ID(BDRY_WALLTFIXEDCATALYTIC1),
              _bdry_ID(BDRY_WALLTFIXEDINJECTION1),
@@ -105,6 +107,7 @@ void add_bdry_types_fluid_to_codex(SOAP_codex_t *codex){
   add_int_to_codex(codex,"BDRY_INFLOWSUPERSONIC",   BDRY_INFLOWSUPERSONIC);
   add_int_to_codex(codex,"BDRY_INFLOWSUBSONIC1",   BDRY_INFLOWSUBSONIC1);
   add_int_to_codex(codex,"BDRY_INFLOWSUBSONICMASSFLOWFIXED1",  BDRY_INFLOWSUBSONICMASSFLOWFIXED1 );
+  add_int_to_codex(codex,"BDRY_INFLOWINJECTION1",  BDRY_INFLOWINJECTION1 );
   add_int_to_codex(codex,"BDRY_OUTFLOWSUPERSONIC1",  BDRY_OUTFLOWSUPERSONIC1 );
   add_int_to_codex(codex,"BDRY_OUTFLOWSUBSONIC1",  BDRY_OUTFLOWSUBSONIC1 );
   add_int_to_codex(codex,"BDRY_OUTFLOWSUBSONICMFIXED1",  BDRY_OUTFLOWSUBSONICMFIXED1 );
@@ -349,6 +352,65 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
 
 }
 
+static void update_bdry_inflow_injection(np_t *np, gl_t *gl, long lA, long lB, long lC,
+                                         long theta, long thetasgn,
+                                         bool BDRYDIRECFOUND, int ACCURACY){
+  spec_t wwall;
+  double Rk,cpk,gammak,Mwall,Tstag,Pstag,Twall,Pwall;
+  long dim,spec,specinj;
+  dim_t Vwall,n;
+  bool ref_flag;
+
+//  Twall=_f_symmetry(ACCURACY,_T(np[lB],gl),_T(np[lC],gl));
+  Tstag=_bdry_param(np,gl,lA,0,TYPELEVEL_FLUID_WORK);
+  Pstag=_bdry_param(np,gl,lA,1,TYPELEVEL_FLUID_WORK);
+  specinj=round(_bdry_param(np,gl,lA,2,TYPELEVEL_FLUID_WORK))-1;
+
+  
+  if (!find_unit_vector_normal_to_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK, n)) 
+    fatal_error("Problem finding unit normal vector in update_bdry_inflow_injection()");
+  
+  
+  Pwall=_Pstar(np[lB],gl);
+
+  Rk=kB/_m(specinj);
+  cpk=_cpk_from_T_equilibrium(specinj, _T(np[lA],gl));
+  gammak=cpk/(cpk-Rk);
+  
+  // first assume choking at the injection point (M=1)
+  Mwall=1.0;
+  Pwall=Pstag/pow(1.0+(gammak-1.0)/2.0,gammak/(gammak-1.0));
+  // check if choking is possible; if not, set the pressure at the boundary equal to the pressure nearby
+  if (Pwall<_Pstar(np[lC],gl)){
+    Pwall=min(Pstag,_Pstar(np[lC],gl));
+    // find Mach number at the wall knowing the pressure and stagnation pressure
+    if ((pow(Pstag/Pwall,(gammak-1.0)/gammak)-1.0)*2.0/(gammak-1.0)<0.0) {
+      wfprintf(stderr,"\n\n gammak=%E  Pstag=%E  Pwall=%E \n\n",gammak,Pstag,Pwall);
+    }
+    assert_np(np[lA],(pow(Pstag/Pwall,(gammak-1.0)/gammak)-1.0)*2.0/(gammak-1.0)>=0.0);
+    Mwall=sqrt((pow(Pstag/Pwall,(gammak-1.0)/gammak)-1.0)*2.0/(gammak-1.0));
+    assert_np(np[lA],Mwall<1.0);
+  }
+  
+
+  Twall=Tstag/(1.0+(gammak-1.0)/2.0*sqr(Mwall));
+  for (dim=0; dim<nd; dim++){
+    Vwall[dim]=n[dim]*Mwall*sqrt(gammak*Rk*Twall);
+  }
+
+  for (spec=0; spec<ns; spec++){
+    if (spec==specinj) wwall[spec]=1.0; 
+      else wwall[spec]=1e-99;
+  }
+
+
+
+  reformat_w(gl,wwall,"_bdry",&ref_flag);
+
+
+  find_U_2(np, lA,gl,wwall,Vwall,Pwall,Twall);
+}
+
 
 bool is_node_bdry_symmetry_plane_fluid(np_t np){
   double RET;
@@ -423,6 +485,12 @@ void update_bdry_fluid(np_t *np, gl_t *gl, long lA, long lB, long lC, long lD, l
     case BDRY_FREESTREAM1:
       if (BDRYDIRECFOUND)
         update_bdry_freestream(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
+      else update_bdry_outflow(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
+    break;
+
+    case BDRY_INFLOWINJECTION1:
+      if (BDRYDIRECFOUND)
+        update_bdry_inflow_injection(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
       else update_bdry_outflow(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
     break;
 

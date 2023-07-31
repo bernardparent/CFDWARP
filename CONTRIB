@@ -115,7 +115,9 @@ RODRIGUEZ FUENTES, Felipe Martin
     model/chem/_C2H4_Air_23s/usc32.c
 
   - added interpolation variables mapping in src/data.c
-      
+
+  - in model/fluid/_Navier-Stokes/fluid_bdry.c added BDRY_INFLOWINJECTION1      
+    
     
 SCHWARTZENTRUBER, Thomas E.
 

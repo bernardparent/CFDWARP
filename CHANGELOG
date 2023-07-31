@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 JUL 31a
+  * in model/fluid/_Navier-Stokes/fluid_bdry.c
+    - added BDRY_INFLOWINJECTION1, and update_bdry_inflow_injection()
+    
+
 2023 JUL 27a
   * in lib/exm/exm.c
     - added find_words_from_string()
