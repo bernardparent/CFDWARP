@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 SEP 08a
+  * in model/fluid/_Favre-Reynolds_plasma/fluid_bdry.c
+    - added boundary condition BDRY_INFLOWINJECTION1
+  * in model/thermo/_generic/enthalpy.c
+    - added more info on how enthalpy data for species NH4 was obtained
+
+
 2023 JUL 31a
   * in model/fluid/_Navier-Stokes/fluid_bdry.c
     - added BDRY_INFLOWINJECTION1, and update_bdry_inflow_injection()

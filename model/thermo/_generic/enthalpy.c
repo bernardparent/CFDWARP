@@ -3531,7 +3531,7 @@ const static double Pa[SMAP_NS][3][11]=
 
 /* 
    species NH4
-   obtained from species NH4+ by subtracting 4.410300000e+04 to b1
+   obtained from species NH4+ by subtracting the ionization energy of NH4 (4.410300000e+04) to b1. The ionization energy of NH4 is obtained from "Wight, G. R., and C. E. Brion. "Estimation of the excitation and ionization energies of NH4, H3O and H2F radicals using core analogies applied to K-shell electron energy loss spectra." Chemical Physics Letters 26.4 (1974): 607-609."
    pos 0: Tmin lower range limit
    pos 1: Tmax upper range limit
    pos 2-8: a1,a2,...,a7
