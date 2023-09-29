@@ -157,7 +157,7 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
 /* "Fall-off" reactions (+M): Reaction no. (25), (26) Lindemann approx*/
 /*  Units of s, mole, cm3, cal, and K */
 
-void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
+void find_W ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
  
   long k;
   spec_t X;
@@ -527,7 +527,7 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
 
 }
 
-void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
+void find_dW_dx ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
                   double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
                     

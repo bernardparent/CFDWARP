@@ -114,7 +114,7 @@ void find_dW_dx_None ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
 }
 
 
-void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
+void find_W ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
   switch (gl->model.chem.CHEMMODEL){
     case CHEMMODEL_MACHERET2007: 
       find_W_Macheret2007 ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
@@ -134,7 +134,7 @@ void find_W ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Esta
 }
 
 
-void find_dW_dx ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
+void find_dW_dx ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
                   double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   switch (gl->model.chem.CHEMMODEL){

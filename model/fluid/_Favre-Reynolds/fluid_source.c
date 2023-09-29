@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/share/chem_share.h>
 
 
-static void find_Schem(np_t *np, gl_t *gl, long l, flux_t S){
+void find_Schem(np_t *np, gl_t *gl, long l, flux_t S){
   spec_t W,rhok;
   long flux,spec;
   double Estar;
@@ -43,7 +43,7 @@ static void find_Schem(np_t *np, gl_t *gl, long l, flux_t S){
   }
   for (spec=0; spec<ns; spec++) rhok[spec]=_rhok(np[l],spec);
   Estar=0.0;
-  find_W(gl, rhok, _T(np[l],gl), _T(np[l],gl), _T(np[l],gl), Estar, _Qbeam(np[l],gl), W);
+  find_W(np[l],gl, rhok, _T(np[l],gl), _T(np[l],gl), _T(np[l],gl), Estar, _Qbeam(np[l],gl), W);
   for (spec=0; spec<ns; spec++){
     S[spec]=W[spec];
   }
@@ -83,7 +83,7 @@ static void find_dSchem_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
   Estar=0.0;  
   for (s=0; s<ns; s++) rhok[s]=_rhok(np[l],s);
 
-  find_dW_dx(gl, rhok, _T(np[l],gl), _T(np[l],gl), _T(np[l],gl), Estar,_Qbeam(np[l],gl),
+  find_dW_dx(np[l],gl, rhok, _T(np[l],gl), _T(np[l],gl), _T(np[l],gl), Estar,_Qbeam(np[l],gl),
            dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam);
   find_dT_dU(np[l], gl, dTdU);
   for ( k = 0; k < nf; k++ ){
@@ -107,7 +107,7 @@ void test_dSchem_dU(np_t *np, gl_t *gl, long l){
   spec_t rhok;
   Estar=0.0;
   for (spec=0; spec<ns; spec++) rhok[spec]=_rhok(np[l],spec);
-  test_dW_dx(gl, gl->cycle.fluid.Uref, rhok, _T(np[l],gl), _T(np[l],gl), _T(np[l],gl), Estar, _Qbeam(np[l],gl));
+  test_dW_dx(np[l],gl, gl->cycle.fluid.Uref, rhok, _T(np[l],gl), _T(np[l],gl), _T(np[l],gl), Estar, _Qbeam(np[l],gl));
 }
 
 

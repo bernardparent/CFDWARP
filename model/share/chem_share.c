@@ -2616,15 +2616,15 @@ void add_to_dW_fwbw_3r2p_Lindemann(int specR1, int specR2, int specR3,
 
 
 
-void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam){
+void test_dW_dx(np_t np, gl_t *gl, spec_t rhokref, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam){
   long r,s; 
   spec_t dWdT,dWdTe,dWdTv,dWdQbeam;
   spec2_t dWrhok,dWrhok2;   
   spec_t rhok2,dWdT2,W,W2, X;
   double drhok,dQbeam,dT,N,N2,Estar2;
  
-  find_W(gl, rhok, T, Te, Tv, Estar, Qbeam, W);      
-  find_dW_dx(gl, rhok, T, Te, Tv, Estar, Qbeam,
+  find_W(np,gl, rhok, T, Te, Tv, Estar, Qbeam, W);      
+  find_dW_dx(np,gl, rhok, T, Te, Tv, Estar, Qbeam,
               dWrhok, dWdT, dWdTe, dWdTv, dWdQbeam);
 
   N=0.0;
@@ -2637,7 +2637,7 @@ void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, double T, double Te, doub
   // find dWdQbeam numerically    
    wfprintf(stdout,"\n\ndWdQbeam:\n");
    dQbeam=Qbeam/10000.0+1.0e2;
-   find_W(gl, rhok, T, Te,Tv,Estar, Qbeam+dQbeam, W2);
+   find_W(np,gl, rhok, T, Te,Tv,Estar, Qbeam+dQbeam, W2);
    for (s=0; s<ns; s++) dWdT2[s]=(W2[s]-W[s])/dQbeam;
    for (s=0; s<ns; s++){  
      wfprintf(stdout,"%15.15E  %15.15E\n",dWdQbeam[s],dWdT2[s]);
@@ -2650,7 +2650,7 @@ void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, double T, double Te, doub
     rhok2[s]+=drhok;
     N2=N+(rhok2[s]-rhok[s])/_m(s);
     Estar2=Estar*N/N2;
-    find_W(gl, rhok2, T, Te,Tv,Estar2,Qbeam, W2);
+    find_W(np,gl, rhok2, T, Te,Tv,Estar2,Qbeam, W2);
     for (r=0; r<ns; r++) dWrhok2[r][s]=(W2[r]-W[r])/(drhok);
   }
   for (r=0; r<ns; r++){
@@ -2669,7 +2669,7 @@ void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, double T, double Te, doub
   // find dWdT numerically 
    wfprintf(stdout,"\n\ndWdT:\n");
    dT=T/10000.0;
-  find_W(gl, rhok, T+dT, Te,Tv,Estar,Qbeam, W2);
+  find_W(np,gl, rhok, T+dT, Te,Tv,Estar,Qbeam, W2);
   for (s=0; s<ns; s++) dWdT2[s]=(W2[s]-W[s])/dT;
   for (s=0; s<ns; s++){  
     wfprintf(stdout,"%15.15E  %15.15E\n",dWdT[s],dWdT2[s]);
@@ -2679,7 +2679,7 @@ void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, double T, double Te, doub
   // find dWdTv numerically 
    wfprintf(stdout,"\n\ndWdTv:\n");
   dT=Tv/10000.0;
-  find_W(gl, rhok, T, Te,Tv+dT,Estar,Qbeam, W2);
+  find_W(np,gl, rhok, T, Te,Tv+dT,Estar,Qbeam, W2);
   for (s=0; s<ns; s++) dWdT2[s]=(W2[s]-W[s])/dT;
   for (s=0; s<ns; s++){  
     wfprintf(stdout,"%15.15E  %15.15E\n",dWdTv[s],dWdT2[s]);
@@ -2689,7 +2689,7 @@ void test_dW_dx(gl_t *gl, spec_t rhokref, spec_t rhok, double T, double Te, doub
   // find dWdTe numerically 
    wfprintf(stdout,"\n\ndWdTe:\n");
   dT=Te/10000.0;
-  find_W(gl, rhok, T, Te+dT,Tv,Estar,Qbeam, W2);
+  find_W(np,gl, rhok, T, Te+dT,Tv,Estar,Qbeam, W2);
   for (s=0; s<ns; s++) dWdT2[s]=(W2[s]-W[s])/dT;
   for (s=0; s<ns; s++){  
     wfprintf(stdout,"%15.15E  %15.15E\n",dWdTe[s],dWdT2[s]);
@@ -2788,7 +2788,7 @@ void add_to_dQei(long spec, double exci, double kf, double dkfdTe, spec_t rhok, 
   dQeidrhok[spec] += kf *1e-6* exci * echarge * rhok[speceminus] / _calM ( speceminus )  / _calM ( spec ) * sqr(calA);
   dQeidrhok[speceminus] += kf *1e-6* exci * echarge / _calM ( speceminus ) * rhok[spec] / _calM ( spec ) * sqr(calA);
 }
-
+#endif
 
 /* find excitation energy in eV using the difference in enthalpy of formation */
 double _exci_2r2p(long react1, long react2, long prod1, long prod2){
@@ -2826,4 +2826,47 @@ double _exci_2r4p(long react1, long react2, long prod1, long prod2, long prod3, 
   return(exci);
 }
 
+#ifdef _AVERAGEDRATES
+#ifdef UNSTEADY
+double _averaged_rate(np_t np, gl_t *gl, long react, double rate){
+  long cnt,react_map;
+  double newrate;
+  bool FOUND;
+  FOUND=FALSE;
+  react_map=0; //to avoid compiler warning
+  for (cnt=0; cnt<numaveragedrates; cnt++){
+    if (averagedrates_react[cnt]==react){
+      FOUND=TRUE;
+      react_map=cnt;
+    }
+  }
+  if (!FOUND) fatal_error("Problem finding react_map in _averaged_rate().");
+  switch (gl->AVERAGEDRATES){
+    case AVERAGEDRATES_ADD:
+      if (gl->averagedrates_time<0.0) fatal_error("Averaged rates not initialized properly. Need to call SetAveragedRates() first.");
+      np.bs->averagedrates[react_map]=(np.bs->averagedrates[react_map]*gl->averagedrates_time+gl->dt*rate)/(gl->averagedrates_time+gl->dt);
+      newrate=rate;
+    break;
+    case AVERAGEDRATES_SET:
+      np.bs->averagedrates[react_map]=rate;
+      newrate=rate;
+    break;
+    case AVERAGEDRATES_ON:
+      if (gl->averagedrates_time<0.0) fatal_error("Averaged rates not initialized properly. Need to call SetAveragedRates() first.");
+      newrate=np.bs->averagedrates[react_map];
+    break;
+    case AVERAGEDRATES_OFF:
+      newrate=rate;
+    break;
+    default:
+      newrate=0.0;
+      fatal_error("gl->AVERAGEDRATES can not be set to %ld.",gl->AVERAGEDRATES);
+  }
+  return(newrate);
+}
+#else
+double _averaged_rate(np_t np, gl_t *gl, long react, double rate){
+  return(rate);
+}
+#endif
 #endif

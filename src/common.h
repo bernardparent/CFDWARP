@@ -169,6 +169,11 @@
 #endif
 #include <limits.h>
 
+#define AVERAGEDRATES_ADD 0
+#define AVERAGEDRATES_OFF 1
+#define AVERAGEDRATES_ON 2
+#define AVERAGEDRATES_SET 3
+
 typedef struct{
  long is,js,ks,ie,je,ke;
 } zone_t;
@@ -250,6 +255,10 @@ typedef struct {
 #endif
 #ifdef _TSEMF_STORE_COEFFICIENTS
   EXM_gl3D_t tsemfcoeffzone;
+#endif
+#if defined(UNSTEADY) && defined(_AVERAGEDRATES)
+   double averagedrates_time;
+   long AVERAGEDRATES;
 #endif
 } gl_t;
 
@@ -417,7 +426,9 @@ typedef struct {
 #ifdef _FLUID_FBODY_QADD
    bool FBODY,QADD;   
 #endif
-
+#if defined(UNSTEADY) && defined(_AVERAGEDRATES)
+   double averagedrates[numaveragedrates];
+#endif
 } npbs_t;
 
 

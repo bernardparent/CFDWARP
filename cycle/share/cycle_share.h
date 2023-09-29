@@ -153,4 +153,11 @@ void solve_TDMA_emfield(np_t *np, gl_t *gl, long theta, long ls, long le,
                         int TYPELEVEL, EXM_tdmaline_t *tdma, long numlines);
 #endif
 
+
+#if defined(UNSTEADY) && defined(_AVERAGEDRATES)
+void set_averaged_rates(np_t *np, gl_t *gl);
+
+void add_to_averaged_rates(np_t *np, gl_t *gl);
+#endif
+
 #endif /* _CYCLE_SHARE_H */

@@ -42,11 +42,11 @@ const static bool REACTION[20]=
 
 
 
-void find_W_bavafa2008 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
+void find_W_bavafa2008 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
   long k;
   spec_t X, N;
   double R;
-  double theta;
+  double theta,rate;
 
   theta = log(Estar);
 
@@ -58,12 +58,13 @@ void find_W_bavafa2008 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
 
   R=Rchem;
   
+  
   if (REACTION[1]){
-    add_to_W_2r3p ( specNH3, speceminus, specNH3plus, speceminus, speceminus, min( exp ( 1.2346e-14 * pow ( theta, 9.0 ) + 0.3115 * theta ), 1.5640e-07 ), N, W );
+    add_to_W_2r3p ( specNH3, speceminus, specNH3plus, speceminus, speceminus, _averaged_rate(np,gl,1,min( exp ( 1.2346e-14 * pow ( theta, 9.0 ) + 0.3115 * theta ), 1.5640e-07 )), N, W );
   }
 
   if (REACTION[2]){
-    add_to_W_2r4p ( specNH3, speceminus, specNH2plus, specH, speceminus, speceminus, min( exp ( 0.4853 * theta + 5.5515e-131 * pow( theta, 79.0 ) ), 2.4490e-10 ), N, W );
+    add_to_W_2r4p ( specNH3, speceminus, specNH2plus, specH, speceminus, speceminus, _averaged_rate(np,gl,2,min( exp ( 0.4853 * theta + 5.5515e-131 * pow( theta, 79.0 ) ), 2.4490e-10 )), N, W );
   }
 
   if (REACTION[3]){
@@ -95,7 +96,7 @@ void find_W_bavafa2008 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
 }
 
 
-void find_dW_dx_bavafa2008 ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
+void find_dW_dx_bavafa2008 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
                   double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, s, spec;                    /* counters */
@@ -215,3 +216,5 @@ void find_dQei_dx_bavafa2008(gl_t *gl, spec_t rhok, double Estar, double Te, spe
   }
 
 }
+
+

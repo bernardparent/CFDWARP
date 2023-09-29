@@ -53,6 +53,9 @@ void write_runtime_template(FILE **controlfile){
   "    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2"
 #ifdef UNSTEADY
     ",dt"
+#ifdef _AVERAGEDRATES
+    ",AVERAGEDRATES_OFF"
+#endif
 #endif
   ");\n"
 #ifdef EMFIELD
@@ -109,6 +112,10 @@ void write_runtime_template(FILE **controlfile){
   " && ximax_emfield<xiverge_emfield"
 #endif
   ",\n"
+#ifdef _AVERAGEDRATES
+  "      {SetAveragedRates();}\n"
+  "      {AddToAveragedRates();}\n"
+#endif
   "      IncreaseTimeLevel();\n"
   "      WriteDataFile(outputfilename\".\"round(time/dt));\n"
   "      printf(\"dt=%%E time=%%Es\\n\",dt,time);\n"
@@ -140,9 +147,16 @@ void runtime_actions_cycle_specific(char *actionname, char **argum, SOAP_codex_t
   if (strcmp(actionname,"UpdateFluid")==0) {
     SOAP_substitute_all_argums(argum, codex);
 #ifdef UNSTEADY
-    if (SOAP_number_argums(*argum)!=5) SOAP_fatal_error(codex,"Number of arguments not equal to 5 in UpdateFluid(); action. This is likely due to the Standard() module within the control file being valid for steady-state cases, while CFDWARP is here compiled for time accurate cases.");
     gl->dt=SOAP_get_argum_double(codex,*argum,4);
     if (gl->dt<=0.0) fatal_error("The time step dt must be positive when calling UpdateFluid.");
+#if defined(_AVERAGEDRATES) && defined(UNSTEADY)
+    if (SOAP_number_argums(*argum)!=6) SOAP_fatal_error(codex,"Number of arguments not equal to 6 in UpdateFluid(); action. This is likely due to the Standard() module within the control file being valid for steady-state cases, while CFDWARP is here compiled for time accurate cases.");
+    gl->AVERAGEDRATES=round(SOAP_get_argum_long(codex,*argum,5));
+    if (gl->AVERAGEDRATES!=AVERAGEDRATES_OFF  && gl->AVERAGEDRATES!=AVERAGEDRATES_ON)
+      fatal_error("When calling UpdateFluid, AVERATEDRATES must be set to either AVERAGEDRATES_OFF or AVERAGEDRATES_ON, not to %ld.",gl->AVERAGEDRATES);
+#else
+    if (SOAP_number_argums(*argum)!=5) SOAP_fatal_error(codex,"Number of arguments not equal to 5 in UpdateFluid(); action. This is likely due to the Standard() module within the control file being valid for steady-state cases, while CFDWARP is here compiled for time accurate cases.");
+#endif
 #endif
     gl->CFL=SOAP_get_argum_double(codex,*argum,0);
     if (gl->CFL<0.0) fatal_error("The CFL number can not be negative when calling UpdateFluid.");
@@ -201,6 +215,18 @@ void runtime_actions_cycle_specific(char *actionname, char **argum, SOAP_codex_t
   }
 #endif
 
+
+#if defined(UNSTEADY) && defined(_AVERAGEDRATES)
+  if (strcmp(actionname,"SetAveragedRates")==0) {
+    set_averaged_rates(np, gl);
+    codex->ACTIONPROCESSED=TRUE;
+  }
+
+  if (strcmp(actionname,"AddToAveragedRates")==0) {
+    add_to_averaged_rates(np, gl);
+    codex->ACTIONPROCESSED=TRUE;
+  }
+#endif
 
 
 

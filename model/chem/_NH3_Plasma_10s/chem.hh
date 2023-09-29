@@ -3,6 +3,14 @@
 #define _CHEM_PLASMA
 #define _CHEM_ACTIONNAME "NH3Plasma10s"
 #define _CHEM_WEEE_TWOTEMPERATURE
+#define _AVERAGEDRATES
+
+#define numaveragedrates 2
+
+const static long averagedrates_react[numaveragedrates] = {
+  1,  
+  2
+};
 
 #define ns 10
 #define ncs 4
@@ -67,4 +75,5 @@ typedef struct {
   int CHEMMODEL;
   bool QEISOURCETERMS;
 } gl_model_chem_t;
+
 

@@ -7,6 +7,36 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 SEP 29a
+  * in cycle/*/cycle.c (except _standard)
+    - in init_cycle(), added gl->AVERAGEDRATES=AVERAGEDRATES_OFF
+  * in cycle/_standard/cycle.c
+    - in runtime_actions_cycle_specific(), added AVERAGEDRATES passed as the last argument
+      of UpdateFluid()
+    - in runtime_actions_cycle_specific(), added calls to SetAveragedRates() and AddToAveragedRates()
+  * in cycle/share/cycle_share.c
+    - in update_runtime_codex_vars_except_xi_from_gl(), added AVERAGEDRATES_OFF and 
+      AVERAGEDRATES_ON
+    - added set_averaged_rates()
+    - added add_to_averaged_rates()
+  * in model/chem/*/chem.c
+    - added parameter np to functions find_W() and find_dW_dx()
+  * in model/chem/_NH3_Plasma_10s/bavafa2008.c
+    - added _averaged_rate() call to reactions 1 and 2
+  * in model/chem/_NH3_Plasma_10s/chem.hh
+    - added definition of _AVERAGEDRATES, numaveragedrates, and averagedrates_react
+  * in model/fluid/_*/fluid_source.c
+    - in find_Schem() and find_dSchem_dU(), added parameter np[l] to find_W() and find_dW_dx()
+    - in test_dSchem_dU(), added parameter np[l] to test_dW_dx()
+  * in model/share/chem_share.c
+    - added np to test_dW_dx()
+    - added _averaged_rate()
+  * in src/common.h
+    - added definitions of AVERAGEDRATES_ADD, AVERAGEDRATES_SET, AVERAGEDRATES_ON, AVERAGEDRATES_OFF
+    - in  gl_t, added averagedrates_time and AVERAGEDRATES
+    - in npbs_t, added averagedrates[numaveragedrates]
+    
+
 2023 SEP 08a
   * in model/fluid/_Favre-Reynolds_plasma/fluid_bdry.c
     - added boundary condition BDRY_INFLOWINJECTION1

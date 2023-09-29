@@ -225,6 +225,11 @@ int main ( int argc, char **argv ) {
   gl.dt = 1e99;
 #endif
 
+#if defined(UNSTEADY) && defined (_AVERAGEDRATES)
+  gl.averagedrates_time = -1.0e99;
+  gl.AVERAGEDRATES=AVERAGEDRATES_SET;
+#endif
+
 #ifdef EMFIELD
   gl.numsubiter_tsemf = 4;
   gl.tsemfmethod = 0;

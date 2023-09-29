@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/emfield/_emfield.h>
 #include <model/metrics/_metrics.h>
 #include <model/fluid/_fluid.h>
+#include <model/chem/_chem.h>
 
 
 #ifdef OPENMPTHREADS
@@ -963,8 +964,10 @@ void increase_time_level(np_t *np, gl_t *gl){
 #endif//UNSTEADY
 
 
+
 void runtime_actions(char *actionname, char **argum, SOAP_codex_t *codex){
   char *oldfilename;
+  
   oldfilename=(char *)malloc(sizeof(char)*(5+strlen((((readcontrolarg_t *)codex->action_args)->gl->output_filename))));
   strcpy(oldfilename,(((readcontrolarg_t *)codex->action_args)->gl->output_filename));
   if (strcmp(actionname,"WriteDataFile")==0) {
@@ -1349,6 +1352,10 @@ void update_runtime_codex_vars_except_xi_from_gl(gl_t *gl, SOAP_codex_t *codex){
   add_double_to_codex(codex,"effiter_R_emfield",gl->effiter_R_emfield);
 #endif
 #endif//DISTMPI
+#ifdef _AVERAGEDRATES
+  add_int_to_codex(&(gl->cycle.codex), "AVERAGEDRATES_ON", AVERAGEDRATES_ON);
+  add_int_to_codex(&(gl->cycle.codex), "AVERAGEDRATES_OFF", AVERAGEDRATES_OFF);
+#endif
 }
 
 
@@ -1479,6 +1486,39 @@ void find_ximax(np_t *np, gl_t *gl, zone_t zone, int IJK_UPDATE){
   }
 }
 
+
+
+#if defined(UNSTEADY) && defined(_AVERAGEDRATES)
+void set_averaged_rates(np_t *np, gl_t *gl){
+  long i,j,k;
+  flux_t Schem;
+  gl->AVERAGEDRATES=AVERAGEDRATES_SET;
+  gl->averagedrates_time=0.0;
+//  printf("setting averaged rates ------------------------------\n");
+  for_ijk(gl->domain,is,js,ks,ie,je,ke){
+    if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)) {
+      assert(is_node_resumed(np[_ai(gl,i,j,k)]));
+      find_Schem(np,gl,_ai(gl,i,j,k),Schem);
+    }
+  }
+  gl->averagedrates_time=gl->dt;
+}
+
+
+void add_to_averaged_rates(np_t *np, gl_t *gl){
+  long i,j,k;
+  flux_t Schem;
+  gl->AVERAGEDRATES=AVERAGEDRATES_ADD;
+  for_ijk(gl->domain,is,js,ks,ie,je,ke){
+    if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)) {
+      assert(is_node_resumed(np[_ai(gl,i,j,k)]));
+      find_Schem(np,gl,_ai(gl,i,j,k),Schem);
+    }
+  }
+  gl->averagedrates_time+=gl->dt;
+}
+
+#endif
 
 /*
 static void PrintZones(zone_t *zones, long numzone){
