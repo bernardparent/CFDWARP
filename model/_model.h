@@ -309,4 +309,8 @@ void find_dUstar_dUprime_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqma
 
 bool is_node_bdry_no_cross(np_t np, int TYPELEVEL);
 
+#ifdef _FLUID_WALLDISTANCE
+bool is_node_bdry_wall_fluid(np_t np, gl_t *gl);
+#endif
+
 #endif /* _MODEL_H */

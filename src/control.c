@@ -1038,6 +1038,133 @@ void find_metrics_on_all_nodes(np_t *np, gl_t *gl, zone_t zone){
 }
 
 
+#ifdef _FLUID_WALLDISTANCE
+
+
+
+void reduce_wall_distance_given_wallxyz(np_t *np, gl_t *gl,  dim_t wallxyz){
+  long i,j,k,l,dim;
+  double dist2;
+  bool TOOFAR;
+  
+  for_ijk (gl->domain,is,js,ks,ie,je,ke){
+    if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)){
+      l=_ai(gl,i,j,k);
+      TOOFAR=FALSE;
+      dim=0;
+      dist2=0.0;
+      do {
+        dist2+=sqr(_x(np[l],dim)-wallxyz[dim]);
+        if (dist2>np[l].bs->walldistance2) TOOFAR=TRUE;
+        dim++;
+      } while (!TOOFAR && dim<nd);
+      if (!TOOFAR){
+        while (dim<nd) {
+          dist2+=sqr(_x(np[l],dim)-wallxyz[dim]);
+          if (dist2>np[l].bs->walldistance2) TOOFAR=TRUE;
+          dim++;
+        }
+        np[l].bs->walldistance2=min(np[l].bs->walldistance2,dist2);
+      }
+    }
+  }
+}
+
+
+
+#ifdef DISTMPI
+
+void find_wall_distance(np_t *np, gl_t *gl){
+  long i,j,k,l,dim,cnt,thisnumbdrywall,numbdrywall;
+  dim_t *wallxyz,*thiswallxyz;
+  MPI_Status MPI_Status1;
+  int numproc,ranksend,rankrecv,thisrank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &thisrank);
+  MPI_Comm_size(MPI_COMM_WORLD, &numproc);
+
+  wfprintf(stdout,"wall distance..");
+  thiswallxyz=malloc(sizeof(dim_t));
+  wallxyz=malloc(sizeof(dim_t));
+  cnt=0;
+  for_ijk (_domain_from_rank(thisrank,gl),is,js,ks,ie,je,ke){
+    if (is_node_bdry_wall_fluid(np[_ai(gl,i,j,k)],gl)){
+      thiswallxyz=realloc(thiswallxyz,sizeof(dim_t)*(cnt+1));
+      for (dim=0; dim<nd; dim++) thiswallxyz[cnt][dim]=_x(np[_ai(gl,i,j,k)],dim);
+      cnt++; 
+    }
+  }
+  thisnumbdrywall=cnt;
+  
+  
+  for_ijk (gl->domain,is,js,ks,ie,je,ke){
+    l=_ai(gl,i,j,k);
+    np[l].bs->walldistance2=1e99;
+  }
+
+  for (ranksend=0; ranksend<numproc; ranksend++){
+    if (ranksend==thisrank){
+      for (rankrecv=0; rankrecv<numproc; rankrecv++){
+        if (rankrecv!=ranksend){
+          MPI_Send(&thisnumbdrywall,1,MPI_INT,rankrecv,0,MPI_COMM_WORLD);
+          MPI_Send(thiswallxyz,thisnumbdrywall*nd,MPI_DOUBLE,rankrecv,0,MPI_COMM_WORLD);
+        }
+      }
+#ifdef OPENMPTHREADS
+#pragma omp parallel for private(cnt) schedule(dynamic)
+#endif
+      for (cnt=0; cnt<thisnumbdrywall; cnt++)
+        reduce_wall_distance_given_wallxyz(np, gl,  thiswallxyz[cnt]);
+    } else {
+      MPI_Recv(&numbdrywall,1,MPI_INT,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
+      wallxyz=realloc(wallxyz,sizeof(dim_t)*(numbdrywall));
+      MPI_Recv(wallxyz,numbdrywall*nd,MPI_DOUBLE,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
+#ifdef OPENMPTHREADS
+#pragma omp parallel for private(cnt) schedule(dynamic)
+#endif
+      for (cnt=0; cnt<numbdrywall; cnt++)
+        reduce_wall_distance_given_wallxyz(np, gl,  wallxyz[cnt]);
+    }
+  }
+  MPI_Barrier(MPI_COMM_WORLD);
+  free(wallxyz);
+  free(thiswallxyz);
+}
+
+#else
+
+void find_wall_distance(np_t *np, gl_t *gl){
+  long i,j,k,l,dim,cnt,numbdrywall;
+  dim_t *wallxyz;
+  wfprintf(stdout,"wall distance..");
+  wallxyz=malloc(sizeof(dim_t));
+  cnt=0;
+  for_ijk (gl->domain,is,js,ks,ie,je,ke){
+    if (is_node_bdry_wall_fluid(np[_ai(gl,i,j,k)],gl)){
+      wallxyz=realloc(wallxyz,sizeof(dim_t)*(cnt+1));
+      for (dim=0; dim<nd; dim++) wallxyz[cnt][dim]=_x(np[_ai(gl,i,j,k)],dim);
+      cnt++; 
+    }
+  }
+  numbdrywall=cnt;
+  for_ijk (gl->domain,is,js,ks,ie,je,ke){
+    l=_ai(gl,i,j,k);
+    np[l].bs->walldistance2=1e99;
+  }
+#ifdef OPENMPTHREADS
+#pragma omp parallel for private(cnt) schedule(dynamic)
+#endif
+  for (cnt=0; cnt<numbdrywall; cnt++)
+    reduce_wall_distance_given_wallxyz(np, gl,  wallxyz[cnt]);
+  free(wallxyz);
+}
+
+#endif
+
+
+#endif
+
+
+
 
 
 void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
@@ -1334,6 +1461,9 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     read_bdry(*argum, codex);
     // need to adjust metrics on symmetry nodes, so recalculate them after imposing the BCs
     find_metrics_on_all_nodes((*np), gl, gl->domain);
+#ifdef _FLUID_WALLDISTANCE
+    find_wall_distance((*np),gl);
+#endif
     wfprintf(stdout,"done;\n");
     ((readcontrolarg_t *)codex->action_args)->module_level++;
     codex->ACTIONPROCESSED=TRUE;

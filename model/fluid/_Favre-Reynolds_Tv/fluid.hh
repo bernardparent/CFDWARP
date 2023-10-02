@@ -1,5 +1,6 @@
 #define _FLUID_METHOD "Favre-Reynolds Multispecies N2 Vibrational Energy Transport"
 #define _FLUID_FAVREREYNOLDS
+#define _FLUID_WALLDISTANCE
 #define _FLUID_MULTISPECIES
 #define _FLUID_NEUTRALSTRANSPORT
 #define _FLUID_DIFFUSION TRUE

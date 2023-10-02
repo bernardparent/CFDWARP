@@ -429,6 +429,9 @@ typedef struct {
 #if defined(UNSTEADY) && defined(_AVERAGEDRATES)
    double averagedrates[numaveragedrates];
 #endif
+#ifdef _FLUID_WALLDISTANCE
+   double walldistance2;
+#endif
 } npbs_t;
 
 

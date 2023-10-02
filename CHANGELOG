@@ -7,6 +7,23 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 01a
+  * in model/fluid/_Favre*/fluid.hh
+    - added #define _FLUID_WALLDISTANCE
+  * in model/fluid/_Favre*/fluid_bdry.c
+    - added is_node_bdry_wall_fluid()
+  * in model/fluid/*/fluid_bdry.c
+    - fixed a bug in is_node_bdry_symmetry_plane_fluid(): double RET should be bool RET
+  * in model/fluid/_Favre-Reynolds/fluid_post.c
+    - in find_post_variable_*_fluid(), added the variable "wall distance"
+  * in src/common.h
+    - in npbs_t, added walldistance2
+  * in src/control.c
+    - added reduce_wall_distance_given_wallxyz()
+    - added find_wall_distance()
+    - in readcontrol_actions(), added call to find_wall_distance()
+    
+
 2023 SEP 29a
   * in cycle/*/cycle.c (except _standard)
     - in init_cycle(), added gl->AVERAGEDRATES=AVERAGEDRATES_OFF

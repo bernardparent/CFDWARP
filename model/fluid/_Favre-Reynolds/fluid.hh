@@ -1,5 +1,6 @@
 #define _FLUID_METHOD "Favre-Reynolds Multispecies"
 #define _FLUID_FAVREREYNOLDS
+#define _FLUID_WALLDISTANCE
 #define _FLUID_MULTISPECIES
 #define _FLUID_NEUTRALSTRANSPORT
 #define _FLUID_DIFFUSION TRUE
@@ -19,7 +20,7 @@
 #define fluxtke (ns+nd+1)
 #define fluxpsi (ns+nd+2)
 
-#define totalpostvarfluid (13+nd+ns)
+#define totalpostvarfluid (14+nd+ns)
 #define totalinitvarfluid (nd+ns+4)
 #define hbw_bdry_fluid 2
 // hbw_mem_fluid is the neighbor-nodes bandwidth   on which the node fluid props depend when being resumed

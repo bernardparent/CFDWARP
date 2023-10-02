@@ -50,6 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BDRY_FREESTREAM1 2
 
 
+
+
 void write_bdry_fluid_template(FILE **controlfile){
   wfprintf(*controlfile,
   "  %s(\n",_FLUID_ACTIONNAME);
@@ -382,10 +384,19 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
 
 
 bool is_node_bdry_symmetry_plane_fluid(np_t np){
-  double RET;
+  bool RET;
   if (is_node_bdry(np,TYPELEVEL_FLUID) && (_node_type(np,TYPELEVEL_FLUID)==BDRY_SYMMETRICAL1 
    || _node_type(np,TYPELEVEL_FLUID)==BDRY_SYMMETRICAL2)) RET=TRUE; else RET=FALSE;
   return(RET);
+}
+
+
+bool is_node_bdry_wall_fluid(np_t np, gl_t *gl){
+  bool RET;
+  if (is_node_bdry(np,TYPELEVEL_FLUID) && (_node_type(np,TYPELEVEL_FLUID)==BDRY_WALLADIABATIC1 
+   || _node_type(np,TYPELEVEL_FLUID)==BDRY_WALLTFIXED1 || _node_type(np,TYPELEVEL_FLUID)==BDRY_WALLTFIXEDCATALYTIC1
+   || _node_type(np,TYPELEVEL_FLUID)==BDRY_WALLTFIXEDINJECTION1)) RET=TRUE; else RET=FALSE;
+  return(RET);    
 }
 
 
