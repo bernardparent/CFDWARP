@@ -155,7 +155,7 @@ void solve_TDMA_emfield(np_t *np, gl_t *gl, long theta, long ls, long le,
 
 
 #if defined(UNSTEADY) && defined(_AVERAGEDRATES)
-void set_averaged_rates(np_t *np, gl_t *gl);
+void set_averaged_rates_to_zero(np_t *np, gl_t *gl);
 
 void add_to_averaged_rates(np_t *np, gl_t *gl);
 #endif

@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 02a
+  * in cycle/_standard/cycle.c and cycle/share/cycle_share.c and model/share/chem_share.c
+    - renamed SetAveragedRates to SetAveragedRatesToZero
+  * in cycle/share/cycle_share.c
+    - rewrote the function SetAveragedRatesToZero()
+
+
 2023 OCT 01a
   * in model/fluid/_Favre*/fluid.hh
     - added #define _FLUID_WALLDISTANCE

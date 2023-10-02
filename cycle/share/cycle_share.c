@@ -1489,19 +1489,15 @@ void find_ximax(np_t *np, gl_t *gl, zone_t zone, int IJK_UPDATE){
 
 
 #if defined(UNSTEADY) && defined(_AVERAGEDRATES)
-void set_averaged_rates(np_t *np, gl_t *gl){
-  long i,j,k;
-  flux_t Schem;
-  gl->AVERAGEDRATES=AVERAGEDRATES_SET;
+void set_averaged_rates_to_zero(np_t *np, gl_t *gl){
+  long i,j,k,cnt;
   gl->averagedrates_time=0.0;
-//  printf("setting averaged rates ------------------------------\n");
   for_ijk(gl->domain,is,js,ks,ie,je,ke){
     if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)) {
       assert(is_node_resumed(np[_ai(gl,i,j,k)]));
-      find_Schem(np,gl,_ai(gl,i,j,k),Schem);
+      for (cnt=0; cnt<numaveragedrates; cnt++) np[_ai(gl,i,j,k)].bs->averagedrates[cnt]=0.0;
     }
   }
-  gl->averagedrates_time=gl->dt;
 }
 
 

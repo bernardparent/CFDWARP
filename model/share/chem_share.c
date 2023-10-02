@@ -2843,7 +2843,7 @@ double _averaged_rate(np_t np, gl_t *gl, long react, double rate){
   if (!FOUND) fatal_error("Problem finding react_map in _averaged_rate().");
   switch (gl->AVERAGEDRATES){
     case AVERAGEDRATES_ADD:
-      if (gl->averagedrates_time<0.0) fatal_error("Averaged rates not initialized properly. Need to call SetAveragedRates() first.");
+      if (gl->averagedrates_time<0.0) fatal_error("Averaged rates not initialized properly. Need to call SetAveragedRatesToZero() first.");
       np.bs->averagedrates[react_map]=(np.bs->averagedrates[react_map]*gl->averagedrates_time+gl->dt*rate)/(gl->averagedrates_time+gl->dt);
       newrate=rate;
     break;
@@ -2852,7 +2852,7 @@ double _averaged_rate(np_t np, gl_t *gl, long react, double rate){
       newrate=rate;
     break;
     case AVERAGEDRATES_ON:
-      if (gl->averagedrates_time<0.0) fatal_error("Averaged rates not initialized properly. Need to call SetAveragedRates() first.");
+      if (gl->averagedrates_time<0.0) fatal_error("Averaged rates not initialized properly. Need to call SetAveragedRatesToZero() first.");
       newrate=np.bs->averagedrates[react_map];
     break;
     case AVERAGEDRATES_OFF:

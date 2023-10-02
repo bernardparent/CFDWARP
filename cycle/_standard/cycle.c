@@ -113,7 +113,7 @@ void write_runtime_template(FILE **controlfile){
 #endif
   ",\n"
 #ifdef _AVERAGEDRATES
-  "      {SetAveragedRates();}\n"
+  "      {SetAveragedRatesToZero();}\n"
   "      {AddToAveragedRates();}\n"
 #endif
   "      IncreaseTimeLevel();\n"
@@ -217,8 +217,8 @@ void runtime_actions_cycle_specific(char *actionname, char **argum, SOAP_codex_t
 
 
 #if defined(UNSTEADY) && defined(_AVERAGEDRATES)
-  if (strcmp(actionname,"SetAveragedRates")==0) {
-    set_averaged_rates(np, gl);
+  if (strcmp(actionname,"SetAveragedRatesToZero")==0) {
+    set_averaged_rates_to_zero(np, gl);
     codex->ACTIONPROCESSED=TRUE;
   }
 
