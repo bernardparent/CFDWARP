@@ -227,7 +227,7 @@ int main ( int argc, char **argv ) {
 
 #if defined(UNSTEADY) && defined (_AVERAGEDRATES)
   gl.averagedrates_time = -1.0e99;
-  gl.AVERAGEDRATES=AVERAGEDRATES_SET;
+  gl.AVERAGEDRATES=AVERAGEDRATES_OFF;
 #endif
 
 #ifdef EMFIELD

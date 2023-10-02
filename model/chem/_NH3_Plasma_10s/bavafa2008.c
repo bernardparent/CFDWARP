@@ -46,7 +46,7 @@ void find_W_bavafa2008 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, do
   long k;
   spec_t X, N;
   double R;
-  double theta,rate;
+  double theta;
 
   theta = log(Estar);
 
@@ -99,7 +99,7 @@ void find_W_bavafa2008 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, do
 void find_dW_dx_bavafa2008 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
                   double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
-  long k, s, spec;                    /* counters */
+  long k, s;                    /* counters */
   spec_t X, N;
   double R;
   double dkfdTe,dkfdT,dkfdTv,kf;

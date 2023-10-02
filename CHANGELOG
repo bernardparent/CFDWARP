@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 02b
+  * in model/chem/_NH3_Plasma_10s/bavafa2008.c
+    - removed unused variables
+  * in model/chem/_NH3_Plasma_10s/bavafa2008.h
+    - added np parameter to find_W_bavafa2008 and to find_dW_dx_bavafa2008
+  * in model/chem/_NH3_Plasma_10s/chem.c
+    - added np parameter to find_W_bavafa2008 and to find_dW_dx_bavafa2008 calls
+  * in src/main.c
+    - changed gl.AVERAGEDRATES=AVERAGEDRATES_SET to gl.AVERAGEDRATES=AVERAGEDRATES_OFF
+    
+
 2023 OCT 02a
   * in cycle/_standard/cycle.c and cycle/share/cycle_share.c and model/share/chem_share.c
     - renamed SetAveragedRates to SetAveragedRatesToZero

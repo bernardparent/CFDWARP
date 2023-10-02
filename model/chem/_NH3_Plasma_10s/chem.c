@@ -109,7 +109,7 @@ void find_dW_dx_None ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
 void find_W ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
   switch (gl->model.chem.CHEMMODEL){
     case CHEMMODEL_BAVAFA2008: 
-      find_W_bavafa2008 ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
+      find_W_bavafa2008 ( np, gl, rhok, T, Te, Tv, Estar, Qbeam, W );
     break;
     case CHEMMODEL_NONE: 
       find_W_None ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );    
@@ -125,7 +125,7 @@ void find_dW_dx ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   switch (gl->model.chem.CHEMMODEL){
     case CHEMMODEL_BAVAFA2008: 
-      find_dW_dx_bavafa2008 ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+      find_dW_dx_bavafa2008 ( np, gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
     break;
     case CHEMMODEL_NONE: 
       find_dW_dx_None ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
@@ -141,7 +141,6 @@ void find_dW_dx ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv
 
 
 void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
-  double theta;
   
   *Qei=0.0;  
   if (gl->model.chem.QEISOURCETERMS){
@@ -160,7 +159,6 @@ void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
 
 
 void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
-  double theta;
   long spec;
   
   for (spec=0; spec<ns; spec++) dQeidrhok[spec]=0.0;
