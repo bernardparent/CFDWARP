@@ -1,46 +1,71 @@
 {
   _______________________________________________________________________________________________
 
-  WARP: a CFD Code for Plasma Aerodynamics [a]
+                                           C F D W A R P
+
+                                CFD Code for Plasma & Reactive Flow
   _______________________________________________________________________________________________
 
-  Cycle Strategy                          Multizone [1]
-  Fluid Transport Integration             Block ADI [2,3]
-  EM Field Integration                    none
-  Convection Derivative Discretization    FDS [5] Total Variation Diminishing 2nd Order [4]
-  Time Derivative Discretization          Steady-State
-  Fluid Transport Model                   Favre-Reynolds Multispecies
-  Chemical Model                          Air 1 species 0 reaction
-  Beam Model                              None
-  EM Field Model                          None
-  Thermodynamic Model                     NASA Glenn Polynomials [6]
-  Number of Dimensions                    2
-  Number of Flux Components               6
-  Number of Species                       1
-  Number of Charged Species               0
-  List of Species                         Air
+  Version                          23oct02b
+  Compiler                         gcc 8.3.0 with OPENMP threads with assertions
+  Compiled on                      Oct  3 2023 at 21:54:30
+  Cycle Strategy                   Standard
+  Fluid Relaxation                 Block ADI [1,2]
+  EM Field Relaxation              None
+  Convection Discretization        Reconstruction-Evolution MUSCL with flux FVS [3], FDS [5],
+                                   and primitive interpolation TVD [4], WENO [7], CWENO [9],
+                                   AOWENO [8], and eigenvalue conditioning HARTEN, GNOFFO [10],
+                                   PECLET [11], PASCAL [6], and PARENT positivity-preserving
+                                   filter [12]
+  Temporal Discretization          Steady-State
+  Fluid Model                      Favre-Reynolds Multispecies
+  Thermodynamic Model              NASA Glenn Polynomials [13].
+  Transport Model                  Dixon-Lewis [14]
+  Chemical Model                   Air 1 species 0 reaction
+  EM Field Model                   None
+  Beam Model                       None
+  Number of Dimensions             2
+  Number of Flux Components        6
+  Number of Species                1
+  Number of Charged Species        0
+  List of Species                  Air
   _______________________________________________________________________________________________
 
-  [a]  B Parent. "Weakly-ionized Airflow Resolver and Post-processor: a CFD Code for Plasma
-       Aerodynamics", WARP version 16dec30b compiled on Dec 31 2016 at 22:25:06 using gcc 4.8.4
-       with OPENMP threads. WARP is a Copyright (c) 1998-2016 of Bernard Parent. Copying and
-       distribution of WARP is prohibited.
-  [1]  B Parent and JP Sislian. "The Use of Domain Decomposition in Accelerating the Convergence
-       of Quasihyperbolic Systems", Journal of Computational Physics 179:140-169, 2002.
-  [2]  WR Briley and H McDonald. "On the Structure and Use of Linearized Block Implicit Schemes",
-       Journal of Computational Physics 34:54-73, 1980.
-  [3]  RM Beam and RF Warming. "An Implicit Finite-Difference Algorithm for Hyperbolic Systems in
-       Conservation-Law-Form", Journal of Computational Physics 22:87-110, 1976.
+  [1]  WR Briley and H McDonald. "On the Structure and Use of Linearized Block Implicit
+       Schemes", Journal of Computational Physics 34:54-73, 1980.
+  [2]  RM Beam and RF Warming. "An Implicit Finite-Difference Algorithm for Hyperbolic Systems
+       in Conservation-Law-Form", Journal of Computational Physics 22:87-110, 1976.
+  [3]  JL Steger and RF Warming. "Flux Vector Splitting of the Inviscid Gasdynamic Equations
+       with Application to Finite-Difference Methods", Journal of Computational Physics 40:263-
+       293, 1981.
   [4]  WK Anderson, JL Thomas, and B Van Leer. "Comparison of Finite Volume Flux Vector
        Splittings for the Euler Equations", AIAA Journal 24:1453-1460, 1986.
   [5]  PL Roe. "Approximate Riemann Solvers, Parameter Vectors, and Difference Schemes", Journal
        of Computational Physics 43:357-372, 1981.
-  [6]  BJ McBride, MJ Zehe, and S Gordon. "NASA Glenn Coefficients for Calculating Thermodynamic
+  [6]  B Parent. "Positivity-Preserving Dual Time Stepping Schemes for Gas Dynamics", Journal of
+       Computational Physics 361:391-411, 2018.
+  [7]  G Jiang and CW Shu. "Efficient Implementation of Weighted ENO Schemes", Journal of
+       Computational Physics 126:202-228, 1996.
+  [8]  DS Balsara, S Garain, and CW Shu. "An Efficient Class of WENO schemes with Adaptive
+       Order", Journal of Computational Physics 326:780-804, 2016.
+  [9]  M Dumbser and M Kaser. "Arbitrary High Order Non-oscillatory Finite Volume Schemes on
+       Unstructured Meshes for Linear Hyperbolic Systems", Journal of Computational Physics,
+       221:693-723, 2007.
+  [10] P Gnoffo and  JA White. "Computational Aerothermodynamic Simulation Issues on
+       Unstructured Grids", 37th AIAA Thermophysics Conference, AIAA Paper 2004-2371, 2004.
+  [11] B Parent. "Multidimensional High-Resolution Schemes for Viscous Hypersonic Flows", AIAA
+       Journal, 55:141-152, 2017.
+  [12] B Parent. "Making a Flux Positivity-Preserving: A General Purpose Filter for the Euler
+       Equations", AIAA Paper 2019-0906, AIAA Scitech, San Diego CA, 2019.
+  [13] BJ McBride, MJ Zehe, and S Gordon. "NASA Glenn Coefficients for Calculating Thermodynamic
        Properties of Individual Species", NASA TP 2002-211556, 2002.
+  [14] Dixon-Lewis, G., "Computer Modelling of Combustor Reactions", Springer Verlag, 1984.
+
 
 }
 
-Mx_top=8.0;
+
+Mx_top=2.7;
 Mx_bot=2.0;
 
 mf=1.0; 
@@ -83,6 +108,12 @@ Grid(
 
 );
 
+Block(
+  Fluid(
+    Cut(is,jm1,  im,jm2);
+  );
+);
+
 
 Bdry(
   FavreReynolds(
@@ -105,9 +136,9 @@ Bdry(
     BDRY_SLIPWALL1                     12        Slip wall, 1st order, Adiabatic
     _________________________________________________________________________________________
     }
-    Cut(is,jm1,  im,jm2);
-    All(BDRY_WALLTFIXED1);
-    Faces(BDRY_INFLOWSUPERSONIC,BDRY_OUTFLOWSUPERSONIC1,  BDRY_OUTFLOWSUPERSONIC1,BDRY_OUTFLOWSUPERSONIC1);
+    All(BDRY_OUTFLOWSUPERSONIC1);
+    Plane("i",is,BDRY_INFLOWSUPERSONIC);
+
     {
     Cut(is,js,  ie,je);
     Region(is,js,  ie,je,  BDRY_INFLOWSUPERSONIC);
@@ -118,8 +149,8 @@ Bdry(
  
 Model(
   FavreReynolds(
-    TURBMODEL=TURBMODEL_KOMEGA1988;  {TURBMODEL_KOMEGA2008 [RECOMMENDED], TURBMODEL_KOMEGA1988, TURBMODEL_KEPSILON}
-    DILATDISSIP=DILATDISSIP_WILCOX; {DILATDISSIP_WILCOX [RECOMMENDED], DILATDISSIP_SARKAR, NO}
+    TURBMODEL=TURBMODEL_SST1994;  
+    DILATDISSIP=DILATDISSIP_WILCOX; 
     RAPCOMP=NO;     {Coakley rapid compression correction}
     TURBSOURCE=YES; {solve the turbulence source terms?}
     REACTING=YES;   {Chemical reactions?}
@@ -134,9 +165,9 @@ Model(
     kmin=1.0e-10;   kmax=9.9e99;   {min and max TKE allowed in the domain in m2/s2}
     psimin=1e-10;   psimax=9.9e99; {min and max omega/epsilon allowed in the domain}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain}
-    zetaA1=0.1e0;     {conditions the eigenvalues of the A jacobian}
-    EIGENVALCOND=EIGENVALCOND_PECLET; {set the eigenvalue conditioning to EIGENVALCOND_PECLET, EIGENVALCOND_PASCAL [RECOMMENDED], or EIGENVALCOND_HARTEN}
     AXISYMMETRIC=NO;
+    SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
+    SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
   );
 );
 
@@ -178,87 +209,60 @@ Init(
   );
 );
 
+Disc(
+  FavreReynolds(
+    zetaA1=0.1e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.2e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+  );
+  MUSCL(
+    FLUX=FLUX_FDS;
+    AVERAGING=AVERAGING_ROE;
+    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
+    AOWENO_gammalo=0.85;
+    AOWENO_gammahi=0.85;
+    INTERPOL=INTERPOL_TVD2_VANLEER;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
+    POSFILTER=POSFILTER_NONE;
+    POSFILTER_numiter=4;
+  );
+);
+
 
 Cycle(
   FavreReynolds(
-    xiverge=3e2;{residual convergence threshold}
+    xiverge=1e-3;{residual convergence threshold}
     rhoref=1.0;  {reference density in kg/m3}
     aref=300.0;  {reference sound speed in m/s}
     kref=1e4;    {reference turbulence kinetic energy in m2/s2}
     psiref=1e8;  {reference specific dissipation rate of the TKE in 1/s if for TURBMODEL_KOMEGA*
                   reference dissipation rate of the TKE in m2/s3 for TURBMODEL_KEPSILON}
-    Uref[1]=rhoref;   
-    Uref[2]=rhoref*aref;   
-    Uref[3]=rhoref*aref;   
-    Uref[4]=rhoref*aref*aref;  
-    Uref[5]=rhoref*kref;  
-    Uref[6]=rhoref*psiref;  
+    for (spec,1,numspec,
+      Uref[spec]=rhoref;
+    );
+    for (dim,1,numdim,
+      Uref[numspec+dim]=rhoref*aref;
+    );
+    Uref[numspec+numdim+1]=rhoref*aref*aref;
+    Uref[numspec+numdim+2]=rhoref*kref;  
+    Uref[numspec+numdim+3]=rhoref*psiref;  
   );
-  MultizoneSteady(
+  SteadyState(
     if (mod(iter,50)==0,
       WriteDataFile(outputfilename);
     );
-    sigma1=0.35;   {exponent of maximum pseudotime step in all dimensions}
-    sigma2=0.35;   {exponent of maximum pseudotime step in all fluxes}
-    PRECONDITIONER=PRECON_LOCALTIMESTEP;
+    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
+    sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
       CFL=0.01;
     );
-    CFL=min(CFL*1.05,0.5);
-    phi1=20;      {maximum number of gridlines per zone in each dimension}
-    UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2,phi1);
-
-    printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld) %3ld/%3ld%s \n",
-           CFL,iter,effiter_U,ximax,i_ximax,
-           j_ximax,numzones_updated,numzones_total,clipinfo);
+    CFL=min(CFL*1.01,2.5);
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
+    printf("%6.2f %6ld %9.3f   %E (%2ld %4ld,%4ld)  %s\n",
+           CFL,iter,effiter_U,ximax,flux_ximax,i_ximax,
+           j_ximax,clipinfo);
   );
 );
 
 
 Post(
-  xstation[1]=0.1;{m}
-  xstation[2]=0.2;{m}
-  xstation[3]=0.3;{m}
-  for (cnt,1,3,
-    SetPostDomainToXstation(xstation[cnt]);
-    printf("    Processing x-station..");
-    Pback=XSTATION_Pback({Aback,m2/m}1.0, {Pback_min,Pa}400, {Pback_max,Pa}4000, {numsteps}300,
-                 {q_min,m (as small a positive value as possible)}1.0);
-    Fpot=XSTATION_Fpot(Pback,{numsteps}300, {q_min,m}1.0);
-    mdot=XSTATION_mdot();
-    Tstag=XSTATION_Tstag();
-    Pstag=XSTATION_Pstag({numsteps} 300);
-    Pstar=XSTATION_Pstar();
-    T=XSTATION_T();
-    q=XSTATION_q();
-    rho=XSTATION_rho();
-    htstar=XSTATION_htstar();
-    printf("\n"
-           "    x      = %E m\n"
-           "    Pback  = %E Pa\n"
-           "    Fpot   = %E Ns/kg\n"
-           "    mdot   = %E kg/ms\n"
-           "    htstar = %E J/kg\n"
-           "    Tstag  = %E K\n"
-           "    Pstag  = %E Pa\n"
-           "    Pstar  = %E Pa\n"
-           "    T      = %E K\n"
-           "    q      = %E m/s\n"
-           "    rho    = %E kg/m3\n\n"
-           ,xstation[cnt],Pback,Fpot,mdot,htstar,Tstag,Pstag,Pstar,T,q,rho);
-  );
-  ResetPostDomain();
-  RestrictPostDomainToRegion(is,js, ie,je);
-  printf("\n");
-  for (dim,1,2,
-    Fshear[dim]=_Fshear(dim,BDRY_WALLTFIXED1);
-    Fpressure[dim]=_Fpressure(dim,BDRY_WALLTFIXED1);
-  );
-  printf("    Fshear    = (%+E,%+E) N/m\n",Fshear[1],Fshear[2]);
-  printf("    Fpressure = (%+E,%+E) N/m\n",Fpressure[1],Fpressure[2]);
-  printf("\n");
-  {
-  WritePostFile("post.01", "tecplot",POSTFILE_ALL);
-  WritePostFile("grid.01", "tecplot",POSTFILE_GRID);
-  }
 );

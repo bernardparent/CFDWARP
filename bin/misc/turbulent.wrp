@@ -27,6 +27,16 @@ Grid(
 );
 
 
+Block(
+  Fluid(
+    {
+    Cut(is,js,  ie,je);
+    Link(i1,j1,  i2,j2);
+    }
+  );
+);
+
+
 Bdry(
   FavreReynolds(
     {

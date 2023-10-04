@@ -119,6 +119,7 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
     SOAP_add_int_to_vars(codex,"TURBMODEL_KEPSILON",TURBMODEL_KEPSILON); 
     SOAP_add_int_to_vars(codex,"TURBMODEL_KOMEGA1988",TURBMODEL_KOMEGA1988); 
     SOAP_add_int_to_vars(codex,"TURBMODEL_KOMEGA2008",TURBMODEL_KOMEGA2008); 
+    SOAP_add_int_to_vars(codex,"TURBMODEL_SST1994",TURBMODEL_SST1994); 
 
     gl->MODEL_FLUID_READ=TRUE;
     
@@ -154,8 +155,8 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
     find_bool_var_from_codex(codex,"ADD_ETA_TO_ETAT_WITHIN_QK",&gl->model.fluid.ADD_ETA_TO_ETAT_WITHIN_QK);
     find_bool_var_from_codex(codex,"TURBSOURCE",&gl->model.fluid.TURBSOURCE);
     find_int_var_from_codex(codex,"TURBMODEL",&gl->model.fluid.TURBMODEL);
-    if (gl->model.fluid.TURBMODEL!=TURBMODEL_KEPSILON && gl->model.fluid.TURBMODEL!=TURBMODEL_KOMEGA1988 && gl->model.fluid.TURBMODEL!=TURBMODEL_KOMEGA2008)
-      SOAP_fatal_error(codex,"TURBMODEL must be set to either TURBMODEL_KEPSILON or TURBMODEL_KOMEGA1988 or TURBMODEL_KOMEGA2008.");
+    if (gl->model.fluid.TURBMODEL!=TURBMODEL_KEPSILON && gl->model.fluid.TURBMODEL!=TURBMODEL_KOMEGA1988 && gl->model.fluid.TURBMODEL!=TURBMODEL_KOMEGA2008 && gl->model.fluid.TURBMODEL!=TURBMODEL_SST1994)
+      SOAP_fatal_error(codex,"TURBMODEL must be set to either TURBMODEL_KEPSILON or TURBMODEL_KOMEGA1988 or TURBMODEL_KOMEGA2008 or TURBMODEL_SST1994.");
     find_bool_var_from_codex(codex,"RAPCOMP",&gl->model.fluid.RAPCOMP);
     find_bool_var_from_codex(codex,"REACTING",&gl->model.fluid.REACTING);
     find_int_var_from_codex(codex,"DILATDISSIP",&gl->model.fluid.DILATDISSIP);

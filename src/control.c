@@ -1110,7 +1110,8 @@ void find_wall_distance(np_t *np, gl_t *gl){
         }
       }
 #ifdef OPENMPTHREADS
-#pragma omp parallel for private(cnt) schedule(dynamic)
+//can't thread unless a nodelock is implemented (see data.c)
+//#pragma omp parallel for private(cnt) schedule(dynamic)
 #endif
       for (cnt=0; cnt<thisnumbdrywall; cnt++)
         reduce_wall_distance_given_wallxyz(np, gl,  thiswallxyz[cnt]);
@@ -1119,7 +1120,8 @@ void find_wall_distance(np_t *np, gl_t *gl){
       wallxyz=realloc(wallxyz,sizeof(dim_t)*(numbdrywall));
       MPI_Recv(wallxyz,numbdrywall*nd,MPI_DOUBLE,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
 #ifdef OPENMPTHREADS
-#pragma omp parallel for private(cnt) schedule(dynamic)
+//can't thread unless a nodelock is implemented (see data.c)
+//#pragma omp parallel for private(cnt) schedule(dynamic)
 #endif
       for (cnt=0; cnt<numbdrywall; cnt++)
         reduce_wall_distance_given_wallxyz(np, gl,  wallxyz[cnt]);
@@ -1151,7 +1153,8 @@ void find_wall_distance(np_t *np, gl_t *gl){
     np[l].bs->walldistance2=1e99;
   }
 #ifdef OPENMPTHREADS
-#pragma omp parallel for private(cnt) schedule(dynamic)
+//can't thread unless a nodelock is implemented (see data.c)
+//#pragma omp parallel for private(cnt) schedule(dynamic)
 #endif
   for (cnt=0; cnt<numbdrywall; cnt++)
     reduce_wall_distance_given_wallxyz(np, gl,  wallxyz[cnt]);

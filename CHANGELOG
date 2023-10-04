@@ -7,6 +7,23 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 03a
+  * in model/fluid/_Favre*/fluid.c
+    - in read_model_fluid_actions() added TURBMODEL_SST1994
+  * in model/share/fluid_share.c
+    - in _ktilde(), _eps(), _omega(), _etat_from_rho_eta_k_psitilde(), _etakstar(), _etapsistar(),
+      find_k_psi_bdry_wall(),  _factepsilon(), find_Stnorm(), find_dStnorm_dU(), find_dStcomp_dU()
+      added code for TURBMODEL_SST1994
+    - added function _F1() needed for TURBMODEL_SST1994
+    - in _etat_from_rho_eta_k_psitilde(), fixed a bug with KOMEGA2008 model: sum was set to zero
+      after being computed while it shouldn't be
+  * in src/control.c
+    - in find_wall_distance(), removed the calls to OMP threading (will lead to problems because
+      there is no nodelock implemented here)
+  * in bin
+    - added shearlayer.wrp
+    
+
 2023 OCT 02b
   * in model/chem/_NH3_Plasma_10s/bavafa2008.c
     - removed unused variables

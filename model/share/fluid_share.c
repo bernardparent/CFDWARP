@@ -692,6 +692,10 @@ double _ktilde (np_t *np, long l, gl_t *gl){
       ret=max(min(gl->model.fluid.kdiv,_psitilde(np[l],gl)*_eta(np,l,gl)/_rho(np[l])*0.09e0),
               _k(np[l]));   
     break;
+    case TURBMODEL_SST1994:
+      ret=max(min(gl->model.fluid.kdiv,_psitilde(np[l],gl)*_eta(np,l,gl)/_rho(np[l])*0.09e0),
+              _k(np[l]));   
+    break;
     default:
       fatal_error("Turbulence model invalid in _ktilde");
   }
@@ -719,6 +723,9 @@ double _eps (np_t np, gl_t *gl){
     case TURBMODEL_KOMEGA2008:
       ret=0.09*max(0.0,_k(np))*max(0.0,_psi(np));
     break;
+    case TURBMODEL_SST1994:
+      ret=0.09*max(0.0,_k(np))*max(0.0,_psi(np));
+    break;
     default:
       fatal_error("Turbulence model invalid in _eps().");
   }
@@ -737,6 +744,9 @@ double _omega (np_t *np, long l, gl_t *gl){
       ret=_psi(np[l]);
     break;
     case TURBMODEL_KOMEGA2008:
+      ret=_psi(np[l]);
+    break;
+    case TURBMODEL_SST1994:
       ret=_psi(np[l]);
     break;
     default:
@@ -766,7 +776,7 @@ double _dVi_dxj(np_t *np, long l, gl_t *gl, long i, long j){
 
 
 double _etat_from_rho_eta_k_psitilde(np_t *np, long l, gl_t *gl, double rho, double eta, double k, double psitilde){
-  double etat,Ret,sum,sum2;
+  double etat,Ret,sum,sum2,F2,d;
   long i,j,m;
   etat=0.0;
   switch(gl->model.fluid.TURBMODEL){
@@ -794,8 +804,20 @@ double _etat_from_rho_eta_k_psitilde(np_t *np, long l, gl_t *gl, double rho, dou
           sum+=sqr(sum2);
         }
       } 
-      sum=0.0;
+//      sum=0.0;
       etat=rho*max(k,0.0e0)/max(psitilde,35.0/12.0*sqrt(0.5*sum)); 
+    break;
+    case TURBMODEL_SST1994:
+      sum=0.0;
+      for (i=0; i<nd; i++){
+        for (j=0; j<nd; j++){
+          sum2=_dVi_dxj(np,l,gl,i,j)+_dVi_dxj(np,l,gl,j,i);
+          sum+=sqr(sum2);
+        }
+      }      
+      d=sqrt(np[l].bs->walldistance2);
+      F2=tanh(sqr(max(2.0*sqrt(max(k,0.0))/(0.09*psitilde*d),500.0*eta/(rho*d*d*psitilde))));
+      etat=rho*0.31*max(k,0.0e0)/max(0.31*psitilde,F2*sqrt(0.5*sum));
     break;
     default:
       fatal_error("Turbulence model invalid in _etat_from_rho_eta_k_psitilde."); 
@@ -838,8 +860,45 @@ double _nustar (np_t *np, long l, gl_t *gl, long spec) {
 }
 
 
+static double _F1(np_t *np, long l, gl_t *gl){
+  double sum1,dkdxj,domegadxj,CD,d,arg1,F1;
+  long dim,j,linner;
+  
+  find_l_of_nearest_inner_node(np, gl, l, TYPELEVEL_FLUID, &linner);
+  d=sqrt(np[linner].bs->walldistance2);
+  
+  sum1=0.0;
+  for (j=0; j<nd; j++){
+    dkdxj=0.0;
+    domegadxj=0.0;
+    for (dim=0; dim<nd; dim++){
+      dkdxj+=_X(np[linner], dim,j)*0.5*(_k(np[_al(gl,linner,dim,+1)])-_k(np[_al(gl,linner,dim,-1)]));
+      domegadxj+=_X(np[linner], dim,j)*0.5*(_psi(np[_al(gl,linner,dim,+1)])-_psi(np[_al(gl,linner,dim,-1)]));
+    }
+    sum1+=dkdxj*domegadxj;
+  }
+  CD=max(2.0*_rho(np[linner])*0.856/_psitilde(np[linner],gl)*sum1,1e-20);
+  
+  arg1=
+     min(
+       max(
+         sqrt(max(0.0,_k(np[linner]))/(0.09*d*_psitilde(np[linner],gl))) 
+       , 
+         500.0*_eta(np,linner,gl)/(_rho(np[linner])*d*d*_psitilde(np[linner],gl))
+       )
+     ,
+       4.0*_rho(np[linner])*0.856*max(0.0,_k(np[linner]))/(CD*d*d)
+     );
+  F1=tanh(powint(arg1,4));
+
+  assert(F1>=0.0);
+  assert(F1<=1.0);
+  return(F1);
+}
+
+
 double _etakstar (np_t *np, long l, gl_t *gl) {
-  double etakstar;
+  double etakstar,F1;
   etakstar=_eta(np,l,gl);  
   switch (gl->model.fluid.TURBMODEL){
     case TURBMODEL_KEPSILON:
@@ -851,6 +910,10 @@ double _etakstar (np_t *np, long l, gl_t *gl) {
     case TURBMODEL_KOMEGA2008:
       etakstar+=3.0/5.0*_rho(np[l])*max(0.0,_k(np[l]))/_psitilde(np[l],gl);
     break;
+    case TURBMODEL_SST1994:
+      F1=_F1(np, l, gl);
+      etakstar+=_etat(np,l,gl)*(F1*0.85+(1.0-F1)*1.0);
+    break;
     default:
       fatal_error("Turbulence model invalid in _etakstar().");
   }
@@ -859,7 +922,7 @@ double _etakstar (np_t *np, long l, gl_t *gl) {
 
 
 double _etapsistar (np_t *np, long l, gl_t *gl) {
-  double etapsistar;
+  double etapsistar,F1;
   etapsistar=_eta(np,l,gl);  
   switch (gl->model.fluid.TURBMODEL){
     case TURBMODEL_KEPSILON:
@@ -870,6 +933,10 @@ double _etapsistar (np_t *np, long l, gl_t *gl) {
     break;
     case TURBMODEL_KOMEGA2008:
       etapsistar+=0.5e0*_rho(np[l])*max(0.0,_k(np[l]))/_psitilde(np[l],gl);
+    break;
+    case TURBMODEL_SST1994:
+      F1=_F1(np, l, gl);
+      etapsistar+=_etat(np,l,gl)*(F1*0.5+(1.0-F1)*0.856);
     break;
     default:
       fatal_error("Turbulence model invalid in _etapsistar().");
@@ -923,6 +990,17 @@ void find_k_psi_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, double 
       /* use the Menter boundary condition here but substitute eta by etastar -> this works better when
           y+ of the near wall node is significantly higher than 1*/
       *psi=800.0e0*_etastar(np,lB,gl)/_rho(np[lB])/sqrdw;
+    break;
+    case TURBMODEL_SST1994:
+      sqrdw=0.0e0;
+      for (dim=0; dim<nd; dim++){
+        sqrdw=sqrdw+sqr(np[lB].bs->x[dim]-np[lA].bs->x[dim]);
+      }
+      assert_np(np[lB],_rho(np[lB])!=0.0e0);
+      assert_np(np[lA],sqrdw!=0.0e0);
+      /* use the Menter boundary condition here but substitute eta by etastar -> this works better when
+          y+ of the near wall node is significantly higher than 1*/
+      *psi=(10.0*6.0/0.075)*_etastar(np,lB,gl)/_rho(np[lB])/sqrdw;
     break;
     default:
       fatal_error("Turbulence model invalid in find_k_psi_bdry_wall().");
@@ -1036,8 +1114,8 @@ static double _factepsilon(np_t np, gl_t *gl, long theta){
 /* in St, find the source terms of the k-omega / k-epsilon turbulence models */
 void find_Stnorm(np_t *np, gl_t *gl, long l, flux_t St){
   long flux,i,j,dim,theta;
-  double dkdxj,domegadxj,chiw,eta,etat,Ret,Qk,sum1,sum1a,sum2,sum2a,
-         Omega,rho,ktilde,psitilde,k,eps,psi;
+  double dkdxj,domegadxj,chiw,eta,etat,Ret,Qk,sum,sum1,sum1a,sum2,sum2a,
+         Omega,rho,ktilde,psitilde,k,eps,psi,gamma1,gamma2,F1,F2,etattilde,d;
 
   for (flux=0; flux<nf; flux++){
     St[flux]=0.0e0;
@@ -1114,10 +1192,44 @@ void find_Stnorm(np_t *np, gl_t *gl, long l, flux_t St){
                        -psi/ktilde*0.7867*(1.0+85.0*chiw)/(1.0+100.0*chiw)*rho*eps
                        +TEST_VANISH*1.0/8.0*rho/psitilde*max(0.0,sum1));
     break;
+    case TURBMODEL_SST1994:
+      // use the Qk limiter (see Menter, F. R., "Zonal Two Equation k-omega Turbulence Models for Aerodynamic Flows," AIAA Paper 93-2906, July 1993, https://doi.org/10.2514/6.1993-2906)
+      St[fluxtke]=TEST_VANISH*min(Qk,20.0*0.09*rho*psi*k)-0.09*rho*psi*k;
+      assert_np(np[l],ktilde!=0.0e0);
+      gamma1=0.075/0.09-0.5*sqr(0.41)/sqrt(0.09);
+      gamma2=0.0828/0.09-0.856*sqr(0.41)/sqrt(0.09);
+      F1=_F1(np,l,gl);
+
+      sum=0.0;
+      for (i=0; i<nd; i++){
+        for (j=0; j<nd; j++){
+          sum2=_dVi_dxj(np,l,gl,i,j)+_dVi_dxj(np,l,gl,j,i);
+          sum+=sqr(sum2);
+        }
+      }      
+      d=sqrt(np[l].bs->walldistance2);
+      F2=tanh(sqr(max(2.0*sqrt(max(k,0.0))/(0.09*psitilde*d),500.0*_eta(np,l,gl)/(rho*d*d*psitilde))));
+      etattilde=rho*0.31*ktilde/max(0.31*psitilde,F2*sqrt(0.5*sum));
+      
+      sum1=0.0;
+      for (j=0; j<nd; j++){
+        dkdxj=0.0;
+        domegadxj=0.0;
+        for (dim=0; dim<nd; dim++){
+          dkdxj+=_X(np[l], dim,j)*0.5*(_k(np[_al(gl,l,dim,+1)])-_k(np[_al(gl,l,dim,-1)]));
+          domegadxj+=_X(np[l], dim,j)*0.5*(_psi(np[_al(gl,l,dim,+1)])-_psi(np[_al(gl,l,dim,-1)]));
+        }
+        sum1+=dkdxj*domegadxj;
+      }
+      St[fluxpsi]=rho*(F1*gamma1+(1.0-F1)*gamma2)/etattilde*TEST_VANISH*Qk
+                 -(F1*0.075+(1.0-F1)*0.0828)*rho*sqr(psi)
+                 +TEST_VANISH*2.0*(1.0-F1)*rho*0.856/psitilde*sum1;    
+    break;
     default:
       fatal_error("Turbulence model invalid in find_Stnorm().");
   }
 }
+
 
 
 static void find_xistar_and_fMt(gl_t *gl, double Mt, double *xi_star, double *fMt){
@@ -1168,7 +1280,8 @@ void find_Stcomp(np_t *np, gl_t *gl, long l, flux_t St){
     Mt=sqrt(2.0e0*max(_k(np[l]),0.0e0))/athermo;
     find_xistar_and_fMt(gl,Mt,&xi_star,&fMt);
     St[fluxtke]=-xi_star*rho*eps*fMt;
-    if (gl->model.fluid.TURBMODEL==TURBMODEL_KOMEGA1988 || gl->model.fluid.TURBMODEL==TURBMODEL_KOMEGA2008) {
+    if (gl->model.fluid.TURBMODEL==TURBMODEL_KOMEGA1988 || gl->model.fluid.TURBMODEL==TURBMODEL_KOMEGA2008
+        || gl->model.fluid.TURBMODEL==TURBMODEL_SST1994) {
       St[fluxpsi]=psi/ktilde*xi_star*rho*eps*fMt;
     }
   }
@@ -1276,7 +1389,7 @@ void find_Saxi_FavreReynolds(np_t *np, gl_t *gl, long l, flux_t S){
 
 void find_dStnorm_dU(np_t *np, gl_t *gl, long l, sqmat_t dStnormdU){
   long spec,row,col;
-  double chiw;
+  double chiw,F1;
   double switch_psiclip;
 
   for (row=0; row<nf; row++){
@@ -1315,6 +1428,18 @@ void find_dStnorm_dU(np_t *np, gl_t *gl, long l, sqmat_t dStnormdU){
       dStnormdU[fluxpsi][fluxpsi]=-max(0.0,2.0*0.09*0.7867*(1.0+85.0*chiw)/(1.0+100.0*chiw))*_psi(np[l])
          -0.09*_psi(np[l])*max(0.0,2360.1*chiw*(1.0+85.0*chiw)/sqr(1.0+100.0*chiw))
          -0.09*_psi(np[l])*max(0.0,-200.61*chiw/(1.0+100.0*chiw));
+    break;
+    case TURBMODEL_SST1994:
+      F1=_F1(np,l,gl);
+//      St[fluxtke]=-0.09*rho*psi*k;
+//      St[fluxpsi]=-(F1*0.075+(1.0-F1)*0.0828)*rho*sqr(psi)
+      for (spec=0; spec<ns; spec++){
+        dStnormdU[fluxtke][spec]=0.09*_psi(np[l])*_k(np[l]);
+        dStnormdU[fluxpsi][spec]=(F1*0.075+(1.0-F1)*0.0828)*sqr(_psi(np[l]));
+      }
+      dStnormdU[fluxtke][fluxtke]=-0.09*max(0.0,_psi(np[l]));
+      dStnormdU[fluxtke][fluxpsi]=-0.09*max(0.0,_k(np[l]));
+      dStnormdU[fluxpsi][fluxpsi]=-(F1*0.075+(1.0-F1)*0.0828)*max(0.0,_psi(np[l]));
     break;
     default:
       fatal_error("Turbulence model invalid in find_dStnorm_dU().");
@@ -1374,6 +1499,13 @@ void find_dStcomp_dU(np_t *np, gl_t *gl, long l, sqmat_t dStcompdU){
 /*      St[fluxtke]=-xi_star*rho*eps*fMt;
         St[fluxtke]=-xi_star*(rho*k)*(rho*psi)/rho*fMt*0.09;
         need to check about the factor 2.0e0 below */
+        dStcompdU[fluxtke][fluxpsi]=-xi_star*fMt*k*0.09;
+        dStcompdU[fluxtke][fluxtke]=-xi_star*fMt*2.0e0*_psi(np[l])*0.09;
+        for (spec=0; spec<ns; spec++){
+          dStcompdU[fluxtke][spec]=xi_star*2.0e0*k*_psi(np[l])*fMt*0.09;
+        }
+      break;
+      case TURBMODEL_SST1994:
         dStcompdU[fluxtke][fluxpsi]=-xi_star*fMt*k*0.09;
         dStcompdU[fluxtke][fluxtke]=-xi_star*fMt*2.0e0*_psi(np[l])*0.09;
         for (spec=0; spec<ns; spec++){

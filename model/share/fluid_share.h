@@ -60,6 +60,7 @@ double _kappav (np_t *np, long l, gl_t *gl);
 #define TURBMODEL_KEPSILON 1
 #define TURBMODEL_KOMEGA1988 2
 #define TURBMODEL_KOMEGA2008 3
+#define TURBMODEL_SST1994 4
 #define DILATDISSIP_NONE 0
 #define DILATDISSIP_WILCOX 1
 #define DILATDISSIP_SARKAR 2
