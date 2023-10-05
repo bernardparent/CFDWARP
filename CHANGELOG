@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 05c
+  * in model/chem/_NH3_Plasma_10s/chem.hh
+    - added missing 3 and 4 to averagedrates_react
+
+
 2023 OCT 05b
   * in model/chem/_NH3_Plasma_10s/bavafa2008.c
     - added _average_rates() calls to reactions 3 and 4

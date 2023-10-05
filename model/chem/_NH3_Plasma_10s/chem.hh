@@ -9,7 +9,9 @@
 
 const static long averagedrates_react[numaveragedrates] = {
   1,  
-  2
+  2,
+  3,
+  4
 };
 
 #define ns 10
