@@ -5,7 +5,7 @@
 #define _CHEM_WEEE_TWOTEMPERATURE
 #define _AVERAGEDRATES
 
-#define numaveragedrates 2
+#define numaveragedrates 4
 
 const static long averagedrates_react[numaveragedrates] = {
   1,  
