@@ -1395,11 +1395,17 @@ void find_subzones_in_zone_given_zonelength(long zonelength, zone_t zone, long *
     zonej=mod(cntzone/(numzonei),numzonej)+1;
     (*subzones)[cntzone].js=zone.js+(zone.je-zone.js+1)*(zonej-1)/numzonej+min(zonej-1,1);
     (*subzones)[cntzone].je=min(zone.je,zone.js+(zone.je-zone.js+1)*(zonej)/numzonej);
+#else
+    (*subzones)[cntzone].js=0;
+    (*subzones)[cntzone].je=0;    
 #endif
 #ifdef _3DL
     zonek=mod(cntzone/(numzonei*numzonej),numzonek)+1;
     (*subzones)[cntzone].ks=zone.ks+(zone.ke-zone.ks+1)*(zonek-1)/numzonek+min(zonek-1,1);
     (*subzones)[cntzone].ke=min(zone.ke,zone.ks+(zone.ke-zone.ks+1)*(zonek)/numzonek);
+#else
+    (*subzones)[cntzone].ks=0;
+    (*subzones)[cntzone].ke=0;
 #endif
   }
 }

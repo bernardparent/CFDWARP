@@ -6,6 +6,15 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2023 OCT 05a
+  * in cycle/share/cycle_share.c
+    - in setup_multizone(), set ks and ke to 0 when in 2D mode (to avoid a valgrind complaint)
+  * in src/common.c
+    - in find_subzones_in_zone_given_zonelength(), set ks and ke to 0 when in 2D mode 
+      (to avoid a valgrind complaint)
+    
+
 2023 OCT 04a
   * in model/chem/
     - added _NH3_Plasma_34s/

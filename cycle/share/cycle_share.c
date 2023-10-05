@@ -1635,20 +1635,32 @@ void setup_multizone(np_t *np, gl_t *gl, zone_t zone, zone_t lim, double xiverge
 #ifdef _2DL
     multizone->bdry[cnt].js=max(lim.js,multizone->ts[cnt].js-hbw_bdry_fluid);
     multizone->bdry[cnt].je=min(lim.je,multizone->ts[cnt].je+hbw_bdry_fluid);
+#else
+    multizone->bdry[cnt].js=0;
+    multizone->bdry[cnt].je=0;
 #endif
 #ifdef _3DL
     multizone->bdry[cnt].ks=max(lim.ks,multizone->ts[cnt].ks-hbw_bdry_fluid);
     multizone->bdry[cnt].ke=min(lim.ke,multizone->ts[cnt].ke+hbw_bdry_fluid);
+#else
+    multizone->bdry[cnt].ks=0;
+    multizone->bdry[cnt].ke=0;
 #endif
     multizone->res[cnt].is=max(lim.is,multizone->ts[cnt].is-hbw_bdry_fluid-hbw_res_fluid);
     multizone->res[cnt].ie=min(lim.ie,multizone->ts[cnt].ie+hbw_bdry_fluid+hbw_res_fluid);
 #ifdef _2DL
     multizone->res[cnt].js=max(lim.js,multizone->ts[cnt].js-hbw_bdry_fluid-hbw_res_fluid);
     multizone->res[cnt].je=min(lim.je,multizone->ts[cnt].je+hbw_bdry_fluid+hbw_res_fluid);
+#else
+    multizone->res[cnt].js=0;
+    multizone->res[cnt].je=0;
 #endif
 #ifdef _3DL
     multizone->res[cnt].ks=max(lim.ks,multizone->ts[cnt].ks-hbw_bdry_fluid-hbw_res_fluid);
     multizone->res[cnt].ke=min(lim.ke,multizone->ts[cnt].ke+hbw_bdry_fluid+hbw_res_fluid);
+#else
+    multizone->res[cnt].ks=0;
+    multizone->res[cnt].ke=0;
 #endif
   }
   multizone->numzones_total=numsubzones;
