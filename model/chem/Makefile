@@ -38,6 +38,7 @@ cleanall:
 	( cd _He_Air_3s_0r ; make cleanall )
 	( cd _H2_He_CH4_Plasma_13s ; make cleanall )
 	( cd _NH3_Plasma_10s ; make cleanall )
+	( cd _NH3_Plasma_34s ; make cleanall )
 
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.

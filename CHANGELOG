@@ -6,6 +6,16 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2023 OCT 04a
+  * in model/chem/
+    - added _NH3_Plasma_34s/
+  * in model/share/chem_share.c
+    - added functions add_to_W_fw_2r4p() and add_to_dW_fw_2r4p()
+  * in model/thermo/_generic/enthalpy.c and model/thermo/_generic/thermo.c and
+    model/transport/_Dixon-Lewis/transport.c
+    - added species NNH, N2H2, N2H3, N2H4, H-, H3+, N3+, N4+, NH2-, NH+, NNH+, H2P, H2C1Pi, N2D,
+      H3, N4, N3
+
 
 2023 OCT 03a
   * in model/fluid/_Favre*/fluid.c

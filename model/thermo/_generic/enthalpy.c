@@ -3531,7 +3531,7 @@ const static double Pa[SMAP_NS][3][11]=
 
 /* 
    species NH4
-   obtained from species NH4+ by subtracting the ionization energy of NH4 (4.410300000e+04) to b1. The ionization energy of NH4 is obtained from "Wight, G. R., and C. E. Brion. "Estimation of the excitation and ionization energies of NH4, H3O and H2F radicals using core analogies applied to K-shell electron energy loss spectra." Chemical Physics Letters 26.4 (1974): 607-609."
+obtained from species NH4+ by subtracting the ionization energy of NH4 (4.410300000e+04) to b1. The ionization energy of NH4 is obtained from "Wight, G. R., and C. E. Brion. "Estimation of the excitation and ionization energies of NH4, H3O and H2F radicals using core analogies applied to K-shell electron energy loss spectra." Chemical Physics Letters 26.4 (1974): 607-609."   
    pos 0: Tmin lower range limit
    pos 1: Tmax upper range limit
    pos 2-8: a1,a2,...,a7
@@ -3578,7 +3578,861 @@ const static double Pa[SMAP_NS][3][11]=
        -1.201535761e+02  /* b2 */          
       }
     },
-                              
+    
+/* 
+   species NNH
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/* The coefficients are obtained from "Burcat, Alexander, and Branko Ruscic. Third millenium ideal gas and condensed phase thermochemical database for combustion (with update from active thermochemical tables). No. ANL-05/20. Argonne National Lab.(ANL), Argonne, IL (United States), 2005." */ 
+    {
+      {
+       +50.00e0,         /* Tmin [K] */ 
+       +200.0e0,        /* Tmax [K] */
+       -1.341564522e+02, /* a1 */
+       +9.013952070e+00, /* a2 */
+       +3.761191920e+00, /* a3 */
+       +3.150900178e-03, /* a4 */
+       -2.124635640e-05, /* a5 */
+       +6.462629190e-08, /* a6 */
+       -5.125968310e-11, /* a7 */
+       +2.905289083e+04, /* b1 */
+       +5.138193520e+00  /* b2 */
+      },
+      {
+       +200.0e0,        /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       -2.234849766e+04, /* a1 */
+       +3.799796780e+02, /* a2 */
+       +1.747089322e+00, /* a3 */
+       +4.729753260e-03, /* a4 */
+       -7.588910180e-08, /* a5 */
+       -1.751925418e-09, /* a6 */
+       +6.583999590e-13, /* a7 */
+       +2.731434238e+04, /* b1 */
+       +1.680375906e+01  /* b2 */        
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       +9.759574290e+05, /* a1 */
+       -4.187312640e+03, /* a2 */
+       +9.644079210e+00, /* a3 */
+       -9.381345650e-04, /* a4 */
+       +1.899951707e-07, /* a5 */
+       -2.042744637e-11, /* a6 */
+       +9.020082270e-16, /* a7 */
+       +5.440933700e+04, /* b1 */
+       -3.669269970e+01  /* b2 */          
+      }
+    },
+    
+/* 
+   species N2H2
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/* The coefficients are obtained from "Burcat, Alexander, and Branko Ruscic. Third millenium ideal gas and condensed phase thermochemical database for combustion (with update from active thermochemical tables). No. ANL-05/20. Argonne National Lab.(ANL), Argonne, IL (United States), 2005." */ 
+    {
+      {
+       +50.00e0,         /* Tmin [K] */ 
+       +200.0e0,        /* Tmax [K] */
+       -4.684621200e+02, /* a1 */
+       +3.105465277e+01, /* a2 */
+       +3.185638910e+00, /* a3 */
+       +1.075111468e-02, /* a4 */
+       -7.469825300e-05, /* a5 */
+       +2.544127344e-07, /* a6 */
+       -3.184292930e-10, /* a7 */
+       +2.277747320e+04, /* b1 */
+       +6.690111560e+00  /* b2 */
+      },
+      {
+       +200.0e0,        /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       -1.385224704e+05, /* a1 */
+       +2.171346411e+03, /* a2 */
+       -8.410085980e+00, /* a3 */
+       +3.004285170e-02, /* a4 */
+       -2.707145858e-05, /* a5 */
+       +1.412208350e-08, /* a6 */
+       -3.102835755e-12, /* a7 */
+       +1.262949898e+04, /* b1 */
+       +7.280748700e+01  /* b2 */        
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       +5.582073380e+06, /* a1 */
+       -1.581816401e+04, /* a2 */
+       +1.845116316e+01, /* a3 */
+       -7.760644200e-05, /* a4 */
+       -6.578854220e-07, /* a5 */
+       +1.430474536e-10, /* a6 */
+       -9.249309720e-15, /* a7 */
+       +1.248877277e+05, /* b1 */
+       -1.070727074e+02  /* b2 */          
+      }
+    },
+    
+/* 
+   species N2H3
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/* The coefficients are obtained from "Burcat, Alexander, and Branko Ruscic. Third millenium ideal gas and condensed phase thermochemical database for combustion (with update from active thermochemical tables). No. ANL-05/20. Argonne National Lab.(ANL), Argonne, IL (United States), 2005." */ 
+    {
+      {
+       +50.00e0,         /* Tmin [K] */ 
+       +200.0e0,        /* Tmax [K] */
+       +3.736670550e+00, /* a1 */
+       +1.178638304e-02, /* a2 */
+       -1.843647930e-04, /* a3 */
+       +1.174323657e-06, /* a4 */
+       -2.351480436e-09, /* a5 */
+       +0.000000000e+00, /* a6 */
+       +0.000000000e+00, /* a7 */
+       +2.576938299e+04, /* b1 */
+       +5.943670490e+00  /* b2 */
+      },
+      {
+       +200.0e0,        /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       +3.333828220e+00, /* a1 */
+       +1.938390630e-03, /* a2 */
+       +2.106401154e-05, /* a3 */
+       -2.893245289e-08, /* a4 */
+       +1.185550772e-11, /* a5 */
+       +0.000000000e+00, /* a6 */
+       +0.000000000e+00, /* a7 */
+       +2.582915010e+04, /* b1 */
+       +8.202427980e+00  /* b2 */        
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       +4.162571650e+00, /* a1 */
+       +7.153279030e-03, /* a2 */
+       -2.406097098e-06, /* a3 */
+       +3.710356010e-10, /* a4 */
+       -2.150395988e-14, /* a5 */
+       +0.000000000e+00, /* a6 */
+       +0.000000000e+00, /* a7 */
+       +2.526586223e+04, /* b1 */
+       +2.199260509e+00  /* b2 */          
+      }
+    },        
+
+/* 
+   species N2H4
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/* The coefficients are obtained from https://cearun.grc.nasa.gov/ThermoBuild/*/
+    {
+      {
+       +200.00e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       -1.660756354e+05, /* a1 */
+       +3.035416736e+03, /* a2 */
+       -1.736889823e+01, /* a3 */
+       +7.159834020e-02, /* a4 */
+       -8.866799300e-05, /* a5 */
+       +5.798970280e-08, /* a6 */
+       -1.530037218e-11, /* a7 */
+       -3.731927230e+03, /* b1 */
+       +1.190002218e+02  /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +(6000.0e0-dTrangemin),        /* Tmax [K] */
+       +3.293486700e+06, /* a1 */
+       -1.199850628e+04, /* a2 */
+       +2.104406814e+01, /* a3 */
+       -1.399381724e-03, /* a4 */
+       +1.933173351e-07, /* a5 */
+       -1.318016127e-11, /* a6 */
+       +3.166400170e-16, /* a7 */
+       +8.348433700e+04, /* b1 */
+       -1.155751024e+02  /* b2 */        
+      },
+      {
+       +(6000.0e0-dTrangemin),        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       +3.293486700e+06, /* a1 */
+       -1.199850628e+04, /* a2 */
+       +2.104406814e+01, /* a3 */
+       -1.399381724e-03, /* a4 */
+       +1.933173351e-07, /* a5 */
+       -1.318016127e-11, /* a6 */
+       +3.166400170e-16, /* a7 */
+       +8.348433700e+04, /* b1 */
+       -1.155751024e+02  /* b2 */           
+      }
+    }, 
+    
+/* 
+   species H-
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/* The coefficients are obtained from https://cearun.grc.nasa.gov/ThermoBuild/*/
+    {
+      {
+       +298.15e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       +0.000000000e+00, /* a1 */
+       +0.000000000e+00, /* a2 */
+       +2.500000000e+00, /* a3 */
+       +0.000000000e+00, /* a4 */
+       +0.000000000e+00, /* a5 */
+       +0.000000000e+00, /* a6 */
+       +0.000000000e+00, /* a7 */
+       +1.597615494e+04, /* b1 */
+       -1.139013868e+00  /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       +0.000000000e+00, /* a1 */
+       +0.000000000e+00, /* a2 */
+       +2.500000000e+00, /* a3 */
+       +0.000000000e+00, /* a4 */
+       +0.000000000e+00, /* a5 */
+       +0.000000000e+00, /* a6 */
+       +0.000000000e+00, /* a7 */
+       +1.597615494e+04, /* b1 */
+       -1.139013868e+00  /* b2 */        
+      },
+      {
+       +6000.0e0,        /* Tmin [K] */ 
+       +20000.0e0,        /* Tmax [K] */
+       +0.000000000e+00, /* a1 */
+       +0.000000000e+00, /* a2 */
+       +2.500000000e+00, /* a3 */
+       +0.000000000e+00, /* a4 */
+       +0.000000000e+00, /* a5 */
+       +0.000000000e+00, /* a6 */
+       +0.000000000e+00, /* a7 */
+       +1.597615494e+04, /* b1 */
+       -1.139013868e+00  /* b2 */           
+      }
+    },    
+
+/* 
+   species H3+
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/* The coefficients are obtained from "Burcat, Alexander, and Branko Ruscic. Third millenium ideal gas and condensed phase thermochemical database for combustion (with update from active thermochemical tables). No. ANL-05/20. Argonne National Lab.(ANL), Argonne, IL (United States), 2005." */ 
+    {
+      {
+       +298.15e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       +1.197407576e+05, /* a1 */
+       -1.656930931e+03, /* a2 */
+       +1.318371947e+01, /* a3 */
+       -2.545438756e-02, /* a4 */
+       +3.553761210e-05, /* a5 */
+       -2.199166171e-08, /* a6 */
+       +5.219100000e-12, /* a7 */
+       +1.406189406e+05, /* b1 */
+       -5.606229210e+01  /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +(6000.0e0-dTrangemin),        /* Tmax [K] */
+       +2.298525273e+06, /* a1 */
+       -7.458676930e+03, /* a2 */
+       +1.127193499e+01, /* a3 */
+       -1.390908322e-03, /* a4 */
+       +2.616308416e-07, /* a5 */
+       -2.642014073e-11, /* a6 */
+       +1.106389126e-15, /* a7 */
+       +1.800657603e+05, /* b1 */
+       -6.001124390e+01  /* b2 */        
+      },
+      {
+       +(6000.0e0-dTrangemin),        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       +2.298525273e+06, /* a1 */
+       -7.458676930e+03, /* a2 */
+       +1.127193499e+01, /* a3 */
+       -1.390908322e-03, /* a4 */
+       +2.616308416e-07, /* a5 */
+       -2.642014073e-11, /* a6 */
+       +1.106389126e-15, /* a7 */
+       +1.800657603e+05, /* b1 */
+       -6.001124390e+01  /* b2 */            
+      }
+    },
+
+/* 
+   species N3+
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/* The coefficients are obtained from "Burcat, Alexander, and Branko Ruscic. Third millenium ideal gas and condensed phase thermochemical database for combustion (with update from active thermochemical tables). No. ANL-05/20. Argonne National Lab.(ANL), Argonne, IL (United States), 2005." */ 
+    {
+      {
+       +298.15e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       -1.347213411e+05, /* a1 */
+       +1.649307518e+03, /* a2 */
+       -4.422459470e+00, /* a3 */
+       +2.492863759e-02, /* a4 */
+       -2.617753893e-05, /* a5 */
+       +1.412449742e-08, /* a6 */
+       -3.124218733e-12, /* a7 */
+       +1.737522288e+05, /* b1 */
+       +4.983206920e+01  /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +(6000.0e0-dTrangemin),        /* Tmax [K] */
+       -3.799843400e+04, /* a1 */
+       -1.233011048e+03, /* a2 */
+       +8.400589390e+00, /* a3 */
+       -3.555017810e-04, /* a4 */
+       +7.789827920e-08, /* a5 */
+       -8.882379930e-12, /* a6 */
+       +4.100262160e-16, /* a7 */
+       +1.877349307e+05, /* b1 */
+       -2.549398119e+01  /* b2 */        
+      },
+      {
+       +(6000.0e0-dTrangemin),        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       -3.799843400e+04, /* a1 */
+       -1.233011048e+03, /* a2 */
+       +8.400589390e+00, /* a3 */
+       -3.555017810e-04, /* a4 */
+       +7.789827920e-08, /* a5 */
+       -8.882379930e-12, /* a6 */
+       +4.100262160e-16, /* a7 */
+       +1.877349307e+05, /* b1 */
+       -2.549398119e+01  /* b2 */            
+      }
+    }, 
+    
+/* 
+   species N4+
+   obtained from species N4 by adding 8.458500000e+04 to b1
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/* The coefficients of N4 are obtained from "Burcat, Alexander, and Branko Ruscic. Third millenium ideal gas and condensed phase thermochemical database for combustion (with update from active thermochemical tables). No. ANL-05/20. Argonne National Lab.(ANL), Argonne, IL (United States), 2005." and the ionization potential of N4 to N4+ is obtained from https://atct.anl.gov/Thermochemical%20Data/version%201.124/species/?species_number=1387 */ 
+    {
+      {
+       +50.00e0,         /* Tmin [K] */ 
+       +200.0e0,        /* Tmax [K] */
+       -5.729835420e+01, /* a1 */
+       -3.650687410e+01, /* a2 */
+       +8.750647940e+00, /* a3 */
+       -8.564536740e-03, /* a4 */
+       +5.549107780e-05, /* a5 */
+       -1.905566002e-07, /* a6 */
+       +2.687348259e-10, /* a7 */
+       +8.032008030e+04 + 8.4585e+04, /* b1 */
+       -5.522615600e+00  /* b2 */
+      },
+      {
+       +200.0e0,        /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       +4.301671170e+04, /* a1 */
+       -7.337145670e+02, /* a2 */
+       +1.278784742e+01, /* a3 */
+       -1.520137786e-02, /* a4 */
+       +2.356596064e-05, /* a5 */
+       -1.553299677e-08, /* a6 */
+       +3.842837860e-12, /* a7 */
+       +8.358685220e+04 + 8.4585e+04, /* b1 */
+       -2.825549529e+01  /* b2 */        
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       +1.219500941e+06, /* a1 */
+       -4.461202970e+03, /* a2 */
+       +1.284198204e+01, /* a3 */
+       -1.013252987e-03, /* a4 */
+       +2.057077673e-07, /* a5 */
+       -2.213915218e-11, /* a6 */
+       +9.777882910e-16, /* a7 */
+       +1.080411256e+05 + 8.4585e+04, /* b1 */
+       -3.848650960e+01  /* b2 */            
+      }
+    },
+    
+/* 
+   species NH2-
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/* The coefficients are obtained from "Burcat, Alexander, and Branko Ruscic. Third millenium ideal gas and condensed phase thermochemical database for combustion (with update from active thermochemical tables). No. ANL-05/20. Argonne National Lab.(ANL), Argonne, IL (United States), 2005." */ 
+    {
+      {
+       +298.15e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       -8.016569250e+03, /* a1 */
+       +8.084737170e+01, /* a2 */
+       +3.952482600e+00, /* a3 */
+       -1.816736448e-03, /* a4 */
+       +5.925479030e-06, /* a5 */
+       -3.793408680e-09, /* a6 */
+       +7.934036500e-13, /* a7 */
+       +1.110753566e+04, /* b1 */
+       +8.276627560e-01  /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +(6000.0e0-dTrangemin),        /* Tmax [K] */
+       +1.917440212e+06, /* a1 */
+       -6.293304800e+03, /* a2 */
+       +1.036618653e+01, /* a3 */
+       -1.017371794e-03, /* a4 */
+       +1.769605080e-07, /* a5 */
+       -1.649768339e-11, /* a6 */
+       +6.379772960e-16, /* a7 */
+       +5.138118770e+04, /* b1 */
+       -4.787394250e+01  /* b2 */        
+      },
+      {
+       +(6000.0e0-dTrangemin),        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       +1.917440212e+06, /* a1 */
+       -6.293304800e+03, /* a2 */
+       +1.036618653e+01, /* a3 */
+       -1.017371794e-03, /* a4 */
+       +1.769605080e-07, /* a5 */
+       -1.649768339e-11, /* a6 */
+       +6.379772960e-16, /* a7 */
+       +5.138118770e+04, /* b1 */
+       -4.787394250e+01  /* b2 */             
+      }
+    }, 
+    
+/* 
+   species NH+
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/* The coefficients are obtained from https://cearun.grc.nasa.gov/ThermoBuild/*/
+    {
+      {
+       +298.15e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       +4.253656850e+03, /* a1 */
+       -2.458222206e+02, /* a2 */
+       +6.708919490e+00, /* a3 */
+       -1.038489430e-02, /* a4 */
+       +1.509008623e-05, /* a5 */
+       -9.580512190e-09, /* a6 */
+       +2.333206758e-12, /* a7 */
+       +2.001077797e+05, /* b1 */
+       -1.395057632e+01  /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       +1.405709438e+06, /* a1 */
+       -4.136215710e+03, /* a2 */
+       +7.632014480e+00, /* a3 */
+       -1.228325778e-03, /* a4 */
+       +2.721187746e-07, /* a5 */
+       -2.010098289e-11, /* a6 */
+       +3.717190180e-17, /* a7 */
+       +2.258975960e+05, /* b1 */
+       -2.786785234e+01  /* b2 */        
+      },
+      {
+       +6000.0e0,        /* Tmin [K] */ 
+       +20000.0e0,        /* Tmax [K] */
+       +2.392941759e+08, /* a1 */
+       -1.741658624e+05, /* a2 */
+       +5.107907910e+01, /* a3 */
+       -5.567623700e-03, /* a4 */
+       +3.273391600e-07, /* a5 */
+       -9.797978060e-12, /* a6 */
+       +1.186543279e-16, /* a7 */
+       +1.554705305e+06, /* b1 */
+       -4.065968960e+02  /* b2 */             
+      }
+    }, 
+    
+/* 
+   species NNH+
+   obtained from species NNH by adding 9.505300000e+04 to b1
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/* The coefficients are obtained from "Burcat, Alexander, and Branko Ruscic. Third millenium ideal gas and condensed phase thermochemical database for combustion (with update from active thermochemical tables). No. ANL-05/20. Argonne National Lab.(ANL), Argonne, IL (United States), 2005." and the ionization energy of 8.19 ev is obtained from https://atct.anl.gov/Thermochemical%20Data/version%201.124/species/?species_number=198*/ 
+    {
+      {
+       +50.00e0,         /* Tmin [K] */ 
+       +200.0e0,        /* Tmax [K] */
+       -1.341564522e+02, /* a1 */
+       +9.013952070e+00, /* a2 */
+       +3.761191920e+00, /* a3 */
+       +3.150900178e-03, /* a4 */
+       -2.124635640e-05, /* a5 */
+       +6.462629190e-08, /* a6 */
+       -5.125968310e-11, /* a7 */
+       +2.905289083e+04 + 9.505300000e+04, /* b1 */
+       +5.138193520e+00  /* b2 */
+      },
+      {
+       +200.0e0,        /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       -2.234849766e+04, /* a1 */
+       +3.799796780e+02, /* a2 */
+       +1.747089322e+00, /* a3 */
+       +4.729753260e-03, /* a4 */
+       -7.588910180e-08, /* a5 */
+       -1.751925418e-09, /* a6 */
+       +6.583999590e-13, /* a7 */
+       +2.731434238e+04 + 9.505300000e+04, /* b1 */
+       +1.680375906e+01  /* b2 */        
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       +9.759574290e+05, /* a1 */
+       -4.187312640e+03, /* a2 */
+       +9.644079210e+00, /* a3 */
+       -9.381345650e-04, /* a4 */
+       +1.899951707e-07, /* a5 */
+       -2.042744637e-11, /* a6 */
+       +9.020082270e-16, /* a7 */
+       +5.440933700e+04 + 9.505300000e+04, /* b1 */
+       -3.669269970e+01  /* b2 */          
+      }
+    },
+
+/* 
+   species H2P
+   obtained from species H by adding 1.183700000e+05 to b1
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/   
+/* H to H(2P) has an ionization energy of 10.2ev which is obtained from BOLSIG+ Morgan database and this equals to 1.1837e+05 K. Adding 1.1837e+05 K to b1 for H to get the thermo of H(2P)*/ 
+    {
+      {
+       +200.00e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       +0.000000000E+00,  /* a1 */
+       +0.000000000E+00,  /* a2 */
+       +2.500000000E+00,  /* a3 */
+       +0.000000000E+00,  /* a4 */
+       +0.000000000E+00,  /* a5 */
+       +0.000000000E+00,  /* a6 */
+       +0.000000000E+00,  /* a7 */
+       +2.547370801E+04 + 1.183700000e+05,  /* b1 */
+       -4.466828530E-01   /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +(6000.0e0-dTrangemin),        /* Tmax [K] */
+       +6.078774250E+01,  /* a1 */
+       -1.819354417E-01,  /* a2 */
+       +2.500211817E+00,  /* a3 */
+       -1.226512864E-07,  /* a4 */
+       +3.732876330E-11,  /* a5 */
+       -5.687744560E-15,  /* a6 */
+       +3.410210197E-19,  /* a7 */
+       +2.547486398E+04 + 1.183700000e+05,  /* b1 */
+       -4.481917770E-01   /* b2 */
+      },
+      {
+       +(6000.0e0-dTrangemin),        /* Tmin [K] */ 
+       +6000.0e0,       /* Tmax [K] */
+       +6.078774250E+01,  /* a1 */
+       -1.819354417E-01,  /* a2 */
+       +2.500211817E+00,  /* a3 */  
+       -1.226512864E-07,  /* a4 */
+       +3.732876330E-11,  /* a5 */
+       -5.687744560E-15,  /* a6 */
+       +3.410210197E-19,  /* a7 */
+       +2.547486398E+04 + 1.183700000e+05,  /* b1 */
+       -4.481917770E-01   /* b2 */
+      }
+    }, 
+    
+/* 
+   species H2C1Pi 
+   obtained from species H2 by adding 1.43900000e+05 to b1
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/*H2 to H2(C1Π u 2pπ) has an ionization energy of 12.4ev which is obtained from BOLSIG+ Morgan database and this equals to 1.4390e+05 K. Adding 1.4390e+05 K to b1 for H2 to get the thermo of H2(C1Π u 2pπ)*/   
+    {
+      {
+       +200.00e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       +4.078322810E+04,  /* a1 */
+       -8.009185450E+02,  /* a2 */
+       +8.214701670E+00,  /* a3 */
+       -1.269714360E-02,  /* a4 */
+       +1.753604930E-05,  /* a5 */
+       -1.202860160E-08,  /* a6 */
+       +3.368093160E-12,  /* a7 */
+       +2.682484380E+03 + 1.43900000e+05,  /* b1 */
+       -3.043788660E+01   /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +(6000.0e0-dTrangemin),        /* Tmax [K] */
+       +5.608123380E+05,  /* a1 */
+       -8.371491340E+02,  /* a2 */
+       +2.975363040E+00,  /* a3 */  
+       +1.252249930E-03,  /* a4 */
+       -3.740718420E-07,  /* a5 */
+       +5.936628250E-11,  /* a6 */
+       -3.606995730E-15,  /* a7 */
+       +5.339815850E+03 + 1.43900000e+05,  /* b1 */
+       -2.202764050E+00   /* b2 */
+      },
+      {
+       +(6000.0e0-dTrangemin),        /* Tmin [K] */ 
+       +6000.0e0,       /* Tmax [K] */
+       +5.608123380E+05,  /* a1 */
+       -8.371491340E+02,  /* a2 */
+       +2.975363040E+00,  /* a3 */  
+       +1.252249930E-03,  /* a4 */
+       -3.740718420E-07,  /* a5 */
+       +5.936628250E-11,  /* a6 */
+       -3.606995730E-15,  /* a7 */
+       +5.339815850E+03 + 1.43900000e+05,  /* b1 */
+       -2.202764050E+00   /* b2 */
+      }
+   }, 
+   
+/* species N2D
+   obtained from species N by adding 2.76190000e+04 to b1
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/* N to N(2D) has an ionization energy of 2.38ev which is obtained from "Henry, Ronald JW, P. G. Burke, and A-L. Sinfailam. "Scattering of electrons by C, N, O, N+, O+, and O++." Physical Review 178.1 (1969): 218." and this equals to 2.7619e+04 K. Adding 2.7619e+04 K to b1 of N to get the thermo of N(2D)*/   
+    {
+      {
+       +200.0e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       +0.000000000e+00, /* a1 */
+       +0.000000000e+00, /* a2 */
+       +2.500000000e+00, /* a3 */
+       +0.000000000e+00, /* a4 */
+       +0.000000000e+00, /* a5 */
+       +0.000000000e+00, /* a6 */
+       +0.000000000e+00, /* a7 */
+       +5.610463780e+04 + 2.76190000e+04, /* b1 */
+       +4.193905036e+00  /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       +8.876501380e+04, /* a1 */
+       -1.071231500e+02, /* a2 */
+       +2.362188287e+00, /* a3 */
+       +2.916720081e-04, /* a4 */
+       -1.729515100e-07, /* a5 */
+       +4.012657880e-11, /* a6 */
+       -2.677227571e-15, /* a7 */
+       +5.697351330e+04 + 2.76190000e+04, /* b1 */
+       +4.865231506e+00  /* b2 */        
+      },
+      {
+       +6000.0e0,        /* Tmin [K] */ 
+       +20000.0e0,       /* Tmax [K] */
+       +5.475181050e+08, /* a1 */
+       -3.107574980e+05, /* a2 */
+       +6.916782740e+01, /* a3 */
+       -6.847988130e-03, /* a4 */
+       +3.827572400e-07, /* a5 */
+       -1.098367709e-11, /* a6 */
+       +1.277986024e-16, /* a7 */
+       +2.550585618e+06 + 2.76190000e+04, /* b1 */
+       -5.848769753e+02  /* b2 */        
+      }
+    }, 
+    
+/* 
+   species H3
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/* The coefficients are obtained from H3+ as H3 is not available. Needto be corrected*/ 
+    {
+      {
+       +298.15e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       +1.197407576e+05, /* a1 */
+       -1.656930931e+03, /* a2 */
+       +1.318371947e+01, /* a3 */
+       -2.545438756e-02, /* a4 */
+       +3.553761210e-05, /* a5 */
+       -2.199166171e-08, /* a6 */
+       +5.219100000e-12, /* a7 */
+       +1.406189406e+05, /* b1 */
+       -5.606229210e+01  /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +(6000.0e0-dTrangemin),        /* Tmax [K] */
+       +2.298525273e+06, /* a1 */
+       -7.458676930e+03, /* a2 */
+       +1.127193499e+01, /* a3 */
+       -1.390908322e-03, /* a4 */
+       +2.616308416e-07, /* a5 */
+       -2.642014073e-11, /* a6 */
+       +1.106389126e-15, /* a7 */
+       +1.800657603e+05, /* b1 */
+       -6.001124390e+01  /* b2 */        
+      },
+      {
+       +(6000.0e0-dTrangemin),        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       +2.298525273e+06, /* a1 */
+       -7.458676930e+03, /* a2 */
+       +1.127193499e+01, /* a3 */
+       -1.390908322e-03, /* a4 */
+       +2.616308416e-07, /* a5 */
+       -2.642014073e-11, /* a6 */
+       +1.106389126e-15, /* a7 */
+       +1.800657603e+05, /* b1 */
+       -6.001124390e+01  /* b2 */            
+      }
+    }, 
+    
+/* 
+   species N4
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/* The coefficients of N4 are obtained from "Burcat, Alexander, and Branko Ruscic. Third millenium ideal gas and condensed phase thermochemical database for combustion (with update from active thermochemical tables). No. ANL-05/20. Argonne National Lab.(ANL), Argonne, IL (United States), 2005."*/ 
+    {
+      {
+       +50.00e0,         /* Tmin [K] */ 
+       +200.0e0,        /* Tmax [K] */
+       -5.729835420e+01, /* a1 */
+       -3.650687410e+01, /* a2 */
+       +8.750647940e+00, /* a3 */
+       -8.564536740e-03, /* a4 */
+       +5.549107780e-05, /* a5 */
+       -1.905566002e-07, /* a6 */
+       +2.687348259e-10, /* a7 */
+       +8.032008030e+04, /* b1 */
+       -5.522615600e+00  /* b2 */
+      },
+      {
+       +200.0e0,        /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       +4.301671170e+04, /* a1 */
+       -7.337145670e+02, /* a2 */
+       +1.278784742e+01, /* a3 */
+       -1.520137786e-02, /* a4 */
+       +2.356596064e-05, /* a5 */
+       -1.553299677e-08, /* a6 */
+       +3.842837860e-12, /* a7 */
+       +8.358685220e+04, /* b1 */
+       -2.825549529e+01  /* b2 */        
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       +1.219500941e+06, /* a1 */
+       -4.461202970e+03, /* a2 */
+       +1.284198204e+01, /* a3 */
+       -1.013252987e-03, /* a4 */
+       +2.057077673e-07, /* a5 */
+       -2.213915218e-11, /* a6 */
+       +9.777882910e-16, /* a7 */
+       +1.080411256e+05, /* b1 */
+       -3.848650960e+01  /* b2 */            
+      }
+    },
+    
+/* 
+   species N3
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/* The coefficients are same as N3+, Need to be corrected*/ 
+    {
+      {
+       +298.15e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       -1.347213411e+05, /* a1 */
+       +1.649307518e+03, /* a2 */
+       -4.422459470e+00, /* a3 */
+       +2.492863759e-02, /* a4 */
+       -2.617753893e-05, /* a5 */
+       +1.412449742e-08, /* a6 */
+       -3.124218733e-12, /* a7 */
+       +1.737522288e+05, /* b1 */
+       +4.983206920e+01  /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +(6000.0e0-dTrangemin),        /* Tmax [K] */
+       -3.799843400e+04, /* a1 */
+       -1.233011048e+03, /* a2 */
+       +8.400589390e+00, /* a3 */
+       -3.555017810e-04, /* a4 */
+       +7.789827920e-08, /* a5 */
+       -8.882379930e-12, /* a6 */
+       +4.100262160e-16, /* a7 */
+       +1.877349307e+05, /* b1 */
+       -2.549398119e+01  /* b2 */        
+      },
+      {
+       +(6000.0e0-dTrangemin),        /* Tmin [K] */ 
+       +6000.0e0,        /* Tmax [K] */
+       -3.799843400e+04, /* a1 */
+       -1.233011048e+03, /* a2 */
+       +8.400589390e+00, /* a3 */
+       -3.555017810e-04, /* a4 */
+       +7.789827920e-08, /* a5 */
+       -8.882379930e-12, /* a6 */
+       +4.100262160e-16, /* a7 */
+       +1.877349307e+05, /* b1 */
+       -2.549398119e+01  /* b2 */            
+      }
+    },
+                                                              
   };
 
 

@@ -140,6 +140,10 @@ void add_to_W_bw_2r3p(int specR1, int specR2,
                             int specP1, int specP2, int specP3,
                             double A, double n, double E, double T, spec_t X, spec_t W);
 
+void add_to_W_fw_2r4p(int specR1, int specR2,
+                            int specP1, int specP2, int specP3, int specP4,
+                            double A, double n, double E, double T, spec_t X, spec_t W);
+                            
 /* A in cm^6 mole^(-2) s^(-1) K^(-n)
    E in cal mole^(-1) 
    T in Kelvin
@@ -229,6 +233,11 @@ void add_to_dW_bw_2r3p(int specR1, int specR2,
                              int specP1, int specP2, int specP3,
                              double A, double n, double E, double T, spec_t X, 
                              spec_t dWdT, spec2_t dWdrhok);
+                             
+void add_to_dW_fw_2r4p(int specR1, int specR2,
+                       int specP1, int specP2, int specP3, int specP4,
+                       double A, double n, double E, double T, spec_t X, 
+                       spec_t dWdT, spec2_t dWdrhok);
 
 /* A in cm^6 mole^(-2) s^(-1) K^(-n)
    E in cal mole^(-1) 

@@ -169,11 +169,28 @@ const static double Peps[SMAP_NS]=
    252.0,       /* C3H4p */
    252.0,       /* C3H3p1 */
    558.3,       /* NH3 */
-   558.3,       /* NH2 */   /* !! unknown value: fixed to the one of NH3 */
-   558.3,       /* NH4+ */   /* !! unknown value: fixed to the one of NH3 */
-   558.3,       /* NH3+ */   /* !! unknown value: fixed to the one of NH3 */
-   558.3,       /* NH2+ */   /* !! unknown value: fixed to the one of NH3 */
-   558.3,       /* NH4 */   /* !! unknown value: fixed to the one of NH3 */
+   558.3,       /* NH2 */     /* !! unknown value: fixed to the one of NH3 */
+   558.3,       /* NH4+ */    /* !! unknown value: fixed to the one of NH3 */
+   558.3,       /* NH3+ */    /* !! unknown value: fixed to the one of NH3 */
+   558.3,       /* NH2+ */    /* !! unknown value: fixed to the one of NH3 */
+   558.3,       /* NH4 */     /* !! unknown value: fixed to the one of NH3 */
+   232.4,       /*NNH */      /* !!unknown value: fixed to the one of N2O */
+   232.4,       /*N2H2 */     /* !!unknown value: fixed to the one of N2O */
+   232.4,       /*N2H3 */     /* !! unknown value: fixed to the one of N2O */
+   232.4,       /*N2H4 */     /* !! unknown value: fixed to the one of N2O */
+   37.0e0,      /*H- */       /* !! unknown value: fixed to the one of H */
+   59.7e0,      /*H3+ */      /* !! unknown value: fixed to the one of H2 */
+   71.4e0,      /*N3+ */      /* !! unknown value: fixed to the one of N2 */
+   71.4e0,      /*N4+ */      /* !! unknown value: fixed to the one of N2 */
+   558.3,       /*NH2- */     /* !! unknown value: fixed to the one of NH3 */
+   558.3,       /*NH+ */      /* !! unknown value: fixed to the one of NH3 */
+   71.4e0,      /*NNH+ */     /* !! unknown value: fixed to the one of N2 */
+   37.0e0,      /*H(2P) */    /* !! unknown value: fixed to the one of H */
+   59.7e0,      /* H2(C1Pi) */  /* !! unknown value: fixed to the one of H2 */
+   71.4e0,      /* N(2D) */   /* !! unknown value: fixed to the one of N */
+   59.7e0,      /*H3 */      /* !! unknown value: fixed to the one of H2 */
+   71.4e0,      /*N4 */      /* !! unknown value: fixed to the one of N2 */
+   71.4e0,      /*N3 */      /* !! unknown value: fixed to the one of N2 */
   };
 
 
@@ -262,6 +279,23 @@ const static double Psig[SMAP_NS]=
    0.290E0,     /* NH3+ */    /* !! unknown value: fixed to the one of NH3 */
    0.290E0,     /* NH2+ */    /* !! unknown value: fixed to the one of NH3 */
    0.290E0,     /* NH4 */    /* !! unknown value: fixed to the one of NH3 */
+   0.3828E0,       /*NNH */      /* !!unknown value: fixed to the one of N2O */
+   0.3828E0,       /*N2H2 */     /* !!unknown value: fixed to the one of N2O */
+   0.3828E0,       /*N2H3 */     /* !! unknown value: fixed to the one of N2O */
+   0.3828E0,       /*N2H4 */     /* !! unknown value: fixed to the one of N2O */
+   0.2708E+0,      /*H- */       /* !! unknown value: fixed to the one of H */
+   0.2827E+0,      /*H3+ */      /* !! unknown value: fixed to the one of H2 */
+   0.3798e0,      /*N3+ */      /* !! unknown value: fixed to the one of N2 */
+   0.3798e0,      /*N4+ */      /* !! unknown value: fixed to the one of N2 */
+   0.290E0,       /*NH2- */     /* !! unknown value: fixed to the one of NH3 */
+   0.290E0,       /*NH+ */      /* !! unknown value: fixed to the one of NH3 */
+   0.3798e0,      /*NNH+ */     /* !! unknown value: fixed to the one of N2 */
+   0.2708E+0,      /*H(2P) */    /* !! unknown value: fixed to the one of H */
+   0.2827E+0,      /* H2(C1Pi) */  /* !! unknown value: fixed to the one of H2 */
+   0.3298e0,      /* N(2D) */   /* !! unknown value: fixed to the one of N */
+   0.2827E+0,      /*H3 */      /* !! unknown value: fixed to the one of H2 */
+   0.3798e0,      /*N4 */      /* !! unknown value: fixed to the one of N2 */
+   0.3798e0,      /*N3 */      /* !! unknown value: fixed to the one of N2 */
   };
 
 

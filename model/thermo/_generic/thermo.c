@@ -130,6 +130,23 @@ const static speciesname_t speciesname[SMAP_NS]=
    "NH3+",
    "NH2+",
    "NH4",
+   "NNH",
+   "N2H2",
+   "N2H3",
+   "N2H4",
+   "H-",
+   "H3+",
+   "N3+",
+   "N4+",
+   "NH2-",
+   "NH+",
+   "NNH+",
+   "H(2P)",
+   "H2(C1Pi)",
+   "N(2D)",
+   "H3",
+   "N4",
+   "N3",
   };
 
 
@@ -230,6 +247,23 @@ const static double calM[SMAP_NS]=
    17.0300E-3,    /*NH3+ */
    16.0220E-3,    /*NH2+ */
    18.0385E-3,    /*NH4 */ 
+   29.0213E-3,    /*NNH */
+   30.0293E-3,    /*N2H2 */
+   31.0372E-3,    /*N2H3 */
+   32.0452E-3,    /*N2H4 */
+   1.00849E-3,    /*H- */
+   3.02327E-3,    /*H3+ */
+   42.0196E-3,    /*N3+ */
+   56.0263E-3,    /*N4+ */
+   16.0231E-3,    /*NH2- */
+   15.0141E-3,    /*NH+ */
+   29.0208E-3,    /*NNH+ */
+   1.00794E-3,    /*H(2P) */
+   2.01588E-3,    /* H2(C1Pi) */
+   14.0067e-3,    /* N(2D) */
+   3.02327E-3,    /*H3 */
+   56.0268E-3,    /*N4 */
+   42.0201E-3,    /*N3 */
   };
 
 
@@ -318,6 +352,23 @@ const static long ck[SMAP_NS]=
    +1,    /*NH3+ */ 
    +1,    /*NH2+ */
    0,    /*NH4 */
+   0,    /*NNH */
+   0,    /*N2H2 */
+   0,    /*N2H3 */
+   0,    /*N2H4 */
+   -1,    /*H- */
+   +1,    /*H3+ */
+   +1,    /*N3+ */
+   +1,    /*N4+ */
+   -1,    /*NH2- */
+   +1,    /*NH+ */
+   +1,    /*NNH+ */
+   0,    /*H(2P) */
+   0,    /* H2(C1Pi) */
+   0,    /* N(2D) */
+   0,    /*H3 */
+   0,    /*N4 */
+   0,    /*N3 */
   };
   
 const static long numatoms[SMAP_NS]=
@@ -404,6 +455,23 @@ const static long numatoms[SMAP_NS]=
    4,    /*NH3+ */
    3,    /*NH2+ */ 
    5,    /*NH4 */
+   3,    /*NNH */
+   4,    /*N2H2 */
+   5,    /*N2H3 */
+   6,    /*N2H4 */
+   1,    /*H- */
+   3,    /*H3+ */
+   3,    /*N3+ */
+   4,    /*N4+ */
+   3,    /*NH2- */
+   2,    /*NH+ */
+   3,    /*NNH+ */
+   1,    /*H(2P) */
+   2,    /* H2(C1Pi) */
+   1,    /* N(2D) */
+   3,    /*H3 */
+   4,    /*N4 */
+   3,    /*N3 */
   }; 
   
 
@@ -1177,6 +1245,15 @@ double _ionizationpot(long k){
     break;
     case SMAP_NH3:
       ionizationenergy=1.634e-18;
+    break;
+    case SMAP_H:
+      ionizationenergy=2.1789e-18;
+    break;
+    case SMAP_H2C1Pi:
+      ionizationenergy=1.6343e-18;
+    break;
+    case SMAP_NH:
+      ionizationenergy=2.1592e-18;
     break;
     default:
       ionizationenergy=0.0;

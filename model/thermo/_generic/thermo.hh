@@ -3,7 +3,7 @@
 
 #define THERMO_P_REF 100000.0
 
-#define SMAP_NS 82
+#define SMAP_NS 99
 
 #define SMAP_eminus   0
 #define SMAP_O2       1
@@ -87,4 +87,21 @@
 #define SMAP_NH3plus     79
 #define SMAP_NH2plus     80
 #define SMAP_NH4     81
+#define SMAP_NNH     82
+#define SMAP_N2H2     83
+#define SMAP_N2H3     84
+#define SMAP_N2H4     85
+#define SMAP_Hminus     86
+#define SMAP_H3plus     87
+#define SMAP_N3plus     88
+#define SMAP_N4plus     89
+#define SMAP_NH2minus     90
+#define SMAP_NHplus     91
+#define SMAP_NNHplus     92
+#define SMAP_H2P    93
+#define SMAP_H2C1Pi     94
+#define SMAP_N2D     95
+#define SMAP_H3     96
+#define SMAP_N4     97
+#define SMAP_N3     98
 

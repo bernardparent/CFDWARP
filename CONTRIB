@@ -84,11 +84,17 @@ OMPRAKAS, Ajjay
   
   - added the chemical solver model/chem/_NH3_Plasma_10s/
   
-  - addition of add_to_W_2r4p and add_to_dW_2r4p to model/share/chem_share.c
+  - addition of add_to_W_fw_2r4p, add_to_dW_fw_2r4p, add_to_W_2r4p and add_to_dW_2r4p to model/share/chem_share.c
   
-  - addition of species  NH3, NH2, NH4+, NH3+, NH2+, and NH4 in model/thermo/_generic/thermo.c, model/thermo/_generic/enthalpy.c, model/thermo/_generic/thermo.hh, and model/transport/_Dixon-Lewis/transport.c
+  - addition of species  NH3, NH2, NH4+, NH3+, NH2+, and NH4 in model/thermo/_generic/thermo.c, 
+    model/thermo/_generic/enthalpy.c, model/thermo/_generic/thermo.hh, and model/transport/_Dixon-Lewis/transport.c
   
   - addition of ionizationenergy of NH3 under _ionizationpot() in model/thermo/_generic/thermo.c
+  
+  - addition of species NNH, N2H2, N2H3, N2H4, H-, H3+, N3+, N4+, NH2-, NH+, NNH+, H2P, H2C1Pi, N2D, H3, N4, N3
+
+  - addition of model/chem/_NH3_Plasma_34s
+  
 
 PADMANABHAN, Sathyan 
 
