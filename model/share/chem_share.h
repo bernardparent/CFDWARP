@@ -547,6 +547,5 @@ double _exci_2r3p(long react1, long react2, long prod1, long prod2, long prod3);
 /* find excitation energy in eV using the difference in enthalpy of formation */
 double _exci_2r4p(long react1, long react2, long prod1, long prod2, long prod3, long prod4);
 
-double _averaged_rate(np_t np, gl_t *gl, long react, double rate);
 
 #endif /* _CHEM_SHARE_H */

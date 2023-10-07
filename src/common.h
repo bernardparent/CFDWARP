@@ -178,7 +178,6 @@ typedef struct{
  long is,js,ks,ie,je,ke;
 } zone_t;
 
-
 typedef struct {
   long garbage; /* necessary to avoid compiler hang on AIX */
 } voidarg_t;
@@ -200,6 +199,18 @@ typedef char initvarname_t[100];
 #ifdef EMFIELD
   typedef double initvar_emfield_t[numinitvar_emfield];
 #endif
+
+
+#if defined(UNSTEADY) && defined(_AVERAGEDRATES)
+  #ifndef _AVERAGEDRATES_FLUID
+    #define numaveragedrates_fluid 0
+  #endif
+  #ifndef _AVERAGEDRATES_CHEM
+    #define numaveragedrates_chem 0
+  #endif
+  #define numaveragedrates (numaveragedrates_chem+numaveragedrates_fluid)
+#endif
+
 
 typedef struct {
   zone_t domain,window,domain_all,domain_lim,domain_lim_all;

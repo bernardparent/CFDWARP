@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <model/thermo/_thermo.h>
 #include <model/share/chem_share.h>
+#include <model/share/model_share.h>
 
 
 const static bool REACTION[20]=
@@ -48,7 +49,7 @@ void find_W_bavafa2008 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, do
   double R;
   double theta;
 
-//  Estar=3.6e-21;
+  //Estar=3.6e-21;
   theta = log(Estar);
 
   for ( k = 0; k < ns; k++ ) {
@@ -121,6 +122,7 @@ void find_dW_dx_bavafa2008 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te
     }
   }
 
+  //Estar=3.6e-21;
   /* find properties needed by add_to_dW* functions in proper units */
   R=Rchem;
   theta = log(Estar);
@@ -131,7 +133,7 @@ void find_dW_dx_bavafa2008 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te
   }
 
 
-  if (REACTION[1] && FALSE){
+  if (REACTION[1]){
     kf = min( exp ( 1.2346e-14 * pow ( theta, 9.0 ) + 0.3115 * theta ), 1.5640e-07 );
     dkfdTe = 0.0;
     dkfdT = 0.0;
@@ -139,7 +141,7 @@ void find_dW_dx_bavafa2008 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te
     add_to_dW_2r3p ( specNH3, speceminus, specNH3plus, speceminus, speceminus, kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
   }
 
-  if (REACTION[2] && FALSE){
+  if (REACTION[2]){
     kf = min( exp ( 0.4853 * theta + 5.5515e-131 * pow( theta, 79.0 ) ), 2.4490e-10 );
     dkfdTe = 0.0;
     dkfdT = 0.0;
@@ -147,7 +149,7 @@ void find_dW_dx_bavafa2008 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te
     add_to_dW_2r4p ( specNH3, speceminus, specNH2plus, specH, speceminus, speceminus, kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
   }
 
-  if (REACTION[3] && FALSE){
+  if (REACTION[3]){
     kf = min( exp ( 2.0636e-07 * pow( theta, 5.0 ) - 4.3548e-11 * pow( theta, 7.0 ) ), 1.0400e-08 * exp( -1.1290e+19 * Estar ) + 2.0460e-09 * exp( -3.6270e05 * Estar ) );
     dkfdTe = 0.0;
     dkfdT = 0.0;
@@ -155,7 +157,7 @@ void find_dW_dx_bavafa2008 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te
     add_to_dW_2r3p ( specNH3, speceminus, specNH2, specH, speceminus, kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
   }
 
-  if (REACTION[4] && FALSE){
+  if (REACTION[4]){
     kf = min( exp ( 1.4602e-07 * pow ( theta, 5.0 ) - 1.3747e-21 * pow( theta, 13.0 ) ), 1.200e-08 );
     dkfdTe = 0.0;
     dkfdT = 0.0;

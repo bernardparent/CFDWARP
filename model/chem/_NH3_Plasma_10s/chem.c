@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/_model.h>
 #include <model/thermo/_thermo.h>
 #include <model/share/chem_share.h>
+#include <model/share/model_share.h>
 #include <src/control.h>
 #include "bavafa2008.h"
 

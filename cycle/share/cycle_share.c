@@ -1503,12 +1503,13 @@ void set_averaged_rates_to_zero(np_t *np, gl_t *gl){
 
 void add_to_averaged_rates(np_t *np, gl_t *gl){
   long i,j,k;
-  flux_t Schem;
+  flux_t Sstar;
   gl->AVERAGEDRATES=AVERAGEDRATES_ADD;
   for_ijk(gl->domain,is,js,ks,ie,je,ke){
     if (is_node_inner(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)) {
       assert(is_node_resumed(np[_ai(gl,i,j,k)]));
-      find_Schem(np,gl,_ai(gl,i,j,k),Schem);
+      //find_Schem(np,gl,_ai(gl,i,j,k),Sstar);
+      find_Sstar(np,gl,_ai(gl,i,j,k),Sstar);
     }
   }
   gl->averagedrates_time+=gl->dt;

@@ -102,3 +102,62 @@ double _f_symmetry(int ACCURACY, ...) {
 }
 
 
+
+#if defined(_AVERAGEDRATES) && defined(UNSTEADY)
+double _averaged_rate(np_t np, gl_t *gl, long id, double rate){
+  long id_map,cntfluid,cntchem;
+  double newrate;
+  bool FOUND;
+  FOUND=FALSE;
+  id_map=0; //to avoid compiler warning
+  cntfluid=0;
+#ifdef _AVERAGEDRATES_FLUID
+  for (cntfluid=0; cntfluid<numaveragedrates_fluid; cntfluid++){
+    if (averagedrates_fluid_id[cntfluid]==id){
+      FOUND=TRUE;
+      id_map=cntfluid;
+    }
+  }
+#endif
+#ifdef _AVERAGEDRATES_CHEM
+  for (cntchem=0; cntchem<numaveragedrates_chem; cntchem++){
+    if (averagedrates_chem_id[cntchem]==id){
+      if (!FOUND) FOUND=TRUE;
+        else fatal_error("Problem in function _averaged_rate: two averagedrates IDs %ld can not be the same.",id);
+      id_map=cntchem+cntfluid;
+    }
+  }
+#endif
+  assert(id_map>=0);
+  assert(id_map<numaveragedrates);  
+
+  if (!FOUND) fatal_error("Problem finding id_map in _averaged_rate().");
+  switch (gl->AVERAGEDRATES){
+    case AVERAGEDRATES_ADD:
+      if (gl->averagedrates_time<0.0) fatal_error("Averaged rates not initialized properly. Need to call SetAveragedRatesToZero() first.");
+      np.bs->averagedrates[id_map]=(np.bs->averagedrates[id_map]*gl->averagedrates_time+gl->dt*rate)/(gl->averagedrates_time+gl->dt);
+      newrate=rate;
+    break;
+    case AVERAGEDRATES_SET:
+      np.bs->averagedrates[id_map]=rate;
+      newrate=rate;
+    break;
+    case AVERAGEDRATES_ON:
+      if (gl->averagedrates_time<0.0) fatal_error("Averaged rates not initialized properly. Need to call SetAveragedRatesToZero() first.");
+      newrate=np.bs->averagedrates[id_map];
+    break;
+    case AVERAGEDRATES_OFF:
+      newrate=rate;
+    break;
+    default:
+      newrate=0.0;
+      fatal_error("gl->AVERAGEDRATES can not be set to %ld.",gl->AVERAGEDRATES);
+  }
+  return(newrate);
+}
+#else
+double _averaged_rate(np_t np, gl_t *gl, long id, double rate){
+  return(rate);
+}
+#endif
+

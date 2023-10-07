@@ -7,6 +7,28 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 06a
+  * in cycle/share/cycle_share.c
+    - in add_to_averaged_rates(), now calls find_Sstar() instead of find_Schem()
+  * in model/chem/_NH3_Plasma_10s/bavafa2008.c
+    - made reactions 1-4 implicit again
+  * renamed:
+    - _AVERAGEDRATES to _AVERAGEDRATES_CHEM
+    - numaveragedrates to numaveragedrates_chem
+    - averagedrates_react to averagedrates_chem_id
+  * in model/fluid/_Navier-Stokes_plasma/fluid.hh
+    - added _AVERAGEDRATES section
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Semfield(), now calls _averaged_rate() when calculating S[fluxet]
+  * in model/share/chem_share.c
+    - removed _averaged_rate()
+  * in model/share/model_share.c
+    - added _averaged_rate() with modifications to handle the fluid (not only the chem) averaged
+      rates
+  * in src/common.h
+    - added #define numaveragedrates (numaveragedrates_chem+numaveragedrates_fluid)
+    
+
 2023 OCT 05c
   * in model/chem/_NH3_Plasma_10s/chem.hh
     - added missing 3 and 4 to averagedrates_react

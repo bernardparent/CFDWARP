@@ -12,5 +12,7 @@ double _f_extrapol(int ACCURACY, ...);
 
 double _f_symmetry(int ACCURACY, ...);
 
+double _averaged_rate(np_t np, gl_t *gl, long react, double rate);
+
 
 #endif /* _MODEL_SHARE_H */

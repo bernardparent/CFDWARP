@@ -4,15 +4,18 @@
 #define _CHEM_ACTIONNAME "NH3Plasma10s"
 #define _CHEM_WEEE_TWOTEMPERATURE
 #define _AVERAGEDRATES
+#define _AVERAGEDRATES_CHEM
 
-#define numaveragedrates 4
+#define numaveragedrates_chem 4
 
-const static long averagedrates_react[numaveragedrates] = {
+const static long averagedrates_chem_id[numaveragedrates_chem] = {
   1,  
   2,
   3,
   4
 };
+
+
 
 #define ns 10
 #define ncs 4
