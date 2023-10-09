@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 08a
+  * in src/common.h
+    - added a fake omp_lock_t when OPENMPTHREADS is not defined
+  * in src/control.c
+    - in reduce_wall_distance_given_wallxyz(), added calls to omp lock and unlock
+      before writing the wall distance at one node
+    - in find_wall_distance(), added omp_init_lock(), initialized nodelock and passed it as a
+      parameter to reduce_wall_distance_given_wallxyz()
+
+
 2023 OCT 06a
   * in cycle/share/cycle_share.c
     - in add_to_averaged_rates(), now calls find_Sstar() instead of find_Schem()

@@ -12,6 +12,10 @@
   #define THREADS
 #endif
 
+#if !(defined(OPENMPTHREADS))
+typedef double omp_lock_t;
+#endif
+
 #define THREADTYPE_ALL 0
 #define THREADTYPE_POSIX 1
 #define THREADTYPE_POSIX_LOOP 2
