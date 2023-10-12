@@ -2044,10 +2044,13 @@ void add_to_dW_fw_2r2p_Lindemann(int specR1, int specR2,
     dk0dT  = k0*n0/T + k0*(E0/(sqr(T)*Rchem));
     dkinfdT = kinf*ninf/T + kinf*(Einf/(sqr(T)*Rchem));
   
-    dkfdX2 = -(k0 * k0 * kinf) / sqr(kinf + k0*X[specR2]); /*  cm^6 (mole^2 s)^(-1)   */ 
- 
-    dkfdT = kinf*dk0dT / ( kinf + k0*X[specR2] ) - k0 * ( X[specR2]*kinf*dk0dT - X[specR2]*k0*dkinfdT ) / sqr(kinf + k0*X[specR2]);
-
+    //{Original Equations -- gave a NaN for very low temperatures}
+    //dkfdX2 = -(k0 * k0 * kinf) / sqr(kinf + k0*X[specR2]); /*  cm^6 (mole^2 s)^(-1)   */ 
+    //dkfdT = kinf*dk0dT / ( kinf + k0*X[specR2] ) - k0 * ( X[specR2]*kinf*dk0dT - X[specR2]*k0*dkinfdT ) / sqr(kinf + k0*X[specR2]);
+    
+    //{Updated Equations}
+    dkfdX2 = -(k0 * k0) / (kinf + k0*X[specR2]) / (kinf + k0*X[specR2]) * kinf; /*  cm^6 (mole^2 s)^(-1)   */   
+    dkfdT = kinf*dk0dT / ( kinf + k0*X[specR2] ) - (k0 / (kinf + k0*X[specR2]) / (kinf + k0*X[specR2])) * ( X[specR2]*kinf*dk0dT - X[specR2]*k0*dkinfdT );
   } else {
     kf = 0.0; 
     dkfdT = 0.0; 
@@ -2187,9 +2190,13 @@ void add_to_dW_bw_2r2p_Lindemann(int specR1, int specR2,
     dk0dT  = k0*n0/T + k0*(E0/(sqr(T)*Rchem));
     dkinfdT = kinf*ninf/T + kinf*(Einf/(sqr(T)*Rchem));
   
-    dkfdX2 = -(k0 * k0 * kinf) / sqr(kinf + k0*X[specR2]); /*  cm^6 (mole^2 s)^(-1)   */ 
- 
-    dkfdT = kinf*dk0dT / ( kinf + k0*X[specR2] ) - k0 * ( X[specR2]*kinf*dk0dT - X[specR2]*k0*dkinfdT ) / sqr(kinf + k0*X[specR2]);
+    //{Original Equations -- gave a NaN for very low temperatures}
+    //dkfdX2 = -(k0 * k0 * kinf) / sqr(kinf + k0*X[specR2]); /*  cm^6 (mole^2 s)^(-1)   */ 
+    //dkfdT = kinf*dk0dT / ( kinf + k0*X[specR2] ) - k0 * ( X[specR2]*kinf*dk0dT - X[specR2]*k0*dkinfdT ) / sqr(kinf + k0*X[specR2]);
+    
+    //{Updated Equations}
+    dkfdX2 = -(k0 * k0) / (kinf + k0*X[specR2]) / (kinf + k0*X[specR2]) * kinf; /*  cm^6 (mole^2 s)^(-1)   */   
+    dkfdT = kinf*dk0dT / ( kinf + k0*X[specR2] ) - (k0 / (kinf + k0*X[specR2]) / (kinf + k0*X[specR2])) * ( X[specR2]*kinf*dk0dT - X[specR2]*k0*dkinfdT );
     
   } else {
     kf = 0.0; 
@@ -2269,9 +2276,13 @@ void add_to_dW_bw_2r3p_Lindemann(int specR1, int specR2,
     dk0dT  = k0*n0/T + k0*(E0/(sqr(T)*Rchem));
     dkinfdT = kinf*ninf/T + kinf*(Einf/(sqr(T)*Rchem));
   
-    dkfdX2 = -(k0 * k0 * kinf) / sqr(kinf + k0*X[specR2]); /*  cm^6 (mole^2 s)^(-1)   */ 
- 
-    dkfdT = kinf*dk0dT / ( kinf + k0*X[specR2] ) - k0 * ( X[specR2]*kinf*dk0dT - X[specR2]*k0*dkinfdT ) / sqr(kinf + k0*X[specR2]);
+    //{Original Equations -- gave a NaN for very low temperatures}
+    //dkfdX2 = -(k0 * k0 * kinf) / sqr(kinf + k0*X[specR2]); /*  cm^6 (mole^2 s)^(-1)   */ 
+    //dkfdT = kinf*dk0dT / ( kinf + k0*X[specR2] ) - k0 * ( X[specR2]*kinf*dk0dT - X[specR2]*k0*dkinfdT ) / sqr(kinf + k0*X[specR2]);
+    
+    //{Updated Equations}
+    dkfdX2 = -(k0 * k0) / (kinf + k0*X[specR2]) / (kinf + k0*X[specR2]) * kinf; /*  cm^6 (mole^2 s)^(-1)   */   
+    dkfdT = kinf*dk0dT / ( kinf + k0*X[specR2] ) - (k0 / (kinf + k0*X[specR2]) / (kinf + k0*X[specR2])) * ( X[specR2]*kinf*dk0dT - X[specR2]*k0*dkinfdT );
 
   } else {
     kf = 0.0; 
@@ -2402,7 +2413,6 @@ void add_to_W_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
                                 double A0,  double n0 , double E0, 								
 							                	double T,  spec_t X, spec_t W){
   double kf,sum, k0, kinf;
-  
   if (A0 > 0.0 || Ainf > 0.0) {
     k0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));    /* cm^6 mole^(-2) s^(-1) */ 
     kinf = Ainf*pow(T,ninf)*exp(-Einf/(T*Rchem));  /*  cm^3 (mole s)^(-1)   */ 
@@ -2511,11 +2521,11 @@ void add_to_dW_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
                                  spec_t dWdT, spec2_t dWdrhok){
 									 
   double kf, sum, k0, kinf, dkfdT, dk0dT, dkinfdT, dkfdX3;
+  
   if (A0 > 0.0 || Ainf > 0.0) {
     k0  = A0*pow(T,n0)*exp(-E0/(T*Rchem));    /* cm^6 mole^(-2) s^(-1) */ 
     kinf = Ainf*pow(T,ninf)*exp(-Einf/(T*Rchem));  /*  cm^3 (mole s)^(-1)   */ 
     kf = k0*kinf/(kinf + k0*X[specR3]);  /* cm^6 mole^(-2) s^(-1) */
-    
     dk0dT  = k0*n0/T + k0*(E0/(sqr(T)*Rchem));
     dkinfdT = kinf*ninf/T + kinf*(Einf/(sqr(T)*Rchem));
     
@@ -2524,16 +2534,14 @@ void add_to_dW_fw_3r2p_Lindemann(int specR1, int specR2, int specR3,
     //dkfdT = kinf*dk0dT / ( kinf + k0*X[specR3] ) - k0 * ( X[specR3]*kinf*dk0dT - X[specR3]*k0*dkinfdT ) / sqr(kinf + k0*X[specR3]);
     
     //{Updated Equations}
-    dkfdX3 = -(k0 * k0) / (kinf + k0*X[specR3]) / (kinf + k0*X[specR3]) * kinf; /*  cm^6 (mole^2 s)^(-1)   */   
-    dkfdT = kinf*dk0dT / ( kinf + k0*X[specR3] ) - (k0 / (kinf + k0*X[specR3]) / (kinf + k0*X[specR3])) * ( X[specR3]*kinf*dk0dT - X[specR3]*k0*dkinfdT );
-    
-    
-    
+    dkfdX3 = -kinf*(k0 / (kinf + k0*X[specR3]))* (k0 / (kinf + k0*X[specR3])); /*  cm^6 (mole^2 s)^(-1)   */   
+    dkfdT = kinf*dk0dT / ( kinf + k0*X[specR3] ) - (k0 / (kinf + k0*X[specR3]) ) * ( X[specR3]*kinf*dk0dT - X[specR3]*k0*dkinfdT )/ (kinf + k0*X[specR3]);
   } else {
-    kf = 0.0; 
-    dkfdT = 0.0; 
-    dkfdX3 = 0.0; 
+    kf = 0.0;
+    dkfdX3=0.0;
+    dkfdT=0.0;
   }
+  
   
   // dWdT 
   

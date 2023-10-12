@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 11a
+  * in model/chem/_C2H4_Air_23s/chem.c
+    - in reaction [26], made sure the temperature does not fall below 500 K
+  * in model/chem/_C2H4_Air_Plasma_36s/adamovich2023e.c
+    - in reaction [130], made sure the temperature does not fall below 500 K
+  * in model/fluid/_*/fluid_source.c
+    - in find_dSchem_dU(), added code at the end to make sure the diagonal elements of the
+      Jacobian are not positive
+  * in model/share/chem_share.c
+    - in add_to_dW_*_*_Lindemann(), 
+      
+
 2023 OCT 08a
   * in src/common.h
     - added a fake omp_lock_t when OPENMPTHREADS is not defined

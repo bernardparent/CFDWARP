@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/thermo/_thermo.h>
 #include <model/share/chem_share.h>
 
+#define TMIN_LINDEMANN 500.0
+
 /* taken from  Zettervall, N., Fureby, C., and Nilsson, E. J., 
   “Small skeletal kinetic reaction mechanism for ethylene–air combustion,” 
    Energy and Fuels, Vol. 31, No. 12, 2017, pp. 14138–14149. */
@@ -304,7 +306,7 @@ void find_W ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, do
   if (REACTION[26]){
   // reaction (26): CH3 + H(+M)  -> CH4(+M) 
 	 for (k=0; specM[k]!=specEND; k++){
-    add_to_W_fw_3r2p_Lindemann ( specCH3, specH, specM[k], specCH4, specM[k], eff2[k]*5.20e+12, 0.0, -1.310e+3, eff2[k]*8.25e+14, 0.0, -1.9310e+4,  T, X, W );
+    add_to_W_fw_3r2p_Lindemann ( specCH3, specH, specM[k], specCH4, specM[k], eff2[k]*5.20e+12, 0.0, -1.310e+3, eff2[k]*8.25e+14, 0.0, -1.9310e+4,  max(TMIN_LINDEMANN,T), X, W );
 	 }  
   } 
   
@@ -685,7 +687,7 @@ void find_dW_dx ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv
   if (REACTION[26]){
   // reaction (26): CH3 + H(+M)  -> CH4(+M)
    for (k=0; specM[k]!=specEND; k++){	
-    add_to_dW_fw_3r2p_Lindemann ( specCH3, specH, specM[k], specCH4, specM[k], eff2[k]*5.20e+12, 0.0, -1.310e+3, eff2[k]*8.25e+14, 0.0, -1.9310e+4,  T,X, dWdT, dWdrhok );
+    add_to_dW_fw_3r2p_Lindemann ( specCH3, specH, specM[k], specCH4, specM[k], eff2[k]*5.20e+12, 0.0, -1.310e+3, eff2[k]*8.25e+14, 0.0, -1.9310e+4,  max(TMIN_LINDEMANN,T),X, dWdT, dWdrhok );
 	 }    
   } 
 
