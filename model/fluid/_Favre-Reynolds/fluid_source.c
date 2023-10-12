@@ -99,7 +99,7 @@ static void find_dSchem_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
     for (s=0; s<nf; s++)  dS_dU[k][s]+=dWdTe[k]*dTdU[s];
   }
 #ifndef TEST
-  for (k=0; k<nf; k++) dSchemdU[k][k]=min(0.0e0,dSchemdU[k][k]);
+  for (k=0; k<nf; k++) dS_dU[k][k]=min(0.0e0,dS_dU[k][k]);
 #endif
 }
 

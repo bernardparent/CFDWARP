@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 11b
+  * in model/fluid/_*/fluid_source.c
+    - in find_dSchem_dU(), renamed dSchemdU to dS_dU
+
+
 2023 OCT 11a
   * in model/chem/_C2H4_Air_23s/chem.c
     - in reaction [26], made sure the temperature does not fall below 500 K
@@ -16,7 +21,7 @@ ________________________________________________________________________________
     - in find_dSchem_dU(), added code at the end to make sure the diagonal elements of the
       Jacobian are not positive
   * in model/share/chem_share.c
-    - in add_to_dW_*_*_Lindemann(), 
+    - in add_to_dW_*_*_Lindemann(), updated the "Updated Equations"
       
 
 2023 OCT 08a
