@@ -67,8 +67,8 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    BDRY_INFLOWSUBSONICMASSFLOWFIXED1 %c   Inflow, subsonic, Pstag, Massflow/Area fixed\n"
     "    BDRY_INFLOWINJECTION1             %c   Inflow, param Tstag, Pstag, specCs \n"
     "    BDRY_OUTFLOWSUPERSONIC1           %c   Outflow, supersonic\n"
-    "    BDRY_OUTFLOWSUBSONIC1             %c   Outflow, subsonic, P fixed\n"
-    "    BDRY_OUTFLOWSUBSONICMFIXED1       %c   Outflow, subsonic, M fixed\n"
+    "    BDRY_OUTFLOWSUBSONIC1             %c   Outflow, subsonic, P fixed, param P\n"
+    "    BDRY_OUTFLOWSUBSONICMFIXED1       %c   Outflow, subsonic, M fixed, param M\n"
     "    BDRY_SYMMETRICAL2                 %c   Symmetrical, 2nd order\n"
     "    BDRY_SYMMETRICAL1                 %c   Symmetrical, 1st order\n"
     "    BDRY_WALLTFIXED1                  %c   Wall, T specified, param Twall\n"
@@ -143,7 +143,7 @@ static void update_bdry_back_pressure(np_t *np, gl_t *gl, long lA, long lB, long
   bool ref_flag;
 
   assert_np(np[lA],is_node_resumed(np[lA]));
-  Pstar=_Pstar(np[lA],gl);
+  Pstar=_bdry_param(np,gl,lA,0,TYPELEVEL_FLUID_WORK);
   for (spec=0; spec<ns; spec++){
     rhok[spec]=_f_extrapol(ACCURACY,_rhok(np[lB],spec),_rhok(np[lC],spec));
   }
@@ -170,12 +170,7 @@ static void update_bdry_outflow_Mach(np_t *np, gl_t *gl, long lA, long lB, long 
   assert_np(np[lA],is_node_resumed(np[lA]));
 
   /* Store desired Mach number (Mdes) at C */
-  V_temp=0.0;
-  for (dim=0; dim<nd; dim++){
-    V_temp=V_temp+sqr(_V(np[lA],dim));
-  }
-  Vmag=sqrt(V_temp);
-  Mdes=Vmag/_a(np[lA],gl);
+  Mdes=_bdry_param(np,gl,lA,0,TYPELEVEL_FLUID_WORK);
 
 
   /* Extrapolate Mach number (Mextr) at C from A and B */

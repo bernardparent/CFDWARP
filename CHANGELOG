@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 13a
+  * in model/chem/_NH3_Plasma_34s/Li2012.c
+    - various modifications due to wrong units listed in Li's paper
+  * in model/fluid/_Favre-Reynolds/fluid_bdry.c
+    - in update_bdry_back_pressure() and update_bdry_outflow_Mach(), now reads the pressure
+      and Mach number from a given param instead of from the last properties at the bdry node 
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - in find_post_variable_*_fluid(), made modifications so that the averagedrates are added to
+      the post variables
+      
+
 2023 OCT 11b
   * in model/fluid/_*/fluid_source.c
     - in find_dSchem_dU(), renamed dSchemdU to dS_dU
