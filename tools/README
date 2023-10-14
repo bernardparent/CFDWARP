@@ -35,10 +35,6 @@ equilairplasma.c             outputs the molar fractions of air in thermochemica
 inlet.c                      finds properties in a n-oblique-shock Oswatitch supersonic 
                              inlet 
 
-inletgeom.c                  finds an external compression inlet geometry given the two 
-                             flow turning angles and the flight mach number and inlet 
-                             length
-
 mpitest.c                    program to test MPI installation
 
 normalshock.c                finds the properties after a normal shock, given the Mach 

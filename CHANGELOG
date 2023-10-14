@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 13b
+  * in model/fluid/_*/fluid_bdry.c
+    - in update_bdry_back_pressure() and update_bdry_outflow_Mach(), now reads the pressure
+      and Mach number from a given param instead of from the last properties at the bdry node 
+  * in tools
+    - deleted inletgeom.c
+    
+
 2023 OCT 13a
   * in model/chem/_NH3_Plasma_34s/Li2012.c
     - various modifications due to wrong units listed in Li's paper

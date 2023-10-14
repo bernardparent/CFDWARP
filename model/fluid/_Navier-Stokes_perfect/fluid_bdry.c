@@ -73,7 +73,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    BDRY_WALLADIABATIC1        %c     Wall, adiabatic, 1o\n"
     "    BDRY_WALLADIABATIC2        %c     Wall, adiabatic, 2o\n"
     "    BDRY_INFLOWSUBSONIC1       %c     Subsonic Inflow 1o (Constant Tstag, Pstag at inflow)\n"
-    "    BDRY_OUTFLOWSUBSONIC1      %c     Subsonic Outflow 1o (Constant P at outflow)\n"
+    "    BDRY_OUTFLOWSUBSONIC1      %c     Subsonic Outflow 1o (Constant P at outflow), param P\n"
     "    BDRY_FREESTREAM1           %c     Freestream, 1o, params Vx,Vy,"if3DL("Vz,")" P, T\n"
 #if defined(UNSTEADY)
     "    BDRY_INFLOWFLUCTUATING     %c     Inflow, supersonic, spatio-temporally varying,\n                                     params N_modes, "if3DL("beta, ")"omega, "if3DL("ifoblique, ")"phi_baseflow,\n                                     Re_phi_shapefunction,Im_phi_shapefunction...\n                                     where phi∈{Vx,Vy,"if3DL("Vz,")"rho,T}\n"
@@ -398,7 +398,7 @@ static void update_bdry_subsonic_outflow(np_t *np, gl_t *gl, long lA, long lB, l
     }
   }
     
-  Pnew=_P(np[lA],gl);
+  Pnew=_bdry_param(np,gl,lA,0,TYPELEVEL_FLUID_WORK);
 
   assert_np(np[lA],is_node_resumed(np[lA]));
   find_U_2(np, lA, gl, Vnew, Pnew, Tnew);
