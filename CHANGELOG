@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 15a
+  * in model/share/fluid_share.c
+    - in find_Stnorm(), turned off the Qk limiter for TURBMODEL_SST1994
+  * in model/chem/_NH3_Plasma_10s/bavafa2008.c
+    - in find_dW_dx_bavafa2008(), turned off the implicit treatment of reactions 1-4
+    
+
 2023 OCT 13b
   * in model/fluid/_*/fluid_bdry.c
     - in update_bdry_back_pressure() and update_bdry_outflow_Mach(), now reads the pressure

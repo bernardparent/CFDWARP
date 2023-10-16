@@ -1194,7 +1194,8 @@ void find_Stnorm(np_t *np, gl_t *gl, long l, flux_t St){
     break;
     case TURBMODEL_SST1994:
       // use the Qk limiter (see Menter, F. R., "Zonal Two Equation k-omega Turbulence Models for Aerodynamic Flows," AIAA Paper 93-2906, July 1993, https://doi.org/10.2514/6.1993-2906)
-      St[fluxtke]=TEST_VANISH*min(Qk,20.0*0.09*rho*psi*k)-0.09*rho*psi*k;
+      //St[fluxtke]=TEST_VANISH*min(Qk,20.0*0.09*rho*psi*k)-0.09*rho*psi*k;
+      St[fluxtke]=TEST_VANISH*Qk-0.09*rho*psi*k;
       assert_np(np[l],ktilde!=0.0e0);
       gamma1=0.075/0.09-0.5*sqr(0.41)/sqrt(0.09);
       gamma2=0.0828/0.09-0.856*sqr(0.41)/sqrt(0.09);
