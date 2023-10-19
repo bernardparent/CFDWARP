@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 18a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - in find_post_variable_value_fluid(), fixed a bug for EdotJe post variable
+    
+
 2023 OCT 15a
   * in model/share/fluid_share.c
     - in find_Stnorm(), turned off the Qk limiter for TURBMODEL_SST1994

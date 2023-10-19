@@ -1,1 +1,1 @@
-#define VERSION "23oct15a"
+#define VERSION "23oct18a"
