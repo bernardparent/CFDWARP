@@ -1255,6 +1255,9 @@ double _ionizationpot(long k){
     case SMAP_NH:
       ionizationenergy=2.1592e-18;
     break;
+    case SMAP_H2P:
+      ionizationenergy=5.4497e-19;
+    break;
     default:
       ionizationenergy=0.0;
       fatal_error("spec %ld does not have an ionization energy specified in _ionizationpot().",k);

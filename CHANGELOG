@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 20b
+  * in  model/thermo/_generic/thermo.c
+    - in _ionizationpot(), added ionization energy for SMAP_H2P
+
+
 2023 OCT 20a
   * in model/chem/_NH3_Plasma_34s/
     - fixed issues with the units of several reactions
