@@ -202,6 +202,10 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
 #endif
 
 
+#if defined(UNSTEADY) && defined(_AVERAGEDRATES)
+      if (fscanf(datafile," averagedrates_time=%lg AVERAGEDRATES=%ld",&(gl->averagedrates_time),&(gl->AVERAGEDRATES))!=2) fatal_error("Problem reading AVERAGEDRATES variables within fscanf in read_data_file_binary().");
+#endif
+
       if (fscanf(datafile,"%*[^\n]")!=0) fatal_error("Problem with fscanf in read_data_file_binary().");
 
 
@@ -352,6 +356,59 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
   }
   if(NOREScount>0) wfprintf(stdout,"WARNING: The residual at the previous time step could not be found within the data file %s. The residual has been set to zero..",filename);
 #endif
+
+
+#if defined(UNSTEADY) && defined(_AVERAGEDRATES)
+  double averagedrates[numaveragedrates];
+  bool NOAVERAGEDRATES=FALSE;
+  long NOAVERAGEDRATEScount=0;
+  
+  wfprintf(stdout,"averagedrates.");
+  find_NODEVALID_on_domain_all(np, gl, TYPELEVEL_FLUID, NODEVALID);
+  wfprintf(stdout,".");
+  for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
+
+#ifdef DISTMPI
+        if (rank==0) {
+#endif
+          if (NODEVALID[_ai_all(gl,i,j,k)]) {
+            switch (DATATYPE){
+              case DATATYPE_BINARY:
+                if (fread(averagedrates, numaveragedrates*sizeof(double), 1, datafile)!=1){
+                  NOAVERAGEDRATES=TRUE;
+                  NOAVERAGEDRATEScount++;
+                }
+              break;
+              case DATATYPE_ASCII:
+                for (flux=0; flux<numaveragedrates; flux++){
+                  if (fscanf(datafile,"%lg%*[^\n]",&(averagedrates[flux]))!=1){
+                    NOAVERAGEDRATES=TRUE;
+                    NOAVERAGEDRATEScount++;
+                  }  
+                }
+              break;
+              default:
+                fatal_error("DATATYPE must be either DATATYPE_ASCII or DATATYPE_BINARY.");
+            }
+
+          }
+#ifdef DISTMPI
+        }
+		MPI_Bcast(&NOAVERAGEDRATES, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
+        if (!NOAVERAGEDRATES) MPI_Bcast_Node(&averagedrates, numaveragedrates, MPI_DOUBLE, 0, MPI_COMM_WORLD, i, j, k, gl);
+        if (j==gl->domain_all.js && k==gl->domain_all.ks) MPI_Barrier(MPI_COMM_WORLD);
+#endif
+        if (is_node_in_zone(i,j,k,gl->domain_lim)) {
+          for (flux=0; flux<numaveragedrates; flux++){
+            if (!NOAVERAGEDRATES) np[_ai(gl,i,j,k)].bs->averagedrates[flux]=averagedrates[flux];
+            else if (NOAVERAGEDRATES) np[_ai(gl,i,j,k)].bs->averagedrates[flux]=0.0;
+          }
+        }
+		NOAVERAGEDRATES=FALSE;
+  }
+  if(NOAVERAGEDRATEScount>0) wfprintf(stdout,"WARNING: The averaged rates could not be found within the data file %s. The averaged rates have been set to zero..",filename);
+#endif
+
 
   fclose(datafile);
 
@@ -617,7 +674,7 @@ void read_data_file_mpi(char *filename, np_t *np, gl_t *gl, long level){
 
 void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATYPE){
   FILE *datafile;
-  long i,j,k;
+  long i,j,k,sizeoftmpflux;
   flux_t *fluxtmp;
   bool *NODEVALID;
 #ifdef EMFIELD
@@ -632,17 +689,26 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
   MPI_Status MPI_Status1;
 #endif
 
+  sizeoftmpflux=nf*sizeof(double);
 #ifdef EMFIELD
-  assert(nf>=nfe);
+  sizeoftmpflux=max(sizeoftmpflux,nfe*sizeof(double));
 #endif
-  fluxtmp=(flux_t *)malloc((gl->domain_lim_all.ie-gl->domain_lim_all.is+1)
+#if defined(UNSTEADY) && defined(_AVERAGEDRATES)
+  sizeoftmpflux=max(sizeoftmpflux,numaveragedrates*sizeof(double));
+  double averagedrates[numaveragedrates];
+#endif  
+
+  typedef double tmpflux_t[sizeoftmpflux];
+
+
+  fluxtmp=(tmpflux_t *)malloc((gl->domain_lim_all.ie-gl->domain_lim_all.is+1)
 #ifdef _2DL
                           *(gl->domain_lim_all.je-gl->domain_lim_all.js+1)
 #endif
 #ifdef _3DL
                           *(gl->domain_lim_all.ke-gl->domain_lim_all.ks+1)
 #endif
-                          *sizeof(flux_t));
+                          *sizeoftmpflux);
   NODEVALID=(bool *)malloc((gl->domain_lim_all.ie-gl->domain_lim_all.is+1)
 #ifdef _2DL
                           *(gl->domain_lim_all.je-gl->domain_lim_all.js+1)
@@ -713,6 +779,10 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
 
 #ifdef EMFIELD
   wfprintf(datafile," Lc=%E effiter_U_emfield=%E effiter_R_emfield=%E",gl->Lc,effiter_U_emfield,effiter_R_emfield);
+#endif
+
+#if defined(UNSTEADY) && defined(_AVERAGEDRATES)
+  wfprintf(datafile," averagedrates_time=%E AVERAGEDRATES=%ld",gl->averagedrates_time,gl->AVERAGEDRATES);
 #endif
 
   wfprintf(datafile,"\n");
@@ -849,6 +919,64 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
         }
   }
 #endif
+
+
+
+
+
+
+
+#if defined(UNSTEADY) && defined(_AVERAGEDRATES)
+  find_NODEVALID_on_domain_all(np, gl, TYPELEVEL_FLUID, NODEVALID);
+#ifdef DISTMPI
+  for (proc=0; proc<numproc; proc++){
+    domain=_domain_from_rank(proc,gl);
+    for_ijk(domain,is,js,ks,ie,je,ke){
+          if (proc==rank){
+            for (flux=0; flux<numaveragedrates; flux++) averagedrates[flux]=np[_ai(gl,i,j,k)].bs->averagedrates[flux];
+            if (proc!=0) {
+              MPI_Send(averagedrates,numaveragedrates,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
+            }
+          } 
+          
+          if (rank==0 && proc!=0) {
+            MPI_Recv(averagedrates,numaveragedrates,MPI_DOUBLE,proc,0,MPI_COMM_WORLD,&MPI_Status1);
+          }
+          
+          for (flux=0; flux<numaveragedrates; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=averagedrates[flux];
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
+  }
+#else
+  for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
+        for (flux=0; flux<numaveragedrates; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->averagedrates[flux];
+  }
+#endif
+
+  for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
+        if (NODEVALID[_ai_all(gl,i,j,k)]) {
+          switch (DATATYPE){
+            case DATATYPE_BINARY:
+              wfwrite(fluxtmp[_ai_all(gl,i,j,k)], numaveragedrates*sizeof(double), 1, datafile);
+            break;
+            case DATATYPE_ASCII:
+              for (flux=0; flux<numaveragedrates; flux++)
+                wfprintf(datafile, "%18.16E\n",fluxtmp[_ai_all(gl,i,j,k)][flux]);
+            break;
+            default:
+              fatal_error("DATATYPE must be either DATATYPE_ASCII or DATATYPE_BINARY.");
+          }
+        }
+  }
+#endif
+
+
+
+
+
+
+
+
 
 
 #ifdef DISTMPI

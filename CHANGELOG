@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 25a
+  * in src/data.c
+    - in read_data_file_binary_ascii() and write_data_file_binary_ascii(), added code to 
+      read and write the averagedrates to the data file
+      
+
 2023 OCT 20b
   * in  model/thermo/_generic/thermo.c
     - in _ionizationpot(), added ionization energy for SMAP_H2P
