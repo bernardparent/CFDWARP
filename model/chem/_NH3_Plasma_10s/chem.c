@@ -30,15 +30,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/share/model_share.h>
 #include <src/control.h>
 #include "bavafa2008.h"
+#include "omprakas2023.h"
 
 #define CHEMMODEL_NONE 1
 #define CHEMMODEL_BAVAFA2008 2
+#define CHEMMODEL_OMPRAKAS2023 3
 
 
 void write_model_chem_template(FILE **controlfile){
   wfprintf(*controlfile,
     "  %s(\n"
-    "    CHEMMODEL=CHEMMODEL_BAVAFA2008;\n"
+    "    CHEMMODEL=CHEMMODEL_BAVAFA2008; {CHEMMODEL can be set to CHEMMODEL_BAVAFA2008 or CHEMMODEL_OMPRAKAS2023 or CHEMMODEL_NONE}\n"
     "    QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}\n"
     "  );\n"
   ,_CHEM_ACTIONNAME);
@@ -60,6 +62,7 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
     if (((readcontrolarg_t *)codex->action_args)->VERBOSE) wfprintf(stdout,"%s..",_CHEM_ACTIONNAME);
     SOAP_add_int_to_vars(codex,"CHEMMODEL_NONE",CHEMMODEL_NONE); 
     SOAP_add_int_to_vars(codex,"CHEMMODEL_BAVAFA2008",CHEMMODEL_BAVAFA2008);
+    SOAP_add_int_to_vars(codex,"CHEMMODEL_OMPRAKAS2023",CHEMMODEL_OMPRAKAS2023);
     gl->MODEL_CHEM_READ=TRUE;
 
     action_original=codex->action;
@@ -69,8 +72,9 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
 
     find_int_var_from_codex(codex,"CHEMMODEL",&gl->model.chem.CHEMMODEL);
     if (gl->model.chem.CHEMMODEL!=CHEMMODEL_BAVAFA2008
+        && gl->model.chem.CHEMMODEL!=CHEMMODEL_OMPRAKAS2023
         && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)
-      SOAP_fatal_error(codex,"CHEMMODEL must be set to CHEMMODEL_BAVAFA2008.");
+      SOAP_fatal_error(codex,"CHEMMODEL must be set to CHEMMODEL_BAVAFA2008 or CHEMMODEL_OMPRAKAS2023 or CHEMMODEL_NONE.");
     find_bool_var_from_codex(codex,"QEISOURCETERMS",&gl->model.chem.QEISOURCETERMS);
 
     SOAP_clean_added_vars(codex,numvarsinit);
@@ -112,6 +116,9 @@ void find_W ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, do
     case CHEMMODEL_BAVAFA2008: 
       find_W_bavafa2008 ( np, gl, rhok, T, Te, Tv, Estar, Qbeam, W );
     break;
+    case CHEMMODEL_OMPRAKAS2023: 
+      find_W_omprakas2023 ( np, gl, rhok, T, Te, Tv, Estar, Qbeam, W );
+    break;
     case CHEMMODEL_NONE: 
       find_W_None ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );    
     break;
@@ -127,6 +134,9 @@ void find_dW_dx ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv
   switch (gl->model.chem.CHEMMODEL){
     case CHEMMODEL_BAVAFA2008: 
       find_dW_dx_bavafa2008 ( np, gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+    break;
+    case CHEMMODEL_OMPRAKAS2023: 
+      find_dW_dx_omprakas2023 ( np, gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
     break;
     case CHEMMODEL_NONE: 
       find_dW_dx_None ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
@@ -149,6 +159,9 @@ void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
       case CHEMMODEL_BAVAFA2008: 
         find_Qei_bavafa2008 ( gl, rhok, Estar, Te, Qei );
       break;
+      case CHEMMODEL_OMPRAKAS2023: 
+        find_Qei_omprakas2023 ( gl, rhok, Estar, Te, Qei );
+      break;
       case CHEMMODEL_NONE: 
         *Qei=0.0;
       break;
@@ -170,6 +183,9 @@ void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrh
       case CHEMMODEL_BAVAFA2008: 
         find_dQei_dx_bavafa2008 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
       break;
+      case CHEMMODEL_OMPRAKAS2023: 
+        find_dQei_dx_omprakas2023 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+      break;
       case CHEMMODEL_NONE: 
         *dQeidTe=0.0;
       break;
@@ -185,6 +201,6 @@ void find_We ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Est
 
   switch (gl->model.chem.CHEMMODEL){
     default:
-      fatal_error("CHEMMODEL must be set to CHEMMODEL_BAVAFA2008 for two-temperature model of We*ee.");
+      fatal_error("CHEMMODEL must be set to CHEMMODEL_BAVAFA2008 or CHEMMODEL_OMPRAKAS2023 for two-temperature model of We*ee.");
   }
 }

@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 28a
+  * in model/chem/_NH3_Plasma_10s
+    - added omprakas2023.c
+  * in model/chem/_NH3_Plasma_10s/chem.c
+    - modified functions to include CHEMMODEL_OMPRAKAS2023
+  * in model/chem/_NH3_Plasma_10s/doc/report.tex
+    - added omprakas2023 model documentation
+    
+
 2023 OCT 25a
   * in src/data.c
     - in read_data_file_binary_ascii() and write_data_file_binary_ascii(), added code to 
