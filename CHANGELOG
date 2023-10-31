@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 31a
+  * in model/chem/_NH3_Plasma_10s/omprakas2023.c
+    - turned off reactions 3 and 4
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Se(), added an _averagedrate() call for _Eemag_smoothed and for _E_dot_Je_over_mueNe
+    
+
 2023 OCT 28a
   * in model/chem/_NH3_Plasma_10s
     - added omprakas2023.c

@@ -33,8 +33,8 @@ const static bool REACTION[20]=
    FALSE, /* reaction 0 */
    TRUE, /* reaction 1 */
    TRUE, /* reaction 2 */
-   TRUE, /* reaction 3 */
-   TRUE, /* reaction 4 */
+   FALSE, /* reaction 3 */
+   FALSE, /* reaction 4 */
    TRUE, /* reaction 5 */
    TRUE, /* reaction 6 */
    TRUE, /* reaction 7 */
