@@ -7,6 +7,24 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 31b
+  * in src/common.h
+    - added typedef char averagedrates_id_type[100];
+  * in model/chem/_NH3_Plasma_10s/bavafa2008.c and model/chem/_NH3_Plasma_10s/omprakas2023.c
+    - changed the calls to _averaged_rate() with a id string instead of a id number
+  * in model/chem/_NH3_Plasma_10s/chem.hh
+    - changed the type of averagedrates_chem_id to averagedrates_id_type from long
+  * in model/fluid/_Navier-Stokes_plasma/fluid.hh
+    - changed the type of averagedrates_fluid_id to averagedrates_id_type from long
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - in find_post_variable_name_fluid(), now outputs the id string of the averaged rate
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - changed the calls to _averaged_rate() with a id string instead of a id number
+    - in find_Se(), now averages EdotJe not EdotjeovermueNe
+  * in src/common.h
+    - added typedef char averagedrates_id_type[100]
+    
+ 
 2023 OCT 31a
   * in model/chem/_NH3_Plasma_10s/omprakas2023.c
     - turned off reactions 3 and 4

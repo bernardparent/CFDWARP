@@ -104,7 +104,7 @@ double _f_symmetry(int ACCURACY, ...) {
 
 
 #if defined(_AVERAGEDRATES) && defined(UNSTEADY)
-double _averaged_rate(np_t np, gl_t *gl, long id, double rate){
+double _averaged_rate(np_t np, gl_t *gl, averagedrates_id_type id, double rate){
   long id_map,cntfluid,cntchem;
   double newrate;
   bool FOUND;
@@ -113,7 +113,7 @@ double _averaged_rate(np_t np, gl_t *gl, long id, double rate){
   cntfluid=0;
 #ifdef _AVERAGEDRATES_FLUID
   for (cntfluid=0; cntfluid<numaveragedrates_fluid; cntfluid++){
-    if (averagedrates_fluid_id[cntfluid]==id){
+    if (strcmp(averagedrates_fluid_id[cntfluid],id)==0){
       FOUND=TRUE;
       id_map=cntfluid;
     }
@@ -121,7 +121,7 @@ double _averaged_rate(np_t np, gl_t *gl, long id, double rate){
 #endif
 #ifdef _AVERAGEDRATES_CHEM
   for (cntchem=0; cntchem<numaveragedrates_chem; cntchem++){
-    if (averagedrates_chem_id[cntchem]==id){
+    if (strcmp(averagedrates_chem_id[cntchem],id)==0){
       if (!FOUND) FOUND=TRUE;
         else fatal_error("Problem in function _averaged_rate: two averagedrates IDs %ld can not be the same.",id);
       id_map=cntchem+cntfluid;

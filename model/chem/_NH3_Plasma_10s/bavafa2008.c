@@ -62,19 +62,19 @@ void find_W_bavafa2008 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, do
   
   
   if (REACTION[1]){
-    add_to_W_2r3p ( specNH3, speceminus, specNH3plus, speceminus, speceminus, _averaged_rate(np,gl,1,min( exp ( 1.2346e-14 * pow ( theta, 9.0 ) + 0.3115 * theta ), 1.5640e-07 )), N, W );
+    add_to_W_2r3p ( specNH3, speceminus, specNH3plus, speceminus, speceminus, _averaged_rate(np,gl,"kf1",min( exp ( 1.2346e-14 * pow ( theta, 9.0 ) + 0.3115 * theta ), 1.5640e-07 )), N, W );
   }
 
   if (REACTION[2]){
-    add_to_W_2r4p ( specNH3, speceminus, specNH2plus, specH, speceminus, speceminus, _averaged_rate(np,gl,2,min( exp ( 0.4853 * theta + 5.5515e-131 * pow( theta, 79.0 ) ), 2.4490e-10 )), N, W );
+    add_to_W_2r4p ( specNH3, speceminus, specNH2plus, specH, speceminus, speceminus, _averaged_rate(np,gl,"kf2",min( exp ( 0.4853 * theta + 5.5515e-131 * pow( theta, 79.0 ) ), 2.4490e-10 )), N, W );
   }
 
   if (REACTION[3]){
-    add_to_W_2r3p ( specNH3, speceminus, specNH2, specH, speceminus, _averaged_rate(np,gl,3,min( exp ( 2.0636e-07 * pow( theta, 5.0 ) - 4.3548e-11 * pow( theta, 7.0 ) ), 1.0400e-08 * exp( -1.1290e+19 * Estar ) + 2.0460e-09 * exp( -3.6270e05 * Estar ) )), N, W );
+    add_to_W_2r3p ( specNH3, speceminus, specNH2, specH, speceminus, _averaged_rate(np,gl,"kf3",min( exp ( 2.0636e-07 * pow( theta, 5.0 ) - 4.3548e-11 * pow( theta, 7.0 ) ), 1.0400e-08 * exp( -1.1290e+19 * Estar ) + 2.0460e-09 * exp( -3.6270e05 * Estar ) )), N, W );
   }
 
   if (REACTION[4]){
-    add_to_W_2r4p ( specNH3, speceminus, specNH, specH, specH, speceminus, _averaged_rate(np,gl,4,min( exp ( 1.4602e-07 * pow ( theta, 5.0 ) - 1.3747e-21 * pow( theta, 13.0 ) ), 1.200e-08 )), N, W );
+    add_to_W_2r4p ( specNH3, speceminus, specNH, specH, specH, speceminus, _averaged_rate(np,gl,"kf4",min( exp ( 1.4602e-07 * pow ( theta, 5.0 ) - 1.3747e-21 * pow( theta, 13.0 ) ), 1.200e-08 )), N, W );
   }
 
   if (REACTION[5]){
@@ -134,7 +134,7 @@ void find_dW_dx_bavafa2008 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te
 
 
   if (REACTION[1] && FALSE){
-    kf = _averaged_rate(np,gl,1,min( exp ( 1.2346e-14 * pow ( theta, 9.0 ) + 0.3115 * theta ), 1.5640e-07 ));
+    kf = _averaged_rate(np,gl,"kf1",min( exp ( 1.2346e-14 * pow ( theta, 9.0 ) + 0.3115 * theta ), 1.5640e-07 ));
     dkfdTe = 0.0;
     dkfdT = 0.0;
     dkfdTv = 0.0;
@@ -142,7 +142,7 @@ void find_dW_dx_bavafa2008 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te
   }
 
   if (REACTION[2] && FALSE){
-    kf = _averaged_rate(np,gl,2,min( exp ( 0.4853 * theta + 5.5515e-131 * pow( theta, 79.0 ) ), 2.4490e-10 ));
+    kf = _averaged_rate(np,gl,"kf2",min( exp ( 0.4853 * theta + 5.5515e-131 * pow( theta, 79.0 ) ), 2.4490e-10 ));
     dkfdTe = 0.0;
     dkfdT = 0.0;
     dkfdTv = 0.0;
@@ -150,7 +150,7 @@ void find_dW_dx_bavafa2008 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te
   }
 
   if (REACTION[3] && FALSE){
-    kf = _averaged_rate(np,gl,3,min( exp ( 2.0636e-07 * pow( theta, 5.0 ) - 4.3548e-11 * pow( theta, 7.0 ) ), 1.0400e-08 * exp( -1.1290e+19 * Estar ) + 2.0460e-09 * exp( -3.6270e05 * Estar ) ));
+    kf = _averaged_rate(np,gl,"kf3",min( exp ( 2.0636e-07 * pow( theta, 5.0 ) - 4.3548e-11 * pow( theta, 7.0 ) ), 1.0400e-08 * exp( -1.1290e+19 * Estar ) + 2.0460e-09 * exp( -3.6270e05 * Estar ) ));
     dkfdTe = 0.0;
     dkfdT = 0.0;
     dkfdTv = 0.0;
@@ -158,7 +158,7 @@ void find_dW_dx_bavafa2008 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te
   }
 
   if (REACTION[4] && FALSE){
-    kf = _averaged_rate(np,gl,4,min( exp ( 1.4602e-07 * pow ( theta, 5.0 ) - 1.3747e-21 * pow( theta, 13.0 ) ), 1.200e-08 ));
+    kf = _averaged_rate(np,gl,"kf4",min( exp ( 1.4602e-07 * pow ( theta, 5.0 ) - 1.3747e-21 * pow( theta, 13.0 ) ), 1.200e-08 ));
     dkfdTe = 0.0;
     dkfdT = 0.0;
     dkfdTv = 0.0;

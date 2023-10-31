@@ -8,11 +8,11 @@
 
 #define numaveragedrates_chem 4
 
-const static long averagedrates_chem_id[numaveragedrates_chem] = {
-  1,  
-  2,
-  3,
-  4
+const static averagedrates_id_type averagedrates_chem_id[numaveragedrates_chem] = {
+  "kf1",  
+  "kf2",
+  "kf3",
+  "kf4"
 };
 
 

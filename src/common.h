@@ -177,6 +177,7 @@ typedef double omp_lock_t;
 #define AVERAGEDRATES_OFF 1
 #define AVERAGEDRATES_ON 2
 #define AVERAGEDRATES_SET 3
+typedef char averagedrates_id_type[100];
 
 typedef struct{
  long is,js,ks,ie,je,ke;
