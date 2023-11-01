@@ -165,7 +165,7 @@ double _averaged_rate(np_t np, gl_t *gl, averagedrates_id_type id, double rate){
   return(newrate);
 }
 #else
-double _averaged_rate(np_t np, gl_t *gl, long id, double rate){
+double _averaged_rate(np_t np, gl_t *gl, averagedrates_id_type id, double rate){
   return(rate);
 }
 #endif

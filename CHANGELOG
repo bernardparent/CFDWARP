@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 NOV 01a
+  * in model/share/model_share.c
+    - fixed a bug in the parameters of _averaged_rate()
+    
+
 2023 OCT 31d
   * in model/chem/_NH3_Plasma_34s/Li2012.c
     - in find_W_li2012() fixed again mistakes related to units
