@@ -114,7 +114,8 @@ double _averaged_rate(np_t np, gl_t *gl, averagedrates_id_type id, double rate){
 #ifdef _AVERAGEDRATES_FLUID
   for (cntfluid=0; cntfluid<numaveragedrates_fluid; cntfluid++){
     if (strcmp(averagedrates_fluid_id[cntfluid],id)==0){
-      FOUND=TRUE;
+      if (!FOUND) FOUND=TRUE;
+        else fatal_error("Problem in function _averaged_rate: two averagedrates IDs %ld can not be the same.",id);
       id_map=cntfluid;
     }
   }
@@ -131,7 +132,15 @@ double _averaged_rate(np_t np, gl_t *gl, averagedrates_id_type id, double rate){
   assert(id_map>=0);
   assert(id_map<numaveragedrates);  
 
-  if (!FOUND) fatal_error("Problem finding id_map in _averaged_rate().");
+  if (!FOUND) {
+    for (cntfluid=0; cntfluid<numaveragedrates_fluid; cntfluid++){
+      printf("%s\n",averagedrates_fluid_id[cntfluid]);
+    }
+    for (cntchem=0; cntchem<numaveragedrates_chem; cntchem++){
+      printf("%s\n",averagedrates_chem_id[cntchem]);
+    }
+    fatal_error("Problem finding id '%s' in averagedrates_fluid_id[] or averagedrates_chem_id[].",id);
+  }
   switch (gl->AVERAGEDRATES){
     case AVERAGEDRATES_ADD:
       if (gl->averagedrates_time<0.0) fatal_error("Averaged rates not initialized properly. Need to call SetAveragedRatesToZero() first.");

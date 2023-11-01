@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 31c
+  * in model/fluid/_Navier-Stokes_plasma/fluid.hh
+    - fixed a bug: EDOTJEOVERMUENE should be EDOTJE
+  * in model/share/model_share.c
+    - in _averaged_rate(), added better error messages when the id can not be found
+    
+
 2023 OCT 31b
   * in src/common.h
     - added typedef char averagedrates_id_type[100];
