@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 OCT 31d
+  * in model/chem/_NH3_Plasma_34s/Li2012.c
+    - in find_W_li2012() fixed again mistakes related to units
+    - in find_dW_li2012(), fixed dkfdT mistakes
+    
+
 2023 OCT 31c
   * in model/fluid/_Navier-Stokes_plasma/fluid.hh
     - fixed a bug: EDOTJEOVERMUENE should be EDOTJE
