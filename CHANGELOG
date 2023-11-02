@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 NOV 01b
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Semfield(), changed the averaged rate from EDOTJ to EDOTJOVERNEMUE
+    - in find_Se(), changed the averaged rate from EDOTJE to EDOTJEOVERNEMUE
+    
+
 2023 NOV 01a
   * in model/share/model_share.c
     - fixed a bug in the parameters of _averaged_rate()
