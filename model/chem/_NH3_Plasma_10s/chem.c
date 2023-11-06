@@ -42,6 +42,8 @@ void write_model_chem_template(FILE **controlfile){
     "  %s(\n"
     "    CHEMMODEL=CHEMMODEL_BAVAFA2008; {CHEMMODEL can be set to CHEMMODEL_BAVAFA2008 or CHEMMODEL_OMPRAKAS2023 or CHEMMODEL_NONE}\n"
     "    QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}\n"
+    "    kf1averagedmax=1e-5; \n"
+    "    kf2averagedmax=1e-5; \n"
     "  );\n"
   ,_CHEM_ACTIONNAME);
 }
@@ -65,6 +67,7 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
     SOAP_add_int_to_vars(codex,"CHEMMODEL_OMPRAKAS2023",CHEMMODEL_OMPRAKAS2023);
     gl->MODEL_CHEM_READ=TRUE;
 
+
     action_original=codex->action;
     codex->action=&read_model_chem_actions_2;
     SOAP_process_code(*argum, codex, SOAP_VARS_KEEP_ALL);
@@ -76,6 +79,9 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
         && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)
       SOAP_fatal_error(codex,"CHEMMODEL must be set to CHEMMODEL_BAVAFA2008 or CHEMMODEL_OMPRAKAS2023 or CHEMMODEL_NONE.");
     find_bool_var_from_codex(codex,"QEISOURCETERMS",&gl->model.chem.QEISOURCETERMS);
+
+    find_double_var_from_codex(codex,"kf1averagedmax",&gl->model.chem.kf1averagedmax);
+    find_double_var_from_codex(codex,"kf2averagedmax",&gl->model.chem.kf2averagedmax);
 
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;

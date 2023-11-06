@@ -79,6 +79,7 @@ const static long speciestype[ns] = {
 typedef struct {
   int CHEMMODEL;
   bool QEISOURCETERMS;
+  double kf1averagedmax,kf2averagedmax;
 } gl_model_chem_t;
 
 

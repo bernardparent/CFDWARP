@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 NOV 06a
+  * in model/chem/_NH3_Plasma_10s/chem.c
+    - in write_model_chem_template() and read_model_chem_actions(), added code to handle 
+      kf1averagedmax and kf2averagedmax
+  * in model/chem/_NH3_Plasma_10s/omprakas2023.c
+    - in find_W_omprakas2023() and find_dW_dx_omprakas2023 now calls 
+      _averaged_rate_limited() for reactions 1 and 2    
+  * in model/fluid/_Navier-Stokes_plasma/fluid.hh
+    - changed EDOTOVERNEMUE to EDOTJ
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Semfield(), S[fluxet] is now computed with an averaged rate of EDOTJ not EDOTOVERNEMUE
+  * in model/share/model_share.c
+    - added _averaged_rate_limited()
+    
+
 2023 NOV 01b
   * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
     - in find_Semfield(), changed the averaged rate from EDOTJ to EDOTJOVERNEMUE

@@ -67,11 +67,11 @@ void find_W_omprakas2023 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, 
   
   
   if (REACTION[1]){
-    add_to_W_2r3p ( specNH3, speceminus, specNH3plus, speceminus, speceminus, _averaged_rate(np,gl,"kf1",min( exp ( 1.2346e-14 * pow ( theta, 9.0 ) + 0.3115 * theta ), 1.5640e-07 )), N, W );
+    add_to_W_2r3p ( specNH3, speceminus, specNH3plus, speceminus, speceminus, _averaged_rate_limited(np,gl,"kf1",min( exp ( 1.2346e-14 * pow ( theta, 9.0 ) + 0.3115 * theta ), 1.5640e-07 ), 0.0, gl->model.chem.kf1averagedmax), N, W );
   }
 
   if (REACTION[2]){
-    add_to_W_2r4p ( specNH3, speceminus, specNH2plus, specH, speceminus, speceminus, _averaged_rate(np,gl,"kf2",min( exp ( 0.4853 * theta + 5.5515e-131 * pow( theta, 79.0 ) ), 2.4490e-10 )), N, W );
+    add_to_W_2r4p ( specNH3, speceminus, specNH2plus, specH, speceminus, speceminus, _averaged_rate_limited(np,gl,"kf2",min( exp ( 0.4853 * theta + 5.5515e-131 * pow( theta, 79.0 ) ), 2.4490e-10 ), 0.0, gl->model.chem.kf2averagedmax), N, W );
   }
 
   if (REACTION[3]){
@@ -159,7 +159,7 @@ void find_dW_dx_omprakas2023 ( np_t np, gl_t *gl, spec_t rhok, double T, double 
 
 
   if (REACTION[1] && FALSE){
-    kf = _averaged_rate(np,gl,"kf1",min( exp ( 1.2346e-14 * pow ( theta, 9.0 ) + 0.3115 * theta ), 1.5640e-07 ));
+    kf = _averaged_rate_limited(np,gl,"kf1",min( exp ( 1.2346e-14 * pow ( theta, 9.0 ) + 0.3115 * theta ), 1.5640e-07 ),0.0,gl->model.chem.kf1averagedmax);
     dkfdTe = 0.0;
     dkfdT = 0.0;
     dkfdTv = 0.0;
@@ -167,7 +167,7 @@ void find_dW_dx_omprakas2023 ( np_t np, gl_t *gl, spec_t rhok, double T, double 
   }
 
   if (REACTION[2] && FALSE){
-    kf = _averaged_rate(np,gl,"kf2",min( exp ( 0.4853 * theta + 5.5515e-131 * pow( theta, 79.0 ) ), 2.4490e-10 ));
+    kf = _averaged_rate_limited(np,gl,"kf2",min( exp ( 0.4853 * theta + 5.5515e-131 * pow( theta, 79.0 ) ), 2.4490e-10 ),0.0,gl->model.chem.kf2averagedmax);
     dkfdTe = 0.0;
     dkfdT = 0.0;
     dkfdTv = 0.0;
