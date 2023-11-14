@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 NOV 13a
+  * in model/chem/_NH3_Plasma_10s/omprakas2023.c
+    - changed reactions 1 and 2 to be function of Te instead of E/N
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Se(), now averages EDOTJE and not EDOTJEOVERMUENE within averaged_rates() 
+
+
 2023 NOV 06a
   * in model/chem/_NH3_Plasma_10s/chem.c
     - in write_model_chem_template() and read_model_chem_actions(), added code to handle 

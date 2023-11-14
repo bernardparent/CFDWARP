@@ -65,13 +65,21 @@ void find_W_omprakas2023 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, 
 
   R=Rchem;
   
-  
-  if (REACTION[1]){
+  /*
+   if (REACTION[1]){
     add_to_W_2r3p ( specNH3, speceminus, specNH3plus, speceminus, speceminus, _averaged_rate_limited(np,gl,"kf1",min( exp ( 1.2346e-14 * pow ( theta, 9.0 ) + 0.3115 * theta ), 1.5640e-07 ), 0.0, gl->model.chem.kf1averagedmax), N, W );
   }
+   */
+  if (REACTION[1]){
+    add_to_W_2r3p ( specNH3, speceminus, specNH3plus, speceminus, speceminus, min( 1.2886E-13 * pow(Te,1.0491) * exp(-1.8060E5/Te), 7.000e-08 ), N, W );
+  }
+  /* if (REACTION[2]){
+    add_to_W_2r4p ( specNH3, speceminus, specNH2plus, specH, speceminus, speceminus, _averaged_rate_limited(np,gl,"kf2",min( exp ( 0.4853 * theta + 5.5515e-131 * pow( theta, 79.0 ) ), 2.4490e-10 ), 0.0, gl->model.chem.kf2averagedmax), N, W );
+  }
+  */
 
   if (REACTION[2]){
-    add_to_W_2r4p ( specNH3, speceminus, specNH2plus, specH, speceminus, speceminus, _averaged_rate_limited(np,gl,"kf2",min( exp ( 0.4853 * theta + 5.5515e-131 * pow( theta, 79.0 ) ), 2.4490e-10 ), 0.0, gl->model.chem.kf2averagedmax), N, W );
+    add_to_W_2r4p ( specNH3, speceminus, specNH2plus, specH, speceminus, speceminus, min( 9.3960E-14 * pow(Te,0.6295) * exp(-1.5139E5/Te), 4.500e-10 ), N, W );
   }
 
   if (REACTION[3]){
@@ -157,15 +165,31 @@ void find_dW_dx_omprakas2023 ( np_t np, gl_t *gl, spec_t rhok, double T, double 
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
   }
 
-
-  if (REACTION[1] && FALSE){
+  /*
+   if (REACTION[1] && FALSE){
     kf = _averaged_rate_limited(np,gl,"kf1",min( exp ( 1.2346e-14 * pow ( theta, 9.0 ) + 0.3115 * theta ), 1.5640e-07 ),0.0,gl->model.chem.kf1averagedmax);
     dkfdTe = 0.0;
     dkfdT = 0.0;
     dkfdTv = 0.0;
     add_to_dW_2r3p ( specNH3, speceminus, specNH3plus, speceminus, speceminus, kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
   }
-
+  */
+  if (REACTION[1]){
+    kf = min( 1.2886E-13 * pow(Te,1.0491) * exp(-1.8060E5/Te), 7.000e-08 );
+    
+    if (1.2886E-13 * pow(Te,1.0491) * exp(-1.8060E5/Te) < 7.000e-08 ){/*Te < 436910.0*/
+      dkfdTe = 1.2886E-13 * pow(Te, (1.0491 - 2)) * (1.0491 * Te + 1.8060E5) * exp(-1.8060E5/Te);
+      /*dkfdTe = _dkfdT_Arrhenius(2, 1.2886E-13 * calA, 1.0491, 1.8060E5 * R, Te);*/
+    } else {
+      dkfdTe = 0.0;
+    }
+    
+    dkfdT = 0.0;
+    dkfdTv = 0.0;
+    add_to_dW_2r3p ( specNH3, speceminus, specNH3plus, speceminus, speceminus, kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
+  }
+  
+  /* 
   if (REACTION[2] && FALSE){
     kf = _averaged_rate_limited(np,gl,"kf2",min( exp ( 0.4853 * theta + 5.5515e-131 * pow( theta, 79.0 ) ), 2.4490e-10 ),0.0,gl->model.chem.kf2averagedmax);
     dkfdTe = 0.0;
@@ -173,8 +197,23 @@ void find_dW_dx_omprakas2023 ( np_t np, gl_t *gl, spec_t rhok, double T, double 
     dkfdTv = 0.0;
     add_to_dW_2r4p ( specNH3, speceminus, specNH2plus, specH, speceminus, speceminus, kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
   }
+  */
+  if (REACTION[2]){
+    kf = min( 9.3960E-14 * pow(Te,0.6295) * exp(-1.5139E5/Te), 4.500e-10 );
+    
+    if (9.3960E-14 * pow(Te,0.6295) * exp(-1.5139E5/Te) < 4.500e-10){ /* Te < 913855.0*/
+      dkfdTe = 9.3960E-14 * pow(Te, (0.6295 - 2)) * (0.6295 * Te + 1.5139E5) * exp(-1.5139E5/Te);
+      /*dkfdTe = _dkfdT_Arrhenius(2, 9.3960E-14 * calA, 0.6295, 1.5139E5 * R, Te);*/
+    } else {
+      dkfdTe = 0.0;
+    }
+    
+    dkfdT = 0.0;
+    dkfdTv = 0.0;
+    add_to_dW_2r4p ( specNH3, speceminus, specNH2plus, specH, speceminus, speceminus, kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
+  }
 
-  if (REACTION[3] && FALSE){
+  if (REACTION[3]){
     kf = _averaged_rate(np,gl,"kf3",min( exp ( 2.0636e-07 * pow( theta, 5.0 ) - 4.3548e-11 * pow( theta, 7.0 ) ), 1.0400e-08 * exp( -1.1290e+19 * Estar ) + 2.0460e-09 * exp( -3.6270e05 * Estar ) ));
     dkfdTe = 0.0;
     dkfdT = 0.0;
@@ -182,7 +221,7 @@ void find_dW_dx_omprakas2023 ( np_t np, gl_t *gl, spec_t rhok, double T, double 
     add_to_dW_2r3p ( specNH3, speceminus, specNH2, specH, speceminus, kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
   }
 
-  if (REACTION[4] && FALSE){
+  if (REACTION[4]){
     kf = _averaged_rate(np,gl,"kf4",min( exp ( 1.4602e-07 * pow ( theta, 5.0 ) - 1.3747e-21 * pow( theta, 13.0 ) ), 1.200e-08 ));
     dkfdTe = 0.0;
     dkfdT = 0.0;
@@ -234,13 +273,22 @@ void find_Qei_omprakas2023(gl_t *gl, spec_t rhok, double Estar, double Te, doubl
  
   double theta;
   *Qei=0.0;  
-  theta=log(Estar);
-
+  /*theta=log(Estar);*/
+  
+  /*
   if (REACTION[1]) {
     add_to_Qei(specNH3, _ionizationpot(specNH3), min( exp ( 1.2346e-14 * pow ( theta, 9.0 ) + 0.3115 * theta ), 1.5640e-07 ), rhok, Qei);
   }
   if (REACTION[2]) {
     add_to_Qei(specNH3, _ionizationpot(specNH3), min( exp ( 0.4853 * theta + 5.5515e-131 * pow( theta, 79.0 ) ), 2.4490e-10 ), rhok, Qei);
+  }    
+  */
+
+  if (REACTION[1]) {
+    add_to_Qei(specNH3, _ionizationpot(specNH3), min( 1.2886E-13 * pow(Te,1.0491) * exp(-1.8060E5/Te), 7.000e-08 ), rhok, Qei);
+  }
+  if (REACTION[2]) {
+    add_to_Qei(specNH3, _ionizationpot(specNH3), min( 9.3960E-14 * pow(Te,0.6295) * exp(-1.5139E5/Te), 4.500e-10 ), rhok, Qei);
   }   
 
 }
@@ -254,13 +302,21 @@ void find_dQei_dx_omprakas2023(gl_t *gl, spec_t rhok, double Estar, double Te, s
   
   for (spec=0; spec<ns; spec++) dQeidrhok[spec]=0.0;
   *dQeidTe=0.0;  
-  theta=log(Estar);
-
-  if (REACTION[1]) {
+  /*theta=log(Estar);*/
+  
+  /* if (REACTION[1]) {
     add_to_dQei(specNH3, _ionizationpot(specNH3), min( exp ( 1.2346e-14 * pow ( theta, 9.0 ) + 0.3115 * theta ), 1.5640e-07 ), 0.0,  rhok, dQeidrhok, dQeidTe);
   }
   if (REACTION[2]) {
     add_to_dQei(specNH3, _ionizationpot(specNH3), min( exp ( 0.4853 * theta + 5.5515e-131 * pow( theta, 79.0 ) ), 2.4490e-10 ), 0.0,  rhok, dQeidrhok, dQeidTe);
+  }
+  */
+
+  if (REACTION[1]) {
+    add_to_dQei(specNH3, _ionizationpot(specNH3), min( 1.2886E-13 * pow(Te,1.0491) * exp(-1.8060E5/Te), 7.000e-08 ), 0.0,  rhok, dQeidrhok, dQeidTe);
+  }
+  if (REACTION[2]) {
+    add_to_dQei(specNH3, _ionizationpot(specNH3), min( 9.3960E-14 * pow(Te,0.6295) * exp(-1.5139E5/Te), 4.500e-10 ), 0.0,  rhok, dQeidrhok, dQeidTe);
   }
 
 }
