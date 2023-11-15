@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 NOV 14a
+  * in lib/exm/exm.c
+    - added the functions is_file_writable() and is_file_readable()
+  * in model/chem/_NH3_Plasma_10s/doc
+    - improved the report.tex
+  * in src/control.c
+    - in write_control(), added a call to is_file_writable
+  * in src/data.c
+    - in write_data_file(), added a call to is_file_writable
+  * in src/post.c
+    - in write_post_file(), added a call to is_file_writable
+    
+
 2023 NOV 13a
   * in model/chem/_NH3_Plasma_10s/omprakas2023.c
     - changed reactions 1 and 2 to be function of Te instead of E/N

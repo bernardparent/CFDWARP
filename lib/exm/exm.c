@@ -2154,6 +2154,44 @@ double maxmag(double x, double y){
 }
 
 
+bool is_file_writable(char *filename) {
+// this will only work if the file exists:
+//   if (access(filename, W_OK)!=0) fatal_error("Insufficient permissions to write file %s.",filename);
+// the following is more general
+  FILE *fp;
+  int ret;
+  // Try to open the file in write mode.
+  fp = fopen(filename, "w");
+  // If the file can be opened, then it can be created or overwritten.
+  if (fp != NULL) {
+    fclose(fp);
+    ret=TRUE;
+  } else {
+    // If the file cannot be opened, then it cannot be created or overwritten.
+    ret=FALSE;
+  }
+  return ret;
+}
+
+
+bool is_file_readable(char *filename) {
+// this will only work if the file exists:
+//   if (access(filename, R_OK)!=0) fatal_error("Insufficient permissions to read file %s.",filename);
+  FILE *fp;
+  int ret;
+  // Try to open the file in read mode.
+  fp = fopen(filename, "r");
+  // If the file can be opened, then it exists and can be read
+  if (fp != NULL) {
+    fclose(fp);
+    ret=TRUE;
+  } else {
+    // If the file cannot be opened, then it cannot be read
+    ret=FALSE;
+  }
+  return ret;
+}
+
 
 #ifdef linux
 

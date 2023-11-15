@@ -35,6 +35,10 @@ echo "Removing proprietary directory .././model/chem/_H2_He_CH4_Plasma_13s"
 rm -rf .././model/chem/_H2_He_CH4_Plasma_13s 
 cp -a _proprietary .././model/chem/_H2_He_CH4_Plasma_13s 
 ( printf "current H2_He_CH4_Plasma_13s\nEND" ) > .././model/chem/_H2_He_CH4_Plasma_13s/.config 
+echo "Removing proprietary directory .././model/chem/_NH3_Plasma_10s"
+rm -rf .././model/chem/_NH3_Plasma_10s 
+cp -a _proprietary .././model/chem/_NH3_Plasma_10s 
+( printf "current NH3_Plasma_10s\nEND" ) > .././model/chem/_NH3_Plasma_10s/.config 
 echo "Removing proprietary directory .././model/chem/_NH3_Plasma_34s"
 rm -rf .././model/chem/_NH3_Plasma_34s 
 cp -a _proprietary .././model/chem/_NH3_Plasma_34s 

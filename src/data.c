@@ -1151,6 +1151,8 @@ void write_data_file_mpi(char *filename, np_t *np, gl_t *gl){
 }
 
 
+
+
 void write_data_file(np_t *np, gl_t *gl){
   char *tmp_filename,*tmp_filename2;
 #ifdef DISTMPI
@@ -1168,6 +1170,7 @@ void write_data_file(np_t *np, gl_t *gl){
 #endif
     rename(tmp_filename,tmp_filename2);
     rename(gl->output_filename,tmp_filename);
+    if (!is_file_writable(gl->output_filename)) fatal_error("Insufficient permissions to write data file %s.",gl->output_filename);
 #ifdef DISTMPI
   }
 #endif

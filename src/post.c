@@ -540,6 +540,15 @@ void write_post_file_vtk(np_t *np, gl_t *gl, zone_t zone, char *filename, bool G
 
 void write_post_file(np_t *np, gl_t *gl, zone_t zone, char *filename, char *postprocessor, bool GRIDONLY){
   bool FOUND;
+#ifdef DISTMPI
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  if (rank==0) {
+#endif
+    if (!is_file_writable(filename)) fatal_error("Insufficient permissions to write post file %s.",filename);
+#ifdef DISTMPI
+  }
+#endif
 
     zone.is=min(gl->domain_all.ie,max(gl->domain_all.is,zone.is));
     zone.js=min(gl->domain_all.je,max(gl->domain_all.js,zone.js));

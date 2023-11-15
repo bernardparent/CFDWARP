@@ -535,6 +535,7 @@ void write_control(char *filename){
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   if (rank==0) {
 #endif
+    if (!is_file_writable(filename)) fatal_error("Insufficient permissions to write control file %s.",filename);
     controlfile = fopen(filename, "w");
     wfprintf(stdout,"Writing to control file %s...",filename);
     wfprintf(controlfile,"{\n");

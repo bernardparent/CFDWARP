@@ -263,6 +263,9 @@ double maxmag(double x, double y);
 
 void output_backtrace(void);
 
+bool is_file_writable(char *filename);
+
+bool is_file_readable(char *filename);
 
 #ifndef NDEBUG
   #define assert_str(x) #x
