@@ -6,6 +6,12 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2023 NOV 17a
+  * in model/chem/_C2H4_Air_23s
+    - moved reactions from chem.c to zettervall2017.c
+    - created a new solver zettervall2017b.c obtained from a CHEMKIN file
+    - created a new solver konnovzettervall.c obtained from a CHEMKIN file
+    
 
 2023 NOV 14a
   * in lib/exm/exm.c

@@ -1,8 +1,9 @@
 #define _CHEM_C2H4_AIR_23S_66R_ZETTERVALL
-#define _CHEM_METHOD "C2H4-Air 23 species 66 reactions Zettervall [zettervall2017a]"
+#define _CHEM_METHOD "C2H4-Air 23 species 66 reactions Zettervall [zettervall2017a] and Zettervall-Konnov"
+#define _CHEM_ACTIONNAME "C2H4Air23s"
 
 #define CHEM_NEUTRAL TRUE
-#define ns 23
+#define ns 25
 #define ncs 0
 
 #define specH    0
@@ -28,6 +29,8 @@
 #define specCH3O 20
 #define specCO   21
 #define specCO2  22
+#define specNO  23
+#define specN  24
 
 #define SPECIES_ELECTRON 0
 #define SPECIES_NEUTRAL  1
@@ -37,6 +40,8 @@
 
 #define SMAP_CHO SMAP_HCO
 #define SMAP_CH2O SMAP_HCHO
+#define specHCO  specCHO
+
 /*
 Species ordering:
 1. Electrons
@@ -71,7 +76,9 @@ const static long smap[ns] = {
   SMAP_CH2O,
   SMAP_CH3O,
   SMAP_CO, 
-  SMAP_CO2 
+  SMAP_CO2,
+  SMAP_NO,
+  SMAP_N
 };     
        
        
@@ -100,9 +107,13 @@ const static long speciestype[ns] = {
   SPECIES_NEUTRAL,
   SPECIES_NEUTRAL,
   SPECIES_NEUTRAL,
-  SPECIES_NEUTRAL
+  SPECIES_NEUTRAL,
+  SPECIES_NEUTRAL,
+  SPECIES_NEUTRAL  
 };
 
 typedef struct {
+  int CHEMMODEL;
+  double TMIN_LINDEMANN;
 } gl_model_chem_t;
 
