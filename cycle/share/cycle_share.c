@@ -932,7 +932,8 @@ void increase_time_level(np_t *np, gl_t *gl){
   long i,j,k,flux,l;
   gl->time+=gl->dt;
   gl->iter=0;
-  add_double_to_codex(&(gl->cycle.codex),"time",gl->time);  
+  add_double_to_codex(&(gl->cycle.codex),"time",gl->time);
+  gl->timelevelcnt++;  
   for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
         l=_ai(gl,i,j,k);
         if ((is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID))){
@@ -1318,6 +1319,7 @@ void update_runtime_codex_vars_except_xi_from_gl(gl_t *gl, SOAP_codex_t *codex){
   add_double_to_codex(codex,"time",gl->time);  
 #endif
   add_double_to_codex(codex,"CFL",gl->CFL);
+  add_int_to_codex(codex,"timelevelcnt",gl->timelevelcnt);
 #ifdef UNSTEADY
   add_double_to_codex(codex,"dt",gl->dt);
 #endif

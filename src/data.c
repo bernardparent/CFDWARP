@@ -196,6 +196,11 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
       if (fscanf(datafile," dt=%lg",&tmp_double)!=1) fatal_error("Problem reading dt variable within fscanf in read_data_file_binary().");
 #endif
 
+#ifdef UNSTEADY
+      if (fscanf(datafile," timelevelcnt=%ld",&(gl->timelevelcnt))!=1) fatal_error("Problem reading timelevelcnt variable within fscanf in read_data_file_binary().");
+#else
+      if (fscanf(datafile," timelevelcnt=%ld",&tmp_double)!=1) fatal_error("Problem reading timelevelcnt variable within fscanf in read_data_file_binary().");
+#endif
       
 #ifdef EMFIELD
       if (fscanf(datafile," Lc=%lg effiter_U_emfield=%lg effiter_R_emfield=%lg",&(gl->Lc),&(gl->effiter_U_emfield),&(gl->effiter_R_emfield))!=3) fatal_error("Problem reading EMFIELD variables within fscanf in read_data_file_binary().");
@@ -775,6 +780,12 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
   wfprintf(datafile," dt=%E",gl->dt);
 #else
   wfprintf(datafile," dt=%E",dt_steady);
+#endif
+
+#if defined(UNSTEADY)
+  wfprintf(datafile," timelevelcnt=%ld",gl->timelevelcnt);
+#else
+  wfprintf(datafile," timelevelcnt=%ld",0);
 #endif
 
 #ifdef EMFIELD

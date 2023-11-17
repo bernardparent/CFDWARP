@@ -6,6 +6,20 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2023 NOV 17b
+  * in src/common.h
+    - declared a variable timelevelcnt as a long integer
+  * src/main.c
+    - initialized timelevelcnt = 0 in #if defined(UNSTEADY)
+  * in cycle/share/cycle_share.c
+    - added timelevelcnt++ under increase_time_level()
+    - added add_int_to_codex(codex,"timelevelcnt",gl->timelevelcnt) under update_runtime_codex_vars_except_xi_from_gl()
+  * in src/data.c
+    - added wfprintf for timelevelcnt under write_data_file_binary_ascii()
+    - added fscanf for timelevelcnt under read_data_file_binary_ascii()
+
+
 2023 NOV 17a
   * in model/chem/_C2H4_Air_23s
     - moved reactions from chem.c to zettervall2017.c
