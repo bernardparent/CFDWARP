@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 NOV 17c
+  * in src/data.c
+    - in read_data_file_binary_ascii(), fixed a bug related to tmp_double which should have been
+      tmp_long
+      
+  
 2023 NOV 17b
   * in src/common.h
     - declared a variable timelevelcnt as a long integer

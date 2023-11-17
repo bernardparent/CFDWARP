@@ -104,6 +104,7 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
 #endif
 #ifndef UNSTEADY
   double tmp_double;
+  long tmp_long;
 #endif
   bool FORMAT010;
   bool *NODEVALID;
@@ -199,7 +200,7 @@ void read_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, long level,
 #ifdef UNSTEADY
       if (fscanf(datafile," timelevelcnt=%ld",&(gl->timelevelcnt))!=1) fatal_error("Problem reading timelevelcnt variable within fscanf in read_data_file_binary().");
 #else
-      if (fscanf(datafile," timelevelcnt=%ld",&tmp_double)!=1) fatal_error("Problem reading timelevelcnt variable within fscanf in read_data_file_binary().");
+      if (fscanf(datafile," timelevelcnt=%ld",&tmp_long)!=1) fatal_error("Problem reading timelevelcnt variable within fscanf in read_data_file_binary().");
 #endif
       
 #ifdef EMFIELD
