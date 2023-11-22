@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/share/chem_share.h>
 
 
-const static bool REACTION[78] = {
+const static bool REACTION[79] = {
   TRUE, /* reaction[0] */
   TRUE, /* reaction[1] */
   TRUE, /* reaction[2] */
@@ -106,6 +106,7 @@ const static bool REACTION[78] = {
   TRUE, /* reaction[75] */
   TRUE, /* reaction[76] */
   TRUE, /* reaction[77] */
+  TRUE, /* reaction[78] */
 };
 
 
@@ -301,7 +302,7 @@ void find_W_KonnovZettervall ( gl_t *gl, spec_t rhok, double T, double Te, doubl
   if (REACTION[50])
     add_to_W_fw_2r2p(specCO2, specH, specCO, specOH, 1.57000E+09, 1.3, 19800.0, T, X, W);
 
-  if (REACTION[51])  {
+  if (REACTION[51]  && gl->model.chem.LINDEMANNREACTIONS)  {
     for (specM = 0; specM < ns; specM++) {
       switch (specM) {
         case specC2H4: eff = 3.0; break;
@@ -318,7 +319,7 @@ void find_W_KonnovZettervall ( gl_t *gl, spec_t rhok, double T, double Te, doubl
     }
   }
 
-  if (REACTION[52])  {
+  if (REACTION[52]  && gl->model.chem.LINDEMANNREACTIONS)  {
     for (specM = 0; specM < ns; specM++) {
       switch (specM) {
         case specC2H4: eff = 3.0; break;
@@ -426,6 +427,9 @@ void find_W_KonnovZettervall ( gl_t *gl, spec_t rhok, double T, double Te, doubl
 
   if (REACTION[77])
     add_to_W_fw_2r2p(specCH, specO2, specHCO, specO, 3.3E+13, 0.0, 0.0, T, X, W);
+
+  if (REACTION[78])  
+    add_to_W_fw_2r2p ( specCH, specCO2, specHCO, specCO,  8.40e+13, 0.0, 200.0, T, X, W );   
 
 }
 
@@ -630,7 +634,7 @@ void find_dW_dx_KonnovZettervall ( gl_t *gl, spec_t rhok, double T, double Te, d
   if (REACTION[50])
     add_to_dW_fw_2r2p(specCO2, specH, specCO, specOH, 1.57000E+09, 1.3, 19800.0, T, X, dWdT, dWdrhok);
 
-  if (REACTION[51])  {
+  if (REACTION[51]  && gl->model.chem.LINDEMANNREACTIONS)  {
     for (specM = 0; specM < ns; specM++) {
       switch (specM) {
         case specC2H4: eff = 3.0; break;
@@ -647,7 +651,7 @@ void find_dW_dx_KonnovZettervall ( gl_t *gl, spec_t rhok, double T, double Te, d
     }
   }
 
-  if (REACTION[52])  {
+  if (REACTION[52] && gl->model.chem.LINDEMANNREACTIONS)  {
     for (specM = 0; specM < ns; specM++) {
       switch (specM) {
         case specC2H4: eff = 3.0; break;
@@ -755,6 +759,9 @@ void find_dW_dx_KonnovZettervall ( gl_t *gl, spec_t rhok, double T, double Te, d
 
   if (REACTION[77])
     add_to_dW_fw_2r2p(specCH, specO2, specHCO, specO, 3.3E+13, 0.0, 0.0, T, X, dWdT, dWdrhok);
+
+  if (REACTION[78])  
+    add_to_dW_fw_2r2p ( specCH, specCO2, specHCO, specCO,  8.40e+13, 0.0, 200.0, T, X, dWdT, dWdrhok );   
 
 }
 

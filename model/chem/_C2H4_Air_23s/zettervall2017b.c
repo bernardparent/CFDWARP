@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   “Small skeletal kinetic reaction mechanism for ethylene–air combustion,” 
    Energy and Fuels, Vol. 31, No. 12, 2017, pp. 14138–14149. */
 
-const static bool REACTION[66] = {
+const static bool REACTION[67] = {
   TRUE, /* reaction[0] */
   TRUE, /* reaction[1] */
   TRUE, /* reaction[2] */
@@ -99,6 +99,7 @@ const static bool REACTION[66] = {
   TRUE, /* reaction[63] */
   TRUE, /* reaction[64] */
   TRUE, /* reaction[65] */
+  TRUE, /* reaction[66] */
 };
 
 void find_W_Zettervall2017b ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
@@ -247,7 +248,7 @@ void find_W_Zettervall2017b ( gl_t *gl, spec_t rhok, double T, double Te, double
   if (REACTION[38])
     add_to_W_fw_2r2p(specCO2, specH, specCO, specOH, 1.57000E+09, 1.3, 19800.0, T, X, W);
 
-  if (REACTION[39])  {
+  if (REACTION[39] && gl->model.chem.LINDEMANNREACTIONS)  {
     for (specM = 0; specM < ns; specM++) {
       switch (specM) {
         case specC2H4: eff = 3.0; break;
@@ -264,7 +265,7 @@ void find_W_Zettervall2017b ( gl_t *gl, spec_t rhok, double T, double Te, double
     }
   }
 
-  if (REACTION[40])  {
+  if (REACTION[40] && gl->model.chem.LINDEMANNREACTIONS)  {
     for (specM = 0; specM < ns; specM++) {
       switch (specM) {
         case specC2H4: eff = 3.0; break;
@@ -372,6 +373,9 @@ void find_W_Zettervall2017b ( gl_t *gl, spec_t rhok, double T, double Te, double
 
   if (REACTION[65])
     add_to_W_fw_2r2p(specCH, specO2, specHCO, specO, 3.3E+13, 0.0, 0.0, T, X, W);
+
+  if (REACTION[66])  
+    add_to_W_fw_2r2p ( specCH, specCO2, specHCO, specCO,  8.40e+13, 0.0, 200.0, T, X, W );   
 
 }
 
@@ -530,7 +534,7 @@ void find_dW_dx_Zettervall2017b ( gl_t *gl, spec_t rhok, double T, double Te, do
   if (REACTION[38])
     add_to_dW_fw_2r2p(specCO2, specH, specCO, specOH, 1.57000E+09, 1.3, 19800.0, T, X, dWdT, dWdrhok);
 
-  if (REACTION[39])  {
+  if (REACTION[39] && gl->model.chem.LINDEMANNREACTIONS)  {
     for (specM = 0; specM < ns; specM++) {
       switch (specM) {
         case specC2H4: eff = 3.0; break;
@@ -547,7 +551,7 @@ void find_dW_dx_Zettervall2017b ( gl_t *gl, spec_t rhok, double T, double Te, do
     }
   }
 
-  if (REACTION[40])  {
+  if (REACTION[40] && gl->model.chem.LINDEMANNREACTIONS)  {
     for (specM = 0; specM < ns; specM++) {
       switch (specM) {
         case specC2H4: eff = 3.0; break;
@@ -655,6 +659,9 @@ void find_dW_dx_Zettervall2017b ( gl_t *gl, spec_t rhok, double T, double Te, do
 
   if (REACTION[65])
     add_to_dW_fw_2r2p(specCH, specO2, specHCO, specO, 3.3E+13, 0.0, 0.0, T, X, dWdT, dWdrhok);
+
+  if (REACTION[66])  
+    add_to_dW_fw_2r2p ( specCH, specCO2, specHCO, specCO,  8.40e+13, 0.0, 200.0, T, X, dWdT, dWdrhok );   
 
 }
 

@@ -6,6 +6,25 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2023 NOV 22a
+  * in model/chem/_C2H4_Air_23s/chem.c
+    - added the user defined LINDEMANNREACTIONS
+  * in model/chem/_C2H4_Air_23s/doc/report.tex
+    - fixed a mistake related to the 3rd body efficiencies of various reactions
+  * in model/chem/_C2H4_Air_23s/konnovzettervall.c
+    - added missing reaction 78
+  * in model/chem/_C2H4_Air_23s/zettervall2017.c
+    - fixed a mistake related to the 3rd body efficiencies of various reactions
+  * in model/chem/_C2H4_Air_23s/zettervall2017b.c
+    - added missing reaction 66
+  * in model/chem/_C2H4_Air_Plasma_36s/adamovich2023e.c
+    - added missing reaction 130
+  * in model/chem/_NH3_Plasma_10s/chem.c
+    - added a user define constant called TOWNSENDFROMTE
+  * in model/chem/_NH3_Plasma_10s/omprakas2023.c
+    - added code so that when TOWNSENDFROMTE is set to TRUE, then the townsend ionization rates
+      use electron temperature instead of E/N
+      
 
 2023 NOV 17c
   * in src/data.c

@@ -44,6 +44,7 @@ void write_model_chem_template(FILE **controlfile){
     "  %s(\n"
     "    CHEMMODEL=CHEMMODEL_ZETTERVALL2017;\n"
     "    TMIN_LINDEMANN=500.0;\n"
+    "    LINDEMANNREACTIONS=TRUE;\n"
     "  );\n"
   ,_CHEM_ACTIONNAME);
 }
@@ -72,6 +73,8 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
     codex->action=&read_model_chem_actions_2;
     SOAP_process_code(*argum, codex, SOAP_VARS_KEEP_ALL);
     codex->action=action_original;
+
+    find_bool_var_from_codex(codex,"LINDEMANNREACTIONS",&gl->model.chem.LINDEMANNREACTIONS);
 
     find_int_var_from_codex(codex,"CHEMMODEL",&gl->model.chem.CHEMMODEL);
     if (gl->model.chem.CHEMMODEL!=CHEMMODEL_ZETTERVALL2017 && gl->model.chem.CHEMMODEL!=CHEMMODEL_ZETTERVALL2017B 
