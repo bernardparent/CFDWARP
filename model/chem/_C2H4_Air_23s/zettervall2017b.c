@@ -243,7 +243,7 @@ void find_W_Zettervall2017b ( gl_t *gl, spec_t rhok, double T, double Te, double
     add_to_W_fw_2r2p(specOH, specHO2, specH2O, specO2, 2.00000E+13, 0.0, 1000.0, T, X, W);
 
   if (REACTION[37])
-    add_to_W_fw_2r2p(specCO, specOH, specCO2, specH, 1.51000E+07, 1.3, -758.0, T, X, W);
+    add_to_W_fw_2r2p(specCO, specOH, specCO2, specH, 1.51000E+07, 1.3, -758.0, max(gl->model.chem.TMIN_PROBLEMREACTIONS,T), X, W);
 
   if (REACTION[38])
     add_to_W_fw_2r2p(specCO2, specH, specCO, specOH, 1.57000E+09, 1.3, 19800.0, T, X, W);
@@ -277,7 +277,7 @@ void find_W_Zettervall2017b ( gl_t *gl, spec_t rhok, double T, double Te, double
         case specN2: eff = 0.4; break;
         default: eff = 1.0;
       }
-      add_to_W_fw_3r2p_Lindemann(specCH3, specH, specM, specCH4, specM, eff*5.20000E+12, 0.0, -1310.0, eff*8.25000E+14, 0.0, -19310.0, max(gl->model.chem.TMIN_LINDEMANN,T), X, W);
+      add_to_W_fw_3r2p_Lindemann(specCH3, specH, specM, specCH4, specM, eff*5.20000E+12, 0.0, -1310.0, eff*8.25000E+14, 0.0, -19310.0, max(gl->model.chem.TMIN_PROBLEMREACTIONS,T), X, W);
     }
   }
 
@@ -334,7 +334,7 @@ void find_W_Zettervall2017b ( gl_t *gl, spec_t rhok, double T, double Te, double
 
   if (REACTION[55])  {
     for (specM = 0; specM < ns; specM++) {
-      add_to_W_fw_3r2p(specOH, specOH, specM, specH2O2, specM, 9.86000E+14, 0.0, -5070.0, T, X, W);
+      add_to_W_fw_3r2p(specOH, specOH, specM, specH2O2, specM, 9.86000E+14, 0.0, -5070.0, max(gl->model.chem.TMIN_PROBLEMREACTIONS,T), X, W);
     }
   }
 
@@ -529,7 +529,7 @@ void find_dW_dx_Zettervall2017b ( gl_t *gl, spec_t rhok, double T, double Te, do
     add_to_dW_fw_2r2p(specOH, specHO2, specH2O, specO2, 2.00000E+13, 0.0, 1000.0, T, X, dWdT, dWdrhok);
 
   if (REACTION[37])
-    add_to_dW_fw_2r2p(specCO, specOH, specCO2, specH, 1.51000E+07, 1.3, -758.0, T, X, dWdT, dWdrhok);
+    add_to_dW_fw_2r2p(specCO, specOH, specCO2, specH, 1.51000E+07, 1.3, -758.0, max(gl->model.chem.TMIN_PROBLEMREACTIONS,T), X, dWdT, dWdrhok);
 
   if (REACTION[38])
     add_to_dW_fw_2r2p(specCO2, specH, specCO, specOH, 1.57000E+09, 1.3, 19800.0, T, X, dWdT, dWdrhok);
@@ -563,7 +563,7 @@ void find_dW_dx_Zettervall2017b ( gl_t *gl, spec_t rhok, double T, double Te, do
         case specN2: eff = 0.4; break;
         default: eff = 1.0;
       }
-      add_to_dW_fw_3r2p_Lindemann(specCH3, specH, specM, specCH4, specM, eff*5.20000E+12, 0.0, -1310.0, eff*8.25000E+14, 0.0, -19310.0, max(gl->model.chem.TMIN_LINDEMANN,T), X, dWdT, dWdrhok);
+      add_to_dW_fw_3r2p_Lindemann(specCH3, specH, specM, specCH4, specM, eff*5.20000E+12, 0.0, -1310.0, eff*8.25000E+14, 0.0, -19310.0, max(gl->model.chem.TMIN_PROBLEMREACTIONS,T), X, dWdT, dWdrhok);
     }
   }
 
@@ -620,7 +620,7 @@ void find_dW_dx_Zettervall2017b ( gl_t *gl, spec_t rhok, double T, double Te, do
 
   if (REACTION[55])  {
     for (specM = 0; specM < ns; specM++) {
-      add_to_dW_fw_3r2p(specOH, specOH, specM, specH2O2, specM, 9.86000E+14, 0.0, -5070.0, T, X, dWdT, dWdrhok);
+      add_to_dW_fw_3r2p(specOH, specOH, specM, specH2O2, specM, 9.86000E+14, 0.0, -5070.0, max(gl->model.chem.TMIN_PROBLEMREACTIONS,T), X, dWdT, dWdrhok);
     }
   }
 

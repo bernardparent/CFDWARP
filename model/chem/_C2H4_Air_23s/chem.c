@@ -43,7 +43,7 @@ void write_model_chem_template(FILE **controlfile){
   wfprintf(*controlfile,
     "  %s(\n"
     "    CHEMMODEL=CHEMMODEL_ZETTERVALL2017;\n"
-    "    TMIN_LINDEMANN=500.0;\n"
+    "    TMIN_PROBLEMREACTIONS=500.0;\n"
     "    LINDEMANNREACTIONS=TRUE;\n"
     "  );\n"
   ,_CHEM_ACTIONNAME);
@@ -81,7 +81,7 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
      && gl->model.chem.CHEMMODEL!=CHEMMODEL_KONNOVZETTERVALL && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)
       SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_KONNOVZETTERVALL or CHEMMODEL_ZETTERVALL2017 or CHEMMODEL_NONE or CHEMMODEL_ZETTERVALL2017B.");
 
-    find_double_var_from_codex(codex,"TMIN_LINDEMANN",&gl->model.chem.TMIN_LINDEMANN);
+    find_double_var_from_codex(codex,"TMIN_PROBLEMREACTIONS",&gl->model.chem.TMIN_PROBLEMREACTIONS);
 
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;

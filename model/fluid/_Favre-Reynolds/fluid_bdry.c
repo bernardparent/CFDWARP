@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BDRY_FREESTREAM1 2
 #define BDRY_WALLTFIXEDINJECTION1 17
 #define BDRY_INFLOWINJECTION1 18
+#define BDRY_INFLOWINJECTIONCHOKED1 19
 
 
 void write_bdry_fluid_template(FILE **controlfile){
@@ -66,6 +67,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    BDRY_INFLOWSUBSONIC1              %c   Inflow, subsonic, Tstag, Pstag fixed\n"
     "    BDRY_INFLOWSUBSONICMASSFLOWFIXED1 %c   Inflow, subsonic, Pstag, Massflow/Area fixed\n"
     "    BDRY_INFLOWINJECTION1             %c   Inflow, param Tstag, Pstag, specCs \n"
+    "    BDRY_INFLOWINJECTIONCHOKED1       %c   Inflow, param Tstag, Pstag, specCs \n"
     "    BDRY_OUTFLOWSUPERSONIC1           %c   Outflow, supersonic\n"
     "    BDRY_OUTFLOWSUBSONIC1             %c   Outflow, subsonic, P fixed, param P\n"
     "    BDRY_OUTFLOWSUBSONICMFIXED1       %c   Outflow, subsonic, M fixed, param M\n"
@@ -92,7 +94,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    Region(is" if2DL(",js") if3DL(",ks") ",  ie" if2DL(",je") if3DL(",ke") ",  BDRY_INFLOWSUPERSONIC);\n"
     "    }\n"
     "  );\n",_bdry_ID(BDRY_INFLOWSUPERSONIC),_bdry_ID(BDRY_INFLOWSUBSONIC1),
-             _bdry_ID(BDRY_INFLOWSUBSONICMASSFLOWFIXED1),_bdry_ID(BDRY_INFLOWINJECTION1),_bdry_ID(BDRY_OUTFLOWSUPERSONIC1),
+             _bdry_ID(BDRY_INFLOWSUBSONICMASSFLOWFIXED1),_bdry_ID(BDRY_INFLOWINJECTION1),_bdry_ID(BDRY_INFLOWINJECTIONCHOKED1),_bdry_ID(BDRY_OUTFLOWSUPERSONIC1),
              _bdry_ID(BDRY_OUTFLOWSUBSONIC1),_bdry_ID(BDRY_OUTFLOWSUBSONICMFIXED1),
              _bdry_ID(BDRY_SYMMETRICAL2),_bdry_ID(BDRY_SYMMETRICAL1),_bdry_ID(BDRY_WALLTFIXED1),_bdry_ID(BDRY_WALLTFIXEDINJECTION1),
              _bdry_ID(BDRY_WALLADIABATIC1),_bdry_ID(BDRY_SLIPWALL1),_bdry_ID(BDRY_FREESTREAM1)
@@ -105,6 +107,7 @@ void add_bdry_types_fluid_to_codex(SOAP_codex_t *codex){
   add_int_to_codex(codex,"BDRY_INFLOWSUBSONIC1",   BDRY_INFLOWSUBSONIC1);
   add_int_to_codex(codex,"BDRY_INFLOWSUBSONICMASSFLOWFIXED1",  BDRY_INFLOWSUBSONICMASSFLOWFIXED1 );
   add_int_to_codex(codex,"BDRY_INFLOWINJECTION1",  BDRY_INFLOWINJECTION1 );
+  add_int_to_codex(codex,"BDRY_INFLOWINJECTIONCHOKED1",  BDRY_INFLOWINJECTIONCHOKED1 );
   add_int_to_codex(codex,"BDRY_OUTFLOWSUPERSONIC1",  BDRY_OUTFLOWSUPERSONIC1 );
   add_int_to_codex(codex,"BDRY_OUTFLOWSUBSONIC1",  BDRY_OUTFLOWSUBSONIC1 );
   add_int_to_codex(codex,"BDRY_OUTFLOWSUBSONICMFIXED1",  BDRY_OUTFLOWSUBSONICMFIXED1 );
@@ -424,7 +427,7 @@ static void update_bdry_inflow_injection_old(np_t *np, gl_t *gl, long lA, long l
 
 static void update_bdry_inflow_injection(np_t *np, gl_t *gl, long lA, long lB, long lC,
                                          long theta, long thetasgn,
-                                         bool BDRYDIRECFOUND, int ACCURACY){
+                                         bool FORCECHOKING, bool BDRYDIRECFOUND, int ACCURACY){
   spec_t wwall;
   double Rk,cpk,gammak,Mwall,Tstag,Pstag,kwall,psiwall,Twall,Pwall;
   long dim,spec,specinj;
@@ -451,7 +454,7 @@ static void update_bdry_inflow_injection(np_t *np, gl_t *gl, long lA, long lB, l
   Mwall=1.0;
   Pwall=Pstag/pow(1.0+(gammak-1.0)/2.0,gammak/(gammak-1.0));
   // check if choking is possible; if not, set the pressure at the boundary equal to the pressure nearby
-  if (Pwall<_Pstar(np[lC],gl)){
+  if (!FORCECHOKING && Pwall<_Pstar(np[lC],gl)){
     Pwall=min(Pstag,_Pstar(np[lC],gl));
     // find Mach number at the wall knowing the pressure and stagnation pressure
     if ((pow(Pstag/Pwall,(gammak-1.0)/gammak)-1.0)*2.0/(gammak-1.0)<0.0) {
@@ -566,7 +569,13 @@ void update_bdry_fluid(np_t *np, gl_t *gl, long lA, long lB, long lC, long lD, l
 
     case BDRY_INFLOWINJECTION1:
       if (BDRYDIRECFOUND)
-        update_bdry_inflow_injection(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
+        update_bdry_inflow_injection(np, gl, lA, lB, lC, theta, thetasgn, FALSE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
+      else update_bdry_outflow(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
+    break;
+
+    case BDRY_INFLOWINJECTIONCHOKED1:
+      if (BDRYDIRECFOUND)
+        update_bdry_inflow_injection(np, gl, lA, lB, lC, theta, thetasgn, TRUE, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
       else update_bdry_outflow(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY_FIRSTORDER);
     break;
 

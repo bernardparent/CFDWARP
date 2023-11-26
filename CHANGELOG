@@ -6,6 +6,27 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2023 NOV 26a
+  * renamed
+    - TMIN_LINDEMANN to TMIN_PROBLEMREACTIONS
+  * in model/chem/_C2H4_Air_23s/konnovzettervall.c
+    - added TMIN_PROBLEMREACTIONS clipping to reactions 49 and 67
+  * in model/chem/_C2H4_Air_23s/zettervall2017.c
+    - added TMIN_PROBLEMREACTIONS clipping to reactions 46 and 62
+  * in model/chem/_C2H4_Air_23s/zettervall2017b.c
+    - added TMIN_PROBLEMREACTIONS clipping to reactions 37 and 55
+  * in model/chem/_C2H4_Air_Plasma_36s/adamovich2023e.c
+    - added TMIN_PROBLEMREACTIONS clipping to reactions 101 and 119
+  * in model/chem/_C2H4_Air_Plasma_36s/chem.c
+    - added the user-specified constant TMIN_PROBLEMREACTIONS to read_model_chem_actions()
+  * in model/chem/_NH3_Plasma_10s/doc/report.tex
+    - changed the rate of reaction #1 in the omprakas2023 model
+  * in model/chem/_NH3_Plasma_10s/omprakas2023.c
+    - changed the rate of reaction #1 in the omprakas2023 model
+  * in model/fluid/_Favre-Reynolds/fluid_bdry.c
+    - added BDRY_INFLOWINJECTIONCHOKED1 to the list of boundary conditions  
+
 2023 NOV 22a
   * in model/chem/_C2H4_Air_23s/chem.c
     - added the user defined LINDEMANNREACTIONS
