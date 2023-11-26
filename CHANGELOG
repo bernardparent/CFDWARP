@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 NOV 26b
+  * in model/fluid/_Favre-Reynolds_plasma/fluid_bdry.c
+    - added BDRY_INFLOWINJECTIONCHOKED1 to the list of boundary conditions  
+
+
 2023 NOV 26a
   * renamed
     - TMIN_LINDEMANN to TMIN_PROBLEMREACTIONS
@@ -26,6 +31,7 @@ ________________________________________________________________________________
     - changed the rate of reaction #1 in the omprakas2023 model
   * in model/fluid/_Favre-Reynolds/fluid_bdry.c
     - added BDRY_INFLOWINJECTIONCHOKED1 to the list of boundary conditions  
+
 
 2023 NOV 22a
   * in model/chem/_C2H4_Air_23s/chem.c
