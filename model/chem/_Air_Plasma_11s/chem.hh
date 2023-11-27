@@ -68,7 +68,7 @@ const static long speciestype[ns] = {
 
 typedef struct {
   int CHEMMODEL;
-  bool ADDITIONALREACTION;
+  bool ADDITIONALREACTION[7];
   bool TOWNSENDIONIZATIONIMPLICIT;
   bool QEISOURCETERMS;
 } gl_model_chem_t;

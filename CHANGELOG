@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 NOV 26c
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - deleted the constants ADDITIONALREACTION
+    - replaced them with gl->model.chem.ADDITIONALREACTION[]
+  
+
 2023 NOV 26b
   * in model/fluid/_Favre-Reynolds_plasma/fluid_bdry.c
     - added BDRY_INFLOWINJECTIONCHOKED1 to the list of boundary conditions  

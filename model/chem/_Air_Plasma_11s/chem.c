@@ -57,24 +57,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define Estarmin 1e-40
 
-/* set all reactions to true except for testing purposes */
-const static bool ADDITIONALREACTION[7]=
-  {
-   TRUE, /* reaction 0 */
-   TRUE, /* reaction 1 */
-   TRUE, /* reaction 2 */
-   TRUE, /* reaction 3 */
-   TRUE, /* reaction 4 */
-   TRUE, /* reaction 5 */
-   TRUE, /* reaction 6 */
-  };
 
 
 void write_model_chem_template(FILE **controlfile){
   wfprintf(*controlfile,
     "  %s(\n"
     "    CHEMMODEL=CHEMMODEL_DUNNKANG1973;\n"
-    "    ADDITIONALREACTION=FALSE; {include reactions function of EoverN}\n"
+    "    for (react,1,6, ADDITIONALREACTION[react]=FALSE;); {include reactions function of EoverN}\n"
     "    TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE generally}\n"
     "    QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}\n"
     "  );\n"
@@ -88,7 +77,8 @@ void read_model_chem_actions_2(char *actionname, char **argum, SOAP_codex_t *cod
 
 
 void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex){
-  long numvarsinit;
+  long numvarsinit,cnt;
+  char addreactstr[100];
   void (*action_original) (char *, char **, struct SOAP_codex_t *);
   gl_t *gl=((readcontrolarg_t *)codex->action_args)->gl;
   if (strcmp(actionname,_CHEM_ACTIONNAME)==0) {
@@ -120,7 +110,10 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
         && gl->model.chem.CHEMMODEL!=CHEMMODEL_FARBAR2013 && gl->model.chem.CHEMMODEL!=CHEMMODEL_PARENTDUNN2021
         && gl->model.chem.CHEMMODEL!=CHEMMODEL_PARENTPARK2021 && gl->model.chem.CHEMMODEL!=CHEMMODEL_KIM2021 && gl->model.chem.CHEMMODEL!=CHEMMODEL_PARENT2023 && gl->model.chem.CHEMMODEL!=CHEMMODEL_PARENT2023B &&  gl->model.chem.CHEMMODEL!=CHEMMODEL_THOGULUVA2023 && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)
       SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_DUNNKANG1973 or CHEMMODEL_NONE or CHEMMODEL_BOYD2007 or CHEMMODEL_PARK1993 or CHEMMODEL_LENARD1964 or CHEMMODEL_FARBAR2013 or CHEMMODEL_PARENTDUNN2021 or CHEMMODEL_PARENTPARK2021 or CHEMMODEL_KIM2021 or CHEMMODEL_PARENT2023 or CHEMMODEL_PARENT2023B or CHEMMODEL_THOGULUVA2023.");
-    find_bool_var_from_codex(codex,"ADDITIONALREACTION",&gl->model.chem.ADDITIONALREACTION);
+    for (cnt=1; cnt<=6; cnt++) {
+      sprintf(addreactstr,"ADDITIONALREACTION[%ld]",cnt);
+      find_bool_var_from_codex(codex,addreactstr,&gl->model.chem.ADDITIONALREACTION[cnt]);
+    }
     find_bool_var_from_codex(codex,"TOWNSENDIONIZATIONIMPLICIT",&gl->model.chem.TOWNSENDIONIZATIONIMPLICIT);
     find_bool_var_from_codex(codex,"QEISOURCETERMS",&gl->model.chem.QEISOURCETERMS);
 
@@ -157,22 +150,22 @@ void add_W_Additional ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, d
 
 
     
-  if (ADDITIONALREACTION[1])
+  if (gl->model.chem.ADDITIONALREACTION[1])
       add_to_W_2r3p ( specN2, speceminus,   specN2plus, speceminus, speceminus,   exp ( -0.0105809 * sqr ( theta ) - 2.40411e-75 * pow ( theta, 46.0 ) ), N, W);
 
-  if (ADDITIONALREACTION[2])
+  if (gl->model.chem.ADDITIONALREACTION[2])
       add_to_W_2r3p ( specO2, speceminus,   specO2plus, speceminus, speceminus,   exp ( -0.0102785 * sqr ( theta ) - 2.42260e-75 * pow ( theta, 46.0 ) ), N, W);
 
-  if (ADDITIONALREACTION[3])
+  if (gl->model.chem.ADDITIONALREACTION[3])
       add_to_W_2r3p ( specNO, speceminus,   specNOplus, speceminus, speceminus,   exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), N, W);
 
-  if (ADDITIONALREACTION[4]) 
+  if (gl->model.chem.ADDITIONALREACTION[4]) 
       add_to_W_fw_3r2p ( specNOplus, speceminus, speceminus,   specNO, speceminus, 2.2e40, -4.5, 0.0*R, Te, X, W );
 
-  if (ADDITIONALREACTION[5])
+  if (gl->model.chem.ADDITIONALREACTION[5])
       add_to_W_2r3p ( specN, speceminus,   specNplus, speceminus, speceminus,   exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), N, W);
 
-  if (ADDITIONALREACTION[6])
+  if (gl->model.chem.ADDITIONALREACTION[6])
       add_to_W_2r3p ( specO, speceminus,   specOplus, speceminus, speceminus,   exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), N, W);
   
 }
@@ -203,7 +196,7 @@ void add_dW_dx_Additional ( gl_t *gl, spec_t rhok, double T, double Te, double T
   Te_from_Estar=max(300.0,Te_from_Estar); 
 
 
-  if (ADDITIONALREACTION[1] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
+  if (gl->model.chem.ADDITIONALREACTION[1] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
     kf=exp ( -0.0105809 * sqr ( theta ) - 2.40411e-75 * pow ( theta, 46.0 ) );
     dkfdTe = 0.0;
     dkfdT=0.0;
@@ -211,7 +204,7 @@ void add_dW_dx_Additional ( gl_t *gl, spec_t rhok, double T, double Te, double T
     add_to_dW_2r3p ( specN2, speceminus,   specN2plus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
   
-  if (ADDITIONALREACTION[2] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
+  if (gl->model.chem.ADDITIONALREACTION[2] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
     kf=exp ( -0.0102785 * sqr ( theta ) - 2.42260e-75 * pow ( theta, 46.0 ) );
     dkfdTe = 0.0;
     dkfdT=0.0;
@@ -219,7 +212,7 @@ void add_dW_dx_Additional ( gl_t *gl, spec_t rhok, double T, double Te, double T
     add_to_dW_2r3p ( specO2, speceminus,   specO2plus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
-  if (ADDITIONALREACTION[3] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT){
+  if (gl->model.chem.ADDITIONALREACTION[3] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT){
     kf=exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) );
     dkfdTe = 0.0;
     dkfdT=0.0;
@@ -227,11 +220,11 @@ void add_dW_dx_Additional ( gl_t *gl, spec_t rhok, double T, double Te, double T
     add_to_dW_2r3p ( specNO, speceminus,   specNOplus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
 
-  if (ADDITIONALREACTION[4]){
+  if (gl->model.chem.ADDITIONALREACTION[4]){
     add_to_dW_fw_3r2p ( specNOplus, speceminus, speceminus,   specNO, speceminus, 2.2e40, -4.5, 0.0*R, Te, X, dWdTe, dWdrhok );
   }
 
-  if (ADDITIONALREACTION[5] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
+  if (gl->model.chem.ADDITIONALREACTION[5] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
     kf=exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0));
     dkfdTe = 0.0;
     dkfdT=0.0;
@@ -239,7 +232,7 @@ void add_dW_dx_Additional ( gl_t *gl, spec_t rhok, double T, double Te, double T
     add_to_dW_2r3p ( specN, speceminus,   specNplus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
   
-  if (ADDITIONALREACTION[6] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
+  if (gl->model.chem.ADDITIONALREACTION[6] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
     kf=exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0));
     dkfdTe = 0.0;
     dkfdT=0.0;
@@ -427,15 +420,15 @@ void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
     theta=log(Estar);
 
     if (gl->model.chem.ADDITIONALREACTION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
-      if (ADDITIONALREACTION[1]) 
+      if (gl->model.chem.ADDITIONALREACTION[1]) 
         add_to_Qei(specN2,_ionizationpot(specN2), exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), rhok, Qei);
-      if (ADDITIONALREACTION[2]) 
+      if (gl->model.chem.ADDITIONALREACTION[2]) 
         add_to_Qei(specO2,_ionizationpot(specO2), exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), rhok, Qei);
-      if (ADDITIONALREACTION[3]) 
+      if (gl->model.chem.ADDITIONALREACTION[3]) 
         add_to_Qei(specNO,_ionizationpot(specNO), exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), rhok, Qei);
-      if (ADDITIONALREACTION[5]) 
+      if (gl->model.chem.ADDITIONALREACTION[5]) 
         add_to_Qei(specN,_ionizationpot(specN), exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), rhok, Qei);
-      if (ADDITIONALREACTION[6]) 
+      if (gl->model.chem.ADDITIONALREACTION[6]) 
         add_to_Qei(specO,_ionizationpot(specO), exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), rhok, Qei);
     }
   } 
@@ -496,15 +489,15 @@ void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrh
     theta=log(Estar);
 
     if (gl->model.chem.ADDITIONALREACTION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
-      if (ADDITIONALREACTION[1]) 
+      if (gl->model.chem.ADDITIONALREACTION[1]) 
         add_to_dQei(specN2,_ionizationpot(specN2), exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
-      if (ADDITIONALREACTION[2]) 
+      if (gl->model.chem.ADDITIONALREACTION[2]) 
         add_to_dQei(specO2,_ionizationpot(specO2), exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
-      if (ADDITIONALREACTION[3]) 
+      if (gl->model.chem.ADDITIONALREACTION[3]) 
         add_to_dQei(specNO,_ionizationpot(specNO), exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), 0.0, rhok, dQeidrhok, dQeidTe);
-      if (ADDITIONALREACTION[5]) 
+      if (gl->model.chem.ADDITIONALREACTION[5]) 
       add_to_dQei(specN,_ionizationpot(specN), exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), 0.0, rhok, dQeidrhok, dQeidTe);
-      if (ADDITIONALREACTION[6]) 
+      if (gl->model.chem.ADDITIONALREACTION[6]) 
       add_to_dQei(specO,_ionizationpot(specO), exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), 0.0, rhok, dQeidrhok, dQeidTe);
     }
   }

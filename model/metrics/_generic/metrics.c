@@ -37,6 +37,10 @@ double _Omega(np_t np, gl_t *gl){
 
 double _X(np_t np, long dim1, long dim2){
   double tmp;
+/*  assert(dim1>=0);
+  assert(dim1<nd);
+  assert(dim2>=0);
+  assert(dim2<nd); */
   tmp=np.bs->X[dim1][dim2];
   return(tmp);
 }
