@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 NOV 30a
+  * in model/chem/_NH3_Plasma_10s/omprakas2023.c
+    - changed the rates for reaction 2
+    - set all Qei terms to 0
+  * in model/fluid/_Favre-Reynolds_plasma/fluid_source.c and model/fluid/_Favre-Reynolds_plasma/fluid.c
+    - added code for N2VIBMODEL_TEQUILIBRIUM
+  * 
+     
 2023 NOV 26c
   * in model/chem/_Air_Plasma_11s/chem.c
     - deleted the constants ADDITIONALREACTION
