@@ -219,7 +219,7 @@ typedef char initvarname_t[100];
 
 typedef struct {
   zone_t domain,window,domain_all,domain_lim,domain_lim_all;
-  long iter,nn,timelevelcnt;
+  long iter,nn,timelevel;
 #ifdef _CYCLE_PREDICTOR_CORRECTOR
   long numsubiter_pc,subiter_pc;
 #endif

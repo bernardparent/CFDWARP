@@ -219,7 +219,7 @@ int main ( int argc, char **argv ) {
 
 #if defined(UNSTEADY)
   gl.time = 0.0;
-  gl.timelevelcnt = 0;
+  gl.timelevel = 0;
 #endif
 
 #ifdef UNSTEADY
