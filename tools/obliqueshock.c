@@ -39,7 +39,7 @@ int chkarg ( int argc, char **argv, char *arg ) {
 }
 
 int main ( int argc, char **argv ) {
-  double delta, delta_1, delta_2, gamma, gamma_1, gamma_2, M1, M1_1, M1_2, M2, T2overT1, P2overP1, phi;
+  double delta, delta_1, delta_2, gamma, gamma_1, gamma_2, M1, M1_1, M1_2, M2, T2overT1, P2overP1, phi, Pstag2overPstag1;
   bool delta_flag, gamma_flag, mach_flag;
   bool validOptions, shockvalid;
   long cnt, numsteps;
@@ -95,6 +95,7 @@ int main ( int argc, char **argv ) {
              "T2/T1        " 
              "P2/P1        " 
              "q2/q1        " 
+             "Pstag2/Pstag1" 
              "phi (deg)\n" );
     for ( cnt = 0; cnt < numsteps; cnt++ ) {
       M1 = cnt / ( double ) ( max ( numsteps - 1, 1 ) ) * ( M1_2 - M1_1 ) + M1_1;
@@ -102,10 +103,11 @@ int main ( int argc, char **argv ) {
       gamma = cnt / ( double ) ( max ( numsteps - 1, 1 ) ) * ( gamma_2 - gamma_1 ) + gamma_1;
       delta = cnt / ( double ) ( max ( numsteps - 1, 1 ) ) * ( delta_2 - delta_1 ) + delta_1;
       FindWedgeShockProps ( gamma, delta, M1, &M2, &T2overT1, &P2overP1, &phi, &shockvalid );
+      Pstag2overPstag1=P2overP1*pow((1.0+(gamma-1.0)/2.0*M2*M2)/(1.0+(gamma-1.0)/2.0*M1*M1),(gamma)/(gamma-1.0));
       if ( shockvalid ) {
-        printf ( "%E %E %E %E %E %E %E %E\n",
+        printf ( "%E %E %E %E %E %E %E %E %E\n",
                  M1, gamma, delta/pi*180.0, M2, T2overT1,
-                 P2overP1, M2 / M1 * sqrt ( T2overT1 ), 180.0e0 * phi / pi );
+                 P2overP1, M2 / M1 * sqrt ( T2overT1 ), Pstag2overPstag1, 180.0e0 * phi / pi );
       } else {
         printf ( "Couldn't find root...\n" );
       }

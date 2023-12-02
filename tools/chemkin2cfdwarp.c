@@ -1585,31 +1585,33 @@ void check_all_indicators_formfit_electrontemperature_Q(char oldLine[], char pre
 
 int build_current_function(int run, FILE* input, FILE* output) {
         
-    char *newLine, *oldLine, *prevLine, *lastLine, *word, *species;
+    char *newLine, *oldLine, *prevLine, *lastLine, *scoutLine,  *word, *species;
     
     species = (char*)malloc(sizeof(char)*1);
     newLine = (char *)malloc(1000*sizeof(char));
     oldLine = (char *)malloc(1000*sizeof(char));
     prevLine = (char *)malloc(1000*sizeof(char));
     lastLine = (char *)malloc(1000*sizeof(char));
+    scoutLine = (char *)malloc(1000*sizeof(char));
     word = (char *)malloc(200*sizeof(char));
     
     
-    int loc = 0, numR = 0, numP = 0, tot = 0, ind = 0, check = 0, e = 0, way = 10, Q = 0, M = 0, flag1 = 0, flag2 = 0, flag3 = 0, flag4 = 0, reaction = 0, h = 0, ply = 0, i = 0;
+    int loc = 0, numR = 0, numP = 0, tot = 0, ind = 0, check = 0, e = 0, way = 10, Q = 0, M = 0, flag1 = 0, flag2 = 0, flag3 = 0, flag4 = 0, reaction = 0, h = 0, ply = 0, i = 0, marker = 0;
 
     rewind(input);
     fgets(oldLine, 1000, input);
     fgets(prevLine, 1000, input);
     fgets(lastLine, 1000, input);
+    fgets(newLine, 1000, input);
     
     oldLine = (char *)realloc(oldLine, (strlen(oldLine) + 1) * sizeof(char));
     prevLine = (char *)realloc(prevLine, (strlen(prevLine) + 1) * sizeof(char));    
-    lastLine = (char *)realloc(lastLine, (strlen(lastLine) + 1) * sizeof(char));    
+    lastLine = (char *)realloc(lastLine, (strlen(lastLine) + 1) * sizeof(char));
+    newLine = (char *)realloc(newLine, (strlen(newLine) + 1) * sizeof(char));    
 
     species[0] = 'L';
     
-    while (fgets(newLine, 1000, input) != NULL) {
-        newLine = (char *)realloc(newLine, (strlen(newLine) + 1) * sizeof(char));
+    while (marker <= 3) {
         loc++;
         flag1 = 0, flag2 = 0, flag3 = 0, flag4 = 0;
         if (species[0] == 'L') {
@@ -1651,22 +1653,51 @@ int build_current_function(int run, FILE* input, FILE* output) {
             if (run != -1)
               print_output_line(oldLine, prevLine, lastLine, newLine, ind, e, Q, way, tot, run, numR, numP, output, M, reaction, h, loc, ply, species);
         }
-        oldLine = (char *)realloc(oldLine, (strlen(prevLine) + 1) * sizeof(char));
-        strcpy(oldLine, prevLine);
+        if (marker < 4) {
+          oldLine = (char *)realloc(oldLine, (strlen(prevLine) + 1) * sizeof(char));
+          strcpy(oldLine, prevLine);
+          if (marker == 3)
+            marker++;
+        }
         
-        prevLine = (char *)realloc(prevLine, (strlen(lastLine) + 1) * sizeof(char));
-        strcpy(prevLine, lastLine);
-            
-        lastLine = (char *)realloc(lastLine, (strlen(newLine) + 1) * sizeof(char));    
-        strcpy(lastLine, newLine);
+        if (marker < 3) {
+          prevLine = (char *)realloc(prevLine, (strlen(lastLine) + 1) * sizeof(char));
+          strcpy(prevLine, lastLine);
+          if (marker == 2)
+            marker++;
+        }
         
-        newLine = (char *)realloc(newLine, 1000 * sizeof(char));
+        if (marker < 2) {   
+          lastLine = (char *)realloc(lastLine, (strlen(newLine) + 1) * sizeof(char));    
+          strcpy(lastLine, newLine);
+          if (marker == 1)
+            marker++;
+        }
+        
+        if (marker < 1) {
+          newLine = (char *)realloc(newLine, (strlen(scoutLine) + 1) * sizeof(char));    
+          strcpy(newLine, scoutLine);
+        }
+        
+        
+        if (marker == 0) {
+          if (fgets(scoutLine, 1000, input) != NULL) {
+            newLine = (char *)realloc(newLine, (strlen(scoutLine) + 1) * sizeof(char));    
+            strcpy(newLine, scoutLine);
+          }
+          else {
+            marker = 1;
+          }
+        }
+        
+        
     }
     if (species[0] == 'L') {
       free ( lastLine );
       free ( oldLine );
       free ( prevLine );
       free ( newLine );
+      free ( scoutLine );
       free ( word );
       free ( species );
       return 0;
@@ -1682,6 +1713,7 @@ int build_current_function(int run, FILE* input, FILE* output) {
     free ( oldLine );
     free ( prevLine );
     free ( newLine );
+    free ( scoutLine );
     free ( word );
     free ( species );
     return 1;

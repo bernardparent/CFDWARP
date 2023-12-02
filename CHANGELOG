@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 DEC 01a
+  * in tools/chemkin2cfdwarp.c
+    - fixed a bug which prevented the last chemkin reaction from being read 
+  * in tools/obliqueshock.c
+    - added Pstag2/Pstag1 as an additional output
+    
+
 2023 NOV 30b
   * renamed
     - timelevelcnt to timelevel
