@@ -102,6 +102,9 @@ void find_Fstar_interface_FDSplus_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h
 void find_Fstar_interface_FDS_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h,  long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
                      metrics_t metrics, int EIGENVALCOND, int AVERAGING, flux_t Fint);
 
+void find_Fstar_interface_FDSR_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h,  long theta, flux_t musclvarsm1h, 
+                     flux_t musclvarsp1h, metrics_t metrics, int EIGENVALCOND, int AVERAGING, flux_t Fint);
+
 void find_Fstar_interface_FVSplus_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h, long theta, 
                      flux_t musclvarsm1h, flux_t musclvarsp1h, metrics_t metrics,  long numiter, 
                      int EIGENVALCOND, int AVERAGING, flux_t Fint, sqmat_t lambdaminusp1h, sqmat_t lambdaplusm1h);

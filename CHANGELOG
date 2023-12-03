@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 DEC 03a
+  * in cycle/resconv/_MUSCL/resconv.c
+    - added FLUX_FDSR flux
+  * in cycle/share/res_share.c
+    - added find_Fstar_interface_FDSR_muscl()
+    - in find_Fstar_interface_FDS_muscl_without_CDF() added calls to find_L_restrained_from_jacvars
+      and find_Linv_restrained_from_jacvars
+    - in find_Fstar_interface_FDS_muscl_with_CDF() added calls to find_L_restrained_from_jacvars
+      and find_Linv_restrained_from_jacvars
+  * in model/share/fluid_share.c
+    - added find_L_restrained_from_jacvars()
+    - added find_Linv_restrained_from_jacvars()
+
+
 2023 DEC 01a
   * in tools/chemkin2cfdwarp.c
     - fixed a bug which prevented the last chemkin reaction from being read 

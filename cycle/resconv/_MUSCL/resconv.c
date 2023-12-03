@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define FLUX_FDS 1
 #define FLUX_FVS 2
+#define FLUX_FDSR 3
 #define INTERPOL_AOWENO5 1
 #define INTERPOL_AOWENO7 2
 #define INTERPOL_AOWENO9 3
@@ -98,6 +99,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"AVERAGING_ROE",AVERAGING_ROE);
     SOAP_add_int_to_vars(codex,"AVERAGING_ARITH",AVERAGING_ARITH);
     SOAP_add_int_to_vars(codex,"FLUX_FDS",FLUX_FDS); 
+    SOAP_add_int_to_vars(codex,"FLUX_FDSR",FLUX_FDSR); 
     SOAP_add_int_to_vars(codex,"FLUX_FVS",FLUX_FVS); 
     SOAP_add_int_to_vars(codex,"INTERPOL_TVD2_MINMOD",INTERPOL_TVD2_MINMOD); 
     SOAP_add_int_to_vars(codex,"INTERPOL_TVD2_MINMOD2",INTERPOL_TVD2_MINMOD2); 
@@ -147,8 +149,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
 
 
     find_int_var_from_codex(codex,"FLUX",&gl->cycle.resconv.FLUX);
-    if (gl->cycle.resconv.FLUX!=FLUX_FDS && gl->cycle.resconv.FLUX!=FLUX_FVS)
-      SOAP_fatal_error(codex,"FLUX must be set to either FLUX_FDS or FLUX_FVS.");
+    if (gl->cycle.resconv.FLUX!=FLUX_FDS && gl->cycle.resconv.FLUX!=FLUX_FVS && gl->cycle.resconv.FLUX!=FLUX_FDSR)
+      SOAP_fatal_error(codex,"FLUX must be set to either FLUX_FDS or FLUX_FDSR or FLUX_FVS.");
     find_int_var_from_codex(codex,"INTERPOL",&gl->cycle.resconv.INTERPOL);
     if (
 #if (hbw_resconv_fluid>=2)
@@ -367,12 +369,16 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t 
       find_Fstar_interface_FDS_muscl(np, gl, l, _al(gl,l,theta,+1),  theta, musclvarsL, musclvarsR,
                      metrics, EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
     break;
+    case FLUX_FDSR:
+      find_Fstar_interface_FDSR_muscl(np, gl, l, _al(gl,l,theta,+1),  theta, musclvarsL, musclvarsR,
+                     metrics, EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
+    break;
     case FLUX_FVS:
       find_Fstar_interface_FVS_muscl(np, gl, l, _al(gl,l,theta,+1),  theta, musclvarsL,  musclvarsR,
                      metrics, EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
     break;
     default:
-      fatal_error("gl->cycle.resconv.FLUX must be set to either FLUX_FDS or FLUX_FVS in find_Fstar_interface().");
+      fatal_error("gl->cycle.resconv.FLUX must be set to either FLUX_FDS or FLUX_FDSR or FLUX_FVS in find_Fstar_interface().");
   }
 
 

@@ -2877,3 +2877,309 @@ void update_w_V_at_injection_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
   for (dim=0; dim<nd; dim++) Vwall[dim]=n[dim]*mdottot/_rho(np[lB]);
 }
 #endif
+
+
+
+#if defined(_FLUID_MULTISPECIES)
+
+void find_L_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t L){
+  double Vstar,a;
+  double dPdrhoetstar,Xmag,q2,a2,Vx,Vy,Xhat1,Xhat2;
+  spec_t dPdrhok,w;
+  long row,col,spec,dim;
+  dim_t Xhat;
+  double qtmp1;
+#ifdef _3D
+  double Vz,Xhat3,X1,X2,X3,qtmp2,qtmp3;
+  double Xtmp1,Xtmp2,Xtmp3,Xtmp4,Xtmp5,Xtmp6,Xtmp7,Xtmp8,Xtmp9;
+#endif
+
+  rearrange_metrics_eigenset2(&metrics);
+  Xmag=0.0e0;
+  Vstar=0.0e0;
+  for (dim=0; dim<nd; dim++){
+    Xmag+=sqr(metrics.X[dim]);
+    Vstar=Vstar+metrics.X[dim]*jacvars.V[dim];
+  }
+  assert(Xmag>0.0e0);
+  Xmag=sqrt(Xmag);
+  assert(Xmag!=0.0e0);
+  for (dim=0; dim<nd; dim++){
+   Xhat[dim]=metrics.X[dim]/Xmag;
+  }
+  a=_a_from_jacvars(jacvars);
+  a2=sqr(a);
+  for (spec=0; spec<ns; spec++){
+    dPdrhok[spec]=jacvars.dPdrhok[spec];
+    w[spec]=jacvars.w[spec];
+  }
+
+  dPdrhoetstar=jacvars.dPdrhoetstar;
+  for (row=0; row<nf; row++){
+    for (col=0; col<nf; col++){
+      L[row][col]=0.0e0;
+    }
+  }
+  q2=0.0e0;
+  for (dim=0; dim<nd; dim++){
+   q2=q2+sqr(jacvars.V[dim]);
+  }
+  assert(dPdrhoetstar!=0.0e0);
+
+#ifdef _2D
+  Vx=jacvars.V[0];
+  Vy=jacvars.V[1];
+  Xhat1=Xhat[0];
+  Xhat2=Xhat[1];
+  qtmp1 = -Vy*Xhat1 + Vx*Xhat2;
+
+  for (spec=0; spec<ns; spec++){
+    L[spec][spec]=2.0*a2;
+  }
+
+  for (row=0; row<ns; row++){
+    for (col=0; col<ns; col++){
+      L[row][col]+=-w[row]*(a2+dPdrhok[col]+a*qtmp1);
+    }
+    L[row][ns]=w[row]*(dPdrhoetstar*Vx+a*Xhat2);
+    L[row][ns+1]=w[row]*(dPdrhoetstar*Vy-a*Xhat1);
+    L[row][fluxet]=-w[row]*dPdrhoetstar;
+  }
+  
+
+  for (spec=0; spec<ns; spec++){
+    L[ns][spec]=a2 - dPdrhok[spec] + a*qtmp1;
+  }
+  L[ns][ns]=dPdrhoetstar*Vx - a*Xhat2;
+  L[ns][ns+1]=dPdrhoetstar*Vy + a*Xhat1;
+  L[ns][fluxet]=-dPdrhoetstar;
+
+
+  for (spec=0; spec<ns; spec++){
+    L[ns+1][spec]=-a*Vstar/Xmag + dPdrhok[spec];
+  }
+  L[ns+1][ns]=-dPdrhoetstar*Vx + a*Xhat1;
+  L[ns+1][ns+1]=-dPdrhoetstar*Vy + a*Xhat2;
+  L[ns+1][fluxet]=dPdrhoetstar; 
+
+  for (spec=0; spec<ns; spec++){
+    L[fluxet][spec]=a*Vstar/Xmag + dPdrhok[spec];
+  }
+  L[fluxet][ns]=-(dPdrhoetstar*Vx + a*Xhat1);
+  L[fluxet][ns+1]=-(dPdrhoetstar*Vy + a*Xhat2);
+  L[fluxet][fluxet]=dPdrhoetstar;
+
+  for (row=0; row<nf; row++){
+    for (col=0; col<nf; col++){
+      L[row][col]=L[row][col]/(2.0*a2);
+    }
+  }
+#endif
+
+
+
+
+#ifdef _3D
+  Vx=jacvars.V[0];
+  Vy=jacvars.V[1];
+  Vz=jacvars.V[2];
+  Xhat1=Xhat[0];
+  Xhat2=Xhat[1];
+  Xhat3=Xhat[2];
+  X1=metrics.X[0];
+  X2=metrics.X[1];
+  X3=metrics.X[2];
+
+  Xtmp1 = (X1*X1 + X2*(X2 - X3) + 2.0*X1*X3)/(Xmag*(X1 + X2 + X3));
+  Xtmp2 = (X1*X1 + 2.0*X1*X2 + X3*(-X2 + X3))/(Xmag*(X1 + X2 + X3));
+  Xtmp3 = (X1*(X2 + X3) + 2.0*(X2*X2 + X3*X3))/(Xmag*(X1 + X2 + X3));
+  qtmp1 = (-Vz*Xtmp1 - Vy*Xtmp2 + Vx*Xtmp3);
+  Xtmp4 = (X1*X1 + X2*X2 - X1*X3 + 2.0*X2*X3)/((X1 + X2 + X3)*Xmag);
+  Xtmp5 = (2.0*X1*X2 + X2*X2 - X1*X3 + X3*X3)/((X1 + X2 + X3)*Xmag);
+  Xtmp6 = (2.0*X1*X1 + X1*X2 + X3*(X2 + 2.0*X3))/((X1 + X2 + X3)*Xmag);
+  qtmp2 = (Vz*Xtmp4 + Vx*Xtmp5 - Vy*Xtmp6);
+  Xtmp7 = (-X1*X2 + X2*X2 + 2.0*X1*X3 + X3*X3)/((X1 + X2 + X3)*Xmag);
+  Xtmp8 = (2.0*X1*X1 + X1*X3 + X2*(2.0*X2 + X3))/((X1 + X2 + X3)*Xmag);
+  Xtmp9 = (X1*X1 - X1*X2 + X3*(2.0*X2 + X3))/((X1 + X2 + X3)*Xmag);
+  qtmp3 = (Vx*Xtmp7 - Vz*Xtmp8 + Vy*Xtmp9);
+
+  for (row=0; row<ns; row++){
+    L[row][row]=1.0;
+    for (col=0; col<ns; col++){
+      L[row][col]+=-w[row]*(a*qtmp1 + 2.0*a2 + dPdrhok[col])/(3.0*a2);
+    }
+    L[row][ns]=w[row]*(dPdrhoetstar*Vx + a*Xtmp3)/(3.0*a2);
+    L[row][ns+1]=w[row]*(dPdrhoetstar*Vy - a*Xtmp2)/(3.0*a2);
+    L[row][ns+2]=w[row]*(dPdrhoetstar*Vz - a*Xtmp1)/(3.0*a2);
+    L[row][fluxet]=-w[row]*dPdrhoetstar/(3.0*a2);
+  }
+
+  for (spec=0; spec<ns; spec++){
+    L[ns][spec]=(a2 - dPdrhok[spec] + a*qtmp2)/(3.0*a2);
+  }
+  L[ns][ns]=(dPdrhoetstar*Vx - a*Xtmp5)/(3.0*a2);
+  L[ns][ns+1]=(dPdrhoetstar*Vy + a*Xtmp6)/(3.0*a2);
+  L[ns][ns+2]=(dPdrhoetstar*Vz - a*Xtmp4)/(3.0*a2);
+  L[ns][fluxet]=-dPdrhoetstar/(3.0*a2);
+
+  for (spec=0; spec<ns; spec++){
+    L[ns+1][spec]=(a2 - dPdrhok[spec] + a*qtmp3)/(3.0*a2);
+  }
+  L[ns+1][ns]=(dPdrhoetstar*Vx - a*Xtmp7)/(3.0*a2);
+  L[ns+1][ns+1]=(dPdrhoetstar*Vy - a*Xtmp9)/(3.0*a2);
+  L[ns+1][ns+2]=(dPdrhoetstar*Vz + a*Xtmp8)/(3.0*a2);
+  L[ns+1][fluxet]=-dPdrhoetstar/(3.0*a2);
+
+  for (spec=0; spec<ns; spec++){
+    L[ns+2][spec]=(-a*Vstar/Xmag + dPdrhok[spec])/(2.0*a2);
+  }
+  L[ns+2][ns]=(-dPdrhoetstar*Vx + a*Xhat1)/(2.0*a2);
+  L[ns+2][ns+1]=(-dPdrhoetstar*Vy + a*Xhat2)/(2.0*a2);
+  L[ns+2][ns+2]=(-dPdrhoetstar*Vz + a*Xhat3)/(2.0*a2);
+  L[ns+2][fluxet]=dPdrhoetstar/(2.0*a2);
+
+  for (spec=0; spec<ns; spec++){
+    L[fluxet][spec]=(a*Vstar/Xmag + dPdrhok[spec])/(2.0*a2);
+  }
+  L[fluxet][ns]=(-dPdrhoetstar*Vx - a*Xhat1)/(2.0*a2);
+  L[fluxet][ns+1]=(-dPdrhoetstar*Vy - a*Xhat2)/(2.0*a2);
+  L[fluxet][ns+2]=(-dPdrhoetstar*Vz - a*Xhat3)/(2.0*a2);
+  L[fluxet][fluxet]=dPdrhoetstar/(2.0*a2);
+
+#endif
+  for (row=fluxet+1; row<nf; row++){
+    L[row][row]=1.0;
+  }
+}
+
+
+void find_Linv_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
+  double H,Vstar,a;
+  double dPdrhoetstar,Xmag,q2,Vx,Vy,Xhat1,Xhat2;
+  spec_t dPdrhok,w;
+  long row,col,spec,dim;
+  dim_t Xhat;
+#ifdef _3D
+  double Vz,Xhat3;
+#endif
+
+  rearrange_metrics_eigenset2(&metrics);
+
+  Xmag=0.0e0;
+  Vstar=0.0e0;
+  for (dim=0; dim<nd; dim++){
+    Xmag+=sqr(metrics.X[dim]);
+    Vstar=Vstar+metrics.X[dim]*jacvars.V[dim];
+  }
+  assert(Xmag>0.0e0);
+  Xmag=sqrt(Xmag);
+  assert(Xmag!=0.0e0);
+  for (dim=0; dim<nd; dim++){
+    Xhat[dim]=metrics.X[dim]/Xmag;
+  }
+  H=jacvars.htstar;
+  a=_a_from_jacvars(jacvars);
+  for (spec=0; spec<ns; spec++){
+    dPdrhok[spec]=jacvars.dPdrhok[spec];
+    w[spec]=jacvars.w[spec];
+  }
+  dPdrhoetstar=jacvars.dPdrhoetstar;
+  for (row=0; row<nf; row++){
+    for (col=0; col<nf; col++){
+      R[row][col]=0.0e0;
+    }
+  }
+  q2=0.0e0;
+  for (dim=0; dim<nd; dim++){
+   q2=q2+sqr(jacvars.V[dim]);
+  }
+  assert(dPdrhoetstar!=0.0e0);
+
+#ifdef _2D
+  Vx=jacvars.V[0];
+  Vy=jacvars.V[1];
+  Xhat1=Xhat[0];
+  Xhat2=Xhat[1];
+  for (spec=0; spec<ns; spec++){
+    R[spec][spec]=1.0;
+    R[spec][ns]=w[spec];
+    R[spec][ns+1]=w[spec];
+    R[spec][ns+2]=w[spec];
+    R[ns][spec]=Vx + a*Xhat2;
+    R[ns+1][spec]=Vy - a*Xhat1;
+    R[fluxet][spec]=q2 - dPdrhok[spec]/dPdrhoetstar + a*(Vx*Xhat2 - Vy*Xhat1);
+  }
+  
+  R[ns][ns]=Vx - a*Xhat2;
+  R[ns][ns+1]=Vx + a*Xhat1;
+  R[ns][fluxet]=Vx - a*Xhat1;
+
+  R[ns+1][ns]=Vy + a*Xhat1;
+  R[ns+1][ns+1]=Vy + a*Xhat2;
+  R[ns+1][fluxet]=Vy - a*Xhat2;
+
+  R[fluxet][ns]=H - a*a/dPdrhoetstar + a*(Vy*Xhat1 - Vx*Xhat2);
+  R[fluxet][ns+1]=H + a*(Vx*Xhat1 + Vy*Xhat2);
+  R[fluxet][fluxet]=H - a*(Vx*Xhat1 + Vy*Xhat2);
+#endif
+
+#ifdef _3D
+  double a2;
+  a2=sqr(a);
+  Vx=jacvars.V[0];
+  Vy=jacvars.V[1];
+  Vz=jacvars.V[2];
+  Xhat1=Xhat[0];
+  Xhat2=Xhat[1];
+  Xhat3=Xhat[2];
+
+  for (spec=0; spec<ns; spec++){
+    R[spec][spec]=1.0;
+    R[spec][ns]=w[spec];
+    R[spec][ns+1]=w[spec];
+    R[spec][ns+2]=w[spec];
+    R[spec][ns+3]=w[spec];
+    R[ns][spec]=Vx + a*(Xhat2 + Xhat3);
+    R[ns+1][spec]=Vy - a*Xhat1;
+    R[ns+2][spec]=Vz - a*Xhat1;
+    R[fluxet][spec]=q2 - dPdrhok[spec]/dPdrhoetstar + a*Vx*(Xhat2 + Xhat3) - a*(Vy + Vz)*Xhat1;
+  }
+
+  R[ns][ns]=Vx - a*Xhat2;
+  R[ns][ns+1]=Vx - a*Xhat3;
+  R[ns][ns+2]=Vx + a*Xhat1;
+  R[ns][fluxet]=Vx - a*Xhat1;
+
+  R[ns+1][ns]=Vy + a*(Xhat1 + Xhat3);
+  R[ns+1][ns+1]=Vy - a*Xhat3;
+  R[ns+1][ns+2]=Vy + a*Xhat2;
+  R[ns+1][fluxet]=Vy - a*Xhat2;
+
+  R[ns+2][ns]=Vz - a*Xhat2;
+  R[ns+2][ns+1]=Vz + a*(Xhat1 + Xhat2);
+  R[ns+2][ns+2]=Vz + a*Xhat3;
+  R[ns+2][fluxet]=Vz - a*Xhat3;
+
+  R[fluxet][ns]=H - a2/dPdrhoetstar + a*Vy*(Xhat1 + Xhat3) - a*(Vx + Vz)*Xhat2;
+  R[fluxet][ns+1]=H - a2/dPdrhoetstar + a*Vz*(Xhat1 + Xhat2) - a*(Vx + Vy)*Xhat3;
+  R[fluxet][ns+2]=H + a*(Vx*Xhat1 + Vy*Xhat2 + Vz*Xhat3);
+  R[fluxet][fluxet]=H - a*(Vx*Xhat1 + Vy*Xhat2 + Vz*Xhat3);
+
+#endif
+  for (row=fluxet+1; row<nf; row++){
+    R[row][row]=1.0;
+  }
+}
+
+
+#else
+
+void find_L_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t L){
+  find_L_from_jacvars(jacvars, metrics, L);
+}
+
+void find_Linv_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t Linv){
+  find_Linv_from_jacvars(jacvars, metrics, Linv);
+}
+
+#endif //#if defined(_FLUID_MULTISPECIES)

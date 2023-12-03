@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cycle/share/res_share.h>
 #include <cycle/restime/_restime.h>
 #include <src/bdry.h>
+#include <model/_model.h>
 
 
 #define CWENO_CENTRAL_WEIGHT 100.0
@@ -1241,7 +1242,7 @@ void find_Fstar_interface_FDSplus_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h
 
 
 void find_Fstar_interface_FDS_muscl_with_CDF(np_t *np, gl_t *gl, long lm1h, long lp1h,  long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
-                     metrics_t metrics, int EIGENVALCOND, int AVERAGING, flux_t Fint){
+                     metrics_t metrics, int EIGENVALCOND, int AVERAGING, bool RESTRAINED, flux_t Fint){
 
   sqmat_t Lm1h,Linvm1h,Linvp1h,Lp1h,Lp0_RE,Linvp0_RE,lambdapp0_RE,lambdap0_RE;
   long flux;
@@ -1257,6 +1258,7 @@ void find_Fstar_interface_FDS_muscl_with_CDF(np_t *np, gl_t *gl, long lm1h, long
   jacvars_t jacvarsm1h_RE,jacvarsp1h_RE,jacvarsp0_RE;
   sqmat_t lambdaminusp1h, lambdaplusm1h;
 
+  if (RESTRAINED) fatal_error("find_Fstar_interface_FDS_muscl_with_CDF can not be used for now in FDS RESTRAINED mode.");
   find_jacvars_from_musclvars(musclvarsm1h, metrics, gl, theta, &jacvarsm1h_RE);
   find_jacvars_from_musclvars(musclvarsp1h, metrics, gl, theta, &jacvarsp1h_RE);
   
@@ -1336,7 +1338,7 @@ void find_Fstar_interface_FDS_muscl_with_CDF(np_t *np, gl_t *gl, long lm1h, long
 
 
 void find_Fstar_interface_FDS_muscl_without_CDF(gl_t *gl, long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
-                     metrics_t metrics, int EIGENVALCOND, int AVERAGING, flux_t Fint){
+                     metrics_t metrics, int EIGENVALCOND, int AVERAGING, bool RESTRAINED, flux_t Fint){
   flux_t Fm1h,Fp1h,mattmp,Um1h,Up1h,fluxtmp,alphap0;
   jacvars_t jacvarsm1h,jacvarsp1h,jacvarsp0;
   sqmat_t Linv,lambdap,L;
@@ -1346,14 +1348,19 @@ void find_Fstar_interface_FDS_muscl_without_CDF(gl_t *gl, long theta, flux_t mus
   find_jacvars_from_musclvars(musclvarsp1h, metrics, gl, theta, &jacvarsp1h);
   find_jacvars_at_interface_from_jacvars(jacvarsm1h, jacvarsp1h, gl, theta, metrics, AVERAGING, &jacvarsp0);
   
-  find_L_from_jacvars(jacvarsp0, metrics, L);
+  if (RESTRAINED) {
+    find_L_restrained_from_jacvars(jacvarsp0, metrics, L);
+    find_Linv_restrained_from_jacvars(jacvarsp0, metrics, Linv);
+  } else { 
+    find_L_from_jacvars(jacvarsp0, metrics, L);
+    find_Linv_from_jacvars(jacvarsp0, metrics, Linv);
+  }
+  find_conditioned_Lambda_absolute_from_jacvars(jacvarsp0, metrics, EIGENVALCOND, lambdap);
   find_Ustar_from_musclvars(musclvarsm1h, metrics, gl, Um1h);
   find_Ustar_from_musclvars(musclvarsp1h, metrics, gl, Up1h);
   for (flux=0; flux<nf; flux++) mattmp[flux]=Up1h[flux]-Um1h[flux];
   multiply_matrix_and_vector(L,mattmp,alphap0);
 
-  find_conditioned_Lambda_absolute_from_jacvars(jacvarsp0, metrics, EIGENVALCOND, lambdap);
-  find_Linv_from_jacvars(jacvarsp0, metrics, Linv);
   for (flux=0; flux<nf; flux++) fluxtmp[flux]=-lambdap[flux][flux]*alphap0[flux];
   multiply_matrix_and_vector(Linv,fluxtmp,Fint);
 
@@ -1368,14 +1375,35 @@ void find_Fstar_interface_FDS_muscl_without_CDF(gl_t *gl, long theta, flux_t mus
 
 void find_Fstar_interface_FDS_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h,  long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
                      metrics_t metrics, int EIGENVALCOND, int AVERAGING, flux_t Fint){
+  bool RESTRAINED;
+  RESTRAINED=FALSE;
 #ifdef _RESTIME_CDF
   find_Fstar_interface_FDS_muscl_with_CDF(np, gl, lm1h, lp1h,  theta, musclvarsm1h, musclvarsp1h,
-                                          metrics, EIGENVALCOND, AVERAGING, Fint);
+                                          metrics, EIGENVALCOND, AVERAGING, RESTRAINED, Fint);
 #else
   find_Fstar_interface_FDS_muscl_without_CDF(gl, theta, musclvarsm1h, musclvarsp1h,
-                                             metrics, EIGENVALCOND, AVERAGING, Fint);
+                                             metrics, EIGENVALCOND, AVERAGING, RESTRAINED, Fint);
 #endif
 }
+
+
+
+
+
+void find_Fstar_interface_FDSR_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h,  long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
+                     metrics_t metrics, int EIGENVALCOND, int AVERAGING, flux_t Fint){
+  bool RESTRAINED;
+  RESTRAINED=TRUE;
+#ifdef _RESTIME_CDF
+  find_Fstar_interface_FDS_muscl_with_CDF(np, gl, lm1h, lp1h,  theta, musclvarsm1h, musclvarsp1h,
+                                          metrics, EIGENVALCOND, AVERAGING, RESTRAINED, Fint);
+#else
+  find_Fstar_interface_FDS_muscl_without_CDF(gl, theta, musclvarsm1h, musclvarsp1h,
+                                             metrics, EIGENVALCOND, AVERAGING, RESTRAINED, Fint);
+#endif
+}
+
+
 
 
 void find_Fstar_interface_FVS_muscl_without_CDF(gl_t *gl, long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
