@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* When using eigenset2, rearrange metrics when a singularity occurs within the left eigenvector
    matrix. Only rearrange the metrics part of the left and right eigenvectors and leave the metrics
    of the eigenvalues as they are. */
+#define EIGENSET1 1
 #define EIGENSET2 2
 #define EIGENSET EIGENSET2
 
@@ -349,6 +350,111 @@ void find_Lambda_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t lamb
 
 
 
+void find_Linv_from_jacvars_eigenset1(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
+  double htstar,Vstar,Vhat,a;
+  double dPdrhoetstar,sum;
+  spec_t dPdrhok,w;
+  long row,col,spec,dim;
+  dim_t Xhat;
+  double k,ev,cN2;
+  double l[3][2];
+  if3D( double denom; )
+
+  k=jacvars.k;
+  cN2=jacvars.w[specN2];
+  ev=jacvars.ev;
+  sum=0.0e0;
+  Vstar=0.0e0;
+  for (dim=0; dim<nd; dim++){
+    sum=sum+sqr(metrics.X[dim]);
+    Vstar=Vstar+metrics.X[dim]*jacvars.V[dim];
+  }
+  assert(sum>0.0e0);
+  sum=sqrt(sum);
+  assert(sum!=0.0e0);
+  for (dim=0; dim<nd; dim++){
+   Xhat[dim]=metrics.X[dim]/sum;
+  }
+  Vhat=Vstar/sum;
+  htstar=jacvars.htstar;
+  a=_a_from_jacvars(jacvars);
+  for (spec=0; spec<ns; spec++){
+    dPdrhok[spec]=jacvars.dPdrhok[spec];
+    w[spec]=jacvars.w[spec];
+  }
+  dPdrhoetstar=jacvars.dPdrhoetstar;
+  for (row=0; row<nf; row++){
+    for (col=0; col<nf; col++){
+      R[row][col]=0.0e0;
+    }
+  }
+  sum=0.0e0;
+  for (dim=0; dim<nd; dim++){
+   sum=sum+sqr(jacvars.V[dim]);
+  }
+  assert(dPdrhoetstar!=0.0e0);
+  for (spec=0; spec<ns; spec++){
+    R[spec][spec]=1.0e0;
+    for (dim=0; dim<nd; dim++){
+      R[ns+dim][spec]=jacvars.V[dim];
+    }
+    R[fluxet][spec]=sum-dPdrhok[spec]/(dPdrhoetstar)
+                           +jacvars.k*(1.0e0-2.0e0/3.0e0/dPdrhoetstar)
+                           +ev*cN2;
+    R[spec][fluxet-1]=w[spec];
+    R[spec][fluxet]=w[spec];
+    R[fluxtke][spec]=jacvars.k;
+    R[fluxpsi][spec]=jacvars.psi;
+    R[fluxev][spec]=cN2*jacvars.ev;
+  }
+  for (dim=0; dim<nd; dim++){
+    R[ns+dim][fluxet-1]=jacvars.V[dim]+Xhat[dim]*a;
+    R[ns+dim][fluxet]=jacvars.V[dim]-Xhat[dim]*a;
+  }
+  R[fluxet][fluxet-1]=htstar+Vhat*a;
+  R[fluxet][fluxet]=htstar-Vhat*a;
+  R[fluxet][fluxtke]=a*a*(1.0e0-2.0e0/(3.0e0*dPdrhoetstar));
+  R[fluxet][fluxev]=cN2*a*a;
+
+
+  R[fluxtke][fluxet-1]=k;
+  R[fluxtke][fluxet]=k;
+  R[fluxtke][fluxtke]=a*a;
+  R[fluxpsi][fluxet-1]=jacvars.psi;
+  R[fluxpsi][fluxet]=jacvars.psi;
+  R[fluxpsi][fluxpsi]=a*a;
+  R[fluxev][fluxet-1]=cN2*ev;
+  R[fluxev][fluxet]=cN2*ev;
+  R[fluxev][fluxev]=cN2*a*a;
+
+
+#ifdef _2D
+  l[0][0]=Xhat[1];
+  l[1][0]=-Xhat[0];
+#endif
+#ifdef _3D
+  assert(sqr(Xhat[2]-Xhat[1])+sqr(Xhat[0]-Xhat[2])
+         +sqr(Xhat[1]-Xhat[0])>0.0e0);
+  denom=sqrt(sqr(Xhat[2]-Xhat[1])+sqr(Xhat[0]-Xhat[2])
+         +sqr(Xhat[1]-Xhat[0]));
+  assert(denom!=0);
+  l[0][0]=(Xhat[2]-Xhat[1])/denom;
+  l[1][0]=(Xhat[0]-Xhat[2])/denom;
+  l[2][0]=(Xhat[1]-Xhat[0])/denom;
+  l[0][1]=Xhat[1]*l[2][0]-Xhat[2]*l[1][0];
+  l[1][1]=Xhat[2]*l[0][0]-Xhat[0]*l[2][0];
+  l[2][1]=Xhat[0]*l[1][0]-Xhat[1]*l[0][0];
+#endif
+
+  for (col=0; col<(nd-1); col++){
+    R[fluxet][ns+col]=0.0e0;
+    for (row=0; row<nd; row++){
+      R[ns+row][ns+col]=l[row][col]*a;
+      R[fluxet][ns+col]=R[fluxet][ns+col]
+          +jacvars.V[row]*l[row][col]*a;
+    }
+  }
+}
 
 
 
@@ -569,6 +675,7 @@ Linv = {
 
 
 void find_Linv_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
+  if (EIGENSET==EIGENSET1) find_Linv_from_jacvars_eigenset1(jacvars, metrics, R);
   if (EIGENSET==EIGENSET2) find_Linv_from_jacvars_eigenset2(jacvars, metrics, R);
   
 }
@@ -660,6 +767,13 @@ alpha = {c1*Pstar*Prhoetstar/(3*a2), c2*Pstar*Prhoetstar/(3*a2), c3*Pstar*Prhoet
     find_Ustar_from_jacvars(jacvars, metrics, Ustar);
     multiply_matrix_and_vector(L,Ustar,LUstar);
   }
+}
+
+
+void find_L_from_jacvars_eigenset1(jacvars_t jacvars, metrics_t metrics, sqmat_t L){
+  sqmat_t Linv;
+  find_Linv_from_jacvars_eigenset1(jacvars, metrics, L);
+  invert_matrix(Linv,L);  
 }
 
 

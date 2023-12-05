@@ -3050,7 +3050,13 @@ void find_L_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_
   for (row=fluxet+1; row<nf; row++){
     L[row][row]=1.0;
   }
+/*  find_L_from_jacvars(jacvars, metrics, L);
+  sqmat_t R;
+  find_Linv_restrained_from_jacvars(jacvars, metrics, R);
+  invert_matrix(R,L); */
 }
+
+
 
 
 void find_Linv_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
@@ -3169,6 +3175,7 @@ void find_Linv_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqm
   for (row=fluxet+1; row<nf; row++){
     R[row][row]=1.0;
   }
+//  find_Linv_from_jacvars(jacvars, metrics, R);
 }
 
 

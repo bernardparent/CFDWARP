@@ -359,6 +359,20 @@ static void find_Aabs_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t
 }
 
 
+static void find_Aabs_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t Aabs){
+  sqmat_t mattmp,R,L,lambdap;
+  long flux;
+
+  find_Lambda_from_jacvars(jacvars, metrics, lambdap);
+  for (flux=0; flux<nf; flux++) lambdap[flux][flux]=fabs(lambdap[flux][flux]);
+  find_conditioned_Lambda_absolute_from_jacvars(jacvars, metrics, EIGENVALCOND_DEFAULT, lambdap);
+  find_Linv_restrained_from_jacvars(jacvars, metrics, R);
+  find_L_restrained_from_jacvars(jacvars, metrics, L);
+  multiply_diagonal_matrix_and_matrix(lambdap,L,mattmp);
+  multiply_matrix_and_matrix(R,mattmp,Aabs);
+}
+
+
 void find_dFstar_dUstar_FDS_interface(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
   sqmat_t Ap1,Ap0;
   sqmat_t Aabs;
@@ -382,6 +396,52 @@ void find_dFstar_dUstar_FDS_interface(np_t *np, gl_t *gl, long theta, long l, sq
   //find_jacvars_at_interface_Roe_average(jacvarsL,jacvarsR,gl,theta,&jacvarsp1h);
 
   find_Aabs_from_jacvars(jacvarsp1h, metricsp1h, Aabs);
+  find_dFstar_dUstar(np[l], gl, theta, Ap0);
+  find_dFstar_dUstar(np[lp1], gl, theta, Ap1);
+
+  for (row=0; row<nf; row++){
+    for (col=0; col<nf; col++){
+      B[row][col]=0.5*(Ap0[row][col]+Omegap1h/Omegap0*Aabs[row][col]);
+      C[row][col]=0.5*(Ap1[row][col]-Omegap1h/Omegap1*Aabs[row][col]);
+    }
+  }
+
+#if (defined(_RESTIME_CDF))
+  sqmat_t B1,C1;
+  find_dFstarxt_dUstar_interface(np, gl, theta, l, jacvarsp1h, metricsp1h, B1, C1);
+  for (row=0; row<nf; row++){
+    for (col=0; col<nf; col++){
+      B[row][col]+=B1[row][col];
+      C[row][col]+=C1[row][col];
+    }
+  }
+#endif  
+}
+
+
+void find_dFstar_dUstar_FDSR_interface(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
+  sqmat_t Ap1,Ap0;
+  sqmat_t Aabs;
+  jacvars_t jacvarsL,jacvarsR,jacvarsp1h;
+  double Omegap0,Omegap1,Omegap1h;
+  long lp0,lp1;
+  metrics_t metricsp1h;
+  long row,col;
+
+  lp0=_al(gl,l,theta,+0);
+  lp1=_al(gl,l,theta,+1);
+
+  Omegap1h=(_Omega(np[lp0],gl)+_Omega(np[lp1],gl))*0.5e0;
+  Omegap0=_Omega(np[lp0],gl);
+  Omegap1=_Omega(np[lp1],gl);
+
+  find_metrics_at_interface(np,gl,lp0,lp1,theta,&metricsp1h);
+  find_jacvars(np[lp0], gl, metricsp1h, theta, &jacvarsL);
+  find_jacvars(np[lp1], gl, metricsp1h, theta, &jacvarsR);
+  find_jacvars_at_interface_arith_average(jacvarsL,jacvarsR,gl,theta,&jacvarsp1h);
+  //find_jacvars_at_interface_Roe_average(jacvarsL,jacvarsR,gl,theta,&jacvarsp1h);
+
+  find_Aabs_restrained_from_jacvars(jacvarsp1h, metricsp1h, Aabs);
   find_dFstar_dUstar(np[l], gl, theta, Ap0);
   find_dFstar_dUstar(np[lp1], gl, theta, Ap1);
 
@@ -655,6 +715,10 @@ void add_dFstar_dUstar_to_TDMA(np_t *np, gl_t *gl, long theta, long l, double fa
       find_dFstar_dUstar_FDS_interface(np, gl, theta, l, Bp1h, Cp1h);
       find_dFstar_dUstar_FDS_interface(np, gl, theta, _al(gl,l,theta,-1), Am1h, Bm1h);
     break;
+    case CONVJACOBIAN_FDSR:
+      find_dFstar_dUstar_FDSR_interface(np, gl, theta, l, Bp1h, Cp1h);
+      find_dFstar_dUstar_FDSR_interface(np, gl, theta, _al(gl,l,theta,-1), Am1h, Bm1h);
+    break;
     case CONVJACOBIAN_FDSPLUS:
       find_dFstar_dUstar_FDSplus_interface(np, gl, theta, l, Bp1h, Cp1h);
       find_dFstar_dUstar_FDSplus_interface(np, gl, theta, _al(gl,l,theta,-1), Am1h, Bm1h);
@@ -708,6 +772,9 @@ void find_TDMA_jacobians_conservative(np_t *np, gl_t *gl, long theta, long l, sq
       break;
       case CONVJACOBIAN_FDS:
         find_dFstar_dUstar_FDS_interface(np, gl, theta, l, B1, C1);
+      break;
+      case CONVJACOBIAN_FDSR:
+        find_dFstar_dUstar_FDSR_interface(np, gl, theta, l, B1, C1);
       break;
       case CONVJACOBIAN_FDSPLUS:
         find_dFstar_dUstar_FDSplus_interface(np, gl, theta, l, B1, C1);

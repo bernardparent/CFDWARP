@@ -215,7 +215,7 @@ Disc(
     zetaA2=0.2e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   MUSCL(
-    FLUX=FLUX_FDS;
+    FLUX=FLUX_FDSR;
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.85;
