@@ -653,7 +653,7 @@ void find_dW_dx ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv
 
 
 
-void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
+void find_Qei(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
   double theta;
   
   *Qei=0.0;  
@@ -667,7 +667,7 @@ void find_Qei(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
 
 
 
-void find_dQei_dx(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
+void find_dQei_dx(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
   double theta;
   long spec;
   

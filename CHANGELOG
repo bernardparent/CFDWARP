@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 DEC 05a
+  * in various files, added argument np_t np to find_Qei()
+  * in various files, added argument np_t np to find_dQei_dx()
+  * in model/chem/_NH3_Plasma_10s/bavafa2008.c
+    - added _kf1(), _kf2(), _kf3(), etc to avoid repeating these reaction rate coefficients
+    - added find_Qchemave_bavafa2008()
+  * in model/share/chem_share.c
+    - added add_to_Q_2r3p()
+    - added add_to_Q_2r4p()
+
+  
 2023 DEC 04a
   * in model/fluid/_Favre-Reynolds_Tv/fluid_conv.c
     - added eigenset1

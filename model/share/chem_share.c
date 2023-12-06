@@ -2907,3 +2907,54 @@ double _exci_2r4p(long react1, long react2, long prod1, long prod2, long prod3, 
   return(exci);
 }
 
+
+
+/*
+  kf in cm3/s
+  T in K
+  rho in kg/m3
+  Q in W/m3
+*/
+void add_to_Q_2r3p(long specR1, long specR2, long specP1, long specP2, long specP3, double kf, spec_t rhok, double T, double *Q){
+  double Qperparticule;
+  spec_t N;
+  long k;
+  
+  for ( k = 0; k < ns; k++ ) {
+    N[k] = rhok[k] / _calM (k ) * 1e-6 * calA;  /* particules/cm^3 */
+  }
+  
+  Qperparticule=_hk_from_T_equilibrium(specP1, T)*_m(specP1)
+    +_hk_from_T_equilibrium(specP2, T)*_m(specP2)
+    +_hk_from_T_equilibrium(specP3, T)*_m(specP3)
+    -_hk_from_T_equilibrium(specR1, T)*_m(specR1)
+    -_hk_from_T_equilibrium(specR2, T)*_m(specR2); // J
+  *Q+=Qperparticule*kf*N[specR1]*N[specR2]*1e6; // W/m3 
+}
+
+
+/*
+  kf in cm3/s
+  T in K
+  rho in kg/m3
+  Q in W/m3
+*/
+void add_to_Q_2r4p(long specR1, long specR2, long specP1, long specP2, long specP3, long specP4, double kf, spec_t rhok, double T, double *Q){
+  double Qperparticule;
+  spec_t N;
+  long k;
+  
+  for ( k = 0; k < ns; k++ ) {
+    N[k] = rhok[k] / _calM (k ) * 1e-6 * calA;  /* particules/cm^3 */
+  }
+
+  Qperparticule=_hk_from_T_equilibrium(specP1, T)*_m(specP1)
+    +_hk_from_T_equilibrium(specP2, T)*_m(specP2)
+    +_hk_from_T_equilibrium(specP3, T)*_m(specP3)
+    +_hk_from_T_equilibrium(specP4, T)*_m(specP4)
+    -_hk_from_T_equilibrium(specR1, T)*_m(specR1)
+    -_hk_from_T_equilibrium(specR2, T)*_m(specR2); // J
+  *Q+=Qperparticule*kf*N[specR1]*N[specR2]*1e6; // W/m3 
+}
+
+

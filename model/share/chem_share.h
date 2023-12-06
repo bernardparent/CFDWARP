@@ -547,5 +547,14 @@ double _exci_2r3p(long react1, long react2, long prod1, long prod2, long prod3);
 /* find excitation energy in eV using the difference in enthalpy of formation */
 double _exci_2r4p(long react1, long react2, long prod1, long prod2, long prod3, long prod4);
 
+/*
+  kf in cm3/s
+  T in K
+  rho in kg/m3
+  Q in W/m3
+*/
+void add_to_Q_2r3p(long specR1, long specR2, long specP1, long specP2, long specP3, double kf, spec_t rhok, double T, double *Q);
+
+void add_to_Q_2r4p(long specR1, long specR2, long specP1, long specP2, long specP3, long specP4, double kf, spec_t rhok, double T, double *Q);
 
 #endif /* _CHEM_SHARE_H */
