@@ -363,9 +363,9 @@ static void find_Aabs_restrained_from_jacvars(jacvars_t jacvars, metrics_t metri
   sqmat_t mattmp,R,L,lambdap;
   long flux;
 
-  find_Lambda_from_jacvars(jacvars, metrics, lambdap);
+  find_Lambda_restrained_from_jacvars(jacvars, metrics, lambdap);
   for (flux=0; flux<nf; flux++) lambdap[flux][flux]=fabs(lambdap[flux][flux]);
-  find_conditioned_Lambda_absolute_from_jacvars(jacvars, metrics, EIGENVALCOND_DEFAULT, lambdap);
+  find_conditioned_Lambda_absolute_restrained_from_jacvars(jacvars, metrics, EIGENVALCOND_DEFAULT, lambdap);
   find_Linv_restrained_from_jacvars(jacvars, metrics, R);
   find_L_restrained_from_jacvars(jacvars, metrics, L);
   multiply_diagonal_matrix_and_matrix(lambdap,L,mattmp);

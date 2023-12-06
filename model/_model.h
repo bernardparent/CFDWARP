@@ -313,6 +313,10 @@ void find_Linv_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqm
 
 void find_L_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t L);
 
+void find_conditioned_Lambda_absolute_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t Lambdaabs);
+
+void find_Lambda_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t lambda);
+
 
 #ifdef _FLUID_WALLDISTANCE
 bool is_node_bdry_wall_fluid(np_t np, gl_t *gl);

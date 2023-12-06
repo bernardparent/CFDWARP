@@ -1351,11 +1351,12 @@ void find_Fstar_interface_FDS_muscl_without_CDF(gl_t *gl, long theta, flux_t mus
   if (RESTRAINED) {
     find_L_restrained_from_jacvars(jacvarsp0, metrics, L);
     find_Linv_restrained_from_jacvars(jacvarsp0, metrics, Linv);
+    find_conditioned_Lambda_absolute_restrained_from_jacvars(jacvarsp0, metrics, EIGENVALCOND, lambdap);
   } else { 
     find_L_from_jacvars(jacvarsp0, metrics, L);
     find_Linv_from_jacvars(jacvarsp0, metrics, Linv);
+    find_conditioned_Lambda_absolute_from_jacvars(jacvarsp0, metrics, EIGENVALCOND, lambdap);
   }
-  find_conditioned_Lambda_absolute_from_jacvars(jacvarsp0, metrics, EIGENVALCOND, lambdap);
   find_Ustar_from_musclvars(musclvarsm1h, metrics, gl, Um1h);
   find_Ustar_from_musclvars(musclvarsp1h, metrics, gl, Up1h);
   for (flux=0; flux<nf; flux++) mattmp[flux]=Up1h[flux]-Um1h[flux];

@@ -87,7 +87,7 @@ Bdry(
 Model(
  
   FavreReynolds(
-    TURBMODEL=TURBMODEL_KOMEGA2008;      {set TURBMODEL to 
+    TURBMODEL=TURBMODEL_SST1994;      {set TURBMODEL to 
                      - TURBMODEL_KOMEGA1988 for Wilcox k-omega model (1988)
                      - TURBMODEL_KOMEGA2008 for new Wilcox k-omega model (2008)
                      - TURBMODEL_KEPSILON for Launder-Sharma k-epsilon model}
@@ -103,18 +103,18 @@ Model(
                       - recommended value of 0.5 in shear layers}
     Sct=1.0e0;      {the turbulent Schmidt number;
                       - set it to a value between 0.2 and 2}
-    kdiv=1.0e2;     {set kdiv in m2/s2 to as low a value as possible and
+    kdiv=1.0e0;     {set kdiv in m2/s2 to as low a value as possible and
                    - at most one tenth the maximum value of k in the boundary layer
                      profile exhibiting the lowest maximum k for supersonic flow
                    - at most one hundredth the maximum value of k in the boundary layer}
     ADD_ETA_TO_ETAT_WITHIN_QK=NO;  {say NO for standard kinetic energy transport model}
-    psidiv=1e3;   {set psidiv to as low a positive value as possible}
+    psidiv=1e0;   {set psidiv to as low a positive value as possible}
     Pmin=1.0e-2;    Pmax=9.9e99;   {min and max pressure allowed in the domain in Pa}
     Tmin=1.0e1;     Tmax=6.0e3;    {min and max temperature allowed in the domain in K}
     Twmin=Tmin;     Twmax=Tmax;    {min and max wall temperature allowed on any wall boundary node in K}
-    kmin=-1.0e3;   kmax=9.9e99;   {min and max TKE allowed in the domain in m2/s2}
+    kmin=1e-10;   kmax=9.9e99;   {min and max TKE allowed in the domain in m2/s2}
     psimin=1e-10;   psimax=9.9e99; {min and max omega/epsilon allowed in the domain}
-    wmin=-1.0e-9;                  {min mass fraction allowed in the domain}
+    wmin=1.0e-9;                  {min mass fraction allowed in the domain}
     
     AXISYMMETRIC=NO; {not tested yet!!}
     SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
@@ -206,7 +206,7 @@ Cycle(
     if (iter==1,
       CFL=0.01;
     );
-    CFLmax=1.0;
+    CFLmax=0.2;
     if (iter>5000, CFLmax=1.0;);
     CFL=min(CFL*1.05,CFLmax);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);

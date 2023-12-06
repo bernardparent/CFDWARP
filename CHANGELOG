@@ -7,6 +7,29 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 DEC 06a
+  * in cycle/share/res_share.c
+    - in find_Fstar_interface_FDS_muscl_without_CDF() added call to 
+      find_conditioned_Lambda_absolute_restrained_from_jacvars
+  * in cycle/share/ts_share.c
+    - in void find_Aabs_restrained_from_jacvars(), now calls find_Lambda_restrained_from_jacvars()
+      and find_conditioned_Lambda_absolute_restrained_from_jacvars()
+  * in model/chem/_NH3_Plasma_10s
+    - improved rodriguez2023.c (reaction 17) 
+    - improved the documentation of omprakas2023.c
+  * in model/fluid/_Favre-Reynolds_Tv/fluid.c, model/fluid/_Favre-Reynolds_plasma/fluid.c
+    model/fluid/_Navier-Stokes_plasma/fluid.c
+    - added gl->model.fluid.wminN2
+  * in model/fluid/_Favre-Reynolds_plasma/fluid_bdry.c
+    - in update_bdry_inflow_injection(), set wwall[specN2]=gl->model.fluid.wminN2
+  * in model/share/fluid_share.c
+    - changed find_L_restrained_from_jacvars() and find_Linv_restrained_from_jacvars() so that they
+      use the eigenset1 eigenvectors and so that they use the thermodynamic speed of sound (not the
+      speed of sound derived from the Jacobian matrix)
+    - added find_Lambda_restrained_from_jacvars() 
+    - added find_conditioned_Lambda_absolute_restrained_from_jacvars()
+  * 
+
 2023 DEC 05e
   * in model/chem/_NH3_Plasma_10s/rodriguez2023.c
     - in _kf1() and _kf2(), made sure theta is at least -50 -- needed to prevent an underflow

@@ -177,4 +177,5 @@ void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, l
 void update_w_V_at_injection_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, spec_t nukA, spec_t nukB, 
                                   long paramstart, long paramend, spec_t wwall, dim_t Vwall);
 
+
 #endif /* _FLUID_SHARE_H */

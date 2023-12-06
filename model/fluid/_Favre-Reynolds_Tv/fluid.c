@@ -71,6 +71,7 @@ void write_model_fluid_template(FILE **controlfile){
     "    Twmin=Tmin;     Twmax=Tmax;    {K}\n"
     "    kmin=1.0e-10;   kmax=9.9e99;   {m2/s2}\n"
     "    psimin=1e-10;   psimax=9.9e99; {1/s}\n"
+    "    wminN2=0.01; {make sure that the N2 mass fraction is at least 1%}\n"
     "    wmin=1.0e-50;                  {min mass fraction allowed in the domain}\n"
 #ifdef _2D
     "    AXISYMMETRIC=NO;\n"
@@ -159,6 +160,7 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
     find_double_var_from_codex(codex,"psimin",&gl->model.fluid.psimin);
     find_double_var_from_codex(codex,"psimax",&gl->model.fluid.psimax);
     find_double_var_from_codex(codex,"wmin",&gl->model.fluid.wmin);
+    find_double_var_from_codex(codex,"wminN2",&gl->model.fluid.wminN2);
     find_double_var_from_codex(codex,"kdiv",&gl->model.fluid.kdiv);
     find_double_var_from_codex(codex,"psidiv",&gl->model.fluid.psidiv);
     find_double_var_from_codex(codex,"Sct",&gl->model.fluid.Sct);
@@ -876,6 +878,11 @@ void reformat_w(gl_t *gl, spec_t w, char *suffix,  bool *flag){
       add_to_clipped_variables2(gl,speciesname,suffix);
       w[spec]=gl->model.fluid.wmin;
       free(speciesname);
+      *flag=TRUE;
+    }
+    if (spec==specN2 && w[spec]<gl->model.fluid.wminN2) {
+      add_to_clipped_variables2(gl,"wminN2",suffix);
+      w[spec]=gl->model.fluid.wminN2;
       *flag=TRUE;
     }
     sum=sum+w[spec];

@@ -52,7 +52,7 @@ typedef struct {
   bool RAPCOMP,TURBSOURCE,
        REACTING,ADD_ETA_TO_ETAT_WITHIN_QK,SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL;
   double kdiv,psidiv,zetaA1,zetaA3,zetaA2,Prt,Sct;
-  double Pmin,Pmax,Tmin,Tmax,wmin,kmin,kmax,
+  double Pmin,Pmax,Tmin,Tmax,wmin,wminN2,kmin,kmax,
          psimin,psimax,aref,Eref,evref,kref,psiref,
          Tvmin,Tvmax,Twmin,Twmax;
   int DILATDISSIP,TURBMODEL,N2VIBMODEL,TEMODEL;
