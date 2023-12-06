@@ -123,6 +123,8 @@ RODRIGUEZ FUENTES, Felipe Martin
   - added interpolation variables mapping in src/data.c
 
   - in model/fluid/_Navier-Stokes/fluid_bdry.c added BDRY_INFLOWINJECTION1      
+
+  - added model/chem/_NH3_Plasma_10s/rodriguez2023.c
     
     
 SCHWARTZENTRUBER, Thomas E.

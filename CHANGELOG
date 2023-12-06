@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 DEC 05b
+  * in model/chem/_NH3_Plasma_10s/chem.c
+    - made changes to incorporate the rodriguez2023.c module
+  * in model/chem/_NH3_Plasma_10s
+    - added rodriguez2023.c
+    
+
 2023 DEC 05a
   * in various files, added argument np_t np to find_Qei()
   * in various files, added argument np_t np to find_dQei_dx()
