@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 DEC 05c
+  * in model/chem/_NH3_Plasma_10s/bavafa2008.c and model/chem/_NH3_Plasma_10s/rodriguez2023.c
+    - changed the type to static double of the functions _kf*()
+    
+
 2023 DEC 05b
   * in model/chem/_NH3_Plasma_10s/chem.c
     - made changes to incorporate the rodriguez2023.c module
