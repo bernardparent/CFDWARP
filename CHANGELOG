@@ -6,6 +6,13 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2023 DEC 05e
+  * in model/chem/_NH3_Plasma_10s/rodriguez2023.c
+    - in _kf1() and _kf2(), made sure theta is at least -50 -- needed to prevent an underflow
+    - turned off reaction 17 (issues with it)
+    
+    
 2023 DEC 05d
   * in model/chem/_NH3_Plasma_10s/chem.hh
     - fixed a bug with the species ordering
