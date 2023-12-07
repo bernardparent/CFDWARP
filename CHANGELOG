@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 DEC 07a
+  * in model/chem/_NH3_Plasma_10s
+    - made changes to rodriguez2023.c and its documentation
+
+  
+2023 DEC 06b
+  * in model/chem/_NH3_Plasma_10s/omprakas2023.c
+    - made minor updates
+  * in model/chem/_NH3_Plasma_10s/doc/
+    - added documentation of the rodriguez2023.c solver
+    
+
 2023 DEC 06a
   * in cycle/share/res_share.c
     - in find_Fstar_interface_FDS_muscl_without_CDF() added call to 
@@ -28,7 +40,7 @@ ________________________________________________________________________________
       speed of sound derived from the Jacobian matrix)
     - added find_Lambda_restrained_from_jacvars() 
     - added find_conditioned_Lambda_absolute_restrained_from_jacvars()
-  * 
+   
 
 2023 DEC 05e
   * in model/chem/_NH3_Plasma_10s/rodriguez2023.c
