@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 DEC 15a
+  * in model/chem/_NH3_Plasma_10s
+    - made improvements to the Rodriguez model
+    
+
 2023 DEC 08a
   * in  model/chem/_NH3_Plasma_10s/rodriguez2023.c
     - made improvements
