@@ -326,7 +326,7 @@ static void update_dUstar_emfield_SOR_forward(np_t *np, gl_t *gl, long flux, zon
   MPI_Comm_rank(MPI_COMM_WORLD, &thisrank);
   MPI_Pack_size( 1, MPI_DOUBLE, MPI_COMM_WORLD, &packsize );
   
-  buffersize = (zone.ie-zone.is)*(zone.je-zone.js)if3DL(*(zone.ke-zone.ks)) * (MPI_BSEND_OVERHEAD + packsize);
+  buffersize = (zone.ie-zone.is+1)*(zone.je-zone.js+1)if3DL(*(zone.ke-zone.ks+1)) * (MPI_BSEND_OVERHEAD + packsize);
   buffer = (double *)malloc( buffersize );
   mpivars=(double *)malloc(sizeof(double));
 
@@ -528,7 +528,7 @@ static void update_dUstar_emfield_SOR_backward(np_t *np, gl_t *gl, long flux, zo
   MPI_Comm_rank(MPI_COMM_WORLD, &thisrank);
   MPI_Pack_size( 1, MPI_DOUBLE, MPI_COMM_WORLD, &packsize );
   
-  buffersize = min(INT_MAX,(zone.ie-zone.is)*(zone.je-zone.js)if3DL(*(zone.ke-zone.ks)) * (MPI_BSEND_OVERHEAD + packsize));
+  buffersize = min(INT_MAX,(zone.ie-zone.is+1)*(zone.je-zone.js+1)if3DL(*(zone.ke-zone.ks+1)) * (MPI_BSEND_OVERHEAD + packsize));
   buffer = (double *)malloc( buffersize );
   mpivars=(double *)malloc(sizeof(double));
 

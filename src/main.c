@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdarg.h>
 #include <model/_model.h>
 #include <src/version.hh>
+#include <sys/resource.h>
 
 static int SIGUSR1_CAUGHT;
 
@@ -182,6 +183,23 @@ int main ( int argc, char **argv ) {
   MPI_Init ( &argc, &argv );
 #endif //THREADS
 #endif
+
+  // change the stack size to at least 16 MB
+  // the same could be achieved at link time using the linker flag -Wl,-z,stack-size=4194304 (example for 4MB)
+  const rlim_t kStackSize = 16 * 1024 * 1024;   // min stack size = 16 MB
+  struct rlimit rl;
+  int result;
+  result = getrlimit(RLIMIT_STACK, &rl);
+  if (result == 0) {
+    if (rl.rlim_cur < kStackSize) {
+      rl.rlim_cur = kStackSize;
+      result = setrlimit(RLIMIT_STACK, &rl);
+      if (result != 0) {
+        wfprintf(stderr, "setrlimit returned result = %d\n", result);
+      } 
+    }
+  }
+
   node_j = 0;
   node_k = 0;
   /* take care of the command line options */

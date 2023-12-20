@@ -479,7 +479,7 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   MPI_Pack_size( 1, MPI_DOUBLE, MPI_COMM_WORLD, &packsize );
   
   recvproc=(int *)malloc((numproc+2)*sizeof(int));
-  buffersize = min(INT_MAX,nmc*(zone.ie-zone.is)*(zone.je-zone.js)if3DL(*(zone.ke-zone.ks)) * (MPI_BSEND_OVERHEAD + packsize));
+  buffersize = min(INT_MAX,nmc*(zone.ie-zone.is+1)*(zone.je-zone.js+1)if3DL(*(zone.ke-zone.ks+1)) * (MPI_BSEND_OVERHEAD + packsize));
   buffer = (double *)malloc( buffersize );
 
   MPI_Buffer_attach( buffer, buffersize );

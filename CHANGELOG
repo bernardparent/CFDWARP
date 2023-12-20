@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 DEC 20a
+  * in cycle/share/cycle_share.c
+    - in update_linked_nodes(), increased the buffer size 
+      from (zone.ie-zone.is)*(zone.je-zone.js)if3DL(*(zone.ke-zone.ks)
+      to (zone.ie-zone.is+1)*(zone.je-zone.js+1)if3DL(*(zone.ke-zone.ks+1))
+  * in cycle/share/tsemf_share.c
+    - in update_dUstar_emfield_SOR_forward() and update_dUstar_emfield_SOR_backward()
+      increased the buffer size 
+      from (zone.ie-zone.is)*(zone.je-zone.js)if3DL(*(zone.ke-zone.ks)
+      to (zone.ie-zone.is+1)*(zone.je-zone.js+1)if3DL(*(zone.ke-zone.ks+1))
+  * in src/main.c
+    - at the beginning of main(), increased the stack size to 16 MB
+    
+
 2023 DEC 15a
   * in model/chem/_NH3_Plasma_10s
     - made improvements to the Rodriguez model
