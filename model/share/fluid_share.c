@@ -776,7 +776,7 @@ double _dVi_dxj(np_t *np, long l, gl_t *gl, long i, long j){
 
 
 double _etat_from_rho_eta_k_psitilde(np_t *np, long l, gl_t *gl, double rho, double eta, double k, double psitilde){
-  double etat,Ret,sum,sum2,F2,d;
+  double etat,Ret,sum,sum2,F2,d,vortmag;
   long i,j,m;
   etat=0.0;
   switch(gl->model.fluid.TURBMODEL){
@@ -808,16 +808,25 @@ double _etat_from_rho_eta_k_psitilde(np_t *np, long l, gl_t *gl, double rho, dou
       etat=rho*max(k,0.0e0)/max(psitilde,35.0/12.0*sqrt(0.5*sum)); 
     break;
     case TURBMODEL_SST1994:
-      sum=0.0;
+    /*
+      vortmag=sqr(_dVi_dxj(np,l,gl,1,0)-_dVi_dxj(np,l,gl,0,1));
+#ifdef _3D
+      vortmag+=sqr(_dVi_dxj(np,l,gl,2,1)-_dVi_dxj(np,l,gl,1,2));
+      vortmag+=sqr(_dVi_dxj(np,l,gl,0,2)-_dVi_dxj(np,l,gl,2,0));
+#endif
+      vortmag=sqrt(max(0.0,vortmag));
+      */
+      vortmag=0.0;
       for (i=0; i<nd; i++){
         for (j=0; j<nd; j++){
-          sum2=_dVi_dxj(np,l,gl,i,j)+_dVi_dxj(np,l,gl,j,i);
-          sum+=sqr(sum2);
-        }
-      }      
+          vortmag+=0.5*sqr(_dVi_dxj(np,l,gl,i,j)-_dVi_dxj(np,l,gl,j,i));
+        }        
+      }
+      vortmag=sqrt(max(0.0,vortmag));
+      
       d=sqrt(np[l].bs->walldistance2);
       F2=tanh(sqr(max(2.0*sqrt(max(k,0.0))/(0.09*psitilde*d),500.0*eta/(rho*d*d*psitilde))));
-      etat=rho*0.31*max(k,0.0e0)/max(0.31*psitilde,F2*sqrt(0.5*sum));
+      etat=rho*0.31*max(k,0.0e0)/max(0.31*psitilde,F2*vortmag);
     break;
     default:
       fatal_error("Turbulence model invalid in _etat_from_rho_eta_k_psitilde."); 

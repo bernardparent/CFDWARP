@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 DEC 22a
+  * in model/share/fluid_share.c
+    - in _etat_from_rho_eta_k_psitilde(), fixed a misimplementation of the turbulence viscosity
+      in the SST 1994 model (should be function of the vorticity magnitude, not the shear stress
+      magnitude)
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - added Menter 1994 SST model to the 2 k-omega models
+    - improved the section on zetae (electron loss coefficient)
+    
+
 2023 DEC 20a
   * in cycle/share/cycle_share.c
     - in update_linked_nodes(), increased the buffer size 

@@ -2087,13 +2087,13 @@ But $\vec{E} \cdot \vec{V}^{\rm e}=(\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot 
 - Q_{\rm ei}
 \end{equation}
 %
-Substitute $Q_{\rm en}$ from Eq.\ (\ref{eqn:Qen}):
+Substitute $Q_{\rm en}$ from Eq.\ (\ref{eqn:Qen}) but write in in ``standard form'' as in Raizer's book (not function of $T_e-Tv$ but of $T_e$:
 %
 \begin{equation}
 0
 = 
    C_{\rm e} N_{\rm e} (\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot \vec{V}^{\rm e}  
-- \frac{3 N_{\rm e}k_{\rm B} (T_{\rm e}-T_{\rm v})  |C_{\rm e}| \zeta_{\rm e}}{2 m_{\rm e}\mu_{\rm e}}
+- \frac{3 N_{\rm e}k_{\rm B} T_{\rm e}  |C_{\rm e}| \zeta_{\rm e}}{2 m_{\rm e}\mu_{\rm e}}
 - Q_{\rm ei}
 \end{equation}
 %
@@ -2102,25 +2102,24 @@ where  $\zeta_{\rm e}$ is the electron energy loss coefficient which we wish to 
 \begin{equation}
   \zeta_{\rm e}   
 =  
- \frac{2 m_{\rm e} \mu_{\rm e}}{3 |C_{\rm e}| N_{\rm e} k_{\rm B} (T_{\rm e}-T_{\rm v}) }
+ \frac{2 m_{\rm e} \mu_{\rm e}}{3 |C_{\rm e}| N_{\rm e} k_{\rm B} T_{\rm e} }
 \left(  C_{\rm e} N_{\rm e} (\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot \vec{V}^{\rm e}
  - Q_{\rm ei}\right)
-\label{eqn:zetae}
+\label{eqn:zetae1}
  \end{equation}
 %
 In the ``local approximation'',  the electron velocity can be taken from Eq.\ (\ref{eqn:Vcharged}) neglecting the pressure gradients:
 %
 \begin{equation}
   \vec{V}^{\rm e}=\vec{V}^{\rm n} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right)
-\label{eqn:zetae_Ve}
 \end{equation}
 % 
-Substitute the latter in Eq.\ (\ref{eqn:zetae}):
+Substitute the latter in Eq.\ (\ref{eqn:zetae1}):
 %
 \begin{equation}
   \zeta_{\rm e}  
 =  
- \frac{2 m_{\rm e} \mu_{\rm e}}{3 |C_{\rm e}| N_{\rm e} k_{\rm B} (T_{\rm e}-T_{\rm v}) }
+ \frac{2 m_{\rm e} \mu_{\rm e}}{3 |C_{\rm e}| N_{\rm e} k_{\rm B} T_{\rm e} }
 \left( C_{\rm e} N_{\rm e} \left(\vec{E} + \vec{V^{\rm e}} \times \vec{B}\right)\cdot \left(\vec{V}^{\rm n} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right)\right)
  - Q_{\rm ei}\right)
  \end{equation}
@@ -2130,7 +2129,7 @@ Because the magnitude of the neutrals velocity can be assumed small compared to 
 \begin{equation}
   \zeta_{\rm e}  
 =  
- \frac{2 m_{\rm e} \mu_{\rm e}}{3 |C_{\rm e}| N_{\rm e} k_{\rm B} (T_{\rm e}-T_{\rm v}) }
+ \frac{2 m_{\rm e} \mu_{\rm e}}{3 |C_{\rm e}| N_{\rm e} k_{\rm B} T_{\rm e} }
 \left(  -N_{\rm e} \mu_{\rm e} C_{\rm e} |\vec{E}+\vec{V}^{\rm e}\times \vec{B}|^2
  - Q_{\rm ei}\right)
  \end{equation}
@@ -2140,7 +2139,7 @@ or, noting that $C_e = -e$:
 \begin{equation}
   \zeta_{\rm e}  
 =  
- \frac{2 m_{\rm e} \mu_{\rm e}}{3 e N_{\rm e} k_{\rm B} (T_{\rm e}-T_{\rm v}) }
+ \frac{2 m_{\rm e} \mu_{\rm e}}{3 e N_{\rm e} k_{\rm B} T_{\rm e} }
 \left(  N_{\rm e} N^2 \mu_{\rm e} e \left(\frac{|\vec{E}+\vec{V}^{\rm e}\times \vec{B}|}{N}\right)^2
  - Q_{\rm ei}\right)
  \end{equation}
@@ -2157,7 +2156,7 @@ Then
 \frameeqn{
   \zeta_{\rm e}  
 =  
- \frac{2 m_{\rm e} \mu_{\rm e} N}{3  k_{\rm B} (T_{\rm e}-T_{\rm v}) }
+ \frac{2 m_{\rm e} \mu_{\rm e} N}{3  k_{\rm B} T_{\rm e} }
 \left( N \mu_{\rm e}  \left(E^\star(T_{\rm e})\right)^2
  - \frac{Q_{\rm ei}}{e N_{\rm e} N}\right)
 }
@@ -2177,17 +2176,17 @@ Now, recall the expression for $Q_{\rm en}$ in Eq.\ (\ref{eqn:Qen}):
 Substitute $\zeta_{\rm e}$ from (\ref{eqn:zetae}) in the latter:
 %
 \begin{equation}
-  Q_{\rm e-n} =  N_{\rm e}   |C_{\rm e}|  N
+  Q_{\rm e-n} =  \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} \left( N_{\rm e}   |C_{\rm e}|  N
 \left( N \mu_{\rm e}  \left(E^\star(T_{\rm e})\right)^2
- - \frac{Q_{\rm ei}}{e N_{\rm e} N}\right)
+ - \frac{Q_{\rm ei}}{e N_{\rm e} N}\right) \right)
 \end{equation}
 %
 Simplify:
 %
 \begin{equation}
-  Q_{\rm e-n} =  N_{\rm e}   |C_{\rm e}|  N^2
+  Q_{\rm e-n} = \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} \left( N_{\rm e}   |C_{\rm e}|  N^2
   \mu_{\rm e}  \left(E^\star(T_{\rm e})\right)^2
- - Q_{\rm ei}
+ - Q_{\rm ei} \right)
 \end{equation}
 %
 
@@ -2258,17 +2257,16 @@ where $T_{\rm e}^\prime$ denotes the electron temperature determined in the loca
  \frac{2 m_{\rm e} \mu_{\rm e}}{3 |C_{\rm e}| N_{\rm e} k_{\rm B} (T_{\rm e}^\prime-T) }
 \left(  C_{\rm e} N_{\rm e} (\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot \vec{V}^{\rm e}
  - Q_{\rm ei}\right)
-\label{eqn:zetae}
+\label{eqn:oldzetae}
  \end{equation}
 %
 In the ``local approximation'',  the electron velocity can be taken from Eq.\ (\ref{eqn:Vcharged}) neglecting the pressure gradients:
 %
 \begin{equation}
   \vec{V}^{\rm e}=\vec{V}^{\rm n} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right)
-\label{eqn:zetae_Ve}
 \end{equation}
 % 
-Substitute the latter in Eq.\ (\ref{eqn:zetae}):
+Substitute the latter in Eq.\ (\ref{eqn:oldzetae}):
 %
 \begin{equation}
   \zeta_{\rm e}  
@@ -2363,12 +2361,12 @@ Thus:
  -12.15~\frac{\rm J}{\rm C}\cdot \left( \frac{N_{\rm O_2}}{N_{\rm n}}\right) k_{\rm ei}^{\rm O_2}
  \end{array}
  \right]
- \label{eqn:zetae2}
+ \label{eqn:oldzetae2}
  \end{equation}
 %
 In the latter, $\mu_{\rm e} N_{\rm n}$ and $T_{\rm e}^\prime$ can be expressed as a function of the reduced electric field for a given reference neutrals temperature $T$ (here set to 250~K). As well, for air in which the mass fractions of molecular oxygen and nitrogen are of 0.235 and 0.765 respectively, we get ${N_{\rm N_2}}/{N_{\rm n}}=0.788$ and ${N_{\rm O_2}}/{N_{\rm n}}=0.212$. 
 
-Thus Eq.\ (\ref{eqn:zetae2}) can yield $\zeta_{\rm e}$ function of the electron temperature when using the Townsend ionization rates shown in Eqs.\ (\ref{eqn:keiO2}) and (\ref{eqn:keiN2}), the electron mobility from Ref.\ \cite{jcp:2014:parent}, and the electron temperature from Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev} (see Table \ref{tab:Te2}). Some 6th degree polynomials are then fitted to the data obtained (of $\zeta_{\rm e}$ function of the electron temperature), with the polynomial coefficients tabulated in Table \ref{tab:xicoefficients}. Although the polynomials for $\zeta_{\rm e}$ induce an error of as much as 30\% on the electron temperature, this is not a particular source of concern because the error is only substantial at low electron temperature (less than 2000~K) and at such low temperature the experimental data also has a significant error (see the differences in electron temperature as a function of the reduced electric field between one set of experimental data in Table \ref{tab:Te} and another set in Table \ref{tab:Te2}).   
+Thus Eq.\ (\ref{eqn:oldzetae2}) can yield $\zeta_{\rm e}$ function of the electron temperature when using the Townsend ionization rates shown in Eqs.\ (\ref{eqn:keiO2}) and (\ref{eqn:keiN2}), the electron mobility from Ref.\ \cite{jcp:2014:parent}, and the electron temperature from Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev} (see Table \ref{tab:Te2}). Some 6th degree polynomials are then fitted to the data obtained (of $\zeta_{\rm e}$ function of the electron temperature), with the polynomial coefficients tabulated in Table \ref{tab:xicoefficients}. Although the polynomials for $\zeta_{\rm e}$ induce an error of as much as 30\% on the electron temperature, this is not a particular source of concern because the error is only substantial at low electron temperature (less than 2000~K) and at such low temperature the experimental data also has a significant error (see the differences in electron temperature as a function of the reduced electric field between one set of experimental data in Table \ref{tab:Te} and another set in Table \ref{tab:Te2}).   
 
 
 %
@@ -2859,16 +2857,32 @@ Needed to determine the effective pressure $P^\star$ or the total energy $e_{\rm
 where $\visc_k^\star$ is set to:
 %
 \begin{equation}
-\visc_k^\star = \left\{\begin{array}{ll}\mfd\visc  + \frac{1}{2}\visc_{\rm t} & \textrm{1988 model \cite{aiaa:1988:wilcox}} \alb
-                                      \mfd \visc  +  \frac{3}{5} \frac{\rho k}{\omega} & \textrm{2008 model \cite{aiaa:2008:wilcox}}  \end{array} \right.
+\visc_k^\star = \left\{\begin{array}{ll}\mfd\visc  + \frac{1}{2}\visc_{\rm t} & \textrm{1988~$k\omega$~model \cite{aiaa:1988:wilcox}} \alb
+                                      \mfd \visc  +  \frac{3}{5} \frac{\rho k}{\omega} & \textrm{2008~$k\omega$~model \cite{aiaa:2008:wilcox}}  \alb
+                                      \mfd \visc + \visc_{\rm t} (0.85 F_1+(1-F_1))  & \textrm{1994 SST model \cite{aiaa:1994:menter}}
+                                      \end{array} \right.
+\end{equation}
+%
+with $F_1$ equal to:
+%
+\begin{equation}
+F_1= {\rm tanh} \left(
+  \min \left(
+  \max \left(
+  \frac{\sqrt{k}}{0.09 \omega d}, ~500 \frac{\visc}{\rho \omega  d^2}
+   \right),~
+   \frac{4\cdot 0.856 \rho k}{d^2 \max\left(\frac{2\cdot 0.856 \rho }{\omega} \frac{\partial k}{\partial x_j}\frac{\partial \omega}{\partial x_j}  ,~10^{-20} \right)}
+   \right)^4
+   \right)
 \end{equation}
 %
 and where $\epsilon$ is set to:
 %
 \begin{equation}
 \epsilon= \left\{\begin{array}{ll}
-                    \frac{9}{100} k\omega & \textrm{1988 model \cite{aiaa:1988:wilcox}} \alb
-                    \frac{9}{100} k \omega & \textrm{2008 model \cite{aiaa:2008:wilcox}} \alb
+                    \frac{9}{100} k\omega & \textrm{1988~$k\omega$~model \cite{aiaa:1988:wilcox}} \alb
+                    \frac{9}{100} k \omega & \textrm{2008~$k\omega$~model \cite{aiaa:2008:wilcox}} \alb
+                    \frac{9}{100} k \omega & \textrm{1994 SST model \cite{aiaa:1994:menter}} \alb
                  \end{array} \right.
 \end{equation}
 %
@@ -2892,9 +2906,18 @@ From the turbulence kinetic energy $k$ and its specific dissipation rate $\omega
 \begin{equation}
 \visc_{\rm t}=\left\{
 \begin{array}{ll}\mfd
-\frac{\rho k}{\omega} & \textrm{1988 model \cite{aiaa:1988:wilcox}}\alb\mfd
+\frac{\rho k}{\omega} & \textrm{1988~$k\omega$~model \cite{aiaa:1988:wilcox}}\alb\mfd
 \mfd \frac{\rho k}{{\rm max}\left(\omega,~\mfd\frac{35}{12}\sqrt{\frac{1}{2}\sum_{i=1}^3\sum_{j=1}^3\left(\frac{\partial \vec{V}^{\rm n}_i}{\partial x_j}+\frac{\partial \vec{V}^{\rm n}_j}{\partial x_i}-\frac{2}{3}\delta_{ij}\sum_{k=1}^{3} \frac{\partial \vec{V}^{\rm n}_k}{\partial x_k}\right)^2}\right)}
- & \textrm{2008 model \cite{aiaa:2008:wilcox}} \alb
+ & \textrm{2008~$k\omega$~model \cite{aiaa:2008:wilcox}} \alb
+\mfd \frac{0.31 \rho k} {\max \left(
+0.31 \omega,
+~\mfd {\rm tanh} \left(\max\left(\frac{2 \sqrt{k}}{0.09 \omega d} ,~ \frac{500 \visc}{\rho d^2 \omega}\right)^2 \right)\sqrt{
+\frac{1}{2}\sum_{i=1}^3\sum_{j=1}^3\left(
+\frac{\partial \vec{V}^{\rm n}_i}{\partial x_j}-\frac{\partial \vec{V}^{\rm n}_j}{\partial x_i}
+\right)^2
+} %sqrt
+\right)}
+ & \textrm{1994 SST model \cite{aiaa:1994:menter}} \alb
 \end{array}
 \right.
 \end{equation}
@@ -2957,8 +2980,9 @@ where $\omega$ is the turbulence kinetic energy specific dissipation rate and $\
 \begin{equation}
 \visc_\omega^\star=\left\{
 \begin{array}{ll}\mfd
-\visc +\frac{1}{2}\visc_{\rm t} & \textrm{1988~model~\cite{aiaa:1988:wilcox}}\alb\mfd
-\visc +\frac{1}{2}\frac{\rho k}{\omega} & \textrm{2008~model~\cite{aiaa:2008:wilcox}}\alb
+\visc +\frac{1}{2}\visc_{\rm t} & \textrm{1988~$k\omega$~model~\cite{aiaa:1988:wilcox}}\alb\mfd
+\visc +\frac{1}{2}\frac{\rho k}{\omega} & \textrm{2008~$k\omega$~model~\cite{aiaa:2008:wilcox}}\alb\mfd
+\visc + (0.5 F_1 + 0.856(1-F_1)) \visc_{\rm t}& \textrm{1994~SST~model~\cite{aiaa:1994:menter}}\alb\mfd
 \end{array}
 \right.
 \end{equation}
@@ -2969,7 +2993,8 @@ and $S_{\omega}$  is set to:
 S_{\omega}= \left\{
 \begin{array}{ll}\mfd
 0 & \textrm{1988~model~\cite{aiaa:1988:wilcox}}\alb\mfd
-\frac{1}{8}\frac{\rho}{\omega}{\rm max}\left(0,~\sum_{j=1}^3\frac{\partial k}{\partial x_j}\frac{\partial \omega}{\partial x_j}\right) & \textrm{2008~model~\cite{aiaa:2008:wilcox}}\alb
+\frac{1}{8}\frac{\rho}{\omega}{\rm max}\left(0,~\sum_{j=1}^3\frac{\partial k}{\partial x_j}\frac{\partial \omega}{\partial x_j}\right) & \textrm{2008~model~\cite{aiaa:2008:wilcox}}\alb\mfd
+2\cdot 0.856 (1-F_1)\frac{\rho}{\omega}{\rm max}\left(0,~\sum_{j=1}^3\frac{\partial k}{\partial x_j}\frac{\partial \omega}{\partial x_j}\right) & \textrm{1994~SST~model~\cite{aiaa:1994:menter}}\alb
 \end{array}
 \right.
 \end{equation}
@@ -2979,8 +3004,10 @@ and $Q_{\omega}$ to:
 \begin{equation}
 Q_{\omega}= \left\{
 \begin{array}{ll}\mfd
-\frac{5}{9}  Q_k - \frac{5}{6} \rho \epsilon +\rho \epsilon f({\rm M}_{\rm t}) & \textrm{1988~model~\cite{aiaa:1988:wilcox}}\alb\mfd
-\frac{13}{25}  Q_k - 0.7867 \times \frac{1+ 85 \chi_\omega}{1+100 \chi_\omega} \rho \epsilon +\rho \epsilon f({\rm M}_{\rm t}) & \textrm{2008~model~\cite{aiaa:2008:wilcox}}\alb
+\frac{5}{9}  Q_k - \frac{5}{6} \rho \epsilon +\rho \epsilon f({\rm M}_{\rm t}) & \textrm{1988~$k\omega$~model~\cite{aiaa:1988:wilcox}}\alb\mfd
+\frac{13}{25}  Q_k - 0.7867 \times \frac{1+ 85 \chi_\omega}{1+100 \chi_\omega} \rho \epsilon +\rho \epsilon f({\rm M}_{\rm t}) & \textrm{2008~$k\omega$~model~\cite{aiaa:2008:wilcox}}\alb\mfd
+\frac{\rho (0.553 F_1  + 0.44 (1-F_1))}{\visc_{\rm t}} Q_k
+                 -\left(0.075 F_1 + 0.0828 (1-F_1)\right) \rho \omega^2 +\rho \epsilon f({\rm M}_{\rm t}) & \textrm{1994~SST~model~\cite{aiaa:1994:menter}}\alb\mfd
 \end{array}
 \right.
 \end{equation}
@@ -2998,7 +3025,7 @@ where:
 \right|
 \end{equation}
 %
-It is noted that in the Wilcox $k\omega$ model, $\wtilde{k}$ is
+It is noted that in the Wilcox $k\omega$ models and the Menter SST model, $\wtilde{k}$ is
 set simply to $k$ which in the freestream is set to a small
 value to prevent a division by zero. We prefer, however,  to define $\wtilde{k}$ as
 %
