@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 DEC 24a
+  * in model/chem/_C2H4_Air_23s/konnovzettervall.c
+    - reaction 12 was erroneously commented and is now uncommented
+    - some third body efficiencies were missing in 2 reactions
+  * in model/chem/_C2H4_Air_Plasma_36s/adamovich2023e.c
+    - some third body efficiencies were missing in 2 reactions
+    
+
 2023 DEC 22a
   * in model/share/fluid_share.c
     - in _etat_from_rho_eta_k_psitilde(), fixed a misimplementation of the turbulence viscosity
