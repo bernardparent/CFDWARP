@@ -3694,6 +3694,37 @@ Lastly, $\Delta W_{\rm Schottky}$ is the decrease of the work function by the Sc
 %
 where $\Delta W_{\rm Schottky}$ is in eV, $e$ is the electron charge in Coulomb, $\vec{E}_\chi$ is in V/m, and $\epsilon_0$ is the permittivity of free space in $\rm m^{-3} kg^{-1} s^4 A^2$. 
 
+
+
+\subsection{Injection Inflow Boundary Condition}
+
+The ``Injection inflow'' boundary condition is to be used for small holes through which some fluid is injected within the computational domain. Three parameters are specified: the stagnation temperature of the injected fluid, the stagnation pressure of the injected fluid, and the species type of the fluid injected. The injected fluid Mach number is either subsonic or sonic (choked).
+
+First, it is assumed that the stagnation pressure is sufficiently high for choking to occur. If the so-obtained pressure is less than the pressure at the nearest inner node, then the pressure at the inflow is set to the one of the nearest inner node. If not, then the pressure at the inflow is obtained assuming choking. These two steps can be combined into one to yield the following inflow pressure:
+%
+\begin{equation}
+P_{\rm inflow}=\max\left(
+  P_{\rm nearest~inner~node},~~~
+  P_\circ \left(1+\frac{\gamma-1}{2}\right)^\frac{-\gamma}{\gamma-1}\right)
+\end{equation}
+% 
+Knowing the inflow pressure, we can then find the inflow Mach number:
+%
+\begin{equation}
+M_{\rm inflow}=\left(\frac{2}{\gamma-1} \left(\left(\frac{P_\circ}{P_{\rm inflow}}\right)^{\frac{\gamma-1}{\gamma}} -1\right) \right)^{0.5}
+\end{equation}
+%
+From the latter we can then find the inflow temperature using isentropic relations:
+%
+\begin{equation}
+T_{\rm inflow}=\frac{T_\circ}{1+\frac{\gamma-1}{2}M_{\rm inflow}^2}
+\end{equation}
+%
+with $T_\circ$ and $P_\circ$ being the specified stagnation temperature and stagnation pressure while $\gamma$ is the ratio of the specific heats of the injected fluid.
+
+The velocity vector of the injected fluid is computed from the inflow Mach number and inflow temperature through the calorically perfect speed of sound and pointing perpendicular to the injection boundary surface.
+
+
   \bibliographystyle{warpdoc}
   \bibliography{all}
 
