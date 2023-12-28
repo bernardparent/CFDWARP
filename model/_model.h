@@ -295,7 +295,7 @@ double _flux_norm(long flux);
 
 void condition_Lambda_plus_minus(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  int EIGENVALCOND, sqmat_t Lambdaplus, sqmat_t Lambdaminus);
 
-void find_conditioned_Lambda_absolute_from_jacvars(jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t Lambda);
+void find_conditioned_Lambda_absolute_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t Lambda);
 
 void find_conditioned_Lambda_absolute_from_jacvars_denom(jacvars_t jacvars, metrics_t metrics, sqmat_t Lambda);
 
@@ -313,7 +313,7 @@ void find_Linv_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqm
 
 void find_L_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t L);
 
-void find_conditioned_Lambda_absolute_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t Lambdaabs);
+void find_conditioned_Lambda_absolute_restrained_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t Lambdaabs);
 
 void find_Lambda_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t lambda);
 

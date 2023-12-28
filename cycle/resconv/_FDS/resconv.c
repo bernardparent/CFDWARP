@@ -161,7 +161,7 @@ static void find_Fstar_interface_2o(np_t *np, gl_t *gl, metrics_t metrics, long 
   find_alpha(jacvarsp0, metrics, np[lm1h], np[lp1h], gl, alphap0);
   find_alpha(jacvarsp1, metrics, np[lp1h], np[lp3h], gl, alphap1);
   find_g(alpham1,alphap0,alphap1,g);
-  find_conditioned_Lambda_absolute_from_jacvars(jacvarsp0, metrics, gl->cycle.resconv.EIGENVALCOND, lambdap);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvarsp0, metrics, gl->cycle.resconv.EIGENVALCOND, lambdap);
   find_Linv_from_jacvars(jacvarsp0, metrics, R);
   for (flux=0; flux<nf; flux++)
     fluxtmp[flux]=-lambdap[flux][flux]*alphap0[flux]
@@ -196,7 +196,7 @@ static void find_Fstar_interface_1o(np_t *np, gl_t *gl, metrics_t metrics, long 
 
 
   find_alpha(jacvarsp0, metrics, np[lm1h], np[lp1h], gl, alphap0);
-  find_conditioned_Lambda_absolute_from_jacvars(jacvarsp0, metrics, gl->cycle.resconv.EIGENVALCOND, lambdap);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvarsp0, metrics, gl->cycle.resconv.EIGENVALCOND, lambdap);
   find_Linv_from_jacvars(jacvarsp0, metrics, R);
   for (flux=0; flux<nf; flux++)
     fluxtmp[flux]=-lambdap[flux][flux]*alphap0[flux];
@@ -222,8 +222,8 @@ static void find_Fstar_interface_1o(np_t *np, gl_t *gl, metrics_t metrics, long 
 static void find_Delta_Lambda_for_dtau_local(np_t *np, gl_t *gl, long l, long theta, jacvars_t jacvarsm1h, jacvars_t jacvarsp1h, metrics_t metricsm1h, metrics_t metricsp1h, flux_t Delta_Lambda){
   sqmat_t Lambda_minus,Lambda_plus;
   long flux;
-  find_Lambda_minus_dtau_FDS_from_jacvars(jacvarsm1h, metricsm1h, gl->cycle.resconv.EIGENVALCOND, Lambda_minus);
-  find_Lambda_plus_dtau_FDS_from_jacvars(jacvarsp1h, metricsp1h, gl->cycle.resconv.EIGENVALCOND, Lambda_plus);
+  find_Lambda_minus_dtau_FDS_from_jacvars(gl, jacvarsm1h, metricsm1h, gl->cycle.resconv.EIGENVALCOND, Lambda_minus);
+  find_Lambda_plus_dtau_FDS_from_jacvars(gl, jacvarsp1h, metricsp1h, gl->cycle.resconv.EIGENVALCOND, Lambda_plus);
 
 #ifdef _RESTIME_CDF
   sqmat_t Lambdaxt_minus,Lambdaxt_plus;

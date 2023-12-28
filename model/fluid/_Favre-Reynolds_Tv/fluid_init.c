@@ -201,7 +201,7 @@ void init_node_3(np_t *np, long l, gl_t *gl, initvar_t initvar){
   rho=1.0e0;
   Init2.Tv=values[nd+4+ns];
   for (spec=0; spec<ns; spec++) rhok[spec]=Init2.w[spec]*rho;
-  find_nuk_eta_kappa(rhok, Init2.T, _Te_from_T_Tv(gl,Init2.T,Init2.Tv), nuk, &eta, &kappa);
+  find_nuk_eta_kappa(gl, rhok, Init2.T, _Te_from_T_Tv(gl,Init2.T,Init2.Tv), nuk, &eta, &kappa);
   rho=Re*eta/sqrt(sum);
   Init2.P=_P_from_w_rho_T(Init2.w,rho,Init2.T);
   Init2.k=values[nd+2+ns];

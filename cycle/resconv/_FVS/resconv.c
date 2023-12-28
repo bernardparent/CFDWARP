@@ -168,7 +168,7 @@ static void find_Fplus_Fminus(np_t *np, gl_t *gl, long l, long theta, metrics_t 
   assert(is_node_valid(np[l],TYPELEVEL_FLUID));
 
   find_jacvars(np[l],gl,metrics,theta,&jacvars);
-  find_conditioned_Lambda_absolute_from_jacvars(jacvars, metrics, gl->cycle.resconv.EIGENVALCOND, lambdap);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvars, metrics, gl->cycle.resconv.EIGENVALCOND, lambdap);
   find_Lambda_from_jacvars(jacvars, metrics, lambda);
 #ifdef _RESTIME_CDF
   find_Lambdaxt(np, gl, l, jacvars, metrics, lambdaxt);

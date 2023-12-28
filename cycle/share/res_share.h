@@ -89,9 +89,9 @@ void find_Lambda_minus_dtau_FDS(np_t *np, gl_t *gl, long l, long theta, int EIGE
 
 void find_Lambda_plus_dtau_FDS(np_t *np, gl_t *gl, long l, long theta, int EIGENVALCOND, int AVERAGING, sqmat_t lambdaplus);
 
-void find_Lambda_minus_dtau_FDS_from_jacvars(jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t lambdaminus);
+void find_Lambda_minus_dtau_FDS_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t lambdaminus);
 
-void find_Lambda_plus_dtau_FDS_from_jacvars(jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t lambdaplus);
+void find_Lambda_plus_dtau_FDS_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t lambdaplus);
 
 void find_Lambda_plus_minus_dtau_FDS(np_t *np, gl_t *gl, long l, long theta, int EIGENVALCOND, int AVERAGING, sqmat_t lambdaplus, sqmat_t lambdaminus);
 

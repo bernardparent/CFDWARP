@@ -59,19 +59,19 @@
   
   bool is_node_bdry_symmetry_plane_fluid(np_t np);
 
-  double _Pe_from_jacvars(jacvars_t jacvars, metrics_t metrics);
+  double _Pe_from_jacvars(gl_t *gl , jacvars_t jacvars, metrics_t metrics);
 
   double _a(np_t np, gl_t *gl);
 
   double _a_from_jacvars(jacvars_t jacvars);
 
-  double _eta_from_jacvars(jacvars_t jacvars);
+  double _eta_from_jacvars(gl_t *gl, jacvars_t jacvars);
 
   double _V_from_jacvars(jacvars_t jacvars, long dim);
 
   double _Pstar (np_t np, gl_t *gl);
 
-  double _Re_edge_from_jacvars(jacvars_t jacvars, metrics_t metrics);
+  double _Re_edge_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics);
 
   double _Te_m1(np_t np, gl_t *gl);
 

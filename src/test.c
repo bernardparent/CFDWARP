@@ -851,7 +851,7 @@ void test_dsdT_equilibrium ( double Tmin, double Tmax, double dT ) {
 }
 
 
-void test_eta ( double Tmin, double Tmax, double dT ) {
+void test_eta (gl_t *gl, double Tmin, double Tmax, double dT ) {
   double T, eta, kappa, Te, rho;
   spec_t w,rhok;
   long spec, spec2, spec3;
@@ -874,7 +874,7 @@ void test_eta ( double Tmin, double Tmax, double dT ) {
       Te=T;
       rho=1.0; //?????? value of rho should not affect viscosities
       for (spec3=0; spec3<ns; spec3++) rhok[spec3]=w[spec3]*rho;
-      find_nuk_eta_kappa(rhok, T, Te, nuk, &eta, &kappa);
+      find_nuk_eta_kappa(gl, rhok, T, Te, nuk, &eta, &kappa);
       
       wfprintf ( stdout, "%+12.5E ", eta );
       
@@ -888,7 +888,7 @@ void test_eta ( double Tmin, double Tmax, double dT ) {
 
 
 
-void test_kappa ( spec_t chik, double P, double Tmin, double Tmax, double dT ) {
+void test_kappa ( gl_t *gl, spec_t chik, double P, double Tmin, double Tmax, double dT ) {
   double T, N, eta, kappan, Te;
   long spec;
   chargedspec_t kappac,muk;
@@ -911,7 +911,7 @@ void test_kappa ( spec_t chik, double P, double Tmin, double Tmax, double dT ) {
     }
     wfprintf ( stdout, "%12.5E ", T );
 
-    find_nuk_eta_kappak_muk(rhok, T, Te, nuk, &eta, &kappan, kappac, muk);
+    find_nuk_eta_kappak_muk(gl, rhok, T, Te, nuk, &eta, &kappan, kappac, muk);
 
 
     for ( spec = 0; spec < ncs; spec++ ) {
@@ -927,7 +927,7 @@ void test_kappa ( spec_t chik, double P, double Tmin, double Tmax, double dT ) {
 
 
 
-void test_nu ( spec_t chik, double P, double Tmin, double Tmax, double dT ) {
+void test_nu ( gl_t *gl, spec_t chik, double P, double Tmin, double Tmax, double dT ) {
   double T, N, eta, kappa, Te;
   long spec;
   spec_t nuk,rhok;
@@ -947,7 +947,7 @@ void test_nu ( spec_t chik, double P, double Tmin, double Tmax, double dT ) {
       rhok[spec]=chik[spec]*_m(spec)*N;
     }
     wfprintf ( stdout, "%12.5E ", T );
-    find_nuk_eta_kappa(rhok, T, Te, nuk, &eta, &kappa);
+    find_nuk_eta_kappa(gl, rhok, T, Te, nuk, &eta, &kappa);
     for ( spec = 0; spec < ns; spec++ ) {
       wfprintf ( stdout, "%+12.5E ", nuk[spec] );
     }
@@ -958,7 +958,7 @@ void test_nu ( spec_t chik, double P, double Tmin, double Tmax, double dT ) {
 }
 
 
-void test_mu ( spec_t chik, double P, double Tmin, double Tmax, double dT ) {
+void test_mu ( gl_t *gl, spec_t chik, double P, double Tmin, double Tmax, double dT ) {
   double T, N, eta, kappan, Te;
   long spec;
   chargedspec_t kappac,muk;
@@ -980,7 +980,7 @@ void test_mu ( spec_t chik, double P, double Tmin, double Tmax, double dT ) {
     }
     wfprintf ( stdout, "%12.5E ", T );
 
-    find_nuk_eta_kappak_muk(rhok, T, Te, nuk, &eta, &kappan, kappac, muk);
+    find_nuk_eta_kappak_muk(gl, rhok, T, Te, nuk, &eta, &kappan, kappac, muk);
 
 
     for ( spec = 0; spec < ncs; spec++ ) {
@@ -994,7 +994,7 @@ void test_mu ( spec_t chik, double P, double Tmin, double Tmax, double dT ) {
 
 
 
-void test_Pr ( double Tmin, double Tmax, double dT ) {
+void test_Pr ( gl_t *gl, double Tmin, double Tmax, double dT ) {
   double T, eta, kappa, Te, rho, cp;
   spec_t w, rhok;
   long spec, spec2, spec3;
@@ -1017,7 +1017,7 @@ void test_Pr ( double Tmin, double Tmax, double dT ) {
       Te=T;
       rho=1.0; //???? value of rho doesn't affect viscosities
       for (spec3=0; spec3<ns; spec3++) rhok[spec3]=w[spec3]*rho;
-      find_nuk_eta_kappa(rhok, T, Te, nuk, &eta, &kappa);
+      find_nuk_eta_kappa(gl, rhok, T, Te, nuk, &eta, &kappa);
       cp=_cpk_from_T_equilibrium(spec, T);
 
       wfprintf ( stdout, "%+12.5E ", eta*cp/kappa );
@@ -1061,17 +1061,17 @@ void test_dmuk ( np_t * np, gl_t * gl, long l ) {
       T=_T(np[l],gl);
       find_Ek(np,gl,l,spec,Ek);
       Ekmag=EXM_vector_magnitude(Ek);
-      find_dmuk_from_rhok_Tk_Ek(rhok, T, Ekmag, spec, &dmukdTk, dmukdrhok);
+      find_dmuk_from_rhok_Tk_Ek(gl, rhok, T, Ekmag, spec, &dmukdTk, dmukdrhok);
       if (spec2==-1) {
-        find_nuk_eta_kappak_muk(rhok,T,Te,nuk,&eta,&kappan,kappac,muk1);
-        find_nuk_eta_kappak_muk(rhok,T+1.0,Te,nuk,&eta,&kappan,kappac,muk2);
+        find_nuk_eta_kappak_muk(gl, rhok,T,Te,nuk,&eta,&kappan,kappac,muk1);
+        find_nuk_eta_kappak_muk(gl, rhok,T+1.0,Te,nuk,&eta,&kappan,kappac,muk2);
         dmukdTk_numerical=muk2[spec]-muk1[spec];
         printf("%E  %E \n",dmukdTk,dmukdTk_numerical);
       } else {
         for (spec3=0; spec3<ns; spec3++) rhok2[spec3]=rhok[spec3];
         rhok2[spec2]*=1.0001;
-        find_nuk_eta_kappak_muk(rhok,T,Te,nuk,&eta,&kappan,kappac,muk1);
-        find_nuk_eta_kappak_muk(rhok2,T,Te,nuk,&eta,&kappan,kappac,muk2);
+        find_nuk_eta_kappak_muk(gl, rhok,T,Te,nuk,&eta,&kappan,kappac,muk1);
+        find_nuk_eta_kappak_muk(gl, rhok2,T,Te,nuk,&eta,&kappan,kappac,muk2);
         dmukdrhok_numerical=(muk2[spec]-muk1[spec])/(0.0001*rhok2[spec2]);
         printf("%E  %E \n",dmukdrhok[spec2],dmukdrhok_numerical);
       
@@ -1267,9 +1267,9 @@ int main ( int argc, char **argv ) {
       if ( strcmp ( "s", argv[1] ) == 0 )
         test_s ( Tmin, Tmax, dT );
       if ( strcmp ( "eta", argv[1] ) == 0 )
-        test_eta ( Tmin, Tmax, dT );
+        test_eta ( &gl, Tmin, Tmax, dT );
       if ( strcmp ( "Pr", argv[1] ) == 0 )
-        test_Pr ( Tmin, Tmax, dT );
+        test_Pr ( &gl, Tmin, Tmax, dT );
       if ( strcmp ( "dsdT", argv[1] ) == 0 )
         test_dsdT ( Tmin, Tmax, dT );
       if ( strcmp ( "s_equil", argv[1] ) == 0 )
@@ -1277,11 +1277,11 @@ int main ( int argc, char **argv ) {
       if ( strcmp ( "dsdT_equil", argv[1] ) == 0 )
         test_dsdT_equilibrium ( Tmin, Tmax, dT );
       if ( strcmp ( "nu", argv[1] ) == 0 )
-        test_nu(chik,P,Tmin,Tmax,dT);
+        test_nu(&gl,chik,P,Tmin,Tmax,dT);
       if ( strcmp ( "mu", argv[1] ) == 0 )
-        test_mu(chik,P,Tmin,Tmax,dT);
+        test_mu(&gl,chik,P,Tmin,Tmax,dT);
       if ( strcmp ( "kappa", argv[1] ) == 0 )
-        test_kappa(chik,P,Tmin,Tmax,dT);
+        test_kappa(&gl,chik,P,Tmin,Tmax,dT);
 
     } else {
 #endif

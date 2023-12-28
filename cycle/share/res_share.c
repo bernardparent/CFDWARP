@@ -847,7 +847,7 @@ void find_Lambda_minus_dtau_FVS(np_t *np, gl_t *gl, long l, long theta, int EIGE
   find_metrics_at_node(np, gl, l, theta, &metrics);
   find_jacvars(np[l],gl,metrics,theta,&jacvars);
 
-  find_conditioned_Lambda_absolute_from_jacvars(jacvars, metrics, EIGENVALCOND, lambdap);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvars, metrics, EIGENVALCOND, lambdap);
   find_Lambda_from_jacvars(jacvars, metrics, lambda);
 
   for (row=0; row<nf; row++){
@@ -868,7 +868,7 @@ void find_Lambda_plus_dtau_FVS(np_t *np, gl_t *gl, long l, long theta, int EIGEN
   find_metrics_at_node(np, gl, l, theta, &metrics);
   find_jacvars(np[l],gl,metrics,theta,&jacvars);
 
-  find_conditioned_Lambda_absolute_from_jacvars(jacvars, metrics, EIGENVALCOND, lambdap);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvars, metrics, EIGENVALCOND, lambdap);
   find_Lambda_from_jacvars(jacvars, metrics, lambda);
 
   for (row=0; row<nf; row++){
@@ -905,11 +905,11 @@ void find_jacvars_at_interface_from_jacvars(jacvars_t jacvarsL, jacvars_t jacvar
 }
 
 
-void find_Lambda_minus_dtau_FDS_from_jacvars(jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t lambdaminus){
+void find_Lambda_minus_dtau_FDS_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t lambdaminus){
   sqmat_t lambda,lambdap;
   long row,col;
 
-  find_conditioned_Lambda_absolute_from_jacvars(jacvars, metrics, EIGENVALCOND, lambdap);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvars, metrics, EIGENVALCOND, lambdap);
   find_Lambda_from_jacvars(jacvars, metrics, lambda);
 
   for (row=0; row<nf; row++){
@@ -929,16 +929,16 @@ void find_Lambda_minus_dtau_FDS(np_t *np, gl_t *gl, long l, long theta, int EIGE
   find_jacvars_at_interface(np,gl,_al(gl,l,theta,-1),_al(gl,l,theta,+0),theta,AVERAGING,&jacvarsm1h);
   find_metrics_at_interface(np, gl, _al(gl,l,theta,-1), _al(gl,l,theta,+0), theta, &metrics);
 
-  find_Lambda_minus_dtau_FDS_from_jacvars(jacvarsm1h, metrics, EIGENVALCOND, lambdaminus);
+  find_Lambda_minus_dtau_FDS_from_jacvars(gl, jacvarsm1h, metrics, EIGENVALCOND, lambdaminus);
 }
 
 
 
-void find_Lambda_plus_dtau_FDS_from_jacvars(jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t lambdaplus){
+void find_Lambda_plus_dtau_FDS_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t lambdaplus){
   sqmat_t lambda,lambdap;
   long row,col;
 
-  find_conditioned_Lambda_absolute_from_jacvars(jacvars, metrics, EIGENVALCOND, lambdap);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvars, metrics, EIGENVALCOND, lambdap);
   find_Lambda_from_jacvars(jacvars, metrics, lambda);
 
   for (row=0; row<nf; row++){
@@ -958,7 +958,7 @@ void find_Lambda_plus_dtau_FDS(np_t *np, gl_t *gl, long l, long theta, int EIGEN
   find_jacvars_at_interface(np,gl,_al(gl,l,theta,+0),_al(gl,l,theta,+1),theta,AVERAGING,&jacvarsp1h);
   find_metrics_at_interface(np, gl, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, &metrics);
 
-  find_Lambda_plus_dtau_FDS_from_jacvars(jacvarsp1h, metrics, EIGENVALCOND, lambdaplus);
+  find_Lambda_plus_dtau_FDS_from_jacvars(gl, jacvarsp1h, metrics, EIGENVALCOND, lambdaplus);
 }
 
 
@@ -974,7 +974,7 @@ void find_Lambda_plus_minus_dtau_FDS(np_t *np, gl_t *gl, long l, long theta, int
   find_metrics_at_interface(np, gl, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, &metrics);
 
 
-  find_conditioned_Lambda_absolute_from_jacvars(jacvarsp1h, metrics, EIGENVALCOND, lambdap);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvarsp1h, metrics, EIGENVALCOND, lambdap);
   find_Lambda_from_jacvars(jacvarsp1h, metrics, lambda);
 
   for (row=0; row<nf; row++){
@@ -1272,7 +1272,7 @@ void find_Fstar_interface_FDS_muscl_with_CDF(np_t *np, gl_t *gl, long lm1h, long
   find_Lambda_from_jacvars(jacvarsp0_RE, metrics, lambdap0_RE);
   
   set_matrix_to_zero(lambdapp0_RE);
-  find_conditioned_Lambda_absolute_from_jacvars(jacvarsp0_RE, metrics, EIGENVALCOND, lambdapp0_RE);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvarsp0_RE, metrics, EIGENVALCOND, lambdapp0_RE);
   find_Ustar_from_jacvars(jacvarsm1h_RE,  metrics, Um1h_RE);
   find_Ustar_from_jacvars(jacvarsp1h_RE,  metrics, Up1h_RE);
 
@@ -1351,11 +1351,11 @@ void find_Fstar_interface_FDS_muscl_without_CDF(gl_t *gl, long theta, flux_t mus
   if (RESTRAINED) {
     find_L_restrained_from_jacvars(jacvarsp0, metrics, L);
     find_Linv_restrained_from_jacvars(jacvarsp0, metrics, Linv);
-    find_conditioned_Lambda_absolute_restrained_from_jacvars(jacvarsp0, metrics, EIGENVALCOND, lambdap);
+    find_conditioned_Lambda_absolute_restrained_from_jacvars(gl, jacvarsp0, metrics, EIGENVALCOND, lambdap);
   } else { 
     find_L_from_jacvars(jacvarsp0, metrics, L);
     find_Linv_from_jacvars(jacvarsp0, metrics, Linv);
-    find_conditioned_Lambda_absolute_from_jacvars(jacvarsp0, metrics, EIGENVALCOND, lambdap);
+    find_conditioned_Lambda_absolute_from_jacvars(gl, jacvarsp0, metrics, EIGENVALCOND, lambdap);
   }
   find_Ustar_from_musclvars(musclvarsm1h, metrics, gl, Um1h);
   find_Ustar_from_musclvars(musclvarsp1h, metrics, gl, Up1h);
@@ -1423,8 +1423,8 @@ void find_Fstar_interface_FVS_muscl_without_CDF(gl_t *gl, long theta, flux_t mus
   find_Linv_from_jacvars(jacvarsp1h, metrics, Linvp1h);
   find_Ustar_from_musclvars(musclvarsm1h, metrics, gl, Um1h);
   find_Ustar_from_musclvars(musclvarsp1h, metrics, gl, Up1h);
-  find_conditioned_Lambda_absolute_from_jacvars(jacvarsp1h, metrics, EIGENVALCOND, Lambdaabsp1h);
-  find_conditioned_Lambda_absolute_from_jacvars(jacvarsm1h, metrics, EIGENVALCOND, Lambdaabsm1h);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvarsp1h, metrics, EIGENVALCOND, Lambdaabsp1h);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvarsm1h, metrics, EIGENVALCOND, Lambdaabsm1h);
   find_Lambda_from_jacvars(jacvarsp1h, metrics, Lambdap1h);
   find_Lambda_from_jacvars(jacvarsm1h, metrics, Lambdam1h);
   set_matrix_to_zero(Lambdaplusm1h);
@@ -1483,8 +1483,8 @@ void find_Fstar_interface_FVS_muscl_with_CDF(np_t *np, gl_t *gl, long lm1h, long
   find_Lambda_from_jacvars(jacvarsp1h_RE, metrics, Lambdap1h_RE);
   set_matrix_to_zero(Lambdaabsm1h_RE);
   set_matrix_to_zero(Lambdaabsp1h_RE);
-  find_conditioned_Lambda_absolute_from_jacvars(jacvarsm1h_RE, metrics, EIGENVALCOND, Lambdaabsm1h_RE);
-  find_conditioned_Lambda_absolute_from_jacvars(jacvarsp1h_RE, metrics, EIGENVALCOND, Lambdaabsp1h_RE);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvarsm1h_RE, metrics, EIGENVALCOND, Lambdaabsm1h_RE);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvarsp1h_RE, metrics, EIGENVALCOND, Lambdaabsp1h_RE);
   find_LUstar_from_jacvars(jacvarsm1h_RE,  metrics, LUm1h_RE);
   find_LUstar_from_jacvars(jacvarsp1h_RE,  metrics, LUp1h_RE);
 

@@ -111,7 +111,7 @@ void find_dStcomp_dU(np_t *np, gl_t *gl, long l, sqmat_t dStcompdU);
 
 void find_conditioned_Lambda_absolute_from_jacvars_denom(jacvars_t jacvars, metrics_t metrics, sqmat_t Lambda);
 
-void find_conditioned_Lambda_absolute_from_jacvars(jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t Lambdaabs);
+void find_conditioned_Lambda_absolute_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t Lambdaabs);
 
 void condition_Lambda_plus_minus(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  int EIGENVALCOND, sqmat_t Lambdaplus, sqmat_t Lambdaminus);
 

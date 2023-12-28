@@ -292,12 +292,12 @@ double _a_from_jacvars(jacvars_t jacvars){
 }
 
 
-double _eta_from_jacvars(jacvars_t jacvars){
+double _eta_from_jacvars(gl_t *gl, jacvars_t jacvars){
   spec_t nu,rhok;
   long spec;
   double eta,kappa;
   for (spec=0; spec<ns; spec++) rhok[spec]=jacvars.w[spec]*jacvars.rho;
-  find_nuk_eta_kappa(rhok, jacvars.T, jacvars.T,  nu, &eta, &kappa);
+  find_nuk_eta_kappa(gl, rhok, jacvars.T, jacvars.T,  nu, &eta, &kappa);
   return(eta);
 }
 
@@ -1370,7 +1370,7 @@ void find_Ustar_given_metrics(np_t np, gl_t *gl, metrics_t metrics, flux_t Ustar
 
 
 /* Peclet number */ 
-double _Pe_from_jacvars(jacvars_t jacvars, metrics_t metrics){
+double _Pe_from_jacvars(gl_t *gl , jacvars_t jacvars, metrics_t metrics){
   double Vstar,eta,kappa,Pe,Xmag2;
   long dim,spec;
   spec_t nu,rhok;
@@ -1381,7 +1381,7 @@ double _Pe_from_jacvars(jacvars_t jacvars, metrics_t metrics){
     Xmag2+=sqr(metrics.X[dim]);
   }
   for (spec=0; spec<ns; spec++) rhok[spec]=jacvars.w[spec]*jacvars.rho;
-  find_nuk_eta_kappa(rhok, jacvars.T, jacvars.T, nu, &eta, &kappa);
+  find_nuk_eta_kappa(gl, rhok, jacvars.T, jacvars.T, nu, &eta, &kappa);
   assert(eta>0.0);
   Pe=jacvars.rho/eta*fabs(Vstar)/Xmag2;
   return(Pe);

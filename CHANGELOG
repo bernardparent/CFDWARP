@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 DEC 27b
+  * in model/transport/_transport.h
+    - added gl_t *gl to find_dmuk_from_rhok_Tk_Ek(), find_nuk_eta_kappa(), and
+      find_nuk_eta_kappak_muk()
+  * various c and h files
+    - added gl to calls of find_dmuk_from_rhok_Tk_Ek(), find_nuk_eta_kappa(), and
+      find_nuk_eta_kappak_muk()
+  * in src/data.c
+    - in find_interpolation_map, simplified the screen output of imap interpolation actions
+  * in model/fluid/_drift-diffusion/fluid.c
+    - in _mu() and find_prim_fluid(), now finds N by summing the Nk[] instead of using the ideal gas law
+      
+
 2023 DEC 27a
   * in model/fluid/doc/Transport_Equations/report.tex
     - added the section "Injection Inflow Boundary Condition"

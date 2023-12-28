@@ -1511,7 +1511,7 @@ void find_interpolation_map(char* initvar_str_userinput, char* initvar_str_file,
       (it wasn't found in input, nor in the interpolation file variables, and isn't a species assigned to w_default) */
     if (!FOUND_USERINPUT && !FOUND_FILE && !FOUND_WDEFAULT) fatal_error("Variable %s was not found in the data file and was not given a value after the -imap flag.",initvar_names[cnt]);  
       
-    if (map[cnt].newindex==-1) wfprintf(stdout,"Setting variable %s = %lg everywhere;\n", initvar_names[cnt], map[cnt].newvalue); 
+    if (map[cnt].newindex==-1) wfprintf(stdout,"%s=%lg..", initvar_names[cnt], map[cnt].newvalue); 
   } 
 
   for (cnt=0; cnt<*numvars_file; cnt++) free(initvar_names_file[cnt]); 
@@ -1613,10 +1613,10 @@ void read_data_file_interpolation(input_t input, np_t *np, gl_t *gl){
     }
   }
   data_format_str[16]=EOS;
-  wfprintf(stdout,"Reading interpolation data file %s ",input.name);
+  wfprintf(stdout,"Reading interpolation data file %s..",input.name);
   FORMAT001=FALSE;  
   if (strcmp("WARPINTFORMAT001",data_format_str)==0) {
-    wfprintf(stdout,"in CFDWARP format 001..\n");
+//    wfprintf(stdout,"in CFDWARP format 001..\n");
     FORMAT001=TRUE;
   }
 

@@ -1173,7 +1173,7 @@ double _muk_from_rhok_T_Te_Ek(spec_t rhok, double T, double Te, double Ek, long 
 }
 
 
-void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok){
+void find_dmuk_from_rhok_Tk_Ek(gl, spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok){
   long spec;
   *dmukdTk=0.0;
   for (spec=0; spec<ns; spec++) dmukdrhok[spec]=0.0;

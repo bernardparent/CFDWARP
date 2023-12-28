@@ -447,7 +447,7 @@ double _kappa(np_t *np, long l, gl_t *gl) {
     find_w(np[l],w);
     find_rhok(np[l],rhok);
     cp=_cp_from_w_T_equilibrium(w,T);
-    find_nuk_eta_kappa(rhok, T, T, nu, &eta, &kappa);
+    find_nuk_eta_kappa(gl, rhok, T, T, nu, &eta, &kappa);
     ret=cp*_eta(np,l,gl)/( /* Prandtl number */(_eta(np,l,gl))/(kappa)*cp );
 
   }
@@ -464,7 +464,7 @@ double _eta(np_t *np, long l, gl_t *gl) {
     ret=np[l].wk->etamem;
   } else { 
     find_rhok(np[l],rhok); 
-    find_nuk_eta_kappa(rhok, _T(np[l],gl), _T(np[l],gl), nu, &eta, &kappa);
+    find_nuk_eta_kappa(gl, rhok, _T(np[l],gl), _T(np[l],gl), nu, &eta, &kappa);
     ret=eta;
   }
   return(ret);
@@ -478,7 +478,7 @@ double _nu(np_t np, gl_t *gl, long spec) {
     ret=np.wk->numem[spec];
   } else {
     find_rhok(np,rhok); 
-    find_nuk_eta_kappa(rhok, _T(np,gl), _T(np,gl), nu, &eta, &kappa);
+    find_nuk_eta_kappa(gl, rhok, _T(np,gl), _T(np,gl), nu, &eta, &kappa);
     ret=nu[spec];  
   }
   return(ret);
@@ -853,7 +853,7 @@ void find_prim_fluid_mem(np_t *np, long l, gl_t *gl, double P, double T){
     np[l].wk->Vmem[dim]=np[l].bs->U[ns+dim]/rho;
   }
   for (spec=0; spec<ns; spec++) rhok[spec]=rho*w[spec];
-  find_nuk_eta_kappa(rhok, T,  T, np[l].wk->numem, &(np[l].wk->etamem), &(np[l].wk->kappamem));
+  find_nuk_eta_kappa(gl, rhok, T,  T, np[l].wk->numem, &(np[l].wk->etamem), &(np[l].wk->kappamem));
   np[l].wk->kappamem=_cp_from_w_T_equilibrium(w,T)*np[l].wk->etamem/( /* Prandtl number */(np[l].wk->etamem)/(np[l].wk->kappamem)*(_cp_from_w_T_equilibrium(w,T)) );
 
   k=_k(np[l]);

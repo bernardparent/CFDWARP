@@ -1638,7 +1638,7 @@ void condition_Lambda_plus_minus_Harten(jacvars_t jacvarsp0, jacvars_t jacvarsp1
 }
 
 
-void condition_Lambda_absolute_Peclet(jacvars_t jacvars, metrics_t metrics, sqmat_t Lambdaabs){
+void condition_Lambda_absolute_Peclet(gl_t *gl, jacvars_t jacvars, metrics_t metrics, sqmat_t Lambdaabs){
   long flux,dim,dim2;
   double a,Xmag2,Xmag2min,sum,Pe,zetaAc,zetaAa;
   Xmag2=0.0;
@@ -1650,7 +1650,7 @@ void condition_Lambda_absolute_Peclet(jacvars_t jacvars, metrics_t metrics, sqma
       Xmag2min=min(sum,Xmag2min);
   }
   a=_a_from_jacvars(jacvars)*sqrt(Xmag2);
-  Pe=_Pe_from_jacvars(jacvars, metrics);
+  Pe=_Pe_from_jacvars(gl, jacvars, metrics);
   zetaAc=jacvars.zetaA1*max(0.0,sqrt(Xmag2min/Xmag2)-1.0/max(1.0e-10,min(PECLETMAX,Pe)));
   zetaAa=jacvars.zetaA1;
   for (flux=0; flux<nf; flux++){
@@ -1683,7 +1683,7 @@ void condition_Lambda_plus_minus_Peclet(np_t *np, gl_t *gl, long lp0, long theta
     Xmag2min=min(sum,Xmag2min);
   }
   zetaA1=jacvarsp0.zetaA1;
-  Pe=0.5*(_Pe_from_jacvars(jacvarsp0, metrics)+_Pe_from_jacvars(jacvarsp1, metrics));  
+  Pe=0.5*(_Pe_from_jacvars(gl, jacvarsp0, metrics)+_Pe_from_jacvars(gl, jacvarsp1, metrics));  
   factPe=max(0.0,sqrt(Xmag2min/Xmag2)-1.0/max(1.0e-10,min(PECLETMAX,Pe)));
   for (flux=0; flux<nf; flux++){
     Lambdaplus[flux][flux]+=(aref+Vref)*zetaA1*factPe;
@@ -1867,12 +1867,12 @@ void condition_Lambda_plus_minus_zetaA2(np_t *np, gl_t *gl, long lp0, long theta
 
 
 // as defined in "Computational Aerothermodynamic Simulation Issues on Unstructured Grids" by Gnoffo and White, AIAA 2004-2371
-double _Re_edge_from_jacvars(jacvars_t jacvars, metrics_t metrics){
+double _Re_edge_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics){
   double Re_edge,a,Xmag2,eta;
   long dim;
 
   a=_a_from_jacvars(jacvars);
-  eta=_eta_from_jacvars(jacvars);
+  eta=_eta_from_jacvars(gl, jacvars);
   Xmag2=0.0;
   for (dim=0; dim<nd; dim++) {
     Xmag2+=sqr(metrics.X[dim]);
@@ -1884,14 +1884,14 @@ double _Re_edge_from_jacvars(jacvars_t jacvars, metrics_t metrics){
 
 /* the following is taken from "Computational Aerothermodynamic Simulation Issues on Unstructured Grids" by Gnoffo and White, AIAA 2004-2371
 */
-void condition_Lambda_absolute_Gnoffo(jacvars_t jacvars, metrics_t metrics, sqmat_t Lambdaabs){
+void condition_Lambda_absolute_Gnoffo(gl_t *gl, jacvars_t jacvars, metrics_t metrics, sqmat_t Lambdaabs){
   long flux;
   double sigma,lambdaref,Re_edge;
   sigma=0.0;
   for (flux=0; flux<nf; flux++){
     sigma=max(sigma,Lambdaabs[flux][flux]);
   }
-  Re_edge=_Re_edge_from_jacvars(jacvars,metrics);
+  Re_edge=_Re_edge_from_jacvars(gl,jacvars,metrics);
   lambdaref=jacvars.zetaA1*min(1.0,pow(Re_edge/100.0,8.0))*sigma;
   for (flux=0; flux<nf; flux++){
     if (Lambdaabs[flux][flux]<2.0*lambdaref){
@@ -1901,7 +1901,7 @@ void condition_Lambda_absolute_Gnoffo(jacvars_t jacvars, metrics_t metrics, sqma
 }
 
 
-void condition_Lambda_plus_minus_Gnoffo(jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
+void condition_Lambda_plus_minus_Gnoffo(gl_t *gl, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
   long flux;
   double ap0,ap1,Vp0,Vp1,aref,Vref,zetaA1,Re_edge;
 
@@ -1914,7 +1914,7 @@ void condition_Lambda_plus_minus_Gnoffo(jacvars_t jacvarsp0, jacvars_t jacvarsp1
   aref=max(ap0,ap1);
   Vref=max(fabs(Vp0),fabs(Vp1));
 
-  Re_edge=0.5*(_Re_edge_from_jacvars(jacvarsp0,metrics)+_Re_edge_from_jacvars(jacvarsp1,metrics));
+  Re_edge=0.5*(_Re_edge_from_jacvars(gl,jacvarsp0,metrics)+_Re_edge_from_jacvars(gl,jacvarsp1,metrics));
   zetaA1*=min(1.0,pow(Re_edge/100.0,8.0));
 
   for (flux=0; flux<nf; flux++){  
@@ -1934,7 +1934,7 @@ void find_conditioned_Lambda_absolute_from_jacvars_denom(jacvars_t jacvars, metr
 }
 
 
-void find_conditioned_Lambda_absolute_from_jacvars(jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t Lambdaabs){
+void find_conditioned_Lambda_absolute_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t Lambdaabs){
   long flux;
   find_Lambda_from_jacvars(jacvars,metrics,Lambdaabs);
   if (EIGENVALCOND==EIGENVALCOND_DEFAULT) EIGENVALCOND=jacvars.EIGENVALCOND;
@@ -1942,7 +1942,7 @@ void find_conditioned_Lambda_absolute_from_jacvars(jacvars_t jacvars, metrics_t 
   for (flux=0; flux<nf; flux++) Lambdaabs[flux][flux]=fabs(Lambdaabs[flux][flux]);
   switch (EIGENVALCOND){
     case EIGENVALCOND_PECLET:
-      condition_Lambda_absolute_Peclet(jacvars, metrics, Lambdaabs);
+      condition_Lambda_absolute_Peclet(gl, jacvars, metrics, Lambdaabs);
     break;
     case EIGENVALCOND_PASCAL:
       fatal_error("Eigenvalue conditioning can not be set to EIGENVALCOND_PASCAL with this flux discretization scheme.");
@@ -1951,7 +1951,7 @@ void find_conditioned_Lambda_absolute_from_jacvars(jacvars_t jacvars, metrics_t 
       fatal_error("Eigenvalue conditioning can not be set to EIGENVALCOND_PARENT with this flux discretization scheme.");
     break;
     case EIGENVALCOND_GNOFFO:
-      condition_Lambda_absolute_Gnoffo(jacvars, metrics, Lambdaabs);
+      condition_Lambda_absolute_Gnoffo(gl, jacvars, metrics, Lambdaabs);
     break;
     case EIGENVALCOND_HARTEN:
       condition_Lambda_absolute_Harten(jacvars,metrics,jacvars.zetaA1, FALSE, Lambdaabs);
@@ -1982,7 +1982,7 @@ void condition_Lambda_plus_minus(np_t *np, gl_t *gl, long lp0, long theta, jacva
       condition_Lambda_plus_minus_Parent(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics,  Lambdaplus, Lambdaminus);
     break;
     case EIGENVALCOND_GNOFFO:
-      condition_Lambda_plus_minus_Gnoffo(jacvarsp0, jacvarsp1, metrics,  Lambdaplus, Lambdaminus);
+      condition_Lambda_plus_minus_Gnoffo(gl, jacvarsp0, jacvarsp1, metrics,  Lambdaplus, Lambdaminus);
     break;
     case EIGENVALCOND_HARTEN:
       condition_Lambda_plus_minus_Harten(jacvarsp0, jacvarsp1, metrics,  Lambdaplus, Lambdaminus);
@@ -1995,7 +1995,7 @@ void condition_Lambda_plus_minus(np_t *np, gl_t *gl, long lp0, long theta, jacva
 }
 #else //not defined _FLUID_NEUTRALSTRANSPORT
 
-void find_conditioned_Lambda_absolute_from_jacvars(jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t Lambdaabs){
+void find_conditioned_Lambda_absolute_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t Lambdaabs){
   long flux;
   find_Lambda_from_jacvars(jacvars,metrics,Lambdaabs);
 
@@ -2811,7 +2811,7 @@ void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, l
   dwall=_distance_between_near_bdry_node_and_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK);
   for (spec=0; spec<ns; spec++) rhok[spec]=wwall[spec]*_rho(np[lB]);
   
-  find_nuk_eta_kappa(rhok,Twall,Tewall,nuk,&eta,&kappa);
+  find_nuk_eta_kappa(gl, rhok,Twall,Tewall,nuk,&eta,&kappa);
 
   if (mod(paramend-paramstart+1,3)!=0) fatal_error("Wrong number of extra parameters to catalytic boundary condition.");
   numcat=round((double)(paramend-paramstart+1)/3.0);
@@ -2889,7 +2889,7 @@ void update_w_V_at_injection_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
 
 
 
-#if defined(_FLUID_MULTISPECIES)
+#if defined(_FLUID_MULTISPECIES) && (_FLUID_CONVECTION)
 
 void find_L_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t L){
   sqmat_t R;
@@ -3020,7 +3020,7 @@ void find_Lambda_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, s
 }
 
 
-void find_conditioned_Lambda_absolute_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t Lambdaabs){
+void find_conditioned_Lambda_absolute_restrained_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t Lambdaabs){
   long flux;
   find_Lambda_restrained_from_jacvars(jacvars,metrics,Lambdaabs);
   if (EIGENVALCOND==EIGENVALCOND_DEFAULT) EIGENVALCOND=jacvars.EIGENVALCOND;
@@ -3028,7 +3028,7 @@ void find_conditioned_Lambda_absolute_restrained_from_jacvars(jacvars_t jacvars,
   for (flux=0; flux<nf; flux++) Lambdaabs[flux][flux]=fabs(Lambdaabs[flux][flux]);
   switch (EIGENVALCOND){
     case EIGENVALCOND_PECLET:
-      condition_Lambda_absolute_Peclet(jacvars, metrics, Lambdaabs);
+      condition_Lambda_absolute_Peclet(gl, jacvars, metrics, Lambdaabs);
     break;
     case EIGENVALCOND_PASCAL:
       fatal_error("Eigenvalue conditioning can not be set to EIGENVALCOND_PASCAL with this flux discretization scheme.");
@@ -3037,7 +3037,7 @@ void find_conditioned_Lambda_absolute_restrained_from_jacvars(jacvars_t jacvars,
       fatal_error("Eigenvalue conditioning can not be set to EIGENVALCOND_PARENT with this flux discretization scheme.");
     break;
     case EIGENVALCOND_GNOFFO:
-      condition_Lambda_absolute_Gnoffo(jacvars, metrics, Lambdaabs);
+      condition_Lambda_absolute_Gnoffo(gl, jacvars, metrics, Lambdaabs);
     break;
     case EIGENVALCOND_HARTEN:
       condition_Lambda_absolute_Harten(jacvars,metrics,jacvars.zetaA1, FALSE, Lambdaabs);
@@ -3064,8 +3064,8 @@ void find_Lambda_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, s
   find_Lambda_from_jacvars(jacvars, metrics, lambda);
 }
 
-void find_conditioned_Lambda_absolute_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t Lambdaabs){
-  find_conditioned_Lambda_absolute_from_jacvars(jacvars, metrics, EIGENVALCOND, Lambdaabs);
+void find_conditioned_Lambda_absolute_restrained_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t Lambdaabs){
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvars, metrics, EIGENVALCOND, Lambdaabs);
 }
 
 #endif //#if defined(_FLUID_MULTISPECIES)

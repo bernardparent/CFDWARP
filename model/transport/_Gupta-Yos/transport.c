@@ -1247,7 +1247,7 @@ double _kappak_from_chik_Delta1_Delta2_METHOD4(double T, spec_t chik, spec2_t De
 }
 
 
-void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
+void find_nuk_eta_kappak_muk(gl_t *gl, spec_t rhok, double T, double Te,
                              spec_t nuk, double *eta, double *kappan, chargedspec_t kappac, chargedspec_t muk){
   long spec,k;
   spec_t chik,  Ai, Ai_e;
@@ -1349,18 +1349,18 @@ void find_nuk_eta_kappak_muk(spec_t rhok, double T, double Te,
 }
 
 
-void find_nuk_eta_kappa(spec_t rhok, double T, double Te,
+void find_nuk_eta_kappa(gl_t *gl, spec_t rhok, double T, double Te,
                    spec_t nuk, double *eta, double *kappa){
   chargedspec_t muk,kappac;
   double kappan;
   long k;
-  find_nuk_eta_kappak_muk(rhok, T, Te,nuk, eta, &kappan, kappac, muk);
+  find_nuk_eta_kappak_muk(gl, rhok, T, Te,nuk, eta, &kappan, kappac, muk);
   *kappa=kappan;
   for (k=0; k<ncs; k++)  *kappa+=kappac[k];
 }
 
 
-void find_dmuk_from_rhok_Tk_Ek(spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok){
+void find_dmuk_from_rhok_Tk_Ek(gl_t *gl, spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok){
   long spec;
   *dmukdTk=0.0;
   for (spec=0; spec<ns; spec++) dmukdrhok[spec]=0.0;

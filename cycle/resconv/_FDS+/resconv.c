@@ -152,7 +152,7 @@ static void find_Lambda_minus_plus_Roeplus(np_t *np, gl_t *gl, long lp0, long lp
   find_L_from_jacvars(jacvarsp1h, metrics, Lp1h);
   find_Linv_from_jacvars(jacvarsp1h, metrics, Linvp1h);
   if (ROE_EIGENVALUE_CONDITIONING){
-    find_conditioned_Lambda_absolute_from_jacvars(jacvarsp1h, metrics, gl->cycle.resconv.EIGENVALCOND, lambdapp1h);
+    find_conditioned_Lambda_absolute_from_jacvars(gl, jacvarsp1h, metrics, gl->cycle.resconv.EIGENVALCOND, lambdapp1h);
   } else {
     find_Lambda_from_jacvars(jacvarsp1h, metrics, lambdapp1h);
     for (flux=0; flux<nf; flux++) lambdapp1h[flux][flux]=fabs(lambdapp1h[flux][flux]);
@@ -260,7 +260,7 @@ static void find_Lambda_minus_plus_Roe(np_t *np, gl_t *gl, long lp0, long lp1, j
   find_L_from_jacvars(jacvarsp1h, metrics, Lp1h);
   find_Linv_from_jacvars(jacvarsp1h, metrics, Linvp1h);
   if (ROE_EIGENVALUE_CONDITIONING){
-    find_conditioned_Lambda_absolute_from_jacvars(jacvarsp1h, metrics, gl->cycle.resconv.EIGENVALCOND, lambdapp1h);
+    find_conditioned_Lambda_absolute_from_jacvars(gl, jacvarsp1h, metrics, gl->cycle.resconv.EIGENVALCOND, lambdapp1h);
   } else {
     find_Lambda_from_jacvars(jacvarsp1h, metrics, lambdapp1h);
     for (flux=0; flux<nf; flux++) lambdapp1h[flux][flux]=fabs(lambdapp1h[flux][flux]);
@@ -427,7 +427,7 @@ static void find_Fstar_interface_2o(np_t *np, gl_t *gl, long lm3h, long lm1h, lo
   find_M(jacvarsp1, metrics, np[lp1h], np[lp3h], gl, Mp1);
   find_Lambda_from_jacvars(jacvarsp0, metrics, lambdap0);
   if (ROE_EIGENVALUE_CONDITIONING){
-    find_conditioned_Lambda_absolute_from_jacvars(jacvarsp0, metrics, gl->cycle.resconv.EIGENVALCOND, lambdapp0);
+    find_conditioned_Lambda_absolute_from_jacvars(gl, jacvarsp0, metrics, gl->cycle.resconv.EIGENVALCOND, lambdapp0);
   } else {
     for (flux=0; flux<nf; flux++) lambdapp0[flux][flux]=fabs(lambdap0[flux][flux]);
   }
@@ -590,8 +590,8 @@ void find_Delta_Lambda_for_dtau_non_positive(np_t *np, gl_t *gl, long l, long th
   find_jacvars_at_interface(np, gl, l, _al(gl,l,theta,+1), theta, gl->cycle.resconv.AVERAGING,&jacvarsp1h);
   find_jacvars_at_interface(np, gl, _al(gl,l,theta,-1), l, theta, gl->cycle.resconv.AVERAGING,&jacvarsm1h);
 
-  find_Lambda_minus_dtau_FDS_from_jacvars(jacvarsm1h, metricsm1h, gl->cycle.resconv.EIGENVALCOND, Lambda_minus);
-  find_Lambda_plus_dtau_FDS_from_jacvars(jacvarsp1h, metricsp1h, gl->cycle.resconv.EIGENVALCOND, Lambda_plus);
+  find_Lambda_minus_dtau_FDS_from_jacvars(gl, jacvarsm1h, metricsm1h, gl->cycle.resconv.EIGENVALCOND, Lambda_minus);
+  find_Lambda_plus_dtau_FDS_from_jacvars(gl, jacvarsp1h, metricsp1h, gl->cycle.resconv.EIGENVALCOND, Lambda_plus);
 
 #ifdef _RESTIME_CDF
   sqmat_t Lambdaxt_minus,Lambdaxt_plus;

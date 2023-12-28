@@ -345,13 +345,13 @@ void find_bdry_jacobian(np_t *np, gl_t *gl, long bdrytype, long lA, long lB,
 }
 
 
-static void find_Aabs_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t Aabs){
+static void find_Aabs_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, sqmat_t Aabs){
   sqmat_t mattmp,R,L,lambdap;
   long flux;
 
   find_Lambda_from_jacvars(jacvars, metrics, lambdap);
   for (flux=0; flux<nf; flux++) lambdap[flux][flux]=fabs(lambdap[flux][flux]);
-  find_conditioned_Lambda_absolute_from_jacvars(jacvars, metrics, EIGENVALCOND_DEFAULT, lambdap);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvars, metrics, EIGENVALCOND_DEFAULT, lambdap);
   find_Linv_from_jacvars(jacvars, metrics, R);
   find_L_from_jacvars(jacvars, metrics, L);
   multiply_diagonal_matrix_and_matrix(lambdap,L,mattmp);
@@ -359,13 +359,13 @@ static void find_Aabs_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t
 }
 
 
-static void find_Aabs_restrained_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t Aabs){
+static void find_Aabs_restrained_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, sqmat_t Aabs){
   sqmat_t mattmp,R,L,lambdap;
   long flux;
 
   find_Lambda_restrained_from_jacvars(jacvars, metrics, lambdap);
   for (flux=0; flux<nf; flux++) lambdap[flux][flux]=fabs(lambdap[flux][flux]);
-  find_conditioned_Lambda_absolute_restrained_from_jacvars(jacvars, metrics, EIGENVALCOND_DEFAULT, lambdap);
+  find_conditioned_Lambda_absolute_restrained_from_jacvars(gl, jacvars, metrics, EIGENVALCOND_DEFAULT, lambdap);
   find_Linv_restrained_from_jacvars(jacvars, metrics, R);
   find_L_restrained_from_jacvars(jacvars, metrics, L);
   multiply_diagonal_matrix_and_matrix(lambdap,L,mattmp);
@@ -395,7 +395,7 @@ void find_dFstar_dUstar_FDS_interface(np_t *np, gl_t *gl, long theta, long l, sq
   find_jacvars_at_interface_arith_average(jacvarsL,jacvarsR,gl,theta,&jacvarsp1h);
   //find_jacvars_at_interface_Roe_average(jacvarsL,jacvarsR,gl,theta,&jacvarsp1h);
 
-  find_Aabs_from_jacvars(jacvarsp1h, metricsp1h, Aabs);
+  find_Aabs_from_jacvars(gl, jacvarsp1h, metricsp1h, Aabs);
   find_dFstar_dUstar(np[l], gl, theta, Ap0);
   find_dFstar_dUstar(np[lp1], gl, theta, Ap1);
 
@@ -441,7 +441,7 @@ void find_dFstar_dUstar_FDSR_interface(np_t *np, gl_t *gl, long theta, long l, s
   find_jacvars_at_interface_arith_average(jacvarsL,jacvarsR,gl,theta,&jacvarsp1h);
   //find_jacvars_at_interface_Roe_average(jacvarsL,jacvarsR,gl,theta,&jacvarsp1h);
 
-  find_Aabs_restrained_from_jacvars(jacvarsp1h, metricsp1h, Aabs);
+  find_Aabs_restrained_from_jacvars(gl, jacvarsp1h, metricsp1h, Aabs);
   find_dFstar_dUstar(np[l], gl, theta, Ap0);
   find_dFstar_dUstar(np[lp1], gl, theta, Ap1);
 
@@ -465,11 +465,11 @@ void find_dFstar_dUstar_FDSR_interface(np_t *np, gl_t *gl, long theta, long l, s
 }
 
 
-static void find_Aplus_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t Aplus){
+static void find_Aplus_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, sqmat_t Aplus){
   sqmat_t Lambdap,Lambda,mattmp,Linv,L;
   long flux;
 
-  find_conditioned_Lambda_absolute_from_jacvars(jacvars, metrics, EIGENVALCOND_DEFAULT, Lambdap);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvars, metrics, EIGENVALCOND_DEFAULT, Lambdap);
   find_Lambda_from_jacvars(jacvars, metrics, Lambda);
   for (flux=0; flux<nf; flux++) Lambdap[flux][flux]=0.5*(Lambda[flux][flux]+Lambdap[flux][flux]);
   find_Linv_from_jacvars(jacvars, metrics, Linv);
@@ -479,11 +479,11 @@ static void find_Aplus_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_
 }
 
 
-static void find_Aminus_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t Aminus){
+static void find_Aminus_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, sqmat_t Aminus){
   sqmat_t Lambdap,Lambda,mattmp,Linv,L;
   long flux;
 
-  find_conditioned_Lambda_absolute_from_jacvars(jacvars, metrics, EIGENVALCOND_DEFAULT, Lambdap);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvars, metrics, EIGENVALCOND_DEFAULT, Lambdap);
   find_Lambda_from_jacvars(jacvars, metrics, Lambda);
   for (flux=0; flux<nf; flux++) Lambdap[flux][flux]=0.5*(Lambda[flux][flux]-Lambdap[flux][flux]);
   find_Linv_from_jacvars(jacvars, metrics, Linv);
@@ -506,8 +506,8 @@ void find_dFstar_dUstar_FVS_interface(np_t *np, gl_t *gl, long theta, long l, sq
   find_jacvars(np[lp1],gl,metricsp1h,theta,&jacvarsp1);
   find_jacvars(np[lp0],gl,metricsp1h,theta,&jacvarsp0);
 
-  find_Aplus_from_jacvars(jacvarsp0,metricsp1h,Aplusp0);
-  find_Aminus_from_jacvars(jacvarsp1,metricsp1h,Aminusp1);
+  find_Aplus_from_jacvars(gl, jacvarsp0,metricsp1h,Aplusp0);
+  find_Aminus_from_jacvars(gl, jacvarsp1,metricsp1h,Aminusp1);
 
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){

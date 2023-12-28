@@ -117,7 +117,7 @@ static void find_Fplus_Fminus(np_t *np, gl_t *gl, long l, long theta, metrics_t 
 
 
   find_jacvars(np[l],gl,metrics,theta,&jacvars);
-  find_conditioned_Lambda_absolute_from_jacvars(jacvars, metrics, gl->cycle.resconv.EIGENVALCOND, lambdap);
+  find_conditioned_Lambda_absolute_from_jacvars(gl, jacvars, metrics, gl->cycle.resconv.EIGENVALCOND, lambdap);
   find_Lambda_from_jacvars(jacvars, metrics, lambda);
   //set_matrix_to_zero(lambdap);
   //for (flux=0; flux<nf; flux++) lambdap[flux][flux]=fabs(lambda[flux][flux]);
