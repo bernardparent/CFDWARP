@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.h"
 #include <src/control.h>
 #include <model/thermo/_thermo.h>
+#include <model/transport/_transport.h>
 #include <model/fluid/_fluid.h>
 #include <model/emfield/_emfield.h>
 #include <model/beam/_beam.h>
@@ -246,6 +247,7 @@ void write_model_template(FILE **controlfile){
   );
   write_model_fluid_template(controlfile);
   write_model_chem_template(controlfile);
+  write_model_transport_template(controlfile);
   write_model_emfield_template(controlfile);
   write_model_beam_template(controlfile);
   wfprintf(*controlfile,
@@ -257,6 +259,7 @@ void write_model_template(FILE **controlfile){
 void read_model_actions(char *actionname, char **argum, SOAP_codex_t *codex){
   read_model_fluid_actions(actionname, argum, codex);
   read_model_chem_actions(actionname, argum, codex);
+  read_model_transport_actions(actionname, argum, codex);
   read_model_emfield_actions(actionname, argum, codex);
   read_model_beam_actions(actionname, argum, codex);
 }
@@ -266,6 +269,7 @@ void read_model(char *argum, SOAP_codex_t *codex){
   gl_t *gl=((readcontrolarg_t *)codex->action_args)->gl;
   if (!gl->CONTROL_READ){
     gl->MODEL_CHEM_READ=FALSE;
+    gl->MODEL_TRANSPORT_READ=FALSE;
     gl->MODEL_FLUID_READ=FALSE;
     gl->MODEL_EMFIELD_READ=FALSE;
     gl->MODEL_BEAM_READ=FALSE;
@@ -280,6 +284,10 @@ void read_model(char *argum, SOAP_codex_t *codex){
 #ifdef _CHEM_ACTIONNAME
   if (!gl->MODEL_CHEM_READ) 
     fatal_error("The chem module %s was not found within Model().",_CHEM_ACTIONNAME);
+#endif
+#ifdef _TRANSPORT_ACTIONNAME
+  if (!gl->MODEL_TRANSPORT_READ) 
+    fatal_error("The transport module %s was not found within Model().",_TRANSPORT_ACTIONNAME);
 #endif
   if (!gl->MODEL_EMFIELD_READ) 
     fatal_error("The emfield module %s was not found within Model().",_EMFIELD_ACTIONNAME);

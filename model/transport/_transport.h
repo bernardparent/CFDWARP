@@ -4,6 +4,11 @@
 #include <src/common.h>
 #include <model/share/transport_share.h>  
 
+
+void write_model_transport_template(FILE **controlfile);
+
+void read_model_transport_actions(char *actionname, char **argum, SOAP_codex_t *codex);
+
 void find_dmuk_from_rhok_Tk_Ek(gl_t *gl, spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok);
 
 

@@ -7,6 +7,25 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 DEC 28a
+  * in model/_generic/model.c
+    - in write_model_template() and read_model_template(), added calls to
+      write_model_transport_template() and read_model_transport_template()
+    - in read_model(), added checking of gl->MODEL_TRANSPORT_READ being TRUE 
+  * in model/transport/_Dixon-Lewis/transport.c
+    - added empty functions write_model_transport_template() and read_model_transport_actions()
+  * in model/transport/_Gupta-Yos/transport.c
+    - added functions write_model_transport_template() and read_model_transport_actions()
+    - added TRANSPORTMODEL and LNLAMBDA user-defined constants within the control file
+    - deleted METHOD6
+    - renamed METHOD1 to TRANSPORTMODEL_EQUILIBRIUM_EQ27
+    - renamed METHOD2 to TRANSPORTMODEL_EQUILIBRIUM_EQ30
+    - renamed METHOD3 to TRANSPORTMODEL_EQUILIBRIUM_EQ40A
+    - renamed METHOD4 to TRANSPORTMODEL_NONEQUILIBRIUM
+    - renamed METHOD5 to TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET
+    - renamed METHOD7 to TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED
+    
+
 2023 DEC 27b
   * in model/transport/_transport.h
     - added gl_t *gl to find_dmuk_from_rhok_Tk_Ek(), find_nuk_eta_kappa(), and

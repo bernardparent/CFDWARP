@@ -41,6 +41,7 @@ https://ntrs.nasa.gov/api/citations/19900017748/downloads/19900017748.pdf
 #include <model/thermo/_thermo.h>
 #include <model/transport/_transport.h>
 #include <assert.h>
+#include <src/control.h>
 
 #define Runiv 1.987 //cal/(g-mol K)
 #define kBol 1.38066E-16 // erg/K
@@ -57,17 +58,72 @@ https://ntrs.nasa.gov/api/citations/19900017748/downloads/19900017748.pdf
 #define LNLAMBDA_GUPTAYOS 1
 #define LNLAMBDA_RAIZER 2
 #define LNLAMBDA_NRL 3
-#define LNLAMBDA LNLAMBDA_GUPTAYOS  //Use LNLAMBDA_GUPTAYOS. Other methods are for testing purposes only.
 
-#define METHOD1 1  // Eq(27), first Chapman-Enskog approximation
-#define METHOD2 2  // Eq(30), approximation to method 1, yields results close to method 1 for air mixture
-#define METHOD3 3  // Eq(40a), approximation to method 1 ??? or method 2??
-#define METHOD4 4   // Eq(49) : 5-temperature model, thermal non-equilibrium, and valid to find kappak for each species while METHOD1,METHOD2,METHOD3 can only be used to find kappa for the bulk
-#define METHOD5 5  //same as METHOD4 except that muk and kappac are found from the Parent-Macheret model
-#define METHOD6 6  //same as METHOD4 except that mue and kappae are found from the Parent-Macheret model
-#define METHOD7 7  //same as METHOD4 except that electron-electron collisions are are not counted in finding mue
-                   // and that kappac is found from muk, not from its own equation
-#define METHOD METHOD7  //Use METHOD7. Other methods are for testing purposes only
+#define TRANSPORTMODEL_EQUILIBRIUM_EQ27 1  // Eq(27), first Chapman-Enskog approximation
+#define TRANSPORTMODEL_EQUILIBRIUM_EQ30 2  // Eq(30), approximation to method 1, yields results close to method 1 for air mixture
+#define TRANSPORTMODEL_EQUILIBRIUM_EQ40A 3  // Eq(40a), approximation to method 1 ??? or method 2??
+#define TRANSPORTMODEL_NONEQUILIBRIUM 4   // Eq(49) : 5-temperature model, thermal non-equilibrium, and valid to find kappak for each species while TRANSPORTMODEL_EQUILIBRIUM_EQ27,TRANSPORTMODEL_EQUILIBRIUM_EQ30,TRANSPORTMODEL_EQUILIBRIUM_EQ40A can only be used to find kappa for the bulk
+#define TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET 5  //same as TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED except that muk and kappac are found from the Parent-Macheret model
+#define TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED 7  //same as TRANSPORTMODEL_NONEQUILIBRIUM except that electron-electron collisions are are not counted in finding mue and that kappac is found from muk, not from its own equation; see Parent et al., Effect of Plasma Sheaths on Earth-Entry Magnetohydrodynamics, Journal of Thermophysics and Heat Transfer, Vol. 37 No. 4, Pages 845-857, 2023.
+
+
+
+void write_model_transport_template(FILE **controlfile){
+  wfprintf(*controlfile,
+    "  %s(\n"
+    "    LNLAMBDA=LNLAMBDA_GUPTAYOS;\n"
+    "    TRANSPORTMODEL=TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED;\n"
+    "  );\n"
+  ,_TRANSPORT_ACTIONNAME);
+}
+
+
+
+void read_model_transport_actions_2(char *actionname, char **argum, SOAP_codex_t *codex){
+}
+
+
+void read_model_transport_actions(char *actionname, char **argum, SOAP_codex_t *codex){
+  long numvarsinit;
+  void (*action_original) (char *, char **, struct SOAP_codex_t *);
+  gl_t *gl=((readcontrolarg_t *)codex->action_args)->gl;
+  if (strcmp(actionname,_TRANSPORT_ACTIONNAME)==0) {
+    SOAP_count_all_vars(codex, &numvarsinit);
+
+    if (((readcontrolarg_t *)codex->action_args)->VERBOSE) wfprintf(stdout,"%s..",_TRANSPORT_ACTIONNAME);
+    SOAP_add_int_to_vars(codex,"TRANSPORTMODEL_EQUILIBRIUM_EQ27",TRANSPORTMODEL_EQUILIBRIUM_EQ27); 
+    SOAP_add_int_to_vars(codex,"TRANSPORTMODEL_EQUILIBRIUM_EQ30",TRANSPORTMODEL_EQUILIBRIUM_EQ30); 
+    SOAP_add_int_to_vars(codex,"TRANSPORTMODEL_EQUILIBRIUM_EQ40A",TRANSPORTMODEL_EQUILIBRIUM_EQ40A); 
+    SOAP_add_int_to_vars(codex,"TRANSPORTMODEL_NONEQUILIBRIUM",TRANSPORTMODEL_NONEQUILIBRIUM); 
+    SOAP_add_int_to_vars(codex,"TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED",TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED); 
+    SOAP_add_int_to_vars(codex,"TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET",TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET); 
+    SOAP_add_int_to_vars(codex,"LNLAMBDA_NONE",LNLAMBDA_NONE); 
+    SOAP_add_int_to_vars(codex,"LNLAMBDA_GUPTAYOS",LNLAMBDA_GUPTAYOS); 
+    SOAP_add_int_to_vars(codex,"LNLAMBDA_RAIZER",LNLAMBDA_RAIZER); 
+    SOAP_add_int_to_vars(codex,"LNLAMBDA_NRL",LNLAMBDA_NRL); 
+    
+    
+    gl->MODEL_TRANSPORT_READ=TRUE;
+
+    action_original=codex->action;
+    codex->action=&read_model_transport_actions_2;
+    SOAP_process_code(*argum, codex, SOAP_VARS_KEEP_ALL);
+    codex->action=action_original;
+
+    find_int_var_from_codex(codex,"TRANSPORTMODEL",&gl->model.transport.TRANSPORTMODEL);
+    if (gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_EQUILIBRIUM_EQ27 && gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_EQUILIBRIUM_EQ30 && gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_EQUILIBRIUM_EQ40A && gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_NONEQUILIBRIUM && gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED && gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET)
+      SOAP_fatal_error(codex,"TRANSPORTMODEL must be set to either TRANSPORTMODEL_EQUILIBRIUM_EQ27, TRANSPORTMODEL_EQUILIBRIUM_EQ30, TRANSPORTMODEL_EQUILIBRIUM_EQ40A, TRANSPORTMODEL_NONEQUILIBRIUM, TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED, TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET.");
+
+
+    find_int_var_from_codex(codex,"LNLAMBDA",&gl->model.transport.LNLAMBDA);
+    if (gl->model.transport.LNLAMBDA!=LNLAMBDA_NONE && gl->model.transport.LNLAMBDA!=LNLAMBDA_GUPTAYOS && gl->model.transport.LNLAMBDA!=LNLAMBDA_RAIZER && gl->model.transport.LNLAMBDA!=LNLAMBDA_NRL)
+      SOAP_fatal_error(codex,"LNLAMBDA must be set to either LNLAMBDA_NONE, LNLAMBDA_GUPTAYOS, LNLAMBDA_RAIZER, LNLAMBDA_NRL.");
+
+
+    SOAP_clean_added_vars(codex,numvarsinit);
+    codex->ACTIONPROCESSED=TRUE;
+  }
+}
 
 
 double _piOmega11(long s, long r, double T){
@@ -806,13 +862,13 @@ double EXM_matrix_determinant(EXM_mat_t mat){//improve this, triangular matrix i
 }
 
 
-static double _lnLambda(spec_t rhok, double Te){
+static double _lnLambda(gl_t *gl, spec_t rhok, double Te){
 #ifdef speceminus  
   double Pe,rhoe,lnLambda;
   rhoe=rhok[speceminus];
   Pe = max(1e-10,rhoe*calR*Te/_calM(speceminus)/101325.0e0); //electron pressure, atm
   /*electron pressure correction for the collision integrals of ionic species*/ /*Eq(24b)*/
-  switch (LNLAMBDA){
+  switch (gl->model.transport.LNLAMBDA){
     case LNLAMBDA_GUPTAYOS:
       lnLambda=0.5*log(2.09E-2*1E-12*Te*Te*Te*Te/Pe+1.52*pow(Te*Te*Te*Te*1E-12/Pe,2.0/3.0));
     break;
@@ -829,6 +885,7 @@ static double _lnLambda(spec_t rhok, double Te){
     break;
     default:
       fatal_error("LNLAMBDA set to invalid value.");
+      lnLambda=0.0; //to prevent compiler warning
   }
 #else
   lnLambda=1.0;
@@ -895,7 +952,7 @@ static void find_aij_Ai_for_kappa(spec_t chik, double N, double T, spec2_t Delta
 
 
 // Eq(30), approximation to method 1, yields results close to method 1 for air mixture
-double _kappa_from_rhok_T_Te_METHOD2(spec_t rhok, double T, double Te){
+double _kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ30(gl_t *gl, spec_t rhok, double T, double Te){
   long spec,i,j;
   spec_t chik,  Ai;
   spec2_t Delta1,Delta2;
@@ -907,7 +964,7 @@ double _kappa_from_rhok_T_Te_METHOD2(spec_t rhok, double T, double Te){
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
 
-  find_Delta1_Delta2(N,T,_lnLambda(rhok, Te),Delta1,Delta2);
+  find_Delta1_Delta2(N,T,_lnLambda(gl, rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
   
   kappa_tr     = 0.0e0;
@@ -933,7 +990,7 @@ double _kappa_from_rhok_T_Te_METHOD2(spec_t rhok, double T, double Te){
 }
 
 
-double _kappak_from_chik_N_T_Te_aav_Ai_Delta1_METHOD2(spec_t chik, double N, double T, double Te, double aav, spec_t Ai, spec2_t Delta1, long k){
+double _kappak_from_chik_N_T_Te_aav_Ai_Delta1_TRANSPORTMODEL_EQUILIBRIUM_EQ30(spec_t chik, double N, double T, double Te, double aav, spec_t Ai, spec2_t Delta1, long k){
   long j;
   double den, kappa_tr, kappa_int;
 
@@ -955,19 +1012,19 @@ double _kappak_from_chik_N_T_Te_aav_Ai_Delta1_METHOD2(spec_t chik, double N, dou
 
 
 // Eq(30), approximation to method 1, yields results close to method 1 for air mixture
-double _kappa_from_chik_N_T_Te_aav_Ai_Delta1_METHOD2(spec_t chik, double N, double T, double Te, double aav, spec_t Ai, spec2_t Delta1){
+double _kappa_from_chik_N_T_Te_aav_Ai_Delta1_TRANSPORTMODEL_EQUILIBRIUM_EQ30(spec_t chik, double N, double T, double Te, double aav, spec_t Ai, spec2_t Delta1){
   double kappa;
   long k;
   
   kappa=0.0;
-  for (k=0; k<ns; k++) kappa+=_kappak_from_chik_N_T_Te_aav_Ai_Delta1_METHOD2(chik, N, T, Te, aav, Ai, Delta1, k);
+  for (k=0; k<ns; k++) kappa+=_kappak_from_chik_N_T_Te_aav_Ai_Delta1_TRANSPORTMODEL_EQUILIBRIUM_EQ30(chik, N, T, Te, aav, Ai, Delta1, k);
 
   return(kappa); 
 }
 
 
 // Eq(27), first Chapman-Enskog approximation, bug: off by factor of -1 : needs fixing
-double _kappa_from_rhok_T_Te_METHOD1(spec_t rhok, double T, double Te){
+double _kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ27(gl_t *gl, spec_t rhok, double T, double Te){
   long spec,i,j,l;
   spec_t chik,  Ai;
   spec2_t Delta1,Delta2;
@@ -982,7 +1039,7 @@ double _kappa_from_rhok_T_Te_METHOD1(spec_t rhok, double T, double Te){
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
 
-  find_Delta1_Delta2(N,T,_lnLambda(rhok, Te),Delta1,Delta2);
+  find_Delta1_Delta2(N,T,_lnLambda(gl, rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
   
 
@@ -1030,7 +1087,7 @@ double _kappa_from_rhok_T_Te_METHOD1(spec_t rhok, double T, double Te){
 
 
 // Eq(40a), approximation to method 1 ??? or method 2??
-double _kappa_from_rhok_T_Te_METHOD3(spec_t rhok, double T, double Te){
+double _kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ40A(gl_t *gl, spec_t rhok, double T, double Te){
   long spec,i,j;
   spec_t chik,  Ai;
   spec2_t Delta1,Delta2;
@@ -1042,7 +1099,7 @@ double _kappa_from_rhok_T_Te_METHOD3(spec_t rhok, double T, double Te){
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
 
-  find_Delta1_Delta2(N,T,_lnLambda(rhok, Te),Delta1,Delta2);
+  find_Delta1_Delta2(N,T,_lnLambda(gl, rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
   
 
@@ -1140,7 +1197,7 @@ void find_nuk_from_chik_N_T_Te_Delta1(spec_t chik, double N, double T, double Te
 }
 
 
-void find_muk_from_chik_N_T_Te_Delta1(spec_t chik, double N, double T, double Te, spec2_t Delta1, spec2_t Delta1_e, chargedspec_t muk){
+void find_muk_from_chik_N_T_Te_Delta1(gl_t *gl, spec_t chik, double N, double T, double Te, spec2_t Delta1, spec2_t Delta1_e, chargedspec_t muk){
   double Dm,sum;
   long i,j;
   spec2_t Dij,Dij_e;
@@ -1157,7 +1214,7 @@ void find_muk_from_chik_N_T_Te_Delta1(spec_t chik, double N, double T, double Te
     sum=0; 
     switch (speciestype[i]){
       case SPECIES_ELECTRON:
-        if (METHOD==METHOD7){
+        if (gl->model.transport.TRANSPORTMODEL==TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED || gl->model.transport.TRANSPORTMODEL==TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET){
           for (j=0; j<ns; j++) {
             if (i!=j)
               sum+=chik[j]/(Dij_e[i][j]); 
@@ -1201,13 +1258,6 @@ void find_muk_from_chik_N_T_Te_Delta1(spec_t chik, double N, double T, double Te
 
 
 
-static double _muk_from_kappak(double kappak, double Tk, double rhok, long k){
-  double muk;
-  muk=kappak/(_cpk_from_T_equilibrium(k,Tk)*rhok*kB*Tk)*fabs(_C(k));  
-  return(muk);
-}
-
-
 static double _alpha(long i, long j){
   double ret;
   ret=1.0+(1.0-_calM(i)/_calM(j))*(0.45-2.54*_calM(i)/_calM(j))/sqr(1.0+_calM(i)/_calM(j));
@@ -1215,7 +1265,7 @@ static double _alpha(long i, long j){
 }
 
 
-double _kappak_from_chik_Delta1_Delta2_METHOD4(double T, spec_t chik, spec2_t Delta1, spec2_t Delta2, spec2_t Delta1_e, spec2_t Delta2_e, long i){
+double _kappak_from_chik_Delta1_Delta2_GUPTAYOSNONEQUILIBRIUM(double T, spec_t chik, spec2_t Delta1, spec2_t Delta2, spec2_t Delta1_e, spec2_t Delta2_e, long i){
   double kappak;
   double sum1,sum2;
   long j;
@@ -1260,90 +1310,76 @@ void find_nuk_eta_kappak_muk(gl_t *gl, spec_t rhok, double T, double Te,
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N; 
 
-  find_Delta1_Delta2(N,T,_lnLambda(rhok, Te),Delta1,Delta2);
+  find_Delta1_Delta2(N,T,_lnLambda(gl, rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);  
 
-  find_Delta1_Delta2(N,Te,_lnLambda(rhok, Te),Delta1_e,Delta2_e);
+  find_Delta1_Delta2(N,Te,_lnLambda(gl, rhok, Te),Delta1_e,Delta2_e);
   find_aij_Ai_for_kappa(chik, N, Te, Delta1_e, Delta2_e, aij_e, Ai_e, &aav_e);  
   
   *eta=_eta_from_chik_N_T_Te_Delta1_Delta2(chik, N, T, Te, Delta1, Delta2);
   find_nuk_from_chik_N_T_Te_Delta1(chik, N, T, Te, Delta1, nuk);
 
-  find_muk_from_chik_N_T_Te_Delta1(chik, N, T, Te, Delta1, Delta1_e, muk);
+  find_muk_from_chik_N_T_Te_Delta1(gl, chik, N, T, Te, Delta1, Delta1_e, muk);
   
-  switch (METHOD){
-    case METHOD1:
-      (*kappan)=_kappa_from_rhok_T_Te_METHOD1(rhok, T, Te);
+  switch (gl->model.transport.TRANSPORTMODEL){
+    case TRANSPORTMODEL_EQUILIBRIUM_EQ27:
+      (*kappan)=_kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ27(gl, rhok, T, Te);
       for (k=0; k<ncs; k++){
-        kappac[k]=_kappak_from_chik_Delta1_Delta2_METHOD4(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
+        kappac[k]=_kappak_from_chik_Delta1_Delta2_GUPTAYOSNONEQUILIBRIUM(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
         (*kappan)-=kappac[k];
       }
     break;
-    case METHOD2:
+    case TRANSPORTMODEL_EQUILIBRIUM_EQ30:
       for (k=0; k<ns; k++) {
         if (speciestype[k]==SPECIES_ELECTRON) 
-          kappak[k]=_kappak_from_chik_N_T_Te_aav_Ai_Delta1_METHOD2(chik, N, T, Te, aav_e, Ai_e, Delta1_e, k);
+          kappak[k]=_kappak_from_chik_N_T_Te_aav_Ai_Delta1_TRANSPORTMODEL_EQUILIBRIUM_EQ30(chik, N, T, Te, aav_e, Ai_e, Delta1_e, k);
         else
-          kappak[k]=_kappak_from_chik_N_T_Te_aav_Ai_Delta1_METHOD2(chik, N, T, Te, aav, Ai, Delta1, k);
+          kappak[k]=_kappak_from_chik_N_T_Te_aav_Ai_Delta1_TRANSPORTMODEL_EQUILIBRIUM_EQ30(chik, N, T, Te, aav, Ai, Delta1, k);
       } 
       for (spec=0; spec<ncs; spec++) kappac[spec]=kappak[spec];
       *kappan=0.0;
       for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
     break;
-    case METHOD3:
-      (*kappan)=_kappa_from_rhok_T_Te_METHOD3(rhok, T, Te);
+    case TRANSPORTMODEL_EQUILIBRIUM_EQ40A:
+      (*kappan)=_kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ40A(gl, rhok, T, Te);
       for (k=0; k<ncs; k++){
-        kappac[k]=_kappak_from_chik_Delta1_Delta2_METHOD4(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
+        kappac[k]=_kappak_from_chik_Delta1_Delta2_GUPTAYOSNONEQUILIBRIUM(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
         (*kappan)-=kappac[k];
       }
     break;
-    case METHOD4:
+    case TRANSPORTMODEL_NONEQUILIBRIUM:
       for (k=0; k<ns; k++){
-        kappak[k]=_kappak_from_chik_Delta1_Delta2_METHOD4(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
+        kappak[k]=_kappak_from_chik_Delta1_Delta2_GUPTAYOSNONEQUILIBRIUM(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
       }
       for (spec=0; spec<ncs; spec++) kappac[spec]=kappak[spec];
       *kappan=0.0;
       for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
     break;
-    case METHOD5:
+    case TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET:
       for (spec=0; spec<ncs; spec++) {
         muk[spec]=_muk_from_rhok_T_Te_ParentMacheret(rhok, T, Te, spec);
         kappac[spec]=_kappac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
       }
       for (k=0; k<ns; k++){
         if (k<ncs) kappak[k]=kappac[k];
-          else kappak[k]=_kappak_from_chik_Delta1_Delta2_METHOD4(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
+          else kappak[k]=_kappak_from_chik_Delta1_Delta2_GUPTAYOSNONEQUILIBRIUM(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
       }
       *kappan=0.0;
       for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
     break;
-    case METHOD6:
-#ifdef speceminus    
-      muk[speceminus]=_muk_from_rhok_T_Te_ParentMacheret(rhok, T, Te, speceminus);
-#endif
+    case TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED:
       for (spec=0; spec<ncs; spec++) {
         kappac[spec]=_kappac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
       }
       for (k=0; k<ns; k++){
         if (k<ncs) kappak[k]=kappac[k];
-          else kappak[k]=_kappak_from_chik_Delta1_Delta2_METHOD4(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
-      }
-      *kappan=0.0;
-      for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
-    break;
-    case METHOD7:
-      for (spec=0; spec<ncs; spec++) {
-        kappac[spec]=_kappac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
-      }
-      for (k=0; k<ns; k++){
-        if (k<ncs) kappak[k]=kappac[k];
-          else kappak[k]=_kappak_from_chik_Delta1_Delta2_METHOD4(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
+          else kappak[k]=_kappak_from_chik_Delta1_Delta2_GUPTAYOSNONEQUILIBRIUM(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
       }
       *kappan=0.0;
       for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
     break;
     default:
-      fatal_error("METHOD can not be set to %ld.",METHOD);
+      fatal_error("gl->model.transport.TRANSPORTMODEL can not be set to %ld.",gl->model.transport.TRANSPORTMODEL);
   }
 
 }

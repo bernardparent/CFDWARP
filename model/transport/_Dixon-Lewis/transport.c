@@ -299,6 +299,15 @@ const static double Psig[SMAP_NS]=
   };
 
 
+
+void write_model_transport_template(FILE **controlfile){
+}
+
+
+void read_model_transport_actions(char *actionname, char **argum, SOAP_codex_t *codex){
+}
+
+
 static double _Omega11(double T, double eps){
   double tmp;
   double Tstar;
