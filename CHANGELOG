@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 DEC 28b
+  * in model/fluid/_Favre-Reynolds_plasma/fluid_source.c
+    - in _tauvt() and find_dSvib_dU() for N2VIBMODEL_TEQUILIBRIUM, changed the source term 
+      to N2VIB_EQUILIBRIUM_CONSTANT/_rho(np)
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - renamed N2VIBMODEL_EQUILIBRIUM to N2VIBMODEL_TEQUILIBRIUM
+    - in find_prim_fluid(), fix ev from setting Tv=T when ev is too small
+    - in add_dUstar_to_U(), fix ev from setting Tv=T
+    
+
 2023 DEC 28a
   * in model/_generic/model.c
     - in write_model_template() and read_model_template(), added calls to
