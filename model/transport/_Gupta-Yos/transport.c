@@ -54,17 +54,17 @@ https://ntrs.nasa.gov/api/citations/19900017748/downloads/19900017748.pdf
 #define OMEGATMINCLIP 10.0
 #define OMEGATMAXCLIP 1e9
 
-#define LNLAMBDA_NONE 0
-#define LNLAMBDA_GUPTAYOS 1
-#define LNLAMBDA_RAIZER 2
-#define LNLAMBDA_NRL 3
+#define LNLAMBDA_NONE 100
+#define LNLAMBDA_GUPTAYOS 101
+#define LNLAMBDA_RAIZER 102
+#define LNLAMBDA_NRL 103
 
-#define TRANSPORTMODEL_EQUILIBRIUM_EQ27 1  // Eq(27), first Chapman-Enskog approximation
-#define TRANSPORTMODEL_EQUILIBRIUM_EQ30 2  // Eq(30), approximation to method 1, yields results close to method 1 for air mixture
-#define TRANSPORTMODEL_EQUILIBRIUM_EQ40A 3  // Eq(40a), approximation to method 1 ??? or method 2??
-#define TRANSPORTMODEL_NONEQUILIBRIUM 4   // Eq(49) : 5-temperature model, thermal non-equilibrium, and valid to find kappak for each species while TRANSPORTMODEL_EQUILIBRIUM_EQ27,TRANSPORTMODEL_EQUILIBRIUM_EQ30,TRANSPORTMODEL_EQUILIBRIUM_EQ40A can only be used to find kappa for the bulk
-#define TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET 5  //same as TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED except that muk and kappac are found from the Parent-Macheret model
-#define TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED 7  //same as TRANSPORTMODEL_NONEQUILIBRIUM except that electron-electron collisions are are not counted in finding mue and that kappac is found from muk, not from its own equation; see Parent et al., Effect of Plasma Sheaths on Earth-Entry Magnetohydrodynamics, Journal of Thermophysics and Heat Transfer, Vol. 37 No. 4, Pages 845-857, 2023.
+#define TRANSPORTMODEL_EQUILIBRIUM_EQ27 101  // Eq(27), first Chapman-Enskog approximation
+#define TRANSPORTMODEL_EQUILIBRIUM_EQ30 102  // Eq(30), approximation to method 1, yields results close to method 1 for air mixture
+#define TRANSPORTMODEL_EQUILIBRIUM_EQ40A 103  // Eq(40a), approximation to method 1 ??? or method 2??
+#define TRANSPORTMODEL_NONEQUILIBRIUM 104   // Eq(49) : 5-temperature model, thermal non-equilibrium, and valid to find kappak for each species while TRANSPORTMODEL_EQUILIBRIUM_EQ27,TRANSPORTMODEL_EQUILIBRIUM_EQ30,TRANSPORTMODEL_EQUILIBRIUM_EQ40A can only be used to find kappa for the bulk
+#define TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET 105  //same as TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED except that muk and kappac are found from the Parent-Macheret model
+#define TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED 107  //same as TRANSPORTMODEL_NONEQUILIBRIUM except that electron-electron collisions are are not counted in finding mue and that kappac is found from muk, not from its own equation; see Parent et al., Effect of Plasma Sheaths on Earth-Entry Magnetohydrodynamics, Journal of Thermophysics and Heat Transfer, Vol. 37 No. 4, Pages 845-857, 2023.
 
 
 

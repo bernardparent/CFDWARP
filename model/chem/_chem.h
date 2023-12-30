@@ -20,6 +20,7 @@ void find_dQei_dx(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, spec_
 void find_We ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, 
                           double *We_create, double *We_destroy );
 
+
 #ifdef _AVERAGEDRATES_CHEM
 void find_Qchemave (np_t np, gl_t *gl, spec_t rhok, double Estar, double T, double Te, double *Q );
 #endif

@@ -1095,17 +1095,139 @@ int chkarg ( int argc, char **argv, char *arg ) {
 }
 
 
+
+void output_options_help(int linewidth){
+  long spec;
+  char chistring[1500],chistringorig[1500];
+  char tmpstr[1000];
+  strcpy(chistringorig,"");
+  for (spec=0; spec<ns-1; spec++){
+    strcat(chistringorig,"0.0 "); 
+  }
+  strcat(chistringorig,"1.0 ");
+  strcpy(chistring,chistringorig);
+      write_hline ( stderr, linewidth, 2 );
+      write_options_row ( stderr, "Flag", "Argument(s)", "Description", linewidth, lengthcol1,
+                          lengthcol2 );
+      write_hline ( stderr, linewidth, 2 );
+
+      write_options_row ( stderr, "-r", "string", "control file name", linewidth, lengthcol1,
+                          lengthcol2 );
+      write_options_row ( stderr, "-i", "string", "Input binary data file", linewidth, lengthcol1,
+                          lengthcol2 );
+      sprintf(tmpstr,"%d int",nd); 
+      write_options_row ( stderr, "-node", tmpstr, "i,j"if3D(",k")" indices", linewidth, lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "-dim", "1 int", "dimension", linewidth, lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "A", "none", 
+                          "dFstar/dUstar Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop A", linewidth, lengthcol1,
+                          lengthcol2 );
+      write_options_row ( stderr, "Ajacvars", "none", 
+                          "dFstar/dUstar Jacobian from jacvars  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop Ajacvars",
+                          linewidth, lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "dGdUstar", "none", 
+                          "dG/dUstar Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop dGdUstar", linewidth,
+                          lengthcol1, lengthcol2 );
+#ifdef _FLUID_PLASMA
+      write_options_row ( stderr, "dH1dUstar", "none", 
+                          "dH1/dUstar Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop dH1dUstar", linewidth,
+                          lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "dH2dUstar", "none", 
+                          "dH2/dUstar Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop dH2dUstar", linewidth,
+                          lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "Dstarmat", "none", 
+                          "Dstar plus/minus matrices  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop Dstarmat", linewidth,
+                          lengthcol1, lengthcol2 );
+#endif
+      write_options_row ( stderr, "dZdU", "none", 
+                          "dZ/dU Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop dZdU", linewidth, lengthcol1,
+                          lengthcol2 );
+      write_options_row ( stderr, "dSdU", "none", 
+                          "dS/dU Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop dSdU", linewidth, lengthcol1,
+                          lengthcol2 );
+      write_options_row ( stderr, "dSchemdU", "none", 
+                          "dSchem/dU Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop dSchemdU", linewidth,
+                          lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "Linv", "none", 
+                          "Right eigenvectors  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop Linv", linewidth, lengthcol1,
+                          lengthcol2 );
+      write_options_row ( stderr, "L", "none", 
+                          "Left eigenvectors  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop L ", linewidth, lengthcol1,
+                          lengthcol2 );
+      write_options_row ( stderr, "Lambda", "none", 
+                          "eigenvalues  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop Lambda ", linewidth, lengthcol1,
+                          lengthcol2 );
+      write_options_row ( stderr, "Lambda2", "none", 
+                          "test eigenvalues  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop Lambda2 ", linewidth, lengthcol1,
+                          lengthcol2 );
+      write_options_row ( stderr, "LambdaZ", "none", 
+                          "test Z matrix eigenvalues  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop LambdaZ", linewidth,
+                          lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "LUstar", "none", 
+                          "characteristic variables  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop LUstar", linewidth,
+                          lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "dUstardUprime", "none", 
+                          "dUstar/dUprime Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop dUstardUprime", linewidth,
+                          lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "Roe", "none", 
+                          "Roe Averaging  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop Roe", linewidth, lengthcol1,
+                          lengthcol2 );
+      write_options_row ( stderr, "jacvars", "none", 
+                          "jacvars from U  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop jacvars", linewidth, lengthcol1,
+                          lengthcol2 );
+#ifdef _FLUID_MULTISPECIES
+      write_options_row ( stderr, "h", "none", "species specific enthalpy  ./test -prop h -Tmin 500 -Tmax 2000 -dT 2",
+                          linewidth, lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "hmolar", "none", "species molar specific enthalpy  ./test -prop hmolar -Tmin 500 -Tmax 2000 -dT 2",
+                          linewidth, lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "cp", "none", "species specific heat  ./test -prop cp -Tmin 500 -Tmax 2000 -dT 2",
+                          linewidth, lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "s", "none", "species specific entropy  ./test -prop s -Tmin 500 -Tmax 2000 -dT 2",
+                          linewidth, lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "dsdT", "none", 
+                          "species dsdT derivative  ./test -prop dsdT -Tmin 500 -Tmax 2000 -dT 2", linewidth, lengthcol1,
+                          lengthcol2 );
+      write_options_row ( stderr, "s_equil", "none", "species specific entropy in equilibrium ./test -prop s_equil -Tmin 500 -Tmax 2000 -dT 2",
+                          linewidth, lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "dsdT_equil", "none", 
+                          "species equilibrium dsdT derivative ./test -prop dsdT_equil -Tmin 500 -Tmax 2000 -dT 2", linewidth, lengthcol1,
+                          lengthcol2 );
+      write_options_row ( stderr, "eta", "none", "species viscosity  ./test -r test.wrp -prop eta -Tmin 500 -Tmax 2000 -dT 2",
+                          linewidth, lengthcol1, lengthcol2 );
+      strcpy(chistring,chistringorig);
+      write_options_row ( stderr, "kappa", "none", strins("species thermal conductivity  ./test -r test.wrp -prop kappa  -Tmin 500 -Tmax 2000 -dT 2 -P 101300 -chik ",chistring,0),
+                          linewidth, lengthcol1, lengthcol2 );
+      strcpy(chistring,chistringorig);
+      write_options_row ( stderr, "nu", "none", strins("species mass diffusion coefficient  ./test -r test.wrp -prop nu  -Tmin 500 -Tmax 2000 -dT 2 -P 101300 -chik ",chistring,0),
+                          linewidth, lengthcol1, lengthcol2 );
+      strcpy(chistring,chistringorig);
+      write_options_row ( stderr, "mu", "none", strins("species mobility  ./test -r test.wrp -prop mu  -Tmin 500 -Tmax 2000 -dT 2 -P 101300 -chik ",chistring,0),
+                          linewidth, lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "Pr", "none", "species Prandtl number  ./test -r test.wrp -prop Pr -Tmin 500 -Tmax 2000 -dT 2",
+                          linewidth, lengthcol1, lengthcol2 );
+#endif
+#ifdef _FLUID_PLASMA
+      write_options_row ( stderr, "dmuk", "none", "mobility jacobians  ./test -r test.wrp -node 10 10"if3D(" 10")" jacvars",
+                          linewidth, lengthcol1, lengthcol2 );
+#endif
+      write_hline ( stderr, linewidth, 2 );
+
+
+      exit ( EXIT_FAILURE );
+}
+
+
 int main ( int argc, char **argv ) {
   np_t npL, npR;
   long theta, cnt, lL, lR, node_i, node_j, node_k;
   char *control_filename;
   np_t *npArray;
   gl_t gl;
-  bool CONTROL;
+  bool CONTROL,VALIDOPTIONS,IJKSPECIFIED;
   int RET;
   input_t input;
   int *argint, argoneint;
-  char tmpstr[1000];
+  double *argdouble, argonedouble,sum;
+  char *propstring;
 
 #ifdef _FLUID_MULTISPECIES
   long spec;
@@ -1139,23 +1261,23 @@ int main ( int argc, char **argv ) {
   create_node ( &npL, 0, 0, 0 );
   create_node ( &npR, 0, 0, 0 );
 
+  propstring=(char *)malloc(sizeof(char));
+  argdouble=(double *)malloc(sizeof(double));
   CONTROL = FALSE;
   control_filename = NULL;
   input.READDATAFILE = FALSE;
 #ifdef UNSTEADY
   input.M1 = FALSE;
 #endif
-  if ( process_flag_string ( argc, argv, "-r", &control_filename ) )
+  if (argc==1) output_options_help(linewidth);
+  if ( process_flag_string ( argc, argv, "-r", &control_filename ) ){
     CONTROL = TRUE;
-
-  if ( CONTROL && argc >= 5 + nd ) {
     if ( process_flag_string ( argc, argv, "-i", &input.name ) )
       input.READDATAFILE = TRUE;
 
     read_control ( control_filename, input, TRUE, FALSE, FALSE, FALSE, -1.0, &npArray, &gl );
     resume_nodes_only_in_zone_and_update_bdry_nodes ( npArray, &gl, gl.domain );
     update_bdry_nodes ( npArray, &gl, gl.domain );
-
 
     theta = 0;
     RET = process_flag_int ( argc, argv, "-dim", &argoneint );
@@ -1171,8 +1293,9 @@ int main ( int argc, char **argv ) {
     node_j = 1;
     node_k = 1;
     RET = process_flag_int_multiple ( argc, argv, "-node", &argint );
-
+    
     if ( RET ) {
+      IJKSPECIFIED=TRUE;
       if ( RET != nd + 1 )
         fatal_error ( "After -node flag, you must supply %d integer arguments.", nd );
       node_i = argint[0];
@@ -1189,11 +1312,19 @@ int main ( int argc, char **argv ) {
       if ( !is_node_in_zone_2 ( _al(&gl, lL, theta, +1), &gl, gl.domain ) )
         fatal_error ( "Node specified after -node flag leads to node on its right not being within domain." );
     } else {
-      fatal_error ( "You must specify -node flag." );
+      IJKSPECIFIED=FALSE;
     }
 
+  }
 
 
+  RET = process_flag_string ( argc, argv, "-prop", &propstring );
+  if ( RET != 2 )
+    fatal_error ( "Need to supply -prop flag followed by a string." );
+
+
+  VALIDOPTIONS=FALSE;
+  if ( CONTROL && IJKSPECIFIED ) {
     lL = _ai ( &gl, node_i, node_j, node_k );
     lR = _al(&gl, lL, theta, +1);
     dispose_node ( &npL );
@@ -1201,198 +1332,191 @@ int main ( int argc, char **argv ) {
     npL = npArray[lL];
     npR = npArray[lR];
 
-    for ( cnt = 3; cnt < argc; cnt++ ) {
-      if ( strcmp ( "A", argv[cnt] ) == 0 )
+      if ( strcmp ( "A", propstring ) == 0 ){
         test_A ( npArray, lL, &gl, theta );
-      if ( strcmp ( "Ajacvars", argv[cnt] ) == 0 )
+        VALIDOPTIONS=TRUE;
+      }
+      if ( strcmp ( "Ajacvars", propstring ) == 0 ) {
         test_A_from_jacvars ( npArray, lL, &gl, theta );
-      if ( strcmp ( "dGdUstar", argv[cnt] ) == 0 )
+        VALIDOPTIONS=TRUE;
+      }
+      if ( strcmp ( "dGdUstar", propstring ) == 0 ) {
         test_dG_dUstar ( npArray, lL, &gl );
+        VALIDOPTIONS=TRUE;
+      }
 #ifdef _FLUID_PLASMA
-      if ( strcmp ( "dH1dUstar", argv[cnt] ) == 0 )
+      if ( strcmp ( "dH1dUstar", propstring ) == 0 ) {
         test_dH1_dUstar ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
-      if ( strcmp ( "dH2dUstar", argv[cnt] ) == 0 )
+        VALIDOPTIONS=TRUE;
+      }
+      if ( strcmp ( "dH2dUstar", propstring ) == 0 ) {
         test_dH2_dUstar ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
-      if ( strcmp ( "Dstarmat", argv[cnt] ) == 0 )
+        VALIDOPTIONS=TRUE;
+      }
+      if ( strcmp ( "Dstarmat", propstring ) == 0 ) {
         test_Dstarmat ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
+        VALIDOPTIONS=TRUE;
+      }
 #endif
-      if ( strcmp ( "dZdU", argv[cnt] ) == 0 )
+      if ( strcmp ( "dZdU", propstring ) == 0 ) {
         test_dZU_dU ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
-      if ( strcmp ( "dSdU", argv[cnt] ) == 0 )
+        VALIDOPTIONS=TRUE;
+      }
+      if ( strcmp ( "dSdU", propstring ) == 0 ) {
         test_dS_dU ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
-      if ( strcmp ( "dSchemdU", argv[cnt] ) == 0 )
+        VALIDOPTIONS=TRUE;
+      }
+      if ( strcmp ( "dSchemdU", propstring ) == 0 ) {
         test_dSchem_dU_local ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
-      if ( strcmp ( "Roe", argv[cnt] ) == 0 )
+        VALIDOPTIONS=TRUE;
+      }
+      if ( strcmp ( "Roe", propstring ) == 0 ) {
         test_Roe_average ( npArray, &gl, lL, lR, theta );
-      if ( strcmp ( "Lambda", argv[cnt] ) == 0 ) {
+        VALIDOPTIONS=TRUE;
+      }
+      if ( strcmp ( "Lambda", propstring ) == 0 ) {
         test_Lambda ( npArray, &gl, lL, lR, theta );
         test_LinvLambdaL ( npArray, &gl, lL, lR, theta );
+        VALIDOPTIONS=TRUE;
       }
-      if ( strcmp ( "Lambda2", argv[cnt] ) == 0 )
+      if ( strcmp ( "Lambda2", propstring ) == 0 ) {
         test_Lambda_2 ( npArray, &gl, lL, lR, theta );
-      if ( strcmp ( "LambdaZ", argv[cnt] ) == 0 )
-        test_LambdaZ ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
-      if ( strcmp ( "Linv", argv[cnt] ) == 0 )
-        test_Linv ( npArray, &gl, lL, lR, theta );
-      if ( strcmp ( "L", argv[cnt] ) == 0 )
-        test_L ( npArray, &gl, lL, lR, theta );
-      if ( strcmp ( "LUstar", argv[cnt] ) == 0 )
-        test_LUstar ( npArray, &gl, lL, lR, theta );
-      if ( strcmp ( "dUstardUprime", argv[cnt] ) == 0 )
-        test_dUstar_dUprime ( npArray, lL, &gl );
-      if ( strcmp ( "jacvars", argv[cnt] ) == 0 )
-        test_jacvars ( npArray, &gl, lL, theta );
-#ifdef _FLUID_PLASMA
-      if ( strcmp ( "dmuk", argv[cnt] ) == 0 )
-        test_dmuk ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
-#endif
-    }
-
-  } else {
-#ifdef _FLUID_MULTISPECIES
-    if ( argc == 5 || argc == 6+ns) {
-      sscanf ( argv[2], "%lg", &Tmin );
-      sscanf ( argv[3], "%lg", &Tmax );
-      sscanf ( argv[4], "%lg", &dT );
-      if (argc==(6+ns)) {
-        sscanf ( argv[5], "%lg", &P );
-        for (spec=0; spec<ns; spec++)  sscanf ( argv[6+spec], "%lg", &(chik[spec]) );
+        VALIDOPTIONS=TRUE;
       }
-      if ( strcmp ( "h", argv[1] ) == 0 )
-        test_h ( Tmin, Tmax, dT );
-      if ( strcmp ( "hmolar", argv[1] ) == 0 )
-        test_hmolar ( Tmin, Tmax, dT );
-      if ( strcmp ( "cp", argv[1] ) == 0 )
-        test_cp ( Tmin, Tmax, dT );
-      if ( strcmp ( "s", argv[1] ) == 0 )
-        test_s ( Tmin, Tmax, dT );
-      if ( strcmp ( "eta", argv[1] ) == 0 )
-        test_eta ( &gl, Tmin, Tmax, dT );
-      if ( strcmp ( "Pr", argv[1] ) == 0 )
-        test_Pr ( &gl, Tmin, Tmax, dT );
-      if ( strcmp ( "dsdT", argv[1] ) == 0 )
-        test_dsdT ( Tmin, Tmax, dT );
-      if ( strcmp ( "s_equil", argv[1] ) == 0 )
-        test_s_equilibrium ( Tmin, Tmax, dT );
-      if ( strcmp ( "dsdT_equil", argv[1] ) == 0 )
-        test_dsdT_equilibrium ( Tmin, Tmax, dT );
-      if ( strcmp ( "nu", argv[1] ) == 0 )
-        test_nu(&gl,chik,P,Tmin,Tmax,dT);
-      if ( strcmp ( "mu", argv[1] ) == 0 )
-        test_mu(&gl,chik,P,Tmin,Tmax,dT);
-      if ( strcmp ( "kappa", argv[1] ) == 0 )
-        test_kappa(&gl,chik,P,Tmin,Tmax,dT);
-
-    } else {
-#endif
-      write_hline ( stderr, linewidth, 2 );
-      write_options_row ( stderr, "Flag", "Argument(s)", "Description", linewidth, lengthcol1,
-                          lengthcol2 );
-      write_hline ( stderr, linewidth, 2 );
-
-      write_options_row ( stderr, "-r", "string", "control file name", linewidth, lengthcol1,
-                          lengthcol2 );
-      write_options_row ( stderr, "-i", "string", "Input binary data file", linewidth, lengthcol1,
-                          lengthcol2 );
-      sprintf(tmpstr,"%d int",nd); 
-      write_options_row ( stderr, "-node", tmpstr, "i,j"if3D(",k")" indices", linewidth, lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "-dim", "1 int", "dimension", linewidth, lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "A", "none", 
-                          "dFstar/dUstar Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" A", linewidth, lengthcol1,
-                          lengthcol2 );
-      write_options_row ( stderr, "Ajacvars", "none", 
-                          "dFstar/dUstar Jacobian from jacvars  ./test -r test.wrp -node 10 10"if3D(" 10")" Ajacvars",
-                          linewidth, lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "dGdUstar", "none", 
-                          "dG/dUstar Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" dGdUstar", linewidth,
-                          lengthcol1, lengthcol2 );
+      if ( strcmp ( "LambdaZ", propstring ) == 0 ) {
+        test_LambdaZ ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
+        VALIDOPTIONS=TRUE;
+      }
+      if ( strcmp ( "Linv", propstring ) == 0 ) {
+        test_Linv ( npArray, &gl, lL, lR, theta );
+        VALIDOPTIONS=TRUE;
+      }
+      if ( strcmp ( "L", propstring ) == 0 ) {
+        test_L ( npArray, &gl, lL, lR, theta );
+        VALIDOPTIONS=TRUE;
+      }
+      if ( strcmp ( "LUstar", propstring ) == 0 ) {
+        test_LUstar ( npArray, &gl, lL, lR, theta );
+        VALIDOPTIONS=TRUE;
+      }
+      if ( strcmp ( "dUstardUprime", propstring ) == 0 ) {
+        test_dUstar_dUprime ( npArray, lL, &gl );
+        VALIDOPTIONS=TRUE;
+      }
+      if ( strcmp ( "jacvars", propstring ) == 0 ) {
+        test_jacvars ( npArray, &gl, lL, theta );
+        VALIDOPTIONS=TRUE;
+      }
 #ifdef _FLUID_PLASMA
-      write_options_row ( stderr, "dH1dUstar", "none", 
-                          "dH1/dUstar Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" dH1dUstar", linewidth,
-                          lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "dH2dUstar", "none", 
-                          "dH2/dUstar Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" dH2dUstar", linewidth,
-                          lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "Dstarmat", "none", 
-                          "Dstar plus/minus matrices  ./test -r test.wrp -node 10 10"if3D(" 10")" Dstarmat", linewidth,
-                          lengthcol1, lengthcol2 );
+      if ( strcmp ( "dmuk", propstring ) == 0 ) {
+        test_dmuk ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
+        VALIDOPTIONS=TRUE;
+      }
 #endif
-      write_options_row ( stderr, "dZdU", "none", 
-                          "dZ/dU Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" dZdU", linewidth, lengthcol1,
-                          lengthcol2 );
-      write_options_row ( stderr, "dSdU", "none", 
-                          "dS/dU Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" dSdU", linewidth, lengthcol1,
-                          lengthcol2 );
-      write_options_row ( stderr, "dSchemdU", "none", 
-                          "dSchem/dU Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" dSchemdU", linewidth,
-                          lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "Linv", "none", 
-                          "Right eigenvectors  ./test -r test.wrp -node 10 10"if3D(" 10")" Linv", linewidth, lengthcol1,
-                          lengthcol2 );
-      write_options_row ( stderr, "L", "none", 
-                          "Left eigenvectors  ./test -r test.wrp -node 10 10"if3D(" 10")" L ", linewidth, lengthcol1,
-                          lengthcol2 );
-      write_options_row ( stderr, "Lambda", "none", 
-                          "eigenvalues  ./test -r test.wrp -node 10 10"if3D(" 10")" Lambda ", linewidth, lengthcol1,
-                          lengthcol2 );
-      write_options_row ( stderr, "Lambda2", "none", 
-                          "test eigenvalues  ./test -r test.wrp -node 10 10"if3D(" 10")" Lambda2 ", linewidth, lengthcol1,
-                          lengthcol2 );
-      write_options_row ( stderr, "LambdaZ", "none", 
-                          "test Z matrix eigenvalues  ./test -r test.wrp -node 10 10"if3D(" 10")" LambdaZ", linewidth,
-                          lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "LUstar", "none", 
-                          "characteristic variables  ./test -r test.wrp -node 10 10"if3D(" 10")" LUstar", linewidth,
-                          lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "dUstardUprime", "none", 
-                          "dUstar/dUprime Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" dUstardUprime", linewidth,
-                          lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "Roe", "none", 
-                          "Roe Averaging  ./test -r test.wrp -node 10 10"if3D(" 10")" Roe", linewidth, lengthcol1,
-                          lengthcol2 );
-      write_options_row ( stderr, "jacvars", "none", 
-                          "jacvars from U  ./test -r test.wrp -node 10 10"if3D(" 10")" jacvars", linewidth, lengthcol1,
-                          lengthcol2 );
-#ifdef _FLUID_MULTISPECIES
-      write_options_row ( stderr, "h", "none", "species specific enthalpy  ./test h 500 2000 2",
-                          linewidth, lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "hmolar", "none", "species molar specific enthalpy  ./test hmolar 500 2000 2",
-                          linewidth, lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "cp", "none", "species specific heat  ./test cp 500 2000 2",
-                          linewidth, lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "s", "none", "species specific entropy  ./test s 500 2000 2",
-                          linewidth, lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "dsdT", "none", 
-                          "species dsdT derivative  ./test dsdT 500 2000 2", linewidth, lengthcol1,
-                          lengthcol2 );
-      write_options_row ( stderr, "s_equil", "none", "species specific entropy in equilibrium ./test s_equil 500 2000 2",
-                          linewidth, lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "dsdT_equil", "none", 
-                          "species equilibrium dsdT derivative ./test dsdT_equil 500 2000 2", linewidth, lengthcol1,
-                          lengthcol2 );
-      write_options_row ( stderr, "eta", "none", "species viscosity  ./test eta 500 2000 2",
-                          linewidth, lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "kappa", "none", "species thermal conductivity  ./test kappa  500 2000 2 101300 0.2 0.2 0.2 0.2 0.2",
-                          linewidth, lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "nu", "none", "species mass diffusion coefficient  ./test nu  500 2000 2 101300 0.2 0.2 0.2 0.2 0.2",
-                          linewidth, lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "mu", "none", "species mobility  ./test mu  500 2000 2 101300 0.2 0.2 0.2 0.2 0.2",
-                          linewidth, lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "Pr", "none", "species Prandtl number  ./test Pr 500 2000 2",
-                          linewidth, lengthcol1, lengthcol2 );
-#endif
-#ifdef _FLUID_PLASMA
-      write_options_row ( stderr, "dmuk", "none", "mobility jacobians  ./test -r test.wrp -node 10 10"if3D(" 10")" jacvars",
-                          linewidth, lengthcol1, lengthcol2 );
-#endif
-      write_hline ( stderr, linewidth, 2 );
+
+  } 
 
 
-      exit ( EXIT_FAILURE );
+  
 #ifdef _FLUID_MULTISPECIES
-    }
-#endif
+
+  if ((CONTROL && !IJKSPECIFIED) || (!CONTROL)){
+    RET = process_flag_double ( argc, argv, "-Tmin", &argonedouble );
+    if ( RET != 2 )
+      fatal_error ( "Need to provide -Tmin flag followed by 1 double argument." );
+    Tmin=(double)argonedouble;
+
+    RET = process_flag_double ( argc, argv, "-Tmax", &argonedouble );
+    if ( RET != 2 )
+      fatal_error ( "Need to provide -Tmax flag followed by 1 double argument." );
+    Tmax=(double)argonedouble;
+    
+    RET = process_flag_double ( argc, argv, "-dT", &argonedouble );
+    if ( RET != 2 )
+      fatal_error ( "Need to provide -dT flag followed by 1 double argument." );
+    dT=(double)argonedouble;    
   }
+
+
+  if (CONTROL && !IJKSPECIFIED){
+
+    if ( strcmp ( "eta", propstring ) == 0 ){
+      test_eta ( &gl, Tmin, Tmax, dT );
+      VALIDOPTIONS=TRUE;
+    }
+    if ( strcmp ( "Pr", propstring ) == 0 ){
+      test_Pr ( &gl, Tmin, Tmax, dT );
+      VALIDOPTIONS=TRUE;
+    }
+
+    if (!VALIDOPTIONS){
+      RET = process_flag_double ( argc, argv, "-P", &argonedouble );
+      if ( RET != 2 )
+        fatal_error ( "Need to provide -P flag followed by 1 double argument." );
+      P=(double)argonedouble;
+
+      RET = process_flag_double_multiple ( argc, argv, "-chik", &argdouble );
+    
+      if ( RET != ns+1 )
+        fatal_error ( "Need to provide -chik flag followed by %d double arguments (the molar fractions of all species).", ns );
+      sum=0.0;
+      for (spec=0; spec<ns; spec++) {
+        chik[spec]=argdouble[spec];
+        sum+=chik[spec];
+      }
+      if (sum<0.999 || sum>1.001) fatal_error("Sum of the molar fractions is %E and should be 1.",sum);
+      if ( strcmp ( "nu", propstring ) == 0 ){
+        test_nu(&gl,chik,P,Tmin,Tmax,dT);
+        VALIDOPTIONS=TRUE;
+      }
+      if ( strcmp ( "mu", propstring ) == 0 ){
+        test_mu(&gl,chik,P,Tmin,Tmax,dT);
+        VALIDOPTIONS=TRUE;
+      }
+      if ( strcmp ( "kappa", propstring ) == 0 ){
+        test_kappa(&gl,chik,P,Tmin,Tmax,dT);
+        VALIDOPTIONS=TRUE;
+      }
+    }
+  }
+#endif
+  
+#ifdef _FLUID_MULTISPECIES
+  if (!CONTROL) {
+    if ( strcmp ( "h", propstring ) == 0 ){
+      test_h ( Tmin, Tmax, dT );
+      VALIDOPTIONS=TRUE;
+    }
+    if ( strcmp ( "hmolar", propstring ) == 0 ){
+      test_hmolar ( Tmin, Tmax, dT );
+      VALIDOPTIONS=TRUE;
+    }
+    if ( strcmp ( "cp", propstring ) == 0 ){
+      test_cp ( Tmin, Tmax, dT );
+      VALIDOPTIONS=TRUE;
+    }
+    if ( strcmp ( "s", propstring ) == 0 ){
+      test_s ( Tmin, Tmax, dT );
+      VALIDOPTIONS=TRUE;
+    }
+    if ( strcmp ( "dsdT", propstring ) == 0 ){
+      test_dsdT ( Tmin, Tmax, dT );
+      VALIDOPTIONS=TRUE;
+    }
+    if ( strcmp ( "s_equil", propstring ) == 0 ){
+      test_s_equilibrium ( Tmin, Tmax, dT );
+      VALIDOPTIONS=TRUE;
+    }
+    if ( strcmp ( "dsdT_equil", propstring ) == 0 ){
+      test_dsdT_equilibrium ( Tmin, Tmax, dT );
+      VALIDOPTIONS=TRUE;
+    }
+  }
+#endif
+
+  
+  if (!VALIDOPTIONS) output_options_help(linewidth);
+  
   //dispose_node ( &npL );
   //dispose_node ( &npR );
 /* 

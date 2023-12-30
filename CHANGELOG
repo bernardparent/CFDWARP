@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2023 DEC 30a
+  * in model/transport/_Gupta-Yos/transport.c
+    - changed the numbering of  LNLAMBDA_* and TRANSPORTMODEL_* from 1,2,3,.. to 101,102,103,..
+  * in src/test.c
+    - made various changes to the way the options are dealt with so that the control file now
+      needs to be read when finding transport coefficients (needed because the type of 
+      transport model is specified in the control file)
+    
+
 2023 DEC 28b
   * in model/fluid/_Favre-Reynolds_plasma/fluid_source.c
     - in _tauvt() and find_dSvib_dU() for N2VIBMODEL_TEQUILIBRIUM, changed the source term 

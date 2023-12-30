@@ -1,6 +1,6 @@
 #!/usr/local/bin/soap
 
-Te=45000;
+Te=50000;
 Te_eV=Te/11000;
 N=1e24;
 Ne=1e17;
@@ -78,6 +78,7 @@ taueN2=1/(Ne*(1-exp(-thetav/Te))^2*0.5*sum);
 
 Qev=N*mN2/taueN2*(RN2*thetav/(exp(thetav/Te)-1));
 
+printf("zetae=%E\n",zetae);
 printf("Qen=%E\n",Qen);
 printf("Qen_new=%E\n",Qen_new);
 printf("Qet=%E\n",Qet);
