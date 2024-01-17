@@ -7,6 +7,23 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JAN 17a
+  * in model/chem/_NH3_Plasma_10s/doc/rodriguez2023.tex
+    - improved the documentation
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c and model/fluid/_Navier-Stokes_plasma/fluid_plasma.c
+    - renamed TEMODEL_TRANSPORT to TEMODEL_TRANSPORTQENQEI
+    - added TEMODEL_TRANSPORTQE
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - added Qe to post variables
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - added find_Qe() and find_dSe_dU_transport_Qe()
+    - in find_Se() and find_dSchem_dU() and find_dSe_dU() renamed TEMODEL_TRANSPORT to 
+      TEMODEL_TRANSPORTQENQEI and added TEMODEL_TRANSPORTQE
+  * in model/thermo/_generic/
+    - added electronimpact.c 
+    - added electronimpact.h
+  
+
 2023 DEC 30a
   * in model/transport/_Gupta-Yos/transport.c
     - changed the numbering of  LNLAMBDA_* and TRANSPORTMODEL_* from 1,2,3,.. to 101,102,103,..

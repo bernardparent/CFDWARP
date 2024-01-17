@@ -5,9 +5,9 @@ CCFLAGSLOCAL = $(CFLAGSCFD) -I../../../lib/include -I../../../.
 
 ####### Files
 
-HEADERS =   thermo.h enthalpy.h 
-SOURCES =   thermo.c enthalpy.c 
-OBJECTS =   thermo.o  enthalpy.o 
+HEADERS =   thermo.h enthalpy.h electronimpact.h
+SOURCES =   thermo.c enthalpy.c electronimpact.c
+OBJECTS =   thermo.o  enthalpy.o  electronimpact.o
 TARGETS  = ../_thermo.a
 
 

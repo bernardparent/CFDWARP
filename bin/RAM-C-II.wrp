@@ -405,17 +405,22 @@ Model(
     }
   );
   NavierStokesPlasma(
-    TEMODEL=TEMODEL_TRANSPORT;
+    TEMODEL=TEMODEL_TRANSPORTQE;
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     INCLUDE_E_EFFECTS_ON_ION_MOBILITY=FALSE;
     INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY=FALSE;
     SCHOTTKY_EFFECT=FALSE;
     N2VIBJOULEHEATING=YES;
+    N2VIBJOULEHEATINGMODEL=N2VIBJOULEHEATINGMODEL_ALEKSANDROV;
     REACTING=YES;
     emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
     sigmadiv=1e-10; {S/m}
     etdiv=1e-1;     {J/kg}
+    wminN2=0.01;
+    emissivity=0.0;
+    emfieldworkfact=1.0;
+    emfieldheatfact=1.0;
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e1;     Tmax=35.0e3;    {K}
     Tvmin=Tmin;     Tvmax=Tmax;  {K}
@@ -427,6 +432,7 @@ Model(
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
     gamma=0.1e0;    {secondary emission coefficient}
     AXISYMMETRIC=YES;
+    QENSOURCETERMS=TRUE;
     SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
     SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
     {
@@ -436,9 +442,13 @@ Model(
   );
   AirPlasma11s(
     CHEMMODEL=CHEMMODEL_PARENTPARK2021;
-    ADDITIONALREACTION=FALSE; {include reactions function of EoverN}
+    for (react,1,6, ADDITIONALREACTION[react]=FALSE;); {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE generally}
     QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}
+  );
+  GuptaYos(
+    LNLAMBDA=LNLAMBDA_GUPTAYOS;
+    TRANSPORTMODEL=TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED;
   );
   Epotential(
     Te_buffer=300.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,Te_buffer);  
@@ -698,7 +708,7 @@ Cycle(
   );
   SteadyState(
     Post();
-    if (mod(iter,200)==0,
+    if (mod(iter,100)==0,
       WriteDataFile(outputfilename);
     );
     sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}

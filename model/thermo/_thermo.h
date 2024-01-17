@@ -126,4 +126,8 @@ double _ionizationpot(long spec);
 
 double _numatoms(long spec);
 
+double _EoverN_from_Nk_Te(spec_t N, double Te);
+
+double _Te_from_Nk_EoverN(spec_t N, double EoverN);
+
 #endif /* _THERMO_H */
