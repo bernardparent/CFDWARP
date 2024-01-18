@@ -617,7 +617,7 @@ static double _Te_from_EoverN_O2_Morgan(double EoverN){
 }
 
 
-double _EoverN_from_Nk_Te(spec_t N, double Te){
+double _EoverN_from_rhok_Te(spec_t rhok, double Te){
   double Estar,Nsum;
   long spec;
   Estar=0.0;
@@ -625,14 +625,14 @@ double _EoverN_from_Nk_Te(spec_t N, double Te){
   for (spec=0; spec<ns; spec++){
     switch (smap[spec]){
       case SMAP_NH3:
-        Estar+=N[spec]*_EoverN_from_Te_NH3_Morgan(Te);
-        Nsum+=N[spec];
+        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_NH3_Morgan(Te);
+        Nsum+=rhok[spec]/_m(spec);
       case SMAP_N2:
-        Estar+=N[spec]*_EoverN_from_Te_N2_Morgan(Te);
-        Nsum+=N[spec];
+        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_N2_Morgan(Te);
+        Nsum+=rhok[spec]/_m(spec);
       case SMAP_O2:
-        Estar+=N[spec]*_EoverN_from_Te_O2_Morgan(Te);
-        Nsum+=N[spec];
+        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_O2_Morgan(Te);
+        Nsum+=rhok[spec]/_m(spec);
       break;
     }
   }
@@ -642,7 +642,7 @@ double _EoverN_from_Nk_Te(spec_t N, double Te){
 }
 
 
-double _Te_from_Nk_EoverN(spec_t N, double EoverN){
+double _Te_from_rhok_EoverN(spec_t rhok, double EoverN){
   double Te,Nsum;
   long spec;
   Te=0.0;
@@ -650,14 +650,14 @@ double _Te_from_Nk_EoverN(spec_t N, double EoverN){
   for (spec=0; spec<ns; spec++){
     switch (smap[spec]){
       case SMAP_NH3:
-        Te+=N[spec]*_Te_from_EoverN_NH3_Morgan(EoverN);
-        Nsum+=N[spec];
+        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_NH3_Morgan(EoverN);
+        Nsum+=rhok[spec]/_m(spec);
       case SMAP_N2:
-        Te+=N[spec]*_Te_from_EoverN_N2_Morgan(EoverN);
-        Nsum+=N[spec];
+        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_N2_Morgan(EoverN);
+        Nsum+=rhok[spec]/_m(spec);
       case SMAP_O2:
-        Te+=N[spec]*_Te_from_EoverN_O2_Morgan(EoverN);
-        Nsum+=N[spec];
+        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_O2_Morgan(EoverN);
+        Nsum+=rhok[spec]/_m(spec);
       break;
     }
   }
