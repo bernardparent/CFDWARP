@@ -28,6 +28,129 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "thermo.h"
 #include "electronimpact.h"
 
+static double _EoverN_from_Te_H_Morgan(double Te){
+  double EoverN;
+  /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections */
+  /* log K */
+  double Te_data[] = 
+  { 
+    6.10955759023806,
+    6.11058825252976,
+    6.11264639578264,
+    6.11905092644849,
+    6.13551324579841,
+    6.17732947085113,
+    6.26932719081473,
+    6.44204443466952,
+    6.71252448865311,
+    7.08223304152285,
+    7.55126153661038,
+    8.13156771780325,
+    8.84331222217878,
+    9.70203062068486,
+    10.3866246486031,
+    10.6277867054200,
+    10.8077150746143,
+    11.0309995603238,
+    11.3463395697431,
+    11.7988853189096,
+    12.2742147582549,
+    15.4249484703984
+  };
+  /* log Vm^2*/
+  double EoverN_data[] = 
+  { 
+    -52.9710237752345,
+    -52.0336121941841,
+    -51.5130088549234,
+    -50.9924846520783,
+    -50.4720536088765,
+    -49.9508086400425,
+    -49.4304530527132,
+    -48.9097613283098,
+    -48.3889819226718,
+    -47.8681639417493,
+    -47.3477899531147,
+    -46.8269271514765,
+    -46.3062070876381,
+    -45.7854988191063,
+    -45.2650643362336,
+    -44.7441801799264,
+    -44.2234497542938,
+    -43.7031878349985,
+    -43.1820998634711,
+    -42.6615654255782,
+    -42.2448171725761,
+    -40.3479193852247
+  };
+  
+  int N = sizeof(Te_data)/sizeof(Te_data[0]);
+  Te = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
+  EoverN = exp( EXM_f_from_monotonespline(N, Te_data, EoverN_data, Te) );
+  return(EoverN);
+}
+
+static double _Te_from_EoverN_H_Morgan(double EoverN){
+  double Te;
+  /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections */
+  /* log Vm^2*/
+  double EoverN_data[] = 
+  { 
+    -52.9710237752345,
+    -52.0336121941841,
+    -51.5130088549234,
+    -50.9924846520783,
+    -50.4720536088765,
+    -49.9508086400425,
+    -49.4304530527132,
+    -48.9097613283098,
+    -48.3889819226718,
+    -47.8681639417493,
+    -47.3477899531147,
+    -46.8269271514765,
+    -46.3062070876381,
+    -45.7854988191063,
+    -45.2650643362336,
+    -44.7441801799264,
+    -44.2234497542938,
+    -43.7031878349985,
+    -43.1820998634711,
+    -42.6615654255782,
+    -42.2448171725761,
+    -39.1439465808988
+  };
+  /* log K */
+  double Te_data[] = 
+  { 
+    6.10955759023806,
+    6.11058825252976,
+    6.11264639578264,
+    6.11905092644849,
+    6.13551324579841,
+    6.17732947085113,
+    6.26932719081473,
+    6.44204443466952,
+    6.71252448865311,
+    7.08223304152285,
+    7.55126153661038,
+    8.13156771780325,
+    8.84331222217878,
+    9.70203062068486,
+    10.3866246486031,
+    10.6277867054200,
+    10.8077150746143,
+    11.0309995603238,
+    11.3463395697431,
+    11.7988853189096,
+    12.2742147582549,
+    15.4249484703984
+  };
+
+  int N = sizeof(EoverN_data)/sizeof(EoverN_data[0]);
+  EoverN = ( min( EoverN_data[N-1], max( log( EoverN) , EoverN_data[0] ) ) );
+  Te = exp( EXM_f_from_monotonespline(N, EoverN_data, Te_data, EoverN) );
+  return(Te);
+}
 
 
 static double _EoverN_from_Te_NH3_Morgan(double Te){
@@ -633,6 +756,9 @@ double _EoverN_from_rhok_Te(spec_t rhok, double Te){
       case SMAP_O2:
         Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_O2_Morgan(Te);
         Nsum+=rhok[spec]/_m(spec);
+      case SMAP_H:
+        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_H_Morgan(Te);
+        Nsum+=rhok[spec]/_m(spec);
       break;
     }
   }
@@ -658,6 +784,9 @@ double _Te_from_rhok_EoverN(spec_t rhok, double EoverN){
       case SMAP_O2:
         Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_O2_Morgan(EoverN);
         Nsum+=rhok[spec]/_m(spec);
+      case SMAP_H:
+        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_H_Morgan(EoverN);
+        Nsum+=rhok[spec]/_m(spec);
       break;
     }
   }
@@ -665,4 +794,3 @@ double _Te_from_rhok_EoverN(spec_t rhok, double EoverN){
   Te/=Nsum;
   return(Te);
 }
-

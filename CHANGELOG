@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JAN 19a
+  * in model/chem/_NH3_Plasma_10s/rodriguez2023.c
+    - changed kf1, kf2, kf3, kf4, kf17 to be function of Te instead of E/N.
+  * in model/thermo/_generic/electronimpact.c
+    - added _EoverN_from_Te_H_Morgan() and _Te_from_EoverN_H_Morgan()
+
+
 2024 JAN 17b
   * in model/chem/_NH3_Plasma_10s/rodriguez2023.c
     - deleted find_Te_from_EoverN_NH3() and find_EoverN_from_Te_NH3()
