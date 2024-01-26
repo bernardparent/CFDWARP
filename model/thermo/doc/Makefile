@@ -4,13 +4,14 @@ SHELL=/bin/sh
 
 LATEXDIR=".:../../../lib/latex:"
 
-all: makedvi makebib makeps makepdf
+all: makedvi makebib 
+#all: makedvi makebib makeps makepdf
 
 makebib:
 	( export BSTINPUTS=$(LATEXDIR) ; exec bibtex report )
 
 makedvi:
-	( export TEXINPUTS=$(LATEXDIR) ; exec latex report )
+	( export TEXINPUTS=$(LATEXDIR) ; exec pdflatex report )
 
 makeps:
 	( export TEXINPUTS=$(LATEXDIR) ; exec dvips -t letter report.dvi -o report.ps )

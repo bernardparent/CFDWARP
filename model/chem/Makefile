@@ -37,6 +37,7 @@ cleanall:
 	( cd _C2H4_Air_Plasma_36s ; make cleanall )
 	( cd _He_Air_3s_0r ; make cleanall )
 	( cd _H2_He_CH4_Plasma_13s ; make cleanall )
+	( cd _NH3_N2_2s_0r ; make cleanall )
 	( cd _NH3_Plasma_10s ; make cleanall )
 	( cd _NH3_Plasma_34s ; make cleanall )
 
