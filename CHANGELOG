@@ -7,6 +7,26 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JAN 31a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - in find_post_variable_value_fluid(), now calls find_Qe() to determine Qe instead of 
+      computing it explicitly
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - updated find_Qe(), find_Se(), find_dSe_dU_transport_Qe()
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - added the section "Electron Energy Relaxation Terms"
+  * in model/share/transport_share.c
+    - removed "static" in front of double _lnLambda()
+  * in model/thermo/_generic/electronimpact.c
+    - added _EoverNk_from_Te() and _mueNk_from_Te()
+    - added _mueN_N2()
+    - fixed bugs in _EoverN_from_rhok_Te() and _Te_from_rhok_EoverN()
+  * in model/thermo/_generic/test/EoverN.c
+    - made modifications
+  * in src/test.c
+    - in main(), fixed bug by adding input.BINARYMPI = FALSE;
+    
+
 2024 JAN 26a
   * in model/chem/_NH3_Plasma_10s/doc/rodriguez2023.tex
     - made improvements

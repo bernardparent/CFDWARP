@@ -11,7 +11,6 @@ void read_model_transport_actions(char *actionname, char **argum, SOAP_codex_t *
 
 void find_dmuk_from_rhok_Tk_Ek(gl_t *gl, spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok);
 
-
 void find_nuk_eta_kappa(gl_t *gl, spec_t rhok, double T, double Te, spec_t nuk, double *eta, double *kappa);
 
 void find_nuk_eta_kappak_muk(gl_t *gl, spec_t rhok, double T, double Te,

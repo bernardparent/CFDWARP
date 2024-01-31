@@ -214,7 +214,7 @@ void adjust_muk_for_Ek_effect(long k, double Ek, double N, double *muk){
 }
 
 
-static double _lnLambda(spec_t rhok, double Te){
+double _lnLambda(spec_t rhok, double Te){
   double lnlambda;
 #ifdef speceminus  
   double Pe,rhoe;

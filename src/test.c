@@ -1256,7 +1256,8 @@ int main ( int argc, char **argv ) {
 #endif //UNSTEADY
   input.ASCII = FALSE;
   input.INTERPOLATION = FALSE;
-
+  input.BINARYMPI = FALSE;
+  
   seed_random (  );
   create_node ( &npL, 0, 0, 0 );
   create_node ( &npR, 0, 0, 0 );

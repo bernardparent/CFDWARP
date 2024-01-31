@@ -24,6 +24,7 @@ void find_dmuk_from_rhok_Tk_Ek_ParentMacheret(spec_t rhok, double Tk, double Ek,
 
 double _muk_from_rhok_T_Te_ParentMacheret(spec_t rhok, double T, double Te, long k);
 
+double _lnLambda(spec_t rhok, double Te);
 
 
 #endif /* _TRANSPORT_SHARE_H */

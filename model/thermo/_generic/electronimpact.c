@@ -630,6 +630,26 @@ static double _Te_from_EoverN_O2(double EoverN){
   return(Te);
 }
 
+double _EoverNk_from_Te(long spec, double Te){
+  double Estar;
+  switch (smap[spec]){
+    case SMAP_NH3:
+      Estar=_EoverN_from_Te_NH3_Morgan(Te);
+    break;
+    case SMAP_N2:
+      Estar=_EoverN_from_Te_N2(Te);
+    break;
+    case SMAP_O2:
+      Estar=_EoverN_from_Te_O2(Te);
+    break;
+    case SMAP_H:
+      Estar=_EoverN_from_Te_H_Morgan(Te);
+    break;
+    default:
+      Estar=0.0;
+  }
+  return(Estar);
+}
 
 double _EoverN_from_rhok_Te(spec_t rhok, double Te){
   double Estar,Nsum;
@@ -641,12 +661,15 @@ double _EoverN_from_rhok_Te(spec_t rhok, double Te){
       case SMAP_NH3:
         Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_NH3_Morgan(Te);
         Nsum+=rhok[spec]/_m(spec);
+      break;
       case SMAP_N2:
         Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_N2(Te);
         Nsum+=rhok[spec]/_m(spec);
+      break;
       case SMAP_O2:
         Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_O2(Te);
         Nsum+=rhok[spec]/_m(spec);
+      break;
       case SMAP_H:
         Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_H_Morgan(Te);
         Nsum+=rhok[spec]/_m(spec);
@@ -659,6 +682,8 @@ double _EoverN_from_rhok_Te(spec_t rhok, double Te){
 }
 
 
+
+
 double _Te_from_rhok_EoverN(spec_t rhok, double EoverN){
   double Te,Nsum;
   long spec;
@@ -669,12 +694,15 @@ double _Te_from_rhok_EoverN(spec_t rhok, double EoverN){
       case SMAP_NH3:
         Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_NH3_Morgan(EoverN);
         Nsum+=rhok[spec]/_m(spec);
+      break;
       case SMAP_N2:
         Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_N2(EoverN);
         Nsum+=rhok[spec]/_m(spec);
+      break;
       case SMAP_O2:
         Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_O2(EoverN);
         Nsum+=rhok[spec]/_m(spec);
+      break;
       case SMAP_H:
         Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_H_Morgan(EoverN);
         Nsum+=rhok[spec]/_m(spec);
@@ -684,4 +712,71 @@ double _Te_from_rhok_EoverN(spec_t rhok, double EoverN){
   if (Nsum==0.0) fatal_error("Couldn't find any valid species when determining Te in _Te_from_Nk_EoverN().");
   Te/=Nsum;
   return(Te);
+}
+
+
+static double _mueN_N2(double Te){
+  double mueN_N2;  
+  /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections */
+  /* log K */
+  double Te_control[] = 
+  { 
+    2.30258509299405,
+    4.30406509320417,
+    6.11777329755360,
+    6.16032225820390,
+    6.31422787002356,
+    6.65309818932878,
+    7.12888595635390,
+    7.52092804412992,
+    8.05462032845107,
+    8.75401408453109,
+    9.14756478528784,
+    9.34312262669112,
+    9.44165160928006,
+    10.0847647584658,
+    11.1894893389638,
+    11.9794616745625,
+    12.7963582069535
+  };
+  /* log m2/Vs*/
+  double mueN_control[] = 
+  { 
+    67.4168215829997,
+    61.6589718870732,
+    58.8604497828070,
+    58.7654953142236,
+    58.5220600000565,
+    58.1127487333608,
+    57.6332201163168,
+    57.3072804521954,
+    56.9306920039230,
+    56.4577812312559,
+    56.0953860429103,
+    55.7885443350081,
+    55.5658436861888,
+    55.3408534122814,
+    55.1394225183092,
+    54.8599215249993,
+    54.5710926348406
+  };
+  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
+  mueN_N2 = EXM_f_from_monotonespline(N, Te_control, mueN_control, Te);
+  return(exp( mueN_N2 ));
+}
+
+
+
+double _mueNk_from_Te(long spec, double Te){
+  double mueN;
+  switch (smap[spec]){
+    case SMAP_N2:
+      mueN=_mueN_N2(Te);
+    break;
+    default:
+      mueN=3.74E19*exp(33.5/sqrt(log(Te)));
+  }
+  return(mueN);
 }
