@@ -191,6 +191,7 @@ const static double Peps[SMAP_NS]=
    59.7e0,      /*H3 */      /* !! unknown value: fixed to the one of H2 */
    71.4e0,      /*N4 */      /* !! unknown value: fixed to the one of N2 */
    71.4e0,      /*N3 */      /* !! unknown value: fixed to the one of N2 */
+   558.3,       /* NH3v */   /* !! unknown value: fixed to the one of NH3 */
   };
 
 
@@ -296,6 +297,7 @@ const static double Psig[SMAP_NS]=
    0.2827E+0,      /*H3 */      /* !! unknown value: fixed to the one of H2 */
    0.3798e0,      /*N4 */      /* !! unknown value: fixed to the one of N2 */
    0.3798e0,      /*N3 */      /* !! unknown value: fixed to the one of N2 */
+   0.290E0,     /* NH3v */     /* !! unknown value: fixed to the one of NH3 */
   };
 
 

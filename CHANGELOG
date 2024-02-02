@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 FEB 02a
+  * in model/chem/_NH3_Plasma_10s/chem.c
+    - added CHEMMODEL_ARAKONI2007 model
+  * in model/thermo/_generic/enthalpy.c and model/thermo/_generic/thermo.c 
+    and model/transport/_Dixon-Lewis/transport.c
+    - added species NH3v
+  * in model/chem/_NH3_Plasma_10s/
+    - added arakoni2007.c
+    
+
 2024 FEB 01a
   * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
     - in find_post_variable_name_fluid() and find_post_variable_value_fluid(), fixed
