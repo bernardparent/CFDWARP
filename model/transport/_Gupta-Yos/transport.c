@@ -862,7 +862,7 @@ double EXM_matrix_determinant(EXM_mat_t mat){//improve this, triangular matrix i
 }
 
 
-static double _lnLambda(gl_t *gl, spec_t rhok, double Te){
+static double _lnLambda_local(gl_t *gl, spec_t rhok, double Te){
 #ifdef speceminus  
   double Pe,rhoe,lnLambda;
   rhoe=rhok[speceminus];
@@ -964,7 +964,7 @@ double _kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ30(gl_t *gl, spec_t rh
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
 
-  find_Delta1_Delta2(N,T,_lnLambda(gl, rhok, Te),Delta1,Delta2);
+  find_Delta1_Delta2(N,T,_lnLambda_local(gl, rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
   
   kappa_tr     = 0.0e0;
@@ -1039,7 +1039,7 @@ double _kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ27(gl_t *gl, spec_t rh
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
 
-  find_Delta1_Delta2(N,T,_lnLambda(gl, rhok, Te),Delta1,Delta2);
+  find_Delta1_Delta2(N,T,_lnLambda_local(gl, rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
   
 
@@ -1099,7 +1099,7 @@ double _kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ40A(gl_t *gl, spec_t r
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
 
-  find_Delta1_Delta2(N,T,_lnLambda(gl, rhok, Te),Delta1,Delta2);
+  find_Delta1_Delta2(N,T,_lnLambda_local(gl, rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
   
 
@@ -1310,10 +1310,10 @@ void find_nuk_eta_kappak_muk(gl_t *gl, spec_t rhok, double T, double Te,
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N; 
 
-  find_Delta1_Delta2(N,T,_lnLambda(gl, rhok, Te),Delta1,Delta2);
+  find_Delta1_Delta2(N,T,_lnLambda_local(gl, rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);  
 
-  find_Delta1_Delta2(N,Te,_lnLambda(gl, rhok, Te),Delta1_e,Delta2_e);
+  find_Delta1_Delta2(N,Te,_lnLambda_local(gl, rhok, Te),Delta1_e,Delta2_e);
   find_aij_Ai_for_kappa(chik, N, Te, Delta1_e, Delta2_e, aij_e, Ai_e, &aav_e);  
   
   *eta=_eta_from_chik_N_T_Te_Delta1_Delta2(chik, N, T, Te, Delta1, Delta2);

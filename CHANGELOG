@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 FEB 01a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - in find_post_variable_name_fluid() and find_post_variable_value_fluid(), fixed
+      bugs related to AVERAGEDRATES
+  * in model/transport/_Gupta-Yos/transport.c
+    - renamed _lnLambda() to _lnLambda_local()
+    
+
 2024 JAN 31a
   * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
     - in find_post_variable_value_fluid(), now calls find_Qe() to determine Qe instead of 
