@@ -630,6 +630,50 @@ static double _Te_from_EoverN_O2(double EoverN){
   return(Te);
 }
 
+static double _EoverN_from_Te_NO(double Te){
+  double EoverN;
+  /* Data in log-log coordinates */
+  /* log K */
+  double Te_data[] = 
+  { 
+    2.30258509299405,
+    3.15709869850392,
+    4.15325682806993,
+    5.60445309962002,
+    6.40079140504183,
+    6.90775527898214,
+    8.07432899557906,
+    8.67059265954218,
+    9.54396882476086,
+    10.3367243480594,
+    11.1840222084466,
+    15.4249484703984
+  };
+  /* log Vm^2*/
+  double EoverN_data[] = 
+  {
+    -60.9779329059717,
+    -57.3277129484975,
+    -54.4138087601033,
+    -51.4008648205280,
+    -50.0932061213430,
+    -49.3445762009764,
+    -45.5773327731255,
+    -45.1609340852378,
+    -44.6399834464209,
+    -43.5989741084572,
+    -42.5573177634926,
+    -38.0453342922307
+  };
+  
+  int N = sizeof(Te_data)/sizeof(Te_data[0]);
+  Te = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
+  EoverN = exp( EXM_f_from_monotonespline(N, Te_data, EoverN_data, Te) );
+  return(EoverN);
+}
+
+
+
 double _EoverNk_from_Te(long spec, double Te){
   double Estar;
   switch (smap[spec]){
@@ -641,6 +685,9 @@ double _EoverNk_from_Te(long spec, double Te){
     break;
     case SMAP_O2:
       Estar=_EoverN_from_Te_O2(Te);
+    break;
+    case SMAP_NO:
+      Estar=_EoverN_from_Te_NO(Te);
     break;
     case SMAP_H:
       Estar=_EoverN_from_Te_H_Morgan(Te);
@@ -668,6 +715,10 @@ double _EoverN_from_rhok_Te(spec_t rhok, double Te){
       break;
       case SMAP_O2:
         Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_O2(Te);
+        Nsum+=rhok[spec]/_m(spec);
+      break;
+      case SMAP_NO:
+        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_NO(Te);
         Nsum+=rhok[spec]/_m(spec);
       break;
       case SMAP_H:
