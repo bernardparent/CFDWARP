@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 FEB 06a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Qe() and find_dSe_dU_transport_Qe(), added relaxation with translational energy
+      modes of the neutrals
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - in the section "Electron Energy Relaxation Terms", added relaxation with translational energy
+      modes of the neutrals
+    
+
 2024 FEB 05a
   * in model/chem/_NH3_Plasma_10s/arakoni2007.c
     - improved Arakonic model reactions

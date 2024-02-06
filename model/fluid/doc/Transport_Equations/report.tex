@@ -2517,30 +2517,57 @@ Q_{\rm e}
 %
 with $(\mu_{\rm e} N)_k$ the product of the mobility and the total number density of the electrons in species $k$ assuming no electron-ion collisions and assuming that the gas number density $N$ is made up solely of molecules of species $k$.  Similarly, $E^\star_k$ is the reduced electric field of species $k$ assuming no electron-ion collisions and assuming that the gas number density $N$ is made up solely of molecules of species $k$. Both $(\mu_{\rm e} N)_k$ and $E^\star_k$ can be found from experiments or from BOLSIG+ for many species.
 
-The above expression for $Q_{\rm e}$ includes all electron-neutral collisions but is missing the electron-ion collisions. We can add those following \cite{jfm:1964:appleton} as follows:
+
+
+
+
+The above expression for $Q_{\rm e}$ will predict accurately all electron losses including electron impact ionization and excitation, elastic collisions, and inelastic collisions with the vibrational energy modes of the molecule. However, it does suffer from relaxing towards the vibrational temperature of the heavy species. This is generally true because the relaxation with the vibrational energy modes is 1-2 orders of magnitude faster than the one with the translational energy modes of the heavy molecules. However, this ceases to be the case when $T-T_{\rm e}$ is one order of magnitude higher than $T-T_{\rm v}$. Then, the relaxation with the translational energy modes becomes important. We can add those following \cite[page 16]{book:1991:raizer} and
+ \cite{jfm:1964:appleton} as follows:
 %
 \begin{equation}
 Q_{\rm e}
 = 
    \sum_k \beta_k^{\rm n} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
- + \sum_k \beta_k^{\rm i} 3 N_{\rm e} k_{\rm B} (T_{\rm e}-T)  \frac{m_{\rm e} }{m_k} \nu_{\rm ek}  
+ + \sum_k^{k \ne e}  \frac{(T_{\rm e}-T)}{T_{\rm e}} \frac{2 m_{\rm e}}{m_k} \frac{3}{2} N_{\rm e} k_{\rm B} T_{\rm e} \nu_{\rm ek}  
 \end{equation}
 %
-where $\nu_{\rm ek}$ is the collision frequency between the electrons and species $k$. We can rewrite the collision frequency as:
-%
-\begin{equation}
-\nu_{\rm ek} = N_k \sigma_{\rm ek} \overline{q_{\rm e}} 
-\end{equation}
-%
-where where  $\sigma_{ek}$ is the collision cross section between an electron and species $k$ and $\overline{q_{\rm e}}$ is the average electron speed. Replacing the latter in the former:
+or
 %
 \begin{equation}
 Q_{\rm e}
 = 
    \sum_k \beta_k^{\rm n} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
+ + \sum_k^{k\ne e}  3 N_{\rm e} k_{\rm B} (T_{\rm e}-T) \frac{ m_{\rm e}}{m_k}   \nu_{\rm ek}  
+\end{equation}
+%
+where $\nu_{\rm ek}$ is the collision frequency between the electrons and species $k$. 
+We can rewrite the collision frequency as function of the mobility \cite[page 9]{book:1991:raizer} or the collision cross section as follows:
+%
+\begin{equation}
+\nu_{ek} = \frac{|C_{\rm e}|}{m_{\rm e} \mu_{ek}} = N_k \sigma_{ek} \overline{q_{\rm e}} 
+\end{equation}
+%
+where $\mu_{ek}$ is the electron mobility within species $k$ and where  $\sigma_{ek}$ is the collision cross section between an electron and species $k$ and $\overline{q_{\rm e}}$ is the average electron speed. Replacing the latter in the former:
+%
+\begin{equation}
+Q_{\rm e}
+= 
+   \sum_k \beta_k^{\rm n} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
+ + \sum_k \beta_k^{\rm n} 3 N_{\rm e} k_{\rm B} (T_{\rm e}-T)    \frac{|C_{\rm e}|}{m_k \mu_{ek}}  
  + \sum_k \beta_k^{\rm i} 3 \rho_{\rm e} k_{\rm B} (T_{\rm e}-T) \overline{q_{\rm e}} \frac{N_k}{m_k} \sigma_{ek} 
 \end{equation}
 %
+or,
+%
+\begin{equation}
+Q_{\rm e}
+= 
+   \sum_k \beta_k^{\rm n} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
+ + \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  (T_{\rm e}-T)}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}        
+ + \sum_k \beta_k^{\rm i} 3 \rho_{\rm e} k_{\rm B} (T_{\rm e}-T) \overline{q_{\rm e}} \frac{N_k}{m_k} \sigma_{ek} 
+\end{equation}
+%
+
 We can further express  $\sigma_{ek}$ following Ref.~\cite[page 58]{book:2004:lieberman}:
 %
 \begin{equation}
@@ -2565,6 +2592,7 @@ Then
 Q_{\rm e}
 = 
    \sum_k \beta_k^{\rm n} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
+ + \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  (T_{\rm e}-T)}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}        
  + \sum_k \beta_k^{\rm i} 3 \rho_{\rm e} k_{\rm B} (T_{\rm e}-T) \overline{q_{\rm e}} \frac{N_k}{m_k} \frac{8}{\pi} \left(\frac{|C_i| |C_e|}{4 \pi \epsilon_0 } \frac{1}{\frac{1}{2} m_{\rm e} \overline{q_{\rm e}}^2}\right)^2 \ln \Lambda
 \end{equation}
 %
@@ -2573,6 +2601,7 @@ Q_{\rm e}
 Q_{\rm e}
 = 
    \sum_k \beta_k^{\rm n} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
+ + \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  (T_{\rm e}-T)}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}        
  + \sum_k \beta_k^{\rm i} 3 \rho_{\rm e} k_{\rm B} \frac{(T_{\rm e}-T)}{\overline{q_{\rm e}}^3}  \frac{N_k}{m_k} \frac{8}{\pi} \left(\frac{|C_i| |C_e|}{2 \pi \epsilon_0 m_{\rm e}} \right)^2 \ln \Lambda
 \end{equation}
 %
@@ -2582,6 +2611,7 @@ Q_{\rm e}
 Q_{\rm e}
 = 
    \sum_k \beta_k^{\rm n} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
+ + \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  (T_{\rm e}-T)}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}        
  + \sum_k \beta_k^{\rm i}  \rho_{\rm e} \rho_k  (T_{\rm e}-T )  \frac{6 k_{\rm B} C_i^2 C_e^2 \ln \Lambda}{ \pi^3 \epsilon_0^2 m_{\rm e}^2 m_k^2 \overline{q_{\rm e}}^3}  
 }
 \end{equation}
@@ -2592,10 +2622,11 @@ After expanding the average electron velocity, we get:
 Q_{\rm e}
 = 
    \sum_k \beta_k^{\rm n} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
+ + \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  (T_{\rm e}-T)}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}        
  + \sum_k \beta_k^{\rm i}  \rho_{\rm e} \rho_k  (T_{\rm e}^{-0.5}-T T_{\rm e}^{-1.5}) \left(\frac{\pi m_{\rm e}}{8 k_{\rm B}}\right)^{1.5}  \frac{6 k_{\rm B} C_i^2 C_e^2 \ln \Lambda}{ \pi^3 \epsilon_0^2 m_{\rm e}^2 m_k^2}  
 \end{equation}
 %
-
+In the latter, $(\mu_{e} N)_k$ corresponds to the electron mobility in species $k$ assuming that the plasma is weakly-ionized and that the ions do not affect the electron mobility. The term $(\mu_{e} N)_k$ can be obtained for each neutral species from experiments or from BOLSIG+.
 
 
 \section{Total Energy Transport Equation}
