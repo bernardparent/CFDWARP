@@ -4435,6 +4435,8 @@ obtained from species NH4+ by subtracting the ionization energy of NH4 (4.410300
 
 /* 
    species NH3v
+   obtained from species NH3
+   but added excitation threshold of 0.118 eV = 1.36933e+03 K added to b1, value taken from Arakoni et. al 2007 and NH3 lxcat Morgan database
    pos 0: Tmin lower range limit
    pos 1: Tmax upper range limit
    pos 2-8: a1,a2,...,a7
@@ -4451,7 +4453,7 @@ obtained from species NH4+ by subtracting the ionization energy of NH4 (4.410300
        -2.183766703e-05, /* a5 */
        +1.317385706e-08, /* a6 */
        -3.332322060e-12, /* a7 */
-       -1.264886413e+04, /* b1 */
+       -1.264886413e+04 + 1.36933e+03, /* b1 */
        +4.366014588e+01  /* b2 */
       },
       {
@@ -4464,7 +4466,7 @@ obtained from species NH4+ by subtracting the ionization energy of NH4 (4.410300
        +3.552502750e-08, /* a5 */
        +2.530923570e-12, /* a6 */
        -3.322700530e-16, /* a7 */
-       +4.386191960e+04, /* b1 */
+       +4.386191960e+04  + 1.36933e+03, /* b1 */
        -6.462330602e+01  /* b2 */        
       },
       {
@@ -4477,7 +4479,7 @@ obtained from species NH4+ by subtracting the ionization energy of NH4 (4.410300
        +3.552502750e-08, /* a5 */
        +2.530923570e-12, /* a6 */
        -3.322700530e-16, /* a7 */
-       +4.386191960e+04, /* b1 */
+       +4.386191960e+04  + 1.36933e+03, /* b1 */
        -6.462330602e+01  /* b2 */        
       }
     },  
