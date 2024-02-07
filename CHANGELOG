@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 FEB 07a
+  * in model/chem/_NH3_Plasma_10s/arakoni2007.c
+    - fixed problem with 3-body reaction rates 
+    - removed implicit treatment of Townsend ionization reactions
+    
+
 2024 FEB 06b
   * in model/thermo/_generic/enthalpy.c
     - added the vibrational energy to species NH3v
