@@ -793,8 +793,12 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
   wfprintf(datafile," Lc=%E effiter_U_emfield=%E effiter_R_emfield=%E",gl->Lc,effiter_U_emfield,effiter_R_emfield);
 #endif
 
-#if defined(UNSTEADY) && defined(_AVERAGEDRATES)
-  wfprintf(datafile," averagedrates_time=%E AVERAGEDRATES=%ld",gl->averagedrates_time,gl->AVERAGEDRATES);
+#if defined(_AVERAGEDRATES)
+  #if defined(UNSTEADY) 
+    wfprintf(datafile," averagedrates_time=%E AVERAGEDRATES=%ld",gl->averagedrates_time,gl->AVERAGEDRATES);
+  #else
+    wfprintf(datafile," averagedrates_time=0.0E0 AVERAGEDRATES=0");
+  #endif
 #endif
 
   wfprintf(datafile,"\n");

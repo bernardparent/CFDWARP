@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 FEB 14a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Semfield(), removed _averaged_rate() for EDOTJ
+    - in find_Se(), removed _averaged_rate() for EDOTJE
+  * in src/data.c
+    - in write_data_file_binary_ascii(), added "averagedrates_time=0.0E0 AVERAGEDRATES=0"
+      to first line of data file when not UNSTEADY
+  * in model/chem/_NH3_Plasma_10s/arakoni2007.c
+    - added _averaged_rate_local()
+    
+
 2024 FEB 09a
   * in model/chem/_NH3_Plasma_10s/arakoni2007.c
     - updated some reactions requiring BOLSIG+ curve fits 
