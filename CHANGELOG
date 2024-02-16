@@ -6,6 +6,14 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2024 FEB 16a
+  * in model/share/transport_share.c
+    - added _mueN_N2() and _mueNk_from_Te()
+  * in model/chem/_C2H4_Air_23s/chem.hh
+    - added missing species HCCO
+  * in model/thermo/_generic/electronimpact.c
+    - removed _mueN_N2() and _mueNk_from_Te()
+  * 
 
 2024 FEB 14a
   * in model/fluid/_Navier-Stokes_plasma/fluid_source.c

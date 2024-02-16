@@ -132,6 +132,5 @@ double _Te_from_rhok_EoverN(spec_t rhok, double EoverN);
 
 double _EoverNk_from_Te(long spec, double Te);
 
-double _mueNk_from_Te(long spec, double Te);
 
 #endif /* _THERMO_H */

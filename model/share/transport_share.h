@@ -26,5 +26,6 @@ double _muk_from_rhok_T_Te_ParentMacheret(spec_t rhok, double T, double Te, long
 
 double _lnLambda(spec_t rhok, double Te);
 
+double _mueNk_from_Te(long spec, double Te);
 
 #endif /* _TRANSPORT_SHARE_H */

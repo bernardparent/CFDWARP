@@ -3,7 +3,7 @@
 #define _CHEM_ACTIONNAME "C2H4Air23s"
 
 #define CHEM_NEUTRAL TRUE
-#define ns 25
+#define ns 26
 #define ncs 0
 
 #define specH    0
@@ -31,6 +31,7 @@
 #define specCO2  22
 #define specNO  23
 #define specN  24
+#define specHCCO  25
 
 #define SPECIES_ELECTRON 0
 #define SPECIES_NEUTRAL  1
@@ -78,13 +79,15 @@ const static long smap[ns] = {
   SMAP_CO, 
   SMAP_CO2,
   SMAP_NO,
-  SMAP_N
+  SMAP_N,
+  SMAP_HCCO
 };     
        
        
 
 
 const static long speciestype[ns] = {
+  SPECIES_NEUTRAL,
   SPECIES_NEUTRAL,
   SPECIES_NEUTRAL,
   SPECIES_NEUTRAL,
