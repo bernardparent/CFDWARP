@@ -6,6 +6,18 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2024 FEB 20a
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - in the section "Charged Species Momentum Equation", added a derivation of the drift-diffusion
+      model from the fundamental momentum equation as well as a derivation of the effective
+      mobility
+  * in model/transport/doc/report.tex
+    - improved the formulation of the effective mobility according to the one derived in 
+      section "Charged Species Momentum Equation" of model/fluid/doc/Transport_Equations/report.tex 
+    - added a derivation of the electron mobility within a ionic species
+
+
 2024 FEB 16a
   * in model/share/transport_share.c
     - added _mueN_N2() and _mueNk_from_Te()

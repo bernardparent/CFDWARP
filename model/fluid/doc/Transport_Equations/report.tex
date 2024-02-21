@@ -204,11 +204,66 @@ This document gives an overview of the mass, momentum, and energy fluid transpor
 
 \section{Charged Species Momentum Equation}
 
-The momentum equation for the charged species can be obtained by assuming that the terms related to inertia change and to collision forces between charged species are negligible compared to the terms related to the collision forces between the charged species and the neutrals \cite{jcp:2011:parent}. Then, the following is obtained: 
+
+The charged species momentum equation can be written as:
+%
+\begin{equation}
+m_k N_k \frac{d \vec{V}^k}{dt}= C_k N_k (\vec{E}+ \vec{V}^k \times \vec{B}) - \sum_{m}^{m\ne k} \nu_{km} m_k N_k  (\vec{V}^k - \vec{V}^m) - \vec{\nabla} P_k 
+\end{equation}
+%
+where $\nu_{km}$ is the collision frequency of species $k$ interacting with species $m$. The momentum equation for the charged species can be obtained by assuming that the terms related to inertia change and to collision forces between charged species are negligible compared to the terms related to the collision forces between the charged species and the neutrals \cite{jcp:2011:parent}.
+%
+\begin{equation}
+0= C_k N_k (\vec{E}+ \vec{V}^k \times \vec{B}) - \sum_{m}^{m\ne k} \nu_{km} m_k N_k  (\vec{V}^k - \vec{V}^m) - \vec{\nabla} P_k 
+\end{equation}
+%
+Consider species $k$ to be electrons. Then:
+%
+\begin{equation}
+0= C_{\rm e} N_{\rm e} (\vec{E}+ \vec{V}^{\rm e} \times \vec{B}) - \sum_{m}^{m\ne {\rm e}} \nu_{{\rm e}m} m_{\rm e} N_{\rm e}  (\vec{V}^{\rm e} - \vec{V}^m) - \vec{\nabla} P_{\rm e} 
+\end{equation}
+%
+Note that the electron velocity is typically much larger than the ion or neutrals velocity. Thus we can say that $\vec{V}^{\rm e}-\vec{V}^m=\vec{V}^{\rm e}-\vec{V}$ with $\vec{V}$ the bulk plasma velocity. Then:
+%
+\begin{equation}
+0= C_{\rm e} N_{\rm e} (\vec{E}+ \vec{V}^{\rm e} \times \vec{B}) - \sum_{m}^{m\ne {\rm e}} \frac{\nu_{{\rm e}m} m_{\rm e}}{|C_{\rm e}|} |C_{\rm e}| N_{\rm e}  (\vec{V}^{\rm e} - \vec{V}) - \vec{\nabla} P_{\rm e} 
+\end{equation}
+%
+Define the mobility of species $k$ within species $m$ as:
+%
+\begin{equation}
+ \mu_{km} \equiv \frac{|C_k|}{m_k \nu_{km}}
+\end{equation}
+%
+Substitute the latter in the former:
+%
+\begin{equation}
+0= C_{\rm e} N_{\rm e} (\vec{E}+ \vec{V}^{\rm e} \times \vec{B}) - \sum_{m}^{m\ne {\rm e}} \frac{1}{\mu_{{\rm e}m}} |C_{\rm e}| N_{\rm e}  (\vec{V}^{\rm e} - \vec{V}) - \vec{\nabla} P_{\rm e} 
+\end{equation}
+%
+We can define the total mobility of the electrons as:
+%
+\begin{equation}
+\mu_k \equiv  \frac{1}{\sum_m^{m\ne k} \frac{1}{\mu_{km}}} 
+\end{equation}
+%
+Then
+%
+\begin{equation}
+0= C_{\rm e} N_{\rm e} (\vec{E}+ \vec{V}^{\rm e} \times \vec{B}) - \frac{ |C_{\rm e}| N_{\rm e}}{\mu_{\rm e}}  (\vec{V}^{\rm e} - \vec{V}) - \vec{\nabla} P_{\rm e} 
+\end{equation}
+%
+Similarly, for other charged species, we can obtain:
+%
+\begin{equation}
+0= C_k N_k (\vec{E}+ \vec{V}^{k} \times \vec{B}) - \frac{ |C_k| N_k}{\mu_k}  (\vec{V}^k - \vec{V}) - \vec{\nabla} P_k 
+\end{equation}
+%
+ Then, we can isolate $\vec{V}^k$ in the latter: 
 %
 \begin{equation}
 \frameeqn{
-  \vec{V}^k=\vec{V}^{\rm n} + s_k \mu_k \left(\vec{E}+\vec{V}^k \times \vec{B}\right)-\frac{\mu_k}{|C_k| N_k}\nabla P_k
+  \vec{V}^k=\vec{V} + s_k \mu_k \left(\vec{E}+\vec{V}^k \times \vec{B}\right)-\frac{\mu_k}{|C_k| N_k}\nabla P_k
 }
  \label{eqn:Vcharged}
 \end{equation}

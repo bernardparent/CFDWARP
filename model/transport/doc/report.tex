@@ -381,7 +381,7 @@ where $(c_p)_k$ is the specific heat at constant pressure of the $k$th species a
 \begin{table}
   \center\fontsizetable
   \begin{threeparttable}
-    \tablecaption{Drift velocities as a function of the effective electric field from Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev}.}
+    \tablecaption{Drift velocities of $\rm O_2$, $\rm N_2$ and dry air as a function of the effective electric field from Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev}.}
     \label{tab:electrondriftvelocities}
     \fontsizetable
     \begin{tabular}{r@{.}lr@{.}lr@{.}lr@{.}l}
@@ -419,7 +419,7 @@ where $(c_p)_k$ is the specific heat at constant pressure of the $k$th species a
 %
 \begin{table}
   \center\fontsizetable
-    \tablecaption{Drift velocities as a function of the effective electric field from Fig.\ 10 (b) of Ref.\ \cite{ps:2005:tarasenko}.}
+    \tablecaption{Drift velocities for $\rm N_2$ as a function of the effective electric field from Fig.\ 10 (b) of Ref.\ \cite{ps:2005:tarasenko}.}
     \label{tab:electrondriftvelocities}
     \fontsizetable
     \begin{tabular}{r@{.}lr@{.}l}
@@ -477,17 +477,85 @@ where $(c_p)_k$ is the specific heat at constant pressure of the $k$th species a
 The electron mobility in a partially ionized plasma (a plasma in which both the molar fraction of all neutrals and the molar fraction of all charged species are significant) needs to include collisions between the electrons and the neutrals and collisions between electrons and ions. This results in an electron mobility equal to:
 %
 \begin{equation}
-\mu_{\rm e}=\frac{1}{\frac{1}{\mu_{\rm en}}+\frac{1}{\mu_{\rm ei}}}
+\mu_{\rm e}=\frac{1}{\mfd \sum_k^{k\ne e} \frac{N_k}{\mu_{{\rm e}k}N_k}}
 \end{equation}
 %
-with the electron mobility with respect to ions set to
+or
 %
 \begin{equation}
-\mu_{\rm ei}= \frac{9.5 \times 10^{16}}{\rm m\cdot K^{1.5}\cdot V \cdot s} \frac{T_{\rm e}^{1.5}}{N_{\rm i} \ln \Lambda}
+\mu_{\rm e} N=\frac{1}{\mfd \sum_k^{k\ne e} \frac{\chi_k}{\mu_{{\rm e}k}N_k}}
 \end{equation}
 %
-where $T_{\rm e}$ is the electron temperature in K, $N_{\rm i}$ is the ion number density in m$^{-3}$.
-The latter is obtained from Raizer \cite[Eq.\ (2.9)]{book:1991:raizer}.
+with $\chi_k$ the molar fraction of species $k$, $N$ the total number density of the mixture (including electrons), and $N_k$ the number density of species $k$, and $\mu_{{\rm e}k}$ the mobility of the electrons within species $k$. 
+
+
+
+
+We can rewrite the collision frequency between the electrons and species $k$,  $\nu_{\rm ek}$, as function of the mobility \cite[page 9]{book:1991:raizer} or the collision cross section as follows:
+%
+\begin{equation}
+\nu_{ek} = \frac{|C_{\rm e}|}{m_{\rm e} \mu_{ek}} = N_k \sigma_{ek} \overline{q_{\rm e}} 
+\end{equation}
+%
+where $\mu_{ek}$ is the electron mobility within species $k$ and where  $\sigma_{ek}$ is the collision cross section between an electron and species $k$ and $\overline{q_{\rm e}}$ is the average electron speed.  We can use the latter to express the electron mobility within species $k$ as a function of the collision cross-section $\sigma_{ek}$ as follows:
+%
+\begin{equation}
+\mu_{ek}N_k = \frac{|C_{\rm e}|}{m_{\rm e} \sigma_{ek} \overline{q_{\rm e}}}   
+\end{equation}
+%
+We can further express  $\sigma_{ek}$ following Ref.~\cite[page 58]{book:2004:lieberman}:
+%
+\begin{equation}
+\sigma_{ek}= \frac{8}{\pi} b_0^2 \ln \Lambda
+\end{equation}
+%
+with $\ln \Lambda$ the Coulomb logarithm and $b_0$ equal to \cite[page 56]{book:2004:lieberman}:
+%
+\begin{equation}
+b_0 = \frac{|C_i| |C_e|}{4 \pi \epsilon_0 } \frac{1}{\frac{1}{2} m_{\rm e} \overline{q_{\rm e}}^2}
+\end{equation}
+%
+Then 
+%
+\begin{equation}
+\mu_{ek}N_k = \frac{|C_{\rm e}|}{m_{\rm e} \frac{8}{\pi} \left(\frac{|C_i| |C_e|}{4 \pi \epsilon_0 } \frac{1}{\frac{1}{2} m_{\rm e} \overline{q_{\rm e}}^2} \right)^2 \ln \Lambda \overline{q_{\rm e}}}   
+\end{equation}
+%
+or
+%
+\begin{equation}
+\mu_{ek}N_k = \frac{ \pi^3 \epsilon_0^2 m_{\rm e} \overline{q_{\rm e}}^3}{ 2  C_i^2 |C_e| \ln \Lambda }   
+\end{equation}
+%
+In the latter $\overline{q_{\rm e}}$ is the average speed of the electrons approaching an ion:
+%
+\begin{equation}
+\overline{q_{\rm e}} = \sqrt{\frac{8 k_{\rm B} T_{\rm e}}{\pi m_{\rm e}}}
+\end{equation}
+%
+Substitute:
+%
+\begin{equation}
+\mu_{ek}N_k = \frac{ \pi^3 \epsilon_0^2 m_{\rm e}}{ 2  C_i^2 |C_e| \ln \Lambda } 
+\left(\frac{8 k_{\rm B} }{\pi m_{\rm e}}\right)^\frac{3}{2} T_{\rm e}^{1.5} {\rm ~~~when~kth~species~is~ionic}
+\end{equation}
+%
+Another way we can obtain the electron mobility within a ionic species is by starting from Raizer \cite[Eq.\ (2.9)]{book:1991:raizer}:
+%
+\begin{equation}
+\mu_{{\rm e}k} N_k= \frac{9.5 \times 10^{16}}{\rm m\cdot K^{1.5}\cdot V \cdot s} \frac{T_{\rm e}^{1.5}}{ \ln \Lambda} {\rm ~~~when~kth~species~is~ionic}
+\end{equation}
+%
+where $T_{\rm e}$ is the electron temperature in K, $N_{k}$ is the $k$th ion number density in m$^{-3}$.
+The latter two expressions for the electron mobility within an ionic gas differ only by a constant of proportionality as follows:
+%
+\begin{equation}
+\mu_{ek}N_k = \frac{1.47 \cdot \pi^3 \epsilon_0^2 m_{\rm e}}{ 2  C_i^2 |C_e| \ln \Lambda } 
+\left(\frac{8 k_{\rm B} }{\pi m_{\rm e}}\right)^\frac{3}{2} T_{\rm e}^{1.5} {\rm ~~~when~kth~species~is~ionic}
+\end{equation}
+%
+
+
 Also, $\Lambda$ is the shielding parameter and $\ln \Lambda$ is the Coulomb logarithm. The Coulomb logarithm can be  found from the following \cite[p. 14]{book:1991:raizer}:
 %
 \begin{equation}
@@ -504,14 +572,24 @@ However, we find that using the latter leads to the electrical conductivity bein
 %
 with $N_{\rm e}$ the electron number density in 1/m$^3$ and $T_{\rm e}$ the electron temperature in K. The latter is valid as long as the electron temperature is less than 10 eV. 
 
-Also, we can fit a polynomial through the experimental data outlined in in Chapter 21 of Ref.\ \cite{book:1997:grigoriev} to find $\mu_{\rm en}$ in units of $\rm m^2\cdot V^{-1}\cdot s^{-1}$:
+
+A first approximation for the mobility of electrons within a neutral gas can be obtained from the experimental data of electron mobility in air outlined in in Chapter 21 of Ref.\ \cite{book:1997:grigoriev} (in units of $\rm m^2\cdot V^{-1}\cdot s^{-1}$):
 %
 \begin{equation}
-\mu_{\rm en}=N_{\rm n}^{-1} \cdot 3.74\cdot 10^{19} \cdot {\rm exp}\left(33.5 \cdot \left({\rm ln}\, T_{\rm e} \right)^{-0.5}\right)
+\mu_{{\rm e}k} N_k= 3.74\cdot 10^{19} \cdot {\rm exp}\left(33.5 \cdot \left({\rm ln}\, T_{\rm e} \right)^{-0.5}\right) {\rm ~~~when~kth~species~is~neutral}
 \end{equation}
 %
-where $N_{\rm n}$ is the number density of the neutrals in $m^{-3}$ and $T_{\rm e}$ is the electron temperature in K.
+where $N_k$ is the number density of species $k$ in $m^{-3}$ and $T_{\rm e}$ is the electron temperature in K.
 The latter equation can be used in the range $1000~{\rm K} \le T_{\rm e} \le 57900 ~{\rm K}$ with a relative error on the mobility not exceeding 20\%. In the range $287~{\rm K} \le T_{\rm e} < 1000~{\rm K}$, the relative error is less than 30\%. 
+
+A better evaluation of the mobility within a neutral gas can be obtained from BOLSIG+ as follows:
+%
+\begin{equation}
+\mu_{{\rm e}k} N_k = (\mu_{{\rm e}k} N)(T_{\rm e}) {\rm ~~~when~kth~species~is~neutral}
+\end{equation}
+%
+where $(\mu_{{\rm e}k} N)(T_{\rm e})$ refers to $\mu_{{\rm e}k} N$ as a function of $T_{\rm e}$ for a species $k$ obtained from BOLSIG+. 
+
 
 \subsection{Electron Mobility}
 
