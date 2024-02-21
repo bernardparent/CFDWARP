@@ -219,6 +219,7 @@ double _lnLambda(spec_t rhok, double Te){
 #ifdef speceminus  
   double Pe,rhoe;
   rhoe=rhok[speceminus];
+  rhoe=max(1e-20,rhoe);
   Pe = rhoe*calR*Te/_calM(speceminus)/101325.0e0; //electron pressure, atm
   /*electron pressure correction for the collision integrals of ionic species*/ /*Eq(24b)*/
   switch (LNLAMBDA){
@@ -252,7 +253,7 @@ double _lnLambda(spec_t rhok, double Te){
 
 
 /* electron mobility as a function of electron temperature and mass densities*/
-static double _mue_from_Nn_Ni_Te_rhok(double Nn, double Ni, double Te, spec_t rhok){
+static double _mue_from_Nn_Ni_Te_rhok_old(double Nn, double Ni, double Te, spec_t rhok){
   double muen,mue,muei;
   muen=3.74E19*exp(33.5/sqrt(log(max(300.0,Te))))/Nn;
   muei=9.5e16*pow(Te,1.5)/Ni/_lnLambda(rhok,Te);
@@ -260,6 +261,31 @@ static double _mue_from_Nn_Ni_Te_rhok(double Nn, double Ni, double Te, spec_t rh
   mue=1.0/(1.0/muen+1.0/muei);
   return(mue);
 }
+
+static double _mue_from_Te_rhok(double Te, spec_t rhok){
+  double mue;
+  long spec;
+  spec_t Nk;
+  double N,sum;
+  N=0.0;
+  for (spec=0; spec<ns; spec++) {
+    Nk[spec]=rhok[spec]/_m(spec);
+    N+=Nk[spec];
+  }
+  sum=0;
+  for (spec=0; spec<ns; spec++){
+    if (speciestype[spec]==SPECIES_NEUTRAL)
+        sum+=(Nk[spec]/N)/_mueNk_from_Te_ParentMacheret(spec, Te);
+    if (speciestype[spec]==SPECIES_IONPLUS || speciestype[spec]==SPECIES_IONMINUS)
+        sum+=(Nk[spec]/N)/(1.47*powint(pi,3)*sqr(epsilon0)*_m(speceminus)/(2.0*sqr(_C(spec))*fabs(_C(speceminus))*_lnLambda(rhok,Te))*pow(8.0*kB*Te/pi/_m(speceminus),1.5));
+  }
+  assert(sum!=0.0);
+  assert(N!=0.0);
+  mue=1.0/(sum*N);
+  return(mue);
+}
+
+
 
 
 /* the ion mobility due to collisions with neutrals is calculated as muin=A*Ti^n/Nn 
@@ -302,12 +328,12 @@ double _muk_from_rhok_T_Te_ParentMacheret(spec_t rhok, double T, double Te, long
 #ifdef speceminus
   if (CHEM_NEUTRAL && k==speceminus){
     /* electrons */
-    mu=_mue_from_Nn_Ni_Te_rhok(Nn,Ni,Te,rhok);
+    mu=_mue_from_Te_rhok(Te,rhok);
   } else {
 #endif
     switch (smap[k]){
       case SMAP_eminus:
-        mu=_mue_from_Nn_Ni_Te_rhok(Nn,Ni,Te,rhok);
+        mu=_mue_from_Te_rhok(Te,rhok);
       break;
       case SMAP_O2plus:  
         mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 1.18e23, T, -0.5,   _m(k));
@@ -504,48 +530,42 @@ void find_nuk_from_Dij(spec_t rhok, spec2_t Dij, spec_t nuk){
 
 static double _mueN_N2(double Te){
   double mueN_N2;  
-  /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections */
+  /* 
+  Data in log-log coordinates. 
+  Obtained with BOLSIG+ using Morgan LXCat cross-sections 
+  and experimental data from
+  Grigoriev, I. S. and Meilikhov, E. Z., Handbook of Physical Quantities, CRC, Boca Raton, Florida, 1997 
+  */
+
   /* log K */
   double Te_control[] = 
   { 
-    2.30258509299405,
-    4.30406509320417,
-    6.11777329755360,
-    6.16032225820390,
-    6.31422787002356,
-    6.65309818932878,
-    7.12888595635390,
-    7.52092804412992,
-    8.05462032845107,
-    8.75401408453109,
-    9.14756478528784,
-    9.34312262669112,
-    9.44165160928006,
-    10.0847647584658,
-    11.1894893389638,
-    11.9794616745625,
-    12.7963582069535
+    5.70378247465620,
+    6.00674317023720,
+    7.52656892402778,
+    9.05804529503584,
+    9.28657969532927,
+    9.69562262447425,
+    10.0010042738634,
+    10.7942349131424,
+    11.3595487221077,
+    13.1074773005257,
+    14.4872723773202
   };
   /* log m2/Vs*/
   double mueN_control[] = 
   { 
-    67.4168215829997,
-    61.6589718870732,
-    58.8604497828070,
-    58.7654953142236,
-    58.5220600000565,
-    58.1127487333608,
-    57.6332201163168,
-    57.3072804521954,
-    56.9306920039230,
-    56.4577812312559,
-    56.0953860429103,
-    55.7885443350081,
-    55.5658436861888,
-    55.3408534122814,
-    55.1394225183092,
-    54.8599215249993,
-    54.5710926348406
+    58.8996283915835,
+    58.6143994480998,
+    57.2079523809124,
+    56.0504995922214,
+    55.8498288967592,
+    55.4608930906023,
+    55.2620422318571,
+    55.2281751623455,
+    55.0864976593422,
+    54.4855134423581,
+    54.2677899585132
   };
   
   int N = sizeof(Te_control)/sizeof(Te_control[0]);

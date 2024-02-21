@@ -471,6 +471,14 @@ where $(c_p)_k$ is the specific heat at constant pressure of the $k$th species a
    \end{threeparttable}
 \end{table*}
 %
+\begin{figure}
+\centering
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{figs/mobility_N2.png}}
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{figs/mobility_N2_error.png}}
+\caption{Results for the mobility of electrons in ${\rm N_2}$, showing (a) product of mobility and number density, and (b) error percentage of cubic spline fit of  mobility data. The BOLSIG+ calculation uses electron impact cross sections from the Morgan database in Ref.\ \citen{jcp:2012:morgan}. Experimental data obtained from Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev}.}
+\label{fig:mobility_N2}
+\end{figure}
+
 
 \subsection{Electron Mobility}
 
@@ -512,19 +520,19 @@ We can further express  $\sigma_{ek}$ following Ref.~\cite[page 58]{book:2004:li
 with $\ln \Lambda$ the Coulomb logarithm and $b_0$ equal to \cite[page 56]{book:2004:lieberman}:
 %
 \begin{equation}
-b_0 = \frac{|C_i| |C_e|}{4 \pi \epsilon_0 } \frac{1}{\frac{1}{2} m_{\rm e} \overline{q_{\rm e}}^2}
+b_0 = \frac{|C_k| |C_e|}{4 \pi \epsilon_0 } \frac{1}{\frac{1}{2} m_{\rm e} \overline{q_{\rm e}}^2}
 \end{equation}
 %
 Then 
 %
 \begin{equation}
-\mu_{ek}N_k = \frac{|C_{\rm e}|}{m_{\rm e} \frac{8}{\pi} \left(\frac{|C_i| |C_e|}{4 \pi \epsilon_0 } \frac{1}{\frac{1}{2} m_{\rm e} \overline{q_{\rm e}}^2} \right)^2 \ln \Lambda \overline{q_{\rm e}}}   
+\mu_{ek}N_k = \frac{|C_{\rm e}|}{m_{\rm e} \frac{8}{\pi} \left(\frac{|C_k| |C_e|}{4 \pi \epsilon_0 } \frac{1}{\frac{1}{2} m_{\rm e} \overline{q_{\rm e}}^2} \right)^2 \ln \Lambda \overline{q_{\rm e}}}   
 \end{equation}
 %
 or
 %
 \begin{equation}
-\mu_{ek}N_k = \frac{ \pi^3 \epsilon_0^2 m_{\rm e} \overline{q_{\rm e}}^3}{ 2  C_i^2 |C_e| \ln \Lambda }   
+\mu_{ek}N_k = \frac{ \pi^3 \epsilon_0^2 m_{\rm e} \overline{q_{\rm e}}^3}{ 2  C_k^2 |C_e| \ln \Lambda }   
 \end{equation}
 %
 In the latter $\overline{q_{\rm e}}$ is the average speed of the electrons approaching an ion:
@@ -536,7 +544,7 @@ In the latter $\overline{q_{\rm e}}$ is the average speed of the electrons appro
 Substitute:
 %
 \begin{equation}
-\mu_{ek}N_k = \frac{ \pi^3 \epsilon_0^2 m_{\rm e}}{ 2  C_i^2 |C_e| \ln \Lambda } 
+\mu_{ek}N_k = \frac{ \pi^3 \epsilon_0^2 m_{\rm e}}{ 2  C_k^2 |C_e| \ln \Lambda } 
 \left(\frac{8 k_{\rm B} }{\pi m_{\rm e}}\right)^\frac{3}{2} T_{\rm e}^{1.5} {\rm ~~~when~kth~species~is~ionic}
 \end{equation}
 %
@@ -550,7 +558,7 @@ where $T_{\rm e}$ is the electron temperature in K, $N_{k}$ is the $k$th ion num
 The latter two expressions for the electron mobility within an ionic gas differ only by a constant of proportionality as follows:
 %
 \begin{equation}
-\mu_{ek}N_k = \frac{1.47 \cdot \pi^3 \epsilon_0^2 m_{\rm e}}{ 2  C_i^2 |C_e| \ln \Lambda } 
+\mu_{ek}N_k = \frac{1.47 \cdot \pi^3 \epsilon_0^2 m_{\rm e}}{ 2  C_k^2 |C_e| \ln \Lambda } 
 \left(\frac{8 k_{\rm B} }{\pi m_{\rm e}}\right)^\frac{3}{2} T_{\rm e}^{1.5} {\rm ~~~when~kth~species~is~ionic}
 \end{equation}
 %
@@ -588,12 +596,7 @@ A better evaluation of the mobility within a neutral gas can be obtained from BO
 \mu_{{\rm e}k} N_k = (\mu_{{\rm e}k} N)(T_{\rm e}) {\rm ~~~when~kth~species~is~neutral}
 \end{equation}
 %
-where $(\mu_{{\rm e}k} N)(T_{\rm e})$ refers to $\mu_{{\rm e}k} N$ as a function of $T_{\rm e}$ for a species $k$ obtained from BOLSIG+. 
-
-
-\subsection{Electron Mobility}
-
-The electron mobility can be obtained from the drift velocity obtained experimentally, as shown in Table \ref{tab:electrondriftvelocities}.
+where $(\mu_{{\rm e}k} N)(T_{\rm e})$ refers to $\mu_{{\rm e}k} N$ as a function of $T_{\rm e}$ for a species $k$ obtained from BOLSIG+ or from the drift velocity measured experimentally as shown in Table \ref{tab:electrondriftvelocities} for N$_2$, O$_2$ and Air.
 
 
 \subsection{Ion Mobility}
@@ -1445,7 +1448,6 @@ After substituting values for the constants and simplifying we get the following
 }
 \end{equation}
 %
-
 
 
 

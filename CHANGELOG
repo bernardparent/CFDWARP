@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 FEB 21b
+  * in model/share/transport_share.c
+    - in _lnLambda(), made sure rhoe is at least 1E-20 kg/m3, otherwise this leads
+      to a NaN
+    - in _mue_from_Te_rhok(), changed the implementation so that it matches the latest 
+      model/fluid/doc/Transport_Equations/report.tex
+    - in _mueN_N2(), added latest spline fit 
+  * in model/transport/doc/report.tex
+    - added N2 mobility figure
+    
+
 2024 FEB 21a 
   * in model/fluid/doc/Transport_Equations/report.tex
     - added better explanations in the charged species momentum equation section
