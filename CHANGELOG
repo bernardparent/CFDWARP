@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 FEB 21a 
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - added better explanations in the charged species momentum equation section
+  * in model/share/transport_share.c
+    - renamed _mueNk_from_Te() to _mueNk_from_Te_ParentMacheret()
+  * in model/transport/*/transport.c
+    - added _mueNk_from_Te() which calls _mueNk_from_Te_ParentMacheret()
+  * in model/transport/doc/report.tex
+    - added electron temperature data to Table 2
+
+
 2024 FEB 20a
   * in model/fluid/doc/Transport_Equations/report.tex
     - in the section "Charged Species Momentum Equation", added a derivation of the drift-diffusion

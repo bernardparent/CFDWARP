@@ -556,7 +556,7 @@ static double _mueN_N2(double Te){
 
 
 
-double _mueNk_from_Te(long spec, double Te){
+double _mueNk_from_Te_ParentMacheret(long spec, double Te){
   double mueN;
   switch (smap[spec]){
     case SMAP_N2:

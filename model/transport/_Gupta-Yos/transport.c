@@ -1402,3 +1402,8 @@ void find_dmuk_from_rhok_Tk_Ek(gl_t *gl, spec_t rhok, double Tk, double Ek, long
   for (spec=0; spec<ns; spec++) dmukdrhok[spec]=0.0;
 }
 
+double _mueNk_from_Te(long spec, double Te){
+  double mueNk;
+  mueNk=_mueNk_from_Te_ParentMacheret(spec, Te);
+  return(mueNk);
+}
