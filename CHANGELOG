@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 FEB 21d
+  * in model/share/transport_share.c
+    - added _mueN_O2()
+  * in model/transport/doc/report.tex
+    - added plots for mobility in O2 gas
+    
+
 2024 FEB 21c
   * in model/transport/_Dixon-Lewis/transport.c
     - in _mueNk_from_Te(), added a fatal_error if spec is not neutral

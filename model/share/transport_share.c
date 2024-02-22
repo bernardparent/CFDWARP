@@ -574,6 +574,52 @@ static double _mueN_N2(double Te){
   return(exp( mueN_N2 ));
 }
 
+static double _mueN_O2(double Te){
+  double mueN_O2;  
+  /* 
+  Data in log-log coordinates. 
+  Obtained with BOLSIG+ using Morgan LXCat cross-sections 
+  and experimental data from
+  Grigoriev, I. S. and Meilikhov, E. Z., Handbook of Physical Quantities, CRC, Boca Raton, Florida, 1997 
+  */
+
+  /* log K */
+  double Te_control[] = 
+  { 
+    5.70378247465620,
+    7.39303753148020,
+    8.15517758348606,
+    8.64580049988764,
+    9.45446056782523,
+    10.2346191249505,
+    10.5829258193665,
+    11.1835383764881,
+    11.8792632932909,
+    13.6691438195424,
+    14.3029333748767
+  };
+  /* log m2/Vs*/
+  double mueN_control[] = 
+  { 
+    58.8729601445013,
+    57.5646273248511,
+    57.2544269409688,
+    56.9107008574445,
+    56.3934443433482,
+    56.1375109692110,
+    55.7320458611028,
+    55.6126991034703,
+    55.1275961353042,
+    54.3524788207324,
+    54.2715666017936
+  };
+  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
+  mueN_O2 = EXM_f_from_monotonespline(N, Te_control, mueN_control, Te);
+  return(exp( mueN_O2 ));
+}
+
 
 
 double _mueNk_from_Te_ParentMacheret(long spec, double Te){
@@ -582,8 +628,15 @@ double _mueNk_from_Te_ParentMacheret(long spec, double Te){
     case SMAP_N2:
       mueN=_mueN_N2(Te);
     break;
+    case SMAP_O2:
+      mueN=_mueN_O2(Te);
+    break;
     default:
       mueN=3.74E19*exp(33.5/sqrt(log(Te)));
   }
   return(mueN);
 }
+
+
+
+
