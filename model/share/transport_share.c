@@ -552,7 +552,7 @@ static double _mueN_N2(double Te){
     13.1074773005257,
     14.4872723773202
   };
-  /* log m2/Vs*/
+  /* log 1/mVs*/
   double mueN_control[] = 
   { 
     58.8996283915835,
@@ -598,7 +598,7 @@ static double _mueN_O2(double Te){
     13.6691438195424,
     14.3029333748767
   };
-  /* log m2/Vs*/
+  /* log 1/mVs*/
   double mueN_control[] = 
   { 
     58.8729601445013,
@@ -620,6 +620,54 @@ static double _mueN_O2(double Te){
   return(exp( mueN_O2 ));
 }
 
+static double _mueN_NH3(double Te){
+  double mueN_NH3;  
+  /* 
+  Data in log-log coordinates. 
+  Obtained with BOLSIG+ using Morgan LXCat cross-sections 
+  and experimental data from
+  Lisovskiy, Valeriy, et al. "Electron drift velocity in NH3 in strong electric fields determined from rf breakdown curves." 
+  Journal of Physics D: Applied Physics 38.6 (2005): 872. 
+  */
+
+  /* log K */
+  double Te_control[] = 
+  { 
+    5.70378247465620,
+    6.19053974785861,
+    6.24135109789768,
+    7.03617842704541,
+    9.56528386809320,
+    10.0472135898206,
+    10.4282169546571,
+    10.7073962257784,
+    11.2676001481862,
+    11.7445614851530,
+    13.0608547382026,
+    14.9141228466324
+  };
+  /* log 1/mVs*/
+  double mueN_control[] = 
+  { 
+    54.0580694275312,
+    54.3181707667273,
+    54.3946089721228,
+    54.6311710173000,
+    55.2897567904578,
+    55.6265008560765,
+    55.7045482187792,
+    55.6723602562662,
+    55.2485220539277,
+    54.9779646059690,
+    54.6349916977022,
+    54.3457514999829
+  };
+  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
+  mueN_NH3 = EXM_f_from_monotonespline(N, Te_control, mueN_control, Te);
+  return(exp( mueN_NH3 ));
+}
 
 
 double _mueNk_from_Te_ParentMacheret(long spec, double Te){
@@ -631,12 +679,11 @@ double _mueNk_from_Te_ParentMacheret(long spec, double Te){
     case SMAP_O2:
       mueN=_mueN_O2(Te);
     break;
+    case SMAP_NH3:
+      mueN=_mueN_NH3(Te);
+    break;
     default:
       mueN=3.74E19*exp(33.5/sqrt(log(Te)));
   }
   return(mueN);
 }
-
-
-
-

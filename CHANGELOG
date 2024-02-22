@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 FEB 22b
+  * in model/share/transport_share.c
+    - added _mueN_NH3()
+  * in model/transport/doc/report.tex
+    - added documentation of mueN for NH3 and added a table listing the spline control points
+      for mueN of NH3, N2, O2
+      
+
 2024 FEB 22a
   * in model/chem/_NH3_Plasma_10s/arakoni2007.c
     - Fixed problems in 3 reactions which did not conserve the elements
