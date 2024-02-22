@@ -628,6 +628,7 @@ void find_dmuk_from_rhok_Tk_Ek(gl_t *gl, spec_t rhok, double Tk, double Ek, long
 
 double _mueNk_from_Te(long spec, double Te){
   double mueNk;
+  if (speciestype[spec]!=SPECIES_NEUTRAL) fatal_error("The function _mueNk_from_Te() can only be called for neutral species but spec=%ld is not neutral.",spec);
   mueNk=_mueNk_from_Te_ParentMacheret(spec, Te);
   return(mueNk);
 }

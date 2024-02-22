@@ -886,6 +886,28 @@ void test_eta (gl_t *gl, double Tmin, double Tmax, double dT ) {
 }
 
 
+void test_mueN (gl_t *gl, double Tmin, double Tmax, double dT ) {
+  double mueNk, Te;
+  long spec;
+  printf ( "\n" );
+  printf ( "Species mobilities as function of electron temperature [K].\n" );
+  printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
+  printf ( "\n" );
+  print_column_species_names ( 12 );
+  Te = Tmin;
+  do {
+    wfprintf ( stdout, "%12.5E ", Te );
+    for ( spec = 0; spec < ns; spec++ ) {
+      if (speciestype[spec]==SPECIES_NEUTRAL) mueNk=_mueNk_from_Te(spec,Te);
+        else mueNk=0.0;      
+      wfprintf ( stdout, "%+12.5E ", mueNk );
+    }
+    wfprintf ( stdout, "\n" );
+    Te += dT;
+  } while ( Te < Tmax );
+
+}
+
 
 
 void test_kappa ( gl_t *gl, spec_t chik, double P, double Tmin, double Tmax, double dT ) {
@@ -1202,6 +1224,8 @@ void output_options_help(int linewidth){
       strcpy(chistring,chistringorig);
       write_options_row ( stderr, "mu", "none", strins("species mobility  ./test -r test.wrp -prop mu  -Tmin 500 -Tmax 2000 -dT 2 -P 101300 -chik ",chistring,0),
                           linewidth, lengthcol1, lengthcol2 );
+      write_options_row ( stderr, "mueN", "none", "species specific heat  ./test -r test.wrp -prop mueN -Tmin 500 -Tmax 2000 -dT 2",
+                          linewidth, lengthcol1, lengthcol2 );
       write_options_row ( stderr, "Pr", "none", "species Prandtl number  ./test -r test.wrp -prop Pr -Tmin 500 -Tmax 2000 -dT 2",
                           linewidth, lengthcol1, lengthcol2 );
 #endif
@@ -1218,7 +1242,7 @@ void output_options_help(int linewidth){
 
 int main ( int argc, char **argv ) {
   np_t npL, npR;
-  long theta, cnt, lL, lR, node_i, node_j, node_k;
+  long theta, lL, lR, node_i, node_j, node_k;
   char *control_filename;
   np_t *npArray;
   gl_t gl;
@@ -1447,6 +1471,10 @@ int main ( int argc, char **argv ) {
     }
     if ( strcmp ( "Pr", propstring ) == 0 ){
       test_Pr ( &gl, Tmin, Tmax, dT );
+      VALIDOPTIONS=TRUE;
+    }
+    if ( strcmp ( "mueN", propstring ) == 0 ){
+      test_mueN ( &gl, Tmin, Tmax, dT );
       VALIDOPTIONS=TRUE;
     }
 

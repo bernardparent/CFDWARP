@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 FEB 21c
+  * in model/transport/_Dixon-Lewis/transport.c
+    - in _mueNk_from_Te(), added a fatal_error if spec is not neutral
+  * in model/transport/_Gupta-Yos/transport.c
+    - changed _mueNk_from_Te() so that it used the Gupta-Yos cross sections and not the 
+      Parent-Macheret ones
+  * in src/test.c
+    - added the function test_mueN() and the option mueN
+
+
 2024 FEB 21b
   * in model/share/transport_share.c
     - in _lnLambda(), made sure rhoe is at least 1E-20 kg/m3, otherwise this leads
