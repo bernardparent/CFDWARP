@@ -552,7 +552,7 @@ static double _mueN_N2(double Te){
     13.1074773005257,
     14.4872723773202
   };
-  /* log 1/mVs*/
+  /* log m2/Vs*/
   double mueN_control[] = 
   { 
     58.8996283915835,
@@ -598,7 +598,7 @@ static double _mueN_O2(double Te){
     13.6691438195424,
     14.3029333748767
   };
-  /* log 1/mVs*/
+  /* log m2/Vs*/
   double mueN_control[] = 
   { 
     58.8729601445013,
@@ -618,6 +618,149 @@ static double _mueN_O2(double Te){
   Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
   mueN_O2 = EXM_f_from_monotonespline(N, Te_control, mueN_control, Te);
   return(exp( mueN_O2 ));
+}
+
+static double _mueN_NO(double Te){
+  double mueN_NO;  
+  /* 
+  Data in log-log coordinates. 
+  Obtained with BOLSIG+ using Phelps LXCat cross-sections 
+  and experimental data from
+
+  Bailey, V. and Somerville, J., “XCVIII. The behaviour of electrons in nitric oxide,” The London, Edinburgh, and Dublin
+  Philosophical Magazine and Journal of Science Vol. 17, No. 116, 1934, pp. 1169, 1176.
+  
+  Parkes, D. and Sugden, T., “Electron attachment and detachment in nitric oxide,” Journal of the Chemical Society, Faraday
+  Transactions 2: Molecular and Chemical Physics, Vol. 68, 1972, pp. 600, 614.
+  */
+
+  /* log K */
+  double Te_control[] = 
+  { 
+    5.70378247465620,
+    6.11187508837842,
+    6.28632106382936,
+    7.06055731604381,
+    7.54084158330673,
+    7.75370449660376,
+    7.99226642016825,
+    8.66078964015549,
+    9.55059685233927,
+    10.7689171050734,
+    12.7979646330018,
+    14.2900207133957
+  };
+  /* log m2/Vs*/
+  double mueN_control[] = 
+  { 
+    58.6293380618436,
+    58.5552831386806,
+    58.5354062420094,
+    58.0893558537861,
+    57.3686124409252,
+    56.9769206567492,
+    56.5835313696109,
+    56.3153084187583,
+    55.9881405125567,
+    55.4931539528205,
+    54.1576130578674,
+    54.0272665183761
+  };
+  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
+  mueN_NO = EXM_f_from_monotonespline(N, Te_control, mueN_control, Te);
+  return(exp( mueN_NO ));
+}
+
+static double _mueN_N(double Te){
+  double mueN_N;  
+  /* 
+  Data in log-log coordinates. 
+  Obtained with BOLSIG+ using Morgan LXCat cross-sections 
+  */
+
+  /* log K */
+  double Te_control[] = 
+  { 
+    5.70378247465620,
+    6.13224239120285,
+    6.63877453697547,
+    7.53217816278452,
+    9.51015326130485,
+    9.67250020696868,
+    9.90958126612667,
+    10.0721001956244,
+    10.2909206904909,
+    11.4162185004713,
+    12.8046835832505,
+    14.2629425862465
+  };
+  /* log m2/Vs*/
+  double mueN_control[] = 
+  { 
+    60.1673170102955,
+    59.8889739096267,
+    59.4735770614906,
+    58.6331239896146,
+    56.8895165067773,
+    56.7319881654726,
+    56.5247555312056,
+    56.3966649580482,
+    56.2403683546507,
+    55.6370481324806,
+    55.4009342307237,
+    55.3789359833286
+  };
+  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
+  mueN_N = EXM_f_from_monotonespline(N, Te_control, mueN_control, Te);
+  return(exp( mueN_N ));
+}
+
+static double _mueN_O(double Te){
+  double mueN_O;  
+  /* 
+  Data in log-log coordinates. 
+  Obtained with BOLSIG+ using Morgan LXCat cross-sections 
+  */
+
+  /* log K */
+  double Te_control[] = 
+  { 
+    5.70378247465620,
+    6.13952428150941,
+    6.70544631640622,
+    7.57951709833810,
+    8.89727364573419,
+    9.48048267293584,
+    10.9925001202487,
+    11.4348348805704,
+    12.3839559088080,
+    13.4898268792378,
+    14.3823727973700
+  };
+  /* log m2/Vs*/
+  double mueN_control[] = 
+  { 
+    60.2387759742777,
+    59.9607027609325,
+    59.4786044268034,
+    58.5874379001030,
+    57.2323662090014,
+    56.7285331349713,
+    55.6853472580936,
+    55.2478418824560,
+    54.1838206328367,
+    54.0456594074545,
+    54.1328676376063
+  };
+  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
+  mueN_O = EXM_f_from_monotonespline(N, Te_control, mueN_control, Te);
+  return(exp( mueN_O ));
 }
 
 static double _mueN_NH3(double Te){
@@ -646,7 +789,7 @@ static double _mueN_NH3(double Te){
     13.0608547382026,
     14.9141228466324
   };
-  /* log 1/mVs*/
+  /* log m2/Vs*/
   double mueN_control[] = 
   { 
     54.0580694275312,
@@ -678,6 +821,15 @@ double _mueNk_from_Te_ParentMacheret(long spec, double Te){
     break;
     case SMAP_O2:
       mueN=_mueN_O2(Te);
+    break;
+    case SMAP_NO:
+      mueN=_mueN_NO(Te);
+    break;
+    case SMAP_N:
+      mueN=_mueN_N(Te);
+    break;
+    case SMAP_O:
+      mueN=_mueN_O(Te);
     break;
     case SMAP_NH3:
       mueN=_mueN_NH3(Te);

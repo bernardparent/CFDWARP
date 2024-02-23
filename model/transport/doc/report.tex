@@ -448,21 +448,28 @@ where $(c_p)_k$ is the specific heat at constant pressure of the $k$th species a
     \tablecaption{Coordinates of control points for monotone cubic spline interpolation of electron mobility in various mixtures\tnote{a}.}
     \label{tab:spline_tab}
     \fontsizetable
-    \begin{tabular*}{\textwidth}{c@{\extracolsep{\fill}}lcll}
+    \begin{tabular*}{\textwidth}{c@{\extracolsep{\fill}}llll}
     \toprule
-   No. & Process ~& Variable & Spline control point coordinates  \\
+   No. & Process & Variable & Spline control point coordinates  \\
         \midrule
 
-          
   \multirow{2}{*}{1} &  \multirow{2}{*}{ $\rm e^- + N_2  $   } & ${\rm ln}~T_{\rm e}$  & \tiny 5.7038    6.0067    7.5266    9.0580    9.2866    9.6956   10.0010   10.7942   11.3595   13.1075   14.4873     \\
   &  & ${\rm ln}~\mu_{\rm e}N$     & \tiny  58.8996   58.6144   57.2080   56.0505   55.8498   55.4609   55.2620   55.2282   55.0865   54.4855   54.2678  \\
   \midrule  
   \multirow{2}{*}{2} &  \multirow{2}{*}{ $\rm e^- + O_2  $   } & ${\rm ln}~T_{\rm e}$  & \tiny     5.7038    7.3930    8.1552    8.6458    9.4545   10.2346   10.5829   11.1835   11.8793   13.6691   14.3029 \\
   &  & ${\rm ln}~\mu_{\rm e}N$     & \tiny  58.8730   57.5646   57.2544   56.9107   56.3934   56.1375   55.7320   55.6127   55.1276   54.3525   54.2716    \\
+  \midrule 
+  \multirow{2}{*}{3} &  \multirow{2}{*}{ $\rm e^- + NO  $   } & ${\rm ln}~T_{\rm e}$  & \tiny 5.7038    6.1119    6.2863    7.0606    7.5408    7.7537    7.9923    8.6608    9.5506   10.7689   12.7980   14.2900 \\
+  &  & ${\rm ln}~\mu_{\rm e}N$     & \tiny  58.6293   58.5553   58.5354   58.0894   57.3686   56.9769   56.5835   56.3153   55.9881   55.4932   54.1576   54.0273 \\
+  \midrule 
+  \multirow{2}{*}{4} &  \multirow{2}{*}{ $\rm e^- + N  $   } & ${\rm ln}~T_{\rm e}$  & \tiny 5.7038    6.1322    6.6388    7.5322    9.5102    9.6725    9.9096   10.0721   10.2909   11.4162   12.8047   14.2629 \\
+  &  & ${\rm ln}~\mu_{\rm e}N$   & \tiny 60.1673   59.8890   59.4736   58.6331   56.8895   56.7320   56.5248   56.3967   56.2404   55.6370   55.4009   55.3789 \\     
   \midrule  
-  \multirow{2}{*}{3} &  \multirow{2}{*}{ $\rm e^- + NH_3  $   } & ${\rm ln}~T_{\rm e}$  & \tiny     5.7038    6.1905    6.2414    7.0362    9.5653   10.0472   10.4282   10.7074   11.2676   11.7446   13.0609   14.9141 \\
+  \multirow{2}{*}{5} &  \multirow{2}{*}{ $\rm e^- + O  $   } & ${\rm ln}~T_{\rm e}$  & \tiny 5.7038    6.1395    6.7054    7.5795    8.8973    9.4805   10.9925   11.4348   12.3840   13.4898   14.3824 \\
+  &  & ${\rm ln}~\mu_{\rm e}N$   & \tiny 60.2388   59.9607   59.4786   58.5874   57.2324   56.7285   55.6853   55.2478   54.1838   54.0457   54.1329 \\ 
+  \midrule  
+  \multirow{2}{*}{6} &  \multirow{2}{*}{ $\rm e^- + NH_3  $   } & ${\rm ln}~T_{\rm e}$  & \tiny     5.7038    6.1905    6.2414    7.0362    9.5653   10.0472   10.4282   10.7074   11.2676   11.7446   13.0609   14.9141 \\
   &  & ${\rm ln}~\mu_{\rm e}N$   & \tiny 58.8996   58.6144   57.2080   56.0505   55.8498   55.4609   55.2620   55.2282   55.0865   54.4855   54.2678 \\
-     
  
                        
     \bottomrule
@@ -512,18 +519,42 @@ where $(c_p)_k$ is the specific heat at constant pressure of the $k$th species a
 \centering
 \subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{figs/mobility_O2.png}}
 \subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{figs/mobility_O2_error.png}}
-\caption{Results for the mobility of electrons in ${\rm O_2}$, showing (a) product of mobility and number density, and (b) error percentage of cubic spline fit of  mobility data. The BOLSIG+ calculation uses electron impact cross sections from the Morgan database in Ref.\ \citen{jcp:2012:morgan}. Experimental data obtained from Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev} and Fig. 4 of Ref.\ \citen{ajp:1973:crompton}}
+\caption{Results for the mobility of electrons in ${\rm O_2}$, showing (a) product of mobility and number density, and (b) error percentage of cubic spline fit of  mobility data. The BOLSIG+ calculation uses electron impact cross sections from the Morgan database in Ref.\ \citen{jcp:2012:morgan}. Experimental data obtained from Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev} and Fig. 4 of Ref.\ \citen{ajp:1973:crompton}.}
 \label{fig:mobility_O2}
+\end{figure}
+%
+\begin{figure}
+\centering
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{figs/mobility_NO.png}}
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{figs/mobility_NO_error.png}}
+\caption{Results for the mobility of electrons in ${\rm NO}$, showing (a) product of mobility and number density, and (b) error percentage of cubic spline fit of  mobility data. The BOLSIG+ calculation uses electron impact cross sections from the Phelps database in Ref.\ \citen{jcp:2012:morgan}. Experimental data obtained from Fig.\ 4 of Ref.\ \citen{jos:1934:bailey} and Fig.\ 5 of Ref.\ \citen{jcs:1972:parkes}.}
+\label{fig:mobility_NO}
+\end{figure}
+%
+\begin{figure}
+\centering
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{figs/mobility_N.png}}
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{figs/mobility_N_error.png}}
+\caption{Results for the mobility of electrons in ${\rm N}$, showing (a) product of mobility and number density, and (b) error percentage of cubic spline fit of  mobility data. The BOLSIG+ calculation uses electron impact cross sections from the Morgan database in Ref.\ \citen{jcp:2012:morgan}.}
+\label{fig:mobility_N}
+\end{figure}
+%
+\begin{figure}
+\centering
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{figs/mobility_O.png}}
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{figs/mobility_O_error.png}}
+\caption{Results for the mobility of electrons in ${\rm O}$, showing (a) product of mobility and number density, and (b) error percentage of cubic spline fit of  mobility data. The BOLSIG+ calculation uses electron impact cross sections from the Morgan database in Ref.\ \citen{jcp:2012:morgan}.}
+\label{fig:mobility_O}
 \end{figure}
 %
 \begin{figure}
 \centering
 \subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{figs/mobility_NH3.png}}
 \subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{figs/mobility_NH3_error.png}}
-\caption{Results for the mobility of electrons in ${\rm NH_3}$, showing (a) product of mobility and number density, and (b) error percentage of cubic spline fit of  mobility data. The BOLSIG+ calculation uses electron impact cross sections from the Morgan database in Ref.\ \citen{jcp:2012:morgan}. Experimental data obtained from Fig. 2 of Ref.\ \citen{jopd:2005:lisovskiy}}
+\caption{Results for the mobility of electrons in ${\rm NH_3}$, showing (a) product of mobility and number density, and (b) error percentage of cubic spline fit of  mobility data. The BOLSIG+ calculation uses electron impact cross sections from the Morgan database in Ref.\ \citen{jcp:2012:morgan}. Experimental data obtained from Fig.\ 2 of Ref.\ \citen{jopd:2005:lisovskiy}.}
 \label{fig:mobility_NH3}
 \end{figure}
-
+%
 
 \subsection{Electron Mobility}
 

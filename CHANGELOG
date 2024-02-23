@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 FEB 23a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - in update_bdry_fluid(), now only calls BDRY_WALLTFIXEDCATALYTIC1 if BDRYDIRECFOUND or this
+      leads to a crash due to not being able to find the wall boundary plane on the corner nodes 
+  * in model/share/transport_share.c 
+    - added _mueN_NO(), _mueN_O(), _mueN_N()
+  * in model/transport/doc/report.tex
+    - added documentation for mueN for NO, O, and N
+    
+
 2024 FEB 22b
   * in model/share/transport_share.c
     - added _mueN_NH3()
