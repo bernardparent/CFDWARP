@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 FEB 23b
+  * in src/test.c
+    - changed the call to _mueNk_from_Te() to include *gl as the first parameter  
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - changed the call to _mueNk_from_Te() to include *gl as the first parameter
+  * in model/transport/_Dixon-Lewis/transport.c
+    - changed the call to _mueNk_from_Te() to include *gl as the first parameter
+  * in model/transport/_Gupta-Yos/transport.c
+    - changed the call to _mueNk_from_Te() to include *gl as the first parameter
+    - in _mueNk_from_Te(), now calls _mueNk_from_Te_ParentMacheret()
+      when TRANSPORTMODEL==TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET
+
+
 2024 FEB 23a
   * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
     - in update_bdry_fluid(), now only calls BDRY_WALLTFIXEDCATALYTIC1 if BDRYDIRECFOUND or this

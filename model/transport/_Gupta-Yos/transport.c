@@ -1403,16 +1403,17 @@ void find_dmuk_from_rhok_Tk_Ek(gl_t *gl, spec_t rhok, double Tk, double Ek, long
 }
 
 
-double _mueNk_from_Te(long spec, double Te){
+double _mueNk_from_Te(gl_t *gl, long spec, double Te){
   double mueNk;
   double DijNk,Delta1_e;
-//  mueNk=_mueNk_from_Te_ParentMacheret(spec, Te);
-  if (speciestype[spec]!=SPECIES_NEUTRAL) fatal_error("The function _mueNk_from_Te() can only be called for neutral species but spec=%ld is not neutral.",spec);
-  Delta1_e=_piOmega11(speceminus,spec,Te)*(8.0e0/3.0e0)*sqrt((2.0e0*_calM(speceminus)*1000.0*_calM(spec)*1000.0)/(pi*Runiv*Te*(_calM(speceminus)*1000.0 + _calM(spec)*1000.0)))*1.546e-20; 
-  
-  DijNk=1.0/(1.0/1e6*Delta1_e)/1e4; //the units for Dij here are m2/s 
-  assert(DijNk!=0.0);
-  mueNk=DijNk/(kB*Te)*fabs(_C(speceminus));
-
+  if (gl->model.transport.TRANSPORTMODEL==TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET){
+    mueNk=_mueNk_from_Te_ParentMacheret(spec, Te);
+  } else {
+    if (speciestype[spec]!=SPECIES_NEUTRAL) fatal_error("The function _mueNk_from_Te() can only be called for neutral species but spec=%ld is not neutral.",spec);
+    Delta1_e=_piOmega11(speceminus,spec,Te)*(8.0e0/3.0e0)*sqrt((2.0e0*_calM(speceminus)*1000.0*_calM(spec)*1000.0)/(pi*Runiv*Te*(_calM(speceminus)*1000.0 + _calM(spec)*1000.0)))*1.546e-20; 
+    DijNk=1.0/(1.0/1e6*Delta1_e)/1e4; //the units for Dij here are m2/s 
+    assert(DijNk!=0.0);
+    mueNk=DijNk/(kB*Te)*fabs(_C(speceminus));
+  }
   return(mueNk);
 }

@@ -16,6 +16,6 @@ void find_nuk_eta_kappa(gl_t *gl, spec_t rhok, double T, double Te, spec_t nuk, 
 void find_nuk_eta_kappak_muk(gl_t *gl, spec_t rhok, double T, double Te,
                              spec_t nuk, double *eta, double *kappan, chargedspec_t kappac, chargedspec_t muk);
 
-double _mueNk_from_Te(long spec, double Te);
+double _mueNk_from_Te(gl_t *gl, long spec, double Te);
 
 #endif

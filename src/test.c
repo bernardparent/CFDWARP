@@ -898,7 +898,7 @@ void test_mueN (gl_t *gl, double Tmin, double Tmax, double dT ) {
   do {
     wfprintf ( stdout, "%12.5E ", Te );
     for ( spec = 0; spec < ns; spec++ ) {
-      if (speciestype[spec]==SPECIES_NEUTRAL) mueNk=_mueNk_from_Te(spec,Te);
+      if (speciestype[spec]==SPECIES_NEUTRAL) mueNk=_mueNk_from_Te(gl,spec,Te);
         else mueNk=0.0;      
       wfprintf ( stdout, "%+12.5E ", mueNk );
     }
