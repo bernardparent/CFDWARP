@@ -36,45 +36,82 @@ All remaining parameters are kept to the default value.
 
 The electron energy range in which BOLSIG+ results are valid depend on the energy range of the corresponding cross-section data. Here, only the converged runs are kept, and any results extrapolated by BOLSIG+ are discarded. For higher electron temperatures for which there is no BOLSIG+ solution, the data is extrapolated by placing a spline control point for an electron temperature of $5\cdot10^6$ K, and a corresponding $E/N$ value that reflects the trend of the converged BOLSIG+ results. This last control point can be be modified to get the desired accuracy at very high temperatures. Results for several mixtures are shown below.
 
-\subsection{Atomic hydrogen ($\rm H$)}
+%
+\subsection{Atomic nitrogen ($\rm N$)}
 
-All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableH}. The reduced electric field results are shown in Fig. \ref{fig:electronimpact_4}.
+All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableN}. The reduced electric field results are shown in Fig. \ref{fig:electronimpact_4}.
 
 \begin{table*}
   \center\fontsizetable
   \begin{threeparttable}
-    \tablecaption{$\rm H$ electron impact processes with available cross-section data.}
-    \label{tab:tableH}
+    \tablecaption{$\rm N$ electron impact processes with available cross-section data.}
+    \label{tab:tableN}
     \fontsizetable
     \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}llll}
     \toprule
     {no.}  & {process} & {type} &  {eV range}  &  {ref.} \\
     \midrule
-      1 & $\rm e^- + H \rightarrow H^+ + e^- + e^-$  &  ionization   &  13.6-1000 &   \cite{lxc:2024:morgan} \\ 
+      1 & $\rm e^- + N \rightarrow N^+ + e^- + e^-$  &  ionization   &  14.54-1000 &   \cite{lxc:2024:morgan} \\ 
       \midrule     
-      2 & $\rm e^- + H \rightarrow e^- + H$  &  momentum transfer   &  0-1000  & \cite{lxc:2024:morgan}\\   
+      2 & $\rm e^- + N \rightarrow e^- + N$  &  momentum transfer   &  0-23.1  & \cite{lxc:2024:morgan}\\   
       \midrule
-      3 & $\rm e^- + H \rightarrow e^- + H(2p) $  &  electronic excitation   &  10.2-1000 & \cite{lxc:2024:morgan}\\ 
-      4 & $\rm e^- + H \rightarrow e^- + H(2s) $  &  electronic excitation   &  10.2-1000 & \cite{lxc:2024:morgan}\\ 
+      3 & $\rm e^- + N \rightarrow e^- + N(2p3)2D^0 $  &  electronic excitation   &  2.38-1000 & \cite{lxc:2024:morgan}\\ 
+      4 & $\rm e^- + N \rightarrow e^- + N(2p3)2P^0 $  &  electronic excitation   &  3.58-1000 & \cite{lxc:2024:morgan}\\ 
+      5 & $\rm e^- + N \rightarrow e^- + N(3p)4P $  &  electronic excitation   &  10.3-1000 & \cite{lxc:2024:morgan}\\ 
+      6 & $\rm e^- + N \rightarrow e^- + N(2s2p4)4P $  &  electronic excitation   &  10.9-1000 & \cite{lxc:2024:morgan}\\ 
+      7 & $\rm e^- + N \rightarrow e^- + N(3p) $  &  electronic excitation   &  11.84-1000 & \cite{lxc:2024:morgan}\\ 
+      8 & $\rm e^- + N \rightarrow e^- + N(4s)4P $  &  electronic excitation   &  12.85-1000 & \cite{lxc:2024:morgan}\\ 
+      9 & $\rm e^- + N \rightarrow e^- + N(3d) $  &  electronic excitation   &  13.0-1000 & \cite{lxc:2024:morgan}\\ 
+      10 & $\rm e^- + N \rightarrow e^- + N(4p) $  &  electronic excitation   &  13.24-1000 & \cite{lxc:2024:morgan}\\ 
     \bottomrule
     \end{tabular*}
    \end{threeparttable}
 \end{table*}
 
-\begin{figure}[!ht]
-\centering     %%% not \center
-\includegraphics[width=0.7\linewidth, angle=0.0]{electronimpact_figs/electronimpact_fig4.png}
-\caption{Reduced electric field as a function of the electron temperature for $\rm H$.}
+\begin{figure}[h]
+\subfigure[]{\label{fig:a}\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figure4.png}}
+\subfigure[]{\label{fig:b}\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figure4_error.png}}
+\caption{$E/N$ results for $\rm N$, showing (a) reduced electric field as a function of the electron temperature and (b) error percentage when fitting a cubic spline through BOLSIG+ data. The electron impact cross-sectional data used in the BOLSIG+ calculation is sourced from the Morgan database, Ref.\ \cite{lxc:2024:morgan}.}
 \label{fig:electronimpact_4}
 \end{figure}
-
-\subsection{Atomic nitrogen ($\rm N$)}
-
+%
 \subsection{Atomic oxygen ($\rm O$)}
+
+All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableO}. The reduced electric field results are shown in Fig. \ref{fig:electronimpact_5}.
+
+\begin{table*}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{$\rm O$ electron impact processes with available cross-section data.}
+    \label{tab:tableO}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}llll}
+    \toprule
+    {no.}  & {process} & {type} &  {eV range}  &  {ref.} \\
+    \midrule
+      1 & $\rm e^- + O \rightarrow O^+ + e^- + e^-$  &  ionization   &  13.6-1000 &   \cite{lxc:2024:morgan} \\ 
+      \midrule     
+      2 & $\rm e^- + O \rightarrow e^- + O$  &  momentum transfer   &  0-23.1  & \cite{lxc:2024:morgan}\\   
+      \midrule
+      3 & $\rm e^- + O \rightarrow e^- + O(1D) $  &  electronic excitation   &  1.97-81 & \cite{lxc:2024:morgan}\\ 
+      4 & $\rm e^- + O \rightarrow e^- + O(1S) $  &  electronic excitation   &  4.19-81 & \cite{lxc:2024:morgan}\\ 
+    \bottomrule
+    \end{tabular*}
+   \end{threeparttable}
+\end{table*}
+
+
+\begin{figure}[h]
+\subfigure[]{\label{fig:a}\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figure5.png}}
+\subfigure[]{\label{fig:b}\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figure5_error.png}}
+\caption{$E/N$ results for $\rm O$, showing (a) reduced electric field as a function of the electron temperature and (b) error percentage when fitting a cubic spline through BOLSIG+ data. The electron impact cross-sectional data used in the BOLSIG+ calculation is sourced from the Morgan database, Ref.\ \cite{lxc:2024:morgan}.}
+\label{fig:electronimpact_5}
+\end{figure}
+%
 
 \subsection{Nitrogen molecule ($\rm N_2$)}
 
-Experimental data for $E/N$ vs electron temperature is available from Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev} for $\rm N_2$. In this case a cubic spline is fitted through the experimental data points and also through the remaining lower and upper ranges, if any, for which there is BOLSIG+ data. All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableN2}. The reduced electric field results are shown in Fig. \ref{fig:electronimpact_1}.
+Experimental data for $E/N$ vs electron temperature is available from Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev} for $\rm N_2$. In this case a cubic spline is fitted through the experimental data points and also through the remaining lower and upper ranges, if any, for which there is BOLSIG+ data. All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableN2}. The reduced electric field results are shown in Fig. \ref{fig:electronimpact_1}. 
 
 \begin{table*}
   \center\fontsizetable
@@ -88,48 +125,48 @@ Experimental data for $E/N$ vs electron temperature is available from Ch.\ 21 of
     \midrule
       1 & $\rm e^- + N_2 \rightarrow N_2^+ + e^- + e^-$  &  ionization    &  15.6-1500 &   \cite{lxc:2024:morgan} \\ 
       \midrule     
-      2 & $\rm e^- + NH_3 \rightarrow e^- + NH_3$  &  momentum transfer   &  0-1000  & \cite{lxc:2024:morgan}\\   
+      2 & $\rm e^- + N_2 \rightarrow e^- + N_2$  &  momentum transfer   &  0-1000  & \cite{lxc:2024:morgan}\\   
       \midrule
       3 & $\rm e^- + N_2 \rightarrow e^- + N_2^* $  &  rotational excitation   &  0.02-35 & \cite{lxc:2024:morgan}\\ 
            \midrule
-      4 & $\rm e^- + N_2 \rightarrow e^- + N_2(V1)$  &  vibrational excitation   &  0.290-35 &\cite{lxc:2024:morgan}\\  
-      5 & $\rm e^- + N_2 \rightarrow e^- + N_2(V1)$  &  vibrational excitation   &  0.291-35 &\cite{lxc:2024:morgan}\\  
-      6 & $\rm e^- + N_2 \rightarrow e^- + N_2(V2)$  &  vibrational excitation   &  0.590-35 &\cite{lxc:2024:morgan}\\ 
-      7 & $\rm e^- + N_2 \rightarrow e^- + N_2(V3)$  &  vibrational excitation   &  0.880-35 &\cite{lxc:2024:morgan}\\ 
-      8 & $\rm e^- + N_2 \rightarrow e^- + N_2(V4)$  &  vibrational excitation   &  1.170-35 &\cite{lxc:2024:morgan}\\ 
-      9 & $\rm e^- + N_2 \rightarrow e^- + N_2(V5)$  &  vibrational excitation   &  1.470-35 &\cite{lxc:2024:morgan}\\
-      10 & $\rm e^- + N_2 \rightarrow e^- + N_2(V6)$  &  vibrational excitation   &  1.760-35 &\cite{lxc:2024:morgan}\\ 
-      11 & $\rm e^- + N_2 \rightarrow e^- + N_2(V7)$  &  vibrational excitation   &  2.060-35 &\cite{lxc:2024:morgan}\\ 
-      12 & $\rm e^- + N_2 \rightarrow e^- + N_2(V8)$  &  vibrational excitation   &  2.350-35 &\cite{lxc:2024:morgan}\\ 
+      4 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(\nu_1)$  &  vibrational excitation   &  0.290-35 &\cite{lxc:2024:morgan}\\  
+      5 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(\nu_1)$  &  vibrational excitation   &  0.291-35 &\cite{lxc:2024:morgan}\\  
+      6 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(\nu_2)$  &  vibrational excitation   &  0.590-35 &\cite{lxc:2024:morgan}\\ 
+      7 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(\nu_3)$  &  vibrational excitation   &  0.880-35 &\cite{lxc:2024:morgan}\\ 
+      8 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(\nu_4)$  &  vibrational excitation   &  1.170-35 &\cite{lxc:2024:morgan}\\ 
+      9 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(\nu_5)$  &  vibrational excitation   &  1.470-35 &\cite{lxc:2024:morgan}\\
+      10 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(\nu_6)$  &  vibrational excitation   &  1.760-35 &\cite{lxc:2024:morgan}\\ 
+      11 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(\nu_7)$  &  vibrational excitation   &  2.060-35 &\cite{lxc:2024:morgan}\\ 
+      12 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(\nu_8)$  &  vibrational excitation   &  2.350-35 &\cite{lxc:2024:morgan}\\ 
           \midrule
-      13 & $\rm e^- + N_2 \rightarrow e^- + N_2(A^3 \Sigma_{u}^+) $  &  electronic excitation   &  6.170-35 & \cite{lxc:2024:morgan}\\ 
-      14 & $\rm e^- + N_2 \rightarrow e^- + N_2(A^3 \Sigma_{u}^+)$  &  electronic excitation   &  7.000-35 & \cite{lxc:2024:morgan}\\ 
-      15 & $\rm e^- + N_2 \rightarrow e^- + N_2(B^3 \Pi_{g}) $  &  electronic excitation   &  7.350-35 & \cite{lxc:2024:morgan}\\ 
-      16 & $\rm e^- + N_2 \rightarrow e^- + N_2(W^3 \Delta) $  &  electronic excitation   &  7.360-35 & \cite{lxc:2024:morgan}\\ 
-      17 & $\rm e^- + N_2 \rightarrow e^- + N_2(A^3 \Sigma_{u}^+) $  &  electronic excitation   &  7.80-35 & \cite{lxc:2024:morgan}\\ 
-      18 & $\rm e^- + N_2 \rightarrow e^- + N_2(B^3 \Sigma) $  &  electronic excitation   &  8.16-35 & \cite{lxc:2024:morgan}\\ 
-      19 & $\rm e^- + N_2 \rightarrow e^- + N_2(A^1 \Sigma) $  &  electronic excitation   &  8.40-35 & \cite{lxc:2024:morgan}\\ 
-      20 & $\rm e^- + N_2 \rightarrow e^- + N_2(A^1 \Pi) $  &  electronic excitation   &  8.55-35 & \cite{lxc:2024:morgan}\\ 
-      21 & $\rm e^- + N_2 \rightarrow e^- + N_2(W^1 \Delta) $  &  electronic excitation   &  8.89-35 & \cite{lxc:2024:morgan}\\ 
-      22 & $\rm e^- + N_2 \rightarrow e^- + N_2(C^3 \Pi) $  &  electronic excitation   &  11.03-35 & \cite{lxc:2024:morgan}\\ 
-      23 & $\rm e^- + N_2 \rightarrow e^- + N_2(E^3 \Sigma) $  &  electronic excitation   &  11.88-35 & \cite{lxc:2024:morgan}\\  
-      24 & $\rm e^- + N_2 \rightarrow e^- + N_2(A^1 \Sigma) $  &  electronic excitation   &  12.25-35 & \cite{lxc:2024:morgan}\\ 
+      13 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(A^3 \Sigma_{u}^+) $  &  electronic excitation   &  6.170-35 & \cite{lxc:2024:morgan}\\ 
+      14 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(A^3 \Sigma_{u}^+)$  &  electronic excitation   &  7.000-35 & \cite{lxc:2024:morgan}\\ 
+      15 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(B^3 \Pi_{g}) $  &  electronic excitation   &  7.350-35 & \cite{lxc:2024:morgan}\\ 
+      16 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(W^3 \Delta) $  &  electronic excitation   &  7.360-35 & \cite{lxc:2024:morgan}\\ 
+      17 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(A^3 \Sigma_{u}^+) $  &  electronic excitation   &  7.80-35 & \cite{lxc:2024:morgan}\\ 
+      18 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(B^3 \Sigma) $  &  electronic excitation   &  8.16-35 & \cite{lxc:2024:morgan}\\ 
+      19 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(A^1 \Sigma) $  &  electronic excitation   &  8.40-35 & \cite{lxc:2024:morgan}\\ 
+      20 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(A^1 \Pi) $  &  electronic excitation   &  8.55-35 & \cite{lxc:2024:morgan}\\ 
+      21 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(W^1 \Delta) $  &  electronic excitation   &  8.89-35 & \cite{lxc:2024:morgan}\\ 
+      22 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(C^3 \Pi) $  &  electronic excitation   &  11.03-35 & \cite{lxc:2024:morgan}\\ 
+      23 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(E^3 \Sigma) $  &  electronic excitation   &  11.88-35 & \cite{lxc:2024:morgan}\\  
+      24 & $\rm e^- + N_2 \rightarrow e^- + N_2$$(A^1 \Sigma) $  &  electronic excitation   &  12.25-35 & \cite{lxc:2024:morgan}\\ 
       25 & $\rm e^- + N_2 \rightarrow e^- + N + N $  &  electronic excitation   &  13.00-35 & \cite{lxc:2024:morgan}\\ 
     \bottomrule
     \end{tabular*}
    \end{threeparttable}
 \end{table*}
 
-\begin{figure}[!ht]
-\centering     %%% not \center
-\includegraphics[width=0.7\linewidth, angle=0.0]{electronimpact_figs/electronimpact_fig1.png}
-\caption{Reduced electric field as a function of the electron temperature for $\rm N_2$. Experimental data points are taken from \citen{book:1997:grigoriev}.}
+\begin{figure}[h]
+\subfigure[]{\label{fig:a}\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figure1.png}}
+\subfigure[]{\label{fig:b}\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figure1_error.png}}
+\caption{$E/N$ results for $\rm N_2$, showing (a) reduced electric field as a function of the electron temperature and (b) error percentage when fitting a cubic spline through the data. Experimental $\rm N_2$ data points are taken from Ref.\ \citen{book:1997:grigoriev}.}
 \label{fig:electronimpact_1}
 \end{figure}
-
+%
 \subsection{Oxygen molecule ($\rm O_2$)}
 
-All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableO2}. Experimental data for $E/N$ vs electron temperature is available from Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev} for $\rm O_2$. A cubic spline is fitted through the experimental data points and also through the remaining lower and upper ranges, if any, for which there is BOLSIG+ data.  The reduced electric field results are shown in Fig. \ref{fig:electronimpact_2}. In this case, no experimental data is available for $T_{\rm e}<1000$ K. Rather than make use of the BOLSIG+ results at low electron temperature which might not be accurate, we here prefer to extrapolate from the experimental data to lower $T_{\rm e}$. To do this, the experimental results for air are used and the corresponding $E/N$ value is obtained by summing the $\rm N_2$, $\rm O_2$ $E/N$ results weighed by their corresponding composition in dry air. The extrapolation of the $\rm O_2$ curve for $T_{\rm e}<1000$ K is such that there is good agreement between the experimental data and spline curve fit for air. The latter is shown in Fig. \ref{fig:electronimpact_5}.
+All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableO2}. Experimental data for $E/N$ vs electron temperature is available from Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev} for $\rm O_2$. A cubic spline is fitted through the experimental data points and also through the remaining lower and upper ranges, if any, for which there is BOLSIG+ data.  The reduced electric field results are shown in Fig. \ref{fig:electronimpact_2}. In this case, no experimental data is available for $T_{\rm e}<1000$ K. Rather than make use of the BOLSIG+ results at low electron temperature which might not be accurate, we here prefer to extrapolate from the experimental data to lower $T_{\rm e}$. To do this, the experimental results for air are used and the corresponding $E/N$ value is obtained by summing the $\rm N_2$, $\rm O_2$ $E/N$ results weighed by their corresponding composition in dry air. The extrapolation of the $\rm O_2$ curve for $T_{\rm e}<1000$ K is such that there is good agreement between the experimental data and spline curve fit for air. The latter is shown in Fig. \ref{fig:electronimpact_2}. All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableO2}.
 %
 
 
@@ -150,11 +187,11 @@ All the processes involving cross-sections used in the BOLSIG+ calculation are g
       \midrule
       3 & $\rm e^- + O_2 \rightarrow e^- + O_2^* $  &  rotational excitation   &  0.38-20 & \cite{lxc:2024:morgan}\\ 
            \midrule
-      4 & $\rm e^- + O_2 \rightarrow e^- + O_2(V1)$  &  vibrational excitation   &  0.57-15 &\cite{lxc:2024:morgan}\\  
-      5 & $\rm e^- + O_2 \rightarrow e^- + O_2(V2)$  &  vibrational excitation   &  0.75-15 &\cite{lxc:2024:morgan}\\ 
+      4 & $\rm e^- + O_2 \rightarrow e^- + O_2$$(\nu_1) $  &  vibrational excitation   &  0.57-15 &\cite{lxc:2024:morgan}\\  
+      5 & $\rm e^- + O_2 \rightarrow e^- + O_2$$(\nu_2) $  &  vibrational excitation   &  0.75-15 &\cite{lxc:2024:morgan}\\ 
           \midrule
-      6 & $\rm e^- + O_2 \rightarrow e^- + O_2(A^1 \Delta) $  &  electronic excitation   &  0.977-45 & \cite{lxc:2024:morgan}\\ 
-      7 & $\rm e^- + O_2 \rightarrow e^- + O_2(B^1 \Sigma) $  &  electronic excitation   &  1.627-45 & \cite{lxc:2024:morgan}\\ 
+      6 & $\rm e^- + O_2 \rightarrow e^- + O_2$$(A^1 \Delta) $  &  electronic excitation   &  0.977-45 & \cite{lxc:2024:morgan}\\ 
+      7 & $\rm e^- + O_2 \rightarrow e^- + O_2$$(B^1 \Sigma) $  &  electronic excitation   &  1.627-45 & \cite{lxc:2024:morgan}\\ 
       8 & $\rm e^- + O_2 \rightarrow e^- + O_2(-) $  &  electronic excitation   &  4.50-45 & \cite{lxc:2024:morgan}\\ 
       9 & $\rm e^- + O_2 \rightarrow e^- + O_2(-) $  &  electronic excitation   &  6.00-45 & \cite{lxc:2024:morgan}\\ 
       10 & $\rm e^- + O_2 \rightarrow e^- + O_2(-) $  &  electronic excitation   &  8.40-45 & \cite{lxc:2024:morgan}\\ 
@@ -165,26 +202,67 @@ All the processes involving cross-sections used in the BOLSIG+ calculation are g
 
    \end{threeparttable}
 \end{table*}
-
-
-\begin{figure}[!ht]
-\centering     %%% not \center
-\includegraphics[width=0.7\linewidth, angle=0.0]{electronimpact_figs/electronimpact_fig2.png}
-\caption{Reduced electric field as a function of the electron temperature for $\rm O_2$. Experimental data points are taken from \citen{book:1997:grigoriev}.}
+%
+\begin{figure}[h]
+\subfigure[]{\label{fig:a}\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figure2.png}}
+\subfigure[]{\label{fig:b}\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figure2_error.png}}
+\caption{$E/N$ results for $\rm O_2$, showing (a) reduced electric field as a function of the electron temperature and (b) error percentage when fitting a cubic spline through the data. Experimental $\rm O_2$ data points are taken from \citen{book:1997:grigoriev}.}
 \label{fig:electronimpact_2}
 \end{figure}
 
-\begin{figure}[!ht]
-\centering     %%% not \center
-\includegraphics[width=0.7\linewidth, angle=0.0]{electronimpact_figs/electronimpact_fig5.png}
-\caption{Reduced electric field as a function of the electron temperature for air. Experimental data points are taken from \citen{book:1997:grigoriev}.}
-\label{fig:electronimpact_5}
-\end{figure}
 
+%
+\subsection{Nitric oxide ($\rm NO$)}
+
+The results for NO are obtained by fitting a spline through BOLSIG+ and known experimental data. For electron temperatures less than 1000 K, the reduced electric field is computed assuming that the corresponding electron energy loss function $\zeta_{\rm e} $ in the local approximation takes the floor value of 0.001 according to the following equation:
+%
+\begin{equation}
+\zeta_{\rm e}   =    \frac{2 m_{\rm e} \mu_{\rm e} N}{3  k_{\rm B} T_{\rm e} } \left[  \mu_{\rm e}N  \left(E/N(T_{\rm e})\right)^2\right]
+\end{equation}
+%
+The final curve fit is shown in Fig. \ref{fig:electronimpact_3} alongside all the reference data used to obtain it. All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableNO}.
+
+\begin{table*}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{$\rm NO$ electron impact processes with available cross-section data.}
+    \label{tab:tableNO}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}llll}
+    \toprule
+    {no.}  & {process} & {type} &  {eV range}  &  {ref.} \\
+    \midrule
+      1 & $\rm e^- + NO \rightarrow NO^+ + e^- + e^-$  &  ionization   &  9.26-1000 &   \cite{lxc:2024:morgan} \\ 
+      \midrule     
+      2 & $\rm e^- + NO \rightarrow e^- + NO$  &  momentum transfer   &  0.0-100  & \cite{lxc:2024:morgan}\\   
+      \midrule
+      3 & $\rm e^- + NO \rightarrow e^- + NO$$(\nu_1) $  &  vibrational excitation   &  0.30-100 & \cite{lxc:2024:morgan}\\ 
+      4 & $\rm e^- + NO \rightarrow e^- + NO$$(\nu_2) $  &  vibrational excitation   &  0.45-100 & \cite{lxc:2024:morgan}\\ 
+      5 & $\rm e^- + NO \rightarrow e^- + NO$$(\nu_3) $  &  vibrational excitation   &  0.75-100 & \cite{lxc:2024:morgan}\\ 
+      6 & $\rm e^- + NO \rightarrow e^- + NO$$(\nu_4) $  &  vibrational excitation   &  0.90-100 & \cite{lxc:2024:morgan}\\ 
+      7 & $\rm e^- + NO \rightarrow e^- + NO$$(\nu_5) $  &  vibrational excitation   &  1.20-100 & \cite{lxc:2024:morgan}\\ 
+      8 & $\rm e^- + NO \rightarrow e^- + NO$$(\nu_6) $  &  vibrational excitation   &  1.35-100 & \cite{lxc:2024:morgan}\\ 
+     \midrule
+      9 & $\rm e^- + NO \rightarrow e^- + NO^* $  &  electronic excitation   &  5.50-100 & \cite{lxc:2024:morgan}\\ 
+     10 & $\rm e^- + NO \rightarrow e^- + NO^* $  &  electronic excitation   &  6.60-100 & \cite{lxc:2024:morgan}\\
+     11 & $\rm e^- + NO \rightarrow e^- + NO^* $  &  electronic excitation   &  9.26-100 & \cite{lxc:2024:morgan}\\
+    \bottomrule
+    \end{tabular*}
+   \end{threeparttable}
+\end{table*}
+
+\begin{figure}[h]
+\subfigure[]{\label{fig:a}\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figure3.png}}
+\subfigure[]{\label{fig:b}\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figure3_error.png}}
+\caption{$E/N$ results for $\rm NO$, showing (a) reduced electric field as a function of the electron temperature and (b) error percentage when fitting a cubic spline through the data. Experimental data points are taken from Fig.\ 2 of Ref.\ \citen{jop:1999:mechlinska}, Fig.\ 5 of Ref.\ \citen{jos:1934:bailey} and Fig.\ 1.32 of Ref.\ \citen{jos:1934:skinker}. For electron temperatures less than 1000 K, the $E/N$ values are estimated by assuming a value of electron energy loss function $\zeta_{\rm e} = 0.001$. }
+\label{fig:electronimpact_3}
+\end{figure}
+%
+All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableNH3}. The reduced electric field results are shown in Fig. \ref{fig:electronimpact_3}.
+%
 \subsection{Ammonia ($\rm NH_3$)}
 
-All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableNH3}. The reduced electric field results are shown in Fig. \ref{fig:electronimpact_3}.
-
+All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableNH3}. The reduced electric field results are shown in Fig. \ref{fig:electronimpact_6}.
 
 \begin{table*}
   \center\fontsizetable
@@ -226,13 +304,67 @@ All the processes involving cross-sections used in the BOLSIG+ calculation are g
    \end{threeparttable}
 \end{table*}
 %
-\begin{figure}[!ht]
-\centering     %%% not \center
-\includegraphics[width=0.7\linewidth, angle=0.0]{electronimpact_figs/electronimpact_fig3.png}
-\caption{Reduced electric field as a function of the electron temperature for $\rm NH_3$.}
-\label{fig:electronimpact_3}
+\begin{figure}[h]
+\subfigure[]{\label{fig:a}\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figure6.png}}
+\subfigure[]{\label{fig:b}\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figure6_error.png}}
+\caption{$E/N$ results for $\rm NH_3$, showing (a) reduced electric field as a function of the electron temperature and (b) error percentage when fitting a cubic spline through the data. The electron impact cross-sectional data used in the BOLSIG+ calculation is sourced from the Hayashi database, Ref.\ \cite{springer:1987:hayashi}.}
+\label{fig:electronimpact_6}
 \end{figure}
+%
 
 
+\begin{table}[!htbp]
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Coordinates of control points for monotone cubic spline interpolation of electron impact processes\tnote{a}.}
+    \label{tab:spline_tab}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}lcll}
+    \toprule
+   No.~~ & Process ~& Variable & Spline control point coordinates  \\
+        \midrule
 
+        
+
+  \multirow{2}{*}{1} &  \multirow{2}{*}{ $\rm e^- + N  $   } & ${\rm ln}~T_{\rm e}$  & \tiny      6.1322    6.2124    6.4474    7.5872    8.7256    9.2774    9.4778    9.5934   10.0915   11.1390   11.7497   13.5255   15.4249
+ \\
+  &  & ${\rm ln}~E^\star$     & \tiny -55.2620  -54.4162  -53.5703  -51.4558  -49.7641  -48.9182  -48.0721  -47.2264  -45.1117  -43.4205  -42.5745  -40.8824  -39.6301\\     
+  \midrule  
+      
+  \multirow{2}{*}{2} &  \multirow{2}{*}{ $\rm e^- + O  $   } & ${\rm ln}~T_{\rm e}$  & \tiny    6.1395    6.2392    6.5051    7.6315    8.6771    9.1363    9.2668    9.3848    9.5799   10.1629   10.8830   11.2996   11.6030   12.4065   15.4249 \\
+  &  & ${\rm ln}~E^\star$     & \tiny  -55.2620  -54.4162  -53.5703  -51.4558  -49.7641  -48.9182  -48.0721  -47.2264  -46.3806  -45.1117  -44.2660  -43.4205  -42.5745  -40.8824  -39.0042\\     
+  \midrule    
+  
+  \multirow{2}{*}{3} &  \multirow{2}{*}{ $\rm e^- + N_2 $   } & ${\rm ln}~T_{\rm e}$  & \tiny      5.7836    5.8854    6.0067    6.1891    7.0566    7.5266    7.7497    8.0862    8.8649    9.0580    9.1848    9.2866    9.5415    9.6956    9.7646   10.0010   10.6517   12.7964   15.4249
+\\
+  &  & ${\rm ln}~E^\star$     & \tiny     -51.8608  -51.3500  -51.0135  -50.6569  -49.5583  -49.0474  -48.7110  -48.3543  -47.2557  -46.7448  -46.4084  -46.0517  -44.9531  -44.4423  -44.1058  
+ \\     
+  &  &       & \tiny     -43.7491  -43.3907  -40.6829  -39.1439\\
+  \midrule  
+  
+  \multirow{2}{*}{4} &  \multirow{2}{*}{ $\rm e^- + O_2  $   } & ${\rm ln}~T_{\rm e}$  & \tiny     5.6577    5.8861    6.4770    7.3930    8.1552    8.6458    9.0444    9.4545   10.2346   10.4239   11.1022   11.5585   15.4249
+  \\
+  &  & ${\rm ln}~E^\star$     & \tiny    -50.6569  -50.0691  -49.4041  -48.3543  -47.2557  -46.7448  -46.4084  -46.0517  -44.9531  -44.4423  -43.1821  -42.4533  -39.1439
+  \\     
+  \midrule  
+  
+  \multirow{2}{*}{5} &  \multirow{2}{*}{ $\rm e^- + NO  $   } & ${\rm ln}~T_{\rm e}$  & \tiny    4.6052    5.0387    5.7384    6.0438    6.9078    8.1163    8.3684    9.4004    9.9245   10.2589   11.3016   12.0194   13.1593   14.9141
+ \\
+  &  & ${\rm ln}~E^\star$     & \tiny    -53.3605  -52.4569  -51.1678  -50.6572  -49.3446  -45.9734  -45.3367  -44.6079  -44.2446  -43.7196  -42.4083  -41.3594  -40.0476  -38.7385
+  \\     
+  \midrule  
+        
+  \multirow{2}{*}{6} &  \multirow{2}{*}{ $\rm e^- + NH_3  $   } & ${\rm ln}~T_{\rm e}$  & \tiny 6.2086    6.2700    6.8003    8.8806   10.1453   10.3802   10.7743   11.9975   15.4249   \\
+  
+  &  & ${\rm ln}~E^\star$     & \tiny   -46.3062  -45.8896  -45.3691  -44.9524  -44.5359  -44.3277  -43.5990  -41.7243  -39.7238  \\
+  
+  
+                       
+    \bottomrule
+    \end{tabular*}
+\begin{tablenotes}
+\item[{a}] Notation and units: $T_{\rm e}$ is the electron temperature in Kelvin and $E^\star$ is the reduced electric field in units of V$\rm ~m^2$.
+\end{tablenotes}
+   \end{threeparttable}
+\end{table}
 

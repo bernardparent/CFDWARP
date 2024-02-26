@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 FEB 26a
+  * in model/chem/_NH3_Plasma_10s/arakoni2007.c
+    - added averaged rates to reactions 7, 8, 10
+  * in model/thermo/_generic/electronimpact.c
+    - for species O2 and N2, altered the splines so that they use fewer control points (and retain
+      the same accuracy)
+    - added species N, O, NO
+  * in model/thermo/doc/electronimpact.tex
+    - added species O, N, NO
+
+
 2024 FEB 23b
   * in src/test.c
     - changed the call to _mueNk_from_Te() to include *gl as the first parameter  
