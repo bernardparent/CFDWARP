@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 FEB 27a
+  * in model/chem/_NH3_Plasma_10s/arakoni2007.c
+    - added averaged_rates_local() to reactions up to 23
+  * in model/chem/_NH3_Plasma_10s
+    - deleted arakoni2007_new.c
+    - deleted arakoni2007_old.c
+  * in model/thermo/doc/electronimpact.tex and model/thermo/doc/report.tex
+    - fixed a few bugs that were preventing proper compilation of the document
+  * in src/data.c
+    - in write_data_file_binary_ascii(), fixed a bug: flux_t *fluxtmp; should be tmpflux_t *fluxtmp;
+    
+
 2024 FEB 26a
   * in model/chem/_NH3_Plasma_10s/arakoni2007.c
     - added averaged rates to reactions 7, 8, 10

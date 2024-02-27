@@ -681,7 +681,6 @@ void read_data_file_mpi(char *filename, np_t *np, gl_t *gl, long level){
 void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATYPE){
   FILE *datafile;
   long i,j,k,sizeoftmpflux;
-  flux_t *fluxtmp;
   bool *NODEVALID;
 #ifdef EMFIELD
   double effiter_U_emfield,effiter_R_emfield;
@@ -694,17 +693,17 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
   int rank,proc,numproc;
   MPI_Status MPI_Status1;
 #endif
-
-  sizeoftmpflux=nf*sizeof(double);
+  long ntmpflux=nf;
 #ifdef EMFIELD
-  sizeoftmpflux=max(sizeoftmpflux,nfe*sizeof(double));
+  ntmpflux=max(ntmpflux,nfe);
 #endif
 #if defined(UNSTEADY) && defined(_AVERAGEDRATES)
-  sizeoftmpflux=max(sizeoftmpflux,numaveragedrates*sizeof(double));
+  ntmpflux=max(ntmpflux,numaveragedrates);
   double averagedrates[numaveragedrates];
 #endif  
-
-  typedef double tmpflux_t[sizeoftmpflux];
+  sizeoftmpflux=ntmpflux*sizeof(double);
+  typedef double tmpflux_t[ntmpflux];
+  tmpflux_t *fluxtmp;
 
 
   fluxtmp=(tmpflux_t *)malloc((gl->domain_lim_all.ie-gl->domain_lim_all.is+1)
