@@ -147,7 +147,10 @@ const static speciesname_t speciesname[SMAP_NS]=
    "H3",
    "N4",
    "N3",
-   "NH3v"
+   "NH3v",
+   "H(3P)",
+   "H2(V1)",
+   "H2(B1Sigma)"
   };
 
 
@@ -265,7 +268,10 @@ const static double calM[SMAP_NS]=
    3.02327E-3,    /*H3 */
    56.0268E-3,    /*N4 */
    42.0201E-3,    /*N3 */
-   17.0305E-3    /*NH3v */ 
+   17.0305E-3,    /*NH3v */
+   1.00794E-3,    /*H(3P)*/
+   2.01588E-3,    /*H2(V1)*/
+   2.01588E-3    /*H2(B1Sigma)*/   
   };
 
 
@@ -371,7 +377,10 @@ const static long ck[SMAP_NS]=
    0,    /*H3 */
    0,    /*N4 */
    0,    /*N3 */
-   0    /*NH3v */
+   0,    /*NH3v */
+   0,    /*H(3P) */
+   0,    /* H2(V1) */
+   0    /* H2(B1SIGMA) */
   };
   
 const static long numatoms[SMAP_NS]=
@@ -475,7 +484,10 @@ const static long numatoms[SMAP_NS]=
    3,    /*H3 */
    4,    /*N4 */
    3,    /*N3 */
-   4     /*NH3v */
+   4,     /*NH3v */
+   1,    /*H(3P) */
+   2,    /* H2(V1) */
+   2    /* H2(B1SIGMA) */
   }; 
   
 
@@ -1261,6 +1273,9 @@ double _ionizationpot(long k){
     break;
     case SMAP_H2P:
       ionizationenergy=5.4497e-19;
+    break;
+    case SMAP_H2B1Sigma:
+      ionizationenergy=1.7624e-18;
     break;
     default:
       ionizationenergy=0.0;

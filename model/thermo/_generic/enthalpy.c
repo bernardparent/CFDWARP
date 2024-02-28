@@ -4483,7 +4483,158 @@ obtained from species NH4+ by subtracting the ionization energy of NH4 (4.410300
        -6.462330602e+01  /* b2 */        
       }
     },  
-                                                              
+  /* 
+   species H3P
+   obtained from species H by adding 1.4030e+05 to b1
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/   
+/* H to H(3P) has an ionization energy of 12.0898ev which is obtained from adding BOLSIG+ Morgan database for H(2P) with the energy needed to transition from H(2P) to H(3P) and this equals to 1.4030e+05 K. Adding 1.4030e+05 K to b1 for H to get the thermo of H(3P)*/ 
+    {
+      {
+       +200.00e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       +0.000000000E+00,  /* a1 */
+       +0.000000000E+00,  /* a2 */
+       +2.500000000E+00,  /* a3 */
+       +0.000000000E+00,  /* a4 */
+       +0.000000000E+00,  /* a5 */
+       +0.000000000E+00,  /* a6 */
+       +0.000000000E+00,  /* a7 */
+       +2.547370801E+04 + 1.403000000e+05,  /* b1 */
+       -4.466828530E-01   /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +(6000.0e0-dTrangemin),        /* Tmax [K] */
+       +6.078774250E+01,  /* a1 */
+       -1.819354417E-01,  /* a2 */
+       +2.500211817E+00,  /* a3 */
+       -1.226512864E-07,  /* a4 */
+       +3.732876330E-11,  /* a5 */
+       -5.687744560E-15,  /* a6 */
+       +3.410210197E-19,  /* a7 */
+       +2.547486398E+04 + 1.403000000e+05,  /* b1 */
+       -4.481917770E-01   /* b2 */
+      },
+      {
+       +(6000.0e0-dTrangemin),        /* Tmin [K] */ 
+       +6000.0e0,       /* Tmax [K] */
+       +6.078774250E+01,  /* a1 */
+       -1.819354417E-01,  /* a2 */
+       +2.500211817E+00,  /* a3 */  
+       -1.226512864E-07,  /* a4 */
+       +3.732876330E-11,  /* a5 */
+       -5.687744560E-15,  /* a6 */
+       +3.410210197E-19,  /* a7 */
+       +2.547486398E+04 + 1.403000000e+05,  /* b1 */
+       -4.481917770E-01   /* b2 */
+      }
+    },
+
+  /* 
+   species H2V1
+   obtained from species H2 by adding 5.98790000e+03 to b1
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/*H2 to H2(V1) has an ionization energy of 0.516ev which is obtained from BOLSIG+ Morgan database and this equals to 5.98790000e+03 K. Adding 5.98790000e+03 K to b1 for H2 to get the thermo of H2(V1)*/   
+    {
+      {
+       +200.00e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       +4.078322810E+04,  /* a1 */
+       -8.009185450E+02,  /* a2 */
+       +8.214701670E+00,  /* a3 */
+       -1.269714360E-02,  /* a4 */
+       +1.753604930E-05,  /* a5 */
+       -1.202860160E-08,  /* a6 */
+       +3.368093160E-12,  /* a7 */
+       +2.682484380E+03 + 5.98790000e+03,  /* b1 */
+       -3.043788660E+01   /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +(6000.0e0-dTrangemin),        /* Tmax [K] */
+       +5.608123380E+05,  /* a1 */
+       -8.371491340E+02,  /* a2 */
+       +2.975363040E+00,  /* a3 */  
+       +1.252249930E-03,  /* a4 */
+       -3.740718420E-07,  /* a5 */
+       +5.936628250E-11,  /* a6 */
+       -3.606995730E-15,  /* a7 */
+       +5.339815850E+03 + 5.98790000e+03,  /* b1 */
+       -2.202764050E+00   /* b2 */
+      },
+      {
+       +(6000.0e0-dTrangemin),        /* Tmin [K] */ 
+       +6000.0e0,       /* Tmax [K] */
+       +5.608123380E+05,  /* a1 */
+       -8.371491340E+02,  /* a2 */
+       +2.975363040E+00,  /* a3 */  
+       +1.252249930E-03,  /* a4 */
+       -3.740718420E-07,  /* a5 */
+       +5.936628250E-11,  /* a6 */
+       -3.606995730E-15,  /* a7 */
+       +5.339815850E+03 + 5.98790000e+03,  /* b1 */
+       -2.202764050E+00   /* b2 */
+      }
+   },
+
+   /* 
+   species H2(B1SIGMA)
+   obtained from species H2 by adding 1.27650000e+05 to b1
+   pos 0: Tmin lower range limit
+   pos 1: Tmax upper range limit
+   pos 2-8: a1,a2,...,a7
+   pos 9-10: b1,b2
+*/ 
+/*H2(B1SIGMA) is for the excited states of H2 with ionization energy greater than 11.0ev which is mentioned in Truscott paper and this equals to 1.27650000e+05 K. Adding 1.27650000e+05 K to b1 for H2 to get the thermo of H2(B1SIGMA)*/   
+    {
+      {
+       +200.00e0,         /* Tmin [K] */ 
+       +1000.0e0,        /* Tmax [K] */
+       +4.078322810E+04,  /* a1 */
+       -8.009185450E+02,  /* a2 */
+       +8.214701670E+00,  /* a3 */
+       -1.269714360E-02,  /* a4 */
+       +1.753604930E-05,  /* a5 */
+       -1.202860160E-08,  /* a6 */
+       +3.368093160E-12,  /* a7 */
+       +2.682484380E+03 + 1.27650000e+05,  /* b1 */
+       -3.043788660E+01   /* b2 */
+      },
+      {
+       +1000.0e0,        /* Tmin [K] */ 
+       +(6000.0e0-dTrangemin),        /* Tmax [K] */
+       +5.608123380E+05,  /* a1 */
+       -8.371491340E+02,  /* a2 */
+       +2.975363040E+00,  /* a3 */  
+       +1.252249930E-03,  /* a4 */
+       -3.740718420E-07,  /* a5 */
+       +5.936628250E-11,  /* a6 */
+       -3.606995730E-15,  /* a7 */
+       +5.339815850E+03 + 1.27650000e+05,  /* b1 */
+       -2.202764050E+00   /* b2 */
+      },
+      {
+       +(6000.0e0-dTrangemin),        /* Tmin [K] */ 
+       +6000.0e0,       /* Tmax [K] */
+       +5.608123380E+05,  /* a1 */
+       -8.371491340E+02,  /* a2 */
+       +2.975363040E+00,  /* a3 */  
+       +1.252249930E-03,  /* a4 */
+       -3.740718420E-07,  /* a5 */
+       +5.936628250E-11,  /* a6 */
+       -3.606995730E-15,  /* a7 */
+       +5.339815850E+03 + 1.27650000e+05,  /* b1 */
+       -2.202764050E+00   /* b2 */
+      }
+   },
   };
 
 

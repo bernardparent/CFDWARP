@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 FEB 28a
+  * in model/chem/_NH3_Plasma_10s/chem.c
+    - added CHEMMODEL_OMPRAKAS2023 model
+    - added CHEMMODEL_TRUSCOTT2015 model
+  * in model/chem/_NH3_Plasma_10s/chem.hh
+    - added missing species for truscott2015 model
+  * in model/thermo/_generic/
+    - added H3P, H2V1, H2B1Sigma in enthalpy.c, thermo.c, and thermo.hh
+  * in model/transport/_Dixon-Lewis/transport.c
+    - added H3P, H2V1, H2B1Sigma
+
+
 2024 FEB 27a
   * in model/chem/_NH3_Plasma_10s/arakoni2007.c
     - added averaged_rates_local() to reactions up to 23
