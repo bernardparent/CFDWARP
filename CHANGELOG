@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAR 02a
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - rewrote the section 16 related to the electron energy losses source term Q_e
+
+
 2024 FEB 28a
   * in model/chem/_NH3_Plasma_10s/chem.c
     - added CHEMMODEL_OMPRAKAS2023 model

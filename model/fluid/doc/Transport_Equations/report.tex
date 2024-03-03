@@ -2463,24 +2463,24 @@ Note that the electron loss function is determined assuming a uniform plasma whe
 
 
 
-Let us start from the electron energy transport equation:
+Let us start from the electron energy transport equation for a weakly-ionized plasma composed of one neutral species, one ion species, and electrons:
 %
 \begin{equation}
 \frac{\partial }{\partial t}\rho_{\rm e} e_{\rm e} + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_{\rm e} \vec{V}^{\rm e}_j h_{\rm e} 
 = 
  W_{\rm e} e_{\rm e}
 +   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
-- Q_{\rm e}
+- Q_{\rm e-n}
 \end{equation}
 %
-where $Q_{\rm e}$ contains all electron-impact energy losses and relaxation processes with neutrals and ions (elastic and inelastic). Consider the energy transport equation in the ``local approximation'', where the plasma has uniform properties (with no spatial gradients) and is at steady-state. Then, the latter becomes:
+where $Q_{\rm e-n}$ contains all electron-impact energy losses and relaxation processes with neutrals (elastic and inelastic processes). Consider the energy transport equation in the ``local approximation'', where the plasma has uniform properties (with no spatial gradients) and is at steady-state. Then, the latter becomes:
 %
 \begin{equation}
 0
 = 
  W_{\rm e} e_{\rm e}
 +   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
-- Q_{\rm e}
+- Q_{\rm e-n}
 \end{equation}
 %
 Then, from noting that electron mass conservation equation would yield $W_{\rm e}=0$ at steady-state for a uniform plasma:
@@ -2489,7 +2489,7 @@ Then, from noting that electron mass conservation equation would yield $W_{\rm e
 0
 = 
    C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
-- Q_{\rm e}
+- Q_{\rm e-n}
 \end{equation}
 %
 But $\vec{E} \cdot \vec{V}^{\rm e}=(\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot \vec{V}^{\rm e}$:
@@ -2498,13 +2498,13 @@ But $\vec{E} \cdot \vec{V}^{\rm e}=(\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot 
 0
 = 
    C_{\rm e} N_{\rm e} (\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot \vec{V}^{\rm e}  
-- Q_{\rm e}
+- Q_{\rm e-n}
 \end{equation}
 %
 Isolate $Q_{\rm e}$:
 %
 \begin{equation}
-Q_{\rm e}
+Q_{\rm e-n}
 = 
    C_{\rm e} N_{\rm e} (\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot \vec{V}^{\rm e}  
 \end{equation}
@@ -2518,7 +2518,7 @@ In the ``local approximation'',  the electron velocity can be taken from Eq.\ (\
 Substitute the latter in the former:
 %
 \begin{equation}
-Q_{\rm e}
+Q_{\rm e-n}
 = 
    C_{\rm e} N_{\rm e} (\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot \left( \vec{V}^{\rm n} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right) \right)
 \end{equation}
@@ -2527,7 +2527,7 @@ Q_{\rm e}
 Because the magnitude of the neutrals velocity can be assumed small compared to the magnitude of the electron velocity, the electron energy loss function becomes:
 %
 \begin{equation}
-Q_{\rm e}
+Q_{\rm e-n}
 = 
   - C_{\rm e} N_{\rm e} (\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot \left( \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right) \right)
 \end{equation}
@@ -2535,7 +2535,7 @@ Q_{\rm e}
 or, noting that $C_e = -e$:
 %
 \begin{equation}
-Q_{\rm e}
+Q_{\rm e-n}
 = 
   |C_{\rm e}| N_{\rm e} (\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot \left( \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right) \right)
 \end{equation}
@@ -2549,25 +2549,20 @@ E^\star\equiv \frac{|\vec{E}+\vec{V}^{\rm e}\times \vec{B}|}{N}
 Then
 %
 \begin{equation}
-Q_{\rm e}
+Q_{\rm e-n}
 = 
   |C_{\rm e}| N_{\rm e}\mu_{\rm e}  N^2 (E^\star)^2
 \end{equation}
 %
-The latter is valid when $T_{\rm e} >> T$. Should the main electron energy relaxation process be with the vibrational energy modes then:
+The latter is valid when the plasma is composed of one dominant neutral species, electrons, and one ion species. For a weakly-ionized plasma with multiple neutral species, the latter becomes:
 %
 \begin{equation}
-Q_{\rm e}
+\frameeqn{
+Q_{\rm e-n}
 = 
-  \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e}\mu_{\rm e}  N^2 (E^\star)^2
-\end{equation}
-%
-The latter is valid when the plasma is composed of one neutral species, electrons, and one ion species. For multiple neutral species, the latter becomes:
-%
-\begin{equation}
-Q_{\rm e}
-= 
-  \sum_k^{k\neq e} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
+  \sum_k  \beta_k^{\rm n} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
+}
+\label{eqn:Qe-n}
 \end{equation}
 %
 with $(\mu_{\rm e} N)_k$ the product of the mobility and the total number density of the electrons in species $k$ assuming no electron-ion collisions and assuming that the gas number density $N$ is made up solely of molecules of species $k$.  Similarly, $E^\star_k$ is the reduced electric field of species $k$ assuming no electron-ion collisions and assuming that the gas number density $N$ is made up solely of molecules of species $k$. Both $(\mu_{\rm e} N)_k$ and $E^\star_k$ can be found from experiments or from BOLSIG+ for many species.
@@ -2576,23 +2571,24 @@ with $(\mu_{\rm e} N)_k$ the product of the mobility and the total number densit
 
 
 
-The above expression for $Q_{\rm e}$ will predict accurately all electron losses including electron impact ionization and excitation, elastic collisions, and inelastic collisions with the vibrational energy modes of the molecule. However, it does suffer from relaxing towards the vibrational temperature of the heavy species. This is generally true because the relaxation with the vibrational energy modes is 1-2 orders of magnitude faster than the one with the translational energy modes of the heavy molecules. However, this ceases to be the case when $T-T_{\rm e}$ is one order of magnitude higher than $T-T_{\rm v}$. Then, the relaxation with the translational energy modes becomes important. We can add those following \cite[page 16]{book:1991:raizer} and
+
+The above expression for $Q_{\rm e-n}$ will predict accurately all electron losses with neutrals including electron impact ionization and excitation, elastic collisions, and inelastic collisions with the vibrational energy modes of the molecule. However, it does suffer from not predicting electron energy gains due to collisions with neutrals when the electron temperature is less than the heavy particules temperatures. It also suffers from not predicting electron energy gains and losses with the ions.
+
+The electron energy gains/losses with all heavy particules (either neutrals or ions) due to elastic collisions can be obtained following \cite[page 16]{book:1991:raizer} and
  \cite{jfm:1964:appleton} as follows:
 %
 \begin{equation}
-Q_{\rm e}
+Q_{\rm e-t}
 = 
-   \sum_k \beta_k^{\rm n} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
- + \sum_k^{k \ne e}  \frac{(T_{\rm e}-T)}{T_{\rm e}} \frac{2 m_{\rm e}}{m_k} \frac{3}{2} N_{\rm e} k_{\rm B} T_{\rm e} \nu_{\rm ek}  
+  \sum_k^{k \ne e}  \frac{(T_{\rm e}-T)}{T_{\rm e}} \frac{2 m_{\rm e}}{m_k} \frac{3}{2} N_{\rm e} k_{\rm B} T_{\rm e} \nu_{\rm ek}  
 \end{equation}
 %
 or
 %
 \begin{equation}
-Q_{\rm e}
+Q_{\rm e-t}
 = 
-   \sum_k \beta_k^{\rm n} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
- + \sum_k^{k\ne e}  3 N_{\rm e} k_{\rm B} (T_{\rm e}-T) \frac{ m_{\rm e}}{m_k}   \nu_{\rm ek}  
+  \sum_k^{k\ne e}  3 N_{\rm e} k_{\rm B} (T_{\rm e}-T) \frac{ m_{\rm e}}{m_k}   \nu_{\rm ek}  
 \end{equation}
 %
 where $\nu_{\rm ek}$ is the collision frequency between the electrons and species $k$. 
@@ -2605,20 +2601,18 @@ We can rewrite the collision frequency as function of the mobility \cite[page 9]
 where $\mu_{ek}$ is the electron mobility within species $k$ and where  $\sigma_{ek}$ is the collision cross section between an electron and species $k$ and $\overline{q_{\rm e}}$ is the average electron speed. Replacing the latter in the former:
 %
 \begin{equation}
-Q_{\rm e}
+Q_{\rm e-t}
 = 
-   \sum_k \beta_k^{\rm n} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
- + \sum_k \beta_k^{\rm n} 3 N_{\rm e} k_{\rm B} (T_{\rm e}-T)    \frac{|C_{\rm e}|}{m_k \mu_{ek}}  
+  \sum_k \beta_k^{\rm n} 3 N_{\rm e} k_{\rm B} (T_{\rm e}-T)    \frac{|C_{\rm e}|}{m_k \mu_{ek}}  
  + \sum_k \beta_k^{\rm i} 3 \rho_{\rm e} k_{\rm B} (T_{\rm e}-T) \overline{q_{\rm e}} \frac{N_k}{m_k} \sigma_{ek} 
 \end{equation}
 %
 or,
 %
 \begin{equation}
-Q_{\rm e}
+Q_{\rm e-t}
 = 
-   \sum_k \beta_k^{\rm n} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
- + \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  (T_{\rm e}-T)}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}        
+  \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  (T_{\rm e}-T)}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}        
  + \sum_k \beta_k^{\rm i} 3 \rho_{\rm e} k_{\rm B} (T_{\rm e}-T) \overline{q_{\rm e}} \frac{N_k}{m_k} \sigma_{ek} 
 \end{equation}
 %
@@ -2644,44 +2638,88 @@ with $\overline{q_{\rm e}}$ the average speed of the electrons approaching an io
 Then 
 %
 \begin{equation}
-Q_{\rm e}
+Q_{\rm e-t}
 = 
-   \sum_k \beta_k^{\rm n} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
- + \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  (T_{\rm e}-T)}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}        
+  \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  (T_{\rm e}-T)}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}        
  + \sum_k \beta_k^{\rm i} 3 \rho_{\rm e} k_{\rm B} (T_{\rm e}-T) \overline{q_{\rm e}} \frac{N_k}{m_k} \frac{8}{\pi} \left(\frac{|C_i| |C_e|}{4 \pi \epsilon_0 } \frac{1}{\frac{1}{2} m_{\rm e} \overline{q_{\rm e}}^2}\right)^2 \ln \Lambda
 \end{equation}
 %
 %
 \begin{equation}
-Q_{\rm e}
+Q_{\rm e-t}
 = 
-   \sum_k \beta_k^{\rm n} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
- + \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  (T_{\rm e}-T)}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}        
+  \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  (T_{\rm e}-T)}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}        
  + \sum_k \beta_k^{\rm i} 3 \rho_{\rm e} k_{\rm B} \frac{(T_{\rm e}-T)}{\overline{q_{\rm e}}^3}  \frac{N_k}{m_k} \frac{8}{\pi} \left(\frac{|C_i| |C_e|}{2 \pi \epsilon_0 m_{\rm e}} \right)^2 \ln \Lambda
 \end{equation}
 %
 %
 \begin{equation}
 \frameeqn{
-Q_{\rm e}
+Q_{\rm e-t}
 = 
-   \sum_k \beta_k^{\rm n} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
- + \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  (T_{\rm e}-T)}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}        
+  \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  (T_{\rm e}-T)}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}        
  + \sum_k \beta_k^{\rm i}  \rho_{\rm e} \rho_k  (T_{\rm e}-T )  \frac{6 k_{\rm B} C_i^2 C_e^2 \ln \Lambda}{ \pi^3 \epsilon_0^2 m_{\rm e}^2 m_k^2 \overline{q_{\rm e}}^3}  
 }
-\end{equation}
-%
-After expanding the average electron velocity, we get: 
-%
-\begin{equation}
-Q_{\rm e}
-= 
-   \sum_k \beta_k^{\rm n} \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2
- + \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  (T_{\rm e}-T)}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}        
- + \sum_k \beta_k^{\rm i}  \rho_{\rm e} \rho_k  (T_{\rm e}^{-0.5}-T T_{\rm e}^{-1.5}) \left(\frac{\pi m_{\rm e}}{8 k_{\rm B}}\right)^{1.5}  \frac{6 k_{\rm B} C_i^2 C_e^2 \ln \Lambda}{ \pi^3 \epsilon_0^2 m_{\rm e}^2 m_k^2}  
+\label{eqn:Qe-t}
 \end{equation}
 %
 In the latter, $(\mu_{e} N)_k$ corresponds to the electron mobility in species $k$ assuming that the plasma is weakly-ionized and that the ions do not affect the electron mobility. The term $(\mu_{e} N)_k$ can be obtained for each neutral species from experiments or from BOLSIG+.
+
+The total electron energy loss is not simply $Q_{\rm e-t}+Q_{\rm e-n}$ as obtained from Eqs.\ (\ref{eqn:Qe-t}) and (\ref{eqn:Qe-n}) because $Q_{\rm e-n}$ includes the loss of electron energy due to elastic collisions with the neutrals. We thus need to subtract the loss of electron energy due to elastic collisions from $Q_{\rm e-n}$. This can be done by finding the fraction of $E/N$ within  $Q_{\rm e-n}$ that is responsible for elastic collisions. To do so, equate the first term on the RHS of (\ref{eqn:Qe-t}) with $T\rightarrow0$ to the RHS of (\ref{eqn:Qe-n}):
+%
+\begin{equation}
+  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  T_{\rm e}}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}
+ =
+  |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  (E^\star_k)^2_{\rm tr}
+\end{equation}
+%
+Then, isolate $(E^\star_k)^2_{\rm tr}$:
+%
+\begin{equation}
+\frameeqn{
+(E^\star_k)^2_{\rm tr}=\frac{3  k_{\rm B} T_{\rm e}  }{ m_k (\mu_{\rm e}N)_k^2}
+}
+\end{equation}
+%
+Then, we can subtract $(E^\star_k)^2_{\rm tr}$ from $(E^\star_k)^2$ before adding $Q_{\rm e-n}$ to $Q_{\rm e-t}$:
+%
+\begin{equation}
+\frameeqn{
+Q_{\rm e}
+= 
+  \sum_k \beta_k^{\rm n} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  \left( (E^\star_k)^2 -(E^\star_k)^2_{\rm tr}\right)
++  \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| N_{\rm e} N_k  (T_{\rm e}-T)}{ m_k (\mu_{\rm e}N)_k}        
+ + \sum_k \beta_k^{\rm i}  N_{\rm e} N_k  (T_{\rm e}-T )  \frac{6 k_{\rm B} C_i^2 C_e^2 \ln \Lambda}{ \pi^3 \epsilon_0^2 m_{\rm e} m_k \overline{q_{\rm e}}^3}  
+}
+\label{eqn:Qe}
+\end{equation}
+%
+The latter includes all electron energy losses to the ions and the neutrals either due to elastic or inelastic processes. It also includes electron energy gains due to elastic processes. However, it does not include electron energy gains due to inelastic processes when the electron temperature is less than the gas temperature. Such are, however, expected to be small and not well known. Also, they would not affect significantly the electron temperature except perhaps when the latter is much less than the gas temperature.
+
+After expanding the average electron velocity, we get: 
+%
+\begin{align}
+Q_{\rm e}
+= 
+&  \sum_k \beta_k^{\rm n} |C_{\rm e}| N_{\rm e} N_k (\mu_{\rm e}  N)_k  \left( (E^\star_k)^2 -(E^\star_k)^2_{\rm tr}\right)
++  \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  (T_{\rm e}-T)}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}   
+\nonumber\\     
+ &+ \sum_k \beta_k^{\rm i}  \rho_{\rm e} \rho_k  (T_{\rm e}^{-0.5}-T T_{\rm e}^{-1.5}) \left(\frac{\pi m_{\rm e}}{8 k_{\rm B}}\right)^{1.5}  \frac{6 k_{\rm B} C_i^2 C_e^2 \ln \Lambda}{ \pi^3 \epsilon_0^2 m_{\rm e}^2 m_k^2}  
+\end{align}
+%
+The first term on the RHS needs to be rewritten slightly differently to become numerically stable:
+%
+\begin{align}
+Q_{\rm e}
+= 
+&  \sum_k \frac{\beta_k^{\rm n} |C_{\rm e}| \rho_{\rm e} \rho_k (\mu_{\rm e}  N)_k (T_{\rm e}-T_{\rm ref})}{m_{\rm e} m_k T_{\rm e}} \max\left( (E^\star_k)^2 -(E^\star_k)^2_{\rm tr},~0\right)
++  \sum_k  \frac{3 \beta_k^{\rm n} k_{\rm B} |C_{\rm e}| \rho_{\rm e} \rho_k  (T_{\rm e}-T)}{m_{\rm e} m_k^2 (\mu_{\rm e}N)_k}   
+\nonumber\\     
+ &+ \sum_k \beta_k^{\rm i}  \rho_{\rm e} \rho_k  (T_{\rm e}^{-0.5}-T T_{\rm e}^{-1.5}) \left(\frac{\pi m_{\rm e}}{8 k_{\rm B}}\right)^{1.5}  \frac{6 k_{\rm B} C_i^2 C_e^2 \ln \Lambda}{ \pi^3 \epsilon_0^2 m_{\rm e}^2 m_k^2}  
+\end{align}
+%
+with $T_{\rm ref}$ a small number less than the smallest temperature in the domain (typically set to 10~K).
+
 
 
 \section{Total Energy Transport Equation}
