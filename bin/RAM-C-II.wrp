@@ -439,6 +439,7 @@ Model(
     AddHeatPoint(0.0{x,m},0.0{y,m}, 0.1{radius,m}, 0.0{W/m});
     }
     HEAT_DEPOSITED_TO_ELECTRONS=FALSE;
+    TrefElectronEnergyTransport=50.0;
   );
   AirPlasma11s(
     CHEMMODEL=CHEMMODEL_PARENTPARK2021;
