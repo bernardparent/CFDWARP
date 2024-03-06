@@ -276,8 +276,10 @@ static double _mue_from_Te_rhok(double Te, spec_t rhok){
   for (spec=0; spec<ns; spec++){
     if (speciestype[spec]==SPECIES_NEUTRAL)
         sum+=(Nk[spec]/N)/_mueNk_from_Te_ParentMacheret(spec, Te);
+#ifdef speceminus
     if (speciestype[spec]==SPECIES_IONPLUS || speciestype[spec]==SPECIES_IONMINUS)
         sum+=(Nk[spec]/N)/(1.47*powint(pi,3)*sqr(epsilon0)*_m(speceminus)/(2.0*sqr(_C(spec))*fabs(_C(speceminus))*_lnLambda(rhok,Te))*pow(8.0*kB*Te/pi/_m(speceminus),1.5));
+#endif
   }
   assert(sum!=0.0);
   assert(N!=0.0);

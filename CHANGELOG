@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAR 06a
+  * in model/share/transport_share.c
+    - in _mue_from_Te_rhok(), fixed a bug when compiling the code without electrons within the
+      listed species
+      
+
 2024 MAR 05a
   * in model/fluid/_Navier-Stokes_plasma/fluid.c
     - in read_model_fluid_actions() added TrefElectronEnergyTransport user-defined variable
