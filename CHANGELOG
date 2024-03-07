@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAR 06c
+  * renamed in all h, hh, c files:
+    - TEMODEL_TRANSPORTQENQEI -> TEMODEL_TRANSPORT_PARENT2021
+    - TEMODEL_TRANSPORTQE -> TEMODEL_TRANSPORT_PARENT2024
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - regrouped the electron energy relaxation methods within the same section and named
+      the subsections so that they refer to the name of the model (PARENT2021, PARENT2024).
+      
+
 2024 MAR 06b
   * in model/fluid/_Navier-Stokes_plasma/fluid.c and model/fluid/_Navier-Stokes_plasma/fluid.h
     - added TEMODEL_TRANSPORT_KIM2012 near every instance of TEMODEL_TRANSPORTQE
