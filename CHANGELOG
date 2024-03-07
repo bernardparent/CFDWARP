@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAR 06b
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c and model/fluid/_Navier-Stokes_plasma/fluid.h
+    - added TEMODEL_TRANSPORT_KIM2012 near every instance of TEMODEL_TRANSPORTQE
+  * in model/fluid/_Navier-Stokes_plasma/fluid_plasma.c
+    - added TEMODEL_TRANSPORT_KIM2012 near every instance of TEMODEL_TRANSPORTQE
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - added _kev(), _sigmaes(), _grot(), _taueN2(), find_Qen_Kim2012(), find_dSe_dU_transport_Kim2012()
+    - in find_Qe(), added call to find_Qen_Kim2012()
+    - in find_dSe_dU(), added call to find_dSe_dU_transport_Kim2012()
+    
+
 2024 MAR 06a
   * in model/share/transport_share.c
     - in _mue_from_Te_rhok(), fixed a bug when compiling the code without electrons within the
