@@ -1,40 +1,23 @@
-#define _CHEM_AIRPLASMA12S
-#define _CHEM_METHOD "Air Plasma 12s"
+#define _CHEM_AIRPLASMA8S
+#define _CHEM_METHOD "Air Plasma 9 species Macheret2007 [parent2007a], Rajendran2022, Bowersox2024"
 #define _CHEM_PLASMA
-#define _CHEM_ACTIONNAME "AirPlasma12s"
-#define _CHEM_WEEE_TWOTEMPERATURE
+#define _CHEM_ACTIONNAME "AirPlasma9s"
 
-#define ns 12
-#define ncs 7
 #define CHEM_NEUTRAL FALSE
+
+#define ns 9
+#define ncs 4
 
 #define speceminus 0
 #define specO2minus 1
-#define specOplus 2
-#define specNplus 3
-#define specO2plus 4
-#define specN2plus 5
-#define specNOplus 6
-#define specO 7
-#define specN 8
-#define specNO 9
-#define specO2 10
-#define specN2 11
+#define specO2plus 2
+#define specN2plus 3
+#define specO 4
+#define specN 5
+#define specNO 6
+#define specO2 7
+#define specN2 8
 
-const static long smap[ns] = {
-  SMAP_eminus,
-  SMAP_O2minus,
-  SMAP_Oplus,
-  SMAP_Nplus,
-  SMAP_O2plus,
-  SMAP_N2plus,
-  SMAP_NOplus,
-  SMAP_O,
-  SMAP_N,
-  SMAP_NO,
-  SMAP_O2,
-  SMAP_N2
-};
 
 
 #define SPECIES_ELECTRON 0
@@ -53,12 +36,21 @@ If there are is no electron species, give speceminus a rank of -1
 */
 
 
+const static long smap[ns] = {
+  SMAP_eminus,
+  SMAP_O2minus,
+  SMAP_O2plus,
+  SMAP_N2plus,
+  SMAP_O,
+  SMAP_N,
+  SMAP_NO,
+  SMAP_O2,
+  SMAP_N2
+};
+
 const static long speciestype[ns] = {
   SPECIES_ELECTRON,
   SPECIES_IONMINUS,
-  SPECIES_IONPLUS,
-  SPECIES_IONPLUS,
-  SPECIES_IONPLUS,
   SPECIES_IONPLUS,
   SPECIES_IONPLUS,
   SPECIES_NEUTRAL,
@@ -71,7 +63,7 @@ const static long speciestype[ns] = {
 
 typedef struct {
   int CHEMMODEL;
-  bool NEGATIVEIONREACTIONS;
   bool QEISOURCETERMS;
+  double Tminchem,Teminchem;
 } gl_model_chem_t;
 

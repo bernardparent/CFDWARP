@@ -7,6 +7,24 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAR 08a
+  * in model/chem
+    - deleted _Air_Plasma_12s
+  * in model/chem/_Air_Plasma_8s/chem.c
+    - in write_model_chem_template() and read_model_chem_actions() added the variables
+      Tminchem and Teminchem
+    - in find_W() and find_dW_dx() added T=max(T,gl->model.chem.Tminchem);
+      and Te=max(Te,gl->model.chem.Teminchem);
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_dSe_dU_transport_Kim2012(), added missing linearization terms
+    
+
+2024 MAR 07a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_dSe_dU_transport_Kim2012(), added missing linearization of some temperature 
+      dependent terms 
+    
+    
 2024 MAR 06c
   * renamed in all h, hh, c files:
     - TEMODEL_TRANSPORTQENQEI -> TEMODEL_TRANSPORT_PARENT2021

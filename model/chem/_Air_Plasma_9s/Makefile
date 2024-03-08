@@ -5,9 +5,9 @@ CCFLAGSLOCAL = $(CFLAGSCFD) -I../../../lib/include -I../../../.
 
 ####### Files
 
-HEADERS =   chem.h parentdunn2021.h 
-SOURCES =   chem.c parentdunn2021.c 
-OBJECTS =   chem.o parentdunn2021.o 
+HEADERS =   chem.h macheret2007old.h macheret2007.h rajendran2022.h bowersox2024.h
+SOURCES =   chem.c macheret2007old.c macheret2007.c rajendran2022.c bowersox2024.c
+OBJECTS =   chem.o macheret2007old.o macheret2007.o rajendran2022.o bowersox2024.o
 TARGETS  = ../_chem.a
 
 

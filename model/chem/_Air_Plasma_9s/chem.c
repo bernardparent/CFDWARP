@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2021 Bernard Parent
+Copyright 2018,2021 Bernard Parent
+Copyright 2021 Prasanna Thoguluva Rajendran
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -28,32 +29,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/thermo/_thermo.h>
 #include <model/share/chem_share.h>
 #include <src/control.h>
-#include "parentdunn2021.h"
+#include "macheret2007old.h"
+#include "macheret2007.h"
+#include "rajendran2022.h"
+#include "bowersox2024.h"
 
 #define CHEMMODEL_NONE 1
-#define CHEMMODEL_PARENTDUNN2021 2
+#define CHEMMODEL_MACHERET2007 2
+#define CHEMMODEL_MACHERET2007OLD 3
+#define CHEMMODEL_RAJENDRAN2022 4
+#define CHEMMODEL_BOWERSOX2024 5
 
 
-
-/* set all reactions to true except for testing purposes */
-const static bool NEGATIVEIONREACTION[7]=
-  {
-   TRUE, /* reaction 0 */
-   TRUE, /* reaction 1 */
-   TRUE, /* reaction 2 */
-   TRUE, /* reaction 3 */
-   TRUE, /* reaction 4 */
-   TRUE, /* reaction 5 */
-   TRUE, /* reaction 6 */
-  };
+#define Estarmin 1e-40
 
 
 void write_model_chem_template(FILE **controlfile){
   wfprintf(*controlfile,
     "  %s(\n"
-    "    CHEMMODEL=CHEMMODEL_PARENTDUNN2021;\n"
-    "    NEGATIVEIONREACTIONS=FALSE; {include reactions function of EoverN}\n"
+    "    CHEMMODEL=CHEMMODEL_MACHERET2007;\n"
     "    QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}\n"
+    "    Tminchem=300.0;\n"
+    "    Teminchem=300.0;\n"
     "  );\n"
   ,_CHEM_ACTIONNAME);
 }
@@ -73,7 +70,10 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
 
     if (((readcontrolarg_t *)codex->action_args)->VERBOSE) wfprintf(stdout,"%s..",_CHEM_ACTIONNAME);
     SOAP_add_int_to_vars(codex,"CHEMMODEL_NONE",CHEMMODEL_NONE); 
-    SOAP_add_int_to_vars(codex,"CHEMMODEL_PARENTDUNN2021",CHEMMODEL_PARENTDUNN2021);
+    SOAP_add_int_to_vars(codex,"CHEMMODEL_MACHERET2007",CHEMMODEL_MACHERET2007); 
+    SOAP_add_int_to_vars(codex,"CHEMMODEL_BOWERSOX2024",CHEMMODEL_BOWERSOX2024); 
+    SOAP_add_int_to_vars(codex,"CHEMMODEL_MACHERET2007OLD",CHEMMODEL_MACHERET2007OLD); 
+    SOAP_add_int_to_vars(codex,"CHEMMODEL_RAJENDRAN2022",CHEMMODEL_RAJENDRAN2022); 
     gl->MODEL_CHEM_READ=TRUE;
 
     action_original=codex->action;
@@ -82,73 +82,17 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
     codex->action=action_original;
 
     find_int_var_from_codex(codex,"CHEMMODEL",&gl->model.chem.CHEMMODEL);
-    if (gl->model.chem.CHEMMODEL!=CHEMMODEL_PARENTDUNN2021
+    if (gl->model.chem.CHEMMODEL!=CHEMMODEL_MACHERET2007 && gl->model.chem.CHEMMODEL!=CHEMMODEL_BOWERSOX2024 && gl->model.chem.CHEMMODEL!=CHEMMODEL_MACHERET2007OLD && gl->model.chem.CHEMMODEL!=CHEMMODEL_RAJENDRAN2022 
         && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)
-      SOAP_fatal_error(codex,"CHEMMODEL must be set to CHEMMODEL_PARENTDUNN2021.");
-    find_bool_var_from_codex(codex,"NEGATIVEIONREACTIONS",&gl->model.chem.NEGATIVEIONREACTIONS);
+      SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_MACHERET2007 or CHEMMODEL_BOWERSOX2024 or CHEMMODEL_MACHERET2007OLD or CHEMMODEL_NONE or CHEMMODEL_RAJENDRAN2022.");
     find_bool_var_from_codex(codex,"QEISOURCETERMS",&gl->model.chem.QEISOURCETERMS);
+    find_double_var_from_codex(codex,"Tminchem",&gl->model.chem.Tminchem);
+    find_double_var_from_codex(codex,"Teminchem",&gl->model.chem.Teminchem);
 
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;
   }
 }
-
-
-
-void add_W_NegativeIon ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
-  double N[ns];
-  double R;
-  long k;
-  spec_t X;
-  
-  R=Rchem;
-  for ( k = 0; k < ns; k++ ) {
-    X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
-  }
-  
-    
-  /* find properties needed by add_to_W* functions */
-  for ( k = 0; k < ns; k++ ) {
-    N[k] = rhok[k] / _calM (k ) * 1e-6 * calA;  /* particules/cm^3 */
-  }
-
-
-    
-  if (NEGATIVEIONREACTION[1]){
-  }
-
-  
-}
-
-
-
-void add_dW_dx_NegativeIon ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
-                  double Estar, double Qbeam, spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, 
-                  spec_t dWdTv, spec_t dWdQbeam ) {
-  long k;  
-  spec_t N,X;
-  double R;
-  
-  R=Rchem;
-  for ( k = 0; k < ns; k++ ) {
-    X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
-  }
-  
-
-  /* find properties needed by add_to_dW* functions in proper units */
-  for ( k = 0; k < ns; k++ ) {
-    N[k] = rhok[k] / _calM ( k ) * 1e-6 * calA;
-  }
-
-  if (NEGATIVEIONREACTION[1]) {
-  }
-  
-
-
-}
-
-
-
 
 
 void find_W_None ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
@@ -178,9 +122,20 @@ void find_dW_dx_None ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
 
 
 void find_W ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
+  T=max(T,gl->model.chem.Tminchem);
+  Te=max(Te,gl->model.chem.Teminchem);
   switch (gl->model.chem.CHEMMODEL){
-    case CHEMMODEL_PARENTDUNN2021: 
-      find_W_ParentDunn2021 ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
+    case CHEMMODEL_MACHERET2007: 
+      find_W_Macheret2007 ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
+    break;
+    case CHEMMODEL_BOWERSOX2024: 
+      find_W_Bowersox2024 ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
+    break;
+    case CHEMMODEL_MACHERET2007OLD: 
+      find_W_Macheret2007old ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
+    break;
+    case CHEMMODEL_RAJENDRAN2022: 
+      find_W_Rajendran2022 ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
     break;
     case CHEMMODEL_NONE: 
       find_W_None ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );    
@@ -188,17 +143,26 @@ void find_W ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, do
     default:
       fatal_error("Problem with CHEMMODEL in find_W() within chem.c");
   }
-  if (gl->model.chem.NEGATIVEIONREACTIONS && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  
-    add_W_NegativeIon ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
 }
 
 
 void find_dW_dx ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
                   double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
+  T=max(T,gl->model.chem.Tminchem);
+  Te=max(Te,gl->model.chem.Teminchem);
   switch (gl->model.chem.CHEMMODEL){
-    case CHEMMODEL_PARENTDUNN2021: 
-      find_dW_dx_ParentDunn2021 ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+    case CHEMMODEL_MACHERET2007: 
+      find_dW_dx_Macheret2007 ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+    break;
+    case CHEMMODEL_BOWERSOX2024: 
+      find_dW_dx_Bowersox2024 ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+    break;
+    case CHEMMODEL_MACHERET2007OLD: 
+      find_dW_dx_Macheret2007old ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+    break;
+    case CHEMMODEL_RAJENDRAN2022: 
+      find_dW_dx_Rajendran2022 ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
     break;
     case CHEMMODEL_NONE: 
       find_dW_dx_None ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
@@ -206,23 +170,25 @@ void find_dW_dx ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv
     default:
       fatal_error("Problem with CHEMMODEL in find_W() within chem.c");
   }
-  if (gl->model.chem.NEGATIVEIONREACTIONS  && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  
-    add_dW_dx_NegativeIon ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
-
 }
 
 
-
-
-
 void find_Qei(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
-  double theta;
   
   *Qei=0.0;  
   if (gl->model.chem.QEISOURCETERMS){
     switch (gl->model.chem.CHEMMODEL){
-      case CHEMMODEL_PARENTDUNN2021: 
-        find_Qei_ParentDunn2021 ( gl, rhok, Estar, Te, Qei );
+      case CHEMMODEL_MACHERET2007: 
+        find_Qei_Macheret2007 ( gl, rhok, Estar, Te, Qei );
+      break;
+      case CHEMMODEL_BOWERSOX2024: 
+        find_Qei_Bowersox2024 ( gl, rhok, Estar, Te, Qei );
+      break;
+      case CHEMMODEL_MACHERET2007OLD: 
+        find_Qei_Macheret2007old ( gl, rhok, Estar, Te, Qei );
+      break;
+      case CHEMMODEL_RAJENDRAN2022: 
+        find_Qei_Rajendran2022 ( gl, rhok, Estar, Te, Qei );
       break;
       case CHEMMODEL_NONE: 
         *Qei=0.0;
@@ -230,27 +196,11 @@ void find_Qei(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, double *Q
       default:
         fatal_error("Problem with CHEMMODEL in find_Qei() within chem.c");
     }
-
-    theta=log(Estar);
-
-    if (gl->model.chem.NEGATIVEIONREACTIONS && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
-      if (NEGATIVEIONREACTION[1]) 
-        add_to_Qei(specN2,_ionizationpot(specN2), exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), rhok, Qei);
-      if (NEGATIVEIONREACTION[2]) 
-        add_to_Qei(specO2,_ionizationpot(specO2), exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), rhok, Qei);
-      if (NEGATIVEIONREACTION[3]) 
-        add_to_Qei(specNO,_ionizationpot(specNO), exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), rhok, Qei);
-      if (NEGATIVEIONREACTION[5]) 
-        add_to_Qei(specN,_ionizationpot(specN), exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), rhok, Qei);
-      if (NEGATIVEIONREACTION[6]) 
-        add_to_Qei(specO,_ionizationpot(specO), exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), rhok, Qei);
-    }
-  } 
+  }
 }
 
 
 void find_dQei_dx(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
-  double theta;
   long spec;
   
   for (spec=0; spec<ns; spec++) dQeidrhok[spec]=0.0;
@@ -258,8 +208,17 @@ void find_dQei_dx(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, spec_
   
   if (gl->model.chem.QEISOURCETERMS){
     switch (gl->model.chem.CHEMMODEL){
-      case CHEMMODEL_PARENTDUNN2021: 
-        find_dQei_dx_ParentDunn2021 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+      case CHEMMODEL_MACHERET2007: 
+        find_dQei_dx_Macheret2007 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+      break;
+      case CHEMMODEL_BOWERSOX2024: 
+        find_dQei_dx_Bowersox2024 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+      break;
+      case CHEMMODEL_MACHERET2007OLD: 
+        find_dQei_dx_Macheret2007old ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+      break;
+      case CHEMMODEL_RAJENDRAN2022: 
+        find_dQei_dx_Rajendran2022 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
       break;
       case CHEMMODEL_NONE: 
         *dQeidTe=0.0;
@@ -267,32 +226,5 @@ void find_dQei_dx(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, spec_
       default:
         fatal_error("Problem with CHEMMODEL in find_Qei() within chem.c");
     }
-  
-  
-  
-    theta=log(Estar);
-
-    if (gl->model.chem.NEGATIVEIONREACTIONS && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
-      if (NEGATIVEIONREACTION[1]) 
-        add_to_dQei(specN2,_ionizationpot(specN2), exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
-      if (NEGATIVEIONREACTION[2]) 
-        add_to_dQei(specO2,_ionizationpot(specO2), exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
-      if (NEGATIVEIONREACTION[3]) 
-        add_to_dQei(specNO,_ionizationpot(specNO), exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), 0.0, rhok, dQeidrhok, dQeidTe);
-      if (NEGATIVEIONREACTION[5]) 
-      add_to_dQei(specN,_ionizationpot(specN), exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), 0.0, rhok, dQeidrhok, dQeidTe);
-      if (NEGATIVEIONREACTION[6]) 
-      add_to_dQei(specO,_ionizationpot(specO), exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), 0.0, rhok, dQeidrhok, dQeidTe);
-    }
-  }
-}
-
-
-void find_We ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, 
-                          double *We_create, double *We_destroy ){
-
-  switch (gl->model.chem.CHEMMODEL){
-    default:
-      fatal_error("CHEMMODEL must be set to CHEMMODEL_LENARD1964 for two-temperature model of We*ee.");
   }
 }
