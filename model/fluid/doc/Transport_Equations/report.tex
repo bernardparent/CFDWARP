@@ -9,6 +9,7 @@
 \usepackage{scalefnt}
 \usepackage{bm}
 \usepackage{amsmath}
+\usepackage{mathtools}
 
 %%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand\frameeqn[1]{\fbox{$\displaystyle #1$}}
@@ -73,7 +74,7 @@
    \item[$\vec{E}^k$] the electric field in the $k$th species reference frame, $\vec{E}+\vec{V}^k\times\vec{B}$
    \item[$E^\star$] reduced electric field in electron reference frame, $|\vec{E}+\vec{V}^{\rm e}\times \vec{B}|/N$
    \item[$e$] elementary charge
-   \item[$e_{\rm t}^\star$] total energy, $w_{\rm N_2} \ev + \sum_{k=1}^\ns w_k e_k +\frac{1}{2} |\vec{V}^{\rm n}|^2 + k$
+   \item[$e_{\rm t}^\star$] total energy, $w_{\rm N_2} \ev + \sum_{k=1}^\ns w_k e_k +\frac{1}{2} |\vec{V}|^2 + k$
    \item[$e_{\rm v}$] nitrogen vibrational energy, $R_{\rm N_2} \Theta_{\rm v}/(\exp(\Theta_{\rm v}/T_{\rm v})-1)$
    \item[$e_{\rm v}^0$] nitrogen vibrational energy at equilibrium, $R_{\rm N_2} \Theta_{\rm v}/(\exp(\Theta_{\rm v}/T)-1)$
    \item[$e_{k}$] specific energy of $k$th species, $h_k-P_k/\rho_k$
@@ -103,7 +104,7 @@
    \item[$Q_{\rm b}$] electron beam power deposited
    \item[$Q_{k}$] turbulence kinetic energy production term
    \item[$Q_{\omega}$] source term of the $\omega$ transport equation, $\frac{5}{9}  Q_k - \frac{5}{6} \rho \epsilon$
-   \item[$Q_{\rm J}^{\rm e}$] electron Joule heating, $\frac{1}{\mu_{\rm e}}|C_{\rm e}|N_{\rm e}|\vec{V}^{\rm e}-\vec{V}^{\rm n}|^2$
+   \item[$Q_{\rm J}^{\rm e}$] electron Joule heating, $\frac{1}{\mu_{\rm e}}|C_{\rm e}|N_{\rm e}|\vec{V}^{\rm e}-\vec{V}|^2$
    \item [$q_i^{\rm v}$] heat flux associated with the nitrogen vibrational energy mode along $i$th dimension
    \item [$q_i^k$] heat flux associated with the $k$th species along $i$th dimension
    \item [$q_i$] heat flux associated with the neutral species along $i$th dimension
@@ -118,7 +119,7 @@
    \item[$t$] time
    \item[$\vec{U}$] vector of conserved variables
    \item[$v$] volume (used in first law of thermo)
-   \item[$\vec{V}^{\rm n}$] velocity of the neutrals   
+   \item[$\vec{V}$] velocity of the neutrals   
    \item[$\vec{V}^r$] the $r$th species velocity   
    \item[$W_k$] mass production of species $k$ per unit volume due to chemical reactions
    \item[$w_k$] mass fraction of $k$th species, $\rho_k/\rho$
@@ -273,13 +274,13 @@ We can isolate the pressure gradient:
 \begin{equation}
 \nabla P_k=
   -\frac{|C_k| N_k}{\mu_k}
-(\vec{V}^k-\vec{V}^{\rm n})+C_k N_k \left(\vec{E}+\vec{V}^k \times \vec{B}\right)
+(\vec{V}^k-\vec{V})+C_k N_k \left(\vec{E}+\vec{V}^k \times \vec{B}\right)
 \end{equation}
 % 
 Now the force per unit volume acting on the neutrals due to collisions by the charged species can be written as:
 %
 \begin{equation}
-\vec{F}_i^k \equiv \frac{|C_k| N_k}{\mu_k} (\vec{V}^k-\vec{V}^{\rm n})
+\vec{F}_i^k \equiv \frac{|C_k| N_k}{\mu_k} (\vec{V}^k-\vec{V})
 \end{equation}
 %
 And the electric field in the species reference frame is here denoted as:
@@ -298,7 +299,7 @@ Thus the momentum equation for the charged species becomes:
 It can also be convenient to isolate the velocity $\vec{V}^k$ in the momentum equation: 
 %
 \begin{equation}
-  \vec{V}^{k}_i = \vec{V}^{\rm n}_i+\sum_{j=1}^3 s_k \wtilde{\mu}^k_{ij}  \vec{E}_j^{\rm n}
+  \vec{V}^{k}_i = \vec{V}_i+\sum_{j=1}^3 s_k \wtilde{\mu}^k_{ij}  \vec{E}_j^{\rm n}
              - \sum_{j=1}^3  \frac{\wtilde{\mu}^{k}_{ij}}{|C_k| N_k} \frac{\partial P_k}{\partial x_j}
   \label{eqn:V}
 \end{equation}
@@ -331,7 +332,7 @@ The momentum equation for the neutrals can be written as
 %
 \begin{equation}
 \frameeqn{
-  \rho_{\rm n} \frac{\partial \vec{V}_i^{\rm n} }{\partial t}+ \sum_{j=1}^3 \rho_{\rm n} \vec{V}_j^{\rm n} \frac{\partial \vec{V}_i^{\rm n}}{\partial x_j}
+  \rho_{\rm n} \frac{\partial \vec{V}_i }{\partial t}+ \sum_{j=1}^3 \rho_{\rm n} \vec{V}_j \frac{\partial \vec{V}_i}{\partial x_j}
 =
 -\frac{\partial P_{\rm n}}{\partial x_i} 
 + \sum_{j=1}^3 \frac{\partial \tau_{ji}}{\partial x_j}
@@ -343,7 +344,7 @@ The momentum equation for the neutrals can be written as
 where $\rho_{\rm n}$ is the density of the neutrals, $\vec{F}_i^r$  is the force per unit volume due to collision exerted by the charged species on the neutrals and where $\tau_{ji}$ is the shear stress tensor:
 %
 \begin{equation}
-\tau_{ji} = \visc  \left( \frac{\partial \vec{V}^{\rm n}_i}{\partial x_j} + \frac{\partial \vec{V}^{\rm n}_j}{\partial x_i} - \frac{2}{3} \delta_{ij} \sum_{k=1}^3 \frac{\partial \vec{V}^{\rm n}_k}{\partial x_k} \right)
+\tau_{ji} = \visc  \left( \frac{\partial \vec{V}_i}{\partial x_j} + \frac{\partial \vec{V}_j}{\partial x_i} - \frac{2}{3} \delta_{ij} \sum_{k=1}^3 \frac{\partial \vec{V}_k}{\partial x_k} \right)
 \label{eqn:shearstress}
 \end{equation}
 %
@@ -364,14 +365,14 @@ For a weakly-ionized plasma in which the quasi-totality of the mixture is compos
 where $W_k$ is the rate of mass production of species $k$, $\rho_k$ the density of the $k$th species, and $\vec{V}^{k}$ the velocity of the $k$th species. Assuming that the net amount of charged species mass diffusion is negligible compared to the one of the neutral species, we can write the species mass flux as follows:
 %
 \begin{equation}
-\rho_k \vec{V}^k_i=\rho_k \vec{V}^{\rm n}_i - \nu_k \frac{\partial w_k}{\partial x_i}
+\rho_k \vec{V}^k_i=\rho_k \vec{V}_i - \nu_k \frac{\partial w_k}{\partial x_i}
 \end{equation}
 %  
-where $\nu_k$ is the mass diffusion coefficient and $w_k$ the mass fraction and $\vec{V}^{\rm n}$ the velocity of the bulk of the neutrals. Thus, the mass conservation equation of the $k$th neutral species becomes:
+where $\nu_k$ is the mass diffusion coefficient and $w_k$ the mass fraction and $\vec{V}$ the velocity of the bulk of the neutrals. Thus, the mass conservation equation of the $k$th neutral species becomes:
 %
 \begin{equation}
 \frameeqn{
-  \frac{\partial \rho_k}{\partial t} + \sum_{i=1}^3 \frac{\partial}{\partial x_i} \vec{V}_i^{\rm n} \rho_k 
+  \frac{\partial \rho_k}{\partial t} + \sum_{i=1}^3 \frac{\partial}{\partial x_i} \vec{V}_i \rho_k 
 - \sum_{i=1}^3 \frac{\partial}{\partial x_i} \nu_k \frac{\partial w_k}{\partial x_i}= W_k
 }
 \label{eqn:massneutral}
@@ -397,7 +398,7 @@ As was shown in Ref.\ \cite{jcp:2015:parent}, and based on prior theory outlined
 %
 \begin{align}
   &  \sum_{r=1}^{\ns} \alpha_{kr} \frac{\partial \rho_r}{\partial t}  
-+ \sum_{i=1}^3 \sum_{r=1}^\ns  \frac{\partial}{\partial x_i}      \alpha_{kr} \left( \Delta \vec{V}_i^r + \vec{V}^{\rm n}_i \right)\rho_r  
++ \sum_{i=1}^3 \sum_{r=1}^\ns  \frac{\partial}{\partial x_i}      \alpha_{kr} \left( \Delta \vec{V}_i^r + \vec{V}_i \right)\rho_r  
   + \sum_{i=1}^3 \frac{\partial}{\partial x_i}  \rho_k  (s_k-\beta_k^{\rm g}+ \beta^{\rm a}_k) \mu_k  \vec{E}_i   
 \nonumber \\
 &- \sum_{i=1}^3 \beta_k^{\rm a}\vec{J}_i \frac{\partial}{\partial x_i}  \left( \frac{\mu_k \rho_k}{\sigma} 
@@ -460,7 +461,7 @@ In the latter $\Delta \vec{V}_i^k$ corresponds to:
 Now recall the $i$th component of the momentum equation for the neutrals:
 %
 \begin{equation}
-  \rho_{\rm n} \frac{\partial \vec{V}_i^{\rm n} }{\partial t}+ \sum_{j=1}^3 \rho_{\rm n} \vec{V}_j^{\rm n} \frac{\partial \vec{V}_i^{\rm n}}{\partial x_j}
+  \rho_{\rm n} \frac{\partial \vec{V}_i }{\partial t}+ \sum_{j=1}^3 \rho_{\rm n} \vec{V}_j \frac{\partial \vec{V}_i}{\partial x_j}
 =
 -\frac{\partial P_{\rm n}}{\partial x_i} 
 + \sum_{j=1}^3 \frac{\partial \tau_{ji}}{\partial x_j}
@@ -471,31 +472,31 @@ Now recall the $i$th component of the momentum equation for the neutrals:
 Recall the mass conservation of each neutral species:
 %
 \begin{equation}
-\frac{\partial \rho_k}{\partial t} + \sum_{j=1}^3 \frac{\partial}{\partial x_j} \rho_k \vec{V}^{\rm n}_j = W_k
+\frac{\partial \rho_k}{\partial t} + \sum_{j=1}^3 \frac{\partial}{\partial x_j} \rho_k \vec{V}_j = W_k
 \end{equation}
 %
 Sum over all neutral species:
 %
 \begin{equation}
-\frac{\partial \rho_{\rm n}}{\partial t} + \sum_{j=1}^3 \frac{\partial}{\partial x_j} \rho_{\rm n} \vec{V}^{\rm n}_j = \sum_{k=1}^\nns W_k
+\frac{\partial \rho_{\rm n}}{\partial t} + \sum_{j=1}^3 \frac{\partial}{\partial x_j} \rho_{\rm n} \vec{V}_j = \sum_{k=1}^\nns W_k
 \end{equation}
 %
-Multiply by $\vec{V}_i^{\rm n}$:
+Multiply by $\vec{V}_i$:
 %
 \begin{equation}
-\vec{V}_i^{\rm n} \frac{\partial \rho_{\rm n}}{\partial t} + \sum_{j=1}^3 \vec{V}_i^{\rm n} \frac{\partial}{\partial x_j} \rho_{\rm n} \vec{V}^{\rm n}_j = \vec{V}_i^{\rm n} \sum_{k=1}^\nns  W_k
+\vec{V}_i \frac{\partial \rho_{\rm n}}{\partial t} + \sum_{j=1}^3 \vec{V}_i \frac{\partial}{\partial x_j} \rho_{\rm n} \vec{V}_j = \vec{V}_i \sum_{k=1}^\nns  W_k
 \end{equation}
 %
 Add the latter to Eq.\ (\ref{eqn:momneutrals1}):
 %
 \begin{equation}
-   \frac{\partial  }{\partial t}\rho_{\rm n} \vec{V}_i^{\rm n}
-  + \sum_{j=1}^3  \frac{\partial }{\partial x_j}\rho_{\rm n} \vec{V}_j^{\rm n} \vec{V}_i^{\rm n}
+   \frac{\partial  }{\partial t}\rho_{\rm n} \vec{V}_i
+  + \sum_{j=1}^3  \frac{\partial }{\partial x_j}\rho_{\rm n} \vec{V}_j \vec{V}_i
 =
 -\frac{\partial P_{\rm n}}{\partial x_i} 
 + \sum_{j=1}^3 \frac{\partial \tau_{ji}}{\partial x_j}
 + \sum_{r=1}^\ncs \vec{F}_i^r
-+\vec{V}_i^{\rm n} \sum_{k=1}^\nns  W_k
++\vec{V}_i \sum_{k=1}^\nns  W_k
 \label{eqn:momneutrals2}
 \end{equation}
 %
@@ -515,14 +516,14 @@ Add the latter to Eq.\ (\ref{eqn:momneutrals2}):
 %
 \begin{equation}
 \begin{array}{l}\mfd
-   \frac{\partial  }{\partial t}\rho_{\rm n} \vec{V}_i^{\rm n}
-  + \sum_{j=1}^3  \frac{\partial }{\partial x_j}\rho_{\rm n} \vec{V}_j^{\rm n} \vec{V}_i^{\rm n}
+   \frac{\partial  }{\partial t}\rho_{\rm n} \vec{V}_i
+  + \sum_{j=1}^3  \frac{\partial }{\partial x_j}\rho_{\rm n} \vec{V}_j \vec{V}_i
 \alb\mfd
 =
 -\frac{\partial P_{\rm n}}{\partial x_i} 
 -\sum_{r=1}^\ncs \frac{\partial P_r}{\partial x_i} 
 + \sum_{j=1}^3 \frac{\partial \tau_{ji}}{\partial x_j}
-+\vec{V}_i^{\rm n} \sum_{k=1}^\nns  W_k
++\vec{V}_i \sum_{k=1}^\nns  W_k
 + \sum_{r=1}^\ncs C_r N_r \left(\vec{E}+\vec{V}^r \times \vec{B}\right)_i
 \end{array}
 \end{equation}
@@ -538,13 +539,13 @@ Thus:
 \begin{equation}
 \frameeqn{
 \begin{array}{l}\mfd
-   \frac{\partial  }{\partial t}\rho_{\rm n} \vec{V}_i^{\rm n}
-  + \sum_{j=1}^3  \frac{\partial }{\partial x_j}\rho_{\rm n} \vec{V}_j^{\rm n} \vec{V}_i^{\rm n}
+   \frac{\partial  }{\partial t}\rho_{\rm n} \vec{V}_i
+  + \sum_{j=1}^3  \frac{\partial }{\partial x_j}\rho_{\rm n} \vec{V}_j \vec{V}_i
 \alb\mfd =
 -\frac{\partial P_{\rm n}}{\partial x_i} 
 -\sum_{r=1}^\ncs \frac{\partial P_r}{\partial x_i} 
 + \sum_{j=1}^3 \frac{\partial \tau_{ji}}{\partial x_j}
-+\vec{V}_i^{\rm n} \sum_{k=1}^\nns  W_k
++\vec{V}_i \sum_{k=1}^\nns  W_k
 + \rho_{\rm c} \vec{E}_i +\left(\vec{J} \times \vec{B}\right)_i
 \end{array}
 }
@@ -554,24 +555,24 @@ Thus:
 The latter was obtained by adding the momentum equation of the neutrals to the one of the charged species. However, because the charged species momentum equations do not include inertia terms (they include only the collision forces between the neutrals and the charged species, the pressure gradient forces, and the electromagnetic forces), the total momentum equation outlined in Eq.\ (\ref{eqn:momtotal1}) does not collapse to the standard form of the momentum equation for a mixture of gases under no influence of electric or magnetic fields. Noting that the inertia terms were neglected in the charged species momentum equations assuming the plasma is weakly-ionized, Eq.\ (\ref{eqn:momtotal1}) should be thought of as being only applicable in the limit of a weakly-ionized plasma when the charged species densities are negligible compared to the neutrals densities. Because $\rho_{\rm n} \approx \rho$ in the weakly-ionized approximation, we can say that:
 %
 \begin{equation}
-   \frac{\partial  }{\partial t}\rho_{\rm n} \vec{V}_i^{\rm n}
-  + \sum_{j=1}^3  \frac{\partial }{\partial x_j}\rho_{\rm n} \vec{V}_j^{\rm n} \vec{V}_i^{\rm n}
+   \frac{\partial  }{\partial t}\rho_{\rm n} \vec{V}_i
+  + \sum_{j=1}^3  \frac{\partial }{\partial x_j}\rho_{\rm n} \vec{V}_j \vec{V}_i
 \approx
-   \frac{\partial  }{\partial t}\rho \vec{V}_i^{\rm n}
-  + \sum_{j=1}^3  \frac{\partial }{\partial x_j}\rho \vec{V}_j^{\rm n} \vec{V}_i^{\rm n}  
+   \frac{\partial  }{\partial t}\rho \vec{V}_i
+  + \sum_{j=1}^3  \frac{\partial }{\partial x_j}\rho \vec{V}_j \vec{V}_i  
 \label{eqn:momtotal2}
 \end{equation}
 %    
 As well, the second-to-last term on the RHS of Eq.\ (\ref{eqn:momtotal1}) can be rewritten as:
 %
 \begin{equation}
-\vec{V}_i^{\rm n} \sum_{k=1}^\nns  W_k
+\vec{V}_i \sum_{k=1}^\nns  W_k
 =
--\vec{V}_i^{\rm n} \sum_{k=1}^\ncs  W_k \approx 0
+-\vec{V}_i \sum_{k=1}^\ncs  W_k \approx 0
 \label{eqn:momtotalWk}
 \end{equation}
 %
-The latter vanishes for a weakly-ionized plasma because its magnitude scales with the mass of the charged species which is negligible compared to the mass of the neutrals. As well it can be shown (by substituting $W_k$ from the mass conservation equation for each charged species) that the term $\vec{V}_i^{\rm n} \sum_{k=1}^\nns  W_k$ is in the same order of magnitude as the difference between the RHS and the LHS of Eq.\ (\ref{eqn:momtotal2}). Thus, it wouldn't make sense to keep it within the momentum equation should we substitute $\rho_{\rm n}$ by $\rho$ within the inertia terms as done in Eq.\ (\ref{eqn:momtotal2}).  
+The latter vanishes for a weakly-ionized plasma because its magnitude scales with the mass of the charged species which is negligible compared to the mass of the neutrals. As well it can be shown (by substituting $W_k$ from the mass conservation equation for each charged species) that the term $\vec{V}_i \sum_{k=1}^\nns  W_k$ is in the same order of magnitude as the difference between the RHS and the LHS of Eq.\ (\ref{eqn:momtotal2}). Thus, it wouldn't make sense to keep it within the momentum equation should we substitute $\rho_{\rm n}$ by $\rho$ within the inertia terms as done in Eq.\ (\ref{eqn:momtotal2}).  
 
 Let's regroup the charged species partial pressures with the neutrals partial pressures as follows:
 %
@@ -589,8 +590,8 @@ Then, after substituting Eqs.\ (\ref{eqn:momtotal2}) and (\ref{eqn:momtotalWk}) 
 %
 \begin{equation}
 \frameeqn{
-   \frac{\partial  }{\partial t}\rho \vec{V}_i^{\rm n}
-  + \sum_{j=1}^3  \frac{\partial }{\partial x_j}\rho \vec{V}_j^{\rm n} \vec{V}_i^{\rm n}
+   \frac{\partial  }{\partial t}\rho \vec{V}_i
+  + \sum_{j=1}^3  \frac{\partial }{\partial x_j}\rho \vec{V}_j \vec{V}_i
 =
 -\frac{\partial P }{\partial x_i}  
 + \sum_{j=1}^3 \frac{\partial \tau_{ji}}{\partial x_j}
@@ -611,32 +612,32 @@ The total Joule heating due to electrons and ions occurring in the plasma corres
 %
 \begin{equation}
  Q_{\rm J} = \underbrace{  \sum_{r=1}^\ncs \left( C_r N_r \left( \vec{E}+\vec{V}^r \times\vec{B}\right)  - \vec{\nabla} P_r \right)\cdot \vec{V}^r}_{\textrm{\begin{minipage}{3cm}\flushleft \footnotesize work done on the charged species in the lab frame\end{minipage}}} 
-- \underbrace{\left(\rho_{\rm c} \vec{E} + \vec{J}\times\vec{B} -\sum_{r=1}^\ncs \vec{\nabla} P_r \right)\cdot \vec{V}^{\rm n}}_{\textrm{\begin{minipage}{4cm}\flushleft \footnotesize work done by the charged species on the neutrals in the lab frame\end{minipage}}}
+- \underbrace{\left(\rho_{\rm c} \vec{E} + \vec{J}\times\vec{B} -\sum_{r=1}^\ncs \vec{\nabla} P_r \right)\cdot \vec{V}}_{\textrm{\begin{minipage}{4cm}\flushleft \footnotesize work done by the charged species on the neutrals in the lab frame\end{minipage}}}
 \label{eqn:JouleHeatingDefinition}
 \end{equation}
 %
 where $n_{\rm cs}$ is the number of charged species. After substituting the current density $\vec{J}$ and the net charge density $\rho_{\rm c}$ from Eqs.\ (\ref{eqn:J}) and (\ref{eqn:rhoc})  and simplifying, we obtain: 
 %
 \begin{equation}
- Q_{\rm J} = \sum_{r=1}^\ncs   \left(C_r N_r \vec{E}+C_r N_r \vec{V}^r\times \vec{B}-\vec{\nabla}P_r\right) \cdot  \left( \vec{V}^r -\vec{V}^{\rm n} \right)
+ Q_{\rm J} = \sum_{r=1}^\ncs   \left(C_r N_r \vec{E}+C_r N_r \vec{V}^r\times \vec{B}-\vec{\nabla}P_r\right) \cdot  \left( \vec{V}^r -\vec{V} \right)
 \end{equation}
 %
 Then from the drift-diffusion momentum equation used herein for $\vec{V}^k$ the first term on the RHS can be expressed as (see Eq.\ (\ref{eqn:Vcharged})):
 %
 \begin{equation}
- C_r N_r (\vec{E}+\vec{V}^r\times\vec{B})  -\vec{\nabla} P_r = \frac{|C_r| N_r}{\mu_r} \left(\vec{V}^r-\vec{V}^{\rm n}\right)
+ C_r N_r (\vec{E}+\vec{V}^r\times\vec{B})  -\vec{\nabla} P_r = \frac{|C_r| N_r}{\mu_r} \left(\vec{V}^r-\vec{V}\right)
 \end{equation}
 %
 Substitute the latter in the former and reformat:
 %
 \begin{equation}
- Q_{\rm J} = \sum_{r=1}^\ncs   \frac{|C_r| N_r}{\mu_r} \left(\vec{V}^r-\vec{V}^{\rm n}\right) \cdot  \left( \vec{V}^r -\vec{V}^{\rm n} \right)
+ Q_{\rm J} = \sum_{r=1}^\ncs   \frac{|C_r| N_r}{\mu_r} \left(\vec{V}^r-\vec{V}\right) \cdot  \left( \vec{V}^r -\vec{V} \right)
 \end{equation}
 %
 From the latter it is obvious that the Joule heating associated with the $r$th charged species corresponds to:
 %
 \begin{equation}
- Q_{\rm J}^r =    \frac{|C_r| N_r}{\mu_r} \left|\vec{V}^r-\vec{V}^{\rm n}\right|^2 
+ Q_{\rm J}^r =    \frac{|C_r| N_r}{\mu_r} \left|\vec{V}^r-\vec{V}\right|^2 
 \label{eqn:QJoulespecies}
 \end{equation}
 %
@@ -668,13 +669,13 @@ where $\ev$ is the nitrogen vibrational energy.
 In the latter, the term $P d v/dt$ and the term $\delta W/\Delta t$ do not appear because there are no forces (either due to pressure or not) that can do work on the nitrogen vibrational energy. After dividing all terms by the volume of the system at a certain time, $v$, we get:
 %
 \begin{equation}
-  \rho_{\rm N_2} \frac{d \ev} {d t}  = \frac{\delta Q}{v \Delta t} - \frac{\ev}{v}  \frac{d M_{\rm N_2} }{d t} 
+  \rho_{\rm N_2} \frac{d \ev} {d t}  = \frac{\delta Q}{\mathrlap{-}V \Delta t} - \frac{\ev}{\mathrlap{-}V}  \frac{d M_{\rm N_2} }{d t} 
 \end{equation}
 %
 The term on the RHS corresponds to the heat addition per unit time per unit volume. From Fourier's law and energy exchanges with other energy modes we can write it as follows:
 %
 \begin{equation}
-\frac{\delta Q}{v \Delta t} 
+\frac{\delta Q}{\mathrlap{-}V \Delta t} 
 =
 \underbrace{
   -\sum_{j=1}^{3}\frac{\partial q_j^{\rm v}}{\partial x_j}
@@ -704,7 +705,7 @@ Further, we can change the frame of reference from the fluid frame to the lab fr
 where $\vec{V}_j^{\rm N_2}$ is the nitrogen velocity including both drift and diffusion. Also note that
 %
 \begin{equation}
- \ev W_{\rm N_2} = \frac{\ev}{v} \frac{d M_{\rm N_2}}{dt}
+ \ev W_{\rm N_2} = \frac{\ev}{\mathrlap{-}V} \frac{d M_{\rm N_2}}{dt}
 \end{equation}
 %
 Thus:
@@ -752,17 +753,17 @@ with $\visc$ the viscosity of the mixture and $\Pr$ the Prandtl number of the mi
 But, we can rewrite the nitrogen velocity as follows:
 %
 \begin{equation}
- \rho_{\rm N_2} \vec{V}^{\rm N_2}_j =  \rho_{\rm N_2} \vec{V}^{\rm n}_j - \nu_{\rm N_2} \frac{\partial w_{\rm N_2}}{\partial x_j}
+ \rho_{\rm N_2} \vec{V}^{\rm N_2}_j =  \rho_{\rm N_2} \vec{V}_j - \nu_{\rm N_2} \frac{\partial w_{\rm N_2}}{\partial x_j}
 \end{equation}
 %
-where $\vec{V}_j^{\rm n}$ is the bulk velocity of the neutrals (including drift and diffusion) and where $\nu_{\rm N_2}$ is the molecular diffusion coefficient and $w_{\rm N_2}$ is the nitrogen mass fraction. The latter equation should be understood as the definition of the molecular diffusion coefficient. Then, after substituting the latter in the former, we obtain:
+where $\vec{V}_j$ is the bulk velocity of the neutrals (including drift and diffusion) and where $\nu_{\rm N_2}$ is the molecular diffusion coefficient and $w_{\rm N_2}$ is the nitrogen mass fraction. The latter equation should be understood as the definition of the molecular diffusion coefficient. Then, after substituting the latter in the former, we obtain:
 %
 \begin{equation}
 \frameeqn{
  \begin{array}{r}
   \mfd\frac{\partial}{\partial t} \rho_{\rm N_2} \ev
      + \sum_{j=1}^{3} \frac{\partial }{\partial x_j}
-       \rho_{\rm N_2} \vec{V}^{\rm n}_j \ev
+       \rho_{\rm N_2} \vec{V}_j \ev
      - \sum_{j=1}^{3} \frac{\partial }{\partial x_j} \left(
             \kappaev  \frac{\partial T_{\rm v}}{\partial x_j}\right)
      - \sum_{j=1}^{3} \frac{\partial }{\partial x_j} \left(
@@ -898,29 +899,29 @@ where the static temperature $T$ is expressed in Kelvins and the number density 
 The first law of thermo for the neutrals species can be expressed as:
 %
 \begin{equation}
- \sum_{k=1}^\nns \frac{d }{d t}\left(M_k h_k\right) - v \frac{d P_{\rm n}}{dt} = \frac{\delta Q}{\Delta t}-\frac{\delta W}{\Delta t}
+ \sum_{k=1}^\nns \frac{d }{d t}\left(M_k h_k\right) - \mathrlap{-}V \frac{d P_{\rm n}}{dt} = \frac{\delta Q}{\Delta t}-\frac{\delta W}{\Delta t}
 \end{equation}
 %
 Split the first derivative:
 %
 \begin{equation}
- \sum_{k=1}^\nns M_k\frac{d h_k}{d t} - v \frac{d P_{\rm n}}{dt} = \frac{\delta Q}{\Delta t}-\frac{\delta W}{\Delta t}-\sum_{k=1}^\nns h_k\frac{d M_k}{d t}
+ \sum_{k=1}^\nns M_k\frac{d h_k}{d t} - \mathrlap{-}V \frac{d P_{\rm n}}{dt} = \frac{\delta Q}{\Delta t}-\frac{\delta W}{\Delta t}-\sum_{k=1}^\nns h_k\frac{d M_k}{d t}
 \end{equation}
 %
 Divide through by the volume of the system $v$:
 %
 \begin{equation}
 \sum_{k=1}^\nns \rho_k \frac{d h_k}{d t} -  \frac{d P_{\rm n}}{dt} = 
- \frac{\delta Q}{v \Delta t}
--\frac{\delta W}{v \Delta t}
--\sum_{k=1}^\nns \frac{h_k}{v}\frac{d M_k}{d t}
+ \frac{\delta Q}{\mathrlap{-}V \Delta t}
+-\frac{\delta W}{\mathrlap{-}V \Delta t}
+-\sum_{k=1}^\nns \frac{h_k}{\mathrlap{-}V}\frac{d M_k}{d t}
 \label{eqn:eneutrals2}
 \end{equation}
 %  
 Then, the first term on the RHS corresponds to the heat addition per unit time per unit volume to the system:
 %
 \begin{equation}
-\frac{\delta Q}{v \Delta t}
+\frac{\delta Q}{\mathrlap{-}V \Delta t}
 = 
 \underbrace{
   -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
@@ -946,16 +947,16 @@ Then, the first term on the RHS corresponds to the heat addition per unit time p
 where $q_i$ is the $i$th component of the heat flux and $Q_{r}$ is the net energy per unit volume given by species $r$ to the neutrals (including the heat given or received due a loss/gain of matter through chemical reactions), and $h_k^\circ$ is the heat of formation of species $k$. The second term on the RHS of Eq.\ (\ref{eqn:eneutrals2}) is the work done by the gas on its environment by forces other than pressure. Because the species is neutral, such forces are here limited to the shear stresses and the collision forces with the charged species:
 %
 \begin{equation}
- \frac{\delta W}{v \Delta t}
+ \frac{\delta W}{\mathrlap{-}V \Delta t}
 =
-- \sum_{j=1}^3 \sum_{i=1}^3 \tau_{ji} \frac{\partial \vec{V}_i^{\rm n}}{\partial x_j} 
-- \sum_{r=1}^\ncs \sum_{i=1}^3 \vec{F}_i^{r} \left( \vec{V}_i^{{\rm n}-r}-\vec{V}_i^{\rm n} \right)
+- \sum_{j=1}^3 \sum_{i=1}^3 \tau_{ji} \frac{\partial \vec{V}_i}{\partial x_j} 
+- \sum_{r=1}^\ncs \sum_{i=1}^3 \vec{F}_i^{r} \left( \vec{V}_i^{{\rm n}-r}-\vec{V}_i \right)
 \end{equation}
 %
-where $\tau_{ji}$ is the shear stress of the neutrals and $\vec{V}_j^{\rm n}$ is the bulk velocity of the neutrals including drift and diffusion. As well $\vec{F}_i^r$ is the collision force by the charged species $r$ on the neutrals and $\vec{V}_i^{{\rm n}-r}$ is the average velocity at which the collisions between the charged species $r$ and the neutrals take place.  The last term on the RHS of Eq.\ (\ref{eqn:eneutrals2}) can also be written as:
+where $\tau_{ji}$ is the shear stress of the neutrals and $\vec{V}_j$ is the bulk velocity of the neutrals including drift and diffusion. As well $\vec{F}_i^r$ is the collision force by the charged species $r$ on the neutrals and $\vec{V}_i^{{\rm n}-r}$ is the average velocity at which the collisions between the charged species $r$ and the neutrals take place.  The last term on the RHS of Eq.\ (\ref{eqn:eneutrals2}) can also be written as:
 %
 \begin{equation}
-  \frac{h_k}{v}\frac{d M_k}{d t}
+  \frac{h_k}{\mathrlap{-}V}\frac{d M_k}{d t}
 =
   h_k W_k
 \end{equation}
@@ -968,7 +969,7 @@ Also change the frame of reference from the fluid frame to the lab frame:
 %
 %
 \begin{equation}
-\frac{d P_{\rm n}}{d t} = \frac{\partial P_{\rm n}}{\partial t} + \sum_{i=1}^3 \vec{V}^{\rm n}_i \frac{\partial P_{\rm n}}{\partial x_i}
+\frac{d P_{\rm n}}{d t} = \frac{\partial P_{\rm n}}{\partial t} + \sum_{i=1}^3 \vec{V}_i \frac{\partial P_{\rm n}}{\partial x_i}
 \end{equation}
 %
 Substitute the latter 5 equations in Eq.\ (\ref{eqn:eneutrals2}):
@@ -977,12 +978,12 @@ Substitute the latter 5 equations in Eq.\ (\ref{eqn:eneutrals2}):
 \begin{array}{l}\mfd
   \sum_{k=1}^\nns \rho_k \frac{\partial h_k}{\partial t} 
 + \sum_{k=1}^\nns \sum_{j=1}^3 \rho_k \vec{V}^k_j \frac{\partial h_k}{\partial x_j} 
-- \frac{\partial P_{\rm n}}{\partial t} - \sum_{i=1}^3 \vec{V}^{\rm n}_i \frac{\partial P_{\rm n}}{\partial x_i}
+- \frac{\partial P_{\rm n}}{\partial t} - \sum_{i=1}^3 \vec{V}_i \frac{\partial P_{\rm n}}{\partial x_i}
 = \alb\mfd
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
 +\sum_{r=1}^{\ncs} Q_{r}
-+\sum_{i=1}^3 \sum_{j=1}^3 \tau_{ji} \frac{\partial \vec{V}_i^{\rm n}}{\partial x_j}
-+ \sum_{r=1}^\ncs \sum_{i=1}^3 \vec{F}_i^{r} \left( \vec{V}_i^{{\rm n}-r}-\vec{V}_i^{\rm n} \right) \alb\mfd
++\sum_{i=1}^3 \sum_{j=1}^3 \tau_{ji} \frac{\partial \vec{V}_i}{\partial x_j}
++ \sum_{r=1}^\ncs \sum_{i=1}^3 \vec{F}_i^{r} \left( \vec{V}_i^{{\rm n}-r}-\vec{V}_i \right) \alb\mfd
 - \sum_{k=1}^\nns h_k W_k 
 - \sum_{k=1}^\nns h_k^\circ W_k
 -  Q_{\rm v}
@@ -1003,12 +1004,12 @@ where $W_k$ is the mass creation per unit volume per unit time of species $k$ du
 \begin{array}{l}\mfd
  \sum_{k=1}^\nns \frac{\partial }{\partial t}\rho_k h_k + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_k \vec{V}^k_j h_k 
 - \frac{\partial P_{\rm n}}{\partial t} 
-- \sum_{i=1}^3 \vec{V}^{\rm n}_i \frac{\partial P_{\rm n}}{\partial x_i}
+- \sum_{i=1}^3 \vec{V}_i \frac{\partial P_{\rm n}}{\partial x_i}
 =\alb\mfd 
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
 +\sum_{r=1}^{\ncs} Q_{r}
-+\sum_{i=1}^3 \sum_{j=1}^3 \tau_{ji} \frac{\partial \vec{V}_i^{\rm n}}{\partial x_j}
-+ \sum_{r=1}^\ncs \sum_{i=1}^3 \vec{F}_i^{r} \left( \vec{V}_i^{{\rm n}-r}-\vec{V}_i^{\rm n} \right)
++\sum_{i=1}^3 \sum_{j=1}^3 \tau_{ji} \frac{\partial \vec{V}_i}{\partial x_j}
++ \sum_{r=1}^\ncs \sum_{i=1}^3 \vec{F}_i^{r} \left( \vec{V}_i^{{\rm n}-r}-\vec{V}_i \right)
 \alb\mfd
 - \sum_{k=1}^\nns h_k^\circ W_k
 -  Q_{\rm v}
@@ -1028,12 +1029,12 @@ Substitute the latter in the time derivative term part of the former:
  \begin{array}{l}\mfd
  \sum_{k=1}^\nns \frac{\partial }{\partial t}\rho_k h_k + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_k \vec{V}^k_j h_k 
 - \sum_{k=1}^\nns \frac{\partial P_k}{\partial t} 
-- \sum_{i=1}^3 \vec{V}^{\rm n}_i \frac{\partial P_{\rm n}}{\partial x_i}
+- \sum_{i=1}^3 \vec{V}_i \frac{\partial P_{\rm n}}{\partial x_i}
 = \alb\mfd
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
 +\sum_{r=1}^{\ncs} Q_{r}
-+\sum_{i=1}^3 \sum_{j=1}^3 \tau_{ji} \frac{\partial \vec{V}_i^{\rm n}}{\partial x_j}
-+ \sum_{r=1}^\ncs \sum_{i=1}^3 \vec{F}_i^{r} \left( \vec{V}_i^{{\rm n}-r}-\vec{V}_i^{\rm n} \right)\alb\mfd
++\sum_{i=1}^3 \sum_{j=1}^3 \tau_{ji} \frac{\partial \vec{V}_i}{\partial x_j}
++ \sum_{r=1}^\ncs \sum_{i=1}^3 \vec{F}_i^{r} \left( \vec{V}_i^{{\rm n}-r}-\vec{V}_i \right)\alb\mfd
 - \sum_{k=1}^\nns h_k^\circ W_k
 -  Q_{\rm v}
 + Q_{\rm b}
@@ -1051,12 +1052,12 @@ Thus:
 \begin{equation}
 \begin{array}{l}\mfd
  \sum_{k=1}^\nns \frac{\partial }{\partial t}\rho_k e_k + \sum_{k=1}^\nns \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_k \vec{V}^k_j h_k 
-- \sum_{i=1}^3 \vec{V}^{\rm n}_i \frac{\partial P_{\rm n}}{\partial x_i}
+- \sum_{i=1}^3 \vec{V}_i \frac{\partial P_{\rm n}}{\partial x_i}
 = \alb\mfd
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
 +\sum_{r=1}^{\ncs} Q_{r}
-+\sum_{i=1}^3 \sum_{j=1}^3 \tau_{ji} \frac{\partial \vec{V}_i^{\rm n}}{\partial x_j}
-+ \sum_{r=1}^\ncs \sum_{i=1}^3 \vec{F}_i^{r} \left( \vec{V}_i^{{\rm n}-r}-\vec{V}_i^{\rm n} \right)\alb\mfd
++\sum_{i=1}^3 \sum_{j=1}^3 \tau_{ji} \frac{\partial \vec{V}_i}{\partial x_j}
++ \sum_{r=1}^\ncs \sum_{i=1}^3 \vec{F}_i^{r} \left( \vec{V}_i^{{\rm n}-r}-\vec{V}_i \right)\alb\mfd
 - \sum_{k=1}^\nns h_k^\circ W_k
 -  Q_{\rm v}
 + Q_{\rm b}
@@ -1075,12 +1076,12 @@ Sum over all neutral species and add the latter to the former:
 \begin{equation}
 \begin{array}{l}\mfd
  \sum_{k=1}^\nns\frac{\partial }{\partial t}\rho_k (e_k+h_k^\circ) + \sum_{k=1}^\nns\sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_k \vec{V}^k_j (h_k+h_k^\circ) 
-- \sum_{i=1}^3 \vec{V}^{\rm n}_i \frac{\partial P_{\rm n}}{\partial x_i}
+- \sum_{i=1}^3 \vec{V}_i \frac{\partial P_{\rm n}}{\partial x_i}
 = \alb\mfd
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
 +\sum_{r=1}^{\ncs} Q_{r}
-+\sum_{i=1}^3 \sum_{j=1}^3 \tau_{ji} \frac{\partial \vec{V}_i^{\rm n}}{\partial x_j}
-+ \sum_{r=1}^\ncs \sum_{i=1}^3 \vec{F}_i^{r} \left( \vec{V}_i^{{\rm n}-r}-\vec{V}_i^{\rm n} \right)
++\sum_{i=1}^3 \sum_{j=1}^3 \tau_{ji} \frac{\partial \vec{V}_i}{\partial x_j}
++ \sum_{r=1}^\ncs \sum_{i=1}^3 \vec{F}_i^{r} \left( \vec{V}_i^{{\rm n}-r}-\vec{V}_i \right)
 -  Q_{\rm v}
 + Q_{\rm b}
 \end{array}
@@ -1090,62 +1091,62 @@ Sum over all neutral species and add the latter to the former:
 Keep the latter on hold. Now recall the $i$th component of the momentum equation for the neutrals Eq.\ (\ref{eqn:momentumneutral}):
 %
 \begin{equation}
-  \rho_{\rm n} \frac{\partial \vec{V}_i^{\rm n} }{\partial t}+ \sum_{j=1}^3 \rho_{\rm n} \vec{V}_j^{\rm n} \frac{\partial \vec{V}_i^{\rm n}}{\partial x_j}
+  \rho_{\rm n} \frac{\partial \vec{V}_i }{\partial t}+ \sum_{j=1}^3 \rho_{\rm n} \vec{V}_j \frac{\partial \vec{V}_i}{\partial x_j}
 =
 -\frac{\partial P_{\rm n}}{\partial x_i} 
 + \sum_{j=1}^3 \frac{\partial \tau_{ji}}{\partial x_j}
 + \sum_{r=1}^\ncs \vec{F}_i^r
 \end{equation}
 %
-Multiply the latter by $\vec{V}_i^{\rm n}$ and sum over all $i$s:
+Multiply the latter by $\vec{V}_i$ and sum over all $i$s:
 %
 \begin{equation}
-  \sum_{i=1}^3 \rho_{\rm n} \vec{V}_i^{\rm n} \frac{\partial \vec{V}_i^{\rm n} }{\partial t}
-+ \sum_{i=1}^3 \sum_{j=1}^3 \rho_{\rm n} \vec{V}_j^{\rm n} \vec{V}_i^{\rm n} \frac{\partial \vec{V}_i^{\rm n}}{\partial x_j}
-+ \sum_{i=1}^3 \vec{V}_i^{\rm n} \frac{\partial P_{\rm n}}{\partial x_i} 
+  \sum_{i=1}^3 \rho_{\rm n} \vec{V}_i \frac{\partial \vec{V}_i }{\partial t}
++ \sum_{i=1}^3 \sum_{j=1}^3 \rho_{\rm n} \vec{V}_j \vec{V}_i \frac{\partial \vec{V}_i}{\partial x_j}
++ \sum_{i=1}^3 \vec{V}_i \frac{\partial P_{\rm n}}{\partial x_i} 
 =
-+ \sum_{i=1}^3 \sum_{j=1}^3 \vec{V}_i^{\rm n} \frac{\partial \tau_{ji}}{\partial x_j}
-+ \sum_{i=1}^3 \sum_{r=1}^\ncs \vec{F}_i^r \vec{V}_i^{\rm n}
++ \sum_{i=1}^3 \sum_{j=1}^3 \vec{V}_i \frac{\partial \tau_{ji}}{\partial x_j}
++ \sum_{i=1}^3 \sum_{r=1}^\ncs \vec{F}_i^r \vec{V}_i
 \end{equation}
 %
 Rearrange:
 %
 \begin{equation}
-   \rho_{\rm n}  \frac{\partial  }{\partial t}\left(\frac{1}{2}|\vec{V}^{\rm n}|^2\right)
-+  \sum_{j=1}^3 \rho_{\rm n} \vec{V}_j^{\rm n}  \frac{\partial }{\partial x_j}\left(\frac{1}{2}|\vec{V}^{\rm n}|^2\right)
-+ \sum_{i=1}^3 \vec{V}_i^{\rm n} \frac{\partial P_{\rm n}}{\partial x_i} 
+   \rho_{\rm n}  \frac{\partial  }{\partial t}\left(\frac{1}{2}|\vec{V}|^2\right)
++  \sum_{j=1}^3 \rho_{\rm n} \vec{V}_j  \frac{\partial }{\partial x_j}\left(\frac{1}{2}|\vec{V}|^2\right)
++ \sum_{i=1}^3 \vec{V}_i \frac{\partial P_{\rm n}}{\partial x_i} 
 =
-+ \sum_{i=1}^3 \sum_{j=1}^3 \vec{V}_i^{\rm n} \frac{\partial \tau_{ji}}{\partial x_j}
-+ \sum_{i=1}^3 \sum_{r=1}^\ncs \vec{F}_i^r \vec{V}_i^{\rm n}
++ \sum_{i=1}^3 \sum_{j=1}^3 \vec{V}_i \frac{\partial \tau_{ji}}{\partial x_j}
++ \sum_{i=1}^3 \sum_{r=1}^\ncs \vec{F}_i^r \vec{V}_i
 \label{eqn:eneutrals5}
 \end{equation}
 %
 But, we can sum the mass conservation equations of all neutral species to obtain:
 %
 \begin{equation}
- \frac{\partial }{\partial t}\rho_{\rm n} + \sum_{j=1}^3 \frac{\partial }{\partial x_j} \rho_{\rm n} \vec{V}_j^{\rm n} = \sum_{k=1}^\nns W_k
+ \frac{\partial }{\partial t}\rho_{\rm n} + \sum_{j=1}^3 \frac{\partial }{\partial x_j} \rho_{\rm n} \vec{V}_j = \sum_{k=1}^\nns W_k
 \end{equation}
 %
-Multiply by $\frac{1}{2}|\vec{V}^{\rm n}|^2$:
+Multiply by $\frac{1}{2}|\vec{V}|^2$:
 %
 \begin{equation}
- \frac{1}{2}|\vec{V}^{\rm n}|^2\frac{\partial }{\partial t}\rho_{\rm n} 
-+ \frac{1}{2}|\vec{V}^{\rm n}|^2 \sum_{j=1}^3 \frac{\partial }{\partial x_j} \rho_{\rm n} \vec{V}_j^{\rm n} 
-= \frac{1}{2}|\vec{V}^{\rm n}|^2 \sum_{k=1}^\nns W_k
+ \frac{1}{2}|\vec{V}|^2\frac{\partial }{\partial t}\rho_{\rm n} 
++ \frac{1}{2}|\vec{V}|^2 \sum_{j=1}^3 \frac{\partial }{\partial x_j} \rho_{\rm n} \vec{V}_j 
+= \frac{1}{2}|\vec{V}|^2 \sum_{k=1}^\nns W_k
 \end{equation}
 %
 Add the latter to Eq.\ (\ref{eqn:eneutrals5}):
 %
 \begin{equation}
 \begin{array}{l}\mfd
-     \frac{\partial  }{\partial t}\left( \frac{1}{2}\rho_{\rm n}|\vec{V}^{\rm n}|^2\right)
-+  \sum_{j=1}^3   \frac{\partial }{\partial x_j}\left(\frac{1}{2}\rho_{\rm n} \vec{V}_j^{\rm n} |\vec{V}^{\rm n}|^2\right)
-+ \sum_{i=1}^3 \vec{V}_i^{\rm n} \frac{\partial P_{\rm n}}{\partial x_i} 
+     \frac{\partial  }{\partial t}\left( \frac{1}{2}\rho_{\rm n}|\vec{V}|^2\right)
++  \sum_{j=1}^3   \frac{\partial }{\partial x_j}\left(\frac{1}{2}\rho_{\rm n} \vec{V}_j |\vec{V}|^2\right)
++ \sum_{i=1}^3 \vec{V}_i \frac{\partial P_{\rm n}}{\partial x_i} 
 \alb\mfd
 =
-+ \sum_{i=1}^3 \sum_{j=1}^3 \vec{V}_i^{\rm n} \frac{\partial \tau_{ji}}{\partial x_j}
-+ \sum_{i=1}^3 \sum_{r=1}^\ncs \vec{F}_i^r \vec{V}_i^{\rm n}
-+\frac{1}{2}|\vec{V}^{\rm n}|^2 \sum_{k=1}^\nns W_k
++ \sum_{i=1}^3 \sum_{j=1}^3 \vec{V}_i \frac{\partial \tau_{ji}}{\partial x_j}
++ \sum_{i=1}^3 \sum_{r=1}^\ncs \vec{F}_i^r \vec{V}_i
++\frac{1}{2}|\vec{V}|^2 \sum_{k=1}^\nns W_k
 \end{array}
 \label{eneutrals6}
 \end{equation}
@@ -1155,14 +1156,14 @@ Then, add the latter to Eq.\ (\ref{eqn:eneutrals4})
 \begin{equation}
 \frameeqn{
 \begin{array}{l}\mfd
- \frac{\partial }{\partial t}\left(\sum_{k=1}^\nns \rho_k (e_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}|\vec{V}^{\rm n}|^2 \right) 
-+ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\sum_{k=1}^\nns \rho_k \vec{V}^k_j (h_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}\vec{V}^{\rm n}_j|\vec{V}^{\rm n}|^2 \right)\alb\mfd
+ \frac{\partial }{\partial t}\left(\sum_{k=1}^\nns \rho_k (e_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}|\vec{V}|^2 \right) 
++ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\sum_{k=1}^\nns \rho_k \vec{V}^k_j (h_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}\vec{V}_j|\vec{V}|^2 \right)\alb\mfd
 = 
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
 +\sum_{r=1}^{\ncs} Q_{r}
-+\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
++\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i
 + \sum_{r=1}^\ncs \sum_{i=1}^3 \vec{F}_i^{r} \vec{V}_i^{{\rm n}-r} \alb\mfd
-+\frac{1}{2}|\vec{V}^{\rm n}|^2 \sum_{k=1}^\nns W_k
++\frac{1}{2}|\vec{V}|^2 \sum_{k=1}^\nns W_k
 -  Q_{\rm v}
 + Q_{\rm b}
 \end{array}
@@ -1193,28 +1194,28 @@ Then, add the latter to Eq.\ (\ref{eqn:eneutrals4})
 The first law of thermo for the $k$th species can be expressed as:
 %
 \begin{equation}
- \frac{d }{d t}\left(M_k h_k\right) - v \frac{d P_k}{dt} = \frac{\delta Q}{\Delta t}-\frac{\delta W}{\Delta t}
+ \frac{d }{d t}\left(M_k h_k\right) - \mathrlap{-}V \frac{d P_k}{dt} = \frac{\delta Q}{\Delta t}-\frac{\delta W}{\Delta t}
 \end{equation}
 %
 Split the first derivative:
 %
 \begin{equation}
- M_k\frac{d h_k}{d t} - v \frac{d P_k}{dt} = \frac{\delta Q}{\Delta t}-\frac{\delta W}{\Delta t}-h_k\frac{d m_k}{d t}
+ M_k\frac{d h_k}{d t} - \mathrlap{-}V \frac{d P_k}{dt} = \frac{\delta Q}{\Delta t}-\frac{\delta W}{\Delta t}-h_k\frac{d m_k}{d t}
 \end{equation}
 %
   
 Divide through by the volume of the system $v$:
 %
 \begin{equation}
-\rho_k \frac{d h_k}{d t} -  \frac{d P_k}{dt} = \frac{\delta Q}{v \Delta t}-\frac{\delta W}{v \Delta t}
--\frac{h_k}{v}\frac{d M_k}{d t}
+\rho_k \frac{d h_k}{d t} -  \frac{d P_k}{dt} = \frac{\delta Q}{\mathrlap{-}V \Delta t}-\frac{\delta W}{\mathrlap{-}V \Delta t}
+-\frac{h_k}{\mathrlap{-}V}\frac{d M_k}{d t}
 \label{eqn:echarged2}
 \end{equation}
 %  
 Then, the first term on the RHS corresponds to the heat addition per unit time per unit volume to the system due to conduction:
 %
 \begin{equation}
-\frac{\delta Q}{v \Delta t}= 
+\frac{\delta Q}{\mathrlap{-}V \Delta t}= 
 -
 \underbrace{
 Q_k
@@ -1228,13 +1229,13 @@ W_k h_k^\circ
 where $q^k_i$ is the $i$th component of the heat flux of species $k$ and $Q_{k}$ is the net energy per unit volume given by species $k$ to the neutrals (including the heat given or received due a loss/gain of matter through chemical reactions), and $h_k^\circ$ is the heat of formation of species $k$. The second term on the RHS of Eq.\ (\ref{eqn:echarged2}) is the work done by the gas on its environment by forces other than pressure. 
 %
 \begin{equation}
-\frac{\delta W}{v \Delta t}= \sum_{i=1}^3 \vec{F}_i^k \left( \vec{V}_i^{{\rm n}-k}-\vec{V}_i^k \right)
+\frac{\delta W}{\mathrlap{-}V \Delta t}= \sum_{i=1}^3 \vec{F}_i^k \left( \vec{V}_i^{{\rm n}-k}-\vec{V}_i^k \right)
 \end{equation}
 %
 where $\vec{F}_i^k$ is the force exerted by species $k$ on the neutrals due to collisions and $\vec{V}_i^{{\rm n}-k}$ is the average velocity at which the collisions (between the neutrals the charged species $k$) are taking place. Note that there is no work done on the charged species due to electromagnetic fields in the charged species reference frame. This is due to the work done corresponding to the product between the velocity and the force, with the velocity of the charged species being zero in the charged species frame.  The last term on the RHS of Eq.\ (\ref{eqn:echarged2}) can also be written as:
 %
 \begin{equation}
-  \frac{h_k}{v}\frac{d M_k}{d t} = h_k W_k
+  \frac{h_k}{\mathrlap{-}V}\frac{d M_k}{d t} = h_k W_k
 \end{equation}
 %
 Also change the frame of reference from the species frame to the lab frame:
@@ -1375,19 +1376,19 @@ Substitute the latter in the former:
 We can write the charged species energy transport equation in another form. First recall the charged species velocity Eq.\ (\ref{eqn:Vcharged}):
 %
 \begin{equation}
-  \vec{V}^{k}=\vec{V}^{\rm n} - \mu_{k} \vec{E}^{k} -\frac{\mu_{k}}{|C_{k}| N_{k}}\nabla P_{k}
+  \vec{V}^{k}=\vec{V} - \mu_{k} \vec{E}^{k} -\frac{\mu_{k}}{|C_{k}| N_{k}}\nabla P_{k}
 \end{equation}
 % 
 or,
 %
 \begin{equation}
-  \vec{V}^{k}_j=\vec{V}^{\rm n}_j - \mu_{\rm e} \vec{E}^{k}_j -\frac{\mu_{k}}{|C_{k}| N_{k}} \frac{\partial P_{k}}{\partial x_j} 
+  \vec{V}^{k}_j=\vec{V}_j - \mu_{\rm e} \vec{E}^{k}_j -\frac{\mu_{k}}{|C_{k}| N_{k}} \frac{\partial P_{k}}{\partial x_j} 
 \end{equation}
 % 
 Expand the pressure gradient term:
 %
 \begin{equation}
-  \vec{V}^{k}_j=\vec{V}^{\rm n}_j - \mu_{k} \vec{E}^{k}_j 
+  \vec{V}^{k}_j=\vec{V}_j - \mu_{k} \vec{E}^{k}_j 
     -\frac{\mu_{k} k_{\rm B}}{|C_{k}| } \frac{  \partial T_{k}}{\partial x_j} 
     -\frac{\mu_{k} k_{\rm B} T_{k}}{|C_{k}| N_{k}} \frac{\partial N_{k}  }{\partial x_j} 
 \end{equation}
@@ -1396,7 +1397,7 @@ Multiply by $\rho_{k} (h_{k}+h_k^\circ)$:
 %
 \begin{equation}
   \rho_{k} (h_{k}+h_k^\circ) \vec{V}^{k}_j
-  = \rho_{k} (h_{k}+h_k^\circ)\left( \vec{V}^{\rm n}_j 
+  = \rho_{k} (h_{k}+h_k^\circ)\left( \vec{V}_j 
   - \mu_{k} \vec{E}^{k}_j \right)
   -\frac{\rho_{k} (h_{k}+h_k^\circ) \mu_{k} k_{\rm B}}{|C_{k}| } \frac{  \partial T_{k}}{\partial x_j} 
   -\frac{\rho_{k} (h_{k}+h_k^\circ) \mu_{k} k_{\rm B} T_{k}}{|C_{k}| N_{k}} \frac{\partial N_{k}  }{\partial x_j} 
@@ -1413,7 +1414,7 @@ We can rewrite the former as:
 \begin{equation}
 \frameeqn{
   \rho_{k} (h_{k}+h_k^\circ) \vec{V}^{k}_j
-  = \rho_{k} (h_{k}+h_k^\circ)\left( \vec{V}^{\rm n}_j 
+  = \rho_{k} (h_{k}+h_k^\circ)\left( \vec{V}_j 
   - \mu_{k} \vec{E}^{k}_j \right)
   -\left( \frac{ h_k^\circ }{h_k }\kappa_k \right)\frac{  \partial T_{k}}{\partial x_j} 
   -\kappa_k \frac{  \partial T_{k}}{\partial x_j} 
@@ -1511,47 +1512,46 @@ But $(\vec{V}\times\vec{B})\cdot\vec{V}=0$. Thus:
 The first law of thermo for the electrons can be expressed as:
 %
 \begin{equation}
- \frac{d }{d t}\left(M_{\rm e} h_{\rm e}\right) - v \frac{d P_{\rm e}}{dt} = \frac{\delta Q}{\Delta t}-\frac{\delta W}{\Delta t}
+ \frac{d }{d t}\left(M_{\rm e} h_{\rm e}\right) - \mathrlap{-}V \frac{d P_{\rm e}}{dt} = \frac{\delta Q}{\Delta t}-\frac{\delta W}{\Delta t}
 \end{equation}
 %
 where $M_{\rm e}$ here denotes the total mass of all electrons within the closed system (as opposed to the mass of a single electron).  Split the first derivative:
 %
 \begin{equation}
- M_{\rm e}\frac{d h_{\rm e}}{d t} - v \frac{d P_{\rm e}}{dt} = \frac{\delta Q}{\Delta t}-\frac{\delta W}{\Delta t}-h_{\rm e}\frac{d M_{\rm e}}{d t}
+ M_{\rm e}\frac{d h_{\rm e}}{d t} - \mathrlap{-}V \frac{d P_{\rm e}}{dt} = \frac{\delta Q}{\Delta t}-\frac{\delta W}{\Delta t}-h_{\rm e}\frac{d M_{\rm e}}{d t}
 \end{equation}
 %
-Divide through by the volume of the system $v$:
+Divide through by the volume of the system $\mathrlap{-}V$:
 %
 \begin{equation}
-\rho_{\rm e} \frac{d h_{\rm e}}{d t} -  \frac{d P_{\rm e}}{dt} = \frac{\delta Q}{v \Delta t}-\frac{\delta W}{v \Delta t}
--\frac{h_{\rm e}}{v}\frac{d M_{\rm e}}{d t}
+\rho_{\rm e} \frac{d h_{\rm e}}{d t} -  \frac{d P_{\rm e}}{dt} = \frac{\delta Q}{\mathrlap{-}V \Delta t}-\frac{\delta W}{\mathrlap{-}V \Delta t}
+-\frac{h_{\rm e}}{\mathrlap{-}V}\frac{d M_{\rm e}}{d t}
 \label{eqn:eelectron2}
 \end{equation}
 %  
 The first term on the RHS corresponds to:
 %
 \begin{equation}
-\frac{\delta Q}{v \Delta t}= 
+\frac{\delta Q}{\mathrlap{-}V \Delta t}= 
+\underbrace{
+W_{\rm e} e_{\rm e}
+}_{\begin{minipage}{1.7cm}\flushleft \footnotesize heat gain/lost  due to creation/destruction of electrons\end{minipage}}
 -
 \underbrace{
-Q_{\rm e}
-}_{\begin{minipage}{1.7cm}\flushleft \footnotesize heat exchange with neutrals\end{minipage}}
--
-\underbrace{
-Q_{\rm ei}
-}_{\begin{minipage}{1.7cm}\flushleft \footnotesize heat needed to form electrons through electron-impact \end{minipage}}
+Q_{\rm ic}
+}_{\begin{minipage}{1.7cm}\flushleft \footnotesize heat lost due to inelastic collisions \end{minipage}}
 \end{equation}
 %
 where $q^{\rm e}_i$ is the $i$th component of the electron heat flux and $Q_{\rm e}$ is the net energy per unit volume given by the electrons to the neutrals (including the heat given or received due a loss/gain of matter through chemical reactions), and $Q_{\rm ei}$ is the energy given by electrons to create new electrons through Townsend ionization (i.e., equal to the rate of creation of new electrons through electron impact times the ionization potential). The second term on the RHS of Eq.\ (\ref{eqn:eelectron2}) is the work done by the gas on its environment by forces other than pressure. 
 %
 \begin{equation}
-\frac{\delta W}{v \Delta t}= \sum_{i=1}^3 \vec{F}_i^{\rm e} \left( \vec{V}_i^{{\rm n}-{\rm e}}-\vec{V}_i^{\rm e} \right)
+\frac{\delta W}{\mathrlap{-}V \Delta t}= \sum_{i=1}^3 \vec{F}_i^{\rm e} \left( \vec{V}_i^{{\rm n}-{\rm e}}-\vec{V}_i^{\rm e} \right)
 \end{equation}
 %
 where $\vec{F}_i^{\rm e}$ is the force exerted by the electrons on the neutrals due to collisions and $\vec{V}_i^{{\rm n}-{\rm e}}$ is the average velocity in the lab frame at which the collisions (between the neutrals the electrons) are taking place while $(\vec{V}_i^{{\rm n}-{\rm e}}-\vec{V}_i^{\rm e})$ is the average velocity in the electrons frame at which the neutral-electron collisions take place. Note that there is no work done due to the electromagnetic fields in the electron reference frame because the work done corresponds to the product between the velocity and the force and the velocity of the electrons is of course zero in the electron reference frame.   The last term on the RHS of Eq.\ (\ref{eqn:eelectron2}) can also be written as:
 %
 \begin{equation}
-  \frac{h_{\rm e}}{v}\frac{d M_{\rm e}}{d t} = h_{\rm e} W_{\rm e}
+  \frac{h_{\rm e}}{\mathrlap{-}V}\frac{d M_{\rm e}}{d t} = h_{\rm e} W_{\rm e}
 \end{equation}
 %
 Also change the frame of reference from the species frame to the lab frame:
@@ -1571,9 +1571,9 @@ Substitute the latter 5 equations in Eq.\ (\ref{eqn:eelectron2}):
 \rho_{\rm e} \frac{\partial h_{\rm e}}{\partial t} + \sum_{j=1}^3 \rho_{\rm e} \vec{V}^{\rm e}_j \frac{\partial h_{\rm e}}{\partial x_j} 
 - \frac{\partial P_{\rm e}}{\partial t} - \sum_{i=1}^3 \vec{V}^{\rm e}_i \frac{\partial P_{\rm e}}{\partial x_i}
 = 
--Q_{\rm e}
++ W_{\rm e} e_{\rm e}
 -\sum_{i=1}^3 \vec{F}_i^{\rm e} \left( \vec{V}_i^{{\rm n}-{\rm e}}-\vec{V}_i^{\rm e} \right)
--h_{\rm e} W_{\rm e} - Q_{\rm ei}
+-h_{\rm e} W_{\rm e} - Q_{\rm ic}
 \label{eqn:eelectron3}
 \end{equation}
 %  
@@ -1589,9 +1589,9 @@ where $W_{\rm e}$ is the mass creation per unit volume per unit time of the elec
  \frac{\partial }{\partial t}\rho_{\rm e} h_{\rm e} + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_{\rm e} \vec{V}^{\rm e}_j h_{\rm e} 
 - \frac{\partial P_{\rm e}}{\partial t} - \sum_{i=1}^3 \vec{V}^{\rm e}_i \frac{\partial P_{\rm e}}{\partial x_i}
 = 
--Q_{{\rm e}}
++ W_{\rm e} e_{\rm e}
 -\sum_{i=1}^3 \vec{F}_i^{\rm e} \left( \vec{V}_i^{{\rm n}-{\rm e}}-\vec{V}_i^{\rm e} \right)
-- Q_{\rm ei}
+- Q_{\rm ic}
 \end{equation}
 %  
 Define the internal energy as
@@ -1606,9 +1606,9 @@ Thus:
  \frac{\partial }{\partial t}\rho_{\rm e} e_{\rm e} + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_{\rm e} \vec{V}^{\rm e}_j h_{\rm e} 
 - \sum_{i=1}^3 \vec{V}^{\rm e}_i \frac{\partial P_{\rm e}}{\partial x_i}
 = 
-- Q_{{\rm e}}
++ W_{\rm e} e_{\rm e}
 -\sum_{i=1}^3 \vec{F}_i^{\rm e} \left( \vec{V}_i^{{\rm n}-{\rm e}}-\vec{V}_i^{\rm e} \right)
-- Q_{\rm ei}
+- Q_{\rm ic}
 \label{eqn:eelectron4}
 \end{equation}
 %  
@@ -1629,9 +1629,9 @@ Add the latter to Eq.\ (\ref{eqn:eelectron4}):
 \begin{equation}
  \frac{\partial }{\partial t}\rho_{\rm e} e_{\rm e} + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_{\rm e} \vec{V}^{\rm e}_j h_{\rm e} 
 = 
-- Q_{{\rm e}}
++ W_{\rm e} e_{\rm e}
 -\sum_{i=1}^3 \vec{F}_i^{\rm e}  \vec{V}_i^{{\rm n}-{\rm e}} 
-- Q_{\rm ei}
+- Q_{\rm ic}
 + \sum_{i=1}^3 \vec{V}_i^{\rm e} C_{\rm e} N_{\rm e} \vec{E}^{\rm e}_i
 \end{equation}
 %  
@@ -1640,9 +1640,9 @@ or:
 \begin{equation}
  \frac{\partial }{\partial t}\rho_{\rm e} e_{\rm e} + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_{\rm e} \vec{V}^{\rm e}_j h_{\rm e} 
 = 
-- Q_{{\rm e}}
++ W_{\rm e} e_{\rm e}
 - \vec{F}^{\rm e}\cdot  \vec{V}^{{\rm n}-{\rm e}} 
-- Q_{\rm ei}
+- Q_{\rm ic}
 +   C_{\rm e} N_{\rm e} \vec{V}^{\rm e} \cdot \vec{E}^{\rm e}
 \end{equation}
 %  
@@ -1660,25 +1660,17 @@ Thus:
 \begin{equation}
  \frac{\partial }{\partial t}\rho_{\rm e} e_{\rm e} + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_{\rm e} \vec{V}^{\rm e}_j h_{\rm e} 
 = 
-- Q_{{\rm e}}
++ W_{\rm e} e_{\rm e}
 - \vec{F}^{\rm e}\cdot  \vec{V}^{{\rm n}-{\rm e}} 
-- Q_{\rm ei}
+- Q_{\rm ic}
 +   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
 \end{equation}
 %  
-But recall that $Q_{\rm e}$ was defined as the heat added by the electrons to the neutrals including energy lost/gained through creation and destruction of the electrons through chemical reactions and that that $\vec{F}^{\rm e}\cdot  \vec{V}^{{\rm n}-{\rm e}}$ corresponds to the work done by the electrons on the neutrals through collision forces.  Thus, we can say that:
+We can then define  $Q_{\rm e}$ as:
 %
 \begin{equation}
-Q_{{\rm e}} + \vec{F}^{\rm e}\cdot  \vec{V}^{{\rm n}-{\rm e}}
-=\underbrace{-W_{\rm e} e_{\rm e}}_{\begin{minipage}{3cm} \footnotesize \flushleft energy lost to neutrals due to destruction of electrons through chemical reactions\end{minipage}}
-+ Q_{\rm e-n}
-\end{equation}
-%
-Thus the physical definition of  $Q_{\rm e-n}$ is:
-%
-\begin{equation}
-Q_{\rm e-n} \equiv \vec{F}^{\rm e}\cdot  \vec{V}^{{\rm n}-{\rm e}} + \textrm{heat dissipated by electrons to neutrals}
-\label{eqn:Qen_definition}
+Q_{\rm e} \equiv
+\underbrace{Q_{\rm ic}}_{\begin{minipage}{3cm} \footnotesize \flushleft energy lost to neutrals due to inelastic collisions\end{minipage}} + \underbrace{\vec{F}^{\rm e}\cdot  \vec{V}^{{\rm n}-{\rm e}}}_{\begin{minipage}{3cm} \footnotesize \flushleft energy lost to neutrals due to elastic collisions\end{minipage}} 
 \end{equation}
 %
 Thus:
@@ -1687,9 +1679,8 @@ Thus:
  \frac{\partial }{\partial t}\rho_{\rm e} e_{\rm e} + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \rho_{\rm e} \vec{V}^{\rm e}_j h_{\rm e} 
 = 
 + W_{\rm e} e_{\rm e}
-- Q_{\rm e-n}
+- Q_{\rm e}
 +   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
-- Q_{\rm ei}
 \end{equation}
 %  
 Then, the electron energy transport becomes:
@@ -1700,8 +1691,7 @@ Then, the electron energy transport becomes:
 = 
  W_{\rm e} e_{\rm e}
 +   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
-- Q_{\rm e-n}
-- Q_{\rm ei}
+- Q_{\rm e}
 }
 \label{eqn:eelectron5}
 \end{equation}
@@ -1747,8 +1737,7 @@ Keep the latter on hold. Expand the derivatives in Eq.\ (\ref{eqn:eelectron5}):
 = 
  W_{\rm e} e_{\rm e}
 +   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
-- Q_{\rm e-n}
-- Q_{\rm ei}
+- Q_{\rm e}
 \end{equation}
 %  
 Substract the former from the latter to obtain a second form of the electron energy transport equation (with no loss in generality):
@@ -1761,8 +1750,7 @@ Substract the former from the latter to obtain a second form of the electron ene
 = 
 -W_{\rm e} R_{\rm e} T_{\rm e}
 +   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
-- Q_{\rm e-n}
-- Q_{\rm ei}
+- Q_{\rm e}
 }
 \label{eqn:eelectron6}
 \end{equation}
@@ -1772,19 +1760,19 @@ Substract the former from the latter to obtain a second form of the electron ene
 We can write the electron energy transport equation in yet another form. First recall the charged species velocity Eq.\ (\ref{eqn:Vcharged}) for the electrons:
 %
 \begin{equation}
-  \vec{V}^{\rm e}=\vec{V}^{\rm n} - \mu_{\rm e} \vec{E}^{\rm e} -\frac{\mu_{\rm e}}{|C_{\rm e}| N_{\rm e}}\nabla P_{\rm e}
+  \vec{V}^{\rm e}=\vec{V} - \mu_{\rm e} \vec{E}^{\rm e} -\frac{\mu_{\rm e}}{|C_{\rm e}| N_{\rm e}}\nabla P_{\rm e}
 \end{equation}
 % 
 or,
 %
 \begin{equation}
-  \vec{V}^{\rm e}_j=\vec{V}^{\rm n}_j - \mu_{\rm e} \vec{E}^{\rm e}_j -\frac{\mu_{\rm e}}{|C_{\rm e}| N_{\rm e}} \frac{\partial P_{\rm e}}{\partial x_j} 
+  \vec{V}^{\rm e}_j=\vec{V}_j - \mu_{\rm e} \vec{E}^{\rm e}_j -\frac{\mu_{\rm e}}{|C_{\rm e}| N_{\rm e}} \frac{\partial P_{\rm e}}{\partial x_j} 
 \end{equation}
 % 
 Expand the electron pressure:
 %
 \begin{equation}
-  \vec{V}^{\rm e}_j=\vec{V}^{\rm n}_j - \mu_{\rm e} \vec{E}^{\rm e}_j 
+  \vec{V}^{\rm e}_j=\vec{V}_j - \mu_{\rm e} \vec{E}^{\rm e}_j 
     -\frac{\mu_{\rm e} k_{\rm B}}{|C_{\rm e}| } \frac{  \partial T_{\rm e}}{\partial x_j} 
     -\frac{\mu_{\rm e} k_{\rm B} T_{\rm e}}{|C_{\rm e}| N_{\rm e}} \frac{\partial N_{\rm e}  }{\partial x_j} 
 \end{equation}
@@ -1793,7 +1781,7 @@ Multiply by $\rho_{\rm e} h_{\rm e}$:
 %
 \begin{equation}
   \rho_{\rm e} h_{\rm e} \vec{V}^{\rm e}_j
-  = \rho_{\rm e} h_{\rm e} \vec{V}^{\rm n}_j 
+  = \rho_{\rm e} h_{\rm e} \vec{V}_j 
   - \rho_{\rm e} h_{\rm e} \mu_{\rm e} \vec{E}^{\rm e}_j 
   -\frac{\rho_{\rm e} h_{\rm e} \mu_{\rm e} k_{\rm B}}{|C_{\rm e}| } \frac{  \partial T_{\rm e}}{\partial x_j} 
   -\frac{\rho_{\rm e} h_{\rm e} \mu_{\rm e} k_{\rm B} T_{\rm e}}{|C_{\rm e}| N_{\rm e}} \frac{\partial N_{\rm e}  }{\partial x_j} 
@@ -1803,7 +1791,7 @@ But $\rho_{\rm e}=N_{\rm e} m_{\rm e}$:
 %
 \begin{equation}
   \rho_{\rm e} h_{\rm e} \vec{V}^{\rm e}_j
-  = \rho_{\rm e} h_{\rm e} \vec{V}^{\rm n}_j 
+  = \rho_{\rm e} h_{\rm e} \vec{V}_j 
   - \rho_{\rm e} h_{\rm e} \mu_{\rm e} \vec{E}^{\rm e}_j 
   -\frac{N_{\rm e} m_{\rm e} h_{\rm e} \mu_{\rm e} k_{\rm B}}{|C_{\rm e}| } \frac{  \partial T_{\rm e}}{\partial x_j} 
   -\frac{ m_{\rm e} h_{\rm e} \mu_{\rm e} k_{\rm B} T_{\rm e}}{|C_{\rm e}| } \frac{\partial N_{\rm e}  }{\partial x_j} 
@@ -1813,7 +1801,7 @@ But $h_{\rm e}=\frac{5}{2}\frac{k_{\rm B}}{m_{\rm e}} T_{\rm e}$:
 %
 \begin{equation}
   \rho_{\rm e} h_{\rm e} \vec{V}^{\rm e}_j
-  = \rho_{\rm e} h_{\rm e} \vec{V}^{\rm n}_j 
+  = \rho_{\rm e} h_{\rm e} \vec{V}_j 
   - \rho_{\rm e} h_{\rm e} \mu_{\rm e} \vec{E}^{\rm e}_j 
   -\frac{5 N_{\rm e} k_{\rm B}^2 T_{\rm e} \mu_{\rm e} }{2 |C_{\rm e}| } \frac{  \partial T_{\rm e}}{\partial x_j} 
   -\frac{5 k_{\rm B}^2 T_{\rm e}^2 \mu_{\rm e}}{2 |C_{\rm e}| } \frac{\partial N_{\rm e}  }{\partial x_j} 
@@ -1823,7 +1811,7 @@ But, the electric field in the electron reference frame is $\vec{E}^{\rm e}=\vec
 %
 \begin{equation}
   \rho_{\rm e} h_{\rm e}  \vec{V}^{\rm e}_j
-  = \rho_{\rm e} h_{\rm e} \vec{V}^{\rm n}_j 
+  = \rho_{\rm e} h_{\rm e} \vec{V}_j 
   - \rho_{\rm e} h_{\rm e} \mu_{\rm e} \left( \vec{E}+\vec{V}^{\rm e}\times\vec{B}\right)_j 
   -\frac{5 N_{\rm e} k_{\rm B}^2 T_{\rm e} \mu_{\rm e} }{2 |C_{\rm e}| } \frac{  \partial T_{\rm e}}{\partial x_j} 
   -\frac{5 k_{\rm B}^2 T_{\rm e}^2 \mu_{\rm e}}{2 |C_{\rm e}| } \frac{\partial N_{\rm e}  }{\partial x_j} 
@@ -1832,9 +1820,9 @@ But, the electric field in the electron reference frame is $\vec{E}^{\rm e}=\vec
 Rearrange:
 %
 \begin{equation}
-  \rho_{\rm e} h_{\rm e} \left( \vec{V}^{\rm e}_j - \vec{V}^{\rm n}_j \right)
+  \rho_{\rm e} h_{\rm e} \left( \vec{V}^{\rm e}_j - \vec{V}_j \right)
   = 
-  - \rho_{\rm e} h_{\rm e} \mu_{\rm e} \left( \vec{E}^{\rm n}+(\vec{V}^{\rm e}-\vec{V}^{\rm n})\times\vec{B}\right)_j 
+  - \rho_{\rm e} h_{\rm e} \mu_{\rm e} \left( \vec{E}+(\vec{V}^{\rm e}-\vec{V})\times\vec{B}\right)_j 
   -\frac{5 N_{\rm e} k_{\rm B}^2 T_{\rm e} \mu_{\rm e} }{2 |C_{\rm e}| } \frac{  \partial T_{\rm e}}{\partial x_j} 
   -\frac{5 k_{\rm B}^2 T_{\rm e}^2 \mu_{\rm e}}{2 |C_{\rm e}| } \frac{\partial N_{\rm e}  }{\partial x_j} 
 \end{equation}
@@ -1842,9 +1830,9 @@ Rearrange:
 Rearrange again:
 %
 \begin{equation}
-  \rho_{\rm e} h_{\rm e} \left( \vec{V}^{\rm e} - \vec{V}^{\rm n} -s_{\rm e} \mu_{\rm e}(\vec{V}^{\rm e}-\vec{V}^{\rm n})\times\vec{B}\right)_j
+  \rho_{\rm e} h_{\rm e} \left( \vec{V}^{\rm e} - \vec{V} -s_{\rm e} \mu_{\rm e}(\vec{V}^{\rm e}-\vec{V})\times\vec{B}\right)_j
   = 
-  - \rho_{\rm e} h_{\rm e} \mu_{\rm e} \vec{E}^{\rm n}_j 
+  - \rho_{\rm e} h_{\rm e} \mu_{\rm e} \vec{E}_j 
   -\frac{5 N_{\rm e} k_{\rm B}^2 T_{\rm e} \mu_{\rm e} }{2 |C_{\rm e}| } \frac{  \partial T_{\rm e}}{\partial x_j} 
   -\frac{5 k_{\rm B}^2 T_{\rm e}^2 \mu_{\rm e}}{2 |C_{\rm e}| } \frac{\partial N_{\rm e}  }{\partial x_j} 
 \end{equation}
@@ -1852,9 +1840,9 @@ Rearrange again:
 where $s_{\rm e}$ is the sign of the charge of electrons (i.e., $s_{\rm e}=-1$). Then, it can be easily shown that the latter can be rewritten to:
 %
 \begin{equation}
-  \rho_{\rm e} h_{\rm e} \left( \vec{V}^{\rm e} - \vec{V}^{\rm n} \right)_i
+  \rho_{\rm e} h_{\rm e} \left( \vec{V}^{\rm e} - \vec{V} \right)_i
   = 
-  - \sum_j \rho_{\rm e} h_{\rm e} \tilde{\mu}_{ij}^{\rm e} \vec{E}^{\rm n}_j 
+  - \sum_j \rho_{\rm e} h_{\rm e} \tilde{\mu}_{ij}^{\rm e} \vec{E}_j 
   -\sum_j \frac{5 N_{\rm e} k_{\rm B}^2 T_{\rm e} \tilde{\mu}_{ij}^{\rm e} }{2 |C_{\rm e}| } \frac{  \partial T_{\rm e}}{\partial x_j} 
   -\sum_j \frac{5 k_{\rm B}^2 T_{\rm e}^2 \tilde{\mu}_{ij}^{\rm e}}{2 |C_{\rm e}| } \frac{\partial N_{\rm e}  }{\partial x_j} 
 \end{equation}
@@ -1866,8 +1854,7 @@ Now recall the electron energy transport (\ref{eqn:eelectron5}) but substitute t
 = 
  W_{\rm e} e_{\rm e}
 +   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
-- Q_{\rm e-n}
-- Q_{\rm ei}
+- Q_{\rm e}
 \end{equation}
 %  
 Substitute the former in the latter to obtain a third form of the electron energy transport (with no loss in generality):
@@ -1875,103 +1862,20 @@ Substitute the former in the latter to obtain a third form of the electron energ
 \begin{equation}
 \frameeqn{
 \begin{array}{l}\mfd
- \frac{\partial }{\partial t}\rho_{\rm e} e_{\rm e} + \sum_{i=1}^3  \frac{\partial }{\partial x_i} \rho_{\rm e} \vec{V}^{\rm n}_i h_{\rm e} 
-  - \sum_{i=1}^3 \sum_{j=1}^3 \frac{\partial}{\partial x_i} \rho_{\rm e} h_{\rm e} \tilde{\mu}_{ij}^{\rm e} (\vec{E}+\vec{V}^{\rm n}\times\vec{B})_j 
+ \frac{\partial }{\partial t}\rho_{\rm e} e_{\rm e} + \sum_{i=1}^3  \frac{\partial }{\partial x_i} \rho_{\rm e} \vec{V}_i h_{\rm e} 
+  - \sum_{i=1}^3 \sum_{j=1}^3 \frac{\partial}{\partial x_i} \rho_{\rm e} h_{\rm e} \tilde{\mu}_{ij}^{\rm e} (\vec{E}+\vec{V}\times\vec{B})_j 
   -\sum_{i=1}^3 \sum_{j=1}^3 \frac{\partial}{\partial x_i} \left( \frac{5 N_{\rm e} k_{\rm B}^2 T_{\rm e} \tilde{\mu}_{ij}^{\rm e} }{2 |C_{\rm e}| } \frac{  \partial T_{\rm e}}{\partial x_j} \right)
   \\ \mfd
   -\sum_{i=1}^3 \sum_{j=1}^3 \frac{\partial}{\partial x_i} \left(\frac{5 k_{\rm B}^2 T_{\rm e}^2 \tilde{\mu}_{ij}^{\rm e}}{2 |C_{\rm e}| } \frac{\partial N_{\rm e}  }{\partial x_j} \right)
 = 
  W_{\rm e} e_{\rm e}
 +   C_{\rm e} N_{\rm e} \vec{E} \cdot \vec{V}^{\rm e}  
-- Q_{\rm e-n}
-- Q_{\rm ei}
+- Q_{\rm e}
 \end{array}
 }
 \end{equation}
 %  
 
-
-
-Recall the definition of $Q_{\rm e-n}$ in Eq.\ (\ref{eqn:Qen_definition}):
-%
-\begin{equation}
-Q_{\rm e-n} \equiv \vec{F}^{\rm e}\cdot  \vec{V}^{{\rm n}-{\rm e}} + \textrm{heat dissipated by electrons to neutrals}
-\end{equation}
-%
-The collision force between the electrons and the neutrals corresponds to (see momentum equation for the charged species):
-%
-\begin{equation}
-\vec{F}^{\rm e} = \frac{|C_{\rm e}|N_{\rm e}}{\mu_{\rm e}} \left(\vec{V}^{\rm e} - \vec{V}^{\rm n} \right)
-\end{equation}
-%
-Thus:
-%
-\begin{equation}
-Q_{\rm e-n} = \frac{|C_{\rm e}|N_{\rm e}}{\mu_{\rm e}} \left(\vec{V}^{\rm e} - \vec{V}^{\rm n} \right) \cdot  \vec{V}^{{\rm n}-{\rm e}} + \textrm{heat dissipated by electrons to neutrals}
-\end{equation}
-%
-where the heat dissipated to the neutrals by the electrons would have a similar form as the first term on the RHS but involving random motion of electrons with respect to the bulk. We can lump the two terms into one and assume that the mean electron velocity with respect to the bulk (the thermal velocity, $\overline{q_{\rm e}}$) is in the same order of magnitude as the electron bulk velocity $\vec{V}^{\rm e}$. We further assume that either the bulk or thermal electron velocity is much greater than the neutrals velocity and that the velocity of the collision $\vec{V}^{\rm e}$ is approximately the electron velocity (a good assumption because electrons move quantum mechanically and don't bounce off heavy particules but go through them when interacting with them). Then, we obtain:
-%
-\begin{equation}
-Q_{\rm e-n} \propto \frac{|C_{\rm e}|N_{\rm e}}{\mu_{\rm e}} \overline{q_{\rm e}}^2 
-\end{equation}
-%
-But from the definition of the electron temperature,
-%
-\begin{equation}
-T_{\rm e} \equiv \frac{m_{\rm e}\overline{q_{\rm e}^2}}{3 k_{\rm B} }
-\end{equation}
-%
-Noting that $\overline{q_{\rm e}^2}\propto \overline{q_{\rm e}}^2$:
-%
-\begin{equation}
- \overline{q_{\rm e}}^2 \propto \frac{3 k_{\rm B} T_{\rm e}}{m_{\rm e}} 
-\end{equation}
-%
-Substitute in $Q_{\rm en}$ expression:
-%
-\begin{equation}
-Q_{\rm e-n} \propto \frac{3 k_{\rm B} T_{\rm e} |C_{\rm e}|N_{\rm e}}{m_{\rm e} \mu_{\rm e}}  
-\end{equation}
-%
-Introduce a proportionality constant to obtain an approximate expression for the heat lost to the neutrals due to heat dissipation and collisions:
-%
-\begin{equation}
-  Q_{\rm e-n} \approx \frac{3 N_{\rm e} k_{\rm B} T_{\rm e}  |C_{\rm e}| \zeta_{\rm e}}{2 m_{\rm e}\mu_{\rm e}}
-\end{equation}
-%
-Such is the same expression as found in Ref.\ \cite[page 34]{book:1991:raizer}. 
-But, it should be noted that the main thermal relaxation mechanism between electrons and air molecules is through the nitrogen vibrational energy modes (more than one order of magnitude greater than the translational energy modes). Thus, the loss or gain of energy of the electrons is set here to be proportional to the difference between the  electron  temperature and the nitrogen vibrational temperature as follows:
-%
-\begin{equation}
-  Q_{\rm e-n} \approx \frac{3 N_{\rm e} k_{\rm B} (T_{\rm e}-T_{\rm v})  |C_{\rm e}| \zeta_{\rm e}}{2 m_{\rm e}\mu_{\rm e}}
-\label{eqn:Qen}
-\end{equation}
-%
-Although the derivation of $Q_{\rm e-n}$ is not exact and involves several assumptions, it can be calibrated by letting the proportionality constant $\zeta_{\rm e}$ vary as a function of electron temperature. Such $\zeta_{\rm e}$ is referred to as the electron energy loss function. The electron energy loss function $\zeta_{\rm e}$ can be determined as in Ref.\ \cite{misc:1995:boeuf} so that the electron energy equation yields the correct equilibrium condition (by setting to zero the sum of  all terms within the energy equation that do not become zero in the local approximation at equilibrium). A polynomial giving $\zeta_{\rm e}$ as a function of the electron temperature is given in Table \ref{tab:xicoefficients} below. 
-
-
-
-The ionization potential  can be taken as $2.507 \times 10^{-18}$~J for N$_2$ and $1.947 \times 10^{-18}$~J for O$_2$. The ionization potential is obtained from the NASA Glenn polynomials \citen{nasa:2002:mcbride} at a gas temperature of 300 K, and it is assumed independent of temperature. The latter has a small impact on the ionization potential, which increases by less than 20\% when the temperature is raised from 300 K to 10000 K. Thus, the heat needed for ionization through electron impact, $Q_{\rm ei}$, can be expressed as:
-%
-\begin{equation} 
- \begin{array}{r}\mfd
- Q_{\rm ei}= (2.507 \times 10^{-18} {\rm J}) \cdot N_{\rm e} N_{\rm N_2} k_{\rm ei}^{\rm N_2}
-           + (1.947 \times 10^{-18} {\rm J}) \cdot  N_{\rm e} N_{\rm O_2} k_{\rm ei}^{\rm O_2}
- \end{array}
-\end{equation}
-%
-where $k_{\rm ei}^{\rm N_2}$ and $k_{\rm ei}^{\rm O_2}$ are the Townsend reaction rates function of the reduced electric field \cite{jcp:2014:parent}:
-%
-\begin{equation}
- k_{\rm ei}^{\rm N_2}={\rm exp}(-0.0105809\cdot {\rm ln}^2 E^\star - 2.40411\cdot 10^{-75} \cdot {\rm ln}^{46}E^\star)\times 10^{-6}~\textrm{m$^3$/s}
-\end{equation}
-%
-%
-\begin{equation}
- k_{\rm ei}^{\rm O_2}= {\rm exp}(-0.0102785\cdot {\rm ln}^2 E^\star - 2.42260\cdot 10^{-75} \cdot {\rm ln}^{46}E^\star)\times 10^{-6}~\textrm{m$^3$/s}
-\end{equation}
-%
 
 
 
@@ -1988,7 +1892,7 @@ where $k_{\rm ei}^{\rm N_2}$ and $k_{\rm ei}^{\rm O_2}$ are the Townsend reactio
     \fontsizetable
     \begin{tabular}{r@{.}lr@{.}lr@{.}l}
     \toprule
-    \multicolumn{2}{c}{$|\vec{E}+\vec{V}^{\rm e} \times \vec{B}|/N_{\rm n}$ [V~m$^2$]}  & \multicolumn{2}{c}{$T_{\rm e}$ [eV]}   &  \multicolumn{2}{c}{$T_{\rm e}$ [K]} \\
+    \multicolumn{2}{c}{$|\vec{E}+\vec{V}^{\rm e} \times \vec{B}|/N$ [V~m$^2$]}  & \multicolumn{2}{c}{$T_{\rm e}$ [eV]}   &  \multicolumn{2}{c}{$T_{\rm e}$ [K]} \\
     \midrule
       0&1 $\times 10^{-20}$    &  0&20          &  2321&0\\
       0&2 $\times 10^{-20}$    &  0&34          &  3945&7\\
@@ -2021,7 +1925,7 @@ where $k_{\rm ei}^{\rm N_2}$ and $k_{\rm ei}^{\rm O_2}$ are the Townsend reactio
     \fontsizetable
     \begin{tabular}{r@{.}lr@{.}lr@{.}lr@{.}lr@{.}l}
     \toprule
-    \multicolumn{2}{c}{$|\vec{E}+\vec{V}^{\rm e} \times \vec{B}|/N_{\rm n}$ [V~m$^2$]}  & \multicolumn{2}{c}{$(T_{\rm e})_{\rm N_2}$ [eV]} & \multicolumn{2}{c}{$(T_{\rm e})_{\rm O_2}$ [eV]} & \multicolumn{2}{c}{$T_{\rm e}$ [eV]} &  \multicolumn{2}{c}{$T_{\rm e}$ [K]} \\
+    \multicolumn{2}{c}{$|\vec{E}+\vec{V}^{\rm e} \times \vec{B}|/N$ [V~m$^2$]}  & \multicolumn{2}{c}{$(T_{\rm e})_{\rm N_2}$ [eV]} & \multicolumn{2}{c}{$(T_{\rm e})_{\rm O_2}$ [eV]} & \multicolumn{2}{c}{$T_{\rm e}$ [eV]} &  \multicolumn{2}{c}{$T_{\rm e}$ [K]} \\
     \midrule
       0&003 $\times 10^{-20}$  &  0&028  &  \multicolumn{2}{c}{--}  &  0&02471       &  286&8\\
       0&005 $\times 10^{-20}$  &  0&031  &  \multicolumn{2}{c}{--}  &  0&02736       &  317&5\\
@@ -2052,27 +1956,27 @@ where $k_{\rm ei}^{\rm N_2}$ and $k_{\rm ei}^{\rm O_2}$ are the Townsend reactio
 One of the source terms in the electron energy transport equation $\vec{E}^{\rm e} \cdot \vec{V}^{\rm e}$ can be rewritten differently. Recall the momentum equation of the electrons in Eq.\ (\ref{eqn:Vcharged}):
 %
 \begin{equation}
-  \vec{V}^k=\vec{V}^{\rm n} + s_k \mu_k \left(\vec{E}+\vec{V}^k \times \vec{B}\right)-\frac{\mu_k}{|C_k| N_k}\nabla P_k
+  \vec{V}^k=\vec{V} + s_k \mu_k \left(\vec{E}+\vec{V}^k \times \vec{B}\right)-\frac{\mu_k}{|C_k| N_k}\nabla P_k
 \end{equation}
 % 
 %
 \begin{equation}
 \vec{E}^k \cdot \vec{V}^k 
- = \vec{E}^k \cdot \left( \vec{V}^{\rm n} + s_k \mu_k \vec{E}^k-\frac{\mu_k}{|C_k| N_k}\nabla P_k \right)
+ = \vec{E}^k \cdot \left( \vec{V} + s_k \mu_k \vec{E}^k-\frac{\mu_k}{|C_k| N_k}\nabla P_k \right)
 \end{equation}
 % 
 Multiply both sides by $C_k N_k$:
 %
 \begin{equation}
 \vec{E}^k \cdot \vec{J}^k 
- = C_k N_k \vec{E}^k \cdot \left( \vec{V}^{\rm n} + s_k \mu_k \vec{E}^k-\frac{\mu_k}{|C_k| N_k}\nabla P_k \right)
+ = C_k N_k \vec{E}^k \cdot \left( \vec{V} + s_k \mu_k \vec{E}^k-\frac{\mu_k}{|C_k| N_k}\nabla P_k \right)
 \end{equation}
 % 
 Rearrange the RHS:
 %
 \begin{equation}
 \vec{E}^k \cdot \vec{J}^k 
- = C_k N_k \vec{E}^k \cdot \left( \vec{V}^{\rm n} -\frac{\mu_k}{|C_k| N_k}\nabla P_k \right)
+ = C_k N_k \vec{E}^k \cdot \left( \vec{V} -\frac{\mu_k}{|C_k| N_k}\nabla P_k \right)
   +C_k N_k \vec{E}^k \cdot \left(  s_k \mu_k \vec{E}^k \right)
 \end{equation}
 % 
@@ -2080,7 +1984,7 @@ or
 %
 \begin{equation}
 \vec{E}^k \cdot \vec{J}^k 
- = C_k N_k \vec{E}^k \cdot \left( \vec{V}^{\rm n} -\frac{\mu_k}{|C_k| N_k}\nabla P_k \right)
+ = C_k N_k \vec{E}^k \cdot \left( \vec{V} -\frac{\mu_k}{|C_k| N_k}\nabla P_k \right)
   +|C_k| \mu_k N_k |\vec{E}^k|^2
 \end{equation}
 % 
@@ -2089,11 +1993,18 @@ or,
 \begin{equation}
 \frameeqn{
 \vec{E}^k \cdot \vec{J}^k 
- =   C_k N_k \vec{E}^k \cdot \vec{V}^{\rm n} - s_k \mu_k \vec{E}^k \cdot \nabla P_k 
+ =   C_k N_k \vec{E}^k \cdot \vec{V} - s_k \mu_k \vec{E}^k \cdot \nabla P_k 
   +|C_k| \mu_k N_k |\vec{E}^k|^2
 }
 \end{equation}
 % 
+
+
+
+
+
+
+
 
 
 \section{Electron Energy Relaxation Terms}
@@ -2113,6 +2024,83 @@ Let us start from the electron energy transport equation:
 - Q_{\rm ei}
 \end{equation}
 %
+Where $Q_{\rm ei}$ is the electron energy loss due to electron impact and $Q_{\rm e-n}$ is the electron energy loss due to elastic collisions:
+%
+\begin{equation}
+Q_{\rm e-n} \equiv \vec{F}^{\rm e}\cdot  \vec{V}^{{\rm n}-{\rm e}} 
+\end{equation}
+%
+The collision force between the electrons and the neutrals corresponds to (see momentum equation for the charged species):
+%
+\begin{equation}
+\vec{F}^{\rm e} = \frac{|C_{\rm e}|N_{\rm e}}{\mu_{\rm e}} \left(\vec{V}^{\rm e} - \vec{V} \right)
+\end{equation}
+%
+Thus:
+%
+\begin{equation}
+Q_{\rm e-n} = \frac{|C_{\rm e}|N_{\rm e}}{\mu_{\rm e}} \left(\vec{V}^{\rm e} - \vec{V} \right) \cdot  \vec{V}^{{\rm n}-{\rm e}} 
+\end{equation}
+%
+further assume that either the electron velocity is much greater than the neutrals velocity and that the velocity of the collision $\vec{V}^{\rm e}$ is approximately the electron velocity. Then, we obtain:
+%
+\begin{equation}
+Q_{\rm e-n} \propto \frac{|C_{\rm e}|N_{\rm e}}{\mu_{\rm e}} \overline{q_{\rm e}}^2 
+\end{equation}
+%
+But from the definition of the electron temperature,
+%
+\begin{equation}
+T_{\rm e} \equiv \frac{m_{\rm e}\overline{q_{\rm e}^2}}{3 k_{\rm B} }
+\end{equation}
+%
+Noting that $\overline{q_{\rm e}^2}\propto \overline{q_{\rm e}}^2$:
+%
+\begin{equation}
+ \overline{q_{\rm e}}^2 \propto \frac{3 k_{\rm B} T_{\rm e}}{m_{\rm e}} 
+\end{equation}
+%
+Substitute in $Q_{\rm e-n}$ expression:
+%
+\begin{equation}
+Q_{\rm e-n} \propto \frac{3 k_{\rm B} T_{\rm e} |C_{\rm e}|N_{\rm e}}{m_{\rm e} \mu_{\rm e}}  
+\end{equation}
+%
+Introduce a proportionality constant to obtain an approximate expression for the heat lost to the neutrals due to heat dissipation and collisions:
+%
+\begin{equation}
+  Q_{\rm e-n} \approx \frac{3 N_{\rm e} k_{\rm B} T_{\rm e}  |C_{\rm e}| \zeta_{\rm e}}{2 m_{\rm e}\mu_{\rm e}}
+\label{eqn:Qen}
+\end{equation}
+%
+Such is the same expression as found in Ref.\ \cite[page 34]{book:1991:raizer}. 
+The term $Q_{\rm e-n}$ can be calibrated by letting the proportionality constant $\zeta_{\rm e}$ vary as a function of electron temperature. Such $\zeta_{\rm e}$ is referred to as the electron energy loss function. The electron energy loss function $\zeta_{\rm e}$ can be determined as in Ref.\ \cite{misc:1995:boeuf} so that the electron energy equation yields the correct equilibrium condition (by setting to zero the sum of  all terms within the energy equation that do not become zero in the local approximation at equilibrium). A polynomial giving $\zeta_{\rm e}$ as a function of the electron temperature in pure air is given in Table \ref{tab:xicoefficients} below. 
+
+
+
+The ionization potential  can be taken as $2.507 \times 10^{-18}$~J for N$_2$ and $1.947 \times 10^{-18}$~J for O$_2$. The ionization potential is obtained from the NASA Glenn polynomials \citen{nasa:2002:mcbride} at a gas temperature of 300 K, and it is assumed independent of temperature. The latter has a small impact on the ionization potential, which increases by less than 20\% when the temperature is raised from 300 K to 10000 K. Thus, the heat needed for ionization through electron impact, $Q_{\rm ei}$, can be expressed as:
+%
+\begin{equation} 
+ \begin{array}{r}\mfd
+ Q_{\rm ei}= (2.507 \times 10^{-18} {\rm J}) \cdot N_{\rm e} N_{\rm N_2} k_{\rm ei}^{\rm N_2}
+           + (1.947 \times 10^{-18} {\rm J}) \cdot  N_{\rm e} N_{\rm O_2} k_{\rm ei}^{\rm O_2}
+ \end{array}
+\end{equation}
+%
+where $k_{\rm ei}^{\rm N_2}$ and $k_{\rm ei}^{\rm O_2}$ are the Townsend reaction rates function of the reduced electric field \cite{jcp:2014:parent}:
+%
+\begin{equation}
+ k_{\rm ei}^{\rm N_2}={\rm exp}(-0.0105809\cdot {\rm ln}^2 E^\star - 2.40411\cdot 10^{-75} \cdot {\rm ln}^{46}E^\star)\times 10^{-6}~\textrm{m$^3$/s}
+\end{equation}
+%
+%
+\begin{equation}
+ k_{\rm ei}^{\rm O_2}= {\rm exp}(-0.0102785\cdot {\rm ln}^2 E^\star - 2.42260\cdot 10^{-75} \cdot {\rm ln}^{46}E^\star)\times 10^{-6}~\textrm{m$^3$/s}
+\end{equation}
+%
+
+
+
 Consider the energy transport equation in the ``local approximation'', where the plasma has uniform properties (with no spatial gradients) and is at steady-state. Then, the latter becomes:
 %
 \begin{equation}
@@ -2168,7 +2156,7 @@ where  $\zeta_{\rm e}$ is the electron energy loss coefficient which we wish to 
 In the ``local approximation'',  the electron velocity can be taken from Eq.\ (\ref{eqn:Vcharged}) neglecting the pressure gradients:
 %
 \begin{equation}
-  \vec{V}^{\rm e}=\vec{V}^{\rm n} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right)
+  \vec{V}^{\rm e}=\vec{V} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right)
 \end{equation}
 % 
 Substitute the latter in Eq.\ (\ref{eqn:zetae1}):
@@ -2177,7 +2165,7 @@ Substitute the latter in Eq.\ (\ref{eqn:zetae1}):
   \zeta_{\rm e}  
 =  
  \frac{2 m_{\rm e} \mu_{\rm e}}{3 |C_{\rm e}| N_{\rm e} k_{\rm B} T_{\rm e} }
-\left( C_{\rm e} N_{\rm e} \left(\vec{E} + \vec{V^{\rm e}} \times \vec{B}\right)\cdot \left(\vec{V}^{\rm n} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right)\right)
+\left( C_{\rm e} N_{\rm e} \left(\vec{E} + \vec{V^{\rm e}} \times \vec{B}\right)\cdot \left(\vec{V} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right)\right)
  - Q_{\rm ei}\right)
  \end{equation}
 %
@@ -2223,29 +2211,6 @@ Then
 In the latter, $E^\star$ should be determined directly from the electron temperature (local approximation). Thus, $E^\star=E^\star(T_{\rm e})$. Of course, the curve fits based on experimental data available for $E^\star$ as a function of $T_{\rm e}$ (or vice-versa) must include all electron energy loss-gain processes including those due to electron-impact (the ones part of the $Q_{\rm ei}$ term).    
 
 Then, we note that $\mu_e N$ is only function of electron temperature in the limit of a weakly-ionized plasma (neglecting Coulomb collisions). Also, we note that $Q_{\rm ei}/(N_e N)$ is also function of electron temperature and mass fractions of neutrals or ions, but not of electron mass fraction. Thus, $\zeta_e$ is mostly function of electron temperature with a weak dependence on other terms. 
-
-Now, recall the expression for $Q_{\rm en}$ in Eq.\ (\ref{eqn:Qen}):
-%
-\begin{equation}
-  Q_{\rm e-n} = \frac{3 N_{\rm e} k_{\rm B} (T_{\rm e}-T_{\rm v})  |C_{\rm e}| \zeta_{\rm e}}{2 m_{\rm e}\mu_{\rm e}}
-\end{equation}
-%
-Substitute $\zeta_{\rm e}$ from (\ref{eqn:zetae}) in the latter:
-%
-\begin{equation}
-  Q_{\rm e-n} =  \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} \left( N_{\rm e}   |C_{\rm e}|  N
-\left( N \mu_{\rm e}  \left(E^\star(T_{\rm e})\right)^2
- - \frac{Q_{\rm ei}}{e N_{\rm e} N}\right) \right)
-\end{equation}
-%
-Simplify:
-%
-\begin{equation}
-  Q_{\rm e-n} = \frac{T_{\rm e}-T_{\rm v}}{T_{\rm e}} \left( N_{\rm e}   |C_{\rm e}|  N^2
-  \mu_{\rm e}  \left(E^\star(T_{\rm e})\right)^2
- - Q_{\rm ei} \right)
-\end{equation}
-%
 
 
 
@@ -2321,7 +2286,7 @@ where $T_{\rm e}^\prime$ denotes the electron temperature determined in the loca
 In the ``local approximation'',  the electron velocity can be taken from Eq.\ (\ref{eqn:Vcharged}) neglecting the pressure gradients:
 %
 \begin{equation}
-  \vec{V}^{\rm e}=\vec{V}^{\rm n} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right)
+  \vec{V}^{\rm e}=\vec{V} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right)
 \end{equation}
 % 
 Substitute the latter in Eq.\ (\ref{eqn:oldzetae}):
@@ -2330,7 +2295,7 @@ Substitute the latter in Eq.\ (\ref{eqn:oldzetae}):
   \zeta_{\rm e}  
 =  
  \frac{2 m_{\rm e} \mu_{\rm e}}{3 |C_{\rm e}| N_{\rm e} k_{\rm B} (T_{\rm e}^\prime-T) }
-\left( C_{\rm e} N_{\rm e} \left(\vec{E} + \vec{V^{\rm e}} \times \vec{B}\right)\cdot \left(\vec{V}^{\rm n} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right)\right)
+\left( C_{\rm e} N_{\rm e} \left(\vec{E} + \vec{V^{\rm e}} \times \vec{B}\right)\cdot \left(\vec{V} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right)\right)
  - Q_{\rm ei}\right)
  \end{equation}
 %
@@ -2391,19 +2356,19 @@ After substituting the latter in the expression for $\zeta_{\rm e}$ above and si
 \begin{array}{l}\mfd
 \zeta_{\rm e} 
 =
- \frac{2}{3} \frac{m_{\rm e} \left(\mu_{\rm e} N_{\rm n}\right)}{k_{\rm B} (T_{\rm e}^\prime-T)} 
+ \frac{2}{3} \frac{m_{\rm e} \left(\mu_{\rm e} N\right)}{k_{\rm B} (T_{\rm e}^\prime-T)} 
 \left[  
-  \left(\mu_{\rm e} N_{\rm n}\right)  \left( \frac{|\vec{E}+\vec{V}^{\rm e}\times \vec{B}|}{N_{\rm n}}\right)^2
- -15.65~\frac{\rm J}{\rm C}\cdot \left( \frac{N_{\rm N_2}}{N_{\rm n}}\right)  k_{\rm ei}^{\rm N_2} \right.
+  \left(\mu_{\rm e} N\right)  \left( \frac{|\vec{E}+\vec{V}^{\rm e}\times \vec{B}|}{N}\right)^2
+ -15.65~\frac{\rm J}{\rm C}\cdot \left( \frac{N_{\rm N_2}}{N}\right)  k_{\rm ei}^{\rm N_2} \right.
 \alb\mfd
- \left. -12.15~\frac{\rm J}{\rm C}\cdot \left( \frac{N_{\rm O_2}}{N_{\rm n}}\right) k_{\rm ei}^{\rm O_2}
+ \left. -12.15~\frac{\rm J}{\rm C}\cdot \left( \frac{N_{\rm O_2}}{N}\right) k_{\rm ei}^{\rm O_2}
  \right]
 \end{array}
  \end{equation}
 %
 But:
 \begin{equation}
-|\vec{E}+\vec{V}^{\rm e} \times \vec{B}|/N_{\rm n}=E^\star
+|\vec{E}+\vec{V}^{\rm e} \times \vec{B}|/N=E^\star
 \end{equation}
 %
 Thus:
@@ -2411,18 +2376,18 @@ Thus:
 \begin{equation}
 \zeta_{\rm e} 
 =
- \frac{2}{3} \frac{m_{\rm e} \left(\mu_{\rm e} N_{\rm n}\right)}{k_{\rm B} (T_{\rm e}^\prime-T)} 
+ \frac{2}{3} \frac{m_{\rm e} \left(\mu_{\rm e} N\right)}{k_{\rm B} (T_{\rm e}^\prime-T)} 
 \left[  
 \begin{array}{r}\mfd
-  \left(\mu_{\rm e} N_{\rm n}\right)  \left(E^\star\right)^2
- -15.65~\frac{\rm J}{\rm C}\cdot \left( \frac{N_{\rm N_2}}{N_{\rm n}}\right)  k_{\rm ei}^{\rm N_2}
- -12.15~\frac{\rm J}{\rm C}\cdot \left( \frac{N_{\rm O_2}}{N_{\rm n}}\right) k_{\rm ei}^{\rm O_2}
+  \left(\mu_{\rm e} N\right)  \left(E^\star\right)^2
+ -15.65~\frac{\rm J}{\rm C}\cdot \left( \frac{N_{\rm N_2}}{N}\right)  k_{\rm ei}^{\rm N_2}
+ -12.15~\frac{\rm J}{\rm C}\cdot \left( \frac{N_{\rm O_2}}{N}\right) k_{\rm ei}^{\rm O_2}
  \end{array}
  \right]
  \label{eqn:oldzetae2}
  \end{equation}
 %
-In the latter, $\mu_{\rm e} N_{\rm n}$ and $T_{\rm e}^\prime$ can be expressed as a function of the reduced electric field for a given reference neutrals temperature $T$ (here set to 250~K). As well, for air in which the mass fractions of molecular oxygen and nitrogen are of 0.235 and 0.765 respectively, we get ${N_{\rm N_2}}/{N_{\rm n}}=0.788$ and ${N_{\rm O_2}}/{N_{\rm n}}=0.212$. 
+In the latter, $\mu_{\rm e} N$ and $T_{\rm e}^\prime$ can be expressed as a function of the reduced electric field for a given reference neutrals temperature $T$ (here set to 250~K). As well, for air in which the mass fractions of molecular oxygen and nitrogen are of 0.235 and 0.765 respectively, we get ${N_{\rm N_2}}/{N}=0.788$ and ${N_{\rm O_2}}/{N}=0.212$. 
 
 Thus Eq.\ (\ref{eqn:oldzetae2}) can yield $\zeta_{\rm e}$ function of the electron temperature when using the Townsend ionization rates shown in Eqs.\ (\ref{eqn:keiO2}) and (\ref{eqn:keiN2}), the electron mobility from Ref.\ \cite{jcp:2014:parent}, and the electron temperature from Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev} (see Table \ref{tab:Te2}). Some 6th degree polynomials are then fitted to the data obtained (of $\zeta_{\rm e}$ function of the electron temperature), with the polynomial coefficients tabulated in Table \ref{tab:xicoefficients}. Although the polynomials for $\zeta_{\rm e}$ induce an error of as much as 30\% on the electron temperature, this is not a particular source of concern because the error is only substantial at low electron temperature (less than 2000~K) and at such low temperature the experimental data also has a significant error (see the differences in electron temperature as a function of the reduced electric field between one set of experimental data in Table \ref{tab:Te} and another set in Table \ref{tab:Te2}).   
 
@@ -2510,7 +2475,7 @@ Q_{\rm e-n}
 In the ``local approximation'',  the electron velocity can be taken from Eq.\ (\ref{eqn:Vcharged}) neglecting the pressure gradients:
 %
 \begin{equation}
-  \vec{V}^{\rm e}=\vec{V}^{\rm n} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right)
+  \vec{V}^{\rm e}=\vec{V} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right)
 \end{equation}
 % 
 Substitute the latter in the former:
@@ -2518,7 +2483,7 @@ Substitute the latter in the former:
 \begin{equation}
 Q_{\rm e-n}
 = 
-   C_{\rm e} N_{\rm e} (\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot \left( \vec{V}^{\rm n} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right) \right)
+   C_{\rm e} N_{\rm e} (\vec{E}+\vec{V}^{\rm e}\times\vec{B}) \cdot \left( \vec{V} - \mu_{\rm e} \left(\vec{E}+\vec{V}^{\rm e} \times \vec{B}\right) \right)
 \end{equation}
 %
 
@@ -2758,12 +2723,12 @@ Add the latter to Eq.\ (\ref{eqn:eneutrals7}):
 %
 \begin{equation}
 \begin{array}{l}\mfd
- \frac{\partial }{\partial t}\left(\sum_{k=1}^\ns \rho_k (e_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}|\vec{V}^{\rm n}|^2 \right) 
-+ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\sum_{k=1}^\ns \rho_k \vec{V}^k_j (h_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}\vec{V}^{\rm n}_j|\vec{V}^{\rm n}|^2 \right)
+ \frac{\partial }{\partial t}\left(\sum_{k=1}^\ns \rho_k (e_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}|\vec{V}|^2 \right) 
++ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\sum_{k=1}^\ns \rho_k \vec{V}^k_j (h_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}\vec{V}_j|\vec{V}|^2 \right)
 = \alb\mfd
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
-+\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
-+\frac{1}{2}|\vec{V}^{\rm n}|^2 \sum_{k=1}^\nns W_k
++\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i
++\frac{1}{2}|\vec{V}|^2 \sum_{k=1}^\nns W_k
 + \vec{E}\cdot\vec{J}
 -  Q_{\rm v}
 + Q_{\rm b}
@@ -2774,13 +2739,13 @@ Then add Eq.\ (\ref{eqn:ev1}) to the latter:
 %
 \begin{equation}
 \begin{array}{l}\mfd
- \frac{\partial }{\partial t}\left(\rho_{\rm N_2} \ev+\sum_{k=1}^\ns \rho_k (e_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}|\vec{V}^{\rm n}|^2 \right)\alb\mfd 
-+ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\rho_{\rm N_2} \vec{V}_j^{\rm N_2} \ev + \sum_{k=1}^\ns \rho_k \vec{V}^k_j (h_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}\vec{V}^{\rm n}_j|\vec{V}^{\rm n}|^2 \right)
+ \frac{\partial }{\partial t}\left(\rho_{\rm N_2} \ev+\sum_{k=1}^\ns \rho_k (e_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}|\vec{V}|^2 \right)\alb\mfd 
++ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\rho_{\rm N_2} \vec{V}_j^{\rm N_2} \ev + \sum_{k=1}^\ns \rho_k \vec{V}^k_j (h_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}\vec{V}_j|\vec{V}|^2 \right)
 = \alb\mfd
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
 -\sum_{i=1}^{3}\frac{\partial q_i^{\rm v}}{\partial x_i}
-+\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
-+\frac{1}{2}|\vec{V}^{\rm n}|^2 \sum_{k=1}^\nns W_k
++\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i
++\frac{1}{2}|\vec{V}|^2 \sum_{k=1}^\nns W_k
 + \vec{E}\cdot\vec{J}
 \alb\mfd
 -  Q_{\rm v}
@@ -2801,14 +2766,14 @@ Thus:
 \begin{equation}
 \frameeqn{
 \begin{array}{l}\mfd
- \frac{\partial }{\partial t}\left(\rho_{\rm N_2} \ev+\sum_{k=1}^\ns \rho_k (e_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}|\vec{V}^{\rm n}|^2 \right) \alb\mfd
-+ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\rho_{\rm N_2} \vec{V}_j^{\rm N_2} \ev + \sum_{k=1}^\ns \rho_k \vec{V}^k_j (h_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}\vec{V}^{\rm n}_j|\vec{V}^{\rm n}|^2 \right)
+ \frac{\partial }{\partial t}\left(\rho_{\rm N_2} \ev+\sum_{k=1}^\ns \rho_k (e_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}|\vec{V}|^2 \right) \alb\mfd
++ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\rho_{\rm N_2} \vec{V}_j^{\rm N_2} \ev + \sum_{k=1}^\ns \rho_k \vec{V}^k_j (h_k+h_k^\circ)+\frac{1}{2}\rho_{\rm n}\vec{V}_j|\vec{V}|^2 \right)
  \alb\mfd
 =
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
 -\sum_{i=1}^{3}\frac{\partial q_i^{\rm v}}{\partial x_i}\alb\mfd
-+\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
-+\frac{1}{2}|\vec{V}^{\rm n}|^2 \sum_{k=1}^\nns W_k
++\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i
++\frac{1}{2}|\vec{V}|^2 \sum_{k=1}^\nns W_k
 + \vec{E}\cdot\vec{J}
 + Q_{\rm b}
 \end{array}
@@ -2820,15 +2785,15 @@ Although the latter equation was derived from the basic principles (mass conserv
 %
 \begin{equation}
 \begin{array}{l}\mfd
-\frac{\partial }{\partial t} \left(\frac{1}{2}\rho_{\rm n}|\vec{V}^{\rm n}|^2\right)
+\frac{\partial }{\partial t} \left(\frac{1}{2}\rho_{\rm n}|\vec{V}|^2\right)
 + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(
-\frac{1}{2}\rho_{\rm n}\vec{V}^{\rm n}_j|\vec{V}^{\rm n}|^2
+\frac{1}{2}\rho_{\rm n}\vec{V}_j|\vec{V}|^2
 \right)
--\frac{1}{2}|\vec{V}^{\rm n}|^2 \sum_{k=1}^\nns W_k\alb\mfd
+-\frac{1}{2}|\vec{V}|^2 \sum_{k=1}^\nns W_k\alb\mfd
 \approx
-\frac{\partial }{\partial t} \left(\frac{1}{2}\rho |\vec{V}^{\rm n}|^2\right)
+\frac{\partial }{\partial t} \left(\frac{1}{2}\rho |\vec{V}|^2\right)
 + \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(
-\frac{1}{2}\rho \vec{V}^{\rm n}_j|\vec{V}^{\rm n}|^2
+\frac{1}{2}\rho \vec{V}_j|\vec{V}|^2
 \right)
 \end{array}
 \label{eqn:etotal2}
@@ -2837,8 +2802,8 @@ Although the latter equation was derived from the basic principles (mass conserv
 In the latter, the third term on the LHS is included because it also originates from the momentum equation of the charged species not taking into consideration the change in inertia. Further, its magnitude can be shown to be in the same order of magnitude as the difference between the LHS and the RHS when written in this manner:
 %
 \begin{equation}
-\frac{1}{2}|\vec{V}^{\rm n}|^2 \sum_{k=1}^\nns W_k =
--\frac{1}{2}|\vec{V}^{\rm n}|^2 \sum_{k=1}^\ncs W_k
+\frac{1}{2}|\vec{V}|^2 \sum_{k=1}^\nns W_k =
+-\frac{1}{2}|\vec{V}|^2 \sum_{k=1}^\ncs W_k
 \end{equation}
 %   
 From the latter, it is apparent that such a term is proportional to the mass of the charged species, which would scale in magnitude with the ionization fraction of the plasma. Thus, for a weakly-ionized plasma, it would become negligible compared to the other terms in the total energy transport equation. 
@@ -2848,13 +2813,13 @@ After substituting Eq.\ (\ref{eqn:etotal2}) into Eq.\ (\ref{eqn:etotal1}), we ob
 \begin{equation}
 \frameeqn{
 \begin{array}{l}\mfd
- \frac{\partial }{\partial t}\left(\rho_{\rm N_2} \ev+\sum_{k=1}^\ns \rho_k (e_k+h_k^\circ)+\frac{1}{2}\rho|\vec{V}^{\rm n}|^2 \right) \alb\mfd
-+ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\rho_{\rm N_2} \vec{V}_j^{\rm N_2} \ev + \sum_{k=1}^\ns \rho_k \vec{V}^k_j (h_k+h_k^\circ)+\frac{1}{2}\rho \vec{V}^{\rm n}_j|\vec{V}^{\rm n}|^2 \right)
+ \frac{\partial }{\partial t}\left(\rho_{\rm N_2} \ev+\sum_{k=1}^\ns \rho_k (e_k+h_k^\circ)+\frac{1}{2}\rho|\vec{V}|^2 \right) \alb\mfd
++ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\rho_{\rm N_2} \vec{V}_j^{\rm N_2} \ev + \sum_{k=1}^\ns \rho_k \vec{V}^k_j (h_k+h_k^\circ)+\frac{1}{2}\rho \vec{V}_j|\vec{V}|^2 \right)
  \alb\mfd
 =
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
 -\sum_{i=1}^{3}\frac{\partial q_i^{\rm v}}{\partial x_i}
-+\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
++\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i
 + \vec{E}\cdot\vec{J}
 + Q_{\rm b}
 \end{array}
@@ -2866,14 +2831,14 @@ We can rewrite differently:
 %
 \begin{equation}
 \begin{array}{l}\mfd
- \frac{\partial }{\partial t}\left(\rho_{\rm N_2} \ev+\sum_{k=1}^\ns \rho_k (e_k+h_k^\circ)+\frac{1}{2}\rho|\vec{V}^{\rm n}|^2 \right) \alb\mfd
-+ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\rho_{\rm N_2} \vec{V}_j^{\rm n} \ev + \sum_{k=1}^\ns \rho_k \vec{V}^{\rm n}_j (h_k+h_k^\circ)+\frac{1}{2}\rho \vec{V}^{\rm n}_j|\vec{V}^{\rm n}|^2 \right)\alb\mfd
-+ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\rho_{\rm N_2} (\vec{V}_j^{\rm N_2}-\vec{V}_j^{\rm n}) \ev + \sum_{k=1}^\ns \rho_k (\vec{V}^k_j-\vec{V}^{\rm n}_j) (h_k+h_k^\circ) \right)
+ \frac{\partial }{\partial t}\left(\rho_{\rm N_2} \ev+\sum_{k=1}^\ns \rho_k (e_k+h_k^\circ)+\frac{1}{2}\rho|\vec{V}|^2 \right) \alb\mfd
++ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\rho_{\rm N_2} \vec{V}_j \ev + \sum_{k=1}^\ns \rho_k \vec{V}_j (h_k+h_k^\circ)+\frac{1}{2}\rho \vec{V}_j|\vec{V}|^2 \right)\alb\mfd
++ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\rho_{\rm N_2} (\vec{V}_j^{\rm N_2}-\vec{V}_j) \ev + \sum_{k=1}^\ns \rho_k (\vec{V}^k_j-\vec{V}_j) (h_k+h_k^\circ) \right)
  \alb\mfd
 =
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
 -\sum_{i=1}^{3}\frac{\partial q_i^{\rm v}}{\partial x_i}
-+\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
++\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i
 + \vec{E}\cdot\vec{J}
 + Q_{\rm b}
 \end{array}
@@ -2883,23 +2848,23 @@ We can rewrite differently:
 Note that for the neutrals, the following holds:
 %
 \begin{equation}
-\rho_k (\vec{V}_j^k-\vec{V}_j^{\rm n}) =  - \nu_k \frac{\partial w_k}{\partial x_j}
+\rho_k (\vec{V}_j^k-\vec{V}_j) =  - \nu_k \frac{\partial w_k}{\partial x_j}
 \end{equation}
 %
 Thus:
 %
 \begin{equation}
 \begin{array}{l}\mfd
- \frac{\partial }{\partial t}\left(\rho_{\rm N_2} \ev+\sum_{k=1}^\ns \rho_k (e_k+h_k^\circ)+\frac{1}{2}\rho|\vec{V}^{\rm n}|^2 \right) \alb\mfd
-+ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\rho_{\rm N_2} \vec{V}_j^{\rm n} \ev + \sum_{k=1}^\ns \rho_k \vec{V}^{\rm n}_j (h_k+h_k^\circ)+\frac{1}{2}\rho \vec{V}^{\rm n}_j|\vec{V}^{\rm n}|^2 \right)\alb\mfd
-+ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(-\nu_{\rm N_2} \ev\frac{\partial w_{\rm N_2}}{\partial x_j} + \sum_{k=1}^\ns \beta_k^{\rm c} \rho_k (\vec{V}^k_j-\vec{V}^{\rm n}_j) (h_k+h_k^\circ) 
+ \frac{\partial }{\partial t}\left(\rho_{\rm N_2} \ev+\sum_{k=1}^\ns \rho_k (e_k+h_k^\circ)+\frac{1}{2}\rho|\vec{V}|^2 \right) \alb\mfd
++ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(\rho_{\rm N_2} \vec{V}_j \ev + \sum_{k=1}^\ns \rho_k \vec{V}_j (h_k+h_k^\circ)+\frac{1}{2}\rho \vec{V}_j|\vec{V}|^2 \right)\alb\mfd
++ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(-\nu_{\rm N_2} \ev\frac{\partial w_{\rm N_2}}{\partial x_j} + \sum_{k=1}^\ns \beta_k^{\rm c} \rho_k (\vec{V}^k_j-\vec{V}_j) (h_k+h_k^\circ) 
 - \sum_{k=1}^\ns \beta_k^{\rm n} \nu_k (h_k+h_k^\circ)\frac{\partial w_k}{\partial x_j} 
 \right)
  \alb\mfd
 =
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
 -\sum_{i=1}^{3}\frac{\partial q_i^{\rm v}}{\partial x_i}
-+\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
++\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i
 + \vec{E}\cdot\vec{J}
 + Q_{\rm b}
 \end{array}
@@ -2909,7 +2874,7 @@ Thus:
 where $\beta^{\rm c}_k$ is equal to 1 should the $k$th species be a charged species and to zero otherwise. Similarly, $\beta_k^{\rm n}$ is equal to 1 should $k$th species be a neutral species and to zero otherwise. We can simplify the total energy equation by defining the total specific energy as:
 %
 \begin{equation}
-e_{\rm t} \equiv w_{\rm N_2} \ev + \sum_{k=1}^\ns w_k (e_k + h_k^\circ) +\frac{1}{2} |\vec{V}^{\rm n}|^2
+e_{\rm t} \equiv w_{\rm N_2} \ev + \sum_{k=1}^\ns w_k (e_k + h_k^\circ) +\frac{1}{2} |\vec{V}|^2
 \end{equation}
 %
 After substituting the latter in the former and rearranging, we get:
@@ -2917,18 +2882,18 @@ After substituting the latter in the former and rearranging, we get:
 \begin{equation}
 \begin{array}{l}\mfd
  \frac{\partial }{\partial t}\rho e_{\rm t}
-+ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \vec{V}_j^{\rm n} \left(\rho  e_{\rm t} +  P \right)
++ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \vec{V}_j \left(\rho  e_{\rm t} +  P \right)
 - \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(
    \nu_{\rm N_2} \ev\frac{\partial w_{\rm N_2}}{\partial x_j} + \sum_{k=1}^\ns \beta_k^{\rm n} \nu_k (h_k+h_k^\circ)\frac{\partial w_k}{\partial x_j} 
 \right)
  \alb\mfd
 + \sum_{j=1}^3 \sum_{k=1}^\ns  \frac{\partial }{\partial x_j} \left(
-  \beta_k^{\rm c} w_k (\vec{V}^k_j-\vec{V}^{\rm n}_j) \frac{(h_k+h_k^\circ)}{e_{\rm t}} \rho e_{\rm t} 
+  \beta_k^{\rm c} w_k (\vec{V}^k_j-\vec{V}_j) \frac{(h_k+h_k^\circ)}{e_{\rm t}} \rho e_{\rm t} 
 \right)\alb\mfd
 =
 -\sum_{i=1}^{3}\frac{\partial q_i}{\partial x_i}
 -\sum_{i=1}^{3}\frac{\partial q_i^{\rm v}}{\partial x_i}
-+\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
++\sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i
 + \vec{E}\cdot\vec{J}
 + Q_{\rm b}
 \end{array}
@@ -2941,19 +2906,19 @@ where the mixture pressure $P$ includes the partial pressures of all neutral and
 \frameeqn{
 \begin{array}{l}\mfd
  \frac{\partial }{\partial t}\rho e_{\rm t}
-+ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \vec{V}_j^{\rm n} \left(\rho  e_{\rm t} +  P \right)
++ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \vec{V}_j \left(\rho  e_{\rm t} +  P \right)
 - \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(
    \nu_{\rm N_2} \ev\frac{\partial w_{\rm N_2}}{\partial x_j} + \sum_{k=1}^\ns \beta_k^{\rm n} \nu_k (h_k+h_k^\circ)\frac{\partial w_k}{\partial x_j} 
 \right)
  \alb\mfd
 + \sum_{j=1}^3 \sum_{k=1}^\ns  \frac{\partial }{\partial x_j} \left(
-  \beta_k^{\rm c} w_k (\vec{V}^k_j-\vec{V}^{\rm n}_j) \frac{(h_k+h_k^\circ)}{e_{\rm t}} \rho e_{\rm t} 
+  \beta_k^{\rm c} w_k (\vec{V}^k_j-\vec{V}_j) \frac{(h_k+h_k^\circ)}{e_{\rm t}} \rho e_{\rm t} 
 \right)
 -\sum_{i=1}^{3}\frac{\partial }{\partial x_i}\left(\kappa_{\rm n} \frac{\partial T}{\partial x_i} 
 + \kappa_{\rm v} \frac{\partial T_{\rm v}}{\partial x_i}\right)
 \alb\mfd
 =
- \sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i^{\rm n}
+ \sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j} \tau_{ji} \vec{V}_i
 + \vec{E}\cdot\vec{J}
 + Q_{\rm b}
 \end{array}
@@ -2972,14 +2937,14 @@ Start from the definition of the Joule heating outlined in Eq.\ (\ref{eqn:JouleH
 %
 \begin{equation}
  Q_{\rm J} = \underbrace{  \sum_{r=1}^\ncs \left( C_r N_r \left( \vec{E}+\vec{V}^r \times\vec{B}\right)  - \vec{\nabla} P_r \right)\cdot \vec{V}^r}_{\textrm{\begin{minipage}{3cm}\flushleft \footnotesize work done on the charged species in the lab frame\end{minipage}}} 
-- \underbrace{\left(\rho_{\rm c} \vec{E} + \vec{J}\times\vec{B} -\sum_{r=1}^\ncs \vec{\nabla} P_r \right)\cdot \vec{V}^{\rm n}}_{\textrm{\begin{minipage}{4cm}\flushleft \footnotesize work done by the charged species on the neutrals in the lab frame\end{minipage}}}
+- \underbrace{\left(\rho_{\rm c} \vec{E} + \vec{J}\times\vec{B} -\sum_{r=1}^\ncs \vec{\nabla} P_r \right)\cdot \vec{V}}_{\textrm{\begin{minipage}{4cm}\flushleft \footnotesize work done by the charged species on the neutrals in the lab frame\end{minipage}}}
 \end{equation}
 %
 where $n_{\rm cs}$ is the number of charged species. But $(\vec{V}^r \times\vec{B})\cdot \vec{V}^r=0$. Thus:
 %
 \begin{equation}
  Q_{\rm J} =   \sum_{r=1}^\ncs \left( C_r N_r  \vec{E}  - \vec{\nabla} P_r \right)\cdot \vec{V}^r 
-- \left(\rho_{\rm c} \vec{E} + \vec{J}\times\vec{B} -\sum_{r=1}^\ncs \vec{\nabla} P_r \right)\cdot \vec{V}^{\rm n}
+- \left(\rho_{\rm c} \vec{E} + \vec{J}\times\vec{B} -\sum_{r=1}^\ncs \vec{\nabla} P_r \right)\cdot \vec{V}
 \end{equation}
 %
 Rewrite as:
@@ -2987,23 +2952,23 @@ Rewrite as:
 \begin{equation}
  Q_{\rm J} =   \sum_{r=1}^\ncs \left( C_r N_r  \vec{E}   \right)\cdot \vec{V}^r 
 -  \sum_{r=1}^\ncs \vec{\nabla} P_r \cdot \vec{V}^r 
-- \left(\rho_{\rm c} \vec{E} + \vec{J}\times\vec{B} -\sum_{r=1}^\ncs \vec{\nabla} P_r \right)\cdot \vec{V}^{\rm n}
+- \left(\rho_{\rm c} \vec{E} + \vec{J}\times\vec{B} -\sum_{r=1}^\ncs \vec{\nabla} P_r \right)\cdot \vec{V}
 \end{equation}
 %
 or,
 %
 \begin{equation}
  Q_{\rm J} =   \sum_{r=1}^\ncs \left( C_r N_r  \vec{E}   \right)\cdot \vec{V}^r 
-+  \sum_{r=1}^\ncs \vec{\nabla} P_r \cdot \left(\vec{V}^{\rm n}-\vec{V}^r\right) 
-- \left(\rho_{\rm c} \vec{E} + \vec{J}\times\vec{B} \right)\cdot \vec{V}^{\rm n}
++  \sum_{r=1}^\ncs \vec{\nabla} P_r \cdot \left(\vec{V}-\vec{V}^r\right) 
+- \left(\rho_{\rm c} \vec{E} + \vec{J}\times\vec{B} \right)\cdot \vec{V}
 \end{equation}
 %
 After substituting the current density $\vec{J}$ from Eq.\ (\ref{eqn:J}), we obtain: 
 %
 \begin{equation}
  Q_{\rm J} =     \vec{E} \cdot \vec{J} 
-+  \sum_{r=1}^\ncs \vec{\nabla} P_r \cdot \left(\vec{V}^{\rm n}-\vec{V}^r\right) 
-- \left(\rho_{\rm c} \vec{E} + \vec{J}\times\vec{B} \right)\cdot \vec{V}^{\rm n}
++  \sum_{r=1}^\ncs \vec{\nabla} P_r \cdot \left(\vec{V}-\vec{V}^r\right) 
+- \left(\rho_{\rm c} \vec{E} + \vec{J}\times\vec{B} \right)\cdot \vec{V}
 \end{equation}
 %
 Isolate $\vec{E}\cdot\vec{J}$:
@@ -3011,13 +2976,13 @@ Isolate $\vec{E}\cdot\vec{J}$:
 \begin{equation}
 \vec{E} \cdot \vec{J}
 =
- \left(\rho_{\rm c} \vec{E} + \vec{J}\times\vec{B} \right)\cdot \vec{V}^{\rm n}
+ \left(\rho_{\rm c} \vec{E} + \vec{J}\times\vec{B} \right)\cdot \vec{V}
 + Q_{\rm J} 
-+  \sum_{r=1}^\ncs \vec{\nabla} P_r \cdot \left(\vec{V}^r-\vec{V}^{\rm n}\right) 
++  \sum_{r=1}^\ncs \vec{\nabla} P_r \cdot \left(\vec{V}^r-\vec{V}\right) 
 \end{equation}
 %
-At the differential level, the RHS is exactly equal to the LHS. However, at the discrete level, the LHS could differ from the RHS by a large amount. This can then lead to negative temperatures within the solution because the gas temperature is determined from the subtraction of $e_{\rm t}$ and $e_{\rm v}$ with the latter being function of $Q_{\rm J}$. Thus, to prevent negative gas temperatures, it is recommended to substitute $\vec{E}\cdot\vec{J}$ by $\left(\rho_{\rm c} \vec{E} + \vec{J}\times\vec{B} \right)\cdot \vec{V}^{\rm n}
-+ Q_{\rm J} +  \sum_{r=1}^\ncs \vec{\nabla} P_r \cdot \left(\vec{V}^r-\vec{V}^{\rm n}\right)$ within the total energy equation.
+At the differential level, the RHS is exactly equal to the LHS. However, at the discrete level, the LHS could differ from the RHS by a large amount. This can then lead to negative temperatures within the solution because the gas temperature is determined from the subtraction of $e_{\rm t}$ and $e_{\rm v}$ with the latter being function of $Q_{\rm J}$. Thus, to prevent negative gas temperatures, it is recommended to substitute $\vec{E}\cdot\vec{J}$ by $\left(\rho_{\rm c} \vec{E} + \vec{J}\times\vec{B} \right)\cdot \vec{V}
++ Q_{\rm J} +  \sum_{r=1}^\ncs \vec{\nabla} P_r \cdot \left(\vec{V}^r-\vec{V}\right)$ within the total energy equation.
 
 
 
@@ -3037,7 +3002,7 @@ After Favre-averaging, the neutrals species mass conservation equation outlined 
 %
 \begin{equation}
 \frameeqn{
-  \frac{\partial \rho_k}{\partial t} + \sum_{i=1}^3 \frac{\partial}{\partial x_i} \vec{V}_i^{\rm n} \rho_k 
+  \frac{\partial \rho_k}{\partial t} + \sum_{i=1}^3 \frac{\partial}{\partial x_i} \vec{V}_i \rho_k 
 - \sum_{i=1}^3 \frac{\partial}{\partial x_i} \nu_k^\star \frac{\partial w_k}{\partial x_i}= W_k
 }
 \label{eqn:massneutral_turb}
@@ -3056,11 +3021,11 @@ The Favre-averaged total momentum equation Eq.\ (\ref{eqn:momtotal3}) becomes:
 \begin{equation}
 \frameeqn{
 \begin{array}{l}\mfd
-   \frac{\partial  }{\partial t}\rho \vec{V}_i^{\rm n}
-  + \sum_{j=1}^3  \frac{\partial }{\partial x_j}\rho \vec{V}_j^{\rm n} \vec{V}_i^{\rm n}
+   \frac{\partial  }{\partial t}\rho \vec{V}_i
+  + \sum_{j=1}^3  \frac{\partial }{\partial x_j}\rho \vec{V}_j \vec{V}_i
 =
 -\frac{\partial P^\star}{\partial x_i}\alb\mfd 
-+ \sum_{j=1}^3 \frac{\partial }{\partial x_j} \visc^\star  \left( \frac{\partial \vec{V}^{\rm n}_i}{\partial x_j} + \frac{\partial \vec{V}^{\rm n}_j}{\partial x_i} - \frac{2}{3} \delta_{ij} \sum_{k=1}^3 \frac{\partial \vec{V}^{\rm n}_k}{\partial x_k}  \right)
++ \sum_{j=1}^3 \frac{\partial }{\partial x_j} \visc^\star  \left( \frac{\partial \vec{V}_i}{\partial x_j} + \frac{\partial \vec{V}_j}{\partial x_i} - \frac{2}{3} \delta_{ij} \sum_{k=1}^3 \frac{\partial \vec{V}_k}{\partial x_k}  \right)
 + \rho_{\rm c} \vec{E}_i +\left(\vec{J} \times \vec{B}\right)_i
 \end{array}
 }
@@ -3086,7 +3051,7 @@ The Favre average of the nitrogen vibrational energy transport equation (\ref{eq
  \begin{array}{r}
   \mfd\frac{\partial}{\partial t} \rho_{\rm N_2} \ev
      + \sum_{j=1}^{3} \frac{\partial }{\partial x_j}
-       \rho_{\rm N_2} \vec{V}^{\rm n}_j \ev
+       \rho_{\rm N_2} \vec{V}_j \ev
      - \sum_{j=1}^{3} \frac{\partial }{\partial x_j} \left(
             \kappaev^\star  \frac{\partial T_{\rm v}}{\partial x_j}\right)
      - \sum_{j=1}^{3} \frac{\partial }{\partial x_j} \left(
@@ -3112,19 +3077,19 @@ The Favre-averaged form of the total energy equation (\ref{eqn:etotal8}) can be 
 \frameeqn{
 \begin{array}{l}\mfd
  \frac{\partial }{\partial t}\rho e_{\rm t}^\star
-+ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \vec{V}_j^{\rm n} \left(\rho  e_{\rm t}^\star +  P^\star \right)
++ \sum_{j=1}^3  \frac{\partial }{\partial x_j} \vec{V}_j \left(\rho  e_{\rm t}^\star +  P^\star \right)
 - \sum_{j=1}^3  \frac{\partial }{\partial x_j} \left(
    \nu_{\rm N_2}^\star \ev\frac{\partial w_{\rm N_2}}{\partial x_j} + \sum_{k=1}^\ns \beta_k^{\rm n} \nu_k^\star (h_k+h_k^\circ)\frac{\partial w_k}{\partial x_j} 
 \right)
  \alb\mfd
 + \sum_{j=1}^3 \sum_{k=1}^\ns  \frac{\partial }{\partial x_j} \left(
-  \beta_k^{\rm c} w_k (\vec{V}^k_j-\vec{V}^{\rm n}_j) \frac{(h_k+h_k^\circ)}{e_{\rm t}^\star} \rho e_{\rm t}^\star 
+  \beta_k^{\rm c} w_k (\vec{V}^k_j-\vec{V}_j) \frac{(h_k+h_k^\circ)}{e_{\rm t}^\star} \rho e_{\rm t}^\star 
 \right)\alb\mfd
 -\sum_{i=1}^{3}\frac{\partial }{\partial x_i}\left(\kappa_{\rm n}^\star \frac{\partial T}{\partial x_i} + \kappa_{\rm v}^\star \frac{\partial T_{\rm v}}{\partial x_i}
 + \visc_{k}^\star \frac{\partial k}{\partial x_i}\right)
 \alb\mfd
 =
- \sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j}  \vec{V}_i^{\rm n} \visc^\star  \left( \frac{\partial \vec{V}^{\rm n}_i}{\partial x_j} + \frac{\partial \vec{V}^{\rm n}_j}{\partial x_i} - \frac{2}{3} \delta_{ij} \sum_{k=1}^3 \frac{\partial \vec{V}^{\rm n}_k}{\partial x_k} \right)
+ \sum_{i=1}^3 \sum_{j=1}^3  \frac{\partial }{\partial x_j}  \vec{V}_i \visc^\star  \left( \frac{\partial \vec{V}_i}{\partial x_j} + \frac{\partial \vec{V}_j}{\partial x_i} - \frac{2}{3} \delta_{ij} \sum_{k=1}^3 \frac{\partial \vec{V}_k}{\partial x_k} \right)
 + \vec{E}\cdot\vec{J}
 + Q_{\rm b}
 \end{array}
@@ -3135,7 +3100,7 @@ The Favre-averaged form of the total energy equation (\ref{eqn:etotal8}) can be 
 with
 %
 \begin{equation}
-e_{\rm t}^\star \equiv w_{\rm N_2} \ev + \sum_{k=1}^\ns w_k (e_k + h_k^\circ) +\frac{1}{2} |\vec{V}^{\rm n}|^2 + k
+e_{\rm t}^\star \equiv w_{\rm N_2} \ev + \sum_{k=1}^\ns w_k (e_k + h_k^\circ) +\frac{1}{2} |\vec{V}|^2 + k
 \end{equation}
 %
 %
@@ -3157,7 +3122,7 @@ Needed to determine the effective pressure $P^\star$ or the total energy $e_{\rm
    % unsteady term
     \frac{\partial }{\partial t} \rho k
    % convection term
-  + \sum_{j=1}^{3}\frac{\partial }{\partial x_j} \rho \vec{V}^{\rm n}_j k
+  + \sum_{j=1}^{3}\frac{\partial }{\partial x_j} \rho \vec{V}_j k
    % molecular and turbulent diffusion term
   - \sum_{j=1}^{3} \frac{\partial }{\partial x_j}
      \visc_k^\star \frac{\partial k}{\partial x_j}
@@ -3204,13 +3169,13 @@ Also, the turbulence production term $Q_k$ is set equal to:
 \begin{equation}
   Q_k= \mfd\sum_{i=1}^3 \sum_{j=1}^{3}
          \left[ \visc_{\rm t} \left(
-           \frac{\partial {\vec{V}^{\rm n}_i}}{\partial x_j}
-           +\frac{\partial {\vec{V}^{\rm n}_j}}{\partial x_i}
-           -\frac{2}{3} \delta_{ij} \sum_{k=1}^3 \frac{\partial {\vec{V}^{\rm n}_k}}{\partial x_k}
+           \frac{\partial {\vec{V}_i}}{\partial x_j}
+           +\frac{\partial {\vec{V}_j}}{\partial x_i}
+           -\frac{2}{3} \delta_{ij} \sum_{k=1}^3 \frac{\partial {\vec{V}_k}}{\partial x_k}
             \right)
            - \frac{2}{3} \delta_{ij} {\rho} k
          \right]
-         \frac{\partial {\vec{V}^{\rm n}_i}}{\partial x_j}
+         \frac{\partial {\vec{V}_i}}{\partial x_j}
 \label{eqn:Pk}
 \end{equation}
 %
@@ -3220,13 +3185,13 @@ From the turbulence kinetic energy $k$ and its specific dissipation rate $\omega
 \visc_{\rm t}=\left\{
 \begin{array}{ll}\mfd
 \frac{\rho k}{\omega} & \textrm{1988~$k\omega$~model \cite{aiaa:1988:wilcox}}\alb\mfd
-\mfd \frac{\rho k}{{\rm max}\left(\omega,~\mfd\frac{35}{12}\sqrt{\frac{1}{2}\sum_{i=1}^3\sum_{j=1}^3\left(\frac{\partial \vec{V}^{\rm n}_i}{\partial x_j}+\frac{\partial \vec{V}^{\rm n}_j}{\partial x_i}-\frac{2}{3}\delta_{ij}\sum_{k=1}^{3} \frac{\partial \vec{V}^{\rm n}_k}{\partial x_k}\right)^2}\right)}
+\mfd \frac{\rho k}{{\rm max}\left(\omega,~\mfd\frac{35}{12}\sqrt{\frac{1}{2}\sum_{i=1}^3\sum_{j=1}^3\left(\frac{\partial \vec{V}_i}{\partial x_j}+\frac{\partial \vec{V}_j}{\partial x_i}-\frac{2}{3}\delta_{ij}\sum_{k=1}^{3} \frac{\partial \vec{V}_k}{\partial x_k}\right)^2}\right)}
  & \textrm{2008~$k\omega$~model \cite{aiaa:2008:wilcox}} \alb
 \mfd \frac{0.31 \rho k} {\max \left(
 0.31 \omega,
 ~\mfd {\rm tanh} \left(\max\left(\frac{2 \sqrt{k}}{0.09 \omega d} ,~ \frac{500 \visc}{\rho d^2 \omega}\right)^2 \right)\sqrt{
 \frac{1}{2}\sum_{i=1}^3\sum_{j=1}^3\left(
-\frac{\partial \vec{V}^{\rm n}_i}{\partial x_j}-\frac{\partial \vec{V}^{\rm n}_j}{\partial x_i}
+\frac{\partial \vec{V}_i}{\partial x_j}-\frac{\partial \vec{V}_j}{\partial x_i}
 \right)^2
 } %sqrt
 \right)}
@@ -3280,7 +3245,7 @@ The specific dissipation rate transport equation can be written as:
  \begin{array}{r}
          \mfd \frac{\partial }{\partial t} \rho \omega
         +\mfd\sum_{j=1}^{3}
-          \frac{\partial }{\partial x_j} \rho \vec{V}^{\rm n}_j \omega
+          \frac{\partial }{\partial x_j} \rho \vec{V}_j \omega
         -\sum_{j=1}^3 \frac{\partial }{\partial x_j} \visc_\omega^\star \frac{\partial \omega}{\partial x_j}
 =  \frac{\omega}{\wtilde{k}} Q_{\omega} + S_{\omega} 
  \end{array}
@@ -3331,10 +3296,10 @@ where:
 \chi_\omega=\frac{50^3}{9^3 \omega^3}
 \left|
 \sum_{i=1}^3 \sum_{j=1}^3 \sum_{k=1}^3 
-\left(\frac{\partial \vec{V}^{\rm n}_i}{\partial x_j}-\frac{\partial \vec{V}^{\rm n}_j}{\partial x_i} \right)
-\left(\frac{\partial \vec{V}^{\rm n}_j}{\partial x_k}-\frac{\partial \vec{V}^{\rm n}_k}{\partial x_j} \right)
-\left(\frac{\partial \vec{V}^{\rm n}_k}{\partial x_i}+\frac{\partial \vec{V}^{\rm n}_i}{\partial x_k} 
-     - \delta_{ki}\sum_{m=1}^3\frac{\partial \vec{V}^{\rm n}_m}{\partial x_m}  \right)
+\left(\frac{\partial \vec{V}_i}{\partial x_j}-\frac{\partial \vec{V}_j}{\partial x_i} \right)
+\left(\frac{\partial \vec{V}_j}{\partial x_k}-\frac{\partial \vec{V}_k}{\partial x_j} \right)
+\left(\frac{\partial \vec{V}_k}{\partial x_i}+\frac{\partial \vec{V}_i}{\partial x_k} 
+     - \delta_{ki}\sum_{m=1}^3\frac{\partial \vec{V}_m}{\partial x_m}  \right)
 \right|
 \end{equation}
 %
@@ -3428,9 +3393,9 @@ U = \left[\begin{array}{c}
     \rho_1 \\
     \vdots \\
     \rho_\ns \alb
-    \rho \vec{V}^{\rm n}_1 \\
+    \rho \vec{V}_1 \\
     \vdots \\
-    \rho \vec{V}^{\rm n}_3 \alb
+    \rho \vec{V}_3 \alb
     \rho e_{\rm t}^\star \alb
     \rho k \alb
     \rho \omega \alb
@@ -3453,17 +3418,17 @@ G = \left[ \begin{array}{c}
 \right]
 ~
 F_i = \left[ \begin{array}{c}
-    \rho_1 \vec{V}^{\rm n}_i \\
+    \rho_1 \vec{V}_i \\
     \vdots\\
-    \rho_\ns \vec{V}^{\rm n}_i \alb
-    \rho\vec{V}_i^{\rm n} \vec{V}_1^{\rm n} + \delta_{i1} P^\star \\
+    \rho_\ns \vec{V}_i \alb
+    \rho\vec{V}_i \vec{V}_1^{\rm n} + \delta_{i1} P^\star \\
     \vdots \\
-    \rho\vec{V}_i^{\rm n} \vec{V}_3^{\rm n}  + \delta_{i3} P^\star \alb
-    \rho \vec{V}^{\rm n}_i e_{\rm t}^\star + \vec{V}^{\rm n}_i P^\star \alb
-    \rho \vec{V}^{\rm n}_i k \alb
-    \rho \vec{V}^{\rm n}_i \omega \alb
-    \rho_{\rm N_2} \vec{V}^{\rm n}_i e_{\rm v} \alb
-    \rho_{\rm e} \vec{V}^{\rm n}_i h_{\rm e} \alb
+    \rho\vec{V}_i \vec{V}_3^{\rm n}  + \delta_{i3} P^\star \alb
+    \rho \vec{V}_i e_{\rm t}^\star + \vec{V}_i P^\star \alb
+    \rho \vec{V}_i k \alb
+    \rho \vec{V}_i \omega \alb
+    \rho_{\rm N_2} \vec{V}_i e_{\rm v} \alb
+    \rho_{\rm e} \vec{V}_i h_{\rm e} \alb
 \end{array}\right]
 \end{equation}
 %
@@ -3545,9 +3510,9 @@ H^2 = \left[ \begin{array}{c}
 \begin{equation}
   [D_i]_{k,r}=\left\{\begin{array}{ll}
         \beta_k^{\rm c}\beta_r^{\rm c} \left(
-\alpha_{kr}\Delta \vec{V}_i^r+ (\alpha_{kr}-\delta_{kr})\vec{V}_i^{\rm n}+\delta_{kr}(s_k-\beta_k^{\rm g}+ \beta^{\rm a}_k) \mu_k  \vec{E}_i\right) &\textrm{if $k\le \ns$ and $r \le \ns$} \alb
-        \frac{1}{e_{\rm t}^\star} \sum_{m=1}^\ns \beta_m^{\rm c} w_m (h_m+h_m^\circ) \left(\vec{V}_i^{m}-\vec{V}_i^{\rm n}\right)  &\textrm{if $k=r=\ns+4$ } \alb
-        \frac{5}{3}(\vec{V}_i^{\rm e}-\vec{V}_i^{\rm n}) &\textrm{if $k=r=\ns+8$}
+\alpha_{kr}\Delta \vec{V}_i^r+ (\alpha_{kr}-\delta_{kr})\vec{V}_i+\delta_{kr}(s_k-\beta_k^{\rm g}+ \beta^{\rm a}_k) \mu_k  \vec{E}_i\right) &\textrm{if $k\le \ns$ and $r \le \ns$} \alb
+        \frac{1}{e_{\rm t}^\star} \sum_{m=1}^\ns \beta_m^{\rm c} w_m (h_m+h_m^\circ) \left(\vec{V}_i^{m}-\vec{V}_i\right)  &\textrm{if $k=r=\ns+4$ } \alb
+        \frac{5}{3}(\vec{V}_i^{\rm e}-\vec{V}_i) &\textrm{if $k=r=\ns+8$}
              \end{array}  \right.
 \end{equation}
 %
@@ -3555,9 +3520,9 @@ or we can write $D$ in diagonal form with no loss in generality:
 %
 \begin{equation}
   [D_i]_{k,k}=\left\{\begin{array}{ll}
-        \beta_k^{\rm c} \left(\sum_{r=1}^\ns \frac{\delta_{rk}\sigma+\beta_k^{\rm a} C_r  \mu_k N_r}{\sigma} \left(\Delta \vec{V}_i^r +(1-\delta_{kr})\vec{V}^{\rm n}_i\right)  +(s_k-\beta_k^{\rm g}+ \beta^{\rm a}_k) \mu_k  \vec{E}_i\right) &\textrm{if $k\le \ns$ } \alb
-        \frac{1}{e_{\rm t}^\star} \sum_{m=1}^\ns \beta_m^{\rm c} w_m (h_m+h_m^\circ) \left(\vec{V}_i^{m}-\vec{V}_i^{\rm n}\right)  &\textrm{if $k=\ns+4$ } \alb
-        \frac{5}{3}(\vec{V}_i^{\rm e}-\vec{V}_i^{\rm n}) &\textrm{if $k=\ns+8$}
+        \beta_k^{\rm c} \left(\sum_{r=1}^\ns \frac{\delta_{rk}\sigma+\beta_k^{\rm a} C_r  \mu_k N_r}{\sigma} \left(\Delta \vec{V}_i^r +(1-\delta_{kr})\vec{V}_i\right)  +(s_k-\beta_k^{\rm g}+ \beta^{\rm a}_k) \mu_k  \vec{E}_i\right) &\textrm{if $k\le \ns$ } \alb
+        \frac{1}{e_{\rm t}^\star} \sum_{m=1}^\ns \beta_m^{\rm c} w_m (h_m+h_m^\circ) \left(\vec{V}_i^{m}-\vec{V}_i\right)  &\textrm{if $k=\ns+4$ } \alb
+        \frac{5}{3}(\vec{V}_i^{\rm e}-\vec{V}_i) &\textrm{if $k=\ns+8$}
              \end{array}  \right.
 \end{equation}
 %
@@ -3585,7 +3550,7 @@ or we can write $D$ in diagonal form with no loss in generality:
 
          \delta_{ij} (h_r+h_r^{\circ}+e_{\rm v} \delta_{r z})\nu_r^\star \beta_r^{\rm n} & \textrm{if $k=\ns+4$ and $r \leq \ns$} \alb
 
-         \sum_{m=1}^3  [\psi_{ij}]_{m,r-\ns}\visc^\star \vec{V}^{\rm n}_m & \textrm{if $k=\ns+4$ and $\ns < r \leq \ns+3$} \alb
+         \sum_{m=1}^3  [\psi_{ij}]_{m,r-\ns}\visc^\star \vec{V}_m & \textrm{if $k=\ns+4$ and $\ns < r \leq \ns+3$} \alb
 
          \delta_{ij} \kappa^\star & \textrm{if $k=\ns+4$ and $r=\ns +4$} \alb
 

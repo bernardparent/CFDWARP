@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAR 11a
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - replaced V^n by V
+    - replaced E^n by E
+    - replaced v by \mathrlap{-}V
+    - rewrote the section "Electron Energy Transport Equation (Derivation)"
+    - moved the electron energy loss derivation from the section 
+      "Electron Energy Transport Equation (Derivation)" to the section "Electron Energy Loss Function"
+      
+
 2024 MAR 08a
   * in model/chem
     - deleted _Air_Plasma_12s
