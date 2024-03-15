@@ -878,6 +878,9 @@ double _EoverNk_from_Te(long spec, double Te){
     case SMAP_NH3:
       Estar=_EoverN_from_Te_NH3_Morgan(Te);
     break;
+    case SMAP_NH3v:
+      Estar=_EoverN_from_Te_NH3_Morgan(Te);
+    break;
     case SMAP_N2:
       Estar=_EoverN_from_Te_N2(Te);
     break;
@@ -910,6 +913,10 @@ double _EoverN_from_rhok_Te(spec_t rhok, double Te){
   for (spec=0; spec<ns; spec++){
     switch (smap[spec]){
       case SMAP_NH3:
+        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_NH3_Morgan(Te);
+        Nsum+=rhok[spec]/_m(spec);
+      break;
+      case SMAP_NH3v:
         Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_NH3_Morgan(Te);
         Nsum+=rhok[spec]/_m(spec);
       break;
@@ -955,6 +962,10 @@ double _Te_from_rhok_EoverN(spec_t rhok, double EoverN){
   for (spec=0; spec<ns; spec++){
     switch (smap[spec]){
       case SMAP_NH3:
+        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_NH3_Morgan(EoverN);
+        Nsum+=rhok[spec]/_m(spec);
+      break;
+      case SMAP_NH3v:
         Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_NH3_Morgan(EoverN);
         Nsum+=rhok[spec]/_m(spec);
       break;

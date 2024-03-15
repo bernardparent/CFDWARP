@@ -7,6 +7,22 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAR 15a
+  * in model/emfield/_Epotential*/emfield.c
+    - added function find_DeltaVk_from_mu_thermal() and find_DeltaVk_thermal()
+  * in model/fluid/_*_plasma/fluid_plasma.c
+    - in find_Dstar(), commented out the subtraction of the charged species thermal diffusion to make
+      this module in sync with the latest doc in model/fluid/doc/Transport-Equations
+  * in model/share/transport_share.c
+    - in _mueNk_from_Te_ParentMacheret(), added the species NH3v which is set to NH3
+  * in model/thermo/_generic/electronimpact.c
+    - in _EoverN_from_rhok_Te() and _Te_from_rhok_EoverN(), added the species NH3v
+  * in model/fluid/doc/Transport_Equations/report.tex
+    - Modified significantly the sections on Electron Energy Transport and Charged Species
+      Energy Transport 
+    - modified other parts of the document that depend on these sections
+    
+
 2024 MAR 11a
   * in model/fluid/doc/Transport_Equations/report.tex
     - replaced V^n by V

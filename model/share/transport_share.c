@@ -836,6 +836,9 @@ double _mueNk_from_Te_ParentMacheret(long spec, double Te){
     case SMAP_NH3:
       mueN=_mueN_NH3(Te);
     break;
+    case SMAP_NH3v:
+      mueN=_mueN_NH3(Te);
+    break;
     default:
       mueN=3.74E19*exp(33.5/sqrt(log(Te)));
   }
