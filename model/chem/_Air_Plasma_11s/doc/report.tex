@@ -1231,7 +1231,7 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
  \cmidrule(lr){3-6}\cmidrule(lr){7-10}
 \multicolumn{2}{c}{Reaction} & $T$ & $A$ & $n$ & $E$ & $T$  & $A$ & $n$ & $E$ & \multicolumn{1}{c}{Refs.}\\ 
 \midrule                                          
-27 & $\rm N^{+} + N_2 \rightleftarrows N_2^{+} + N $ &$T$ & $1.0 \cdot 10^{12}$ & $0.5$ & $12,200\, R$ 
+27 & $\rm N^{+} + N_2 \rightleftarrows N_2^{+} + N $ &$T$ & $8.800 \cdot 10^{08}$ & $1.000$ & $31,900 \, R$ 
                                           &$T$ & $1.0 \cdot 10^{12}$ & $0.5$ & $12,200\, R$ & \cite{book:1990:park} \\
                                           
 28 & $\rm O_2^{+} + O \rightleftarrows O^{+} + O_2$ &$T$ & $4.0 \cdot 10^{12}$ & $-0.09$ & $18,000\, R$ 
@@ -1256,6 +1256,127 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 \end{center}
 \end{table}
 %
+
+
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Rodriguez 11-species plasma chemical model (alternative reaction rates for the Kim 2021 model)\tnote{a,b}}
+\begin{tabular}{cccccccc} 
+\toprule
+
+\multicolumn{2}{c}{Reaction} & $T$ & $A$ & $n$ & $E$ & \multicolumn{1}{c}{Refs.}\\ 
+\midrule                
+
+
+
+
+                          
+13 & $\rm NO^{+} + e^- \rightarrow  N + O $  &$T_{\rm e}$ & $3.00 \cdot 10^{-7} \cdot {\cal A} \cdot300^{0.56}$ & $-0.56$ & $0.0$ & \cite{jgr:2004:sheehan} \\
+                                          
+14 & $\rm  O_2^{+}+e^- \rightarrow  O + O $ &$T_{\rm e}$ & $2.40 \cdot 10^{-7} \cdot {\cal A}\cdot300^{0.70} $ & $-0.70$ & $0.0$ & \cite{aip:2001:peverall} \\
+\midrule
+15 & $\rm e^- + N \rightarrow N^{+}+e^- + e^-$ &$T_{\rm e}$ & \multicolumn{3}{p{8cm}}{Rate given as spline-fit using cross-section data from Fig. 4 in Ref. \cite{pr:1962:smith}} 
+                                               &\cite{pr:1962:smith}\\
+~ & $\rm N^{+}+e^- + e^-\rightarrow e^- + N $ &$T_{\rm e}$ & $2.20 \cdot 10^{40} $ & $-4.50$ & $0.0$ 
+                                               &\cite{nasa:1973:dunn}\\
+   \midrule                                       
+16 & $\rm e^- + O \rightarrow O^{+}+e^- + e^-$ &$T_{\rm e}$ & \multicolumn{3}{p{8cm}}{Rate given as spline-fit using cross-section data in Ref. \cite{pcpp:1992:morgan}} 
+                                               &\cite{pcpp:1992:morgan}\\
+~ & $\rm O^{+}+e^- + e^-\rightarrow e^- + O $ &$T_{\rm e}$ & $2.20 \cdot 10^{40} $ & $-4.50$ & $0.0$ 
+                                               &\cite{nasa:1973:dunn}\\
+  \midrule                                        
+26 & $\rm N_2^{+}+e^-\rightarrow N + N $  &$T_{\rm e}$ &  \multicolumn{3}{p{8cm}}{Rate given as spline-fit using cross-section data from Figs.~3, 4 in Ref. \cite{aip:1998:peterson}} & \cite{aip:1998:peterson} \\
+                                          
+29 & $\rm e^{-} +N_2\rightarrow N + N + e^{-}$ &$T_{\rm e}$ & \multicolumn{3}{p{8cm}}{Rate given as spline-fit using cross-section data from Fig.~10 in Ref. \cite{pr:1985;:phelps}}  
+                                               & \cite{pr:1985;:phelps} \\
+                                                                                                                           
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol. $A$ has units of $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$. $E$ has units of cal/mole. The rate is given by $A T^n \exp(-E/RT)$. ${\cal A}$ is Avogadro's number and it is approximately $6.022 \cdot 10^{23}~{\rm mol^{-1}}$.
+\item[{b}] The spline control points for each reaction can be found in Table \ref{tab:11s_spline_tab}. The corresponding reaction rates are obtained with BOLSIG+ using cross-section data from the indicated references.
+\end{tablenotes}
+\label{tab:rodriguez2024b}
+\end{threeparttable}
+\end{center}
+\end{table}
+%
+
+%
+\begin{table}[!ht]
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Coordinates of control points for monotone cubic spline interpolation of reaction rates\tnote{a}.}
+    \label{tab:11s_spline_tab}
+    \fontsizetable
+ 
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}lccccc}
+    
+    \toprule
+   No.~~ & Reaction ~& Rate & ${\rm ln}~T_{\rm e}$ & ${\rm ln}~k$  \\
+        \midrule
+        
+   \multirow{2}{*}{15} &  \multirow{2}{*}{ $\rm e^- + N \rightleftarrows N^+ + e^- +e^- $   } & Forward  &  \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont  
+      10.0920,   10.3442,   10.5823,   10.7863,   10.9561,   11.0733,   11.1957,   11.5243,   11.7452,   14.9141
+ \end{minipage}  & \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont 
+  42.1770, -35.8211, -31.6270, -28.9594, -26.7535, -24.4385, -22.9054, -20.7873, -19.8826, -16.2235
+\end{minipage}\\       
+\midrule
+
+   \multirow{2}{*}{16} &  \multirow{2}{*}{ $\rm e^- +O \rightleftarrows O^+ + e^- +e^- $   } & Forward &  \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont  
+    10.1301,
+    10.4453,
+    10.7659,
+    10.9631,
+    11.0234,
+    11.0584,
+    11.1400,
+    11.4668,
+    11.7954,
+    12.2633,
+    16.6515,
+    14.9141
+ \end{minipage}  & \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont 
+    -52.8136,
+    -38.2561,
+    -31.0487,
+    -27.8416,
+    -25.7922,
+    -24.5029,
+    -23.0528,
+    -20.5393,
+    -19.2421,
+    -18.1015,
+    -17.0574,
+    -16.2235
+\end{minipage}\\       
+\midrule
+
+  \multirow{2}{*}{26} &  \multirow{2}{*}{ $\rm N+N \rightleftarrows   N_2^+ + e^- $   } & Backward &  \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont  
+     2.9613,    5.7153,    9.1741,    9.8638,   12.3696,   14.9141
+ \end{minipage}  & \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont 
+  -15.1097,  -15.6251, -16.9585,  -17.4851,  -18.7960,  -20.7233
+\end{minipage}\\
+\midrule
+
+  \multirow{2}{*}{29} &  \multirow{2}{*}{ $\rm e^- + N_2 \rightleftarrows N+N + e^-$   } & Forward &  \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont  
+    9.5662, 9.6421, 9.8483, 9.9808, 10.2742, 10.8312, 10.9937, 11.1449, 11.4428, 11.6894, 14.9141
+ \end{minipage}  & \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont 
+  -45.6975, -41.8099, -35.8672, -33.6513, -30.3852, -26.0004, -24.6913, -23.4619, -21.1866, -19.8272, -13.9209
+\end{minipage}\\
+
+    \bottomrule
+    \end{tabular*}
+\begin{tablenotes}
+\item[{a}] Notation and units: $T_{\rm e}$ is the electron temperature in Kelvin and $k$ is the reaction rate in units of $\rm cm^3/s$.
+\end{tablenotes}
+   \end{threeparttable}
+\end{table}
+%insert a few newpages here to make sure the refs section follows the tables
+~
+\newpage
 
 
 ~

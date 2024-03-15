@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAR 15b
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - added the module CHEMMODEL_RODRIGUEZ2024
+  * in model/chem/_Air_Plasma_11s/
+    - added rodriguez2024.c
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - added a table for the rodriguez2024 model
+    
+
 2024 MAR 15a
   * in model/emfield/_Epotential*/emfield.c
     - added function find_DeltaVk_from_mu_thermal() and find_DeltaVk_thermal()
