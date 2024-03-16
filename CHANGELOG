@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAR 15c
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - fixed a few mistakes related to the Rodriguez2024 model
+    
+
 2024 MAR 15b
   * in model/chem/_Air_Plasma_11s/chem.c
     - added the module CHEMMODEL_RODRIGUEZ2024

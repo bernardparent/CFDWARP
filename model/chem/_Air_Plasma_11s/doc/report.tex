@@ -1287,7 +1287,7 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 ~ & $\rm O^{+}+e^- + e^-\rightarrow e^- + O $ &$T_{\rm e}$ & $2.20 \cdot 10^{40} $ & $-4.50$ & $0.0$ 
                                                &\cite{nasa:1973:dunn}\\
   \midrule                                        
-26 & $\rm N_2^{+}+e^-\rightarrow N + N $  &$T_{\rm e}$ &  \multicolumn{3}{p{8cm}}{Rate given as spline-fit using cross-section data from Figs.~3, 4 in Ref. \cite{aip:1998:peterson}} & \cite{aip:1998:peterson} \\
+26 & $\rm N_2^{+}+e^-\rightarrow N + N $  &$T_{\rm e}$ &  \multicolumn{3}{p{8cm}}{Rate given as spline-fit through rate data from Fig.~3 in Ref. \cite{aip:1998:peterson}} & \cite{aip:1998:peterson} \\
                                           
 29 & $\rm e^{-} +N_2\rightarrow N + N + e^{-}$ &$T_{\rm e}$ & \multicolumn{3}{p{8cm}}{Rate given as spline-fit using cross-section data from Fig.~10 in Ref. \cite{pr:1985;:phelps}}  
                                                & \cite{pr:1985;:phelps} \\
@@ -1296,7 +1296,7 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 \end{tabular}
 \begin{tablenotes}
 \item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol. $A$ has units of $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$. $E$ has units of cal/mole. The rate is given by $A T^n \exp(-E/RT)$. ${\cal A}$ is Avogadro's number and it is approximately $6.022 \cdot 10^{23}~{\rm mol^{-1}}$.
-\item[{b}] The spline control points for each reaction can be found in Table \ref{tab:11s_spline_tab}. The corresponding reaction rates are obtained with BOLSIG+ using cross-section data from the indicated references.
+\item[{b}] The spline control points for each reaction can be found in Table \ref{tab:11s_spline_tab}. The corresponding reaction rates are obtained with BOLSIG+ using cross-section data from the indicated references or by directly fitting a cubic spline through experimentally measured reaction rate values.
 \end{tablenotes}
 \label{tab:rodriguez2024b}
 \end{threeparttable}
