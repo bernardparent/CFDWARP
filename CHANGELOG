@@ -6,6 +6,16 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2024 MAR 20a
+  * in model/chem/_Air_Plasma_8s/
+    - added rodriguez2024.c
+  * in model/chem/_Air_Plasma_8s/chem.c
+    - added chemical solver rodriguez2024
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Semfield(), added _averagedrate for EDOTJ and EDOTJE and took away _averagedrate 
+      for EEMAG
+  * 
+  
 
 2024 MAR 15c
   * in model/chem/_Air_Plasma_11s/doc/report.tex

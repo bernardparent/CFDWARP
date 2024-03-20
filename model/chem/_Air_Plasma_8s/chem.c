@@ -2,6 +2,7 @@
 /*
 Copyright 2018,2021 Bernard Parent
 Copyright 2021 Prasanna Thoguluva Rajendran
+Copyright 2024 Felipe Martin Rodriguez Fuentes
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -32,12 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "macheret2007old.h"
 #include "macheret2007.h"
 #include "rajendran2022.h"
+#include "rodriguez2024.h"
 
 #define CHEMMODEL_NONE 1
 #define CHEMMODEL_MACHERET2007 2
 #define CHEMMODEL_MACHERET2007OLD 3
 #define CHEMMODEL_RAJENDRAN2022 4
-
+#define CHEMMODEL_RODRIGUEZ2024 5
 
 #define Estarmin 1e-40
 
@@ -71,6 +73,7 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
     SOAP_add_int_to_vars(codex,"CHEMMODEL_MACHERET2007",CHEMMODEL_MACHERET2007); 
     SOAP_add_int_to_vars(codex,"CHEMMODEL_MACHERET2007OLD",CHEMMODEL_MACHERET2007OLD); 
     SOAP_add_int_to_vars(codex,"CHEMMODEL_RAJENDRAN2022",CHEMMODEL_RAJENDRAN2022); 
+    SOAP_add_int_to_vars(codex,"CHEMMODEL_RODRIGUEZ2024",CHEMMODEL_RODRIGUEZ2024); 
     gl->MODEL_CHEM_READ=TRUE;
 
     action_original=codex->action;
@@ -79,9 +82,9 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
     codex->action=action_original;
 
     find_int_var_from_codex(codex,"CHEMMODEL",&gl->model.chem.CHEMMODEL);
-    if (gl->model.chem.CHEMMODEL!=CHEMMODEL_MACHERET2007 && gl->model.chem.CHEMMODEL!=CHEMMODEL_MACHERET2007OLD && gl->model.chem.CHEMMODEL!=CHEMMODEL_RAJENDRAN2022 
+    if (gl->model.chem.CHEMMODEL!=CHEMMODEL_MACHERET2007 && gl->model.chem.CHEMMODEL!=CHEMMODEL_MACHERET2007OLD && gl->model.chem.CHEMMODEL!=CHEMMODEL_RAJENDRAN2022 && gl->model.chem.CHEMMODEL!=CHEMMODEL_RODRIGUEZ2024 
         && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)
-      SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_MACHERET2007 or CHEMMODEL_MACHERET2007OLD or CHEMMODEL_NONE or CHEMMODEL_RAJENDRAN2022.");
+      SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_MACHERET2007 or CHEMMODEL_MACHERET2007OLD or CHEMMODEL_NONE or CHEMMODEL_RAJENDRAN2022 or CHEMMODEL_RODRIGUEZ2024.");
     find_bool_var_from_codex(codex,"QEISOURCETERMS",&gl->model.chem.QEISOURCETERMS);
     find_double_var_from_codex(codex,"Tminchem",&gl->model.chem.Tminchem);
     find_double_var_from_codex(codex,"Teminchem",&gl->model.chem.Teminchem);
@@ -131,6 +134,9 @@ void find_W ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, do
     case CHEMMODEL_RAJENDRAN2022: 
       find_W_Rajendran2022 ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
     break;
+    case CHEMMODEL_RODRIGUEZ2024: 
+      find_W_Rodriguez2024 ( np, gl, rhok, T, Te, Tv, Estar, Qbeam, W );
+    break;
     case CHEMMODEL_NONE: 
       find_W_None ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );    
     break;
@@ -155,6 +161,9 @@ void find_dW_dx ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv
     case CHEMMODEL_RAJENDRAN2022: 
       find_dW_dx_Rajendran2022 ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
     break;
+    case CHEMMODEL_RODRIGUEZ2024: 
+      find_dW_dx_Rodriguez2024 ( np, gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+    break;
     case CHEMMODEL_NONE: 
       find_dW_dx_None ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
     break;
@@ -177,6 +186,9 @@ void find_Qei(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, double *Q
       break;
       case CHEMMODEL_RAJENDRAN2022: 
         find_Qei_Rajendran2022 ( gl, rhok, Estar, Te, Qei );
+      break;
+      case CHEMMODEL_RODRIGUEZ2024: 
+        find_Qei_Rodriguez2024 ( np, gl, rhok, Estar, Te, Qei );
       break;
       case CHEMMODEL_NONE: 
         *Qei=0.0;
@@ -204,6 +216,9 @@ void find_dQei_dx(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, spec_
       break;
       case CHEMMODEL_RAJENDRAN2022: 
         find_dQei_dx_Rajendran2022 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+      break;
+      case CHEMMODEL_RODRIGUEZ2024: 
+        find_dQei_dx_Rodriguez2024 ( np, gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
       break;
       case CHEMMODEL_NONE: 
         *dQeidTe=0.0;

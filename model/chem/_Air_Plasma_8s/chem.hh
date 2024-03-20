@@ -1,5 +1,5 @@
 #define _CHEM_AIRPLASMA8S
-#define _CHEM_METHOD "Air Plasma 8 species Macheret [parent2007a], Rajendran"
+#define _CHEM_METHOD "Air Plasma 8 species Macheret [parent2007a], Rajendran, Rodriguez"
 #define _CHEM_PLASMA
 #define _CHEM_ACTIONNAME "AirPlasma8s"
 
