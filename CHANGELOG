@@ -6,6 +6,12 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2024 MAR 23a
+  * in bin
+    - added Broslawski.wrp
+
+
 2024 MAR 20a
   * in model/chem/_Air_Plasma_8s/
     - added rodriguez2024.c
@@ -14,7 +20,6 @@ ________________________________________________________________________________
   * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
     - in find_Semfield(), added _averagedrate for EDOTJ and EDOTJE and took away _averagedrate 
       for EEMAG
-  * 
   
 
 2024 MAR 15c
