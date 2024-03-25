@@ -375,9 +375,9 @@ void find_dW_dx_Farbar2013 ( gl_t *gl, spec_t rhok, double T, double Te, double 
 void find_Qei_Farbar2013(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
 
     if (REACTION[11]) 
-      add_to_Qei(specO,_ionizationpot(specO), 3.9e33/calA*pow(Te,-3.78)*exp(-158500.0/Te), rhok, Qei);
+      add_to_Qei(gl,Te,specO,_ionizationpot(specO), 3.9e33/calA*pow(Te,-3.78)*exp(-158500.0/Te), rhok, Qei);
     if (REACTION[10]) 
-      add_to_Qei(specN,_ionizationpot(specN), 2.5e34/calA*pow(Te,-3.82)*exp(-168600.0/Te), rhok, Qei);
+      add_to_Qei(gl,Te,specN,_ionizationpot(specN), 2.5e34/calA*pow(Te,-3.82)*exp(-168600.0/Te), rhok, Qei);
  
 }
 
@@ -386,8 +386,8 @@ void find_Qei_Farbar2013(gl_t *gl, spec_t rhok, double Estar, double Te, double 
 void find_dQei_dx_Farbar2013(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
 
     if (REACTION[11]) 
-      add_to_dQei(specO,_ionizationpot(specO), 3.9e33/calA*pow(Te,-3.78)*exp(-158500.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(gl,Te,specO,_ionizationpot(specO), 3.9e33/calA*pow(Te,-3.78)*exp(-158500.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
     if (REACTION[10]) 
-      add_to_dQei(specN,_ionizationpot(specN), 2.5e34/calA*pow(Te,-3.82)*exp(-168600.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(gl,Te,specN,_ionizationpot(specN), 2.5e34/calA*pow(Te,-3.82)*exp(-168600.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
 
 }

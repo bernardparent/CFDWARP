@@ -442,9 +442,9 @@ void find_Qei_Rajendran2022(gl_t *gl, spec_t rhok, double Estar, double Te, doub
   *Qei=0.0;  
 
   if (REACTION[1])
-    add_to_Qei(specN2,_ionizationpot(specN2), 2.6291e-8 * pow( Te, 0.142 ) * exp ( -536330.0 / Te ), rhok, Qei);
+    add_to_Qei(gl,Te,specN2,_ionizationpot(specN2), 2.6291e-8 * pow( Te, 0.142 ) * exp ( -536330.0 / Te ), rhok, Qei);
   if (REACTION[2]) 
-    add_to_Qei(specO2,_ionizationpot(specO2), 3.869e-8 * pow( Te, 0.1166) * exp ( -567360.0 / Te ), rhok, Qei);
+    add_to_Qei(gl,Te,specO2,_ionizationpot(specO2), 3.869e-8 * pow( Te, 0.1166) * exp ( -567360.0 / Te ), rhok, Qei);
 }
 
 
@@ -456,7 +456,7 @@ void find_dQei_dx_Rajendran2022(gl_t *gl, spec_t rhok, double Estar, double Te, 
   *dQeidTe=0.0;  ;
 
   if (REACTION[1])
-    add_to_dQei(specN2,_ionizationpot(specN2), 2.6291e-8 * pow( Te, 0.142 ) * exp ( -536330.0 / Te ), 0.0,  rhok, dQeidrhok, dQeidTe);
+    add_to_dQei(gl,Te,specN2,_ionizationpot(specN2), 2.6291e-8 * pow( Te, 0.142 ) * exp ( -536330.0 / Te ), 0.0,  rhok, dQeidrhok, dQeidTe);
   if (REACTION[2]) 
-    add_to_dQei(specO2,_ionizationpot(specO2), 3.869e-8 * pow( Te, 0.1166) * exp ( -567360.0 / Te ), 0.0,  rhok, dQeidrhok, dQeidTe);
+    add_to_dQei(gl,Te,specO2,_ionizationpot(specO2), 3.869e-8 * pow( Te, 0.1166) * exp ( -567360.0 / Te ), 0.0,  rhok, dQeidrhok, dQeidTe);
 }

@@ -556,29 +556,25 @@ void find_dW_dx_Rodriguez2024 ( np_t np, gl_t *gl, spec_t rhok, double T, double
 
 
 void find_Qei_Rodriguez2024( np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
-  double theta;
   
   *Qei=0.0;  
-  theta=log(Estar);
 
   if (REACTION[1])
-    add_to_Qei(specN2,_ionizationpot(specN2), _kf1(np,gl,Te), rhok, Qei);
+    add_to_Qei(gl,Te,specN2,_ionizationpot(specN2), _kf1(np,gl,Te), rhok, Qei);
   if (REACTION[2]) 
-    add_to_Qei(specO2,_ionizationpot(specO2), _kf2(np,gl,Te), rhok, Qei);
+    add_to_Qei(gl,Te,specO2,_ionizationpot(specO2), _kf2(np,gl,Te), rhok, Qei);
 }
 
 
 
 void find_dQei_dx_Rodriguez2024( np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
-  double theta;
   long spec;
   
   for (spec=0; spec<ns; spec++) dQeidrhok[spec]=0.0;
   *dQeidTe=0.0;  
-  theta=log(Estar);
 
   if (REACTION[1])
-    add_to_dQei(specN2,_ionizationpot(specN2), _kf1(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe);
+    add_to_dQei(gl,Te,specN2,_ionizationpot(specN2), _kf1(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe);
   if (REACTION[2]) 
-    add_to_dQei(specO2,_ionizationpot(specO2), _kf2(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe);
+    add_to_dQei(gl,Te,specO2,_ionizationpot(specO2), _kf2(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe);
 }

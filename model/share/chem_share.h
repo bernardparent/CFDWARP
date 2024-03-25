@@ -518,7 +518,7 @@ double _dkfdT_Arrhenius(long numreactant, double A, double n, double E, double T
  * rhok is the partial densities in kg/m3
  * Qei is the heat removed from the electrons in J/m3
  */
-void add_to_Qei(long spec, double exci, double kf, spec_t rhok, double *Qei);
+void add_to_Qei(gl_t *gl, double Te, long spec, double exci, double kf, spec_t rhok, double *Qei);
 
 
 /* add contributions to dQei_dx coming from one electron impact chemical reaction
@@ -530,7 +530,7 @@ void add_to_Qei(long spec, double exci, double kf, spec_t rhok, double *Qei);
  * dQeidrhok is in J/kg 
  * dQeidTe is in J/(m3 K)
  */
-void add_to_dQei(long spec, double exci, double kf, double dkfdTe, spec_t rhok, spec_t dQeidrhok, double *dQeidT);
+void add_to_dQei(gl_t *gl, double Te, long spec, double exci, double kf, double dkfdTe, spec_t rhok, spec_t dQeidrhok, double *dQeidT);
 
 
 

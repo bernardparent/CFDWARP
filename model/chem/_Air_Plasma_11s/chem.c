@@ -432,15 +432,15 @@ void find_Qei(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, double *Q
 
     if (gl->model.chem.ADDITIONALREACTION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
       if (gl->model.chem.ADDITIONALREACTION[1]) 
-        add_to_Qei(specN2,_ionizationpot(specN2), exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), rhok, Qei);
+        add_to_Qei(gl,Te,specN2,_ionizationpot(specN2), exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), rhok, Qei);
       if (gl->model.chem.ADDITIONALREACTION[2]) 
-        add_to_Qei(specO2,_ionizationpot(specO2), exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), rhok, Qei);
+        add_to_Qei(gl,Te,specO2,_ionizationpot(specO2), exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), rhok, Qei);
       if (gl->model.chem.ADDITIONALREACTION[3]) 
-        add_to_Qei(specNO,_ionizationpot(specNO), exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), rhok, Qei);
+        add_to_Qei(gl,Te,specNO,_ionizationpot(specNO), exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), rhok, Qei);
       if (gl->model.chem.ADDITIONALREACTION[5]) 
-        add_to_Qei(specN,_ionizationpot(specN), exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), rhok, Qei);
+        add_to_Qei(gl,Te,specN,_ionizationpot(specN), exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), rhok, Qei);
       if (gl->model.chem.ADDITIONALREACTION[6]) 
-        add_to_Qei(specO,_ionizationpot(specO), exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), rhok, Qei);
+        add_to_Qei(gl,Te,specO,_ionizationpot(specO), exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), rhok, Qei);
     }
   } 
 }
@@ -504,15 +504,15 @@ void find_dQei_dx(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, spec_
 
     if (gl->model.chem.ADDITIONALREACTION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
       if (gl->model.chem.ADDITIONALREACTION[1]) 
-        add_to_dQei(specN2,_ionizationpot(specN2), exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
+        add_to_dQei(gl,Te,specN2,_ionizationpot(specN2), exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
       if (gl->model.chem.ADDITIONALREACTION[2]) 
-        add_to_dQei(specO2,_ionizationpot(specO2), exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
+        add_to_dQei(gl,Te,specO2,_ionizationpot(specO2), exp(-0.0102785*sqr(theta)-2.42260e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
       if (gl->model.chem.ADDITIONALREACTION[3]) 
-        add_to_dQei(specNO,_ionizationpot(specNO), exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), 0.0, rhok, dQeidrhok, dQeidTe);
+        add_to_dQei(gl,Te,specNO,_ionizationpot(specNO), exp ( -5.9890E-6 * pow ( theta , 4.0 ) + 2.5988E-84 * pow ( theta, 51.0 ) ), 0.0, rhok, dQeidrhok, dQeidTe);
       if (gl->model.chem.ADDITIONALREACTION[5]) 
-      add_to_dQei(specN,_ionizationpot(specN), exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(gl,Te,specN,_ionizationpot(specN), exp(-9.3740E-3*sqr(theta)-3.3250e-23*pow(theta,14.0)), 0.0, rhok, dQeidrhok, dQeidTe);
       if (gl->model.chem.ADDITIONALREACTION[6]) 
-      add_to_dQei(specO,_ionizationpot(specO), exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(gl,Te,specO,_ionizationpot(specO), exp(-1.0729E-2*sqr(theta)+1.6762E-87*pow(theta,53.0)), 0.0, rhok, dQeidrhok, dQeidTe);
     }
   }
 }

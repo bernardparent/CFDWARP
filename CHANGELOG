@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAR 25a
+  * in model/chem/*/*.c and model/share/chem_share.c
+    - added *gl and T parameters to add_to_Qei() and add_to_dQei() functions
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in _sigmaes(), added Te=min(50000.0,Te) because the polynomials used to find the cross-section
+      of electrons with neutrals within the Kim2012 electron energy transport model can not be
+      used reliably above 50000K
+  * in model/share/chem_share.c
+    - in add_to_dQei(), added missing linearization of some terms 
+    - in add_to_Qei() and add_to_dQei(), turned off the Qei terms if Te<QEI_TEMIN
+  * in bin
+    - added Te_vs_EoverN.wrp
+
+
 2024 MAR 23a
   * in bin
     - added Broslawski.wrp

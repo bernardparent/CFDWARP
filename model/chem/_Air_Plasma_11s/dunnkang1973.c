@@ -408,9 +408,9 @@ void find_Qei_DunnKang1973(gl_t *gl, spec_t rhok, double Estar, double Te, doubl
 
     Te=min(TEMAX_TOWNSEND,Te);
     if (REACTION[8]) 
-      add_to_Qei(specO,_ionizationpot(specO), 3.6e31/calA*pow(Te,-2.91)*exp(-158000.0/Te), rhok, Qei);
+      add_to_Qei(gl,Te,specO,_ionizationpot(specO), 3.6e31/calA*pow(Te,-2.91)*exp(-158000.0/Te), rhok, Qei);
     if (REACTION[9]) 
-      add_to_Qei(specN,_ionizationpot(specN), 1.1e32/calA*pow(Te,-3.14)*exp(-169000.0/Te), rhok, Qei);
+      add_to_Qei(gl,Te,specN,_ionizationpot(specN), 1.1e32/calA*pow(Te,-3.14)*exp(-169000.0/Te), rhok, Qei);
  
 }
 
@@ -419,8 +419,8 @@ void find_Qei_DunnKang1973(gl_t *gl, spec_t rhok, double Estar, double Te, doubl
 void find_dQei_dx_DunnKang1973(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
     Te=min(TEMAX_TOWNSEND,Te);
     if (REACTION[8]) 
-      add_to_dQei(specO,_ionizationpot(specO), 3.6e31/calA*pow(Te,-2.91)*exp(-158000.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(gl,Te,specO,_ionizationpot(specO), 3.6e31/calA*pow(Te,-2.91)*exp(-158000.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
     if (REACTION[9]) 
-      add_to_dQei(specN,_ionizationpot(specN), 1.1e32/calA*pow(Te,-3.14)*exp(-169000.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(gl,Te,specN,_ionizationpot(specN), 1.1e32/calA*pow(Te,-3.14)*exp(-169000.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
 
 }

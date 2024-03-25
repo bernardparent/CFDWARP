@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define Kcmin 1.0e-40
 
 #define TREF_EXCI 298.0
+#define QEI_TEMIN 500.0
 
 /* kf in cm^3 s^(-1) 
    N in cm^(-3)
@@ -2845,11 +2846,13 @@ double _dkfdT_Arrhenius(long numreactant, double A, double n, double E, double T
  * rhok is the partial densities in kg/m3
  * Qei is the heat removed from the electrons in J/m3
  */
-void add_to_Qei(long spec, double exci, double kf, spec_t rhok, double *Qei){
+void add_to_Qei(gl_t *gl, double Te, long spec, double exci, double kf, spec_t rhok, double *Qei){
+  double Tref;
 #ifdef TEST
   kf=1e-17;
 #endif
-  (*Qei) += kf * 1E-6* exci * echarge * rhok[speceminus] / _calM ( speceminus ) * rhok[spec] / _calM ( spec ) * sqr(calA);
+  Tref=QEI_TEMIN;
+  (*Qei) += max(0.0,Te-Tref)/Te * kf * 1E-6* exci * echarge * rhok[speceminus] / _calM ( speceminus ) * rhok[spec] / _calM ( spec ) * sqr(calA);
 }
 
 
@@ -2862,12 +2865,19 @@ void add_to_Qei(long spec, double exci, double kf, spec_t rhok, double *Qei){
  * dQeidrhok is in J/kg 
  * dQeidTe is in J/(m3 K)
  */
-void add_to_dQei(long spec, double exci, double kf, double dkfdTe, spec_t rhok, spec_t dQeidrhok, double *dQeidTe){
+void add_to_dQei(gl_t *gl, double Te, long spec, double exci, double kf, double dkfdTe, spec_t rhok, spec_t dQeidrhok, double *dQeidTe){
+  double Tref;
 #ifdef TEST
   kf=1e-17;
 #endif
-  dQeidrhok[spec] += kf *1e-6* exci * echarge * rhok[speceminus] / _calM ( speceminus )  / _calM ( spec ) * sqr(calA);
-  dQeidrhok[speceminus] += kf *1e-6* exci * echarge / _calM ( speceminus ) * rhok[spec] / _calM ( spec ) * sqr(calA);
+  Tref=QEI_TEMIN;
+  dQeidrhok[spec] += max(0.0,Te-Tref)/Te * kf *1e-6* exci * echarge * rhok[speceminus] / _calM ( speceminus )  / _calM ( spec ) * sqr(calA);
+  dQeidrhok[speceminus] += max(0.0,Te-Tref)/Te * kf *1e-6* exci * echarge / _calM ( speceminus ) * rhok[spec] / _calM ( spec ) * sqr(calA);
+  if (Te>Tref){
+  *dQeidTe += 
+    Tref/sqr(Te)* kf * 1E-6* exci * echarge * rhok[speceminus] / _calM ( speceminus ) * rhok[spec] / _calM ( spec ) * sqr(calA) 
+    + max(0.0,(Te-Tref)*dkfdTe)/Te  * 1E-6* exci * echarge * rhok[speceminus] / _calM ( speceminus ) * rhok[spec] / _calM ( spec ) * sqr(calA);
+  }
 }
 #endif
 

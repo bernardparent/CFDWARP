@@ -424,9 +424,9 @@ void find_Qei_Parent2023b(gl_t *gl, spec_t rhok, double Estar, double Te, double
   Estar = max ( Estarmin, Estar );
   theta=log(Estar);
     if (REACTION[24]) 
-      add_to_Qei(specO2,_ionizationpot(specO2), min(_kf_high_EoverN(Estar), exp ( -0.0102785 * sqr ( theta ) - 2.42260e-75 * pow ( theta, 46.0 ) )), rhok, Qei);
+      add_to_Qei(gl,Te,specO2,_ionizationpot(specO2), min(_kf_high_EoverN(Estar), exp ( -0.0102785 * sqr ( theta ) - 2.42260e-75 * pow ( theta, 46.0 ) )), rhok, Qei);
     if (REACTION[25]) 
-      add_to_Qei(specN2,_ionizationpot(specN2), min(_kf_high_EoverN(Estar), exp ( -0.0105809 * sqr ( theta ) - 2.40411e-75 * pow ( theta, 46.0 ) )), rhok, Qei);
+      add_to_Qei(gl,Te,specN2,_ionizationpot(specN2), min(_kf_high_EoverN(Estar), exp ( -0.0105809 * sqr ( theta ) - 2.40411e-75 * pow ( theta, 46.0 ) )), rhok, Qei);
  
 }
 
@@ -438,8 +438,8 @@ void find_dQei_dx_Parent2023b(gl_t *gl, spec_t rhok, double Estar, double Te, sp
   theta=log(Estar);
 
     if (REACTION[24]) 
-      add_to_dQei(specO2,_ionizationpot(specO2), min(_kf_high_EoverN(Estar), exp ( -0.0102785 * sqr ( theta ) - 2.42260e-75 * pow ( theta, 46.0 ) )), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(gl,Te,specO2,_ionizationpot(specO2), min(_kf_high_EoverN(Estar), exp ( -0.0102785 * sqr ( theta ) - 2.42260e-75 * pow ( theta, 46.0 ) )), 0.0, rhok, dQeidrhok, dQeidTe);
     if (REACTION[25]) 
-      add_to_dQei(specN2,_ionizationpot(specN2), min(_kf_high_EoverN(Estar), exp ( -0.0105809 * sqr ( theta ) - 2.40411e-75 * pow ( theta, 46.0 ) )), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(gl,Te,specN2,_ionizationpot(specN2), min(_kf_high_EoverN(Estar), exp ( -0.0105809 * sqr ( theta ) - 2.40411e-75 * pow ( theta, 46.0 ) )), 0.0, rhok, dQeidrhok, dQeidTe);
 
 }

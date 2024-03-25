@@ -232,7 +232,7 @@ void find_dW_dx_Parent2023 ( gl_t *gl, spec_t rhok, double T, double Te, double 
 void find_Qei_Parent2023(gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
 
     if (REACTION[5]) 
-      add_to_Qei(specN2,_ionizationpot(specN2), 1.58e16/calA*pow(Te,0.1420)*exp(-536330.0/Te), rhok, Qei);
+      add_to_Qei(gl,Te,specN2,_ionizationpot(specN2), 1.58e16/calA*pow(Te,0.1420)*exp(-536330.0/Te), rhok, Qei);
  
 }
 
@@ -241,6 +241,6 @@ void find_Qei_Parent2023(gl_t *gl, spec_t rhok, double Estar, double Te, double 
 void find_dQei_dx_Parent2023(gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
 
     if (REACTION[5]) 
-      add_to_dQei(specN2,_ionizationpot(specN2), 1.58e16/calA*pow(Te,0.1420)*exp(-536330.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(gl,Te,specN2,_ionizationpot(specN2), 1.58e16/calA*pow(Te,0.1420)*exp(-536330.0/Te), 0.0, rhok, dQeidrhok, dQeidTe);
 
 }

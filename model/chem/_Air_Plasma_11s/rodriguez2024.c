@@ -1155,9 +1155,9 @@ void find_dW_dx_Rodriguez2024 ( np_t np, gl_t *gl, spec_t rhok, double T, double
 void find_Qei_Rodriguez2024( np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
 
     if (REACTION[15]) 
-      add_to_Qei(specN,_ionizationpot(specN), _kf15(np,gl,Te), rhok, Qei);
+      add_to_Qei(gl,Te,specN,_ionizationpot(specN), _kf15(np,gl,Te), rhok, Qei);
     if (REACTION[16]) 
-      add_to_Qei(specO,_ionizationpot(specO), _kf16(np,gl,Te), rhok, Qei);
+      add_to_Qei(gl,Te,specO,_ionizationpot(specO), _kf16(np,gl,Te), rhok, Qei);
 
  
 }
@@ -1167,9 +1167,9 @@ void find_Qei_Rodriguez2024( np_t np, gl_t *gl, spec_t rhok, double Estar, doubl
 void find_dQei_dx_Rodriguez2024( np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
 
     if (REACTION[15]) 
-      add_to_dQei(specN,_ionizationpot(specN), _kf15(np,gl,Te), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(gl,Te,specN,_ionizationpot(specN), _kf15(np,gl,Te), 0.0, rhok, dQeidrhok, dQeidTe);
     if (REACTION[16]) 
-      add_to_dQei(specO,_ionizationpot(specO), _kf16(np,gl,Te), 0.0, rhok, dQeidrhok, dQeidTe);
+      add_to_dQei(gl,Te,specO,_ionizationpot(specO), _kf16(np,gl,Te), 0.0, rhok, dQeidrhok, dQeidTe);
 
 
 }
