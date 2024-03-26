@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /* set all reactions to true except for testing purposes */
-const static bool REACTION[32]=
+const static bool REACTION[36]=
   {
    FALSE, /* reaction 0 */
    TRUE, /* reaction 1 */
@@ -62,6 +62,12 @@ const static bool REACTION[32]=
    TRUE, /* reaction 27 */
    TRUE, /* reaction 28 */
    TRUE, /* reaction 29 */ /* modified from original kim2021.c */
+   TRUE, /* reaction 30 */ /* N2 ionization to N2+ added for completeness, also included in Qei */
+   TRUE, /* reaction 31 */ /* O2 ionization to O2+ added for completeness, also included in Qei */ 
+   TRUE, /* reaction 32 */ /* NO ionization to NO+ added for completeness, also included in Qei */
+   TRUE, /* reaction 33 */ /* N2+ EI recombination to N2 */
+   TRUE, /* reaction 34 */ /* O2+ EI recombination to O2 */
+   TRUE, /* reaction 35 */ /* NO+ EI recombination to NO */
   };
 
 #define specEND -1
@@ -151,7 +157,118 @@ double _dkbdT_polynomial_rodriguez2024(long numreactant,double A1, double A2, do
   return(dkbdT);
   
 }
-  
+
+static double _kf30(np_t np, gl_t *gl, double Te){
+  /* N2 ionization */
+  double kf30;
+  double Te_control[] = 
+  { 
+    9.84834371140720,
+    9.98187510403172,
+    10.2842026253110,
+    10.4379000473402,
+    10.7180735520921,
+    11.0847700544918,
+    11.1312172236506,
+    11.1947672400602,
+    11.4359634780945,
+    11.5970902872688,
+    14.9141228466324
+  };
+  double kf_control[] = 
+  {
+    -49.4041090773736,
+    -44.5753383016722,
+    -37.3445496845415,
+    -34.6995321737901,
+    -30.8554121214849,
+    -26.0213832234918,
+    -24.7535094737620,
+    -23.5733405380780,
+    -21.3723961320896,
+    -20.4532386997334,
+    -13.9208710736221
+  };  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
+  kf30 = EXM_f_from_monotonespline(N, Te_control, kf_control, Te);
+  return(exp( kf30 ));
+}
+
+static double _kf31(np_t np, gl_t *gl, double Te){
+  /* O2 ionization */
+  double kf31;
+  double Te_control[] = 
+  { 
+    10.0202907721932,
+    10.4221354987933,
+    10.7348892349487,
+    10.8886789169741,
+    10.9092628341176,
+    10.9258895456693,
+    11.0565991775251,
+    11.3985508799110,
+    11.6521900679188,
+    14.9141228466324
+  };
+  double kf_control[] = 
+  {
+    -52.3856567159357,
+    -38.4423353219267,
+    -31.5688748813912,
+    -28.5071300581699,
+    -27.6690345581268,
+    -26.5034974837660,
+    -23.7214009951167,
+    -21.0585987228742,
+    -19.8357861869264,
+    -13.8155105579643
+  };  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
+  kf31 = EXM_f_from_monotonespline(N, Te_control, kf_control, Te);
+  return(exp( kf31 ));
+}
+
+static double _kf32(np_t np, gl_t *gl, double Te){
+  /* NO ionization */
+  double kf32;
+  double Te_control[] = 
+  { 
+    9.50151762905524,
+    9.71542525168571,
+    9.95743728730430,
+    10.1946648096152,
+    10.3714783078394,
+    10.5141430098725,
+    10.5787996714793,
+    10.7837034610053,
+    11.2280252072139,
+    11.6627349810954,
+    12.1515417373043,
+    13.9673160827362
+  };
+  double kf_control[] = 
+  {
+    -45.3314260119327,
+    -38.8204148555533,
+    -34.3366522108206,
+    -31.3594733451623,
+    -29.4711308460977,
+    -27.4629675309323,
+    -25.8461184341637,
+    -23.1037043691453,
+    -20.3218087502358,
+    -18.7708057570274,
+    -17.6468756603750,
+    -15.9835647580007
+  };  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
+  kf32 = EXM_f_from_monotonespline(N, Te_control, kf_control, Te);
+  return(exp( kf32 ));
+}
+
 
 static double _kf15(np_t np, gl_t *gl, double Te){
   /* N ionization */
@@ -471,12 +588,12 @@ void find_W_Rodriguez2024 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te,
 
   if (REACTION[13]){
     add_to_W_fw_2r2p ( specN, specO, specNOplus, speceminus, 8.80e08, 1.0, 31900.0*R, T, X, W );
-    add_to_W_fw_2r2p ( speceminus, specNOplus, specN, specO, 3.00E-7 * calA * pow ( 300.0, 0.56 ), -0.56, 0.0 * R, Te, X, W );
+    add_to_W_fw_2r2p ( speceminus, specNOplus, specN, specO, 3.00E-7 * calA * pow ( 300, 0.56 ), -0.56, 0.0 * R, Te, X, W );
   }
 
   if (REACTION[14]){
     add_to_W_fw_2r2p ( specO, specO, specO2plus, speceminus, 7.10e02, 2.70, 80600.0*R, T, X, W );
-    add_to_W_fw_2r2p ( speceminus, specO2plus, specO, specO, 2.40E-7 * calA * pow ( 300.0, 0.70 ), -0.70, 0.0 * R, Te, X, W );
+    add_to_W_fw_2r2p ( speceminus, specO2plus, specO, specO, 2.40E-7 * calA * pow ( 300, 0.70 ), -0.70, 0.0 * R, Te, X, W );
   }
 
   if (REACTION[15]){
@@ -608,6 +725,29 @@ void find_W_Rodriguez2024 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te,
     add_to_W_fw_3r2p ( specN, specN, speceminus,   speceminus, specN2,   1.20e25, -1.6, 113200.0*R, Te, X, W );
   }   
 
+  if (REACTION[30]){
+    add_to_W_2r3p ( speceminus, specN2, specN2plus, speceminus, speceminus, _kf30(np,gl,Te), N, W ); 
+  }   
+
+  if (REACTION[31]){
+    add_to_W_2r3p ( speceminus, specO2, specO2plus, speceminus, speceminus, _kf31(np,gl,Te), N, W );
+  }  
+
+  if (REACTION[32]){
+    add_to_W_2r3p ( speceminus, specNO, specNOplus, speceminus, speceminus, _kf32(np,gl,Te), N, W );
+  }  
+
+  if (REACTION[33]){
+    add_to_W_fw_3r2p ( specN2plus, speceminus, speceminus, speceminus, specN2, 2.20E40, -4.5, 0.0 * R, Te, X, W );
+  }
+
+  if (REACTION[34]){
+    add_to_W_fw_3r2p ( specO2plus, speceminus, speceminus, speceminus, specO2, 2.20E40, -4.5, 0.0 * R, Te, X, W );
+  }
+
+  if (REACTION[35]){
+    add_to_W_fw_3r2p ( specNOplus, speceminus, speceminus, speceminus, specNO, 2.20E40, -4.5, 0.0 * R, Te, X, W );
+  }
 
 }
 
@@ -912,12 +1052,12 @@ void find_dW_dx_Rodriguez2024 ( np_t np, gl_t *gl, spec_t rhok, double T, double
 
   if (REACTION[13]){
     add_to_dW_fw_2r2p ( specN, specO, specNOplus, speceminus, 8.80e08, 1.0, 31900.0*R, T, X, dWdT, dWdrhok);
-    add_to_dW_fw_2r2p ( specNOplus, speceminus, specN, specO, 3.00E-7 * calA * pow ( 300.0, 0.56 ), -0.56, 0.0 * R, Te, X, dWdTe, dWdrhok );
+    add_to_dW_fw_2r2p ( specNOplus, speceminus, specN, specO, 3.00E-7 * calA * pow ( 300, 0.56 ), -0.56, 0.0 * R, Te, X, dWdTe, dWdrhok );
   }
 
   if (REACTION[14]){
     add_to_dW_fw_2r2p ( specO, specO, specO2plus, speceminus, 7.10e02, 2.70, 80600.0*R, T, X, dWdT, dWdrhok);
-    add_to_dW_fw_2r2p ( specO2plus, speceminus, specO, specO, 2.40E-7 * calA * pow ( 300.0, 0.70 ), -0.70, 0.0 * R, Te, X, dWdTe, dWdrhok );
+    add_to_dW_fw_2r2p ( specO2plus, speceminus, specO, specO, 2.40E-7 * calA * pow ( 300, 0.70 ), -0.70, 0.0 * R, Te, X, dWdTe, dWdrhok );
   }
 
   if (REACTION[15]){
@@ -1133,6 +1273,38 @@ void find_dW_dx_Rodriguez2024 ( np_t np, gl_t *gl, spec_t rhok, double T, double
     add_to_dW_fw_3r2p ( specN, specN, speceminus, speceminus, specN2, 1.20e25, -1.6, 113200.0*R, Te, X, dWdTe, dWdrhok);
   }   
 
+  if (REACTION[30]){
+    dkfdTe = 0.0;
+    dkfdT = 0.0;
+    dkfdTv = 0.0;
+    add_to_dW_2r3p ( speceminus, specN2, specN2plus, speceminus, speceminus, _kf30(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
+  }
+
+  if (REACTION[31]){
+    dkfdTe = 0.0;
+    dkfdT = 0.0;
+    dkfdTv = 0.0;
+    add_to_dW_2r3p ( speceminus, specO2, specO2plus, speceminus, speceminus, _kf31(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
+  }
+
+  if (REACTION[32]){
+    dkfdTe = 0.0;
+    dkfdT = 0.0;
+    dkfdTv = 0.0;
+    add_to_dW_2r3p ( speceminus, specNO, specNOplus, speceminus, speceminus, _kf32(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
+  }
+
+  if (REACTION[33]){
+    add_to_dW_fw_3r2p ( specN2plus, speceminus, speceminus, speceminus, specN2, 2.20E40, -4.5, 0.0 * R, Te, X, dWdTe, dWdrhok );
+  }
+
+  if (REACTION[34]){
+    add_to_dW_fw_3r2p ( specO2plus, speceminus, speceminus, speceminus, specO2, 2.20E40, -4.5, 0.0 * R, Te, X, dWdTe, dWdrhok );
+  }
+
+  if (REACTION[35]){
+    add_to_dW_fw_3r2p ( specNOplus, speceminus, speceminus, speceminus, specNO, 2.20E40, -4.5, 0.0 * R, Te, X, dWdTe, dWdrhok );
+  }  
 
 
   for (spec=0; spec<ns; spec++){
@@ -1158,6 +1330,12 @@ void find_Qei_Rodriguez2024( np_t np, gl_t *gl, spec_t rhok, double Estar, doubl
       add_to_Qei(gl,Te,specN,_ionizationpot(specN), _kf15(np,gl,Te), rhok, Qei);
     if (REACTION[16]) 
       add_to_Qei(gl,Te,specO,_ionizationpot(specO), _kf16(np,gl,Te), rhok, Qei);
+    if (REACTION[30]) 
+      add_to_Qei(gl,Te,specN2,_ionizationpot(specN2), _kf30(np,gl,Te), rhok, Qei);
+    if (REACTION[31]) 
+      add_to_Qei(gl,Te,specO2,_ionizationpot(specO2), _kf31(np,gl,Te), rhok, Qei);
+    if (REACTION[32]) 
+      add_to_Qei(gl,Te,specNO,_ionizationpot(specNO), _kf32(np,gl,Te), rhok, Qei);
 
  
 }
@@ -1170,6 +1348,11 @@ void find_dQei_dx_Rodriguez2024( np_t np, gl_t *gl, spec_t rhok, double Estar, d
       add_to_dQei(gl,Te,specN,_ionizationpot(specN), _kf15(np,gl,Te), 0.0, rhok, dQeidrhok, dQeidTe);
     if (REACTION[16]) 
       add_to_dQei(gl,Te,specO,_ionizationpot(specO), _kf16(np,gl,Te), 0.0, rhok, dQeidrhok, dQeidTe);
-
+    if (REACTION[30])           
+      add_to_dQei(gl,Te,specN2,_ionizationpot(specN2), _kf30(np,gl,Te), 0.0, rhok, dQeidrhok, dQeidTe);
+    if (REACTION[31]) 
+      add_to_dQei(gl,Te,specO2,_ionizationpot(specO2), _kf31(np,gl,Te), 0.0, rhok, dQeidrhok, dQeidTe);
+    if (REACTION[32]) 
+      add_to_dQei(gl,Te,specNO,_ionizationpot(specNO), _kf32(np,gl,Te), 0.0, rhok, dQeidrhok, dQeidTe);
 
 }

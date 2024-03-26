@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAR 26a
+  * in model/chem/_Air_Plasma_11s/rodriguez2024.c
+    - added Townsend ionization of N2+, O2+, NO+
+    - added three body recombination of N2+, O2+, and NO+
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - added Townsend ionization of N2+, O2+, NO+ to rodriguez2024 solver
+    - added three body recombination of N2+, O2+, and NO+ to rodriguez2024 solver
+
+
 2024 MAR 25a
   * in model/chem/*/*.c and model/share/chem_share.c
     - added *gl and T parameters to add_to_Qei() and add_to_dQei() functions

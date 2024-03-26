@@ -98,10 +98,11 @@
 {This control file can be used to obtain EoverN as a function of Te using the specified electron
  energy transport equation}
  
-EdotJe=1e8; {vary EdotJe between 1e3 and 1e9 W/m3}
+EdotJe=3e6; {vary EdotJe between 1e3 and 1e9 W/m3}
 
-{note:  EoverN=sqrt(EdotJe/mue)/N; with mue and N obtained from the post file near the outflow 
-        Te is obtained from the post file near the outflow}
+{notes: * EoverN=sqrt(EdotJe/(mue*e*Ne))/N; with e the elementary charge, and mue, N, Ne obtained from 
+          the post file near the outflow
+        * Te is obtained from the post file near the outflow}
 
 is=1;
 ie=10;
@@ -202,7 +203,7 @@ Bdry(
            if TEMODEL is set to PARENT2024, set relaxTe to 0.1}
 Model(
   NavierStokesPlasma(
-    TEMODEL=TEMODEL_TRANSPORT_PARENT2024;
+    TEMODEL=TEMODEL_TRANSPORT_KIM2012;
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=YES;
@@ -237,7 +238,7 @@ Model(
     TrefElectronEnergyTransport=100.0; {reference temperature used in electron energy transport Qe term}
   );
   AirPlasma11s(
-    CHEMMODEL=CHEMMODEL_PARENT2023;
+    CHEMMODEL=CHEMMODEL_RODRIGUEZ2024;
     for (react,1,6, ADDITIONALREACTION[react]=FALSE;); {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE generally}
     QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}
