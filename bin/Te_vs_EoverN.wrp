@@ -98,7 +98,7 @@
 {This control file can be used to obtain EoverN as a function of Te using the specified electron
  energy transport equation}
  
-EdotJe=3e6; {vary EdotJe between 1e3 and 1e9 W/m3}
+EdotJe=3e6; {start: 2.5e6  vary EdotJe between 1e3 and 1e9 W/m3}
 
 {notes: * EoverN=sqrt(EdotJe/(mue*e*Ne))/N; with e the elementary charge, and mue, N, Ne obtained from 
           the post file near the outflow

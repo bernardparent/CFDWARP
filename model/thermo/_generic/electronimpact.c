@@ -31,58 +31,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static double _EoverN_from_Te_H_Morgan(double Te){
   double EoverN;
-  /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections */
+  /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections
+    Two excitation cross-section sets
+    Ionization cross section in the Morgan database is sourced from
+    Fite, Wade L., and R. T. Brackmann. "Collisions of electrons with hydrogen atoms. I. Ionization." 
+    Physical Review 112.4 (1958): 1141. 
+  */
   /* log K */
   double Te_data[] = 
   { 
-    6.10955759023806,
-    6.11058825252976,
-    6.11264639578264,
-    6.11905092644849,
-    6.13551324579841,
-    6.17732947085113,
-    6.26932719081473,
-    6.44204443466952,
-    6.71252448865311,
-    7.08223304152285,
-    7.55126153661038,
-    8.13156771780325,
-    8.84331222217878,
-    9.70203062068486,
-    10.3866246486031,
-    10.6277867054200,
-    10.8077150746143,
-    11.0309995603238,
-    11.3463395697431,
-    11.7988853189096,
-    12.2742147582549,
+    6.11033068652705,
+    6.11393058756052,
+    6.14077443794177,
+    6.23216982760437,
+    6.68882940347612,
+    7.85542292975633,
+    8.88272619071966,
+    9.86053155270631,
+    10.5666170813485,
+    11.1170083053207,
+    13.0941975227273,
     15.4249484703984
   };
   /* log Vm^2*/
   double EoverN_data[] = 
   { 
-    -52.9710237752345,
-    -52.0336121941841,
-    -51.5130088549234,
-    -50.9924846520783,
-    -50.4720536088765,
-    -49.9508086400425,
-    -49.4304530527132,
-    -48.9097613283098,
-    -48.3889819226718,
-    -47.8681639417493,
-    -47.3477899531147,
-    -46.8269271514765,
-    -46.3062070876381,
-    -45.7854988191063,
-    -45.2650643362336,
-    -44.7441801799264,
-    -44.2234497542938,
-    -43.7031878349985,
-    -43.1820998634711,
-    -42.6615654255782,
-    -42.2448171725761,
-    -40.3479193852247
+    -52.1379167435347,
+    -51.3570438413659,
+    -50.3807566097887,
+    -49.5997764374038,
+    -48.4282564730751,
+    -47.0614794348485,
+    -46.2804862910852,
+    -45.6947269609332,
+    -44.9135483965923,
+    -43.5469925827967,
+    -41.5943358686612,
+    -40.4532799008825
   };
   
   int N = sizeof(Te_data)/sizeof(Te_data[0]);
@@ -93,58 +78,130 @@ static double _EoverN_from_Te_H_Morgan(double Te){
 
 static double _Te_from_EoverN_H_Morgan(double EoverN){
   double Te;
-  /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections */
+  /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections
   /* log Vm^2*/
   double EoverN_data[] = 
   { 
-    -52.9710237752345,
-    -52.0336121941841,
-    -51.5130088549234,
-    -50.9924846520783,
-    -50.4720536088765,
-    -49.9508086400425,
-    -49.4304530527132,
-    -48.9097613283098,
-    -48.3889819226718,
-    -47.8681639417493,
-    -47.3477899531147,
-    -46.8269271514765,
-    -46.3062070876381,
-    -45.7854988191063,
-    -45.2650643362336,
-    -44.7441801799264,
-    -44.2234497542938,
-    -43.7031878349985,
-    -43.1820998634711,
-    -42.6615654255782,
-    -42.2448171725761,
-    -39.1439465808988
+    -52.1379167435347,
+    -51.3570438413659,
+    -50.3807566097887,
+    -49.5997764374038,
+    -48.4282564730751,
+    -47.0614794348485,
+    -46.2804862910852,
+    -45.6947269609332,
+    -44.9135483965923,
+    -43.5469925827967,
+    -41.5943358686612,
+    -40.4532799008825
   };
   /* log K */
   double Te_data[] = 
   { 
-    6.10955759023806,
-    6.11058825252976,
-    6.11264639578264,
-    6.11905092644849,
-    6.13551324579841,
-    6.17732947085113,
-    6.26932719081473,
-    6.44204443466952,
-    6.71252448865311,
-    7.08223304152285,
-    7.55126153661038,
-    8.13156771780325,
-    8.84331222217878,
-    9.70203062068486,
-    10.3866246486031,
-    10.6277867054200,
-    10.8077150746143,
-    11.0309995603238,
-    11.3463395697431,
-    11.7988853189096,
-    12.2742147582549,
+    6.11033068652705,
+    6.11393058756052,
+    6.14077443794177,
+    6.23216982760437,
+    6.68882940347612,
+    7.85542292975633,
+    8.88272619071966,
+    9.86053155270631,
+    10.5666170813485,
+    11.1170083053207,
+    13.0941975227273,
     15.4249484703984
+  };
+
+  int N = sizeof(EoverN_data)/sizeof(EoverN_data[0]);
+  EoverN = ( min( EoverN_data[N-1], max( log( EoverN) , EoverN_data[0] ) ) );
+  Te = exp( EXM_f_from_monotonespline(N, EoverN_data, Te_data, EoverN) );
+  return(Te);
+}
+
+static double _EoverN_from_Te_H2_Morgan(double Te){
+  double EoverN;
+  /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections 
+    Added the Phelps' data for the 13.86 eV excitation process to the Morgan database. 
+    Morgan's original data didn't include the 13.86 eV excitation process.
+  */
+  
+  /* log K */
+  double Te_data[] = 
+  { 
+    6.11033068652705,
+    6.11393058756052,
+    6.13676842357083,
+    6.20442238272387,
+    6.51132074413782,
+    7.37429148857443,
+    8.37645272369656,
+    8.84949075064230,
+    9.34484860305746,
+    9.93632539207584,
+    10.7526685939775,
+    11.4948541084563,
+    15.4249484703984
+  };
+  /* log Vm^2*/
+  double EoverN_data[] = 
+  { 
+    -53.3095821519381,
+    -52.5283242840063,
+    -51.5521354105511,
+    -50.7712733061790,
+    -49.5997764374038,
+    -48.2329546677074,
+    -46.8661131279339,
+    -46.0851552361401,
+    -45.3040664940369,
+    -44.7182809883681,
+    -43.9373759163476,
+    -42.7659153297301,
+    -40.0355447001826
+  };
+  
+  int N = sizeof(Te_data)/sizeof(Te_data[0]);
+  Te = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
+  EoverN = exp( EXM_f_from_monotonespline(N, Te_data, EoverN_data, Te) );
+  return(EoverN);
+}
+
+static double _Te_from_EoverN_H2_Morgan(double EoverN){
+  double Te;
+  /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections
+  /* log Vm^2*/
+  double EoverN_data[] = 
+  { 
+    -53.3095821519381,
+    -52.5283242840063,
+    -51.5521354105511,
+    -50.7712733061790,
+    -49.5997764374038,
+    -48.2329546677074,
+    -46.8661131279339,
+    -46.0851552361401,
+    -45.3040664940369,
+    -44.7182809883681,
+    -43.9373759163476,
+    -42.7659153297301,
+    -40.0355447001826
+  };
+  /* log K */
+  double Te_data[] = 
+  { 
+    6.11033068652705,
+    6.11393058756052,
+    6.13676842357083,
+    6.20442238272387,
+    6.51132074413782,
+    7.37429148857443,
+    8.37645272369656,
+    8.84949075064230,
+    9.34484860305746,
+    9.93632539207584,
+    10.7526685939775,
+    11.4948541084563,
+    15.4249484703984L
   };
 
   int N = sizeof(EoverN_data)/sizeof(EoverN_data[0]);
@@ -893,6 +950,9 @@ double _EoverNk_from_Te(long spec, double Te){
     case SMAP_H:
       Estar=_EoverN_from_Te_H_Morgan(Te);
     break;
+    case SMAP_H2:
+      Estar=_EoverN_from_Te_H2_Morgan(Te);
+    break;
     case SMAP_N:
       Estar=_EoverN_from_Te_N_Morgan(Te);
     break;
@@ -934,6 +994,10 @@ double _EoverN_from_rhok_Te(spec_t rhok, double Te){
       break;
       case SMAP_H:
         Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_H_Morgan(Te);
+        Nsum+=rhok[spec]/_m(spec);
+      break;
+      case SMAP_H2:
+        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_H2_Morgan(Te);
         Nsum+=rhok[spec]/_m(spec);
       break;
       case SMAP_N:
@@ -983,6 +1047,10 @@ double _Te_from_rhok_EoverN(spec_t rhok, double EoverN){
       break;
       case SMAP_H:
         Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_H_Morgan(EoverN);
+        Nsum+=rhok[spec]/_m(spec);
+      break;
+      case SMAP_H2:
+        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_H2_Morgan(EoverN);
         Nsum+=rhok[spec]/_m(spec);
       break;
       case SMAP_N:

@@ -101,9 +101,12 @@ rho=2.61 kg/m3
 
 
 
-dphi=3000; {voltage difference between the cathode and the anode in V}
+dphi=1500; {voltage difference between the cathode and the anode in V}
 Rballast=30000; {ballast resistor in Ohm}
-gammaeminus_electrode=0.4; {Secondary Electron Emission (SEE) coefficient on electrodes}
+
+Relectrodebreakdown=Rballast; {in Ohm; don't change this unless absolutely needed}
+Relectrode=1;           {in Ohm; don't change this unless absolutely needed}
+gammaeminus_electrode=0.3; {Secondary Electron Emission (SEE) coefficient on electrodes}
 gammaeminus_dielectric=0.1; {SEE coefficient on dielectric walls}
 
 
@@ -116,7 +119,8 @@ is3=is2+round(mf*16);  {start of 2nd electrode}
 is4=is3+round(mf*16);  {end of 2nd electrode}
 ie=is4+round(mf*30);   {end of domain}
 js=1;
-js1=js+round(mf*10);   {start of bdry layer region}
+js0=js+round(mf*10);   {end of ballast resistance and start of electrode region}
+js1=js0+round(mf*10);   {end of electrode and start of bdry layer region}
 js2=js1+round(mf*35);  {end of bdry layer region}
 je=js2+round(mf*10);   {end of domain}
 
@@ -133,6 +137,7 @@ xs4=xs3+elecwidth;
 H=0.02;  {height of the domain in m}
 Hbdry=0.005; {max height of boundary layer region in m}
 Hballast=0.0003;  {height of the ballast resistor in m}
+Helectrode=0.0003; {height of the electrode in m}
 dwall=1e-5/mf;   {distance between wall and near wall node in m}
 dx=dwall*25/mf;
 
@@ -159,9 +164,12 @@ Grid(
   JoinCorners(is4,js1, ie,js2,  GE,0.5e0,1,1.0e0,  FE,0.7e0,dwall,1.0e0);
   
   {grid the dielectric and conductor sections under the plate }
+  Copy(is,js1,ie,js1, is,js0);
+  Translate(is,js0,ie,js0,0,-Helectrode);
   Copy(is,js1,ie,js1, is,js);
-  Translate(is,js,ie,js,0,-Hballast);
-  Join(is,js,ie,js1,j,FG,0.5,dwall,1.0);
+  Translate(is,js,ie,js,0,-Hballast-Helectrode);
+  Join(is,js0,ie,js1,j,FG,0.5,dwall,1.0);
+  Join(is,js,ie,js0,j,FG,0.5,dwall,1.0);
 
   {grid the inviscid region above the bdry layer region}
   Copy(is,js2, ie,js2, is,je);
@@ -306,7 +314,8 @@ Model(
     so sigma=Hballast/(Rballast*elecdepth*elecwidth) 
     }
    { SetSolidConductivity(is1,js, is2,js1, Hballast/(Rballast*elecdepth*elecwidth) {S/m}); }
-    SetSolidConductivity(is3,js, is4,js1, Hballast/(Rballast*elecdepth*elecwidth) {S/m});
+    SetSolidConductivity(is3,js0, is4,js1, Helectrode/(Relectrode*elecdepth*elecwidth) {S/m});
+    SetSolidConductivity(is3,js, is4,js0, Hballast/(Rballast*elecdepth*elecwidth) {S/m});
     SetElectroMotiveForce(is,js, ie,je, 0.0{V/m},0.0{V/m}, 1e99{max power in W/m3});
     AXISYMMETRIC=NO;
   );
@@ -341,12 +350,16 @@ rho=2.61 kg/m3}
     T=57.35; {K}
     Tv=T; {K}
     Te=T; {K}
-    Species("O2","N2","e-","default");
+    Species("O2","N2","e-","N2+","default");
     chi_O2=0.21;
     chi_N2=0.79;
     chi_eminus=1e-9;
+    chi_N2plus=chi_eminus;
     chi_default=1e-30;
-    All(INIT_TYPE6,Vx,Vy,P,T,chi_O2,chi_N2,chi_eminus,chi_default,Tv,Te);
+    All(INIT_TYPE6,Vx,Vy,P,T,chi_O2,chi_N2,chi_eminus,chi_N2plus,chi_default,Tv,Te);
+    chi_eminus=1e-4;
+    chi_N2plus=chi_eminus;
+    {Region(is+3,js1,  is4,js2, INIT_TYPE6,Vx,Vy,P,T,chi_O2,chi_N2,chi_eminus,chi_N2plus,chi_default,Tv,Te);}
     {
     Bdry(BDRY_WALLTFIXED1, INIT_TYPE6,Vx,Vy,P,T,chi_O2,chi_N2,chi_eminus,chi_default,Tv,Te);
     Region(is,js,  ie,je, INIT_TYPE6,Vx,Vy,P,T,chi_O2,chi_N2,chi_eminus,chi_default,Tv,Te);
@@ -463,17 +476,28 @@ Cycle(
     if (iter==1,
       CFL=0.001;
     );
-    CFLmax=0.5;
-    if (iter<800*mf, CFLmax=0.2;);
-    CFL=min(CFL*1.05,CFLmax);
+    if (iter<600*mf, 
+      CFLmax=0.4;
+      Relectrodelocal=Relectrodebreakdown;
+    , {else}
+      CFLmax=0.5;
+      fact=min(1400*mf,iter-600*mf)/(1400*mf);
+      Relectrodelocal=exp(fact*ln(Relectrode)+(1-fact)*ln(Relectrodebreakdown));
+    );
+    CFL=min(CFL*1.04,CFLmax);
     Init(Epotential(Region(is3,js,  is4,js,INITEMF_TYPE1,dphi);););
+    Model(
+      Epotential(
+        SetSolidConductivity(is3,js0, is4,js1, Helectrode/(Relectrodelocal*elecdepth*elecwidth) {S/m});
+      );
+    );
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     Lc=1e0;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
     UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,4);
     UpdateEMField(Lc,relaxEMF,TSEMF_SOR,50); 
-    printf("%6.2f %6ld %9.3f   %E (%2ld %4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
-           CFL,iter,effiter_U,ximax,flux_ximax,i_ximax,
+    printf("%4.2f %6.2f %6ld %9.3f   %E (%2ld %4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
+           Relectrodelocal,CFL,iter,effiter_U,ximax,flux_ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
   );
 );

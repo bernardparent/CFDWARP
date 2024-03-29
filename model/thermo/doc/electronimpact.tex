@@ -37,6 +37,91 @@ All remaining parameters are kept to the default value.
 The electron energy range in which BOLSIG+ results are valid depend on the energy range of the corresponding cross-section data. Here, only the converged runs are kept, and any results extrapolated by BOLSIG+ are discarded. For higher electron temperatures for which there is no BOLSIG+ solution, the data is extrapolated by placing a spline control point for an electron temperature of $5\cdot10^6$ K, and a corresponding $E/N$ value that reflects the trend of the converged BOLSIG+ results. This last control point can be be modified to get the desired accuracy at very high temperatures. Results for several mixtures are shown below.
 
 %
+\subsection{Atomic hydrogen ($\rm H$)}
+
+All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableH}. The reduced electric field results are shown in Fig. \ref{fig:electronimpact_H}.
+
+\begin{table*}[!htbp]
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{$\rm H$ electron impact processes with available cross-section data.}
+    \label{tab:tableH}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}llll}
+    \toprule
+    {no.}  & {process} & {type} &  {eV range}  &  {ref.} \\
+    \midrule
+      1 & $\rm e^- + H \rightarrow H^+ + e^- + e^-$  &  ionization  &  13.6-800  &  \cite{lxc:2024:morgan} \\ 
+        \midrule
+      2 & $\rm e^- + H \rightarrow e^- + H$  &  momentum transfer   &  0-1000  & \cite{lxc:2024:morgan}\\  
+        \midrule
+      3 & $\rm e^- + H \rightarrow e^- + H(2p)$  &  excitation   &  10.2-1000  & \cite{lxc:2024:morgan}\\ 
+      4 & $\rm e^- + H \rightarrow e^- + H(2s)$  &  excitation   &  10.2-1000  & \cite{lxc:2024:morgan}\\ 
+
+    \bottomrule
+    \end{tabular*}
+   \end{threeparttable}
+\end{table*}
+
+\begin{figure}[!htbp]
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figureH.png}}
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figureH_error.png}}
+\caption{$E/N$ results for $\rm H$, showing (a) reduced electric field as a function of the electron temperature and (b) error percentage when fitting a cubic spline through BOLSIG+ data. The electron impact cross-sectional data used in the BOLSIG+ calculation is sourced from the Morgan database, Ref.\ \cite{lxc:2024:morgan}.}
+\label{fig:electronimpact_H}
+\end{figure}
+
+%
+\subsection{Hydrogen ($\rm H_2$)}
+
+All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableH2}. The reduced electric field results are shown in Fig. \ref{fig:electronimpact_H2}.
+
+\begin{table*}[!htbp]
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{$\rm H_2$ electron impact processes with available cross-section data.}
+    \label{tab:tableH2}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}llll}
+    \toprule
+    {no.}  & {process} & {type} &  {eV range}  &  {ref.} \\
+    \midrule
+      1 & $\rm e^- + H_2 \rightarrow H_2^+ + e^- + e^-$  &  ionization  &  13.6-800  &  \cite{lxc:2024:morgan} \\ 
+        \midrule
+      2 & $\rm e^- + H_2 \rightarrow e^- + H_2$  &  momentum transfer   &  0-1000  & \cite{lxc:2024:morgan}\\  
+        \midrule
+      3 & $\rm e^- + H_2 \rightarrow e^- + H_2(00\rightarrow 20)$  &  rotational excitation   &  0.044-1000  & \cite{lxc:2024:morgan}\\ 
+      4 & $\rm e^- + H_2 \rightarrow e^- + H_2(10\rightarrow 30)$  &  rotational excitation   &  0.079-1000  & \cite{lxc:2024:morgan}\\ 
+              \midrule
+      5 & $\rm e^- + H_2 \rightarrow e^- + H_2$$(\nu_1)$  &  vibrational excitation   &  0.516-1000  & \cite{lxc:2024:morgan}\\
+      6 & $\rm e^- + H_2 \rightarrow e^- + H_2$$(\nu_2)$  &  vibrational excitation   &  1.000-1000  & \cite{lxc:2024:morgan}\\
+      7 & $\rm e^- + H_2 \rightarrow e^- + H_2$$(\nu_3)$  &  vibrational excitation   &  1.500-1000  & \cite{lxc:2024:morgan}\\
+                    \midrule
+      8 & $\rm e^- + H_2 \rightarrow e^- + H_2$$(B^3\Sigma)$  &  electronic excitation   &  8.900-1000  & \cite{lxc:2024:morgan}\\
+      9 & $\rm e^- + H_2 \rightarrow e^- + H_2$$(B^1\Sigma)$  &  electronic excitation   &  11.30-1000  & \cite{lxc:2024:morgan}\\
+      10 & $\rm e^- + H_2 \rightarrow e^- + H_2$$(C^3\Pi)$  &  electronic excitation   &  11.75-1000  & \cite{lxc:2024:morgan}\\
+      11 & $\rm e^- + H_2 \rightarrow e^- + H_2$$(A^3\Sigma)$  &  electronic excitation   &  11.80-1000  & \cite{lxc:2024:morgan}\\
+     12 & $\rm e^- + H_2 \rightarrow e^- + H_2$$(C^1\Pi)$  &  electronic excitation   &  12.40-1000  & \cite{lxc:2024:morgan}\\
+     13 & $\rm e^- + H_2 \rightarrow e^- + H_2$$({}^1\Sigma)$  &  electronic excitation   &  13.86-1000  & \cite{lxc:2024:morgan}\\
+     14 & $\rm e^- + H_2 \rightarrow e^- + H_2$$(D^3\Pi)$  &  electronic excitation   &  14.00-1000  & \cite{lxc:2024:morgan}\\
+     15 & $\rm e^- + H_2 \rightarrow e^- + H_{2}^*$  &  excitation   &  15.00-1000  & \cite{lxc:2024:morgan}\\
+     16 & $\rm e^- + H_2 \rightarrow e^- + H_2$(Rydberg)  &  excitation   &  15.20-1000  & \cite{lxc:2024:morgan}\\
+     16 & $\rm e^- + H_2 \rightarrow e^- + H_{2}^*$  &  excitation   &  16.60-1000  & \cite{lxc:2024:morgan}\\
+    \bottomrule
+    \end{tabular*}
+   \end{threeparttable}
+\end{table*}
+
+\begin{figure}[!htbp]
+\centering
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figureH2.png}}
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figureH2_error.png}}
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figureH2_drift.png}}
+\caption{$E/N$ results for $\rm H_2$, showing (a) reduced electric field as a function of the electron temperature, (b) error percentage when fitting a cubic spline through BOLSIG+ data and c) drift velocity obtained from BOLSIG+ data as the product of the reduced electron mobility and the reduced electric field. The electron impact cross-sectional data used in the BOLSIG+ calculation is sourced from the Morgan database, Ref.\ \cite{lxc:2024:morgan}. Experimental drift velocity data is taken from Refs.\ \cite{thesis:1965:schlumbohm} and \cite{jop:1977:saelee}.}
+\label{fig:electronimpact_H2}
+\end{figure}
+%
+
+%
 \subsection{Atomic nitrogen ($\rm N$)}
 
 All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableN}. The reduced electric field results are shown in Fig. \ref{fig:electronimpact_4}.
@@ -367,4 +452,3 @@ All the processes involving cross-sections used in the BOLSIG+ calculation are g
 \end{tablenotes}
    \end{threeparttable}
 \end{table}
-

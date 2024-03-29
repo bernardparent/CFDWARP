@@ -470,7 +470,21 @@ where $(c_p)_k$ is the specific heat at constant pressure of the $k$th species a
   \midrule  
   \multirow{2}{*}{6} &  \multirow{2}{*}{ $\rm e^- + NH_3  $   } & ${\rm ln}~T_{\rm e}$  & \tiny     5.7038    6.1905    6.2414    7.0362    9.5653   10.0472   10.4282   10.7074   11.2676   11.7446   13.0609   14.9141 \\
   &  & ${\rm ln}~\mu_{\rm e}N$   & \tiny 58.8996   58.6144   57.2080   56.0505   55.8498   55.4609   55.2620   55.2282   55.0865   54.4855   54.2678 \\
- 
+    \midrule  
+  \multirow{2}{*}{7} &  \multirow{2}{*}{ $\rm e^- + NH_3(v)  $   } & ${\rm ln}~T_{\rm e}$  & \tiny     5.7038    6.1905    6.2414    7.0362    9.5653   10.0472   10.4282   10.7074   11.2676   11.7446   13.0609   14.9141 \\
+  &  & ${\rm ln}~\mu_{\rm e}N$   & \tiny 58.8996   58.6144   57.2080   56.0505   55.8498   55.4609   55.2620   55.2282   55.0865   54.4855   54.2678 \\
+     \midrule  
+  \multirow{2}{*}{8} &  \multirow{2}{*}{ $\rm e^- + H  $   } & ${\rm ln}~T_{\rm e}$  & \tiny         5.7038         6.4001    6.9516    7.2693    8.0837    8.5960    9.1904   10.1562   10.7033   11.1170   11.6913   12.5550   13.3973   14.0927   15.4878   16.7186   17.2690
+ \\
+  &  & ${\rm ln}~\mu_{\rm e}N$   & \tiny   56.8715     56.3360   56.0586   55.9273   55.6794   55.5819   55.5128   55.4844   55.5313   55.5992   55.6880   55.7106   55.6715   55.6781   55.8609   56.0858   56.0636
+ \\
+     \midrule  
+  \multirow{2}{*}{9} &  \multirow{2}{*}{ $\rm e^- + H_2  $   } & ${\rm ln}~T_{\rm e}$  & \tiny   5.7038    6.1103    6.1618    6.3172    6.6995    7.5309    8.1227    8.4969    9.0868    9.9363   10.4246   10.7527   11.4949   12.2070   13.6947   14.7153   15.5977
+
+ \\
+  &  & ${\rm ln}~\mu_{\rm e}N$   & \tiny    58.2578   58.0042   57.9279   57.7797   57.4956   56.9030   56.4496   56.1589   55.7420   55.4435   55.4510   55.5105   55.6575   55.6260   55.3316   55.2690   55.3427
+
+ \\
                        
     \bottomrule
     \end{tabular*}
@@ -506,6 +520,22 @@ where $(c_p)_k$ is the specific heat at constant pressure of the $k$th species a
     \end{tablenotes}
    \end{threeparttable}
 \end{table*}
+%
+\begin{figure}
+\centering
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{figs/mobility_H.png}}
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{figs/mobility_H_error.png}}
+\caption{Results for the mobility of electrons in ${\rm H}$, showing (a) product of mobility and number density, and (b) error percentage of cubic spline fit of  mobility data. The BOLSIG+ calculation uses electron impact cross sections from the Morgan database in Ref.\ \citen{jcp:2012:morgan}.}
+\label{fig:mobility_H}
+\end{figure}
+%
+\begin{figure}
+\centering
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{figs/mobility_H2.png}}
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{figs/mobility_H2_error.png}}
+\caption{Results for the mobility of electrons in ${\rm H_2}$, showing (a) product of mobility and number density, and (b) error percentage of cubic spline fit of  mobility data. The BOLSIG+ calculation uses electron impact cross sections from the Morgan database in Ref.\ \citen{jcp:2012:morgan}.}
+\label{fig:mobility_H2}
+\end{figure}
 %
 \begin{figure}
 \centering

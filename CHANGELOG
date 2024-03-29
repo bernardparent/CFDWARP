@@ -7,6 +7,23 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAR 29a
+  * in bin/Broslawski.wrp
+    - improved the control file to add a high conductivity region above the ballast resistance
+      region
+  * in model/share/transport_share.c
+    - added _mueN_H(), _mueN_H2()
+  * in model/thermo/_generic/electronimpact.c
+    - updated _EoverN_from_Te_H_Morgan()
+    - updated _Te_from_EoverN_H_Morgan()
+    - added _EoverN_from_Te_H2_Morgan()
+    - added _Te_from_EoverN_H2_Morgan()
+  * in model/thermo/doc/electronimpact.tex
+    - added documentation for H and H2
+  * in model/transport/doc/report.tex
+    - added documentation for H and H2
+
+
 2024 MAR 26a
   * in model/chem/_Air_Plasma_11s/rodriguez2024.c
     - added Townsend ionization of N2+, O2+, NO+

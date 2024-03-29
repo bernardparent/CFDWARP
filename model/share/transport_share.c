@@ -814,6 +814,132 @@ static double _mueN_NH3(double Te){
   return(exp( mueN_NH3 ));
 }
 
+static double _mueN_H(double Te){
+  double mueN_H;  
+  /* 
+  Data in log-log coordinates. 
+  Obtained with BOLSIG+ using Morgan LXCat cross-sections 
+  Two excitation cross-section sets
+  Ionization cross section in the Morgan database is sourced from
+  Fite, Wade L., and R. T. Brackmann. "Collisions of electrons with hydrogen atoms. I. Ionization." 
+  Physical Review 112.4 (1958): 1141. 
+  */
+
+  /* log K */
+  double Te_control[] = 
+  { 
+    5.70378247465620,
+    6.11033068652705,
+    6.11393058756052,
+    6.12414518097023,
+    6.17298373730982,
+    6.40013569714949,
+    6.95164912482471,
+    7.26925438818462,
+    8.08368158173731,
+    8.59600983538784,
+    9.19037664351963,
+    10.1562070317188,
+    10.7033198225875,
+    11.1170083053207,
+    11.6912942830039,
+    12.5549622730380,
+    13.3972772699922,
+    14.0927137885248,
+    15.4877647730235,
+    16.7186180260239,
+    17.2690070550377
+  };
+  /* log m2/Vs*/
+  double mueN_control[] = 
+  { 
+    56.8714801442912,
+    56.5258864332204,
+    56.5224898831110,
+    56.5142336084535,
+    56.4775482719967,
+    56.3360202395668,
+    56.0586481207853,
+    55.9273042089275,
+    55.6794359108305,
+    55.5819494516036,
+    55.5128009502043,
+    55.4843854630005,
+    55.5313057187849,
+    55.5992284992120,
+    55.6879633485326,
+    55.7105668294257,
+    55.6714993612348,
+    55.6781175190773,
+    55.8608787329458,
+    56.0857789821206,
+    56.0635952862608
+  };
+  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
+  mueN_H = EXM_f_from_monotonespline(N, Te_control, mueN_control, Te);
+  return(exp( mueN_H ));
+}
+
+static double _mueN_H2(double Te){
+  double mueN_H2;  
+  /* 
+  Data in log-log coordinates. 
+  Obtained with BOLSIG+ using Morgan LXCat cross-sections 
+  Added the Phelps' data for the 13.86 eV excitation process to the Morgan database. 
+  Morgan's original data didn't include the 13.86 eV excitation process.
+  */
+
+  /* log K */
+  double Te_control[] = 
+  { 
+    5.70378247465620,
+    6.11033068652705,
+    6.16179140636237,
+    6.31716472969687,
+    6.69946168754399,
+    7.53093438152965,
+    8.12265439173682,
+    8.49687424420040,
+    9.08681659226334,
+    9.93632539207584,
+    10.4245505422303,
+    10.7526685939775,
+    11.4948541084563,
+    12.2069625312457,
+    13.6947403366686,
+    14.7152648530426,
+    15.5976703062368
+  };
+  /* log m2/Vs*/
+  double mueN_control[] = 
+  { 
+    58.2577745054111,
+    58.0041717466122,
+    57.9278805841500,
+    57.7797387044681,
+    57.4955987384407,
+    56.9029788113506,
+    56.4495807297196,
+    56.1589462499311,
+    55.7419961919560,
+    55.4435301079025,
+    55.4510083313697,
+    55.5104635903556,
+    55.6574570041118,
+    55.6259906597623,
+    55.3315682945057,
+    55.2690178455935,
+    55.3427001348746
+  };
+  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
+  mueN_H2 = EXM_f_from_monotonespline(N, Te_control, mueN_control, Te);
+  return(exp( mueN_H2 ));
+}
+
 
 double _mueNk_from_Te_ParentMacheret(long spec, double Te){
   double mueN;
@@ -838,6 +964,12 @@ double _mueNk_from_Te_ParentMacheret(long spec, double Te){
     break;
     case SMAP_NH3v:
       mueN=_mueN_NH3(Te);
+    break;
+    case SMAP_H:
+      mueN=_mueN_H(Te);
+    break;
+    case SMAP_H2:
+      mueN=_mueN_H2(Te);
     break;
     default:
       mueN=3.74E19*exp(33.5/sqrt(log(Te)));
