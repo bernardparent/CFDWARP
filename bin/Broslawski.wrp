@@ -101,12 +101,12 @@ rho=2.61 kg/m3
 
 
 
-dphi=1500; {voltage difference between the cathode and the anode in V}
+dphi=3000; {voltage difference between the cathode and the anode in V}
 Rballast=30000; {ballast resistor in Ohm}
 
 Relectrodebreakdown=Rballast; {in Ohm; don't change this unless absolutely needed}
 Relectrode=1;           {in Ohm; don't change this unless absolutely needed}
-gammaeminus_electrode=0.3; {Secondary Electron Emission (SEE) coefficient on electrodes}
+gammaeminus_electrode=1.0; {Secondary Electron Emission (SEE) coefficient on electrodes}
 gammaeminus_dielectric=0.1; {SEE coefficient on dielectric walls}
 
 
@@ -477,7 +477,7 @@ Cycle(
       CFL=0.001;
     );
     if (iter<600*mf, 
-      CFLmax=0.4;
+      CFLmax=0.3;
       Relectrodelocal=Relectrodebreakdown;
     , {else}
       CFLmax=0.5;
