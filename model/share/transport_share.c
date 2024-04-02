@@ -814,6 +814,59 @@ static double _mueN_NH3(double Te){
   return(exp( mueN_NH3 ));
 }
 
+static double _mueN_NH3v(double Te){
+  double mueN_NH3v;  
+  /* 
+  Data in log-log coordinates. 
+  Obtained with BOLSIG+ using Morgan LXCat cross-sections shifted +0.118 eV 
+  and experimental data from
+  Lisovskiy, Valeriy, et al. "Electron drift velocity in NH3 in strong electric fields determined from rf breakdown curves." 
+  Journal of Physics D: Applied Physics 38.6 (2005): 872. 
+  */
+
+  /* log K */
+  double Te_control[] = 
+  { 
+    5.70378247465620,
+    6.18970768143374,
+    6.86488420284208,
+    7.95133409310987,
+    8.45970938503665,
+    9.15101486844620,
+    9.55586532298816,
+    9.91549622266251,
+    10.3436517210300,
+    10.6971251405748,
+    10.9740168916093,
+    11.1906299172501,
+    13.0612297139041,
+    14.9141228466324
+  };
+  /* log m2/Vs*/
+  double mueN_control[] = 
+  { 
+    54.0580694275312,
+    54.3205532745338,
+    54.9077485178850,
+    55.2136161382831,
+    55.2989557764110,
+    55.4280834472979,
+    55.5038762723374,
+    55.6665094870962,
+    55.6996465664097,
+    55.6851345965607,
+    55.4591109243742,
+    55.3036124238772,
+    54.6385490119691,
+    54.5688950512972
+  };
+  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
+  mueN_NH3v = EXM_f_from_monotonespline(N, Te_control, mueN_control, Te);
+  return(exp( mueN_NH3v ));
+}
+
 static double _mueN_H(double Te){
   double mueN_H;  
   /* 
@@ -963,7 +1016,7 @@ double _mueNk_from_Te_ParentMacheret(long spec, double Te){
       mueN=_mueN_NH3(Te);
     break;
     case SMAP_NH3v:
-      mueN=_mueN_NH3(Te);
+      mueN=_mueN_NH3v(Te);
     break;
     case SMAP_H:
       mueN=_mueN_H(Te);

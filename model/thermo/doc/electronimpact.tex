@@ -396,6 +396,18 @@ All the processes involving cross-sections used in the BOLSIG+ calculation are g
 \label{fig:electronimpact_6}
 \end{figure}
 %
+\subsection{Ammonia (vibrationally excited state $\rm NH_3$$(v)$)}
+
+The reduced electric field results are shown in Fig. \ref{fig:electronimpact_NH3v}. The cross-sections for electron impact with this vibrationally excited state of ammonia are obtained by shifting the energy threshold of all electron impact processes by +0.118 eV from the cross-section data of ground state ammonia.
+%
+\begin{figure}[!htbp]
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figureNH3v.png}}
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figureNH3v_error.png}}
+\caption{$E/N$ results for $\rm NH_3$$(v)$, showing (a) reduced electric field as a function of the electron temperature and (b) error percentage when fitting a cubic spline through the data. The electron impact cross-sectional data used in the BOLSIG+ calculation is sourced from the Hayashi database, Ref.\ \cite{springer:1987:hayashi}.}
+\label{fig:electronimpact_NH3v}
+\end{figure}
+%
+
 
 
 \begin{table}[!htbp]
@@ -442,8 +454,12 @@ All the processes involving cross-sections used in the BOLSIG+ calculation are g
   \multirow{2}{*}{6} &  \multirow{2}{*}{ $\rm e^- + NH_3  $   } & ${\rm ln}~T_{\rm e}$  & \tiny 6.2086    6.2700    6.8003    8.8806   10.1453   10.3802   10.7743   11.9975   15.4249   \\
   
   &  & ${\rm ln}~E^\star$     & \tiny   -46.3062  -45.8896  -45.3691  -44.9524  -44.5359  -44.3277  -43.5990  -41.7243  -39.7238  \\
+    \midrule  
+  \multirow{2}{*}{7} &  \multirow{2}{*}{ $\rm e^- + NH_3$$(v)$   } & ${\rm ln}~T_{\rm e}$  & \tiny     6.1332    6.2103    6.4055    6.4643    6.5402    6.6125    7.0325    9.3651   10.5660   10.9750   12.5994   15.4249
+  \\
   
-  
+  &  & ${\rm ln}~E^\star$     & \tiny     -49.7948  -49.0140  -48.0380  -47.2567  -46.4757  -46.0852  -45.3041  -44.7183  -43.9374  -43.1563  -41.2036  -39.4587
+  \\  
                        
     \bottomrule
     \end{tabular*}

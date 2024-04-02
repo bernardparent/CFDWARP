@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 APR 01a
+  * in model/share/transport_share.c
+    - added _mueN_NH3v()
+  * in model/thermo/_generic/electronimpact.c
+    - added _EoverN_from_Te_NH3v_Morgan()
+    - added _Te_from_EoverN_NH3v_Morgan()
+  * in model/transport/doc/report.tex
+    - added NH3v reduced mobility documentation
+  * in model/thermo/doc/electronimpact.tex
+    - added NH3v reduced electric field documentation
+
+
 2024 MAR 30a
   * in bin/Broslawski.wrp
     - modified control file

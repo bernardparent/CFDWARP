@@ -124,7 +124,7 @@ static double _EoverN_from_Te_H2_Morgan(double Te){
     Added the Phelps' data for the 13.86 eV excitation process to the Morgan database. 
     Morgan's original data didn't include the 13.86 eV excitation process.
   */
-  
+
   /* log K */
   double Te_data[] = 
   { 
@@ -481,6 +481,91 @@ static double _Te_from_EoverN_NH3_Snoeckx2023(double EoverN){
   Te = exp( EXM_f_from_monotonespline(N, EoverN_data, Te_data, EoverN) );
   return(Te);
 }
+
+static double _EoverN_from_Te_NH3v_Morgan(double Te){
+  double EoverN;
+  /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections */
+  /* log K */
+  double Te_data[] = 
+  { 
+    6.13324994796315,
+    6.21026693472015,
+    6.40551929023296,
+    6.46434883279277,
+    6.54022449032017,
+    6.61246330305119,
+    7.03247749924518,
+    9.36513245944587,
+    10.5660189952063,
+    10.9749679071665,
+    12.5993962383727,
+    15.4249484703984
+  };
+  /* log Vm^2*/
+  double EoverN_data[] = 
+  { 
+    -49.7948263288472,
+    -49.0139993573487,
+    -48.0380174235713,
+    -47.2566751645404,
+    -46.4757383535745,
+    -46.0851552361401,
+    -45.3040664940369,
+    -44.7182809883681,
+    -43.9373759163476,
+    -43.1563425604737,
+    -41.2035854952824,
+    -39.4586573257385
+  };
+  
+  int N = sizeof(Te_data)/sizeof(Te_data[0]);
+  Te = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
+  EoverN = exp( EXM_f_from_monotonespline(N, Te_data, EoverN_data, Te) );
+  return(EoverN);
+}
+
+static double _Te_from_EoverN_NH3v_Morgan(double EoverN){
+  double Te;
+  /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections */
+  /* log Vm^2*/
+  double EoverN_data[] = 
+  { 
+    -49.7948263288472,
+    -49.0139993573487,
+    -48.0380174235713,
+    -47.2566751645404,
+    -46.4757383535745,
+    -46.0851552361401,
+    -45.3040664940369,
+    -44.7182809883681,
+    -43.9373759163476,
+    -43.1563425604737,
+    -41.2035854952824,
+    -39.4586573257385
+  };
+  /* log K */
+  double Te_data[] = 
+  { 
+    6.13324994796315,
+    6.21026693472015,
+    6.40551929023296,
+    6.46434883279277,
+    6.54022449032017,
+    6.61246330305119,
+    7.03247749924518,
+    9.36513245944587,
+    10.5660189952063,
+    10.9749679071665,
+    12.5993962383727,
+    15.4249484703984
+  };
+
+  int N = sizeof(EoverN_data)/sizeof(EoverN_data[0]);
+  EoverN = ( min( EoverN_data[N-1], max( log( EoverN) , EoverN_data[0] ) ) );
+  Te = exp( EXM_f_from_monotonespline(N, EoverN_data, Te_data, EoverN) );
+  return(Te);
+}
+
 
 
 static double _EoverN_from_Te_N2(double Te){
@@ -936,7 +1021,7 @@ double _EoverNk_from_Te(long spec, double Te){
       Estar=_EoverN_from_Te_NH3_Morgan(Te);
     break;
     case SMAP_NH3v:
-      Estar=_EoverN_from_Te_NH3_Morgan(Te);
+      Estar=_EoverN_from_Te_NH3v_Morgan(Te);
     break;
     case SMAP_N2:
       Estar=_EoverN_from_Te_N2(Te);
@@ -977,7 +1062,7 @@ double _EoverN_from_rhok_Te(spec_t rhok, double Te){
         Nsum+=rhok[spec]/_m(spec);
       break;
       case SMAP_NH3v:
-        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_NH3_Morgan(Te);
+        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_NH3v_Morgan(Te);
         Nsum+=rhok[spec]/_m(spec);
       break;
       case SMAP_N2:
@@ -1030,7 +1115,7 @@ double _Te_from_rhok_EoverN(spec_t rhok, double EoverN){
         Nsum+=rhok[spec]/_m(spec);
       break;
       case SMAP_NH3v:
-        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_NH3_Morgan(EoverN);
+        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_NH3v_Morgan(EoverN);
         Nsum+=rhok[spec]/_m(spec);
       break;
       case SMAP_N2:
