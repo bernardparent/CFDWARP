@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 APR 02a
+  * in model/thermo/_generic/electronimpact.c
+    - modified _Te_from_EoverN_N2(), _Te_from_EoverN_O2(), _Te_from_EoverN_O2(), _Te_from_EoverN_N2()
+  * in model/thermo/doc/electronimpact.tex
+    - modified the tables for EoverN vs Te spline coefficients of N2 and O2
+  * in model/chem/_NH3_Plasma_10s/arakoni2007.c
+    - now use _averaged_rate_local() for reactions 24, 27, 31, 32, 35, 39, and 40
+
+
 2024 APR 01a
   * in model/share/transport_share.c
     - added _mueN_NH3v()
