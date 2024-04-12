@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 APR 12a
+  * in model/chem/_Air_Plasma_11s/rodriguez2024.c
+    - improved the electron impact reaction rates 
+  * in model/chem/_Air_Plasma_8s/rodriguez2024.c
+    - improved the electron impact reaction rates
+  * in model/thermo/doc/electronimpact_figs
+    - modified electronimpact_figure1.png, electronimpact_figure2.png
+  * in bin/Te_vs_EoverN.wrp
+    - changed the initial conditions to sea-level air
+    
+
 2024 APR 02a
   * in model/thermo/_generic/electronimpact.c
     - modified _Te_from_EoverN_N2(), _Te_from_EoverN_O2(), _Te_from_EoverN_O2(), _Te_from_EoverN_N2()
