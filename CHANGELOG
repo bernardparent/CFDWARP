@@ -7,6 +7,22 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 APR 16a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - renamed find_dSe_dU_transport_Qe to find_dSe_dU_transport_Parent2024
+    - renamed find_dSe_dU_transport_Qen_Qei to find_dSe_dU_transport_Parent2021
+  * in model/fluid/_Favre-Reynolds_plasma/*
+    - renamed TEMODEL_TRANSPORT to TEMODEL_TRANSPORT_PARENT2024
+  * in model/fluid/_Favre-Reynolds_plasma/fluid.c
+    - in write_model_fluid_template() and read_model_fluid_actions(), added TrefElectronEnergyTransport
+  * in model/fluid/_Favre-Reynolds_plasma/fluid_source.c
+    - added function find_Qe()
+    - in find_Se(), rewrote function using a case and changed the Parent2021 model to Parent2024
+    - added find_dSe_dU_transport_Parent2024()
+    - modified find_dSe_dU_transport so that it is now called find_dSe_dU_transport_Parent2024 
+      and includes the Parent2024 terms rather than the Parent2021 model
+
+
 2024 APR 12a
   * in model/chem/_Air_Plasma_11s/rodriguez2024.c
     - improved the electron impact reaction rates 

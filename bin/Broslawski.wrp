@@ -106,7 +106,7 @@ Rballast=30000; {ballast resistor in Ohm}
 
 Relectrodebreakdown=Rballast; {in Ohm; don't change this unless absolutely needed}
 Relectrode=1;           {in Ohm; don't change this unless absolutely needed}
-gammaeminus_electrode=1.0; {Secondary Electron Emission (SEE) coefficient on electrodes}
+gammaeminus_electrode=0.7; {Secondary Electron Emission (SEE) coefficient on electrodes}
 gammaeminus_dielectric=0.1; {SEE coefficient on dielectric walls}
 
 
