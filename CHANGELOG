@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 APR 18a
+  * in model/chem/_NH3_Plasma_10s
+    - added arakoni2007v2.c and arakoni2007v2.h
+  * in model/chem/_NH3_Plasma_10s/chem.c
+    - added arakonic2007v2 chemical solver
+    
+
 2024 APR 16a
   * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
     - renamed find_dSe_dU_transport_Qe to find_dSe_dU_transport_Parent2024
