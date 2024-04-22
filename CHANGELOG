@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 APR 22c
+  * in model/share/transport_share.c
+    - added _mueN_H2O() and _mueN_C2H4()
+  * in model/thermo/_generic/electronimpact.c
+    - added species H2O and C2H4
+    - added  _EoverN_from_Te_H2O_Triniti() and _Te_from_EoverN_H2O_Triniti(),
+      _Te_from_EoverN_C2H4_Morgan(), _EoverN_from_Te_C2H4_Morgan()
+  * in model/thermo/doc/electronimpact.tex
+    - added documentation for C2H4 and H2O
+  * in model/transport/doc/report.tex
+    - added documentation for C2H4 and H2O
+    
+
 2024 APR 22b
   * in model/chem/_NH3_Plasma_10s/*.c and model/chem/_NH3_Plasma_10s/*.h
     - got rid of  find_Qchemave*

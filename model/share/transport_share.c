@@ -554,7 +554,7 @@ static double _mueN_N2(double Te){
     13.1074773005257,
     14.4872723773202
   };
-  /* log m2/Vs*/
+  /* log m^-1 V^-1 s^-1*/
   double mueN_control[] = 
   { 
     58.8996283915835,
@@ -600,7 +600,7 @@ static double _mueN_O2(double Te){
     13.6691438195424,
     14.3029333748767
   };
-  /* log m2/Vs*/
+  /* log m^-1 V^-1 s^-1*/
   double mueN_control[] = 
   { 
     58.8729601445013,
@@ -652,7 +652,7 @@ static double _mueN_NO(double Te){
     12.7979646330018,
     14.2900207133957
   };
-  /* log m2/Vs*/
+  /* log m^-1 V^-1 s^-1*/
   double mueN_control[] = 
   { 
     58.6293380618436,
@@ -698,7 +698,7 @@ static double _mueN_N(double Te){
     12.8046835832505,
     14.2629425862465
   };
-  /* log m2/Vs*/
+  /* log m^-1 V^-1 s^-1*/
   double mueN_control[] = 
   { 
     60.1673170102955,
@@ -743,7 +743,7 @@ static double _mueN_O(double Te){
     13.4898268792378,
     14.3823727973700
   };
-  /* log m2/Vs*/
+  /* log m^-1 V^-1 s^-1*/
   double mueN_control[] = 
   { 
     60.2387759742777,
@@ -791,7 +791,7 @@ static double _mueN_NH3(double Te){
     13.0608547382026,
     14.9141228466324
   };
-  /* log m2/Vs*/
+  /* log m^-1 V^-1 s^-1*/
   double mueN_control[] = 
   { 
     54.0580694275312,
@@ -842,7 +842,7 @@ static double _mueN_NH3v(double Te){
     13.0612297139041,
     14.9141228466324
   };
-  /* log m2/Vs*/
+  /* log m^-1 V^-1 s^-1*/
   double mueN_control[] = 
   { 
     54.0580694275312,
@@ -903,7 +903,7 @@ static double _mueN_H(double Te){
     16.7186180260239,
     17.2690070550377
   };
-  /* log m2/Vs*/
+  /* log m^-1 V^-1 s^-1*/
   double mueN_control[] = 
   { 
     56.8714801442912,
@@ -965,7 +965,7 @@ static double _mueN_H2(double Te){
     14.7152648530426,
     15.5976703062368
   };
-  /* log m2/Vs*/
+  /* log m^-1 V^-1 s^-1*/
   double mueN_control[] = 
   { 
     58.2577745054111,
@@ -993,6 +993,109 @@ static double _mueN_H2(double Te){
   return(exp( mueN_H2 ));
 }
 
+static double _mueN_C2H4(double Te){
+  double mueN_C2H4;  
+  /* 
+  Data in log-log coordinates. 
+  Obtained with BOLSIG+ using Morgan LXCat cross-sections (includes rotation)
+  and experimental data from
+  Takatou, Junpei, Hiroshi Sato, and Yoshiharu Nakamura. 
+  "Drift velocity and longitudinal diffusion coefficient of electrons in pure ethene." 
+  Journal of Physics D: Applied Physics 44.31 (2011): 315201.
+  */
+  /* log K */
+  double Te_control[] = 
+  { 
+    6.10981535541541,
+    6.11213225695384,
+    6.11546944398115,
+    6.11879553122299,
+    6.14873864131225,
+    6.27655218119267,
+    6.49022696107802,
+    7.51145528620996,
+    9.93238727165571,
+    11.1644839770235,
+    12.6660370899592,
+    15.4249484703984
+  };
+  /* log m^-1 V^-1 s^-1*/
+  double mueN_control[] = 
+  { 
+    58.7308982619931,
+    58.7432823211928,
+    58.7344522417445,
+    58.7006271455909,
+    58.5762282365296,
+    58.2375717980936,
+    57.5863888166327,
+    56.4858176634792,
+    55.7424086481384,
+    54.9220343404036,
+    54.6642052311015,
+    54.6642052311015
+  };
+  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
+  mueN_C2H4 = EXM_f_from_monotonespline(N, Te_control, mueN_control, Te);
+  return(exp( mueN_C2H4 ));
+}
+
+static double _mueN_H2O(double Te){
+  double mueN_H2O;  
+  /* 
+  Data in log-log coordinates. 
+  Obtained with BOLSIG+ using TRINITI LXCat cross-sections (includes rotation)
+  Spline fitted through BOLSIG+ data and
+  Cheung, B., and M. T. Elford. "The drift velocity of electrons in water vapour at low values of E/N." 
+  Australian Journal of Physics, vol. 43, p. 755 43 (1990): 755.
+  data using measured drift velocity values.
+  */
+  /* log K */
+  double Te_control[] = 
+  { 
+    6.11921540244189,
+    6.14659718701357,
+    7.39806748583987,
+    7.91791922822132,
+    8.78370547107909,
+    9.03606079733760,
+    9.51169798444282,
+    10.0603249745514,
+    10.6159499677357,
+    11.2017825750845,
+    11.4414242471762,
+    11.7918896468023,
+    12.7398048977220,
+    14.1794311884019,
+    15.4249484703984
+  };
+  /* log m^-1 V^-1 s^-1*/
+  double mueN_control[] = 
+  { 
+    53.7729238180753,
+    53.7757065165570,
+    54.0023805216706,
+    54.1452107999281,
+    54.3485124754936,
+    54.4192547102123,
+    54.5735461377884,
+    55.2248870772331,
+    55.5175766151933,
+    55.6352788238791,
+    55.5744739431354,
+    55.4156213197854,
+    55.0678505024927,
+    54.6843643011033,
+    54.6176852154666
+  };
+  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
+  mueN_H2O = EXM_f_from_monotonespline(N, Te_control, mueN_control, Te);
+  return(exp( mueN_H2O ));
+}
 
 double _mueNk_from_Te_ParentMacheret(long spec, double Te){
   double mueN;
@@ -1023,6 +1126,12 @@ double _mueNk_from_Te_ParentMacheret(long spec, double Te){
     break;
     case SMAP_H2:
       mueN=_mueN_H2(Te);
+    break;
+    case SMAP_H2O:
+      mueN=_mueN_H2O(Te);
+    break;
+    case SMAP_C2H4:
+      mueN=_mueN_C2H4(Te);
     break;
     default:
       mueN=3.74E19*exp(33.5/sqrt(log(Te)));
