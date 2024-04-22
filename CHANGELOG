@@ -6,6 +6,12 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2024 APR 22a
+  * in model/chem/_NH3_Plasma_10s/chem.c
+    - added arakoni2007omprakas solver
+  * in model/chem/_NH3_Plasma_10s
+    - added arakoni2007omprakas.c and arakoni2007omprakas.h
+  
 
 2024 APR 19a
   * in model/chem/_NH3_Plasma_10s/arakoni2007v2.c
