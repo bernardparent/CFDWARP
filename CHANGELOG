@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 APR 23a
+  * in model/chem
+    - renamed model/chem/_NH3_Plasma_10s/ to model/chem/_NH3_Plasma_32s/
+  * in model/chem
+    - added _NH3_Plasma_19s
+  * in model/chem/_NH3_Plasma_32s/chem.c
+    - added arakoni2007v3 model
+  * in model/chem/_NH3_Plasma_32s
+    - added arakoni2007v3.c
+    
+  
 2024 APR 22c
   * in model/share/transport_share.c
     - added _mueN_H2O() and _mueN_C2H4()
