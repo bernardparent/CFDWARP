@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 APR 24a
+  * in model/chem/
+    - deleted _NH3_Plasma_19s/
+    - added _NH3_Plasma_21s/
+  * in model/chem/_NH3_Plasma_32s/arakoni2007v3.c
+    - added NH3+ and NH2+ ions to solver
+    
+
 2024 APR 23b
   * in model/chem/_NH3_Plasma_19s/arakoni2007v3.c
     - fixed bugs
