@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAY 01a
+  * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
+    - added _averaged_rate_local() and added calls to _averaged_rate_local() for all reactions
+      function of Te
+  * in model/chem/_NH3_Plasma_32s/arakoni2007v2.c
+    - deleted _averaged_rate_local_v2()
+  * in model/fluid/_Favre-Reynolds_plasma/fluid_post.c
+    - added EoverN to the post variables
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - in find_post_variable_value_fluid(), changed E/Nn to E/N
+    
+
 2024 APR 24a
   * in model/chem/
     - deleted _NH3_Plasma_19s/
