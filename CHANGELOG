@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAY 01b
+  * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
+    - renamed arakoniomprakas to arakoni2007omprakas
+    - deleted find_Qchemave_arakoniomprakas()
+    
+
 2024 MAY 01a
   * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
     - added _averaged_rate_local() and added calls to _averaged_rate_local() for all reactions
