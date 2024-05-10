@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAY 09a
+  * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
+    - fixed many bugs
+  * in bin/Broslawski.wrp
+    - improved a few things
+    
+
 2024 MAY 01b
   * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
     - renamed arakoniomprakas to arakoni2007omprakas

@@ -95,17 +95,18 @@ M=5.7
 Re=6E6
 P=3.23 Torr
 T=57.35 K
-rho=2.61 kg/m3
 }
 
 
 
+TEMAXHIGH=600e3;
+TEMAXLOW=100e3;
 
 dphi=3000; {voltage difference between the cathode and the anode in V}
 Rballast=30000; {ballast resistor in Ohm}
 
 Relectrodebreakdown=Rballast; {in Ohm; don't change this unless absolutely needed}
-Relectrode=1;           {in Ohm; don't change this unless absolutely needed}
+Relectrode=0.1;           {in Ohm; don't change this unless absolutely needed}
 gammaeminus_electrode=0.7; {Secondary Electron Emission (SEE) coefficient on electrodes}
 gammaeminus_dielectric=0.1; {SEE coefficient on dielectric walls}
 
@@ -114,14 +115,14 @@ mf=1; {mesh factor}
 
 is=1;
 is1=is+round(mf*40);   {start of 1st electrode}
-is2=is1+round(mf*16);  {end of 1st electrode}
-is3=is2+round(mf*16);  {start of 2nd electrode}
-is4=is3+round(mf*16);  {end of 2nd electrode}
+is2=is1+round(mf*30);  {end of 1st electrode}
+is3=is2+round(mf*30);  {start of 2nd electrode}
+is4=is3+round(mf*30);  {end of 2nd electrode}
 ie=is4+round(mf*30);   {end of domain}
 js=1;
 js0=js+round(mf*10);   {end of ballast resistance and start of electrode region}
 js1=js0+round(mf*10);   {end of electrode and start of bdry layer region}
-js2=js1+round(mf*35);  {end of bdry layer region}
+js2=js1+round(mf*60);  {end of bdry layer region}
 je=js2+round(mf*10);   {end of domain}
 
 elecdepth=0.1324;  {depth of electrodes (along z dimension) in m}
@@ -135,7 +136,7 @@ xs4=xs3+elecwidth;
 
 
 H=0.02;  {height of the domain in m}
-Hbdry=0.005; {max height of boundary layer region in m}
+Hbdry=0.003; {max height of boundary layer region in m}
 Hballast=0.0003;  {height of the ballast resistor in m}
 Helectrode=0.0003; {height of the electrode in m}
 dwall=1e-5/mf;   {distance between wall and near wall node in m}
@@ -277,7 +278,7 @@ Model(
     Pmin=1.0e2;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e1;     Tmax=26.0e3;    {K}
     Tvmin=Tmin;     Tvmax=Tmax;  {K}
-    Temin=30.0;    Temax=1e6;  {K}
+    Temin=30.0;    Temax=TEMAXHIGH;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wminN2=0.01;                  {min mass fraction allowed for N2}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain for neutrals}
@@ -340,8 +341,7 @@ Init(
 {M=5.7
 Re=6E6
 P=3.23 Torr
-T=57.35 K
-rho=2.61 kg/m3}
+T=57.35 K}
 
     }
     Vx=5.7*sqrt(1.4*287*57.35); {m/s}
@@ -437,7 +437,7 @@ Cycle(
                            near cathode}
     relaxNi_bdry=1.0;     {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.2;     {the electron density relaxation factor at the boundary }
-    relaxTe=0.5;          {the electron temperature relaxation factor }
+    relaxTe=1.0;          {the electron temperature relaxation factor }
     rhoref=0.1;           {reference density in kg/m3}
     Tref=300.0;           {reference temperature in K}
     Teref=20000.0;        {reference electron temperature in K}
@@ -479,11 +479,17 @@ Cycle(
     if (iter<600*mf, 
       CFLmax=0.3;
       Relectrodelocal=Relectrodebreakdown;
+      Temaxlocal=TEMAXLOW;
+      relaxTelocal=0.5;
     , {else}
       CFLmax=0.5;
       fact=min(1400*mf,iter-600*mf)/(1400*mf);
       Relectrodelocal=exp(fact*ln(Relectrode)+(1-fact)*ln(Relectrodebreakdown));
+      Temaxlocal=(1-fact)*TEMAXLOW+fact*TEMAXHIGH;
+      relaxTelocal=1.0;
     );
+    Cycle(NavierStokesPlasma(relaxTe=relaxTelocal;););
+    Model(NavierStokesPlasma(Temax=Temaxlocal;););
     CFL=min(CFL*1.04,CFLmax);
     Init(Epotential(Region(is3,js,  is4,js,INITEMF_TYPE1,dphi);););
     Model(
@@ -492,10 +498,11 @@ Cycle(
       );
     );
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
-    Lc=1e0;      {characteristic length scale in meters used to solve the emfield equation}
-    relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
-    UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,4);
-    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,50); 
+    Lc=1e99;      {characteristic length scale in meters used to solve the emfield equation}
+    relaxEMF=1.0; {relaxation factor forced on the update of the emfield variables}
+    UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,6);
+    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,100); 
+    {UpdateEMField(Lc,relaxEMF,TSEMF_NEWTON);}
     printf("%4.2f %6.2f %6ld %9.3f   %E (%2ld %4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            Relectrodelocal,CFL,iter,effiter_U,ximax,flux_ximax,i_ximax,
            j_ximax,ximax_emfield,i_ximax_emfield,j_ximax_emfield,clipinfo);
