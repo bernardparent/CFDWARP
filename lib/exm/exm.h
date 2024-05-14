@@ -206,6 +206,8 @@ void EXM_find_spline(long N, double *x, double *f, double *b);
 
 double EXM_f_from_spline(long N, double *x, double *f, double *b, double thisx);
 
+/* Fritsch, F. N. and Carlson, R. E., “Monotone piecewise cubic interpolation,” SIAM Journal on Numeri-
+cal Analysis, Vol. 17, No. 2, 1980, pp. 238–246.*/
 double EXM_f_from_monotonespline(long N, double *x, double *f, double thisx);
 
 /* insert str1 into str2 at the position pos; returns *str2
