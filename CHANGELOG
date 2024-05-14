@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAY 14b
+  * in src/control.c
+    - in find_wall_distance(), fixed a bug (used to crash if no wall node was found in a mpi domain)
+    
+
 2024 MAY 14a
   * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
     - fixed one bug

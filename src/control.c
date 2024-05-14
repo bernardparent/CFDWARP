@@ -1106,7 +1106,6 @@ void find_wall_distance(np_t *np, gl_t *gl){
     omp_init_lock(&(nodelock[_ai(gl,i,j,k)]));
   }
 #endif
-
   thiswallxyz=malloc(sizeof(dim_t));
   wallxyz=malloc(sizeof(dim_t));
   cnt=0;
@@ -1130,7 +1129,7 @@ void find_wall_distance(np_t *np, gl_t *gl){
       for (rankrecv=0; rankrecv<numproc; rankrecv++){
         if (rankrecv!=ranksend){
           MPI_Send(&thisnumbdrywall,1,MPI_INT,rankrecv,0,MPI_COMM_WORLD);
-          MPI_Send(thiswallxyz,thisnumbdrywall*nd,MPI_DOUBLE,rankrecv,0,MPI_COMM_WORLD);
+          if (thisnumbdrywall>0) MPI_Send(thiswallxyz,thisnumbdrywall*nd,MPI_DOUBLE,rankrecv,0,MPI_COMM_WORLD);
         }
       }
 #ifdef OPENMPTHREADS
@@ -1141,7 +1140,7 @@ void find_wall_distance(np_t *np, gl_t *gl){
     } else {
       MPI_Recv(&numbdrywall,1,MPI_INT,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
       wallxyz=realloc(wallxyz,sizeof(dim_t)*(numbdrywall));
-      MPI_Recv(wallxyz,numbdrywall*nd,MPI_DOUBLE,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
+      if (numbdrywall>0) MPI_Recv(wallxyz,numbdrywall*nd,MPI_DOUBLE,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
 #ifdef OPENMPTHREADS
 #pragma omp parallel for private(cnt) schedule(dynamic)
 #endif
