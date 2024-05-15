@@ -584,8 +584,8 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
       }
     }
     if (thisproc!=-1){
-      if (MPI_Bsend(&numsendvars,1,MPI_LONG,thisproc,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("Problem with MPI_Bsend in update_linked_nodes().");    
-      if (MPI_Bsend(sendvars,numsendvars,MPI_DOUBLE,thisproc,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("Problem with MPI_Bsend in update_linked_nodes().");    
+      if (MPI_Bsend(&numsendvars,1,MPI_LONG,thisproc,5321,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("Problem with MPI_Bsend in update_linked_nodes().");    
+      if (MPI_Bsend(sendvars,numsendvars,MPI_DOUBLE,thisproc,5321,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("Problem with MPI_Bsend in update_linked_nodes().");    
     }
   } while (thisproc!=-1);
 
@@ -616,9 +616,9 @@ void update_linked_nodes(np_t *np, gl_t *gl, int TYPELEVEL){
   cntproc=0;
   while (recvproc[cntproc]!=-1) {
     thisproc=recvproc[cntproc];
-    MPI_Recv(&numsendvars,1,MPI_LONG,thisproc,0,MPI_COMM_WORLD,&MPI_Status1);
+    MPI_Recv(&numsendvars,1,MPI_LONG,thisproc,5321,MPI_COMM_WORLD,&MPI_Status1);
     sendvars=(double *)realloc(sendvars,numsendvars*sizeof(double));
-    MPI_Recv(sendvars,numsendvars,MPI_DOUBLE,thisproc,0,MPI_COMM_WORLD,&MPI_Status1);
+    MPI_Recv(sendvars,numsendvars,MPI_DOUBLE,thisproc,5321,MPI_COMM_WORLD,&MPI_Status1);
     cntsend=0;
     for_ijk(zone,is,js,ks,ie,je,ke){
           if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL) && is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL)){
@@ -1820,7 +1820,7 @@ void exchange_U(np_t *np, gl_t *gl){
       if (thisrank!=rankrecv){
         MPI_Pack_size(nf*sendcnt[rankrecv],MPI_DOUBLE,MPI_COMM_WORLD,&pack_size_Ulocal);
         MPI_Pack_size(1,MPI_LONG,MPI_COMM_WORLD,&pack_size_cnt);
-        bufsize+=(2*MPI_BSEND_OVERHEAD)+pack_size_Ulocal+pack_size_cnt;
+        bufsize+=((2*MPI_BSEND_OVERHEAD)+pack_size_Ulocal+pack_size_cnt);
       }
     }
     buf=(double *)malloc(bufsize);
@@ -1828,16 +1828,16 @@ void exchange_U(np_t *np, gl_t *gl){
     for (rankrecv=0; rankrecv<numproc; rankrecv++){
       if (thisrank!=rankrecv){
         for (prevcnt=0,iterator=0; iterator<rankrecv; iterator++) prevcnt+=sendcnt[iterator];
-        MPI_Bsend(&sendcnt[rankrecv],1,MPI_LONG,rankrecv,1,MPI_COMM_WORLD);
-        MPI_Bsend(&sendUlocal[prevcnt],nf*sendcnt[rankrecv],MPI_DOUBLE,rankrecv,0,MPI_COMM_WORLD);
+        MPI_Bsend(&sendcnt[rankrecv],1,MPI_LONG,rankrecv,5101,MPI_COMM_WORLD);
+        if (sendcnt[rankrecv]!=0) MPI_Bsend(&sendUlocal[prevcnt],nf*sendcnt[rankrecv],MPI_DOUBLE,rankrecv,5100,MPI_COMM_WORLD);
       }
     }
     free(sendUlocal);
     for (ranksend=0; ranksend<numproc; ranksend++){
       if (thisrank!=ranksend){
-        MPI_Recv(&recvcnt[ranksend],1,MPI_LONG,ranksend,1,MPI_COMM_WORLD,&MPI_Status1);
+        MPI_Recv(&recvcnt[ranksend],1,MPI_LONG,ranksend,5101,MPI_COMM_WORLD,&MPI_Status1);
         recvUlocal=(flux_t *)malloc(recvcnt[ranksend]*sizeof(flux_t));
-        MPI_Recv(recvUlocal,recvcnt[ranksend]*nf,MPI_DOUBLE,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
+        if (recvcnt[ranksend]!=0) MPI_Recv(recvUlocal,recvcnt[ranksend]*nf,MPI_DOUBLE,ranksend,5100,MPI_COMM_WORLD,&MPI_Status1);
         for (cnt=0; cnt<recvcnt[ranksend]; cnt++){
           for (prevcnt=0,iterator=0; iterator<ranksend; iterator++) prevcnt+=processcnt[iterator];
           for (flux=0; flux<nf; flux++) np[processnodenums[prevcnt+cnt]].bs->U[flux]=*(*(recvUlocal + cnt) + flux);
@@ -1864,7 +1864,7 @@ void exchange_U(np_t *np, gl_t *gl){
 }
 
 
-void exchange_U_old(np_t *np, gl_t *gl){  //same as above but without the MPI_Buffer
+void exchange_U_nobuffer(np_t *np, gl_t *gl){  //same as above but without the MPI_Buffer
   int rankrecv,numproc,ranksend,thisrank;
   long i,j,k,flux;
   long cnt = 0;
@@ -1872,6 +1872,8 @@ void exchange_U_old(np_t *np, gl_t *gl){  //same as above but without the MPI_Bu
   zone_t zonesend,zonerecv,zone;
   flux_t Ulocal;
   MPI_Status MPI_Status1;
+ 
+ 
  
   MPI_Comm_rank(MPI_COMM_WORLD, &thisrank);
   MPI_Comm_size(MPI_COMM_WORLD, &numproc);
@@ -1885,10 +1887,10 @@ void exchange_U_old(np_t *np, gl_t *gl){  //same as above but without the MPI_Bu
           for_ijk(zone,is,js,ks,ie,je,ke){
                 if (ranksend==thisrank) {
                   for (flux=0; flux<nf; flux++) Ulocal[flux]=np[_ai(gl,i,j,k)].bs->U[flux];
-                  MPI_Send(Ulocal,nf,MPI_DOUBLE,rankrecv,0,MPI_COMM_WORLD);
+                  MPI_Send(Ulocal,nf,MPI_DOUBLE,rankrecv,_ai_all(gl,i,j,k),MPI_COMM_WORLD);
                 }
                 if (rankrecv==thisrank) {
-                  MPI_Recv(Ulocal,nf,MPI_DOUBLE,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
+                  MPI_Recv(Ulocal,nf,MPI_DOUBLE,ranksend,_ai_all(gl,i,j,k),MPI_COMM_WORLD,&MPI_Status1);
                   for (flux=0; flux<nf; flux++) np[_ai(gl,i,j,k)].bs->U[flux]=Ulocal[flux];
                   if (is_node_resumed(np[_ai(gl,i,j,k)])){
                     nodenums=(long *)realloc(nodenums,(cnt+1)*sizeof(long));
@@ -2166,10 +2168,10 @@ void exchange_U_emfield(np_t *np, gl_t *gl){
           for_ijk(zone,is,js,ks,ie,je,ke){
                 if (ranksend==thisrank) {
                   for (flux=0; flux<nfe; flux++) Ulocal[flux]=np[_ai(gl,i,j,k)].bs->Uemfield[flux];
-                  MPI_Send(Ulocal,nfe,MPI_DOUBLE,rankrecv,0,MPI_COMM_WORLD);
+                  MPI_Send(Ulocal,nfe,MPI_DOUBLE,rankrecv,42975,MPI_COMM_WORLD);
                 }
                 if (rankrecv==thisrank) {
-                  MPI_Recv(Ulocal,nfe,MPI_DOUBLE,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
+                  MPI_Recv(Ulocal,nfe,MPI_DOUBLE,ranksend,42975,MPI_COMM_WORLD,&MPI_Status1);
                   for (flux=0; flux<nfe; flux++) np[_ai(gl,i,j,k)].bs->Uemfield[flux]=Ulocal[flux];
                 }
           }

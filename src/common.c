@@ -1832,14 +1832,14 @@ int MPI_Bcast_Node(void *message, int count, MPI_Datatype datatype, int root,
     for (proc=0; proc<numproc; proc++){
       if (proc!=root){
         if (is_node_in_zone(i,j,k,_domain_lim_from_rank(proc,gl))){
-          MPI_IBsend(message,count,datatype,proc,0,MPI_COMM_WORLD);
+          MPI_IBsend(message,count,datatype,proc,3872,MPI_COMM_WORLD);
           ret=MPI_DATA_SENT;
         }
       }
     }
   } else {
     if (is_node_in_zone(i,j,k,gl->domain_lim)) {
-      MPI_Recv(message,count,datatype,root,0,MPI_COMM_WORLD,&MPI_Status1);
+      MPI_Recv(message,count,datatype,root,3872,MPI_COMM_WORLD,&MPI_Status1);
       ret=MPI_DATA_RECEIVED;
     }
   }

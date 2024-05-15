@@ -362,6 +362,7 @@ static void update_dUstar_emfield_SOR_forward(np_t *np, gl_t *gl, long flux, zon
     }
   }
 
+  MPI_Barrier(MPI_COMM_WORLD);
 
   for (iter=0; iter<numiter; iter++)  {
     MPI_Buffer_attach( buffer, buffersize );
@@ -375,26 +376,27 @@ static void update_dUstar_emfield_SOR_forward(np_t *np, gl_t *gl, long flux, zon
 
     rank=_node_rank(gl,zone.is-1,zone.js,zone.ks);
     if (rank!=thisrank){
-      if (MPI_Recv(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(&numvars,1,MPI_INT,rank,39302,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
-      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,39301,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       copy_mpivars_in_zone(np,gl,zone.is-1-exlap,zone.js,zone.ks,zone.is-1,zone.je,zone.ke, flux, numvars,mpivars);
     }
 
+
     rank=_node_rank(gl,zone.is,zone.js-1,zone.ks);
     if (rank!=thisrank){
-      if (MPI_Recv(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(&numvars,1,MPI_INT,rank,39312,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
-      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,39311,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       copy_mpivars_in_zone(np,gl,zone.is,zone.js-1-exlap,zone.ks,zone.ie,zone.js-1,zone.ke, flux, numvars,mpivars);
     }
 
 #ifdef _3DL
     rank=_node_rank(gl,zone.is,zone.js,zone.ks-1);
     if (rank!=thisrank){
-      if (MPI_Recv(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(&numvars,1,MPI_INT,rank,39322,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
-      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,39321,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       copy_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks-1-exlap,zone.ie,zone.je,zone.ks-1, flux, numvars,mpivars);
     }
 #endif
@@ -416,69 +418,73 @@ static void update_dUstar_emfield_SOR_forward(np_t *np, gl_t *gl, long flux, zon
     find_mpivars_in_zone(np,gl,zone.ie-exlap,zone.js,zone.ks,zone.ie,zone.je,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.ie+1,zone.js,zone.ks);
     if (rank!=thisrank){
-      if (MPI_Bsend(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
-      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(&numvars,1,MPI_INT,rank,39302,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,39301,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
+
 
     find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.is+exlap,zone.je,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is-1,zone.js,zone.ks);
     if (rank!=thisrank){
-      if (MPI_Bsend(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
-      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(&numvars,1,MPI_INT,rank,39302,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,39301,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
+
 
     find_mpivars_in_zone(np,gl,zone.is,zone.je-exlap,zone.ks,zone.ie,zone.je,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is,zone.je+1,zone.ks);
     if (rank!=thisrank){
-      if (MPI_Bsend(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
-      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(&numvars,1,MPI_INT,rank,39312,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,39311,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
+
 
     find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.ie,zone.js+exlap,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is,zone.js-1,zone.ks);
     if (rank!=thisrank){
-      if (MPI_Bsend(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
-      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(&numvars,1,MPI_INT,rank,39312,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,39311,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 #ifdef _3DL
     find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ke-exlap,zone.ie,zone.je,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is,zone.js,zone.ke+1);
     if (rank!=thisrank){
-      if (MPI_Bsend(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
-      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(&numvars,1,MPI_INT,rank,39322,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,39321,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 
     find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.ie,zone.je,zone.ks+exlap, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is,zone.js,zone.ks-1);
     if (rank!=thisrank){
-      if (MPI_Bsend(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
-      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(&numvars,1,MPI_INT,rank,39322,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,39321,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 #endif
 
 
     rank=_node_rank(gl,zone.ie+1,zone.js,zone.ks);
     if (rank!=thisrank){
-      if (MPI_Recv(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(&numvars,1,MPI_INT,rank,39302,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
-      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,39301,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       copy_mpivars_in_zone(np,gl,zone.ie+1,zone.js,zone.ks,zone.ie+1+exlap,zone.je,zone.ke, flux, numvars,mpivars);
     }
 
+
     rank=_node_rank(gl,zone.is,zone.je+1,zone.ks);
     if (rank!=thisrank){
-      if (MPI_Recv(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(&numvars,1,MPI_INT,rank,39312,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
-      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,39311,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       copy_mpivars_in_zone(np,gl,zone.is,zone.je+1,zone.ks,zone.ie,zone.je+1+exlap,zone.ke, flux, numvars,mpivars);
     }
 
 #ifdef _3DL
     rank=_node_rank(gl,zone.is,zone.js,zone.ke+1);
     if (rank!=thisrank){
-      if (MPI_Recv(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(&numvars,1,MPI_INT,rank,39322,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
-      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,39321,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       copy_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ke+1,zone.ie,zone.je,zone.ke+1+exlap, flux, numvars,mpivars);
     }
 #endif
@@ -579,26 +585,26 @@ static void update_dUstar_emfield_SOR_backward(np_t *np, gl_t *gl, long flux, zo
 
     rank=_node_rank(gl,zone.ie+1,zone.js,zone.ks);
     if (rank!=thisrank){
-      if (MPI_Recv(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(&numvars,1,MPI_INT,rank,54701,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
-      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,54702,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       copy_mpivars_in_zone(np,gl,zone.ie+1,zone.js,zone.ks,zone.ie+1+exlap,zone.je,zone.ke, flux, numvars,mpivars);
     }
 
     rank=_node_rank(gl,zone.is,zone.je+1,zone.ks);
     if (rank!=thisrank){
-      if (MPI_Recv(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(&numvars,1,MPI_INT,rank,54711,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
-      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,54712,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       copy_mpivars_in_zone(np,gl,zone.is,zone.je+1,zone.ks,zone.ie,zone.je+1+exlap,zone.ke, flux, numvars,mpivars);
     }
 
 #ifdef _3DL
     rank=_node_rank(gl,zone.is,zone.js,zone.ke+1);
     if (rank!=thisrank){
-      if (MPI_Recv(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(&numvars,1,MPI_INT,rank,54721,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
-      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,54722,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       copy_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ke+1,zone.ie,zone.je,zone.ke+1+exlap, flux, numvars,mpivars);
     }
 #endif
@@ -620,69 +626,69 @@ static void update_dUstar_emfield_SOR_backward(np_t *np, gl_t *gl, long flux, zo
     find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.is+exlap,zone.je,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is-1,zone.js,zone.ks);
     if (rank!=thisrank){
-      if (MPI_Bsend(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
-      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(&numvars,1,MPI_INT,rank,54701,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,54702,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 
     find_mpivars_in_zone(np,gl,zone.ie-exlap,zone.js,zone.ks,zone.ie,zone.je,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.ie+1,zone.js,zone.ks);
     if (rank!=thisrank){
-      if (MPI_Bsend(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
-      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(&numvars,1,MPI_INT,rank,54701,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,54702,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 
     find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.ie,zone.js+exlap,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is,zone.js-1,zone.ks);
     if (rank!=thisrank){
-      if (MPI_Bsend(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
-      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(&numvars,1,MPI_INT,rank,54711,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,54712,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 
     find_mpivars_in_zone(np,gl,zone.is,zone.je-exlap,zone.ks,zone.ie,zone.je,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is,zone.je+1,zone.ks);
     if (rank!=thisrank){
-      if (MPI_Bsend(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
-      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(&numvars,1,MPI_INT,rank,54711,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,54712,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 #ifdef _3DL
     find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.ie,zone.je,zone.ks+exlap, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is,zone.js,zone.ks-1);
     if (rank!=thisrank){
-      if (MPI_Bsend(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
-      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(&numvars,1,MPI_INT,rank,54721,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,54722,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 
     find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ke-exlap,zone.ie,zone.je,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is,zone.js,zone.ke+1);
     if (rank!=thisrank){
-      if (MPI_Bsend(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
-      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(&numvars,1,MPI_INT,rank,54721,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
+      if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,54722,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 #endif
 
 
     rank=_node_rank(gl,zone.is-1,zone.js,zone.ks);
     if (rank!=thisrank){
-      if (MPI_Recv(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(&numvars,1,MPI_INT,rank,54701,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
-      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,54702,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       copy_mpivars_in_zone(np,gl,zone.is-1-exlap,zone.js,zone.ks,zone.is-1,zone.je,zone.ke, flux, numvars,mpivars);
     }
 
     rank=_node_rank(gl,zone.is,zone.js-1,zone.ks);
     if (rank!=thisrank){
-      if (MPI_Recv(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(&numvars,1,MPI_INT,rank,54711,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
-      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,54712,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       copy_mpivars_in_zone(np,gl,zone.is,zone.js-1-exlap,zone.ks,zone.ie,zone.js-1,zone.ke, flux, numvars,mpivars);
     }
 
 #ifdef _3DL
     rank=_node_rank(gl,zone.is,zone.js,zone.ks-1);
     if (rank!=thisrank){
-      if (MPI_Recv(&numvars,1,MPI_INT,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(&numvars,1,MPI_INT,rank,54721,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
-      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,0,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
+      if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,54722,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
       copy_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks-1-exlap,zone.ie,zone.je,zone.ks-1, flux, numvars,mpivars);
     }
 #endif

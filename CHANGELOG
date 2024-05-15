@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAY 15a
+  * in cycle/share/cycle_share.c
+    - in update_linked_nodes(), exchange_U(), exchange_U_nobuffer(), exchange_U_emfield(), changed
+      the MPI send and receive tags from 0 to a specific number unique to each function
+  * in cycle/share/tsemf_share.c
+    - in update_dUstar_emfield_SOR_forward(), update_dUstar_emfield_SOR_backward(), changed
+      the MPI send and receive tags from 0 to a specific number unique to each function
+  * in src/common.c
+    - in MPI_Bcast_Node(), changed the MPI send and receive tags from 0 to a specific number
+
+
 2024 MAY 14b
   * in src/control.c
     - in find_wall_distance(), fixed a bug (used to crash if no wall node was found in a mpi domain)
