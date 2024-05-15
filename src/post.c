@@ -86,11 +86,11 @@ void write_post_file_nodplot(np_t *np, gl_t *gl, zone_t zone, char *filename, bo
             find_post_proc_var_value(np, _ai(gl,i,j,k), gl, cnt, &(val[cnt]));
           }
 #ifdef DISTMPI
-          if (rank!=0) MPI_Ssend(val,numpostvar,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
+          if (rank!=0) MPI_Ssend(val,numpostvar,MPI_DOUBLE,0,49776,MPI_COMM_WORLD);
         }
         if (rank==0) {
           if (_node_rank(gl,i,j,k)!=0)
-            MPI_Recv(val,numpostvar,MPI_DOUBLE,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
+            MPI_Recv(val,numpostvar,MPI_DOUBLE,_node_rank(gl,i,j,k),49776,MPI_COMM_WORLD,&MPI_Status1);
 #endif
 
           for (cnt=0; cnt<numpostvar+nd; cnt++) wfprintf(postfile, "%.10E  ",val[cnt]);
@@ -163,11 +163,11 @@ void write_post_file_gnuplot(np_t *np, gl_t *gl, zone_t zone, char *filename, bo
             cntval++;
           }
 #ifdef DISTMPI
-          if (rank!=0) MPI_Ssend(val,numval,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
+          if (rank!=0) MPI_Ssend(val,numval,MPI_DOUBLE,0,41764,MPI_COMM_WORLD);
         }
         if (rank==0) {
           if (_node_rank(gl,i,j,k)!=0)
-            MPI_Recv(val,numval,MPI_DOUBLE,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
+            MPI_Recv(val,numval,MPI_DOUBLE,_node_rank(gl,i,j,k),41764,MPI_COMM_WORLD,&MPI_Status1);
 #endif
           for (cntval=0; cntval<numval; cntval++) wfprintf(postfile, "%.10E  ",val[cntval]);
           wfprintf(postfile, "\n");
@@ -279,11 +279,11 @@ void write_post_file_tecplot(np_t *np, gl_t *gl, zone_t zone, char *filename, bo
             cntval++;
           }
 #ifdef DISTMPI
-          if (rank!=0) MPI_Ssend(val,numval,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
+          if (rank!=0) MPI_Ssend(val,numval,MPI_DOUBLE,0,43873,MPI_COMM_WORLD);
         }
         if (rank==0) {
           if (_node_rank(gl,i,j,k)!=0)
-            MPI_Recv(val,numval,MPI_DOUBLE,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
+            MPI_Recv(val,numval,MPI_DOUBLE,_node_rank(gl,i,j,k),43873,MPI_COMM_WORLD,&MPI_Status1);
 #endif
           for (cntval=0; cntval<numval; cntval++) wfprintf(postfile, "%.10E  ",val[cntval]);
           wfprintf(postfile, "\n");
@@ -421,13 +421,13 @@ void write_post_file_vtk(np_t *np, gl_t *gl, zone_t zone, char *filename, bool G
           }
           CELLVALID[if2D(EXM_ai2(gl2d,i,j))if3D(EXM_ai3(gl3d,i,j,k))]=_CELLVALID(np,gl,i,j,k);
 #ifdef DISTMPI
-          if (rank!=0) MPI_Ssend(val,nd,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
-          if (rank!=0) MPI_Ssend(&(CELLVALID[if2D(EXM_ai2(gl2d,i,j))if3D(EXM_ai3(gl3d,i,j,k))]),1,MPI_INT,0,0,MPI_COMM_WORLD);
+          if (rank!=0) MPI_Ssend(val,nd,MPI_DOUBLE,0,21579,MPI_COMM_WORLD);
+          if (rank!=0) MPI_Ssend(&(CELLVALID[if2D(EXM_ai2(gl2d,i,j))if3D(EXM_ai3(gl3d,i,j,k))]),1,MPI_INT,0,21579,MPI_COMM_WORLD);
         }
         if (rank==0) {
           if (_node_rank(gl,i,j,k)!=0){
-            MPI_Recv(val,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
-            MPI_Recv(&(CELLVALID[if2D(EXM_ai2(gl2d,i,j))if3D(EXM_ai3(gl3d,i,j,k))]),1,MPI_INT,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
+            MPI_Recv(val,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),21579,MPI_COMM_WORLD,&MPI_Status1);
+            MPI_Recv(&(CELLVALID[if2D(EXM_ai2(gl2d,i,j))if3D(EXM_ai3(gl3d,i,j,k))]),1,MPI_INT,_node_rank(gl,i,j,k),21579,MPI_COMM_WORLD,&MPI_Status1);
           }
 #endif
           for (cntval=0; cntval<nd; cntval++) wfprintf(postfile, "%.10E  ",val[cntval]);
@@ -505,11 +505,11 @@ void write_post_file_vtk(np_t *np, gl_t *gl, zone_t zone, char *filename, bool G
                   find_post_proc_var_value(np, _ai(gl,i,j,k), gl, postvar+dim, &(val[dim]));
 
 #ifdef DISTMPI
-                if (rank!=0) MPI_Ssend(val,varnd,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
+                if (rank!=0) MPI_Ssend(val,varnd,MPI_DOUBLE,0,21579,MPI_COMM_WORLD);
               }
               if (rank==0) {
                 if (_node_rank(gl,i,j,k)!=0)
-                  MPI_Recv(val,varnd,MPI_DOUBLE,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
+                  MPI_Recv(val,varnd,MPI_DOUBLE,_node_rank(gl,i,j,k),21579,MPI_COMM_WORLD,&MPI_Status1);
 #endif
                 if (VECTORVAR) {
                   for (dim=0; dim<varnd; dim++) wfprintf(postfile, "%.10E  ",val[dim]);

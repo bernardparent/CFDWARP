@@ -414,16 +414,16 @@ void update_linked_nodes_2(np_t *np, gl_t *gl, int TYPELEVEL){
                   if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK) && is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)){
                     assert(np[_ai(gl,i,j,k)].numlinkmusclvars!=0);
                     assert(np[_ai(gl,i,j,k)].linkmusclvars!=NULL);
-                    MPI_Send(&np[_ai(gl,i,j,k)].numlinkmusclvars,1,MPI_INT,rankrecv,0,MPI_COMM_WORLD);
-                    MPI_Send(np[_ai(gl,i,j,k)].linkmusclvars,numlinkvars,MPI_DOUBLE,rankrecv,0,MPI_COMM_WORLD);
+                    MPI_Send(&np[_ai(gl,i,j,k)].numlinkmusclvars,1,MPI_INT,rankrecv,21522,MPI_COMM_WORLD);
+                    MPI_Send(np[_ai(gl,i,j,k)].linkmusclvars,numlinkvars,MPI_DOUBLE,rankrecv,21522,MPI_COMM_WORLD);
                     
                   }
                 }
                 if (rankrecv==thisrank) {
                   if (is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK) && is_node_bdry(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID_WORK)){
-                    MPI_Recv(&np[_ai(gl,i,j,k)].numlinkmusclvars,1,MPI_INT,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
+                    MPI_Recv(&np[_ai(gl,i,j,k)].numlinkmusclvars,1,MPI_INT,ranksend,21522,MPI_COMM_WORLD,&MPI_Status1);
                     assert(np[_ai(gl,i,j,k)].linkmusclvars!=NULL);
-                    MPI_Recv(np[_ai(gl,i,j,k)].linkmusclvars,numlinkvars,MPI_DOUBLE,ranksend,0,MPI_COMM_WORLD,&MPI_Status1);
+                    MPI_Recv(np[_ai(gl,i,j,k)].linkmusclvars,numlinkvars,MPI_DOUBLE,ranksend,21522,MPI_COMM_WORLD,&MPI_Status1);
                   }
                 }
           }

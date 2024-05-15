@@ -810,12 +810,12 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
           if (proc==rank){
             for (flux=0; flux<nf; flux++) U[flux]=np[_ai(gl,i,j,k)].bs->U[flux];
             if (proc!=0) {
-              MPI_Send(U,nf,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
+              MPI_Send(U,nf,MPI_DOUBLE,0,9452,MPI_COMM_WORLD);
             }
           } 
           
           if (rank==0 && proc!=0) {
-            MPI_Recv(U,nf,MPI_DOUBLE,proc,0,MPI_COMM_WORLD,&MPI_Status1);
+            MPI_Recv(U,nf,MPI_DOUBLE,proc,9452,MPI_COMM_WORLD,&MPI_Status1);
           }
           
           for (flux=0; flux<nf; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=U[flux];
@@ -854,12 +854,12 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
           if (proc==rank){
             for (flux=0; flux<nfe; flux++) U[flux]=np[_ai(gl,i,j,k)].bs->Uemfield[flux];
             if (proc!=0) {
-              MPI_Send(U,nfe,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
+              MPI_Send(U,nfe,MPI_DOUBLE,0,9452,MPI_COMM_WORLD);
             }
           } 
           
           if (rank==0 && proc!=0) {
-            MPI_Recv(U,nfe,MPI_DOUBLE,proc,0,MPI_COMM_WORLD,&MPI_Status1);
+            MPI_Recv(U,nfe,MPI_DOUBLE,proc,9452,MPI_COMM_WORLD,&MPI_Status1);
           }
           
           for (flux=0; flux<nfe; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=U[flux];
@@ -900,12 +900,12 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
           if (proc==rank){
             for (flux=0; flux<nf; flux++) U[flux]=np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux];
             if (proc!=0) {
-              MPI_Send(U,nf,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
+              MPI_Send(U,nf,MPI_DOUBLE,0,9452,MPI_COMM_WORLD);
             }
           } 
           
           if (rank==0 && proc!=0) {
-            MPI_Recv(U,nf,MPI_DOUBLE,proc,0,MPI_COMM_WORLD,&MPI_Status1);
+            MPI_Recv(U,nf,MPI_DOUBLE,proc,9452,MPI_COMM_WORLD,&MPI_Status1);
           }
           
           for (flux=0; flux<nf; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=U[flux];
@@ -950,12 +950,12 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
           if (proc==rank){
             for (flux=0; flux<numaveragedrates; flux++) averagedrates[flux]=np[_ai(gl,i,j,k)].bs->averagedrates[flux];
             if (proc!=0) {
-              MPI_Send(averagedrates,numaveragedrates,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
+              MPI_Send(averagedrates,numaveragedrates,MPI_DOUBLE,0,9452,MPI_COMM_WORLD);
             }
           } 
           
           if (rank==0 && proc!=0) {
-            MPI_Recv(averagedrates,numaveragedrates,MPI_DOUBLE,proc,0,MPI_COMM_WORLD,&MPI_Status1);
+            MPI_Recv(averagedrates,numaveragedrates,MPI_DOUBLE,proc,9452,MPI_COMM_WORLD,&MPI_Status1);
           }
           
           for (flux=0; flux<numaveragedrates; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=averagedrates[flux];
@@ -2104,11 +2104,11 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
                 for (cnt=0; cnt<numinitvar; cnt++) initvar[cnt]=0.0;
 	      }
               if (rank!=0) {
-                MPI_Ssend(initvar,numinitvar,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
+                MPI_Ssend(initvar,numinitvar,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
               }
             }
             if (rank==0 && _node_rank(gl,i,j,k)!=0){
-              MPI_Recv(initvar,numinitvar,MPI_DOUBLE,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
+              MPI_Recv(initvar,numinitvar,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
             }
           } else {
 #ifdef EMFIELD
@@ -2119,11 +2119,11 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
                 for (cnt=0; cnt<numinitvar_emfield; cnt++) initvar_emfield[cnt]=0.0;
 	      }
               if (rank!=0) {
-                MPI_Ssend(initvar_emfield,numinitvar_emfield,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
+                MPI_Ssend(initvar_emfield,numinitvar_emfield,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
               }
             }
             if (rank==0 && _node_rank(gl,i,j,k)!=0){
-              MPI_Recv(initvar_emfield,numinitvar_emfield,MPI_DOUBLE,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
+              MPI_Recv(initvar_emfield,numinitvar_emfield,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
             }
 #endif
           }
@@ -2197,17 +2197,17 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 	      }
 #ifdef DISTMPI
 	    }
-            if (rank!=0 && _node_rank(gl,i,j,k)==rank) MPI_Ssend(x,nd,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
-            if (rank==0 && _node_rank(gl,i,j,k)!=0) MPI_Recv(x,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
-            if (rank!=0 && _node_rank(gl,i,j,k)==rank) MPI_Ssend(dx1,nd,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
-            if (rank==0 && _node_rank(gl,i,j,k)!=0) MPI_Recv(dx1,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
+            if (rank!=0 && _node_rank(gl,i,j,k)==rank) MPI_Ssend(x,nd,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
+            if (rank==0 && _node_rank(gl,i,j,k)!=0) MPI_Recv(x,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
+            if (rank!=0 && _node_rank(gl,i,j,k)==rank) MPI_Ssend(dx1,nd,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
+            if (rank==0 && _node_rank(gl,i,j,k)!=0) MPI_Recv(dx1,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
 #ifdef _2DL  
-            if (rank!=0 && _node_rank(gl,i,j,k)==rank) MPI_Ssend(dx2,nd,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
-            if (rank==0 && _node_rank(gl,i,j,k)!=0) MPI_Recv(dx2,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
+            if (rank!=0 && _node_rank(gl,i,j,k)==rank) MPI_Ssend(dx2,nd,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
+            if (rank==0 && _node_rank(gl,i,j,k)!=0) MPI_Recv(dx2,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
 #endif
 #ifdef _3DL  
-            if (rank!=0 && _node_rank(gl,i,j,k)==rank) MPI_Ssend(dx3,nd,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
-            if (rank==0 && _node_rank(gl,i,j,k)!=0) MPI_Recv(dx3,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
+            if (rank!=0 && _node_rank(gl,i,j,k)==rank) MPI_Ssend(dx3,nd,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
+            if (rank==0 && _node_rank(gl,i,j,k)!=0) MPI_Recv(dx3,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
 #endif
 
 #endif

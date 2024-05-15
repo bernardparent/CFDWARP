@@ -7,6 +7,26 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAY 15b
+  * in cycle/share/cycle_share.c
+    - in update_linked_nodes_2(), changed the MPI send and receive tags from 0 to a specific number 
+  * in cycle/tsemf/_GS/tsemf.c
+    - in update_dUstar_emfield_SOR2_forward() and update_dUstar_emfield_SOR2_backward(), changed
+      the MPI send and receive tags from 0 to a specific number unique to each function
+  * in src/bdry.c
+    - in display_node_type_window(), display_node_type_window(), changed
+      the MPI send and receive tags from 0 to a specific number unique to each function
+  * in src/control.c
+    - in find_wall_distance(), changed the MPI send and receive tags from 0 to a specific number
+  * in src/data.c
+    - in write_data_file_binary_ascii(), write_data_file_interpolation(), changed
+      the MPI send and receive tags from 0 to a specific number unique to each function
+  * in src/post.c
+    - in write_post_file_nodplot(), write_post_file_gnuplot(), write_post_file_tecplot(), 
+      write_post_file_vtk(), changed the MPI send and receive tags from 0 to a specific number 
+      unique to each function
+
+
 2024 MAY 15a
   * in cycle/share/cycle_share.c
     - in update_linked_nodes(), exchange_U(), exchange_U_nobuffer(), exchange_U_emfield(), changed

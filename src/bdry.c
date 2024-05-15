@@ -877,15 +877,15 @@ void display_node_type_window(FILE *outfile, np_t *np, gl_t *gl, int TYPELEVEL,
         nodetype=_node_type(np[_ai(gl,i,j,k)],TYPELEVEL);
         NODELINK=is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL);
         if (rank!=0) {
-          MPI_IBsend(&NODERESUMED,1,MPI_INT,0,0,MPI_COMM_WORLD);
-          MPI_IBsend(&nodetype,1,MPI_LONG,0,0,MPI_COMM_WORLD);
-          MPI_IBsend(&NODELINK,1,MPI_INT,0,0,MPI_COMM_WORLD);
+          MPI_IBsend(&NODERESUMED,1,MPI_INT,0,23861,MPI_COMM_WORLD);
+          MPI_IBsend(&nodetype,1,MPI_LONG,0,23861,MPI_COMM_WORLD);
+          MPI_IBsend(&NODELINK,1,MPI_INT,0,23861,MPI_COMM_WORLD);
         }
       }
       if (rank==0 && _node_rank(gl,i,j,k)!=0) {
-        MPI_Recv(&NODERESUMED,1,MPI_INT,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
-        MPI_Recv(&nodetype,1,MPI_LONG,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
-        MPI_Recv(&NODELINK,1,MPI_INT,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
+        MPI_Recv(&NODERESUMED,1,MPI_INT,_node_rank(gl,i,j,k),23861,MPI_COMM_WORLD,&MPI_Status1);
+        MPI_Recv(&nodetype,1,MPI_LONG,_node_rank(gl,i,j,k),23861,MPI_COMM_WORLD,&MPI_Status1);
+        MPI_Recv(&NODELINK,1,MPI_INT,_node_rank(gl,i,j,k),23861,MPI_COMM_WORLD,&MPI_Status1);
       }
 #else
       nodetype=_node_type(np[_ai(gl,i,j,k)],TYPELEVEL);
@@ -939,15 +939,15 @@ void display_node_type_window(FILE *outfile, np_t *np, gl_t *gl, int TYPELEVEL,
         nodetype=_node_type(np[_ai(gl,i,j,k)],TYPELEVEL);
         NODELINK=is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL);
         if (rank!=0) {
-          MPI_IBsend(&NODERESUMED,1,MPI_INT,0,0,MPI_COMM_WORLD);
-          MPI_IBsend(&nodetype,1,MPI_LONG,0,0,MPI_COMM_WORLD);
-          MPI_IBsend(&NODELINK,1,MPI_INT,0,0,MPI_COMM_WORLD);
+          MPI_IBsend(&NODERESUMED,1,MPI_INT,0,23861,MPI_COMM_WORLD);
+          MPI_IBsend(&nodetype,1,MPI_LONG,0,23861,MPI_COMM_WORLD);
+          MPI_IBsend(&NODELINK,1,MPI_INT,0,23861,MPI_COMM_WORLD);
         }
       }
       if (rank==0 && _node_rank(gl,i,j,k)!=0) {
-        MPI_Recv(&NODERESUMED,1,MPI_INT,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
-        MPI_Recv(&nodetype,1,MPI_LONG,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
-        MPI_Recv(&NODELINK,1,MPI_INT,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
+        MPI_Recv(&NODERESUMED,1,MPI_INT,_node_rank(gl,i,j,k),23861,MPI_COMM_WORLD,&MPI_Status1);
+        MPI_Recv(&nodetype,1,MPI_LONG,_node_rank(gl,i,j,k),23861,MPI_COMM_WORLD,&MPI_Status1);
+        MPI_Recv(&NODELINK,1,MPI_INT,_node_rank(gl,i,j,k),23861,MPI_COMM_WORLD,&MPI_Status1);
       }
 #else
       nodetype=_node_type(np[_ai(gl,i,j,k)],TYPELEVEL);
@@ -994,15 +994,15 @@ void display_node_type_window(FILE *outfile, np_t *np, gl_t *gl, int TYPELEVEL,
         nodetype=_node_type(np[_ai(gl,i,j,k)],TYPELEVEL);
         NODELINK=is_node_link(np[_ai(gl,i,j,k)],TYPELEVEL);
         if (rank!=0) {
-          MPI_IBsend(&NODERESUMED,1,MPI_INT,0,0,MPI_COMM_WORLD);
-          MPI_IBsend(&nodetype,1,MPI_LONG,0,0,MPI_COMM_WORLD);
-          MPI_IBsend(&NODELINK,1,MPI_INT,0,0,MPI_COMM_WORLD);
+          MPI_IBsend(&NODERESUMED,1,MPI_INT,0,23861,MPI_COMM_WORLD);
+          MPI_IBsend(&nodetype,1,MPI_LONG,0,23861,MPI_COMM_WORLD);
+          MPI_IBsend(&NODELINK,1,MPI_INT,0,23861,MPI_COMM_WORLD);
         }
       }
       if (rank==0 && _node_rank(gl,i,j,k)!=0) {
-        MPI_Recv(&NODERESUMED,1,MPI_INT,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
-        MPI_Recv(&nodetype,1,MPI_LONG,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
-        MPI_Recv(&NODELINK,1,MPI_INT,_node_rank(gl,i,j,k),0,MPI_COMM_WORLD,&MPI_Status1);
+        MPI_Recv(&NODERESUMED,1,MPI_INT,_node_rank(gl,i,j,k),23861,MPI_COMM_WORLD,&MPI_Status1);
+        MPI_Recv(&nodetype,1,MPI_LONG,_node_rank(gl,i,j,k),23861,MPI_COMM_WORLD,&MPI_Status1);
+        MPI_Recv(&NODELINK,1,MPI_INT,_node_rank(gl,i,j,k),23861,MPI_COMM_WORLD,&MPI_Status1);
       }
 #else
       nodetype=_node_type(np[_ai(gl,i,j,k)],TYPELEVEL);
