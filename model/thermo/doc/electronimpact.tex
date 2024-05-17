@@ -487,6 +487,55 @@ The reduced electric field results are shown in Fig. \ref{fig:electronimpact_H2O
 \end{figure}
 %
 
+\subsection{Carbon monoxide ($\rm CO$)}
+
+The reduced electric field results are shown in Fig. \ref{fig:electronimpact_CO}. The results for $\rm CO$ are obtained by fitting a spline through BOLSIG+ and known experimental data.
+
+\begin{table*}[!htbp]
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{$\rm CO$ electron impact processes with available cross-section data.}
+    \label{tab:tableCO}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}llll}
+    \toprule
+    {no.}  & {process} & {type} &  {eV range}  &  {ref.} \\
+    \midrule
+      1 & $\rm e^- + CO \rightarrow CO^+ + e^- + e^-$  &  ionization   &  14.01-100 &   \cite{lxc:2024:morgan} \\ 
+      \midrule     
+      2 & $\rm e^- + CO \rightarrow e^- + CO$  &  momentum transfer   &  0.0-1000 & \cite{lxc:2024:morgan}\\   
+      \midrule
+       3 & $\rm e^- + CO \rightarrow e^- + CO(V1)$  &   excitation   &  0.266-100 & \cite{lxc:2024:morgan}\\ 
+      4 & $\rm e^- + CO \rightarrow e^- + CO(V2)$  &   excitation   &  0.528-100 & \cite{lxc:2024:morgan}\\ 
+      5 & $\rm e^- + CO \rightarrow e^- + CO(V3)$  &   excitation   &  0.787-100 & \cite{lxc:2024:morgan}\\ 
+      6 & $\rm e^- + CO \rightarrow e^- + CO(V4)$  &   excitation   &  1.04-100 & \cite{lxc:2024:morgan}\\ 
+      7 & $\rm e^- + CO \rightarrow e^- + CO(V5)$  &   excitation   &  1.30-100 & \cite{lxc:2024:morgan}\\ 
+      8 & $\rm e^- + CO \rightarrow e^- + CO(V6)$  &   excitation   &  1.54-100 & \cite{lxc:2024:morgan}\\ 
+      9 & $\rm e^- + CO \rightarrow e^- + CO(V7)$  &   excitation   &  1.79-100 & \cite{lxc:2024:morgan}\\ 
+      10 & $\rm e^- + CO \rightarrow e^- + CO(V8)$  &   excitation   &  2.03-100 & \cite{lxc:2024:morgan}\\ 
+      11 & $\rm e^- + CO \rightarrow e^- + CO(V9)$  &   excitation   &  2.27-100 & \cite{lxc:2024:morgan}\\ 
+      12 & $\rm e^- + CO \rightarrow e^- + CO(V10)$  &   excitation   &  2.51-100 & \cite{lxc:2024:morgan}\\ 
+      13 & $\rm e^- + CO \rightarrow e^- + CO(A^3\Pi)$  &   electronic excitation   &  6.22-100 & \cite{lxc:2024:morgan}\\ 
+      14 & $\rm e^- + CO \rightarrow e^- + CO(A^3\Sigma)$  &   electronic excitation   &  6.80-100 & \cite{lxc:2024:morgan}\\ 
+      15 & $\rm e^- + CO \rightarrow e^- + CO(A^1\Pi)$  &   electronic excitation   &  7.90-100 & \cite{lxc:2024:morgan}\\ 
+      16 & $\rm e^- + CO \rightarrow e^- + CO(B^3\Sigma)$  &   electronic excitation   &  10.4-100 & \cite{lxc:2024:morgan}\\ 
+      17 & $\rm e^- + CO \rightarrow e^- + CO(C^1\Sigma)$  &   electronic excitation   &  10.6-100 & \cite{lxc:2024:morgan}\\ 
+    \bottomrule
+    \end{tabular*}
+   \end{threeparttable}
+\end{table*}
+
+%
+\begin{figure}[!htbp]
+\centering
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figureCO.png}}
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figureCO_error.png}}
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figureCO_drift.png}}
+\caption{$E^\star$ results for $\rm CO$, showing (a) reduced electric field as a function of the electron temperature, b) error percentage when fitting a cubic spline through the data and (c) bulk drift velocity of electrons in carbon monoxide as a function of the reduced electric field. The electron impact cross-sectional data used in the BOLSIG+ calculation is sourced from the Morgan lxcat database. Experimental data points are taken from Fig. 6 of Ref.\ \cite{jop:1987:nakamura} and Fig. 3 of Ref.\ \cite{jop:1984:roznerski}.}
+\label{fig:electronimpact_CO}
+\end{figure}
+%
+
 
 
 \begin{table}[!htbp]
@@ -541,18 +590,30 @@ The reduced electric field results are shown in Fig. \ref{fig:electronimpact_H2O
   \\  
   
     \midrule  
-  \multirow{2}{*}{7} &  \multirow{2}{*}{ $\rm e^- + C_2 H_4$   } & ${\rm ln}~T_{\rm e}$  & \tiny         6.1098    6.1121    6.1155    6.1188    6.1487    6.2766    6.4902    7.5115    9.9324   11.1645   12.6660   15.4249
+  \multirow{2}{*}{8} &  \multirow{2}{*}{ $\rm e^- + C_2 H_4$   } & ${\rm ln}~T_{\rm e}$  & \tiny         6.1098    6.1121    6.1155    6.1188    6.1487    6.2766    6.4902    7.5115    9.9324   11.1645   12.6660   15.4249
   \\
   
   &  & ${\rm ln}~E^\star$     & \tiny       -55.2620  -54.4110  -53.9853  -53.7725  -52.9212  -50.7933  -48.6652  -46.5372  -44.4092  -42.2812  -40.1532  -38.4508
   \\  
   
     \midrule  
-  \multirow{2}{*}{7} &  \multirow{2}{*}{ $\rm e^- + H_2 O$   } & ${\rm ln}~T_{\rm e}$  & \tiny         6.1101    6.1160    6.1517    6.4204    6.7792    7.5390    9.7639   10.9427   11.3091   12.7398   15.4249
+  \multirow{2}{*}{9} &  \multirow{2}{*}{ $\rm e^- + H_2 O$   } & ${\rm ln}~T_{\rm e}$  & \tiny         6.1101    6.1160    6.1517    6.4204    6.7792    7.5390    9.7639   10.9427   11.3091   12.7398   15.4249
   \\
   
   &  & ${\rm ln}~E^\star$     & \tiny      -49.3036  -48.2401  -47.1756  -45.6864  -45.0478  -44.6221  -44.1963  -43.5577  -42.9197  -40.7916  -38.8686
   \\  
+  
+  
+    \midrule  
+  \multirow{3}{*}{10} &  \multirow{3}{*}{ $\rm e^- + CO$   } & ${\rm ln}~T_{\rm e}$  & \tiny     6.1114    6.1124    6.1139    6.1203    6.1262    6.1912    6.4755    6.9046    7.1482    7.2660    7.4955    8.0413    8.7133    9.0518    9.1509    9.4277   10.0823   11.0675   12.9578   17.1610
+
+  \\
+  
+  &  & ${\rm ln}~E^\star$     & \tiny  -55.2620  -55.0494  -54.8361  -54.4110  -54.1980  -53.3469  -52.2829  -51.2188  -50.1549  -49.0908  -48.0271  -46.9628  -45.8990  
+
+  \\  
+  
+&  &   & \tiny -44.8347  -44.4092  -43.9836  -43.5577  -42.7067  -40.5790  -38.4508 \\
                        
     \bottomrule
     \end{tabular*}

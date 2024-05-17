@@ -79,7 +79,7 @@ static double _EoverN_from_Te_H_Morgan(double Te){
 static double _Te_from_EoverN_H_Morgan(double EoverN){
   double Te;
   /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections
-  /* log Vm^2*/
+     log Vm^2*/
   double EoverN_data[] = 
   { 
     -52.1379167435347,
@@ -169,7 +169,7 @@ static double _EoverN_from_Te_H2_Morgan(double Te){
 static double _Te_from_EoverN_H2_Morgan(double EoverN){
   double Te;
   /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections
-  /* log Vm^2*/
+     log Vm^2*/
   double EoverN_data[] = 
   { 
     -53.3095821519381,
@@ -344,13 +344,13 @@ static double _Te_from_EoverN_NH3_Morgan(double EoverN){
 
 
 
-static double _EoverN_from_Te_NH3_Snoeckx2023(double Te){
-  double EoverN;
   /* Data in log-log coordinates. Obtained with BOLSIG+ using Snoeckx theoretical cross-sections */
   /* Snoeckx, Ramses, Jonathan Tennyson, and Min Suk Cha. 
     "Theoretical cross sections for electron collisions relevant for ammonia discharges part 1: NH3, NH2, and NH." 
      Plasma Sources Science and Technology 32.11 (2023): 115020. */  
   /* log K */
+/*static double _EoverN_from_Te_NH3_Snoeckx2023(double Te){
+  double EoverN;
   double Te_data[] = 
   { 
     6.10955759023806,
@@ -378,7 +378,7 @@ static double _EoverN_from_Te_NH3_Snoeckx2023(double Te){
     14.9385027840463,
     16.3712656820747
   };
-  /* log Vm^2*/
+  // log Vm^2
   double EoverN_data[] = 
   { 
     -51.1111598186747,
@@ -412,14 +412,17 @@ static double _EoverN_from_Te_NH3_Snoeckx2023(double Te){
   EoverN = exp( EXM_f_from_monotonespline(N, Te_data, EoverN_data, Te) );
   return(EoverN);
 }
+*/
 
-static double _Te_from_EoverN_NH3_Snoeckx2023(double EoverN){
-  double Te;
+
+
   /* Data in log-log coordinates. Obtained with BOLSIG+ using Snoeckx theoretical cross-sections */
   /* Snoeckx, Ramses, Jonathan Tennyson, and Min Suk Cha. 
     "Theoretical cross sections for electron collisions relevant for ammonia discharges part 1: NH3, NH2, and NH." 
      Plasma Sources Science and Technology 32.11 (2023): 115020. */  
   /* log Vm2 */
+/*static double _Te_from_EoverN_NH3_Snoeckx2023(double EoverN){
+  double Te;
   double EoverN_data[] = 
   { 
     -51.1111598186747,
@@ -447,7 +450,7 @@ static double _Te_from_EoverN_NH3_Snoeckx2023(double EoverN){
     -39.5905462323655,
     -39.1593648336272
   };
-  /* log K */
+  // log K 
   double Te_data[] = 
   { 
     6.10955759023806,
@@ -481,6 +484,7 @@ static double _Te_from_EoverN_NH3_Snoeckx2023(double EoverN){
   Te = exp( EXM_f_from_monotonespline(N, EoverN_data, Te_data, EoverN) );
   return(Te);
 }
+*/
 
 static double _EoverN_from_Te_NH3v_Morgan(double Te){
   double EoverN;
@@ -1169,6 +1173,122 @@ static double _Te_from_EoverN_C2H4_Morgan(double EoverN){
   return(Te);
 }
 
+static double _EoverN_from_Te_CO_Morgan(double Te){
+  double EoverN;
+  /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections */
+  /* log K */
+  double Te_data[] = 
+  { 
+    6.11136055273548,
+    6.11238935941058,
+    6.11393058756052,
+    6.12032692509042,
+    6.12617563852062,
+    6.19120529156866,
+    6.47549601761968,
+    6.90457893777639,
+    7.14823248330010,
+    7.26601551895648,
+    7.49546517896868,
+    8.04126205931249,
+    8.71326839967549,
+    9.05180967765335,
+    9.15089544894786,
+    9.42774317923393,
+    10.0823416896766,
+    11.0675282480573,
+    12.9578315739641,
+    17.1609507896773
+  };
+  /* log Vm^2*/
+  double EoverN_data[] = 
+  { 
+    -55.2620422318571,
+    -55.0493531384468,
+    -54.8361211151816,
+    -54.4110369666816,
+    -54.1980213879586,
+    -53.3468858844851,
+    -52.2829475994561,
+    -51.2188155408136,
+    -50.1548853707702,
+    -49.0907592581733,
+    -48.0271438115423,
+    -46.9627563249598,
+    -45.8989807728633,
+    -44.8347141184775,
+    -44.4092160934006,
+    -43.9835740781014,
+    -43.5576703023159,
+    -42.7067221582170,
+    -40.5790111063881,
+    -38.4507994003388
+  };
+  
+  int N = sizeof(Te_data)/sizeof(Te_data[0]);
+  Te = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
+  EoverN = exp( EXM_f_from_monotonespline(N, Te_data, EoverN_data, Te) );
+  return(EoverN);
+}
+
+static double _Te_from_EoverN_CO_Morgan(double EoverN){
+  double Te;
+  /* Data in log-log coordinates, Morgan cross-section database*/
+  /* log Vm^2*/
+  double EoverN_data[] = 
+  { 
+    -55.2620422318571,
+    -55.0493531384468,
+    -54.8361211151816,
+    -54.4110369666816,
+    -54.1980213879586,
+    -53.3468858844851,
+    -52.2829475994561,
+    -51.2188155408136,
+    -50.1548853707702,
+    -49.0907592581733,
+    -48.0271438115423,
+    -46.9627563249598,
+    -45.8989807728633,
+    -44.8347141184775,
+    -44.4092160934006,
+    -43.9835740781014,
+    -43.5576703023159,
+    -42.7067221582170,
+    -40.5790111063881,
+    -38.4507994003388
+  };
+  /* log K */
+  double Te_data[] = 
+  { 
+    6.11136055273548,
+    6.11238935941058,
+    6.11393058756052,
+    6.12032692509042,
+    6.12617563852062,
+    6.19120529156866,
+    6.47549601761968,
+    6.90457893777639,
+    7.14823248330010,
+    7.26601551895648,
+    7.49546517896868,
+    8.04126205931249,
+    8.71326839967549,
+    9.05180967765335,
+    9.15089544894786,
+    9.42774317923393,
+    10.0823416896766,
+    11.0675282480573,
+    12.9578315739641,
+    17.1609507896773
+  };
+
+  int N = sizeof(EoverN_data)/sizeof(EoverN_data[0]);
+  EoverN = ( min( EoverN_data[N-1], max( log( EoverN) , EoverN_data[0] ) ) );
+  Te = exp( EXM_f_from_monotonespline(N, EoverN_data, Te_data, EoverN) );
+  return(Te);
+}
+
 double _EoverNk_from_Te(long spec, double Te){
   double Estar;
   switch (smap[spec]){
@@ -1205,128 +1325,93 @@ double _EoverNk_from_Te(long spec, double Te){
     case SMAP_C2H4:
       Estar=_EoverN_from_Te_C2H4_Morgan(Te);
     break;
+    case SMAP_CO:
+      Estar=_EoverN_from_Te_CO_Morgan(Te);
+    break;
     default:
       Estar=0.0;
   }
   return(Estar);
 }
 
+
+double _Tek_from_EoverN(long spec, double EoverN){
+  double Te;
+  switch (smap[spec]){
+    case SMAP_NH3:
+      Te=_Te_from_EoverN_NH3_Morgan(EoverN);
+    break;
+    case SMAP_NH3v:
+      Te=_Te_from_EoverN_NH3v_Morgan(EoverN);
+    break;
+    case SMAP_N2:
+      Te=_Te_from_EoverN_N2(EoverN);
+    break;
+    case SMAP_O2:
+      Te=_Te_from_EoverN_O2(EoverN);
+    break;
+    case SMAP_NO:
+      Te=_Te_from_EoverN_NO(EoverN);
+    break;
+    case SMAP_H:
+      Te=_Te_from_EoverN_H_Morgan(EoverN);
+    break;
+    case SMAP_H2:
+      Te=_Te_from_EoverN_H2_Morgan(EoverN);
+    break;
+    case SMAP_N:
+      Te=_Te_from_EoverN_N_Morgan(EoverN);
+    break;
+    case SMAP_O:
+      Te=_Te_from_EoverN_O_Morgan(EoverN);
+    break;
+    case SMAP_H2O:
+      Te=_Te_from_EoverN_H2O_Triniti(EoverN);
+    break;
+    case SMAP_C2H4:
+      Te=_Te_from_EoverN_C2H4_Morgan(EoverN);
+    break;
+    case SMAP_CO:
+      Te=_Te_from_EoverN_CO_Morgan(EoverN);
+    break;
+    default:
+      Te=0.0;
+  }
+  return(Te);
+}
+
+
 double _EoverN_from_rhok_Te(spec_t rhok, double Te){
-  double Estar,Nsum;
+  double Estar,Nsum,EoverNk;
   long spec;
   Estar=0.0;
   Nsum=0.0;
   for (spec=0; spec<ns; spec++){
-    switch (smap[spec]){
-      case SMAP_NH3:
-        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_NH3_Morgan(Te);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_NH3v:
-        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_NH3v_Morgan(Te);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_N2:
-        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_N2(Te);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_O2:
-        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_O2(Te);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_NO:
-        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_NO(Te);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_H:
-        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_H_Morgan(Te);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_H2:
-        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_H2_Morgan(Te);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_N:
-        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_N_Morgan(Te);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_O:
-        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_O_Morgan(Te);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_H2O:
-        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_H2O_Triniti(Te);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_C2H4:
-        Estar+=rhok[spec]/_m(spec)*_EoverN_from_Te_C2H4_Morgan(Te);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
+    EoverNk=_EoverNk_from_Te(spec, Te);
+    if (EoverNk>1e-30){
+      Estar+=rhok[spec]/_m(spec)*EoverNk;
+      Nsum+=rhok[spec]/_m(spec);
     }
   }
-  if (Nsum==0.0) fatal_error("Couldn't find any valid species when determining Estar in _EoverN_from_Nk_Te().");
+  if (Nsum==0.0) fatal_error("Couldn't find any valid species when determining Estar in _EoverN_from_rhok_Te().");
   Estar/=Nsum;
   return(Estar);
 }
 
 
-
-
 double _Te_from_rhok_EoverN(spec_t rhok, double EoverN){
-  double Te,Nsum;
+  double Te,Nsum,Tek;
   long spec;
   Te=0.0;
   Nsum=0.0;
   for (spec=0; spec<ns; spec++){
-    switch (smap[spec]){
-      case SMAP_NH3:
-        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_NH3_Morgan(EoverN);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_NH3v:
-        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_NH3v_Morgan(EoverN);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_N2:
-        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_N2(EoverN);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_O2:
-        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_O2(EoverN);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_NO:
-        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_NO(EoverN);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_H:
-        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_H_Morgan(EoverN);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_H2:
-        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_H2_Morgan(EoverN);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_N:
-        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_N_Morgan(EoverN);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_O:
-        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_O_Morgan(EoverN);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_H2O:
-        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_H2O_Triniti(EoverN);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
-      case SMAP_C2H4:
-        Te+=rhok[spec]/_m(spec)*_Te_from_EoverN_C2H4_Morgan(EoverN);
-        Nsum+=rhok[spec]/_m(spec);
-      break;
+    Tek=_Tek_from_EoverN(spec, EoverN);
+    if (Tek>1e-30){
+      Te+=rhok[spec]/_m(spec)*Tek;
+      Nsum+=rhok[spec]/_m(spec);
     }
   }
-  if (Nsum==0.0) fatal_error("Couldn't find any valid species when determining Te in _Te_from_Nk_EoverN().");
+  if (Nsum==0.0) fatal_error("Couldn't find any valid species when determining Te in _Te_from_rhok_EoverN().");
   Te/=Nsum;
   return(Te);
 }
-

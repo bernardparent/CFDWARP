@@ -1097,6 +1097,62 @@ static double _mueN_H2O(double Te){
   return(exp( mueN_H2O ));
 }
 
+static double _mueN_CO(double Te){
+  double mueN_CO;  
+  /* 
+  Data in log-log coordinates. 
+  Obtained with BOLSIG+ using Morgan LXCat cross-sections and
+  Nakamura, Y. "Drift velocity and longitudinal diffusion coefficient of electrons in nitrogen and carbon monoxide."
+  Journal of Physics D: Applied Physics 20.7 (1987): 933.
+  data using measured drift velocity values.
+  */
+  /* log K */
+  double Te_control[] = 
+  { 
+    6.11136055273548,
+    7.56395756055317,
+    8.04036999407409,
+    8.88430149926755,
+    9.08632599128427,
+    9.21413470590164,
+    9.50231900094827,
+    9.81658122591833,
+    10.3380008397167,
+    10.7674234987133,
+    10.9238823473555,
+    11.1422295940492,
+    11.9610990579880,
+    12.9578315739641,
+    14.4473638165099,
+    15.4249484703984
+  };
+  /* log m^-1 V^-1 s^-1*/
+  double mueN_control[] = 
+  { 
+    58.3764460351286,
+    57.0592933290420,
+    56.6504114152186,
+    55.6065881431637,
+    55.2289388056105,
+    55.1178838236296,
+    55.0595760469354,
+    55.0755301485726,
+    55.1604453429885,
+    55.2241058224288,
+    55.2059690603590,
+    55.1788938993208,
+    54.9010723636355,
+    54.5930021266404,
+    54.3547112413544,
+    54.3907248656257
+  };
+  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
+  mueN_CO = EXM_f_from_monotonespline(N, Te_control, mueN_control, Te);
+  return(exp( mueN_CO ));
+}
+
 double _mueNk_from_Te_ParentMacheret(long spec, double Te){
   double mueN;
   switch (smap[spec]){
@@ -1133,8 +1189,11 @@ double _mueNk_from_Te_ParentMacheret(long spec, double Te){
     case SMAP_C2H4:
       mueN=_mueN_C2H4(Te);
     break;
+    case SMAP_CO:
+      mueN=_mueN_CO(Te);
+    break;
     default:
-      mueN=3.74E19*exp(33.5/sqrt(log(Te)));
+      mueN=_mueN_N2(Te); //3.74E19*exp(33.5/sqrt(log(Te)));
   }
   return(mueN);
 }

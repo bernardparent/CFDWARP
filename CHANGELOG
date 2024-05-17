@@ -7,6 +7,26 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAY 16a
+  * in model/share/transport_share.c
+    - added _mueN_CO()
+    - in _mueNk_from_Te_ParentMacheret(), added call to _mueN_CO()
+    - in _mueNk_from_Te_ParentMacheret(), now calls _mueN_N2(Te) should the species mobility
+      not be specified (default mobility is now N2 mobility instead of 3.74E19*exp(33.5/sqrt(log(Te)))
+  * in model/thermo/_generic/electronimpact.c
+    - commented out _EoverN_from_Te_NH3_Snoeckx2023() and _Te_from_EoverN_NH3_Snoeckx2023()
+    - added _EoverN_from_Te_CO_Morgan()
+    - added _Te_from_EoverN_CO_Morgan()
+    - in _EoverNk_from_Te(), added call to _EoverN_from_Te_CO_Morgan()
+    - added _Tek_from_EoverN()
+    - in _EoverN_from_rhok_Te(), rewrote the function so that it calls _EoverNk_from_Te()
+    - in _Te_from_rhok_EoverN(), rewrote the function so that it calls _Tek_from_EoverN()
+  * in model/thermo/doc/electronimpact.tex
+    - added documentation for CO
+  * in model/transport/doc/report.tex
+    - added documentation for CO mobility
+    
+
 2024 MAY 15b
   * in cycle/share/cycle_share.c
     - in update_linked_nodes_2(), changed the MPI send and receive tags from 0 to a specific number 
