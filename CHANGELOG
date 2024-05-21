@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+
+2024 MAY 21a
+  * in model/chem/_Cs_Air_Plasma_15s/chem.c
+    - added AIRCHEMMODEL_PARENT2023
+    - added CESIUMCHEMMODEL_PARENT2024
+    - got rid of CESIUMIONIZATIONMODEL* and CESIUMRECOMBINATIONMODEL* options and rather implemented
+      CESIUMCHEMMODEL_LENARD1964, CESIUMCHEMMODEL_ANDRIENKO2021, and CESIUMCHEMMODEL_PARENT2022
+  * in model/chem/_Cs_Air_Plasma_15s/doc/report.tex
+    - updated the documentation to match later changes
+  * in model/chem/_Cs_Air_Plasma_15s
+    - added parent2023.c and parent2023.h
+
+
 2024 MAY 16a
   * in model/share/transport_share.c
     - added _mueN_CO()
