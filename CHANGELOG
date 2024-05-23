@@ -8,6 +8,12 @@ ________________________________________________________________________________
 
 
 
+2024 MAY 22a
+  * in model/fluid/_Favre-Reynolds/fluid_bdry.c
+    - started implementation of BDRY_WALLABLATION1
+    - added update_bdry_wall_ablation()
+ 
+
 2024 MAY 21a
   * in model/chem/_Cs_Air_Plasma_15s/chem.c
     - added AIRCHEMMODEL_PARENT2023
