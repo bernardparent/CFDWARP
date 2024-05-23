@@ -365,17 +365,75 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
 }
 
 
+
+/*
+R.N. Gupta, Aerothermodynamic Analysis of Stardust Sample Return
+Capsule with Coupled Radiation and Ablation
+ JOURNAL OF SPACECRAFT AND ROCKETS
+Vol. 37, No. 4, July–August 2000
+
+Phenolic Impregnated Ceramic Ablator(PICA)
+
+0.001 atm < p < 1.00 atm
+
+sublimation temperature and heat of ablation for PICA (with 92% carbon,
+4.9% oxygen, 2.2% hydrogen, and 0.9% nitrogen by mass)
+
+ 
+ */
 static void update_bdry_wall_ablation(np_t *np, gl_t *gl, long lA, long lB, long lC,
                             long theta, long thetasgn,
                             bool BDRYDIRECFOUND, int ACCURACY){
   spec_t wwall;
   double kwall,psiwall,Twall,Pwall;
-  long dim,spec;
+  long dim,spec,j;
+  double alpha1[6],alpha2[6],alpha3[6];
   dim_t Vwall;
   spec_t nukA,nukB;
   bool ref_flag;
+  double wablationwall;
+  long paramstart,paramend,numinj,inj;
 
-  Twall=1000.0;
+
+  find_Pstar_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY, &Pwall);
+
+  
+  wablationwall=0.0;
+  paramstart=1;
+  paramend=np[lA].numbdryparam-1;
+  if (mod(paramend-paramstart+1,2)!=0) fatal_error("Wrong number of extra parameters to ablation boundary condition.");
+  numinj=round((double)(paramend-paramstart)/2.0);
+  for (inj=0; inj<numinj; inj++){
+    spec=round(_bdry_param(np,gl,lA,paramstart+inj*2,TYPELEVEL_FLUID_WORK))-1;
+    if (spec<0 || spec>=ns) fatal_error("Wrong specification of the ablation boundary condition. The ablation species number is not within bounds.");
+    wablationwall+=_w(np[lA],spec);
+  }
+  assert(wablationwall>=0.0);
+  assert(wablationwall<=1.0001);
+  
+  
+  alpha1[1]=3790.0;
+  alpha1[2]=86.795;
+  alpha1[3]=-2980.0;
+  alpha1[4]=-8250.2;
+  alpha1[5]=-7631.7;
+  alpha2[1]=329.94;
+  alpha2[2]=-66.703;
+  alpha2[3]=-1524.6;
+  alpha2[4]=-4340.9;
+  alpha2[5]=-3885.7;
+  alpha3[1]=20.386;
+  alpha3[2]=-17.654;
+  alpha3[3]=-268.62;
+  alpha3[4]=-771.00;
+  alpha3[5]=-684.89;
+
+  Twall=0.0;
+  for (j=1; j<=5; j++){
+    Twall+=alpha1[j]*powint(log(wablationwall),j-1)
+          +log(Pwall/101300.0)*alpha2[j]*powint(log(wablationwall),j-1)
+          +sqr(log(Pwall/101300.0))*alpha3[j]*powint(log(wablationwall),j-1);
+  }
   /* clip Twall so that it remains within the user-specified bounds */
   Twall=max(gl->model.fluid.Twmin,min(gl->model.fluid.Twmax,Twall));
   
@@ -400,7 +458,6 @@ static void update_bdry_wall_ablation(np_t *np, gl_t *gl, long lA, long lB, long
 
   find_k_psi_bdry_wall(np, gl, lA, lB, lC, &kwall, &psiwall);
 
-  find_Pstar_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY, &Pwall);
 
   find_U_2(np, lA,gl,wwall,Vwall,Pwall,Twall,kwall,psiwall);
 }

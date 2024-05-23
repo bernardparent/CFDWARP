@@ -7,6 +7,10 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAY 23a
+  * in model/fluid/_Favre-Reynolds/fluid_bdry.c
+    - made further improvements to update_bdry_wall_ablation()
+
 
 2024 MAY 22a
   * in model/fluid/_Favre-Reynolds/fluid_bdry.c
