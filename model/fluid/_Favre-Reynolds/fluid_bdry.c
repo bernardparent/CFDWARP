@@ -366,6 +366,86 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
 
 
 
+
+void find_bdry_node_surface(np_t *np, gl_t *gl, long l, dim_t A, double *Amag){
+  long dim,theta,thetasgn;
+  metrics_t metricsp1h;
+  if (find_bdry_direc(np, gl, l, TYPELEVEL_FLUID, &theta, &thetasgn)) {
+    if (thetasgn>0)
+        find_metrics_at_interface(np, gl, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, &metricsp1h);
+      else 
+        find_metrics_at_interface(np, gl, _al(gl,l,theta,-1), _al(gl,l,theta,+0), theta, &metricsp1h);
+    *Amag=0.0; 
+    for (dim=0; dim<nd; dim++){
+      A[dim]=fabs(metricsp1h.Omega*metricsp1h.X2[theta][dim]);
+      *Amag+=sqr(A[dim]);
+    }
+    *Amag=sqrt(*Amag);
+  } else {
+    fatal_error("Couldn't find bdry direc in find_bdry_node_surface()."); 
+  }
+  
+}
+
+
+/* finds the heat to the surface in W 
+   make sure the node l is a bdry node */
+void _heat_to_surface(np_t *np, gl_t *gl, long l, double *heat_to_surface){
+  long theta,thetasgn;
+  long row,col,vartheta,flux;
+  flux_t Gp1,Gp0,dGp1h,tmpp1h;
+  flux_t Gp0p1,Gp0m1,Gp1p1,Gp1m1;
+  sqmat_t Kp1h;
+  metrics_t metricsp1h;
+#ifdef _FLUID_PLASMA
+  flux_t Dstarplusp0,Dstarminusp1,Ustarp0,Ustarp1,DUstarplusp0,DUstarminusp1;
+#endif
+
+  *heat_to_surface=0.0;
+            if (find_bdry_direc(np, gl, l, TYPELEVEL_FLUID, &theta, &thetasgn)) {
+              for (vartheta=0; vartheta<nd; vartheta++){
+                if (thetasgn>0)
+                  find_metrics_at_interface(np, gl, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, &metricsp1h);
+                else 
+                  find_metrics_at_interface(np, gl, _al(gl,l,theta,-1), _al(gl,l,theta,+0), theta, &metricsp1h);
+
+                find_Kstar_interface(np,gl,_al(gl,l,theta,+0),_al(gl,l,theta,thetasgn),metricsp1h,theta,vartheta,Kp1h,CYCLELEVEL_RES);
+                for (row=0; row<nf; row++){
+                  for (col=0; col<nf; col++){
+                    if (row!=col) Kp1h[row][col]=0.0;
+                  }
+                }
+                if (theta==vartheta) {
+                  find_G(np[_al(gl,l,theta,thetasgn)],gl,Gp1);
+                  find_G(np[_al(gl,l,theta,+0)],gl,Gp0);
+                  for (flux=0; flux<nf; flux++)
+                    dGp1h[flux]=thetasgn*(Gp1[flux]-Gp0[flux]);
+                } else {
+                  find_G(np[_all(gl,l,theta,+0,vartheta,+1)],gl,Gp0p1);
+                  find_G(np[_all(gl,l,theta,+0,vartheta,-1)],gl,Gp0m1);
+                  find_G(np[_all(gl,l,theta,thetasgn,vartheta,+1)],gl,Gp1p1);
+                  find_G(np[_all(gl,l,theta,thetasgn,vartheta,-1)],gl,Gp1m1);
+                  for (flux=0; flux<nf; flux++)
+                    dGp1h[flux]=0.25e0*(Gp0p1[flux]+Gp1p1[flux]-Gp0m1[flux]-Gp1m1[flux]);
+                }
+                multiply_matrix_and_vector(Kp1h,dGp1h,tmpp1h);
+                (*heat_to_surface)+=sign(metricsp1h.Omega)*thetasgn*tmpp1h[fluxet];
+              }
+#ifdef _FLUID_PLASMA
+              find_Dstarplus (np, gl, _al(gl,l,theta,+0),       theta, metricsp1h, Dstarplusp0);
+              find_Dstarminus(np, gl, _al(gl,l,theta,thetasgn), theta, metricsp1h, Dstarminusp1);
+              find_Ustar(np[_al(gl,l,theta,+0)],       gl, Ustarp0);
+              find_Ustar(np[_al(gl,l,theta,thetasgn)], gl, Ustarp1);
+              for (flux=0; flux<nf; flux++){
+                DUstarplusp0[flux]=Dstarplusp0[flux]*Ustarp0[flux];
+                DUstarminusp1[flux]=Dstarminusp1[flux]*Ustarp1[flux]; 
+              }
+              (*heat_to_surface)-=sign(metricsp1h.Omega)*thetasgn*(DUstarplusp0[fluxet]+DUstarminusp1[fluxet]); 
+#endif
+            }
+}
+
+
 /*
 R.N. Gupta, Aerothermodynamic Analysis of Stardust Sample Return
 Capsule with Coupled Radiation and Ablation
