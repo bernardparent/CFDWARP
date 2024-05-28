@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAY 28a
+  * in lib/exm/exm.c
+    - in powint(), added assert(y>=0);
+  * in model/chem/_Cs_Air_Plasma_15s/chem.hh
+    - added the species ``C''
+  * in model/fluid/_Favre-Reynolds/fluid_bdry.c
+    - made modifications to update_bdry_wall_ablation()
+    - made modifications to _heat_to_surface()
+    
+
 2024 MAY 24a
   * in model/fluid/_Favre-Reynolds/fluid_bdry.c
     - added find_bdry_node_surface() and _heat_to_surface()

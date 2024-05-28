@@ -1,0 +1,35 @@
+#!/usr/local/bin/soap
+  Pwall=0.00001; {atm}
+  wablationwall=1.0;
+  alpha1[1]=3790.0;
+  alpha1[2]=86.795;
+  alpha1[3]=-2980.0;
+  alpha1[4]=-8250.2;
+  alpha1[5]=-7631.7;
+  alpha2[1]=329.94;
+  alpha2[2]=-66.703;
+  alpha2[3]=-1524.6;
+  alpha2[4]=-4340.9;
+  alpha2[5]=-3885.7;
+  alpha3[1]=20.386;
+  alpha3[2]=-17.654;
+  alpha3[3]=-268.62;
+  alpha3[4]=-771.00;
+  alpha3[5]=-684.89;
+  Twall=0.0;
+  for (j,1,5,
+    Twall=Twall+alpha1[j]*ln(wablationwall)^(j-1)
+          +ln(Pwall)*alpha2[j]*ln(wablationwall)^(j-1)
+          +sqr(ln(Pwall))*alpha3[j]*ln(wablationwall)^(j-1);
+  );
+  printf("Wall temperature at Pwall=%E atm is Twall=%E K\n",Pwall,Twall);
+  printf("\n");
+  
+{  Compare the latter to the (approximate) Clausius-Clapeyron relation: Pv/P0=exp(-Ev/R*(1/T-1/T0));}
+  R=8.314; {J/molK}
+  Ev=717e3; {J/mol}
+  Pv=Pwall/101300*100000; {bar}
+  P0=1; {bar}
+  T0=3915; {K}
+  T=1/(-R/Ev*ln(Pv/P0)+1/T0);
+  printf("Sublimation temperature at Pv=%E bar is T=%E K\n",Pv,T);

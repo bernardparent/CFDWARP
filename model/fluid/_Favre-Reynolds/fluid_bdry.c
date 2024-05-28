@@ -367,7 +367,7 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
 
 
 
-void find_bdry_node_surface(np_t *np, gl_t *gl, long l, dim_t A, double *Amag){
+void find_bdry_node_area(np_t *np, gl_t *gl, long l, dim_t A, double *Amag){
   long dim,theta,thetasgn;
   metrics_t metricsp1h;
   if (find_bdry_direc(np, gl, l, TYPELEVEL_FLUID, &theta, &thetasgn)) {
@@ -382,7 +382,7 @@ void find_bdry_node_surface(np_t *np, gl_t *gl, long l, dim_t A, double *Amag){
     }
     *Amag=sqrt(*Amag);
   } else {
-    fatal_error("Couldn't find bdry direc in find_bdry_node_surface()."); 
+    fatal_error("Couldn't find bdry direc in find_bdry_node_area()."); 
   }
   
 }
@@ -390,9 +390,10 @@ void find_bdry_node_surface(np_t *np, gl_t *gl, long l, dim_t A, double *Amag){
 
 /* finds the heat to the surface in W 
    make sure the node l is a bdry node */
-void _heat_to_surface(np_t *np, gl_t *gl, long l, double *heat_to_surface){
+double _heat_to_surface(np_t *np, gl_t *gl, long l){
   long theta,thetasgn;
   long row,col,vartheta,flux;
+  double heat_to_surface;
   flux_t Gp1,Gp0,dGp1h,tmpp1h;
   flux_t Gp0p1,Gp0m1,Gp1p1,Gp1m1;
   sqmat_t Kp1h;
@@ -400,8 +401,8 @@ void _heat_to_surface(np_t *np, gl_t *gl, long l, double *heat_to_surface){
 #ifdef _FLUID_PLASMA
   flux_t Dstarplusp0,Dstarminusp1,Ustarp0,Ustarp1,DUstarplusp0,DUstarminusp1;
 #endif
-
-  *heat_to_surface=0.0;
+  assert(is_node_bdry(np[l],TYPELEVEL_FLUID));
+  heat_to_surface=0.0;
             if (find_bdry_direc(np, gl, l, TYPELEVEL_FLUID, &theta, &thetasgn)) {
               for (vartheta=0; vartheta<nd; vartheta++){
                 if (thetasgn>0)
@@ -429,7 +430,7 @@ void _heat_to_surface(np_t *np, gl_t *gl, long l, double *heat_to_surface){
                     dGp1h[flux]=0.25e0*(Gp0p1[flux]+Gp1p1[flux]-Gp0m1[flux]-Gp1m1[flux]);
                 }
                 multiply_matrix_and_vector(Kp1h,dGp1h,tmpp1h);
-                (*heat_to_surface)+=sign(metricsp1h.Omega)*thetasgn*tmpp1h[fluxet];
+                (heat_to_surface)+=sign(metricsp1h.Omega)*thetasgn*tmpp1h[fluxet];
               }
 #ifdef _FLUID_PLASMA
               find_Dstarplus (np, gl, _al(gl,l,theta,+0),       theta, metricsp1h, Dstarplusp0);
@@ -440,9 +441,10 @@ void _heat_to_surface(np_t *np, gl_t *gl, long l, double *heat_to_surface){
                 DUstarplusp0[flux]=Dstarplusp0[flux]*Ustarp0[flux];
                 DUstarminusp1[flux]=Dstarminusp1[flux]*Ustarp1[flux]; 
               }
-              (*heat_to_surface)-=sign(metricsp1h.Omega)*thetasgn*(DUstarplusp0[fluxet]+DUstarminusp1[fluxet]); 
+              (heat_to_surface)-=sign(metricsp1h.Omega)*thetasgn*(DUstarplusp0[fluxet]+DUstarminusp1[fluxet]); 
 #endif
             }
+  return(heat_to_surface);
 }
 
 
@@ -472,25 +474,34 @@ static void update_bdry_wall_ablation(np_t *np, gl_t *gl, long lA, long lB, long
   spec_t nukA,nukB;
   bool ref_flag;
   double wablationwall;
-  long paramstart,paramend,numinj,inj;
+  long paramstart,paramend,numspecablation,inj;
+  dim_t Area;
+  double hsum,Areamag,mdotperarea;
+  double wablation[ns];
+  double wablationsum,Pwallatm;
+  long specablation[ns];
 
 
   find_Pstar_bdry_wall(np, gl, lA, lB, lC, theta, thetasgn, BDRYDIRECFOUND, ACCURACY, &Pwall);
 
   
   wablationwall=0.0;
-  paramstart=1;
+  wablationsum=0.0;
+  paramstart=0;
   paramend=np[lA].numbdryparam-1;
+  //fprintf(stderr,"paramstart=%ld  paramend=%ld\n",paramstart,paramend);
   if (mod(paramend-paramstart+1,2)!=0) fatal_error("Wrong number of extra parameters to ablation boundary condition.");
-  numinj=round((double)(paramend-paramstart)/2.0);
-  for (inj=0; inj<numinj; inj++){
-    spec=round(_bdry_param(np,gl,lA,paramstart+inj*2,TYPELEVEL_FLUID_WORK))-1;
-    if (spec<0 || spec>=ns) fatal_error("Wrong specification of the ablation boundary condition. The ablation species number is not within bounds.");
-    wablationwall+=_w(np[lA],spec);
+  numspecablation=round((double)(paramend-paramstart)/2.0);
+  for (inj=0; inj<numspecablation; inj++){
+    specablation[inj]=round(_bdry_param(np,gl,lA,paramstart+inj*2,TYPELEVEL_FLUID_WORK))-1;
+    if (specablation[inj]<0 || specablation[inj]>=ns) fatal_error("Wrong specification of the ablation boundary condition. The ablation species number is not within bounds.");
+    wablation[inj]=_bdry_param(np,gl,lA,paramstart+inj*2+1,TYPELEVEL_FLUID_WORK);
+    wablationsum+=wablation[inj];
+    wablationwall+=_w(np[lA],specablation[inj]);
   }
   assert(wablationwall>=0.0);
   assert(wablationwall<=1.0001);
-  
+  if (wablationsum<0.9999 || wablationsum>1.0001) fatal_error("The mass fraction of the ablation species must sum to 1 not to %E",wablationsum);
   
   alpha1[1]=3790.0;
   alpha1[2]=86.795;
@@ -507,13 +518,17 @@ static void update_bdry_wall_ablation(np_t *np, gl_t *gl, long lA, long lB, long
   alpha3[3]=-268.62;
   alpha3[4]=-771.00;
   alpha3[5]=-684.89;
-
+  // correlation only works for wablationwall>0.5 
+  wablationwall=max(0.4,wablationwall);
+  // correlation only works between 0.001 atm and 1 atm 
+  Pwallatm=max(0.001,min(1.0,Pwall/101300.0));
   Twall=0.0;
   for (j=1; j<=5; j++){
     Twall+=alpha1[j]*powint(log(wablationwall),j-1)
-          +log(Pwall/101300.0)*alpha2[j]*powint(log(wablationwall),j-1)
-          +sqr(log(Pwall/101300.0))*alpha3[j]*powint(log(wablationwall),j-1);
+          +log(Pwallatm)*alpha2[j]*powint(log(wablationwall),j-1)
+          +sqr(Pwallatm)*alpha3[j]*powint(log(wablationwall),j-1);
   }
+//  Twall=3790.0+329.94*log(Pwall/101300.0)+20.386*sqr(log(Pwall/101300.0));
   /* clip Twall so that it remains within the user-specified bounds */
   Twall=max(gl->model.fluid.Twmin,min(gl->model.fluid.Twmax,Twall));
   
@@ -528,8 +543,29 @@ static void update_bdry_wall_ablation(np_t *np, gl_t *gl, long lA, long lB, long
     nukA[spec]=_nustar(np,lA,gl,spec);
     nukB[spec]=_nustar(np,lB,gl,spec); 
   }
+  
+  find_bdry_node_area(np, gl, lA, Area, &Areamag);
+  
+  hsum=0.0;
+  for (inj=0; inj<numspecablation; inj++){
+    hsum+=wablation[inj]*_hk_from_T(specablation[inj], Twall);
+  }
+  hsum-=710.0*Twall; // substract the heat capacity of solid carbon times the wall temperature
+  assert(hsum>0.0);
+  assert(Areamag>0.0);
+  //hsum=5.8e7;
+  mdotperarea=max(1e-20,_heat_to_surface(np, gl, lA))/Areamag/(hsum);
+  
+  for (inj=0; inj<numspecablation; inj++){
+    //wablation[inj]=_bdry_param(np,gl,lA,paramstart+inj*2+1,TYPELEVEL_FLUID_WORK)
+    np[lA].bdryparam[paramstart+inj*2+1]=mdotperarea*wablation[inj];
+  }
   // here need to change np[lA].bdryparam before sending it to update_w_V_at_injection_wall
-  update_w_V_at_injection_wall(np, gl, lA, lB, lC, nukA, nukB, 1, np[lA].numbdryparam-1, wwall, Vwall);
+  update_w_V_at_injection_wall(np, gl, lA, lB, lC, nukA, nukB, 0, np[lA].numbdryparam-1, wwall, Vwall);
+  for (inj=0; inj<numspecablation; inj++){
+    //wablation[inj]=_bdry_param(np,gl,lA,paramstart+inj*2+1,TYPELEVEL_FLUID_WORK)
+    np[lA].bdryparam[paramstart+inj*2+1]=wablation[inj];
+  }
 
   for (spec=0; spec<ncs; spec++) 
     wwall[spec]=0.0;
@@ -540,6 +576,7 @@ static void update_bdry_wall_ablation(np_t *np, gl_t *gl, long lA, long lB, long
 
 
   find_U_2(np, lA,gl,wwall,Vwall,Pwall,Twall,kwall,psiwall);
+  
 }
 
 

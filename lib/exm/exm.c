@@ -1011,6 +1011,7 @@ long mod_old2 (long a, long b)
 double powint(double x, long y){
   double sum;
   long cnt;
+  assert(y>=0);
   sum=1.0e0;
   for (cnt=1; cnt<=labs(y); cnt++){
     sum=sum*x;
