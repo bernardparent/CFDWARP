@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 MAY 28b
+  * in model/fluid/_Favre-Reynolds/fluid_bdry.c
+    - fixed a bug in update_bdry_wall_ablation()
+    - got rid of wwall=0 for charged species in update_bdry_wall_ablation()
+    
+
 2024 MAY 28a
   * in lib/exm/exm.c
     - in powint(), added assert(y>=0);

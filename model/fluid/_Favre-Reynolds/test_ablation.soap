@@ -1,6 +1,6 @@
 #!/usr/local/bin/soap
-  Pwall=0.00001; {atm}
-  wablationwall=1.0;
+  Pwall=0.1; {atm}
+  wablationwall=0.2;
   alpha1[1]=3790.0;
   alpha1[2]=86.795;
   alpha1[3]=-2980.0;

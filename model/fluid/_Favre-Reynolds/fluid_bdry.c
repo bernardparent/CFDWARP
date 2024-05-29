@@ -478,7 +478,7 @@ static void update_bdry_wall_ablation(np_t *np, gl_t *gl, long lA, long lB, long
   dim_t Area;
   double hsum,Areamag,mdotperarea;
   double wablation[ns];
-  double wablationsum,Pwallatm;
+  double wablationsum,Pwallatm,sum;
   long specablation[ns];
 
 
@@ -518,7 +518,7 @@ static void update_bdry_wall_ablation(np_t *np, gl_t *gl, long lA, long lB, long
   alpha3[3]=-268.62;
   alpha3[4]=-771.00;
   alpha3[5]=-684.89;
-  // correlation only works for wablationwall>0.5 
+  // correlation seems to only work for wablationwall>0.4 
   wablationwall=max(0.4,wablationwall);
   // correlation only works between 0.001 atm and 1 atm 
   Pwallatm=max(0.001,min(1.0,Pwall/101300.0));
@@ -526,7 +526,7 @@ static void update_bdry_wall_ablation(np_t *np, gl_t *gl, long lA, long lB, long
   for (j=1; j<=5; j++){
     Twall+=alpha1[j]*powint(log(wablationwall),j-1)
           +log(Pwallatm)*alpha2[j]*powint(log(wablationwall),j-1)
-          +sqr(Pwallatm)*alpha3[j]*powint(log(wablationwall),j-1);
+          +sqr(log(Pwallatm))*alpha3[j]*powint(log(wablationwall),j-1);
   }
 //  Twall=3790.0+329.94*log(Pwall/101300.0)+20.386*sqr(log(Pwall/101300.0));
   /* clip Twall so that it remains within the user-specified bounds */
@@ -538,6 +538,8 @@ static void update_bdry_wall_ablation(np_t *np, gl_t *gl, long lA, long lB, long
   for (spec=0; spec<ns; spec++){
     wwall[spec]=_f_symmetry(ACCURACY,_w(np[lB],spec),_w(np[lC],spec));
   }
+//  for (spec=0; spec<ncs; spec++) 
+//    wwall[spec]=0.0;
 
   for (spec=0; spec<ns; spec++){
     nukA[spec]=_nustar(np,lA,gl,spec);
@@ -567,8 +569,6 @@ static void update_bdry_wall_ablation(np_t *np, gl_t *gl, long lA, long lB, long
     np[lA].bdryparam[paramstart+inj*2+1]=wablation[inj];
   }
 
-  for (spec=0; spec<ncs; spec++) 
-    wwall[spec]=0.0;
 
   reformat_w(gl,wwall,"_bdry",&ref_flag);
 
