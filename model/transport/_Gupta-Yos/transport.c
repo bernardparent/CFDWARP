@@ -65,7 +65,7 @@ https://ntrs.nasa.gov/api/citations/19900017748/downloads/19900017748.pdf
 #define TRANSPORTMODEL_NONEQUILIBRIUM 104   // Eq(49) : 5-temperature model, thermal non-equilibrium, and valid to find kappak for each species while TRANSPORTMODEL_EQUILIBRIUM_EQ27,TRANSPORTMODEL_EQUILIBRIUM_EQ30,TRANSPORTMODEL_EQUILIBRIUM_EQ40A can only be used to find kappa for the bulk
 #define TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET 105  //same as TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED except that muk and kappac are found from the Parent-Macheret model
 #define TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED 107  //same as TRANSPORTMODEL_NONEQUILIBRIUM except that electron-electron collisions are are not counted in finding mue and that kappac is found from muk, not from its own equation; see Parent et al., Effect of Plasma Sheaths on Earth-Entry Magnetohydrodynamics, Journal of Thermophysics and Heat Transfer, Vol. 37 No. 4, Pages 845-857, 2023.
-
+#define TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_IONMOBILITIESPARENTMACHERET 108  //same as TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED except that muk for ions and kappac are found from the Parent-Macheret model
 
 
 void write_model_transport_template(FILE **controlfile){
@@ -97,6 +97,7 @@ void read_model_transport_actions(char *actionname, char **argum, SOAP_codex_t *
     SOAP_add_int_to_vars(codex,"TRANSPORTMODEL_NONEQUILIBRIUM",TRANSPORTMODEL_NONEQUILIBRIUM); 
     SOAP_add_int_to_vars(codex,"TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED",TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED); 
     SOAP_add_int_to_vars(codex,"TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET",TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET); 
+    SOAP_add_int_to_vars(codex,"TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_IONMOBILITIESPARENTMACHERET",TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_IONMOBILITIESPARENTMACHERET); 
     SOAP_add_int_to_vars(codex,"LNLAMBDA_NONE",LNLAMBDA_NONE); 
     SOAP_add_int_to_vars(codex,"LNLAMBDA_GUPTAYOS",LNLAMBDA_GUPTAYOS); 
     SOAP_add_int_to_vars(codex,"LNLAMBDA_RAIZER",LNLAMBDA_RAIZER); 
@@ -111,8 +112,8 @@ void read_model_transport_actions(char *actionname, char **argum, SOAP_codex_t *
     codex->action=action_original;
 
     find_int_var_from_codex(codex,"TRANSPORTMODEL",&gl->model.transport.TRANSPORTMODEL);
-    if (gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_EQUILIBRIUM_EQ27 && gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_EQUILIBRIUM_EQ30 && gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_EQUILIBRIUM_EQ40A && gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_NONEQUILIBRIUM && gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED && gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET)
-      SOAP_fatal_error(codex,"TRANSPORTMODEL must be set to either TRANSPORTMODEL_EQUILIBRIUM_EQ27, TRANSPORTMODEL_EQUILIBRIUM_EQ30, TRANSPORTMODEL_EQUILIBRIUM_EQ40A, TRANSPORTMODEL_NONEQUILIBRIUM, TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED, TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET.");
+    if (gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_EQUILIBRIUM_EQ27 && gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_EQUILIBRIUM_EQ30 && gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_EQUILIBRIUM_EQ40A && gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_NONEQUILIBRIUM && gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED && gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET && gl->model.transport.TRANSPORTMODEL!=TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_IONMOBILITIESPARENTMACHERET)
+      SOAP_fatal_error(codex,"TRANSPORTMODEL must be set to either TRANSPORTMODEL_EQUILIBRIUM_EQ27, TRANSPORTMODEL_EQUILIBRIUM_EQ30, TRANSPORTMODEL_EQUILIBRIUM_EQ40A, TRANSPORTMODEL_NONEQUILIBRIUM, TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED, TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET, TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_IONMOBILITIESPARENTMACHERET.");
 
 
     find_int_var_from_codex(codex,"LNLAMBDA",&gl->model.transport.LNLAMBDA);
@@ -1214,7 +1215,7 @@ void find_muk_from_chik_N_T_Te_Delta1(gl_t *gl, spec_t chik, double N, double T,
     sum=0; 
     switch (speciestype[i]){
       case SPECIES_ELECTRON:
-        if (gl->model.transport.TRANSPORTMODEL==TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED || gl->model.transport.TRANSPORTMODEL==TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET){
+        if (gl->model.transport.TRANSPORTMODEL==TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED || gl->model.transport.TRANSPORTMODEL==TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET || gl->model.transport.TRANSPORTMODEL==TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_IONMOBILITIESPARENTMACHERET){
           for (j=0; j<ns; j++) {
             if (i!=j)
               sum+=chik[j]/(Dij_e[i][j]); 
@@ -1378,6 +1379,20 @@ void find_nuk_eta_kappak_muk(gl_t *gl, spec_t rhok, double T, double Te,
       *kappan=0.0;
       for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
     break;
+    case TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_IONMOBILITIESPARENTMACHERET:
+      for (spec=0; spec<ncs; spec++) {
+        if (speciestype[spec]!=SPECIES_ELECTRON){
+          muk[spec]=_muk_from_rhok_T_Te_ParentMacheret(rhok, T, Te, spec);
+        }
+        kappac[spec]=_kappac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
+      }
+      for (k=0; k<ns; k++){
+        if (k<ncs) kappak[k]=kappac[k];
+          else kappak[k]=_kappak_from_chik_Delta1_Delta2_GUPTAYOSNONEQUILIBRIUM(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
+      }
+      *kappan=0.0;
+      for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
+    break;
     default:
       fatal_error("gl->model.transport.TRANSPORTMODEL can not be set to %ld.",gl->model.transport.TRANSPORTMODEL);
   }
@@ -1406,10 +1421,10 @@ void find_dmuk_from_rhok_Tk_Ek(gl_t *gl, spec_t rhok, double Tk, double Ek, long
 double _mueNk_from_Te(gl_t *gl, long spec, double Te){
   double mueNk;
   double DijNk,Delta1_e;
+  if (speciestype[spec]!=SPECIES_NEUTRAL) fatal_error("The function _mueNk_from_Te() can only be called for neutral species but spec=%ld is not neutral.",spec);
   if (gl->model.transport.TRANSPORTMODEL==TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET){
     mueNk=_mueNk_from_Te_ParentMacheret(spec, Te);
   } else {
-    if (speciestype[spec]!=SPECIES_NEUTRAL) fatal_error("The function _mueNk_from_Te() can only be called for neutral species but spec=%ld is not neutral.",spec);
     Delta1_e=_piOmega11(speceminus,spec,Te)*(8.0e0/3.0e0)*sqrt((2.0e0*_calM(speceminus)*1000.0*_calM(spec)*1000.0)/(pi*Runiv*Te*(_calM(speceminus)*1000.0 + _calM(spec)*1000.0)))*1.546e-20; 
     DijNk=1.0/(1.0/1e6*Delta1_e)/1e4; //the units for Dij here are m2/s 
     assert(DijNk!=0.0);

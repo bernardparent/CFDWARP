@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 01a
+  * in model/transport/_Gupta-Yos/transport.c
+    - added TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_IONMOBILITIESPARENTMACHERET
+    - in find_nuk_eta_kappak_muk(), added code for TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_IONMOBILITIESPARENTMACHERET
+    - in _mueNk_from_Te(), added neutral species check also for 
+      TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_MOBILITIESPARENTMACHERET
+
+
 2024 MAY 28b
   * in model/fluid/_Favre-Reynolds/fluid_bdry.c
     - fixed a bug in update_bdry_wall_ablation()
