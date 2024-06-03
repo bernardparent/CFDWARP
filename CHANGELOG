@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 03b
+  * in model/chem/_Air_Plasma_11s/rodriguez2024.c
+    - fixed a bug with one spline reaction
+  * in model/chem/_Air_Plasma_11s/
+    - added rodriguezpark2024.c
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - added the model rodriguezpark2024
+  * in model/chem/_Air_Plasma_8s/rodriguez2024.c
+    - fixed a bug with one spline reaction
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - updated the document 
+  * in model/chem/_Air_Plasma_8s/doc/report.tex
+    - updated the document
+    
+
 2024 JUN 03a
   * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
     - fixed a mistake in reactions 8 and 14 (rates were off by several orders of magnitude)

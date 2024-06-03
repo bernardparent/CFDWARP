@@ -1262,7 +1262,7 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 \fontsizetable
 \begin{center}
 \begin{threeparttable}
-\tablecaption{Rodriguez 11-species plasma chemical model (alternative reaction rates for the Kim 2021 model)\tnote{a,b}}
+\tablecaption{Rodriguez 11-species plasma chemical model (corrected reaction rates for the Kim 2021 model)\tnote{a,b,c}}
 \begin{tabular}{cccccccc} 
 \toprule
 
@@ -1320,9 +1320,44 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 \end{tabular}
 \begin{tablenotes}
 \item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol. $A$ has units of $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$. $E$ has units of cal/mole. The rate is given by $A T^n \exp(-E/RT)$. ${\cal A}$ is Avogadro's number and it is approximately $6.022 \cdot 10^{23}~{\rm mol^{-1}}$.
-\item[{b}] The spline control points for each reaction can be found in Table \ref{tab:11s_spline_tab}. The corresponding reaction rates are obtained with BOLSIG+ using cross-section data from the indicated references or by directly fitting a cubic spline through experimentally measured reaction rate values.
+\item[{b}] The spline control points for each reaction can be found in Table \ref{tab:correctedreactionratessplinecontrolpoints}. The corresponding reaction rates are obtained with BOLSIG+ using cross-section data from the indicated references or by directly fitting a cubic spline through experimentally measured reaction rate values.
+\item[{c}] Corrected reaction rates for the Kim 2021 model listed in Table \ref{tab:kim2021a}.
 \end{tablenotes}
 \label{tab:rodriguez2024b}
+\end{threeparttable}
+\end{center}
+\end{table}
+%
+
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Rodriguez-Park 11-species plasma chemical model (corrected reaction rates for the Parent-Park model)\tnote{a,b,c}}
+\begin{tabular}{cccccccc} 
+\toprule
+
+\multicolumn{2}{c}{Reaction} & $T$ & $A$ & $n$ & $E$ & \multicolumn{1}{c}{Refs.}\\ 
+\midrule                
+
+3 & $\rm e^{-} +N_2\rightarrow N + N + e^{-}$ &$T_{\rm e}$ & \multicolumn{3}{p{8cm}}{Rate given as spline-fit using cross-section data from Fig.~10 in Ref. \cite{pr:1985;:phelps}} & \cite{pr:1985;:phelps} \\                      
+10 & $\rm NO^{+} + e^- \rightarrow  N + O $  &$T_{\rm e}$ & $3.00 \cdot 10^{-7} \cdot {\cal A} \cdot300^{0.56}$ & $-0.56$ & $0.0$ & \cite{jgr:2004:sheehan} \\
+11 & $\rm  O_2^{+}+e^- \rightarrow  O + O $ &$T_{\rm e}$ & $2.40 \cdot 10^{-7} \cdot {\cal A}\cdot300^{0.70} $ & $-0.70$ & $0.0$ & \cite{aip:2001:peverall} \\
+12 & $\rm N_2^{+}+e^-\rightarrow N + N $  &$T_{\rm e}$ &  \multicolumn{3}{p{8cm}}{Rate given as spline-fit through rate data from Fig.~3 in Ref. \cite{aip:1998:peterson}} & \cite{aip:1998:peterson} \\                                   
+26 & $\rm e^- + O \rightarrow O^{+}+e^- + e^-$ &$T_{\rm e}$ & \multicolumn{3}{p{8cm}}{Rate given as spline-fit using cross-section data in Ref. \cite{pcpp:1992:morgan}}  &\cite{pcpp:1992:morgan}\\
+27 & $\rm e^- + N \rightarrow N^{+}+e^- + e^-$ &$T_{\rm e}$ & \multicolumn{3}{p{8cm}}{Rate given as spline-fit using cross-section data from Fig. 4 in Ref. \cite{pr:1962:smith}} &\cite{pr:1962:smith}\\                                        
+28  & $\rm e^- + O_2   \rightarrow O_2^+ + e^- + e^-$  &$T_{\rm e}$ &  \multicolumn{3}{p{8cm}}{Rate given as spline-fit using cross-section data from Ref. \cite{pcpp:1992:morgan}} & \cite{pcpp:1992:morgan} \\
+29  & $\rm e^- + N_2   \rightarrow N_2^+ + e^- + e^-$   &$T_{\rm e}$ &  \multicolumn{3}{p{8cm}}{Rate given as spline-fit using cross-section data from Fig. 9.4 in Ref. \cite{aip:1986:itikawa}} & \cite{aip:1986:itikawa} \\
+30 & $\rm e^- + NO  \rightarrow NO^+ + e^- + e^-$  &$T_{\rm e}$ &  \multicolumn{3}{p{8cm}}{Rate given as spline-fit using cross-section data from Ref. \cite{pcpp:1992:morgan}} & \cite{pcpp:1992:morgan} \\
+
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol. $A$ has units of $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$. $E$ has units of cal/mole. The rate is given by $A T^n \exp(-E/RT)$. ${\cal A}$ is Avogadro's number and it is approximately $6.022 \cdot 10^{23}~{\rm mol^{-1}}$.
+\item[{b}] The spline control points for each reaction can be found in Table \ref{tab:correctedreactionratessplinecontrolpoints}. The corresponding reaction rates are obtained with BOLSIG+ using cross-section data from the indicated references or by directly fitting a cubic spline through experimentally measured reaction rate values.
+\item[{c}] Corrected reaction rates for the Parent-Park 2021 model listed in Table \ref{tab:parentpark}.
+\end{tablenotes}
+\label{tab:rodriguezpark2024a}
 \end{threeparttable}
 \end{center}
 \end{table}
@@ -1332,92 +1367,91 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 \begin{table}[!ht]
   \center\fontsizetable
   \begin{threeparttable}
-    \tablecaption{Coordinates of control points for monotone cubic spline interpolation of reaction rates\tnote{a}.}
+    \tablecaption{Coordinates of spline control points for the corrected air plasma reaction rates.\tnote{a}}
     \label{tab:11s_spline_tab}
     \fontsizetable
  
-    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}lccccc}
+    \begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}llll@{}}
     
     \toprule
-   No.~~ & Reaction ~& Rate & ${\rm ln}~T_{\rm e}$ & ${\rm ln}~k$  \\
+    Reaction ~ & ${\rm ln}~T_{\rm e}$ & ${\rm ln}~k$ \\
         \midrule
         
-   \multirow{2}{*}{15} &  \multirow{2}{*}{ $\rm e^- + N \rightleftarrows N^+ + e^- +e^- $   } & Forward  &  \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont  
-      10.0920,   10.3442,   10.5823,   10.7863,   10.9561,   11.0733,   11.1957,   11.5243,   11.7452,   14.9141
- \end{minipage}  & \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont 
-  42.1770, -35.8211, -31.6270, -28.9594, -26.7535, -24.4385, -22.9054, -20.7873, -19.8826, -16.2235
-\end{minipage}\\       
-\midrule
+     { $\rm e^- + N \rightarrow N^+ + e^- +e^- $   } &   \begin{minipage}[t]{0.30\textwidth}\raggedright  
+      % 10.0920,   10.3442,   10.5823,   10.7863,   10.9561,   11.0733,   11.1957,   11.5243,   11.7452,   14.9141
+          9.9733,   10.1148,   10.2972,   10.5461,   11.0331,   12.1595,   14.9141
 
-   \multirow{2}{*}{16} &  \multirow{2}{*}{ $\rm e^- +O \rightleftarrows O^+ + e^- +e^- $   } & Forward &  \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont  
-    10.1301,
-    10.4453,
-    10.7659,
-    10.9631,
-    11.0234,
-    11.0584,
-    11.1400,
-    11.4668,
-    11.7954,
-    12.2633,
-    16.6515,
-    14.9141
- \end{minipage}  & \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont 
-    -52.8136,
-    -38.2561,
-    -31.0487,
-    -27.8416,
-    -25.7922,
-    -24.5029,
-    -23.0528,
-    -20.5393,
-    -19.2421,
-    -18.1015,
-    -17.0574,
-    -16.2235
-\end{minipage}\\       
-\midrule
+ \end{minipage}  & \begin{minipage}[t]{0.35\textwidth}\raggedright 
+  % 42.1770, -35.8211, -31.6270, -28.9594, -26.7535, -24.4385, -22.9054, -20.7873, -19.8826, -16.2235
+    -49.6819,  -39.5251,  -32.5922,  -27.7250,  -23.2627,  -18.8262,  -16.4748
 
-  \multirow{2}{*}{26} &  \multirow{2}{*}{ $\rm N+N \rightleftarrows   N_2^+ + e^- $   } & Backward &  \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont  
+\end{minipage} \\       
+~\\
+
+ { $\rm e^- +O \rightarrow O^+ + e^- +e^- $   } &   \begin{minipage}[t]{0.3\textwidth}\raggedright  
+    9.7444,    9.9402,   10.2102,   10.5776,   11.0606,   12.0831,   13.3654,   14.9141
+
+ \end{minipage}  & \begin{minipage}[t]{0.35\textwidth}\raggedright 
+  -45.7081,  -36.5368,  -30.2192,  -26.0516, -22.8011,  -18.4691, -16.8693,  -16.3412
+
+\end{minipage} \\      
+~\\
+
+   { $\rm e^- +  N_2^+ \rightarrow   N+N  $   } &  \begin{minipage}[t]{0.3\textwidth}\raggedright  
      2.9613,    5.7153,    9.1741,    9.8638,   12.3696,   14.9141
- \end{minipage}  & \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont 
+ \end{minipage}  & \begin{minipage}[t]{0.3\textwidth}\raggedright 
   -15.1097,  -15.6251, -16.9585,  -17.4851,  -18.7960,  -20.7233
-\end{minipage}\\
-\midrule
+\end{minipage} \\
+~\\
 
-  \multirow{2}{*}{29} &  \multirow{2}{*}{ $\rm e^- + N_2 \rightleftarrows N+N + e^-$   } & Forward &  \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont  
+   { $\rm e^- + N_2 \rightarrow N+N + e^-$   } & \begin{minipage}[t]{0.3\textwidth}\raggedright  
     9.5662, 9.6421, 9.8483, 9.9808, 10.2742, 10.8312, 10.9937, 11.1449, 11.4428, 11.6894, 14.9141
- \end{minipage}  & \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont 
+ \end{minipage}  & \begin{minipage}[t]{0.35\textwidth}\raggedright 
   -45.6975, -41.8099, -35.8672, -33.6513, -30.3852, -26.0004, -24.6913, -23.4619, -21.1866, -19.8272, -13.9209
-\end{minipage}\\
-\midrule
-  \multirow{2}{*}{30} &  \multirow{2}{*}{ $\rm e^- + N_2 \rightleftarrows N_2^+ + e^- + e^-$   } & Forward &  \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont  
-    9.8483, 9.9819, 10.2842, 10.4379, 10.7181, 11.0848, 11.1312, 11.1948, 11.4360, 11.5971, 14.9141
- \end{minipage}  & \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont 
-  -49.4041, -44.5753, -37.3445, -34.6995, -30.8554, -26.0214, -24.7535, -23.5733, -21.3724, -20.4532, -13.9209
-\end{minipage}\\
-\midrule
-  \multirow{2}{*}{30} &  \multirow{2}{*}{ $\rm e^- + O_2 \rightleftarrows O_2^+ + e^- + e^-$   } & Forward &  \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont  
-       10.0203,   10.4221,   10.7349,   10.8887,   10.9093,   10.9259,   11.0566,   11.3986,   11.6522,   14.9141
- \end{minipage}  & \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont 
-    -52.3857,  -38.4423,  -31.5689,  -28.5071,  -27.6690,  -26.5035,  -23.7214,  -21.0586,  -19.8358,  -13.8155
-\end{minipage}\\
-\midrule
-  \multirow{2}{*}{30} &  \multirow{2}{*}{ $\rm e^- + NO \rightleftarrows NO^+ + e^- + e^-$   } & Forward &  \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont  
-        9.5015,    9.7154,    9.9574,   10.1947,   10.3715,   10.5141,   10.5788,   10.7837,   11.2280,   11.6627,   12.1515,   13.9673
+\end{minipage} \\
+~\\
 
- \end{minipage}  & \begin{minipage}[t]{0.3\textwidth}\raggedright\fontsize{7pt}{7pt}\selectfont 
-    -45.3314,  -38.8204,  -34.3367,  -31.3595,  -29.4711,  -27.4630,  -25.8461,  -23.1037,  -20.3218,  -18.7708,  -17.6469,  -15.9836
+   { $\rm e^- + N_2 \rightarrow N_{2}^+ +e^- + e^-$   } & \begin{minipage}[t]{0.3\textwidth}\raggedright  
+         9.4698,    9.5196,    9.8428,   10.1366,   10.7023,   11.6533,   11.8041,   12.6903,   14.9141
 
-\end{minipage}\\
 
+ \end{minipage}  & \begin{minipage}[t]{0.35\textwidth}\raggedright 
+    -41.1651,  -37.0451,  -30.9051,  -28.6392,  -25.2960,  -19.9307,  -19.3649,  -17.2893,  -15.7126
+
+
+\end{minipage} \\
+~\\
+
+   { $\rm e^- + O_2 \rightarrow O_{2}^+ +e^- + e^-$   } & \begin{minipage}[t]{0.3\textwidth}\raggedright  
+ % 10.0203, 10.4221, 10.7349, 10.8887, 10.9093, 10.9259, 11.0566, 11.3986, 11.6522, 14.9141
+    10.2400,   10.4030,   10.5381,   10.6702,   10.7424,   10.9127,   11.2568,   11.5315,   13.1215,   14.9141
+
+ \end{minipage}  & \begin{minipage}[t]{0.35\textwidth}\raggedright 
+ % -52.3857, -38.4423, -31.5689, -28.5071, -27.6690, -26.5035, -23.7214, -21.0586, -19.8358, -13.8155
+   -44.0087,  -36.3676,  -31.2400,  -27.6638,  -26.2591,  -23.9601,  -21.3797,  -20.0957,  -16.5644,  -15.2808,
+
+\end{minipage} \\
+~\\
+
+   { $\rm e^- + NO \rightarrow NO^+ +e^- + e^-$   } & \begin{minipage}[t]{0.3\textwidth}\raggedright  
+     % 9.5015, 9.7154, 9.9574, 10.1947, 10.3715, 10.5141, 10.5788, 10.7837, 11.2280, 11.6627, 12.1515, 13.9673
+         8.4874,    8.8842,    9.2631,    9.5654,    9.7903,   10.0982,   10.5173,   11.6903,   11.8306,   13.1133,   14.9141
+
+ \end{minipage}  & \begin{minipage}[t]{0.35\textwidth}\raggedright 
+   -43.8225  -39.5270  -36.0264  -33.1178  -30.6688  -26.8095  -22.8654  -18.6549  -18.3163  -16.4545  -15.5993
+
+\end{minipage} \\
+ 
     \bottomrule
     \end{tabular*}
 \begin{tablenotes}
-\item[{a}] Notation and units: $T_{\rm e}$ is the electron temperature in Kelvin and $k$ is the reaction rate in units of $\rm cm^3/s$.
+\item[{a}] The reaction rate $k$ has units of $\textrm{cm}^3\cdot \textrm{s}^{-1}$. The electron temperature $T_{\rm e}$ is in Kelvin.
+
 \end{tablenotes}
+\label{tab:correctedreactionratessplinecontrolpoints}
    \end{threeparttable}
 \end{table}
+
 %insert a few newpages here to make sure the refs section follows the tables
 ~
 \newpage

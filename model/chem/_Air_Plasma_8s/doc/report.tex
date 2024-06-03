@@ -382,41 +382,62 @@ abstract
 \end{table}
 %
 
-\begin{table}[!htbp]
+
+\begin{table}[!ht]
   \center\fontsizetable
   \begin{threeparttable}
     \tablecaption{Coordinates of control points for monotone cubic spline interpolation of reaction rates. Rodriguez (2024) model.\tnote{a}}
     \label{tab:spline_tab}
     \fontsizetable
-    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}lcll}
+ 
+    \begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}llll@{}}
+    
     \toprule
-   No.~~ & Reaction ~& Variable & Spline control point coordinates  \\
+    Reaction ~ & ${\rm ln}~T_{\rm e}$ & ${\rm ln}~k$ \\
+        \midrule
+        
 
 
-          \midrule      
-   \multirow{2}{*}{1} &  \multirow{2}{*}{ $\rm e^- + N_2   \rightarrow N_2^+ + e^- + e^- $ } & ${\rm ln}~T_{\rm e}$  & \tiny       9.8483    9.9819   10.2842   10.4379   10.7181   11.0848   11.1312   11.1948   11.4360   11.5971   14.9141 \\
-  &  & ${\rm ln}~k_f$     & \tiny    -49.4041  -44.5753  -37.3445  -34.6995  -30.8554  -26.0214  -24.7535  -23.5733  -21.3724  -20.4532  -13.9209
-\\  
+   { $\rm e^- +  N_2^+ \rightarrow   N+N  $   } &  \begin{minipage}[t]{0.3\textwidth}\raggedright  
+     2.9613,    5.7153,    9.1741,    9.8638,   12.3696,   14.9141
+ \end{minipage}  & \begin{minipage}[t]{0.3\textwidth}\raggedright 
+  -15.1097,  -15.6251, -16.9585,  -17.4851,  -18.7960,  -20.7233
+\end{minipage} \\
+~\\
 
-          \midrule      
-   \multirow{2}{*}{2} &  \multirow{2}{*}{ $\rm e^- + O_2   \rightarrow O_2^+ + e^- + e^- $ } & ${\rm ln}~T_{\rm e}$  & \tiny        10.0203   10.4221   10.7349   10.8887   10.9093   10.9259   11.0566   11.3986   11.6522   14.9141 \\
-  &  & ${\rm ln}~k_f$     & \tiny      -52.3857  -38.4423  -31.5689  -28.5071  -27.6690  -26.5035  -23.7214  -21.0586  -19.8358  -13.8155
+ 
 
-\\  
+   { $\rm e^- + N_2 \rightarrow N_{2}^+ +e^- + e^-$   } & \begin{minipage}[t]{0.3\textwidth}\raggedright  
+       {  9.4698,    9.5196,    9.8428,   10.1366,   10.7023,   11.6533,   11.8041,   12.6903,   14.9141}
 
-          \midrule      
-   \multirow{2}{*}{4} &  \multirow{2}{*}{ $\rm e^- + N_2^+   \rightarrow N + N $ } & ${\rm ln}~T_{\rm e}$  & \tiny    2.9613    5.7153    9.1741    9.8638   12.3696   14.9141
- \\
-  &  & ${\rm ln}~k_f$     & \tiny   -15.1097  -15.6251  -16.9585  -17.4851  -18.7960  -20.7233
 
-\\  
+ \end{minipage}  & \begin{minipage}[t]{0.35\textwidth}\raggedright 
+     {-41.1651,  -37.0451,  -30.9051,  -28.6392,  -25.2960,  -19.9307,  -19.3649,  -17.2893,  -15.7126}
 
-                       
+
+\end{minipage} \\
+~\\
+
+   { $\rm e^- + O_2 \rightarrow O_{2}^+ +e^- + e^-$   } & \begin{minipage}[t]{0.3\textwidth}\raggedright  
+ % 10.0203, 10.4221, 10.7349, 10.8887, 10.9093, 10.9259, 11.0566, 11.3986, 11.6522, 14.9141
+    10.2400,   10.4030,   10.5381,   10.6702,   10.7424,   10.9127,   11.2568,   11.5315,   13.1215,   14.9141
+
+ \end{minipage}  & \begin{minipage}[t]{0.35\textwidth}\raggedright 
+ % -52.3857, -38.4423, -31.5689, -28.5071, -27.6690, -26.5035, -23.7214, -21.0586, -19.8358, -13.8155
+   -44.0087,  -36.3676,  -31.2400,  -27.6638,  -26.2591,  -23.9601,  -21.3797,  -20.0957,  -16.5644,  -15.2808,
+
+\end{minipage} \\
+~\\
+
+
+ 
     \bottomrule
     \end{tabular*}
 \begin{tablenotes}
-\item[{a}] Notation and units: $T_{\rm e}$ is the electron temperature in Kelvin and $k_f$ is the reaction rate in units of cm$^3$/s.
+\item[{a}] The reaction rate $k$ has units of $\textrm{cm}^3\cdot \textrm{s}^{-1}$. The electron temperature $T_{\rm e}$ is in Kelvin.
+
 \end{tablenotes}
+\label{tab:correctedreactionratessplinecontrolpoints}
    \end{threeparttable}
 \end{table}
 %insert a few newpages here to make sure the refs section follows the tables
