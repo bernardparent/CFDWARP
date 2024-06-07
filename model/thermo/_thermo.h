@@ -109,6 +109,7 @@ double _ev_from_T(double T);
 
 double _dev_dTv_from_Tv(double T);
 
+double _zetav_from_Te_Parent2024(double Te);
 
 double _zetav_from_Te_Aleksandrov(double Te);
 
