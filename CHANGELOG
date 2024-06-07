@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 07b
+  * in model/thermo/_generic/thermo.c
+    - updated _zetav_from_Te_Parent2024()
+   
+
 2024 JUN 07a
   * in model/fluid/_Navier-Stokes_plasma/fluid.c
     - in write_model_fluid_template(), read_model_fluid_actions(), added in various locations code 
@@ -16,7 +21,7 @@ ________________________________________________________________________________
     - in find_Semfield(), added model N2VIBJOULEHEATINGMODEL_PARENT2024
   * in model/thermo/_generic/thermo.c
     - added _zetav_from_Te_Parent2024()
-  * 
+   
 
 2024 JUN 03b
   * in model/chem/_Air_Plasma_11s/rodriguez2024.c
