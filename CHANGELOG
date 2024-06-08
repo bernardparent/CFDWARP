@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 07c
+  * in model/thermo/_generic/thermo.c
+    - updated _zetav_from_Te_Parent2024()
+   
+
 2024 JUN 07b
   * in model/thermo/_generic/thermo.c
     - updated _zetav_from_Te_Parent2024()
