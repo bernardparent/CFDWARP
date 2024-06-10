@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 10a
+  * in model/share/transport_share.c
+    - in _mueN_O2(), updated the spline control points
+  * in model/transport/doc/report.tex
+    - updated the spline control points for the reduced mobility of O2
+    
+
 2024 JUN 07c
   * in model/thermo/_generic/thermo.c
     - updated _zetav_from_Te_Parent2024()
