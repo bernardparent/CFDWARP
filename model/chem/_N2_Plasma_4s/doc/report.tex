@@ -177,6 +177,96 @@ abstract
 
 
 
+
+
+%
+\begin{table}
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Rodriguez (2024) 8-species 28-reactions air plasma chemical model.\tnote{a}}
+    \label{tab:rodriguez}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}lll}
+    \toprule
+    No.&Reaction\tnote{(b)} & Rate Coefficient  & Refs. \\
+    \midrule
+    1  & $\rm e^- + N_2   \rightarrow N_2^+ + e^- + e^-$  
+       &  Spline points given in Table \ref{tab:spline_tab} using cross-section data from Fig. 9.4 in Ref. \cite{aip:1986:itikawa}
+       & \cite{aip:1986:itikawa} \\
+    2 & $\rm e^-+N_2^+ \rightarrow N + N$  
+       & Rate given in Table \ref{tab:spline_tab} as spline-fit through rate data from Fig.~3 in Ref. \cite{aip:1998:peterson}
+       &  \cite{aip:1998:peterson}\\
+    3  & $\rm N_2 \rightarrow e^- + N_2^+$   
+       & $1.8 \cdot 10^{17} \cdot Q_{\rm b}^\star$ 1/s 
+       & \cite{book:1982:bychkov}\\
+    4  & $\rm N_2 + M_1 \rightarrow 2 N + M_1$   
+       & $5.0 \cdot 10^{-8} \cdot \exp(-113200/T) (1-\exp(-3354/T))$ cm$^3$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    5  & $\rm N + N + M_2 \rightarrow N_2 + M_2$   
+       & $8.27 \cdot 10^{-34} \cdot \exp(500/T)$ cm$^6$/s 
+       & \cite{book:1987:krivonosova}, \cite{misc:1997:aleksandrov}\\
+    \bottomrule
+    \end{tabular*}
+\begin{tablenotes}
+\item[{a}] Notation and units: $E^\star$ is the reduced effective electric field in the electron reference frame ($E^\star\equiv|\vec{E}+\vec{V}^{\rm e}\times \vec{B}|/N$) in units of V$\cdot$m$^2$; $T_{\rm e}$ is the electron temperature in Kelvin; $T$ is the neutrals temperature in Kelvin; $Q^\star_{\rm b}$ is the ratio in Watts between the electron beam power per unit volume $Q_{\rm b}$ and the total number density of the plasma $N$  ($Q^\star_{\rm b}\equiv Q_{\rm b}/N$).
+\item[{b}] $\rm M_1=~N_2$
+\item[~] $\rm M_2=~N_2,~N$
+\end{tablenotes}
+   \end{threeparttable}
+\end{table}
+%
+
+
+\begin{table}[!ht]
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Coordinates of control points for monotone cubic spline interpolation of reaction rates. Rodriguez (2024) model.\tnote{a}}
+    \label{tab:spline_tab}
+    \fontsizetable
+ 
+    \begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}llll@{}}
+    
+    \toprule
+    Reaction ~ & ${\rm ln}~T_{\rm e}$ & ${\rm ln}~k$ \\
+        \midrule
+        
+
+
+   { $\rm e^- +  N_2^+ \rightarrow   N+N  $   } &  \begin{minipage}[t]{0.3\textwidth}\raggedright  
+     2.9613,    5.7153,    9.1741,    9.8638,   12.3696,   14.9141
+ \end{minipage}  & \begin{minipage}[t]{0.3\textwidth}\raggedright 
+  -15.1097,  -15.6251, -16.9585,  -17.4851,  -18.7960,  -20.7233
+\end{minipage} \\
+~\\
+
+ 
+
+   { $\rm e^- + N_2 \rightarrow N_{2}^+ +e^- + e^-$   } & \begin{minipage}[t]{0.3\textwidth}\raggedright  
+       {  9.4698,    9.5196,    9.8428,   10.1366,   10.7023,   11.6533,   11.8041,   12.6903,   14.9141}
+
+
+ \end{minipage}  & \begin{minipage}[t]{0.35\textwidth}\raggedright 
+     {-41.1651,  -37.0451,  -30.9051,  -28.6392,  -25.2960,  -19.9307,  -19.3649,  -17.2893,  -15.7126}
+
+
+\end{minipage} \\
+~\\
+
+
+ 
+    \bottomrule
+    \end{tabular*}
+\begin{tablenotes}
+\item[{a}] The reaction rate $k$ has units of $\textrm{cm}^3\cdot \textrm{s}^{-1}$. The electron temperature $T_{\rm e}$ is in Kelvin.
+
+\end{tablenotes}
+\label{tab:correctedreactionratessplinecontrolpoints}
+   \end{threeparttable}
+\end{table}
+
+
+
+
 %insert a few newpages here to make sure the refs section follows the tables
 ~
 \newpage

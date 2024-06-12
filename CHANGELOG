@@ -6,6 +6,14 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2024 JUN 12a
+  * in model/chem/_N2_Plasma_4s/chem.c
+    - added CHEMMODEL_RODRIGUEZ2024
+  * in model/chem/_N2_Plasma_4s/
+    - added rodriguez2024.c
+  * in model/chem/_N2_Plasma_4s/doc/report.tex
+    - added documentation for rodriguez2024 model
+    
 
 2024 JUN 10a
   * in model/share/transport_share.c
