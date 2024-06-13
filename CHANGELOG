@@ -6,6 +6,23 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2024 JUN 12b
+  * in model/chem/_NH3_Plasma_32s/Makefile
+    - added rodriguez2024*
+  * in model/chem/_NH3_Plasma_32s
+    - added rodriguez2024.c and rodriguez2024.h
+  * in model/chem/_NH3_Plasma_32s/chem.c
+    - added CHEMMODEL_RODRIGUEZ2024 
+    - added HMINUSMODEL_*
+  * in model/thermo/_generic/enthalpy.c
+    - added species H2V9
+  * in model/thermo/_generic/thermo.c
+    - added species H2(V9)
+  * in model/transport/_Dixon-Lewis/transport.c
+    - added species H2(V9)
+    
+
 2024 JUN 12a
   * in model/chem/_N2_Plasma_4s/chem.c
     - added CHEMMODEL_RODRIGUEZ2024
