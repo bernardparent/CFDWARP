@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 14c
+  * in model/chem/_C2H4_Air_Plasma_36s/doc/report.tex
+    - updated the documentation so that it is in sync with the latest Adamovich solver
+  * in model/chem/
+    - added the chemical solver _N2_Plasma_8s()
+    
+
 2024 JUN 14b
   * in model/thermo/_generic/enthalpy.c
     - removed a comment within a comment that was introduced in 24jun12b
