@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 14a
+  * in model/chem/_NH3_Plasma_32s/rodriguez2024.c
+    - fixed a bug in reaction 151
+     
+
 2024 JUN 13a
   * in model/transport/_Gupta-Yos/transport.c
     - added the option TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_ELECTRONMOBILITIESPARENTMACHERET
