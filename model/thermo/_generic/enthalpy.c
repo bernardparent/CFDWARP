@@ -4644,7 +4644,7 @@ obtained from species NH4+ by subtracting the ionization energy of NH4 (4.410300
    pos 2-8: a1,a2,...,a7
    pos 9-10: b1,b2
    
-   /* H2(V9) has a corresponding vibrational energy of 3.884 eV which is sourced from 
+    H2(V9) has a corresponding vibrational energy of 3.884 eV which is sourced from 
     Goicoechea, Javier R., and Octavio Roncero. "The role of highly vibrationally excited H2 initiating the nitrogen chemistry-Quantum study and 3p detection of NH emission in the Orion Bar PDR." 
     Astronomy & Astrophysics 664 (2022): A190.
     this equals 4.507197E+04 K. Adding this to b1 for H2 to get the thermo of H2(V9)*/
