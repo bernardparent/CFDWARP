@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 14d
+  * in model/chem/_NH3_Plasma_32s/rodriguez2024.c
+    - renamed a few functions and averagedrates call names
+    
+
 2024 JUN 14c
   * in model/chem/_C2H4_Air_Plasma_36s/doc/report.tex
     - updated the documentation so that it is in sync with the latest Adamovich solver
