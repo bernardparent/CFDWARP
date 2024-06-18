@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 18a
+  * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
+    - fixed a bug which prevented compilation
+    
+
 2024 JUN 17a
   * in model/chem/_N2_Plasma_4s/rodriguez2024.c
     - removed implicit treatment of the Townsend ionization reaction
