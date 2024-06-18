@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 17a
+  * in model/chem/_N2_Plasma_4s/rodriguez2024.c
+    - removed implicit treatment of the Townsend ionization reaction
+  * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
+    - made changes to kf6 and kf12
+    
+
 2024 JUN 14d
   * in model/chem/_NH3_Plasma_32s/rodriguez2024.c
     - renamed a few functions and averagedrates call names

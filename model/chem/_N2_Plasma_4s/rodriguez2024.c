@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/thermo/_thermo.h>
 #include <model/share/chem_share.h>
 #include <model/share/model_share.h>
+#define TOWNSENDIMPLICIT FALSE
 
 #define Estarmin 1e-40
 
@@ -212,7 +213,7 @@ void find_dW_dx_Rodriguez2024 ( gl_t *gl, spec_t rhok, double T, double Te, doub
   theta = log ( Estar );
   */
 
-  if (REACTION[1]){
+  if (REACTION[1] && TOWNSENDIMPLICIT){
     dkfdTe = 0.0;
     dkfdT=0.0;
     dkfdTv=0.0;
