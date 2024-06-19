@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 19a
+  * in model/fluid/_*_plasma/fluid_plasma.c
+    - in _Te_local(), now finds Te from _Te_from_rhok_EoverN()
+  * in model/thermo/_generic/thermo.c
+    - removed find_Te_from_EoverN() and find_EoverN_from_Te() and find_dTe_dEoverN_from_EoverN()
+
+
 2024 JUN 18b
   * in model/chem/_Air_Plasma_11s/doc/report.tex, model/chem/_Air_Plasma_8s/doc/report.tex,
     model/chem/_N2_Plasma_4s/doc/report.tex

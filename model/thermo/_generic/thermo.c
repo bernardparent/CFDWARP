@@ -1166,50 +1166,6 @@ double _dzetae_dTe_from_Te(double Te){
 
 
 
-void find_Te_from_EoverN(double Estar, double *Te){
-  double w[9];
-  double sum,Estarexp,logEstar;
-  long cnt;
-  Estar=max(1e-60,Estar);
-  if (Estar<3e-19){ 
-    w[0] = -3.69167532692495882511E+08;
-    w[1] = -6.26956713747712671757E+07;
-    w[2] = -4.65528490607805550098E+06;
-    w[3] = -1.97394448288739687996E+05;
-    w[4] = -5.22784662897089219769E+03;
-    w[5] = -8.85545617874565635930E+01;
-    w[6] = -9.36914737923363882821E-01;
-    w[7] = -5.66073394421067171284E-03;
-    w[8] = -1.49535882691330832494E-05;
-    logEstar=log(Estar);
-    Estarexp=logEstar;
-    sum=w[0];
-    for (cnt=1; cnt<9; cnt++) {
-      sum+=w[cnt]*Estarexp;
-      Estarexp*=logEstar;
-    }
-    *Te=exp(sum);
-  } else {
-    /* the following is a continuation of the curve assuming that the relationship between Estar and Te is linear for Estar>3e-19)*/
-    *Te=59520.0+(Estar-3e-19)*1.5e23; 
-  }
-}
-
-
-void find_EoverN_from_Te(double Te, double *Estar){
-  long cnt;
-  double Te_new,dTedEstar;
-  cnt=0;
-  *Estar=0.5e-20;
-  do {
-    find_Te_from_EoverN(*Estar, &Te_new);
-    find_dTe_dEoverN_from_EoverN(*Estar, &dTedEstar);
-    (*Estar)-=(Te_new-Te)/dTedEstar;
-    cnt++;
-  } while (cnt<100 && fabs((Te_new-Te)/Te)>1e-5);
-  if (cnt==100) fatal_error("Problem finding Eover in find_EoverN_from_Te. Te=%E Te_new=%E",Te,Te_new);
-}
-
 
 
 /*
@@ -1248,39 +1204,6 @@ void find_Te_from_EoverN_test(double EoverN, double *Te){
 */
 
 
-void find_dTe_dEoverN_from_EoverN(double Estar, double *dTedEstar){
-  double w[9];
-  double sum,Estarexp,logEstar,dsumdlogEstar,dlogEstardEstar;
-  long cnt;
-  double Te;
-  Estar=max(1e-40,Estar);  //make sure Estar is not zero
-  if (Estar<3e-19){ 
-    w[0] = -3.69167532692495882511E+08;
-    w[1] = -6.26956713747712671757E+07;
-    w[2] = -4.65528490607805550098E+06;
-    w[3] = -1.97394448288739687996E+05;
-    w[4] = -5.22784662897089219769E+03;
-    w[5] = -8.85545617874565635930E+01;
-    w[6] = -9.36914737923363882821E-01;
-    w[7] = -5.66073394421067171284E-03;
-    w[8] = -1.49535882691330832494E-05;
-    logEstar=log(Estar);
-    Estarexp=logEstar;
-    sum=w[0];
-    dsumdlogEstar=0.0;
-    for (cnt=1; cnt<9; cnt++) {
-      sum+=w[cnt]*Estarexp;
-      dsumdlogEstar+=w[cnt]*Estarexp/logEstar*(double)cnt;
-      Estarexp*=logEstar;
-    }
-    dlogEstardEstar=1.0/Estar;
-    sum=exp(sum);
-    Te=sum;
-    *dTedEstar=Te*dsumdlogEstar*dlogEstardEstar;
-  } else {
-    *dTedEstar=1.5e23; 
-  }
-}
 
 
 /* ionization potential in eV of species k
