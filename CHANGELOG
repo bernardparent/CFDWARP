@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 20e
+  * in model/chem/_NH3_Plasma_32s/rodriguez2024.c
+    - incorporated the H- production reactions from Arakoni to Bacal
+    
+
 2024 JUN 20d
   * in src/test.c
     - in print_column_species_names() and print_column_charged_species_names()
