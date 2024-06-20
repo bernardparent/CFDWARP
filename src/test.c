@@ -630,12 +630,13 @@ void test_jacvars ( np_t * np, gl_t * gl, long l, long theta ) {
 
 }
 
-void print_column_species_names ( long digits ) {
+void print_column_species_names ( char *firstcoltitle, long digits ) {
   long spec, cnt;
   char *speciesname = ( char * ) malloc ( sizeof ( char ) );
 
-  printf ( " T" );
-  for ( cnt = 0; cnt < digits; cnt++ )
+  assert(digits>7);
+  printf ( " %-8s" ,firstcoltitle);
+  for ( cnt = 0; cnt < digits-7; cnt++ )
     printf ( " " );
   for ( spec = 0; spec < ns; spec++ ) {
     find_species_name ( spec, &speciesname );
@@ -649,12 +650,13 @@ void print_column_species_names ( long digits ) {
 }
 
 
-void print_column_charged_species_names ( long digits ) {
+void print_column_charged_species_names ( char *firstcoltitle,  long digits ) {
   long spec, cnt;
   char *speciesname = ( char * ) malloc ( sizeof ( char ) );
 
-  printf ( " T" );
-  for ( cnt = 0; cnt < digits; cnt++ )
+  assert(digits>7);
+  printf ( " %-8s" ,firstcoltitle);
+  for ( cnt = 0; cnt < digits-7; cnt++ )
     printf ( " " );
   for ( spec = 0; spec < ncs; spec++ ) {
     find_species_name ( spec, &speciesname );
@@ -676,7 +678,7 @@ void test_h ( double Tmin, double Tmax, double dT ) {
   printf ( "Species specific enthalpies [J/kg] as function of temperature [K].\n" );
   printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
   printf ( "\n" );
-  print_column_species_names ( 12 );
+  print_column_species_names ("T", 12 );
   T = Tmin;
   do {
     wfprintf ( stdout, "%12.5E ", T );
@@ -705,7 +707,7 @@ void test_hmolar ( double Tmin, double Tmax, double dT ) {
   printf ( "Species molar specific enthalpies [J/mole] as function of temperature [K].\n" );
   printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
   printf ( "\n" );
-  print_column_species_names ( 12 );
+  print_column_species_names ( "T", 12 );
   T = Tmin;
   do {
     wfprintf ( stdout, "%12.5E ", T );
@@ -734,7 +736,7 @@ void test_cp ( double Tmin, double Tmax, double dT ) {
   printf ( "Species specific heats [J/kgK] as function of temperature [K].\n" );
   printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
   printf ( "\n" );
-  print_column_species_names ( 12 );
+  print_column_species_names ( "T", 12 );
   T = Tmin;
   do {
     wfprintf ( stdout, "%12.5E ", T );
@@ -762,7 +764,7 @@ void test_s ( double Tmin, double Tmax, double dT ) {
   printf ( "Species specific entropies [J/kgK] as function of temperature [K].\n" );
   printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
   printf ( "\n" );
-  print_column_species_names ( 12 );
+  print_column_species_names ("T", 12 );
   T = Tmin;
   do {
     wfprintf ( stdout, "%12.5E ", T );
@@ -790,7 +792,7 @@ void test_dsdT ( double Tmin, double Tmax, double dT ) {
   printf ( "Species dsdT [J/(kg K^2)] as function of temperature [K]. \n" );
   printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
   printf ( "\n" );
-  print_column_species_names ( 12 );
+  print_column_species_names ("T", 12 );
   T = Tmin;
   do {
     wfprintf ( stdout, "%12.5E ", T );
@@ -813,7 +815,7 @@ void test_s_equilibrium ( double Tmin, double Tmax, double dT ) {
   printf ( "Species specific entropies in equilibrium [J/kgK] as function of temperature [K].\n" );
   printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
   printf ( "\n" );
-  print_column_species_names ( 12 );
+  print_column_species_names ( "T", 12 );
   T = Tmin;
   do {
     wfprintf ( stdout, "%12.5E ", T );
@@ -835,7 +837,7 @@ void test_dsdT_equilibrium ( double Tmin, double Tmax, double dT ) {
   printf ( "Species dsdT in equilibrium [J/(kg K^2)] as function of temperature [K]. \n" );
   printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
   printf ( "\n" );
-  print_column_species_names ( 12 );
+  print_column_species_names ( "T", 12 );
   T = Tmin;
   do {
     wfprintf ( stdout, "%12.5E ", T );
@@ -860,7 +862,7 @@ void test_eta (gl_t *gl, double Tmin, double Tmax, double dT ) {
   printf ( "Species viscosities [kg/ms] as function of temperature [K].\n" );
   printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
   printf ( "\n" );
-  print_column_species_names ( 12 );
+  print_column_species_names ( "T", 12 );
   T = Tmin;
   do {
     wfprintf ( stdout, "%12.5E ", T );
@@ -890,10 +892,10 @@ void test_mueN (gl_t *gl, double Tmin, double Tmax, double dT ) {
   double mueNk, Te;
   long spec;
   printf ( "\n" );
-  printf ( "Species mobilities as function of electron temperature [K].\n" );
+  printf ( "Species reduced mobility [1/m-V-s] as function of electron temperature [K].\n" );
   printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
   printf ( "\n" );
-  print_column_species_names ( 12 );
+  print_column_species_names ( "Te", 12 );
   Te = Tmin;
   do {
     wfprintf ( stdout, "%12.5E ", Te );
@@ -923,7 +925,7 @@ void test_kappa ( gl_t *gl, spec_t chik, double P, double Tmin, double Tmax, dou
   for (spec=0; spec<ns; spec++) printf ( "chi[%ld]=%E \n", spec, chik[spec] );
   
   printf ( "\n" );
-  print_column_charged_species_names ( 12 );
+  print_column_charged_species_names ("T", 12 );
   T = Tmin;
   do {
     Te = T;
@@ -960,7 +962,7 @@ void test_nu ( gl_t *gl, spec_t chik, double P, double Tmin, double Tmax, double
   for (spec=0; spec<ns; spec++) printf ( "chi[%ld]=%E \n", spec, chik[spec] );
   
   printf ( "\n" );
-  print_column_species_names ( 12 );
+  print_column_species_names ( "T", 12 );
   T = Tmin;
   do {
     Te = T;
@@ -992,7 +994,7 @@ void test_mu ( gl_t *gl, spec_t chik, double P, double Tmin, double Tmax, double
   for (spec=0; spec<ns; spec++) printf ( "chi[%ld]=%E \n", spec, chik[spec] );
   
   printf ( "\n" );
-  print_column_charged_species_names ( 12 );
+  print_column_charged_species_names ("T", 12 );
   T = Tmin;
   do {
     Te = T;
@@ -1025,7 +1027,7 @@ void test_Pr ( gl_t *gl, double Tmin, double Tmax, double dT ) {
   printf ( "Species Prandtl number as function of temperature [K].\n" );
   printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
   printf ( "\n" );
-  print_column_species_names ( 12 );
+  print_column_species_names ( "T", 12 );
   T = Tmin;
   do {
     wfprintf ( stdout, "%12.5E ", T );
@@ -1224,7 +1226,7 @@ void output_options_help(int linewidth){
       strcpy(chistring,chistringorig);
       write_options_row ( stderr, "mu", "none", strins("species mobility  ./test -r test.wrp -prop mu  -Tmin 500 -Tmax 2000 -dT 2 -P 101300 -chik ",chistring,0),
                           linewidth, lengthcol1, lengthcol2 );
-      write_options_row ( stderr, "mueN", "none", "species specific heat  ./test -r test.wrp -prop mueN -Tmin 500 -Tmax 2000 -dT 2",
+      write_options_row ( stderr, "mueN", "none", "species reduced mobility  ./test -r test.wrp -prop mueN -Tmin 500 -Tmax 2000 -dT 2",
                           linewidth, lengthcol1, lengthcol2 );
       write_options_row ( stderr, "Pr", "none", "species Prandtl number  ./test -r test.wrp -prop Pr -Tmin 500 -Tmax 2000 -dT 2",
                           linewidth, lengthcol1, lengthcol2 );

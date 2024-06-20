@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 20d
+  * in src/test.c
+    - in print_column_species_names() and print_column_charged_species_names()
+      added the parameter char *firstcoltitle
+
+
 2024 JUN 20c
   * in model/chem/_Air_Plasma_11s/chem.c
     - changed call from find_EoverN_from_Te() to _EoverN_from_rhok_Te()
