@@ -143,9 +143,11 @@ void add_W_Additional ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, d
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
   }
   
-  find_EoverN_from_Te(Te, &Estar_from_Te);
+  Estar_from_Te=_EoverN_from_rhok_Te(rhok, Te);
   //if (Estar_from_Te>Estar) Estar=Estar_from_Te;   //??? needs to be verified
-  find_Te_from_EoverN(Estar, &Te_from_Estar);
+  Te_from_Estar=_Te_from_rhok_EoverN(rhok, Estar);
+  
+  
   Te_from_Estar=max(300.0,Te_from_Estar); 
     
   /* find properties needed by add_to_W* functions */
@@ -199,9 +201,9 @@ void add_dW_dx_Additional ( gl_t *gl, spec_t rhok, double T, double Te, double T
   Estar = max ( Estarmin, Estar );
   theta = log ( Estar );
 
-  find_Te_from_EoverN(Estar, &Te_from_Estar);
+  Te_from_Estar=_Te_from_rhok_EoverN(rhok, Estar);
   Te_from_Estar=max(300.0,Te_from_Estar); 
-
+  
 
   if (gl->model.chem.ADDITIONALREACTION[1] && gl->model.chem.TOWNSENDIONIZATIONIMPLICIT) {
     kf=exp ( -0.0105809 * sqr ( theta ) - 2.40411e-75 * pow ( theta, 46.0 ) );

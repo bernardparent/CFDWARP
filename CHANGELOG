@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 20c
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - changed call from find_EoverN_from_Te() to _EoverN_from_rhok_Te()
+    - changed call from find_Te_from_EoverN() to _Te_from_rhok_EoverN()
+  * in model/chem/_H2_Air_Plasma_13s/chem.c
+    - changed call from find_EoverN_from_Te() to _EoverN_from_rhok_Te()
+  * in model/chem/_N2_Plasma_8s/chem.c
+    - changed call from find_Te_from_EoverN() to _Te_from_rhok_EoverN()
+  * in model/fluid/_drift-diffusion/fluid.c
+    - changed call from find_Te_from_EoverN() to _Te_from_rhok_EoverN()
+
+
 2024 JUN 20b
   * in model/thermo/_generic/thermo.c and model/thermo/_generic/thermo.hh
     - renamed H2V9 to H2v
