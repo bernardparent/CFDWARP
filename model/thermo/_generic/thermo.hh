@@ -108,4 +108,4 @@
 #define SMAP_H3P     100
 #define SMAP_H2V1     101
 #define SMAP_H2B1Sigma  102
-#define SMAP_H2V9     103
+#define SMAP_H2v     103

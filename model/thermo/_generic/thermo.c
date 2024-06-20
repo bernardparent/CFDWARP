@@ -151,7 +151,7 @@ const static speciesname_t speciesname[SMAP_NS]=
    "H(3P)",
    "H2(V1)",
    "H2(B1Sigma)",
-   "H2(V9)"
+   "H2v"
   };
 
 
@@ -273,7 +273,7 @@ const static double calM[SMAP_NS]=
    1.00794E-3,    /*H(3P)*/
    2.01588E-3,    /*H2(V1)*/
    2.01588E-3,   /*H2(B1Sigma)*/   
-   2.01588E-3   /*H2(V9)*/
+   2.01588E-3   /*H2v*/
   };
 
 
@@ -383,7 +383,7 @@ const static long ck[SMAP_NS]=
    0,    /*H(3P) */
    0,    /* H2(V1) */
    0,   /* H2(B1SIGMA) */
-   0    /* H2(V9) */
+   0    /* H2v */
   };
   
 const static long numatoms[SMAP_NS]=
@@ -491,7 +491,7 @@ const static long numatoms[SMAP_NS]=
    1,    /*H(3P) */
    2,    /* H2(V1) */
    2,    /* H2(B1SIGMA) */
-   2    /* H2(V9) */
+   2    /* H2v */
   }; 
   
 

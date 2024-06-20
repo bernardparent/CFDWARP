@@ -4637,17 +4637,14 @@ obtained from species NH4+ by subtracting the ionization energy of NH4 (4.410300
    },
 
   /* 
-   species H2V9
+   species H2v
    obtained from species H2 
    pos 0: Tmin lower range limit
    pos 1: Tmax upper range limit
    pos 2-8: a1,a2,...,a7
    pos 9-10: b1,b2
    
-    H2(V9) has a corresponding vibrational energy of 3.884 eV which is sourced from 
-    Goicoechea, Javier R., and Octavio Roncero. "The role of highly vibrationally excited H2 initiating the nitrogen chemistry-Quantum study and 3p detection of NH emission in the Orion Bar PDR." 
-    Astronomy & Astrophysics 664 (2022): A190.
-    this equals 4.507197E+04 K. Adding this to b1 for H2 to get the thermo of H2(V9)*/
+    H2v (v=1) has a corresponding excitation threshold of 0.516ev which is obtained from BOLSIG+ Morgan database and this equals to 5.98790000e+03 K. Adding 5.98790000e+03 K to b1 for H2 to get the thermo of H2v */
     {
       {
        +200.00e0,         /* Tmin [K] */ 
@@ -4659,7 +4656,7 @@ obtained from species NH4+ by subtracting the ionization energy of NH4 (4.410300
        +1.753604930E-05,  /* a5 */
        -1.202860160E-08,  /* a6 */
        +3.368093160E-12,  /* a7 */
-       +2.682484380E+03 + 4.507197E+04,  /* b1 */
+       +2.682484380E+03 + 5.98790000e+03,  /* b1 */
        -3.043788660E+01   /* b2 */
       },
       {
@@ -4672,7 +4669,7 @@ obtained from species NH4+ by subtracting the ionization energy of NH4 (4.410300
        -3.740718420E-07,  /* a5 */
        +5.936628250E-11,  /* a6 */
        -3.606995730E-15,  /* a7 */
-       +5.339815850E+03 + 4.507197E+04,  /* b1 */
+       +5.339815850E+03 + 5.98790000e+03,  /* b1 */
        -2.202764050E+00   /* b2 */
       },
       {
@@ -4685,7 +4682,7 @@ obtained from species NH4+ by subtracting the ionization energy of NH4 (4.410300
        -3.740718420E-07,  /* a5 */
        +5.936628250E-11,  /* a6 */
        -3.606995730E-15,  /* a7 */
-       +5.339815850E+03 + 4.507197E+04,  /* b1 */
+       +5.339815850E+03 + 5.98790000e+03,  /* b1 */
        -2.202764050E+00   /* b2 */
       }
    }

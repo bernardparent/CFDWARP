@@ -7,6 +7,23 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 20b
+  * in model/thermo/_generic/thermo.c and model/thermo/_generic/thermo.hh
+    - renamed H2V9 to H2v
+  * in model/thermo/_generic/enthalpy.c
+    - renamed H2V9 to H2v
+    - changed the enthalpy of H2v to the one of H2V1
+  * in model/transport/_Dixon-Lewis/transport.c
+    - renamed H2V9 to H2v
+  * in model/chem/_NH3_Plasma_32s/chem.hh
+    - removed specH2V1 and reduced number of species by 1
+  * in model/chem/_NH3_Plasma_32s/truscott2015.c
+    - renamed species H2V1 by H2v
+  * in model/chem/_NH3_Plasma_32s/rodriguez2024.c
+    - made several changes related to the BACAL HMINUS model
+    - fixed a bug related to the Arakoni HMINUS model
+    
+
 2024 JUN 20a
   * in model/fluid/_*_plasma/fluid.c
     - got rid of TrefElectronEnergyTransport
