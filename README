@@ -4,17 +4,17 @@
 
                                            C F D W A R P
 
-                                CFD Code for Plasma & Reactive Flow
+                       Computational Fluid Dynamics, Waves, Reactions, Plasmas
 
   _______________________________________________________________________________________________
 
 
-  CFDWARP is a 100,000+ line C code that is specifically tailored to simulate efficiently plasma 
-  and reactive flows occurring in aerodynamics, combustion, hypersonics, and planetary entry. 
-  CFDWARP is a high-order compressible flow solver that uses state-of-the-art flux discretization 
-  schemes suitable for Reynolds-averaged Navier-Stokes (RANS) and Implicit Large Eddy Simulation 
-  (ILES). CFDWARP has the unique capability to efficiently simulate the full coupling between 
-  non-neutral plasma sheaths and the quasi-neutral plasma flow.
+  CFDWARP is a 100,000+ line C code that is specifically tailored to simulate efficiently 
+  compressible plasma and reactive flows occurring in aerodynamics, combustion, hypersonics, and 
+  planetary entry. CFDWARP is a high-order compressible flow solver that uses state-of-the-art 
+  flux discretization schemes suitable for Reynolds-averaged Navier-Stokes (RANS) and Implicit 
+  Large Eddy Simulation (ILES). CFDWARP has the unique capability to efficiently simulate the full 
+  coupling between non-neutral plasma sheaths and the quasi-neutral plasma flow.
 
   Please read the file CONTRIB for the list of the CFDWARP contributors.
 
