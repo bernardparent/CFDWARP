@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 21a
+  * in model/chem/_NH3_Plasma_32s/
+    - added arakoni2007v4.c
+  * in model/chem/_NH3_Plasma_32s/rodriguez2024.c
+    - reverted to a simpler model where the H- ion production is not taken from Bacal except
+      for the excited states reactions
+      
+
 2024 JUN 20e
   * in model/chem/_NH3_Plasma_32s/rodriguez2024.c
     - incorporated the H- production reactions from Arakoni to Bacal
