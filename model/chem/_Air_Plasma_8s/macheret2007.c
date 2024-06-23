@@ -210,7 +210,7 @@ void find_dW_dx_Macheret2007 ( gl_t *gl, spec_t rhok, double T, double Te, doubl
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, s;                    
   spec_t N;
-  double Nt,kf,tmp,dkfdTe,dkfdT,dkfdTv,dtmpdT,dkfdQb;
+  double theta,Nt,kf,tmp,dkfdTe,dkfdT,dkfdTv,dtmpdT,dkfdQb;
   //double Estar_from_Te,Te_from_Estar;
 
   /* initialize all derivatives to zero */
@@ -232,15 +232,11 @@ void find_dW_dx_Macheret2007 ( gl_t *gl, spec_t rhok, double T, double Te, doubl
   }
                   
     
-  /*find_EoverN_from_Te(Te, &Estar_from_Te);
-  //if (Estar_from_Te>Estar) Estar=Estar_from_Te;   //??? needs to be verified
-  find_Te_from_EoverN(Estar, &Te_from_Estar);
-  Te_from_Estar=max(300.0,Te_from_Estar); 
   Estar = max ( Estarmin, Estar );
   theta = log ( Estar );
 
 
-  if (REACTION[1]){
+  if (REACTION[1]  && gl->model.chem.TOWNSENDIMPLICIT){
     kf=exp ( -0.0105809 * sqr ( theta ) - 2.40411e-75 * pow ( theta, 46.0 ) );
     dkfdTe = 0.0;
     dkfdT=0.0;
@@ -248,13 +244,13 @@ void find_dW_dx_Macheret2007 ( gl_t *gl, spec_t rhok, double T, double Te, doubl
     add_to_dW_2r3p ( specN2, speceminus,   specN2plus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
   
-  if (REACTION[2]){
+  if (REACTION[2]  && gl->model.chem.TOWNSENDIMPLICIT){
     kf=exp ( -0.0102785 * sqr ( theta ) - 2.42260e-75 * pow ( theta, 46.0 ) );
     dkfdTe = 0.0;
     dkfdT=0.0;
     dkfdTv=0.0;
     add_to_dW_2r3p ( specO2, speceminus,   specO2plus, speceminus, speceminus,   kf, N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
-  }*/
+  }
   
   if (REACTION[3]){
     kf=2.0e-7 * pow (300.0/Te, 0.7);

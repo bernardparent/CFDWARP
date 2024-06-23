@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2021 Prasanna Thoguluva Rajendran
 Copyright 2024 Felipe Martin Rodriguez Fuentes
 
 Redistribution and use in source and binary forms, with or without modification, are
@@ -176,7 +175,7 @@ static double _kf4(np_t np, gl_t *gl, double Te){
 
 void find_W_Rodriguez2024 (np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, 
                        double Qbeam, spec_t W ) {
-  double theta,tmp,Nt,R;
+  double tmp,Nt,R;
   long k;
   spec_t N;
   spec_t X;
@@ -190,8 +189,6 @@ void find_W_Rodriguez2024 (np_t np, gl_t *gl, spec_t rhok, double T, double Te, 
     Nt += N[k];
   }
   
-  Estar = max ( Estarmin, Estar );
-  theta = log ( Estar );
   
 
   if (REACTION[1]){
@@ -350,14 +347,14 @@ void find_dW_dx_Rodriguez2024 ( np_t np, gl_t *gl, spec_t rhok, double T, double
   theta = log ( Estar );
   */
 
-  if (REACTION[1]){
+  if (REACTION[1] && gl->model.chem.TOWNSENDIMPLICIT){
     dkfdTe = 0.0;
     dkfdT=0.0;
     dkfdTv=0.0;
     add_to_dW_2r3p ( specN2, speceminus, specN2plus, speceminus, speceminus, _kf1(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe);
   }
   
-  if (REACTION[2]){
+  if (REACTION[2] && gl->model.chem.TOWNSENDIMPLICIT){
     dkfdTe = 0.0;
     dkfdT=0.0;
     dkfdTv=0.0;

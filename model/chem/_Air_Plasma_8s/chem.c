@@ -49,6 +49,7 @@ void write_model_chem_template(FILE **controlfile){
     "  %s(\n"
     "    CHEMMODEL=CHEMMODEL_MACHERET2007;\n"
     "    QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}\n"
+    "    TOWNSENDIMPLICIT=FALSE;\n"
     "    Tminchem=300.0;\n"
     "    Teminchem=300.0;\n"
     "  );\n"
@@ -86,6 +87,7 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
         && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)
       SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_MACHERET2007 or CHEMMODEL_MACHERET2007OLD or CHEMMODEL_NONE or CHEMMODEL_RAJENDRAN2022 or CHEMMODEL_RODRIGUEZ2024.");
     find_bool_var_from_codex(codex,"QEISOURCETERMS",&gl->model.chem.QEISOURCETERMS);
+    find_bool_var_from_codex(codex,"TOWNSENDIMPLICIT",&gl->model.chem.TOWNSENDIMPLICIT);
     find_double_var_from_codex(codex,"Tminchem",&gl->model.chem.Tminchem);
     find_double_var_from_codex(codex,"Teminchem",&gl->model.chem.Teminchem);
 

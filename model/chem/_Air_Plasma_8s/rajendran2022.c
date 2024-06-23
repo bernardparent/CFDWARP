@@ -232,11 +232,11 @@ void find_dW_dx_Rajendran2022 ( gl_t *gl, spec_t rhok, double T, double Te, doub
   }
 
 
-  if (REACTION[1]){
+  if (REACTION[1]  && gl->model.chem.TOWNSENDIMPLICIT){
     add_to_dW_fw_2r3p ( specN2, speceminus,   specN2plus, speceminus, speceminus, 2.6291e-8 * calA, 0.142, 536330.0*R, Te, X, dWdTe, dWdrhok);
   }
   
-  if (REACTION[2]) {
+  if (REACTION[2]  && gl->model.chem.TOWNSENDIMPLICIT) {
     add_to_dW_fw_2r3p ( specO2, speceminus,   specO2plus, speceminus, speceminus,   3.869e-8 * calA, 0.1166, 567360.0*R, Te, X, dWdTe, dWdrhok);
   }
   

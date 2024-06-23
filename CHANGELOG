@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 23a
+  * in model/chem/_Air_Plasma_8s/chem.c
+    - added TOWNSENDIMPLICIT 
+  * in model/chem/_Air_Plasma_8s/macheret2007.c, model/chem/_Air_Plasma_8s/rajendran2022.c,
+    and model/chem/_Air_Plasma_8s/rodriguez2024.c
+    - only linearize the first two Townsend ionization reactions if TOWNSENDIMPLICIT is TRUE
+    
+
 2024 JUN 21b
   * in README
     - updated the text
