@@ -99,10 +99,10 @@ T=57.35 K
 
 
 
-TEMAXHIGH=600e3;
+TEMAXHIGH=400e3;
 TEMAXLOW=100e3;
 
-dphi=3000; {voltage difference between the cathode and the anode in V}
+dphi=1500; {voltage difference between the cathode and the anode in V}
 Rballast=30000; {ballast resistor in Ohm}
 
 Relectrodebreakdown=Rballast; {in Ohm; don't change this unless absolutely needed}
@@ -111,7 +111,7 @@ gammaeminus_electrode=0.7; {Secondary Electron Emission (SEE) coefficient on ele
 gammaeminus_dielectric=0.1; {SEE coefficient on dielectric walls}
 
 
-mf=1; {mesh factor}
+mf=2; {mesh factor}
 
 is=1;
 is1=is+round(mf*40);   {start of 1st electrode}
@@ -224,7 +224,7 @@ Bdry(
     BDRY_FREESTREAM1                   5    Freestream, 1o, params Vx,Vy, P, T
     _________________________________________________________________________________________
     }
-    Twall=500.0; {K}
+    Twall=350.0; {K}
     All(BDRY_WALLTFIXED1,Twall,gammaeminus_dielectric);
     Plane("i",is,BDRY_INFLOWSUPERSONIC);
     Plane("i",ie,BDRY_OUTFLOWSUPERSONIC1);
@@ -265,7 +265,7 @@ Model(
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=YES;
-    N2VIBJOULEHEATINGMODEL=N2VIBJOULEHEATINGMODEL_ALEKSANDROV;
+    N2VIBJOULEHEATINGMODEL=N2VIBJOULEHEATINGMODEL_PARENT2024;
     REACTING=YES;
     INCLUDE_E_EFFECTS_ON_ION_MOBILITY=NO; 
     INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY=NO; 
@@ -298,6 +298,7 @@ Model(
   AirPlasma8s(
     CHEMMODEL=CHEMMODEL_RODRIGUEZ2024;
     QEISOURCETERMS=FALSE; {include electron energy cooling due to electron impact}
+    TOWNSENDIMPLICIT=FALSE;
     Tminchem=300.0;
     Teminchem=300.0;
   );
@@ -437,7 +438,7 @@ Cycle(
                            near cathode}
     relaxNi_bdry=1.0;     {the ion density relaxation factor at the boundary }
     relaxNe_bdry=0.2;     {the electron density relaxation factor at the boundary }
-    relaxTe=1.0;          {the electron temperature relaxation factor }
+    relaxTe=0.8;          {the electron temperature relaxation factor }
     rhoref=0.1;           {reference density in kg/m3}
     Tref=300.0;           {reference temperature in K}
     Teref=20000.0;        {reference electron temperature in K}
@@ -482,11 +483,11 @@ Cycle(
       Temaxlocal=TEMAXLOW;
       relaxTelocal=0.5;
     , {else}
-      CFLmax=0.5;
+      CFLmax=0.2;
       fact=min(1400*mf,iter-600*mf)/(1400*mf);
       Relectrodelocal=exp(fact*ln(Relectrode)+(1-fact)*ln(Relectrodebreakdown));
       Temaxlocal=(1-fact)*TEMAXLOW+fact*TEMAXHIGH;
-      relaxTelocal=1.0;
+      relaxTelocal=0.8;
     );
     Cycle(NavierStokesPlasma(relaxTe=relaxTelocal;););
     Model(NavierStokesPlasma(Temax=Temaxlocal;););

@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 24a
+  * in tools/cathode.c
+    - added a new flag -mui so that the ion mobility can be specified at the command line
+  * in bin/Broslawski.wrp
+    - made small changes to make the control file compatible with the latest changes to the
+      rodriguez2024 chemical solver
+      
+
 2024 JUN 23a
   * in model/chem/_Air_Plasma_8s/chem.c
     - added TOWNSENDIMPLICIT 

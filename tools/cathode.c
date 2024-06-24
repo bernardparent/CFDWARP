@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef struct {
   double gamma, Nn, Ti, j;
   long plasmatype;
+  bool MUISPECIFIED;
+  double mui;
 } arg_t;
 
 /* the following is taken from Raizer, Gas Discharge Physics
@@ -139,7 +141,8 @@ double _jres ( void *arg, double dtilde ) {
   Etilde = 1.0 / ( 1.0 + log ( dtilde ) );
   Estar = Etilde * _B ( plasmatype ) * P * 100.0 / Nn;
 
-  mui = _mui ( plasmatype, Nn, Ti, Estar ) * 1e4;       /* cm2 / Vstar s */
+  if (((arg_t *)arg)->MUISPECIFIED) mui=((arg_t *)arg)->mui* 1e4; 
+    else mui = _mui ( plasmatype, Nn, Ti, Estar ) * 1e4;       /* cm2 / Vstar s */
   jmin = sqr ( P ) * ( 1.0 + gamma ) / 9e11 * mui * P * sqr ( Vmin ) / 4.0 / pi / Pdmin / Pdmin / Pdmin;
 
   jres = j - jtilde * jmin * 1e4;
@@ -149,7 +152,7 @@ double _jres ( void *arg, double dtilde ) {
 }
 
 /* find the cathode sheath thickness in m */
-double _d ( long plasmatype, double Ti, double Nn, double gamma, double j ) {
+double _d ( long plasmatype, double Ti, double Nn, double gamma, double j, bool MUISPECIFIED, double mui ) {
   double d, dtilde, relerr, abserr, dtildemin, dtildemax, Pdmin, P;
   long IFLAG;
   arg_t arg;
@@ -171,6 +174,8 @@ double _d ( long plasmatype, double Ti, double Nn, double gamma, double j ) {
   arg.Ti = Ti;
   arg.j = j;
   arg.plasmatype = plasmatype;
+  arg.MUISPECIFIED=MUISPECIFIED;
+  arg.mui=mui;
   dtildemin = 1.0 / ebar;
   dtildemax = 2000.0;
   relerr = 1e-10;
@@ -198,8 +203,8 @@ int chkarg ( int argc, char **argv, char *arg ) {
 }
 
 int main ( int argc, char **argv ) {
-  double j, jtilde, gamma, Pdmin, EoverPmin, Vmin, dtilde, d, P, Vtilde, Etilde, Ti, Nn;
-  bool Ti_flag, gamma_flag, P_flag, j_flag;
+  double j, jtilde, gamma, Pdmin, EoverPmin, Vmin, dtilde, d, P, Vtilde, Etilde, Ti, Nn, mui;
+  bool Ti_flag, gamma_flag, P_flag, j_flag, mui_flag;
   long plasmatype;
   char *strtmp;
 
@@ -213,6 +218,7 @@ int main ( int argc, char **argv ) {
   gamma_flag = FALSE;
   P_flag = FALSE;
   j_flag = FALSE;
+  mui_flag = FALSE;
 
   if ( chkarg ( argc, argv, "-Ti" ) != 0 ) {
     Ti_flag = TRUE;
@@ -232,6 +238,11 @@ int main ( int argc, char **argv ) {
   if ( chkarg ( argc, argv, "-g" ) != 0 ) {
     gamma_flag = TRUE;
     sscanf ( argv[chkarg ( argc, argv, "-g" ) + 1], "%lg", &gamma );
+  }
+
+  if ( chkarg ( argc, argv, "-mui" ) != 0 ) {
+    mui_flag = TRUE;
+    sscanf ( argv[chkarg ( argc, argv, "-mui" ) + 1], "%lg", &mui );
   }
 
   plasmatype = -1;
@@ -262,11 +273,12 @@ int main ( int argc, char **argv ) {
               "-Ti    \t<ion temperature [K]>                  \tdouble   \tY\n"
               "-P     \t<plasma pressure [Pa]>                 \tdouble   \tY\n"
               "-j     \t<current density [A/m2]>               \tdouble   \tY\n"
+              "-mui   \t<ion mobility [m2/V-s]>                 \tdouble   \tN\n"
               "-type  \t<plasma type, AIR, N2, N2lowE>         \tstring   \tY\n" "\n" );
 
   } else {
     Nn = P / kB / Ti;
-    d = _d ( plasmatype, Ti, Nn, gamma, j ) * 100.0;    /* cm */
+    d = _d ( plasmatype, Ti, Nn, gamma, j, mui_flag, mui ) * 100.0;    /* cm */
 
     P = P / 133.0;              /* Torr */
 
@@ -292,12 +304,16 @@ int main ( int argc, char **argv ) {
     else
       printf ( "Low Current Discharge\n" );
     printf ( "\n" );
-    printf ( "mui (at the cathode):                  %E m2/Vs\n",
-             _mui_min ( plasmatype, Nn, Ti, Etilde * EoverPmin * P * 100.0 / Nn ) );
-    printf ( "mui (at the sheath edge):              %E m2/Vs\n",
-             _mui_max ( plasmatype, Nn, Ti, Etilde * EoverPmin * P * 100.0 / Nn ) );
-    printf ( "mui (geometric average):               %E m2/Vs\n",
-             _mui ( plasmatype, Nn, Ti, Etilde * EoverPmin * P * 100.0 / Nn ) );
+    if (mui_flag){
+      printf ( "mui :                                  %E m2/V-s\n", mui );      
+    } else {
+      printf ( "mui (at the cathode):                  %E m2/V-s\n",
+               _mui_min ( plasmatype, Nn, Ti, Etilde * EoverPmin * P * 100.0 / Nn ) );
+      printf ( "mui (at the sheath edge):              %E m2/V-s\n",
+               _mui_max ( plasmatype, Nn, Ti, Etilde * EoverPmin * P * 100.0 / Nn ) );
+      printf ( "mui (geometric average):               %E m2/V-s\n",
+               _mui ( plasmatype, Nn, Ti, Etilde * EoverPmin * P * 100.0 / Nn ) );
+    }
     printf ( "d:                                     %E m \n", d / 100.0 );
     printf ( "Pressure:                              %E torr\n", P );
     printf ( "Voltage drop in cathode sheath:        %E Vstar\n", Vtilde * Vmin );
