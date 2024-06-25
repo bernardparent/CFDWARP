@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 24b
+  * in model/chem/_Air_Plasma_11s/doc/report.tex, model/chem/_Air_Plasma_8s/doc/report.tex,
+    model/chem/_N2_Plasma_4s/doc/report.tex
+    - altered again the spline control points of the N2+ + e- > N + N reaction part of the 
+      rodriguez2024 model
+  * in model/chem/_Air_Plasma_11s/rodriguez2024.c, model/chem/_Air_Plasma_11s/rodriguezpark2024.c,
+    model/chem/_Air_Plasma_8s/rodriguez2024.c, model/chem/_N2_Plasma_4s/rodriguez2024.c
+    - altered again the spline control points of the N2+ + e- > N + N reaction part of the 
+      rodriguez2024 model
+
+
 2024 JUN 24a
   * in tools/cathode.c
     - added a new flag -mui so that the ion mobility can be specified at the command line
