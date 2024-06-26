@@ -99,19 +99,19 @@ T=57.35 K
 
 
 
-TEMAXHIGH=400e3;
+TEMAXHIGH=500e3;
 TEMAXLOW=100e3;
 
-dphi=1500; {voltage difference between the cathode and the anode in V}
+dphi=3000; {voltage difference between the cathode and the anode in V}
 Rballast=30000; {ballast resistor in Ohm}
 
 Relectrodebreakdown=Rballast; {in Ohm; don't change this unless absolutely needed}
 Relectrode=0.1;           {in Ohm; don't change this unless absolutely needed}
-gammaeminus_electrode=0.7; {Secondary Electron Emission (SEE) coefficient on electrodes}
+gammaeminus_electrode=0.65; {Secondary Electron Emission (SEE) coefficient on electrodes}
 gammaeminus_dielectric=0.1; {SEE coefficient on dielectric walls}
 
 
-mf=2; {mesh factor}
+mf=4*sqrt(2); {mesh factor}
 
 is=1;
 is1=is+round(mf*40);   {start of 1st electrode}
@@ -469,7 +469,7 @@ Cycle(
     Uref_emfield[1]=100.0e0; {reference value for the electric field potential in Volts -> used to determine xi}
   );
   SteadyState(
-    if (mod(iter,50)==0,
+    if (mod(iter,200)==0,
       WriteDataFile(outputfilename);
     );
     sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
@@ -487,11 +487,11 @@ Cycle(
       fact=min(1400*mf,iter-600*mf)/(1400*mf);
       Relectrodelocal=exp(fact*ln(Relectrode)+(1-fact)*ln(Relectrodebreakdown));
       Temaxlocal=(1-fact)*TEMAXLOW+fact*TEMAXHIGH;
-      relaxTelocal=0.8;
+      relaxTelocal=0.5;
     );
     Cycle(NavierStokesPlasma(relaxTe=relaxTelocal;););
     Model(NavierStokesPlasma(Temax=Temaxlocal;););
-    CFL=min(CFL*1.04,CFLmax);
+    CFL=min(CFL*1.01,CFLmax);
     Init(Epotential(Region(is3,js,  is4,js,INITEMF_TYPE1,dphi);););
     Model(
       Epotential(
@@ -501,8 +501,8 @@ Cycle(
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     Lc=1e99;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=1.0; {relaxation factor forced on the update of the emfield variables}
-    UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,6);
-    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,100); 
+    UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,10);
+    UpdateEMField(Lc,relaxEMF,TSEMF_SOR,200); 
     {UpdateEMField(Lc,relaxEMF,TSEMF_NEWTON);}
     printf("%4.2f %6.2f %6ld %9.3f   %E (%2ld %4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
            Relectrodelocal,CFL,iter,effiter_U,ximax,flux_ximax,i_ximax,

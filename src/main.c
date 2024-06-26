@@ -183,7 +183,8 @@ int main ( int argc, char **argv ) {
   MPI_Init ( &argc, &argv );
 #endif //THREADS
 #endif
-
+  gl.REFORMAT_INITVAR_SPECIES_SUM_CHECK=TRUE;
+  
   // change the stack size to at least 16 MB
   // the same could be achieved at link time using the linker flag -Wl,-z,stack-size=4194304 (example for 4MB)
   const rlim_t kStackSize = 16 * 1024 * 1024;   // min stack size = 16 MB

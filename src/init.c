@@ -96,7 +96,7 @@ void reformat_initvar_species_fractions(gl_t *gl, initvar_t initvar_orig, initva
   for (spec=0; spec<ns; spec++){
     sum+=initvar[specstart+spec];
   }
-  if (sum<0.999 || sum>1.001){
+  if ((sum<0.999 || sum>1.001) && gl->REFORMAT_INITVAR_SPECIES_SUM_CHECK){
     fatal_error("Species mass or mole fractions sum to %E and not to 1 in Init() module.",sum);
   } else {
     for (spec=0; spec<ns; spec++){

@@ -7,6 +7,26 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 26a
+  * in bin/Broslawski.wrp
+    - made small changes affecting rates of convergence
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - in _relaxTe_effective(), now makes the relaxation factor function of flow properties 
+  * in model/fluid/_Favre-Reynolds_plasma/fluid.c
+    - added _relaxTe_effective()
+    - in add_dUstar_to_U(), added call to _relaxTe_effective()
+  * in src/common.h
+    - added REFORMAT_INITVAR_SPECIES_SUM_CHECK in gl_t
+  * in src/data.c
+    - in read_data_file_interpolation(), sets gl->REFORMAT_INITVAR_SPECIES_SUM_CHECK to FALSE
+      before calling init_node_fluid()
+  * in src/init.c
+    - in reformat_initvar_species_fractions(), do not output an error message if the sum of the
+      mass fractions is not within 0.1% of 1 should gl->REFORMAT_INITVAR_SPECIES_SUM_CHECK=FALSE
+  * in src/main.c
+    - at beginning of main() initializes gl->REFORMAT_INITVAR_SPECIES_SUM_CHECK=TRUE
+    
+
 2024 JUN 24b
   * in model/chem/_Air_Plasma_11s/doc/report.tex, model/chem/_Air_Plasma_8s/doc/report.tex,
     model/chem/_N2_Plasma_4s/doc/report.tex

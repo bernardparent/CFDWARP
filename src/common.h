@@ -276,6 +276,7 @@ typedef struct {
    double averagedrates_time;
    long AVERAGEDRATES;
 #endif
+   bool REFORMAT_INITVAR_SPECIES_SUM_CHECK;
 } gl_t;
 
 

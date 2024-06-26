@@ -1769,7 +1769,7 @@ void read_data_file_interpolation(input_t input, np_t *np, gl_t *gl){
     fflush(stdout);
 //    if (mod(cntzone,numsubzone/100+1)==0) wfprintf(stdout,".");
   }
-
+  gl->REFORMAT_INITVAR_SPECIES_SUM_CHECK=FALSE;
 #ifdef OPENMPTHREADS
   #pragma omp parallel for private(i,j,k,cnt) schedule(static) 
 #endif
@@ -1780,6 +1780,7 @@ void read_data_file_interpolation(input_t input, np_t *np, gl_t *gl){
             np[_ai(gl,i,j,k)].INIT_FLUID=TRUE;
           }
   }
+  gl->REFORMAT_INITVAR_SPECIES_SUM_CHECK=TRUE;
 
   free(initvar);
   free(initvar_file);
