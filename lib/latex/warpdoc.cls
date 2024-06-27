@@ -687,8 +687,8 @@
 \renewcommand{\title}[1]{\ifx\empty#1\else\gdef\@title{\ignorespaces#1\unskip}\fi}
 \newcommand{\institution}[1]{\ifx\empty#1\else\gdef\@institution{\ignorespaces#1\unskip}\fi}
 
-\global\def\@department{Dept.\ of Aerospace Engineering} % Default department is Aerospace
-\global\def\@institution{Pusan National University} % default is 
+\global\def\@department{Dept.\ of Aerospace and Mechanical Engineering} % Default department is Aerospace
+\global\def\@institution{University of Arizona} % default is 
 \global\def\@author{\mbox{}}
 \global\def\@email{\mbox{}}
 \global\def\@title{\mbox{}}

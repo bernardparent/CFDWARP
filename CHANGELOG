@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 27b
+  * in README
+    - updated the description of CFDWARP
+  * in various .tex files
+    - changed BParent's affiliation to current one at UArizona
+  * in lib/latex/warpdoc.cls
+    - changed BParent's affiliation to current one at UArizona
+
+
 2024 JUN 27a
   * in model/chem/_NH3_Plasma_32s/chem.c
     - added H- ionization model BACAL2
