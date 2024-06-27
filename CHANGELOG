@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUN 27a
+  * in model/chem/_NH3_Plasma_32s/chem.c
+    - added H- ionization model BACAL2
+  * in model/chem/_NH3_Plasma_32s/rodriguez2024.c
+    - added BACAL2 option
+
+
 2024 JUN 26a
   * in bin/Broslawski.wrp
     - made small changes affecting rates of convergence
