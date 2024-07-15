@@ -97,21 +97,25 @@ P=3.23 Torr
 T=57.35 K
 }
 
+{
+NOTE:
+Use no more than 5 MPI processes to achieve smooth convergence
+}
 
 
-TEMAXHIGH=500e3;
+TEMAXHIGH=600e3;
 TEMAXLOW=100e3;
 
-dphi=3000; {voltage difference between the cathode and the anode in V}
+dphi=1500; {voltage difference between the cathode and the anode in V}
 Rballast=30000; {ballast resistor in Ohm}
 
 Relectrodebreakdown=Rballast; {in Ohm; don't change this unless absolutely needed}
 Relectrode=0.1;           {in Ohm; don't change this unless absolutely needed}
-gammaeminus_electrode=0.65; {Secondary Electron Emission (SEE) coefficient on electrodes}
+gammaeminus_electrode=0.8; {Secondary Electron Emission (SEE) coefficient on electrodes}
 gammaeminus_dielectric=0.1; {SEE coefficient on dielectric walls}
 
 
-mf=4*sqrt(2); {mesh factor}
+mf=2*sqrt(2); {mesh factor}
 
 is=1;
 is1=is+round(mf*40);   {start of 1st electrode}
@@ -267,7 +271,7 @@ Model(
     N2VIBJOULEHEATING=YES;
     N2VIBJOULEHEATINGMODEL=N2VIBJOULEHEATINGMODEL_PARENT2024;
     REACTING=YES;
-    INCLUDE_E_EFFECTS_ON_ION_MOBILITY=NO; 
+    INCLUDE_E_EFFECTS_ON_ION_MOBILITY=YES; 
     INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY=NO; 
     SCHOTTKY_EFFECT=NO;
     emissivity=0.0;            {emissivity coefficient of the gas mixture needed for radiation heat transfer}
@@ -483,11 +487,11 @@ Cycle(
       Temaxlocal=TEMAXLOW;
       relaxTelocal=0.5;
     , {else}
-      CFLmax=0.2;
+      CFLmax=0.25;
       fact=min(1400*mf,iter-600*mf)/(1400*mf);
       Relectrodelocal=exp(fact*ln(Relectrode)+(1-fact)*ln(Relectrodebreakdown));
       Temaxlocal=(1-fact)*TEMAXLOW+fact*TEMAXHIGH;
-      relaxTelocal=0.5;
+      relaxTelocal=1.0;
     );
     Cycle(NavierStokesPlasma(relaxTe=relaxTelocal;););
     Model(NavierStokesPlasma(Temax=Temaxlocal;););

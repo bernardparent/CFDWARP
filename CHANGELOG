@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUL 15a
+  * in model/chem/_NH3_Plasma_32s/rodriguez2024.c
+    - fixed a few bugs
+    - made H2v production active independently of the chemical solver chosen
+    
+
 2024 JUN 28a
   * in model/fluid/_*_plasma/fluid_source.c
     - in find_dSe_dU_transport_Parent2024(), changed the linearization of the inelastic
