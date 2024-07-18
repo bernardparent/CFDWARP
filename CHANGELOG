@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUL 18a
+  * in model/chem/_NH3_Plasma_32s/*.c
+    - in _averaged_rate_local(), changed the parameter averagedrates_id_type id to char* id to
+      avoid compiler warning with gcc v12
+  * in model/share/model_share.c
+    - in _averaged_rate(), changed the parameter averagedrates_id_type id to char* id to
+      avoid compiler warning with gcc v12
+  * in src/control.c
+    - in write_citations(), changed %s to %.9000s to avoid compiler warning with gcc v12
+
+
 2024 JUL 15a
   * in model/chem/_NH3_Plasma_32s/rodriguez2024.c
     - fixed a few bugs

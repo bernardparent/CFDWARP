@@ -333,9 +333,9 @@ void write_citations(FILE *outputfile, int *cite, int linewidth){
     for (cnt2=0; cnt2<numbib; cnt2++){
       if (cite[cnt2]==cnt) {
         if (cnt<10) {
-          sprintf(str,"  [%ld]  %s\n",cnt,bib[cnt2]);
+          sprintf(str,"  [%ld]  %.9000s\n",cnt,bib[cnt2]);
         } else {
-          sprintf(str,"  [%ld] %s\n",cnt,bib[cnt2]);
+          sprintf(str,"  [%ld] %.9000s\n",cnt,bib[cnt2]);
         }
         wfprintf(outputfile,"%s",strwrpind(str, linewidth,-7));
       }

@@ -12,8 +12,8 @@ double _f_extrapol(int ACCURACY, ...);
 
 double _f_symmetry(int ACCURACY, ...);
 
-double _averaged_rate(np_t np, gl_t *gl, averagedrates_id_type id, double rate);
+double _averaged_rate(np_t np, gl_t *gl, char* id, double rate);
 
-double _averaged_rate_limited(np_t np, gl_t *gl, averagedrates_id_type id, double rate, double averagedratemin, double averagedratemax);
+double _averaged_rate_limited(np_t np, gl_t *gl, char* id, double rate, double averagedratemin, double averagedratemax);
 
 #endif /* _MODEL_SHARE_H */

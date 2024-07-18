@@ -104,7 +104,7 @@ double _f_symmetry(int ACCURACY, ...) {
 
 
 #if defined(_AVERAGEDRATES) && defined(UNSTEADY)
-double _averaged_rate(np_t np, gl_t *gl, averagedrates_id_type id, double rate){
+double _averaged_rate(np_t np, gl_t *gl, char* id, double rate){
   long id_map,cntfluid,cntchem;
   double newrate;
   bool FOUND;
@@ -165,7 +165,7 @@ double _averaged_rate(np_t np, gl_t *gl, averagedrates_id_type id, double rate){
   return(newrate);
 }
 
-double _averaged_rate_limited(np_t np, gl_t *gl, averagedrates_id_type id, double rate, double averagedratemin, double averagedratemax){
+double _averaged_rate_limited(np_t np, gl_t *gl, char* id, double rate, double averagedratemin, double averagedratemax){
   rate=_averaged_rate(np, gl, id, rate);
   if (gl->AVERAGEDRATES==AVERAGEDRATES_ON) {
     rate=min(max(rate,averagedratemin),averagedratemax);
@@ -174,11 +174,11 @@ double _averaged_rate_limited(np_t np, gl_t *gl, averagedrates_id_type id, doubl
 }
 
 #else
-double _averaged_rate(np_t np, gl_t *gl, averagedrates_id_type id, double rate){
+double _averaged_rate(np_t np, gl_t *gl, char* id, double rate){
   return(rate);
 }
 
-double _averaged_rate_limited(np_t np, gl_t *gl, averagedrates_id_type id, double rate, double averagedratemin, double averagedratemax){
+double _averaged_rate_limited(np_t np, gl_t *gl, char* id, double rate, double averagedratemin, double averagedratemax){
   return(rate);
 }
 #endif
