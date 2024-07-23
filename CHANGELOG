@@ -8,6 +8,22 @@ ________________________________________________________________________________
 
 
 
+2024 JUL 23a
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - added TEMODEL_TRANSPORT_RODRIGUEZ2024 
+  * in model/fluid/_Navier-Stokes_plasma/fluid.h
+    - added TEMODEL_TRANSPORT_RODRIGUEZ2024
+  * in model/fluid/_Navier-Stokes_plasma/fluid_plasma.c
+    - added TEMODEL_TRANSPORT_RODRIGUEZ2024
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - added find_Qe_Rodriguez2024()
+    - renamed find_Qe() to find_Qe_Parent2024()
+    - added find_Qe()
+    - added find_dSe_dU_transport_Rodriguez2024()
+    - in find_dSe_dU(), now calls find_dSe_dU_transport_Rodriguez2024()
+    - find find_Se(), now calls find_Qe_Rodriguez2024()
+
+
 2024 JUL 19a
   * in model/chem/_NH3_Plasma_32s/rodriguez2024.c
     - added 2 reactions for H2v relaxation to H2
