@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 JUL 29a
+  * in model/chem/_NH3_Plasma_32s/chem.c
+    - added HMINUSFROMEXCITEDSTATES_BACAL3
+  * in model/chem/_NH3_Plasma_32s/chem.hh
+    - added 4 averaged rates
+  * in model/chem/_NH3_Plasma_32s/rodriguez2024.c
+    - renamed BACAL2 to BACAL3
+    - added BACAL2 which consists of 3 excited states
+  * in model/thermo/_generic/enthalpy.c, model/thermo/_generic/thermo.c, 
+    model/thermo/_generic/thermo.hh, model/transport/_Dixon-Lewis/transport.c
+    - renamed H2V1 to H2v2
+    - added H2v3
+  * in src/control.c
+    - in write_modules() added the full acronym of CFDWARP below the title
+
 
 2024 JUL 23a
   * in model/fluid/_Navier-Stokes_plasma/fluid.c
