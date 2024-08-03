@@ -547,6 +547,7 @@ void write_control(char *filename){
 #ifdef _2D
     GRIDG_write_grid_2D_to_file(&controlfile);
 #endif
+    write_metrics_template(&controlfile);
     write_block_template(&controlfile);
     write_bdry_template(&controlfile);
     write_model_template(&controlfile);
@@ -1473,9 +1474,20 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
 
   }
 
-  if (strcmp(actionname,"Block")==0 && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
+
+  if (strcmp(actionname,"Metrics")==0 && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
     if (((readcontrolarg_t *)codex->action_args)->module_level!=1)
       fatal_error("The Grid() module was not found.");
+    wfprintf(stdout,"Metrics..");
+    read_metrics(*argum, codex);
+    wfprintf(stdout,"done;\n");
+    ((readcontrolarg_t *)codex->action_args)->module_level++;
+  }
+
+
+  if (strcmp(actionname,"Block")==0 && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
+    if (((readcontrolarg_t *)codex->action_args)->module_level!=2)
+      fatal_error("The Metrics() module was not found.");
     wfprintf(stdout,"Block..");
     read_block(*argum, codex);
     find_metrics_on_all_nodes((*np), gl, gl->domain);
@@ -1499,7 +1511,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
   }
 
   if (strcmp(actionname,"Bdry")==0 && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
-    if (((readcontrolarg_t *)codex->action_args)->module_level!=2)
+    if (((readcontrolarg_t *)codex->action_args)->module_level!=3)
       fatal_error("The Block() module was not found.");
     wfprintf(stdout,"Bdry..");
     read_bdry(*argum, codex);
@@ -1514,7 +1526,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
   }
 
   if (strcmp(actionname,ControlActionName_Model)==0 && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
-    if (((readcontrolarg_t *)codex->action_args)->module_level!=3)
+    if (((readcontrolarg_t *)codex->action_args)->module_level!=4)
       fatal_error("The Bdry() module was not found.");
     wfprintf(stdout,"%s..",ControlActionName_Model);
     read_model(*argum, codex);
@@ -1524,7 +1536,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
   }
   
   if (strcmp(actionname,"Init")==0  && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
-    if (((readcontrolarg_t *)codex->action_args)->module_level!=4)
+    if (((readcontrolarg_t *)codex->action_args)->module_level!=5)
       fatal_error("The %s() module was not found.",ControlActionName_Model);
     input=((readcontrolarg_t *)codex->action_args)->input;
     if (input->INTERPOLATION){
@@ -1578,7 +1590,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     codex->ACTIONPROCESSED=TRUE;
   }
   if (strcmp(actionname,"Disc")==0  && !((readcontrolarg_t *)codex->action_args)->GRIDONLY) {
-    if (((readcontrolarg_t *)codex->action_args)->module_level!=5)
+    if (((readcontrolarg_t *)codex->action_args)->module_level!=6)
       fatal_error("The Init() module was not found.");
     wfprintf(stdout,"Disc..");
     read_disc(*argum, codex);
@@ -1587,7 +1599,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     codex->ACTIONPROCESSED=TRUE;
   }
   if (strcmp(actionname,"Cycle")==0 && ((readcontrolarg_t *)codex->action_args)->CYCLEMODULE) {
-    if (((readcontrolarg_t *)codex->action_args)->module_level!=6)
+    if (((readcontrolarg_t *)codex->action_args)->module_level!=7)
       fatal_error("The Disc() module was not found.");
     wfprintf(stdout,"Cycle..");
     read_cycle(*argum, codex);
@@ -1596,7 +1608,7 @@ void readcontrol_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     codex->ACTIONPROCESSED=TRUE;
   }
   if (strcmp(actionname,"Post")==0 && ((readcontrolarg_t *)codex->action_args)->POSTMODULE) {
-    if (((readcontrolarg_t *)codex->action_args)->module_level!=7)
+    if (((readcontrolarg_t *)codex->action_args)->module_level!=8)
       fatal_error("The Cycle() module was not found.");
     wfprintf(stdout,"Post..");
     read_post(*argum, codex);
@@ -1724,11 +1736,11 @@ void read_control(char *control_filename, input_t input, bool CYCLEMODULE, bool 
     /* we need to set gl->nn to a value prior to ProcessCode or gl->effiter_R will not be updated correctly in the function  update_residual() part of the file res.c when called by the cycle module PRIOR to the first iteration*/
 
   SOAP_process_code(code, &codex, SOAP_VARS_KEEP_ALL);
-  if (readcontrolarg.module_level!=8 && POSTMODULE)
+  if (readcontrolarg.module_level!=9 && POSTMODULE)
     fatal_error("The Post() module was not found.");
-  if (readcontrolarg.module_level!=7 && CYCLEMODULE && !POSTMODULE)
+  if (readcontrolarg.module_level!=8 && CYCLEMODULE && !POSTMODULE)
     fatal_error("The Cycle() module was not found.");
-  if (readcontrolarg.module_level!=6 && !CYCLEMODULE && !POSTMODULE && !GRIDONLY)
+  if (readcontrolarg.module_level!=7 && !CYCLEMODULE && !POSTMODULE && !GRIDONLY)
     fatal_error("The Disc() module was not found.");
 //  if (readcontrolarg.module_level!=4 && !CYCLEMODULE  && !POSTMODULE)
 //    fatal_error("The Init() module was not found.");

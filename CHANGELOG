@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 AUG 03a
+  * in model/metrics/_generic/metrics.c
+    - added write_metrics_template()
+    - added read_model_metrics_actions()
+    - added read_metrics()
+    - deleted find_Omega_and_X_at_interface_old()
+    - in find_Omega_and_X_at_interface(), added a switch() so that the old metrics (which were
+      not freestream preserving) can be used by specifying METRICSMODEL_FREESTREAMPRESERVING
+  * in src/control.c
+    - in write_control() and readcontrol_actions(), read_control(), made changes to call
+      read_metrics() and write_metrics_template()
+      
+
 2024 JUL 29a
   * in model/chem/_NH3_Plasma_32s/chem.c
     - added HMINUSFROMEXCITEDSTATES_BACAL3

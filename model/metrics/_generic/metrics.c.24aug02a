@@ -28,16 +28,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <src/bdry.h>
 #include <src/control.h>
 
-#define METRICSMODEL_VIVIANDVINOKUR 1
-#define METRICSMODEL_FREESTREAMPRESERVING 2
+
 
 
 void write_metrics_template(FILE **controlfile){
   wfprintf(*controlfile,"\n\n");
   wfprintf(*controlfile,
   "Metrics(\n");
+#ifdef _2D
   wfprintf(*controlfile,
-  "  METRICSMODEL=METRICSMODEL_FREESTREAMPRESERVING;\n");
+  "  AXISYMMETRIC=FALSE;\n");
+#endif
   wfprintf(*controlfile,
   ");\n");
 }
@@ -50,20 +51,34 @@ void read_model_metrics_actions(char *actionname, char **argum, SOAP_codex_t *co
 }
 
 
+
+
+
 void read_metrics(char *argum, SOAP_codex_t *codex){
   long numvarsinit;
+//  void (*action_original) (char *, char **, struct SOAP_codex_t *);
   gl_t *gl=((readcontrolarg_t *)codex->action_args)->gl;
+    
   SOAP_count_all_vars(codex, &numvarsinit);
+
+
+//  action_original=codex->action;
   codex->action=&read_model_metrics_actions;
-  SOAP_add_int_to_vars(codex,"METRICSMODEL_FREESTREAMPRESERVING",METRICSMODEL_FREESTREAMPRESERVING);
-  SOAP_add_int_to_vars(codex,"METRICSMODEL_VIVIANDVINOKUR",METRICSMODEL_VIVIANDVINOKUR);
   SOAP_process_code(argum, codex, SOAP_VARS_KEEP_ALL);
-  find_int_var_from_codex(codex,"METRICSMODEL",&gl->model.metrics.METRICSMODEL);
-  if (gl->model.metrics.METRICSMODEL!=METRICSMODEL_VIVIANDVINOKUR 
-      && gl->model.metrics.METRICSMODEL!=METRICSMODEL_FREESTREAMPRESERVING)
-      SOAP_fatal_error(codex,"METRICSMODEL must be set to either METRICSMODEL_VIVIANDVINOKUR or METRICSMODEL_FREESTREAMPRESERVING.");
+//  codex->action=action_original;
+
+/*    find_int_var_from_codex(codex,"COMBUSTIONMODEL",&gl->model.chem.COMBUSTIONMODEL);
+    if (gl->model.chem.COMBUSTIONMODEL!=COMBUSTIONMODEL_JACHIMOWSKI1988 
+        && gl->model.chem.COMBUSTIONMODEL!=COMBUSTIONMODEL_SMITH1999 
+        && gl->model.chem.COMBUSTIONMODEL!=COMBUSTIONMODEL_NONE)
+      SOAP_fatal_error(codex,"COMBUSTIONMODEL must be set to either COMBUSTIONMODEL_JACHIMOWSKI1988 or COMBUSTIONMODEL_SMITH1999 or COMBUSTIONMODEL_NONE.");
+*/
+#ifdef _2D
+  find_bool_var_from_codex(codex,"AXISYMMETRIC",&gl->model.metrics.AXISYMMETRIC);
+#endif
   SOAP_clean_added_vars(codex,numvarsinit);
 }
+
 
 
 double _Omega(np_t np, gl_t *gl){
@@ -91,7 +106,9 @@ double _x(np_t np, long dim){
 }
 
 
-void find_Omega_and_X_at_node(np_t *np, gl_t *gl, long l, double *Omega, dim2_t X){
+
+
+void find_Omega_and_X_at_node_old(np_t *np, gl_t *gl, long l, double *Omega, dim2_t X){
 #ifdef _2D
   long i,j;
   *Omega=0.25e0*(np[_al(gl,l,0,+1)].bs->x[0]-np[_al(gl,l,0,-1)].bs->x[0])
@@ -138,26 +155,142 @@ void find_Omega_and_X_at_node(np_t *np, gl_t *gl, long l, double *Omega, dim2_t 
 }
 
 
+double _x2(np_t *np, gl_t *gl, long l, long dim, long dim1, long offset1, long dim2, long offset2, long dim3, long offset3){
+  double tmp,r,theta;
+  long fact1,fact2,fact3;
+  tmp=0.0;
+  if (nd==2){
+    if (dim==2) {
+      tmp=0.0;
+      if (dim1==2) tmp=(double)offset1/2.0;
+      if (dim2==2) tmp=(double)offset2/2.0;
+      if (dim3==2) tmp=(double)offset3/2.0;
+    } else {
+      if (dim1==2) fact1=0; else fact1=1; 
+      if (dim2==2) fact2=0; else fact2=1;
+      if (dim3==2) fact3=0; else fact3=1;
+      tmp=np[_alll(gl,l,dim1,fact1*offset1,dim2,fact2*offset2,dim3,fact3*offset3)].bs->x[dim];
+    }
+    if (gl->model.metrics.AXISYMMETRIC){
+      if (dim1==2) fact1=0; else fact1=1; 
+      if (dim2==2) fact2=0; else fact2=1;
+      if (dim3==2) fact3=0; else fact3=1;
+      r=np[_alll(gl,l,dim1,fact1*offset1,dim2,fact2*offset2,dim3,fact3*offset3)].bs->x[1];
+      theta=0.0;
+      if (dim1==2) theta=(double)offset1*pi/30.0; 
+      if (dim2==2) theta=(double)offset2*pi/30.0; 
+      if (dim3==2) theta=(double)offset3*pi/30.0; 
+      switch (dim){
+        case 0:
+          tmp=np[_alll(gl,l,dim1,fact1*offset1,dim2,fact2*offset2,dim3,fact3*offset3)].bs->x[0];
+        break;
+        case 1:
+          tmp=cos(theta)*r;
+        break;
+        case 2:
+          tmp=sin(theta)*r;
+        break;
+        default:
+          fatal_error("Problem in _x2() function within metrics.c");
+      }
+    }
+    
+  }
+  if (nd==3){
+    tmp=np[_alll(gl,l,dim1,offset1,dim2,offset2,dim3,offset3)].bs->x[dim];    
+  }
+  return(tmp);
+}
+
+
+
+void find_Omega_and_X_at_node(np_t *np, gl_t *gl, long l, double *Omega, dim2_t X){
+  long i,j;
+  if (nd==2 && !gl->model.metrics.AXISYMMETRIC){
+    *Omega=0.25e0*(np[_al(gl,l,0,+1)].bs->x[0]-np[_al(gl,l,0,-1)].bs->x[0])
+                   *(np[_al(gl,l,1,+1)].bs->x[1]-np[_al(gl,l,1,-1)].bs->x[1])
+          -0.25e0*(np[_al(gl,l,1,+1)].bs->x[0]-np[_al(gl,l,1,-1)].bs->x[0])
+                   *(np[_al(gl,l,0,+1)].bs->x[1]-np[_al(gl,l,0,-1)].bs->x[1]);
+    for (i=0; i<nd; i++){
+      for (j=0; j<nd; j++){
+        X[i][j]=(krodelta(i,j)-0.5e0)/(*Omega)*(
+          (+np[_al(gl,l,mod(i+1,nd),+1)].bs->x[mod(j+1,nd)]
+           -np[_al(gl,l,mod(i+1,nd),-1)].bs->x[mod(j+1,nd)])
+         );
+       }
+    }
+  }
+
+  if (nd==3 || (nd==2 && gl->model.metrics.AXISYMMETRIC)){
+    double tmp;
+    tmp=0.0e0;
+    for (i=0; i<3; i++){
+      tmp=tmp+0.125e0*(_x2(np,gl,l,0,mod(i+0,3),+1,0,0,0,0)-_x2(np,gl,l,0,mod(i+0,3),-1,0,0,0,0))
+                     *(_x2(np,gl,l,1,mod(i+1,3),+1,0,0,0,0)-_x2(np,gl,l,1,mod(i+1,3),-1,0,0,0,0))
+                     *(_x2(np,gl,l,2,mod(i+2,3),+1,0,0,0,0)-_x2(np,gl,l,2,mod(i+2,3),-1,0,0,0,0))
+             -0.125e0*(_x2(np,gl,l,0,mod(i+0,3),+1,0,0,0,0)-_x2(np,gl,l,0,mod(i+0,3),-1,0,0,0,0))
+                     *(_x2(np,gl,l,1,mod(i+2,3),+1,0,0,0,0)-_x2(np,gl,l,1,mod(i+2,3),-1,0,0,0,0))
+                     *(_x2(np,gl,l,2,mod(i+1,3),+1,0,0,0,0)-_x2(np,gl,l,2,mod(i+1,3),-1,0,0,0,0));
+    }
+    *Omega=tmp;
+    for (i=0; i<nd; i++){
+      for (j=0; j<nd; j++){
+        X[i][j]=0.25e0/(*Omega)*(
+          (+_x2(np,gl,l,mod(j+1,3),mod(i+1,3),+1,0,0,0,0)  
+           -_x2(np,gl,l,mod(j+1,3),mod(i+1,3),-1,0,0,0,0))
+         *(+_x2(np,gl,l,mod(j+2,3),mod(i+2,3),+1,0,0,0,0)
+           -_x2(np,gl,l,mod(j+2,3),mod(i+2,3),-1,0,0,0,0))
+         -(+_x2(np,gl,l,mod(j+2,3),mod(i+1,3),+1,0,0,0,0) 
+           -_x2(np,gl,l,mod(j+2,3),mod(i+1,3),-1,0,0,0,0))
+         *(+_x2(np,gl,l,mod(j+1,3),mod(i+2,3),+1,0,0,0,0)
+           -_x2(np,gl,l,mod(j+1,3),mod(i+2,3),-1,0,0,0,0))
+         );
+      }
+    }
+  }
+}
+
+
+
+
 void update_metrics_at_node(np_t *np, gl_t *gl, long l) {
   find_Omega_and_X_at_node(np, gl, l, &(np[l].bs->Omega), np[l].bs->X);
 }
 
 
-static double _dx_dX_int(np_t *np, gl_t *gl, long lL, long lR, long theta,
+static double _dx_dX_int_old(np_t *np, gl_t *gl, long lL, long lR, long theta,
                        long dimx, long dimX){
   double tmp;
+
   if (dimX==theta) {
     tmp=np[lR].bs->x[dimx]-np[lL].bs->x[dimx];
   } else {
     tmp=0.25e0*(np[_al(gl,lL,dimX,+1)].bs->x[dimx]-np[_al(gl,lL,dimX,-1)].bs->x[dimx])
        +0.25e0*(np[_al(gl,lR,dimX,+1)].bs->x[dimx]-np[_al(gl,lR,dimX,-1)].bs->x[dimx]);
   }
+
   return(tmp);
 }
 
 
-#ifdef _3D
-static void find_point_in_between_8_nodes(np_t *np, gl_t *gl, long l, long dim1, long dim1sgn, long dim2, long dim2sgn, long dim3, long dim3sgn, EXM_vec3D_t a){
+static double _dx_dX_int(np_t *np, gl_t *gl, long lL, long lR, long theta,
+                       long dimx, long dimX){
+  double tmp;
+
+  if (dimX==theta) {
+    tmp=_x2(np, gl, lR, dimx, 0, 0, 0, 0, 0, 0) -_x2(np, gl, lL, dimx, 0, 0, 0, 0, 0, 0) ;
+  } else {
+    tmp=0.25e0*(_x2(np, gl, lL, dimx, dimX, +1, 0, 0, 0, 0)
+               -_x2(np, gl, lL, dimx, dimX, -1, 0, 0, 0, 0))
+       +0.25e0*(_x2(np, gl, lR, dimx, dimX, +1, 0, 0, 0, 0)
+               -_x2(np, gl, lR, dimx, dimX, -1, 0, 0, 0, 0));
+  }
+
+  return(tmp);
+}
+
+
+static void find_point_in_between_8_nodes_old(np_t *np, gl_t *gl, long l, long dim1, long dim1sgn, long dim2, long dim2sgn, long dim3, long dim3sgn, EXM_vec3D_t a){
   long dim; 
 
   for (dim=0; dim<nd; dim++){
@@ -173,123 +306,207 @@ static void find_point_in_between_8_nodes(np_t *np, gl_t *gl, long l, long dim1,
            );
   }
 }
-#endif
+
+
+static void find_point_in_between_8_nodes(np_t *np, gl_t *gl, long l, long dim1, long dim1sgn, long dim2, long dim2sgn, long dim3, long dim3sgn, EXM_vec3D_t a){
+  long dim; 
+
+  for (dim=0; dim<3; dim++){
+    a[dim]=0.125*(
+             _x2(np, gl, l, dim, 0, 0, 0, 0, 0, 0)
+            +_x2(np, gl, l, dim, dim1, dim1sgn, 0, 0, 0, 0) 
+            +_x2(np, gl, l, dim, dim2, dim2sgn, 0, 0, 0, 0) 
+            +_x2(np, gl, l, dim, dim1, dim1sgn, dim2, dim2sgn, 0, 0) 
+            +_x2(np, gl, l, dim, dim3, dim3sgn, 0, 0, 0, 0) 
+            +_x2(np, gl, l, dim, dim1, dim1sgn, dim3, dim3sgn, 0, 0) 
+            +_x2(np, gl, l, dim, dim2, dim2sgn, dim3, dim3sgn, 0, 0) 
+            +_x2(np, gl, l, dim, dim1, dim1sgn, dim2, dim2sgn, dim3, dim3sgn) 
+           );
+  }
+}
 
 
 // these metrics at the interface preserve freestream
-void find_Omega_and_X_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta,
+void find_Omega_and_X_at_interface_old(np_t *np, gl_t *gl, long lL, long lR, long theta,
                           double *Omega, dim2_t X) {
 #ifdef _2D
   long i,j;
-  switch (gl->model.metrics.METRICSMODEL){
-    case METRICSMODEL_VIVIANDVINOKUR:
-      *Omega=_dx_dX_int(np,gl,lL,lR,theta,0,0)
+  *Omega=_dx_dX_int(np,gl,lL,lR,theta,0,0)
                *_dx_dX_int(np,gl,lL,lR,theta,1,1)
                -_dx_dX_int(np,gl,lL,lR,theta,0,1)
                *_dx_dX_int(np,gl,lL,lR,theta,1,0);
-      for (i=0; i<nd; i++){
-        for (j=0; j<nd; j++){
-          X[i][j]=(2.0e0*krodelta(i,j)-1.0e0)/notzero(*Omega,1e-99)*
-           _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+1,nd));
-        }
-      }
-    break;    
-    case METRICSMODEL_FREESTREAMPRESERVING:
-      *Omega=_dx_dX_int(np,gl,lL,lR,theta,0,0)
-               *_dx_dX_int(np,gl,lL,lR,theta,1,1)
-               -_dx_dX_int(np,gl,lL,lR,theta,0,1)
-               *_dx_dX_int(np,gl,lL,lR,theta,1,0);
-      for (i=0; i<nd; i++){
-        for (j=0; j<nd; j++){
-          X[i][j]=(2.0e0*krodelta(i,j)-1.0e0)/notzero(*Omega,1e-99)*
-            _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+1,nd));
-        }
-      }    
-    break;    
-    default:
-      fatal_error("METRICSMODEL incorrect in find_Omega_and_X_at_interface().");
+  for (i=0; i<nd; i++){
+    for (j=0; j<nd; j++){
+      X[i][j]=(2.0e0*krodelta(i,j)-1.0e0)/notzero(*Omega,1e-99)*
+         _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+1,nd));
+    }
   }
 #endif
 #ifdef _3D
   long i,j;
   EXM_vec3D_t a,b,c,d,ba,ca,da,abc,adc;
-  switch (gl->model.metrics.METRICSMODEL){
-    case METRICSMODEL_VIVIANDVINOKUR:
-      *Omega=0.0e0;
-      for (i=0; i<nd; i++){
-        *Omega+=_dx_dX_int(np,gl,lL,lR,theta,0,i)
+
+  *Omega=0.0e0;
+  for (i=0; i<nd; i++){
+    *Omega+=_dx_dX_int(np,gl,lL,lR,theta,0,i)
                   *_dx_dX_int(np,gl,lL,lR,theta,1,mod(i+1,nd))
                   *_dx_dX_int(np,gl,lL,lR,theta,2,mod(i+2,nd))
                   -_dx_dX_int(np,gl,lL,lR,theta,0,i)
                   *_dx_dX_int(np,gl,lL,lR,theta,1,mod(i+2,nd))
                   *_dx_dX_int(np,gl,lL,lR,theta,2,mod(i+1,nd));
-      }
-      for (i=0; i<nd; i++){
-        for (j=0; j<nd; j++){
-          X[i][j]=1.0e0/notzero(*Omega,1e-99)*(
-            _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+1,nd))*
-                        _dx_dX_int(np,gl,lL,lR,theta,mod(j+2,nd),mod(i+2,nd))
-           -_dx_dX_int(np,gl,lL,lR,theta,mod(j+2,nd),mod(i+1,nd))*
-                        _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+2,nd))
-          );
-        }
-      }
-    break;
-    case METRICSMODEL_FREESTREAMPRESERVING:
-      *Omega=0.0e0;
-      for (i=0; i<nd; i++){
-        *Omega+=_dx_dX_int(np,gl,lL,lR,theta,0,i)
-                  *_dx_dX_int(np,gl,lL,lR,theta,1,mod(i+1,nd))
-                  *_dx_dX_int(np,gl,lL,lR,theta,2,mod(i+2,nd))
-                  -_dx_dX_int(np,gl,lL,lR,theta,0,i)
-                  *_dx_dX_int(np,gl,lL,lR,theta,1,mod(i+2,nd))
-                  *_dx_dX_int(np,gl,lL,lR,theta,2,mod(i+1,nd));
-      }
-      find_point_in_between_8_nodes(np,gl,lL,theta,+1,mod(theta+1,nd),+1,mod(theta+2,nd),-1,a);
-      find_point_in_between_8_nodes(np,gl,lL,theta,+1,mod(theta+1,nd),+1,mod(theta+2,nd),+1,b);
-      find_point_in_between_8_nodes(np,gl,lL,theta,+1,mod(theta+1,nd),-1,mod(theta+2,nd),+1,c);
-      find_point_in_between_8_nodes(np,gl,lL,theta,+1,mod(theta+1,nd),-1,mod(theta+2,nd),-1,d);
+  }
+  find_point_in_between_8_nodes(np,gl,lL,theta,+1,mod(theta+1,nd),+1,mod(theta+2,nd),-1,a);
+  find_point_in_between_8_nodes(np,gl,lL,theta,+1,mod(theta+1,nd),+1,mod(theta+2,nd),+1,b);
+  find_point_in_between_8_nodes(np,gl,lL,theta,+1,mod(theta+1,nd),-1,mod(theta+2,nd),+1,c);
+  find_point_in_between_8_nodes(np,gl,lL,theta,+1,mod(theta+1,nd),-1,mod(theta+2,nd),-1,d);
 
-      for (i=0; i<nd; i++){
-        ba[i]=b[i]-a[i];
-        ca[i]=c[i]-a[i];
-        da[i]=d[i]-a[i];
+  for (i=0; i<nd; i++){
+    ba[i]=b[i]-a[i];
+    ca[i]=c[i]-a[i];
+    da[i]=d[i]-a[i];
+  }
+
+  abc[0]=0.5*(ba[1]*ca[2]-ba[2]*ca[1]);
+  abc[1]=0.5*(ba[2]*ca[0]-ba[0]*ca[2]);
+  abc[2]=0.5*(ba[0]*ca[1]-ba[1]*ca[0]);
+
+  adc[0]=-0.5*(da[1]*ca[2]-da[2]*ca[1]);
+  adc[1]=-0.5*(da[2]*ca[0]-da[0]*ca[2]);
+  adc[2]=-0.5*(da[0]*ca[1]-da[1]*ca[0]);
+
+  for (i=0; i<nd; i++){
+    if (i==theta){
+      for (j=0; j<nd; j++){  
+        X[i][j]=(abc[j]+adc[j])/notzero(*Omega,1e-99);
       }
-
-      abc[0]=0.5*(ba[1]*ca[2]-ba[2]*ca[1]);
-      abc[1]=0.5*(ba[2]*ca[0]-ba[0]*ca[2]);
-      abc[2]=0.5*(ba[0]*ca[1]-ba[1]*ca[0]);
-
-      adc[0]=-0.5*(da[1]*ca[2]-da[2]*ca[1]);
-      adc[1]=-0.5*(da[2]*ca[0]-da[0]*ca[2]);
-      adc[2]=-0.5*(da[0]*ca[1]-da[1]*ca[0]);
-
-      for (i=0; i<nd; i++){
-        if (i==theta){
-          for (j=0; j<nd; j++){  
-            X[i][j]=(abc[j]+adc[j])/notzero(*Omega,1e-99);
-          }
 //      if (i==theta) printf("%E  %E  %E\n",X[i][0],X[i][1],X[i][2]);
-        } else {
-          for (j=0; j<nd; j++){
-            X[i][j]=1.0e0/notzero(*Omega,1e-99)*(
-              _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+1,nd))*
+    } else {
+      for (j=0; j<nd; j++){
+        X[i][j]=1.0e0/notzero(*Omega,1e-99)*(
+           _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+1,nd))*
                         _dx_dX_int(np,gl,lL,lR,theta,mod(j+2,nd),mod(i+2,nd))
-             -_dx_dX_int(np,gl,lL,lR,theta,mod(j+2,nd),mod(i+1,nd))*
+          -_dx_dX_int(np,gl,lL,lR,theta,mod(j+2,nd),mod(i+1,nd))*
                         _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+2,nd))
-            );
-          }
-        }
+        );
+      }
+    }
      // if (i==theta) printf("%E  %E  %E\n\n",X[i][0],X[i][1],X[i][2]);
 
-      }
-    break;
-    default:
-      fatal_error("METRICSMODEL incorrect in find_Omega_and_X_at_interface().");    
   }
 #endif
 }
 
+
+// these metrics at the interface preserve freestream
+void find_Omega_and_X_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta,
+                          double *Omega, dim2_t X) {
+  long i,j;
+  if (nd==2 && !gl->model.metrics.AXISYMMETRIC){
+    *Omega=_dx_dX_int(np,gl,lL,lR,theta,0,0)
+               *_dx_dX_int(np,gl,lL,lR,theta,1,1)
+               -_dx_dX_int(np,gl,lL,lR,theta,0,1)
+               *_dx_dX_int(np,gl,lL,lR,theta,1,0);
+    for (i=0; i<nd; i++){
+      for (j=0; j<nd; j++){
+        X[i][j]=(2.0e0*krodelta(i,j)-1.0e0)/notzero(*Omega,1e-99)*
+          _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+1,nd));
+      }
+    }
+  }
+
+  if (nd==3 || (nd==2 && gl->model.metrics.AXISYMMETRIC)) {
+    EXM_vec3D_t a,b,c,d,ba,ca,da,abc,adc;
+
+    *Omega=0.0e0;
+    for (i=0; i<3; i++){
+      *Omega+=_dx_dX_int(np,gl,lL,lR,theta,0,i)
+                  *_dx_dX_int(np,gl,lL,lR,theta,1,mod(i+1,3))
+                  *_dx_dX_int(np,gl,lL,lR,theta,2,mod(i+2,3))
+                  -_dx_dX_int(np,gl,lL,lR,theta,0,i)
+                  *_dx_dX_int(np,gl,lL,lR,theta,1,mod(i+2,3))
+                  *_dx_dX_int(np,gl,lL,lR,theta,2,mod(i+1,3));
+    }
+    find_point_in_between_8_nodes(np,gl,lL,theta,+1,mod(theta+1,3),+1,mod(theta+2,3),-1,a);
+    find_point_in_between_8_nodes(np,gl,lL,theta,+1,mod(theta+1,3),+1,mod(theta+2,3),+1,b);
+    find_point_in_between_8_nodes(np,gl,lL,theta,+1,mod(theta+1,3),-1,mod(theta+2,3),+1,c);
+    find_point_in_between_8_nodes(np,gl,lL,theta,+1,mod(theta+1,3),-1,mod(theta+2,3),-1,d);
+
+    for (i=0; i<3; i++){
+      ba[i]=b[i]-a[i];
+      ca[i]=c[i]-a[i];
+      da[i]=d[i]-a[i];
+    }
+
+    abc[0]=0.5*(ba[1]*ca[2]-ba[2]*ca[1]);
+    abc[1]=0.5*(ba[2]*ca[0]-ba[0]*ca[2]);
+    abc[2]=0.5*(ba[0]*ca[1]-ba[1]*ca[0]);
+
+    adc[0]=-0.5*(da[1]*ca[2]-da[2]*ca[1]);
+    adc[1]=-0.5*(da[2]*ca[0]-da[0]*ca[2]);
+    adc[2]=-0.5*(da[0]*ca[1]-da[1]*ca[0]);
+
+    for (i=0; i<nd; i++){
+      if (i==theta){
+        for (j=0; j<nd; j++){  
+          X[i][j]=(abc[j]+adc[j])/notzero(*Omega,1e-99);
+        }
+//      if (i==theta) printf("%E  %E  %E\n",X[i][0],X[i][1],X[i][2]);
+      } else {
+        for (j=0; j<nd; j++){
+          X[i][j]=1.0e0/notzero(*Omega,1e-99)*(
+             _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,3),mod(i+1,3))*
+                        _dx_dX_int(np,gl,lL,lR,theta,mod(j+2,3),mod(i+2,3))
+            -_dx_dX_int(np,gl,lL,lR,theta,mod(j+2,3),mod(i+1,3))*
+                        _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,3),mod(i+2,3))
+          );
+        }
+      }
+     // if (i==theta) printf("%E  %E  %E\n\n",X[i][0],X[i][1],X[i][2]);
+    }
+  }
+}
+
+
+// these metrics at the interface do not preserve freestream in 3D
+void find_Omega_and_X_at_interface_older(np_t *np, gl_t *gl, long lL, long lR, long theta,
+                          double *Omega, dim2_t X) {
+#ifdef _2D
+  long i,j;
+  *Omega=_dx_dX_int(np,gl,lL,lR,theta,0,0)
+               *_dx_dX_int(np,gl,lL,lR,theta,1,1)
+               -_dx_dX_int(np,gl,lL,lR,theta,0,1)
+               *_dx_dX_int(np,gl,lL,lR,theta,1,0);
+  for (i=0; i<nd; i++){
+    for (j=0; j<nd; j++){
+      X[i][j]=(2.0e0*krodelta(i,j)-1.0e0)/notzero(*Omega,1e-99)*
+         _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+1,nd));
+    }
+  }
+#endif
+#ifdef _3D
+  long i,j;
+
+  *Omega=0.0e0;
+  for (i=0; i<nd; i++){
+    *Omega+=_dx_dX_int(np,gl,lL,lR,theta,0,i)
+                  *_dx_dX_int(np,gl,lL,lR,theta,1,mod(i+1,nd))
+                  *_dx_dX_int(np,gl,lL,lR,theta,2,mod(i+2,nd))
+                  -_dx_dX_int(np,gl,lL,lR,theta,0,i)
+                  *_dx_dX_int(np,gl,lL,lR,theta,1,mod(i+2,nd))
+                  *_dx_dX_int(np,gl,lL,lR,theta,2,mod(i+1,nd));
+  }
+  for (i=0; i<nd; i++){
+    for (j=0; j<nd; j++){
+      X[i][j]=1.0e0/notzero(*Omega,1e-99)*(
+         _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+1,nd))*
+                        _dx_dX_int(np,gl,lL,lR,theta,mod(j+2,nd),mod(i+2,nd))
+        -_dx_dX_int(np,gl,lL,lR,theta,mod(j+2,nd),mod(i+1,nd))*
+                        _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+2,nd))
+       );
+    }
+  }
+#endif
+}
 
 
 void update_metrics_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta) {

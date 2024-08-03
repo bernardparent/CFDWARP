@@ -7,6 +7,10 @@
 #define BDRYMETRICS_CENTERED 1
 
 
+void write_metrics_template(FILE **controlfile);
+
+void read_metrics(char *argum, SOAP_codex_t *codex);
+
 double _X(np_t np, long dim1, long dim2);
 
 double _x(np_t np, long dim);
