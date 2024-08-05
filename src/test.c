@@ -1252,11 +1252,12 @@ int main ( int argc, char **argv ) {
   int RET;
   input_t input;
   int *argint, argoneint;
-  double *argdouble, argonedouble,sum;
   char *propstring;
 
 #ifdef _FLUID_MULTISPECIES
   long spec;
+  double *argdouble, argonedouble;
+  double sum;
   spec_t chik;
   double P, Tmin, Tmax, dT;
 #endif
@@ -1289,7 +1290,9 @@ int main ( int argc, char **argv ) {
   create_node ( &npR, 0, 0, 0 );
 
   propstring=(char *)malloc(sizeof(char));
+#ifdef _FLUID_MULTISPECIES
   argdouble=(double *)malloc(sizeof(double));
+#endif
   CONTROL = FALSE;
   control_filename = NULL;
   input.READDATAFILE = FALSE;

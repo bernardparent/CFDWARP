@@ -35,6 +35,9 @@ static void reorder_initvar_species(gl_t *gl, initvar_t initvar, long specstart)
   double initdefault;
   bool FOUNDDEFAULT;
   spec_t N;
+  // to avoid compiler warning
+  for (spec=0; spec<ns; spec++) N[spec]=0.0;
+
   if (gl->nsinit!=ns){
     // move values up to make space for missing species
     for (flux=numinitvar-1; flux>=specstart+ns; flux--){

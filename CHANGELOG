@@ -7,6 +7,28 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 AUG 04a
+  * in lib/soap/doc/report.tex
+    - included the acronym and improved the text of the Introduction
+  * in model/_generic/model.hh
+    - included missing "gl_model_metrics_t metrics;" within gl_model_t
+  * in model/fluid/_Navier-Stokes_perfect/fluid_init.c
+    - in find_default_initvar_name(), removed the declaration of the unused variable spec
+  * in model/metrics/_generic/metrics.c
+    - in write_metrics_template(), added code for METRICSMODEL_AXISYMMETRIC
+    - added METRICSMODEL_AXISYMMETRIC
+    - added _xaxi()
+    - added _dx_dX_int_axi()
+    - added find_point_in_between_8_nodes_axi()
+    - in find_Omega_and_X_at_interface(), added code for METRICSMODEL_AXISYMMETRIC
+  * in model/share/transport_share.c
+    - commented _mue_from_Nn_Ni_Te_rhok_old() which is not used anymore
+  * in src/init.c
+    - initialized N[spec] to 0 to avoid compiler warning
+  * in src/test.c
+    - in main() made small changes to avoid compiler warning
+    
+
 2024 AUG 03a
   * in model/metrics/_generic/metrics.c
     - added write_metrics_template()

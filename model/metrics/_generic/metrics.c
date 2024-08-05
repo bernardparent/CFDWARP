@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 1999-2004, 2019, 2021 Bernard Parent
+Copyright 1999-2004, 2019, 2021, 2024 Bernard Parent
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define METRICSMODEL_VIVIANDVINOKUR 1
 #define METRICSMODEL_FREESTREAMPRESERVING 2
+#define METRICSMODEL_AXISYMMETRIC 3
 
 
 void write_metrics_template(FILE **controlfile){
@@ -57,11 +58,21 @@ void read_metrics(char *argum, SOAP_codex_t *codex){
   codex->action=&read_model_metrics_actions;
   SOAP_add_int_to_vars(codex,"METRICSMODEL_FREESTREAMPRESERVING",METRICSMODEL_FREESTREAMPRESERVING);
   SOAP_add_int_to_vars(codex,"METRICSMODEL_VIVIANDVINOKUR",METRICSMODEL_VIVIANDVINOKUR);
+  SOAP_add_int_to_vars(codex,"METRICSMODEL_AXISYMMETRIC",METRICSMODEL_AXISYMMETRIC);
   SOAP_process_code(argum, codex, SOAP_VARS_KEEP_ALL);
-  find_int_var_from_codex(codex,"METRICSMODEL",&gl->model.metrics.METRICSMODEL);
+  find_int_var_from_codex(codex,"METRICSMODEL",&gl->model.metrics.METRICSMODEL);  
   if (gl->model.metrics.METRICSMODEL!=METRICSMODEL_VIVIANDVINOKUR 
-      && gl->model.metrics.METRICSMODEL!=METRICSMODEL_FREESTREAMPRESERVING)
-      SOAP_fatal_error(codex,"METRICSMODEL must be set to either METRICSMODEL_VIVIANDVINOKUR or METRICSMODEL_FREESTREAMPRESERVING.");
+      && gl->model.metrics.METRICSMODEL!=METRICSMODEL_FREESTREAMPRESERVING
+#ifdef _2D
+      && gl->model.metrics.METRICSMODEL!=METRICSMODEL_AXISYMMETRIC
+#endif      
+      )
+      SOAP_fatal_error(codex,"METRICSMODEL must be set to either METRICSMODEL_VIVIANDVINOKUR or METRICSMODEL_FREESTREAMPRESERVING"
+#ifdef _2D
+      " or METRICSMODEL_AXISYMMETRIC"
+#endif
+      "."      
+      );
   SOAP_clean_added_vars(codex,numvarsinit);
 }
 
@@ -87,6 +98,54 @@ double _X(np_t np, long dim1, long dim2){
 double _x(np_t np, long dim){
   double tmp;
   tmp=np.bs->x[dim];
+  return(tmp);
+}
+
+
+double _xaxi(np_t *np, gl_t *gl, long l, long dim, long dim1, long offset1, long dim2, long offset2, long dim3, long offset3){
+  double tmp,r,theta;
+  long fact1,fact2,fact3;
+  tmp=0.0;
+  if (nd==2){
+    if (dim==2) {
+      tmp=0.0;
+      if (dim1==2) tmp=(double)offset1/2.0;
+      if (dim2==2) tmp=(double)offset2/2.0;
+      if (dim3==2) tmp=(double)offset3/2.0;
+    } else {
+      if (dim1==2) fact1=0; else fact1=1; 
+      if (dim2==2) fact2=0; else fact2=1;
+      if (dim3==2) fact3=0; else fact3=1;
+      tmp=np[_alll(gl,l,dim1,fact1*offset1,dim2,fact2*offset2,dim3,fact3*offset3)].bs->x[dim];
+    }
+    if (gl->model.metrics.METRICSMODEL==METRICSMODEL_AXISYMMETRIC){
+      if (dim1==2) fact1=0; else fact1=1; 
+      if (dim2==2) fact2=0; else fact2=1;
+      if (dim3==2) fact3=0; else fact3=1;
+      r=np[_alll(gl,l,dim1,fact1*offset1,dim2,fact2*offset2,dim3,fact3*offset3)].bs->x[1];
+      theta=0.0;
+      if (dim1==2) theta=(double)offset1*pi/30.0; 
+      if (dim2==2) theta=(double)offset2*pi/30.0; 
+      if (dim3==2) theta=(double)offset3*pi/30.0; 
+      switch (dim){
+        case 0:
+          tmp=np[_alll(gl,l,dim1,fact1*offset1,dim2,fact2*offset2,dim3,fact3*offset3)].bs->x[0];
+        break;
+        case 1:
+          tmp=cos(theta)*r;
+        break;
+        case 2:
+          tmp=sin(theta)*r;
+        break;
+        default:
+          fatal_error("Problem in _xaxi() function within metrics.c");
+      }
+    }
+    
+  }
+  if (nd==3){
+    tmp=np[_alll(gl,l,dim1,offset1,dim2,offset2,dim3,offset3)].bs->x[dim];    
+  }
   return(tmp);
 }
 
@@ -155,6 +214,23 @@ static double _dx_dX_int(np_t *np, gl_t *gl, long lL, long lR, long theta,
   return(tmp);
 }
 
+#ifdef _2D
+static double _dx_dX_int_axi(np_t *np, gl_t *gl, long lL, long lR, long theta,
+                       long dimx, long dimX){
+  double tmp;
+
+  if (dimX==theta) {
+    tmp=_xaxi(np, gl, lR, dimx, 0, 0, 0, 0, 0, 0) -_xaxi(np, gl, lL, dimx, 0, 0, 0, 0, 0, 0) ;
+  } else {
+    tmp=0.25e0*(_xaxi(np, gl, lL, dimx, dimX, +1, 0, 0, 0, 0)
+               -_xaxi(np, gl, lL, dimx, dimX, -1, 0, 0, 0, 0))
+       +0.25e0*(_xaxi(np, gl, lR, dimx, dimX, +1, 0, 0, 0, 0)
+               -_xaxi(np, gl, lR, dimx, dimX, -1, 0, 0, 0, 0));
+  }
+
+  return(tmp);
+}
+#endif
 
 #ifdef _3D
 static void find_point_in_between_8_nodes(np_t *np, gl_t *gl, long l, long dim1, long dim1sgn, long dim2, long dim2sgn, long dim3, long dim3sgn, EXM_vec3D_t a){
@@ -175,12 +251,32 @@ static void find_point_in_between_8_nodes(np_t *np, gl_t *gl, long l, long dim1,
 }
 #endif
 
+#ifdef _2D
+static void find_point_in_between_8_nodes_axi(np_t *np, gl_t *gl, long l, long dim1, long dim1sgn, long dim2, long dim2sgn, long dim3, long dim3sgn, EXM_vec3D_t a){
+  long dim; 
+
+  for (dim=0; dim<3; dim++){
+    a[dim]=0.125*(
+             _xaxi(np, gl, l, dim, 0, 0, 0, 0, 0, 0)
+            +_xaxi(np, gl, l, dim, dim1, dim1sgn, 0, 0, 0, 0) 
+            +_xaxi(np, gl, l, dim, dim2, dim2sgn, 0, 0, 0, 0) 
+            +_xaxi(np, gl, l, dim, dim1, dim1sgn, dim2, dim2sgn, 0, 0) 
+            +_xaxi(np, gl, l, dim, dim3, dim3sgn, 0, 0, 0, 0) 
+            +_xaxi(np, gl, l, dim, dim1, dim1sgn, dim3, dim3sgn, 0, 0) 
+            +_xaxi(np, gl, l, dim, dim2, dim2sgn, dim3, dim3sgn, 0, 0) 
+            +_xaxi(np, gl, l, dim, dim1, dim1sgn, dim2, dim2sgn, dim3, dim3sgn) 
+           );
+  }
+}
+#endif
 
 // these metrics at the interface preserve freestream
 void find_Omega_and_X_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta,
                           double *Omega, dim2_t X) {
 #ifdef _2D
-  long i,j;
+  long i,j;      
+  EXM_vec3D_t a,b,c,d,ba,ca,da,abc,adc;
+
   switch (gl->model.metrics.METRICSMODEL){
     case METRICSMODEL_VIVIANDVINOKUR:
       *Omega=_dx_dX_int(np,gl,lL,lR,theta,0,0)
@@ -205,7 +301,56 @@ void find_Omega_and_X_at_interface(np_t *np, gl_t *gl, long lL, long lR, long th
             _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+1,nd));
         }
       }    
-    break;    
+    break;  
+
+    case METRICSMODEL_AXISYMMETRIC:
+      *Omega=0.0e0;
+      for (i=0; i<3; i++){
+        *Omega+=_dx_dX_int_axi(np,gl,lL,lR,theta,0,i)
+                  *_dx_dX_int_axi(np,gl,lL,lR,theta,1,mod(i+1,3))
+                  *_dx_dX_int_axi(np,gl,lL,lR,theta,2,mod(i+2,3))
+                  -_dx_dX_int_axi(np,gl,lL,lR,theta,0,i)
+                  *_dx_dX_int_axi(np,gl,lL,lR,theta,1,mod(i+2,3))
+                  *_dx_dX_int_axi(np,gl,lL,lR,theta,2,mod(i+1,3));
+      }
+      find_point_in_between_8_nodes_axi(np,gl,lL,theta,+1,mod(theta+1,3),+1,mod(theta+2,3),-1,a);
+      find_point_in_between_8_nodes_axi(np,gl,lL,theta,+1,mod(theta+1,3),+1,mod(theta+2,3),+1,b);
+      find_point_in_between_8_nodes_axi(np,gl,lL,theta,+1,mod(theta+1,3),-1,mod(theta+2,3),+1,c);
+      find_point_in_between_8_nodes_axi(np,gl,lL,theta,+1,mod(theta+1,3),-1,mod(theta+2,3),-1,d);
+
+      for (i=0; i<3; i++){
+        ba[i]=b[i]-a[i];
+        ca[i]=c[i]-a[i];
+        da[i]=d[i]-a[i];
+      }
+
+      abc[0]=0.5*(ba[1]*ca[2]-ba[2]*ca[1]);
+      abc[1]=0.5*(ba[2]*ca[0]-ba[0]*ca[2]);
+      abc[2]=0.5*(ba[0]*ca[1]-ba[1]*ca[0]);
+
+      adc[0]=-0.5*(da[1]*ca[2]-da[2]*ca[1]);
+      adc[1]=-0.5*(da[2]*ca[0]-da[0]*ca[2]);
+      adc[2]=-0.5*(da[0]*ca[1]-da[1]*ca[0]);
+
+      for (i=0; i<nd; i++){
+        if (i==theta){
+          for (j=0; j<nd; j++){  
+            X[i][j]=(abc[j]+adc[j])/notzero(*Omega,1e-99);
+          }
+//      if (i==theta) printf("%E  %E  %E\n",X[i][0],X[i][1],X[i][2]);
+        } else {
+          for (j=0; j<nd; j++){
+            X[i][j]=1.0e0/notzero(*Omega,1e-99)*(
+               _dx_dX_int_axi(np,gl,lL,lR,theta,mod(j+1,3),mod(i+1,3))*
+                        _dx_dX_int_axi(np,gl,lL,lR,theta,mod(j+2,3),mod(i+2,3))
+              -_dx_dX_int_axi(np,gl,lL,lR,theta,mod(j+2,3),mod(i+1,3))*
+                        _dx_dX_int_axi(np,gl,lL,lR,theta,mod(j+1,3),mod(i+2,3))
+            );
+          }
+        }
+       // if (i==theta) printf("%E  %E  %E\n\n",X[i][0],X[i][1],X[i][2]);
+      }
+    break;  
     default:
       fatal_error("METRICSMODEL incorrect in find_Omega_and_X_at_interface().");
   }

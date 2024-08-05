@@ -253,6 +253,7 @@ double _lnLambda(spec_t rhok, double Te){
 
 
 /* electron mobility as a function of electron temperature and mass densities*/
+/*
 static double _mue_from_Nn_Ni_Te_rhok_old(double Nn, double Ni, double Te, spec_t rhok){
   double muen,mue,muei;
   muen=3.74E19*exp(33.5/sqrt(log(max(300.0,Te))))/Nn;
@@ -260,7 +261,7 @@ static double _mue_from_Nn_Ni_Te_rhok_old(double Nn, double Ni, double Te, spec_
   //muei=2.5e16*pow(Te,1.5)/Ni;
   mue=1.0/(1.0/muen+1.0/muei);
   return(mue);
-}
+}*/
 
 static double _mue_from_Te_rhok(double Te, spec_t rhok){
   double mue;

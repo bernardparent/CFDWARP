@@ -61,7 +61,7 @@
 }
 
 \title{
-  SOAP: an Interpreter Language for Scientific Computing
+  SOAP: Scientific Oriented Algorithmic Parser 
 }
 
 \date{
@@ -99,33 +99,19 @@ abstract
 
 \section{Introduction}
 
-\subsection{What is SOAP?}
 
-SOAP is a computer language of interpreter type, not unlike Perl, Python, or
-Java. SOAP is designed to be used as an interface between a
-C code and a control file in user space.
+SOAP (Scientific Oriented Algorithmic Parser) is a computer language of interpreter type, not unlike Perl, Python, or Java. SOAP is designed to be used as an interface between a C code and a control file in user space. SOAP differs from other interpreter languages by having a syntax and arithmetic that is oriented towards the engineer or physical scientist.
 
-\subsection{Why SOAP?}
+\subsection{Raison d'\^etre}
 
-I needed a good user interface for my CFDWARP code. For some, a good
-interface probably refers to point-and-click buttons part of a GUI.
-For me however, a good interface is one which enables as much freedom
-in userland as possible, which generally can only be achieved
-through a programming language.
 
-There is a large number of programming languages that are freely available
-and could have been used in this project, but none proved satisfactory: they were
-too involved and complicated to use. Further, none supported arithmetic the way that
-I wanted it: they all seemed to be designed with the computer scientist
-in mind. I wanted my interface language to be designed
-with the engineer in mind, {\it i.e.} with predictable, user-friendly
-arithmetic.
+I needed a good user interface for my CFDWARP code. For some, a good interface might mean point-and-click buttons as part of a GUI. For me, a good interface is one that allows as much freedom in user space as possible, which generally can only be achieved through a programming language.
 
-A second reason to write a specific language for CFDWARP rather than to use an existing one (like python or perl) is for portability reasons. CFDWARP is a CFD code that is to be used not only on desktop computers but also on supercomputers involving tens of thousands of cores. When designing a code that is expected to be run on various platforms, it is better to keep the code as independent of external libraries as possible. Should CFDWARP make use of python or perl, it would need to be linked to python and perl libraries which may or may not be available on the supercomputers. As well, libraries change over time and offer slightly different functionality, also leading to portability issues. By not linking CFDWARP to external libraries these portability issues are avoided and this reduces significantly maintenance of the code.
+There are many programming languages freely available that could have been used for this project, but none proved satisfactory; they were too complex and difficult to use. Moreover, none supported arithmetic in the way I wanted; they all seemed to be designed with computer scientists in mind. I wanted my interface language to be designed with engineers or physical scientists in mind, offering predictable and user-friendly arithmetic.
 
-Besides, writing my own language proved to have a third usefulness: I had never written an interpreter before
-and accomplishing such a task helped me understand better the technicalities 
-involved in language design.
+A second reason for creating a specific language for CFDWARP rather than using an existing one (like Python or Perl) is portability. CFDWARP is a CFD code that is intended for use not only on desktop computers but also on supercomputers with tens of thousands of cores. When designing code expected to run on various platforms, it's better to keep the code as independent of external libraries as possible. If CFDWARP were to use Python or Perl, it would need to link to Python and Perl libraries, which may not be available on supercomputers. Additionally, libraries change over time and may offer slightly different functionalities, leading to portability issues. By not linking CFDWARP to external libraries, these portability issues are avoided hence significantly reducing the maintenance required.
+
+Moreover, writing my own language had a third benefit: I had never written an interpreter before, and accomplishing this task helped me better understand the technicalities involved in language design.
 
 %For those interested, a good place to start searching for computer
 %languages (free or commercial) is as http://sal.kachinatech.com, or at

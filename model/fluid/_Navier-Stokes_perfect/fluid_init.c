@@ -155,7 +155,7 @@ void init_node_fluid(np_t *np, long l, gl_t *gl, long inittype, initvar_t initva
 
 
 void find_default_initvar_name(initvarname_t *initvar_name){
-  long dim,spec;
+  long dim;
   initvarname_t string;
 
   for (dim=0; dim<nd; dim++){
