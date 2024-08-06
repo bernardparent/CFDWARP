@@ -2680,6 +2680,14 @@ void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
     //S[fluxee]=(-1.0/x1)*Ve[1]*np[l].bs->U[fluxee];
 #endif
   }
+  dim_t projarea;
+  long dim;
+  if (gl->model.metrics.METRICSMODEL==METRICSMODEL_AXISYMMETRIC){
+    if (fabs(np[l].bs->x[1])<1e-15) fatal_error("No node must lie on or below the y=0 axis when METRICSMODEL is set to METRICSMODEL_AXISYMMETRIC.");
+    for (flux=0; flux<nf; flux++) S[flux]=0.0e0;
+    find_side_projected_area_of_axisymmetric_cell(np, gl, l, projarea);
+    for (dim=0; dim<nd; dim++) S[ns+dim]=2.0*projarea[dim]*_Pstar(np[l],gl)/_Omega(np[l],gl);  
+  }
 }
 
 

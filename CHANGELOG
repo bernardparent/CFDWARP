@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 AUG 06a
+  * in model/metrics/_generic/metrics.c
+    - in find_Omega_and_X_at_node(), made modifications to find Omega and X using the
+      _xaxi() when METRICSMODEL_AXISYMMETRIC is chosen
+    - added find_side_projected_area_of_axisymmetric_cell()
+  * in model/share/fluid_share.c
+    - in find_Saxi(), added code when METRICSMODEL_AXISYMMETRIC is chosen
+    
+
 2024 AUG 04a
   * in lib/soap/doc/report.tex
     - included the acronym and improved the text of the Introduction

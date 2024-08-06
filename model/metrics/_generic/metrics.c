@@ -32,19 +32,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define METRICSMODEL_FREESTREAMPRESERVING 2
 #define METRICSMODEL_AXISYMMETRIC 3
 
+#define AXISYMMETRIC_CELL_SLICE_ANGLE (pi/180.0)
+
+
 
 void write_metrics_template(FILE **controlfile){
   wfprintf(*controlfile,"\n\n");
   wfprintf(*controlfile,
   "Metrics(\n");
   wfprintf(*controlfile,
-  "  METRICSMODEL=METRICSMODEL_FREESTREAMPRESERVING;\n");
-  wfprintf(*controlfile,
+#ifdef _2D
+  "  METRICSMODEL=METRICSMODEL_VIVIANDVINOKUR;\n"
+  "    {use METRICSMODEL_AXISYMMETRIC for 2D axisymmetric flow}\n"
+#endif
+#ifdef _3D
+  "  METRICSMODEL=METRICSMODEL_FREESTREAMPRESERVING;\n"
+  "    {use METRICSMODEL_VIVIANDVINOKUR for standard generalized curvilinear metrics}\n"
+#endif
   ");\n");
 }
-
-
-
 
 
 void read_model_metrics_actions(char *actionname, char **argum, SOAP_codex_t *codex){
@@ -56,18 +62,27 @@ void read_metrics(char *argum, SOAP_codex_t *codex){
   gl_t *gl=((readcontrolarg_t *)codex->action_args)->gl;
   SOAP_count_all_vars(codex, &numvarsinit);
   codex->action=&read_model_metrics_actions;
+#ifdef _3D
   SOAP_add_int_to_vars(codex,"METRICSMODEL_FREESTREAMPRESERVING",METRICSMODEL_FREESTREAMPRESERVING);
+#endif
   SOAP_add_int_to_vars(codex,"METRICSMODEL_VIVIANDVINOKUR",METRICSMODEL_VIVIANDVINOKUR);
+#ifdef _2D
   SOAP_add_int_to_vars(codex,"METRICSMODEL_AXISYMMETRIC",METRICSMODEL_AXISYMMETRIC);
+#endif
   SOAP_process_code(argum, codex, SOAP_VARS_KEEP_ALL);
   find_int_var_from_codex(codex,"METRICSMODEL",&gl->model.metrics.METRICSMODEL);  
   if (gl->model.metrics.METRICSMODEL!=METRICSMODEL_VIVIANDVINOKUR 
+#ifdef _3D
       && gl->model.metrics.METRICSMODEL!=METRICSMODEL_FREESTREAMPRESERVING
+#endif
 #ifdef _2D
       && gl->model.metrics.METRICSMODEL!=METRICSMODEL_AXISYMMETRIC
 #endif      
       )
-      SOAP_fatal_error(codex,"METRICSMODEL must be set to either METRICSMODEL_VIVIANDVINOKUR or METRICSMODEL_FREESTREAMPRESERVING"
+      SOAP_fatal_error(codex,"METRICSMODEL must be set to either METRICSMODEL_VIVIANDVINOKUR"
+#ifdef _3D
+      " or METRICSMODEL_FREESTREAMPRESERVING"
+#endif
 #ifdef _2D
       " or METRICSMODEL_AXISYMMETRIC"
 #endif
@@ -124,9 +139,9 @@ double _xaxi(np_t *np, gl_t *gl, long l, long dim, long dim1, long offset1, long
       if (dim3==2) fact3=0; else fact3=1;
       r=np[_alll(gl,l,dim1,fact1*offset1,dim2,fact2*offset2,dim3,fact3*offset3)].bs->x[1];
       theta=0.0;
-      if (dim1==2) theta=(double)offset1*pi/30.0; 
-      if (dim2==2) theta=(double)offset2*pi/30.0; 
-      if (dim3==2) theta=(double)offset3*pi/30.0; 
+      if (dim1==2) theta=(double)offset1*AXISYMMETRIC_CELL_SLICE_ANGLE/2.0; 
+      if (dim2==2) theta=(double)offset2*AXISYMMETRIC_CELL_SLICE_ANGLE/2.0; 
+      if (dim3==2) theta=(double)offset3*AXISYMMETRIC_CELL_SLICE_ANGLE/2.0; 
       switch (dim){
         case 0:
           tmp=np[_alll(gl,l,dim1,fact1*offset1,dim2,fact2*offset2,dim3,fact3*offset3)].bs->x[0];
@@ -153,17 +168,48 @@ double _xaxi(np_t *np, gl_t *gl, long l, long dim, long dim1, long offset1, long
 void find_Omega_and_X_at_node(np_t *np, gl_t *gl, long l, double *Omega, dim2_t X){
 #ifdef _2D
   long i,j;
-  *Omega=0.25e0*(np[_al(gl,l,0,+1)].bs->x[0]-np[_al(gl,l,0,-1)].bs->x[0])
+  switch (gl->model.metrics.METRICSMODEL){
+    case METRICSMODEL_VIVIANDVINOKUR:
+      *Omega=0.25e0*(np[_al(gl,l,0,+1)].bs->x[0]-np[_al(gl,l,0,-1)].bs->x[0])
                    *(np[_al(gl,l,1,+1)].bs->x[1]-np[_al(gl,l,1,-1)].bs->x[1])
             -0.25e0*(np[_al(gl,l,1,+1)].bs->x[0]-np[_al(gl,l,1,-1)].bs->x[0])
                    *(np[_al(gl,l,0,+1)].bs->x[1]-np[_al(gl,l,0,-1)].bs->x[1]);
-  for (i=0; i<nd; i++){
-    for (j=0; j<nd; j++){
-      X[i][j]=(krodelta(i,j)-0.5e0)/(*Omega)*(
-          (+np[_al(gl,l,mod(i+1,nd),+1)].bs->x[mod(j+1,nd)]
-           -np[_al(gl,l,mod(i+1,nd),-1)].bs->x[mod(j+1,nd)])
-       );
-     }
+      for (i=0; i<nd; i++){
+        for (j=0; j<nd; j++){
+          X[i][j]=(krodelta(i,j)-0.5e0)/(*Omega)*(
+            (+np[_al(gl,l,mod(i+1,nd),+1)].bs->x[mod(j+1,nd)]
+             -np[_al(gl,l,mod(i+1,nd),-1)].bs->x[mod(j+1,nd)])
+          );
+        }
+      }
+    break;
+    case METRICSMODEL_AXISYMMETRIC:
+      *Omega=0.0;
+      for (i=0; i<3; i++){
+        *Omega+=0.125e0*(_xaxi(np,gl,l,0,mod(i+0,3),+1,0,0,0,0)-_xaxi(np,gl,l,0,mod(i+0,3),-1,0,0,0,0))
+                     *(_xaxi(np,gl,l,1,mod(i+1,3),+1,0,0,0,0)-_xaxi(np,gl,l,1,mod(i+1,3),-1,0,0,0,0))
+                     *(_xaxi(np,gl,l,2,mod(i+2,3),+1,0,0,0,0)-_xaxi(np,gl,l,2,mod(i+2,3),-1,0,0,0,0))
+               -0.125e0*(_xaxi(np,gl,l,0,mod(i+0,3),+1,0,0,0,0)-_xaxi(np,gl,l,0,mod(i+0,3),-1,0,0,0,0))
+                     *(_xaxi(np,gl,l,1,mod(i+2,3),+1,0,0,0,0)-_xaxi(np,gl,l,1,mod(i+2,3),-1,0,0,0,0))
+                     *(_xaxi(np,gl,l,2,mod(i+1,3),+1,0,0,0,0)-_xaxi(np,gl,l,2,mod(i+1,3),-1,0,0,0,0));
+      }
+      for (i=0; i<nd; i++){
+        for (j=0; j<nd; j++){
+          X[i][j]=0.25e0/(*Omega)*(
+            (+_xaxi(np,gl,l,mod(j+1,3),mod(i+1,3),+1,0,0,0,0)  
+             -_xaxi(np,gl,l,mod(j+1,3),mod(i+1,3),-1,0,0,0,0))
+           *(+_xaxi(np,gl,l,mod(j+2,3),mod(i+2,3),+1,0,0,0,0)
+             -_xaxi(np,gl,l,mod(j+2,3),mod(i+2,3),-1,0,0,0,0))
+           -(+_xaxi(np,gl,l,mod(j+2,3),mod(i+1,3),+1,0,0,0,0) 
+             -_xaxi(np,gl,l,mod(j+2,3),mod(i+1,3),-1,0,0,0,0))
+           *(+_xaxi(np,gl,l,mod(j+1,3),mod(i+2,3),+1,0,0,0,0)
+             -_xaxi(np,gl,l,mod(j+1,3),mod(i+2,3),-1,0,0,0,0))
+           );
+        }
+      }
+    break;
+    default:
+      fatal_error("Problem with METRICSMODEL in find_Omega_and_X_at_node().");
   }
 #endif
 #ifdef _3D
@@ -290,19 +336,6 @@ void find_Omega_and_X_at_interface(np_t *np, gl_t *gl, long lL, long lR, long th
         }
       }
     break;    
-    case METRICSMODEL_FREESTREAMPRESERVING:
-      *Omega=_dx_dX_int(np,gl,lL,lR,theta,0,0)
-               *_dx_dX_int(np,gl,lL,lR,theta,1,1)
-               -_dx_dX_int(np,gl,lL,lR,theta,0,1)
-               *_dx_dX_int(np,gl,lL,lR,theta,1,0);
-      for (i=0; i<nd; i++){
-        for (j=0; j<nd; j++){
-          X[i][j]=(2.0e0*krodelta(i,j)-1.0e0)/notzero(*Omega,1e-99)*
-            _dx_dX_int(np,gl,lL,lR,theta,mod(j+1,nd),mod(i+1,nd));
-        }
-      }    
-    break;  
-
     case METRICSMODEL_AXISYMMETRIC:
       *Omega=0.0e0;
       for (i=0; i<3; i++){
@@ -546,6 +579,7 @@ void find_metrics_at_node(np_t *np, gl_t *gl, long l,
 }
 
 
+
 // finds the unit normal vector perpendicular to the boundary surface and pointing towards the fluid
 bool find_unit_vector_normal_to_boundary_plane(np_t *np, gl_t *gl, long lA, long lB, long lC, int TYPELEVEL, dim_t n){
   long cnt,nodefound,lA2,lA3,dim,iA,jA,kA,iB,jB,kB;
@@ -656,3 +690,45 @@ double _distance_between_near_bdry_node_and_boundary_plane(np_t *np, gl_t *gl, l
   }
   return(dwall);
 }
+
+
+
+#ifdef _2D
+void find_side_projected_area_of_axisymmetric_cell(np_t *np, gl_t *gl, long l, dim_t projarea){
+  EXM_vec3D_t A,B,C,D,AB,BD,CA,DC,ABtimesBD,CAtimesDC;
+  double Amag1,Amag2,vecmag;
+  long dim;
+  // first do the face at k=+1/2
+  find_point_in_between_8_nodes_axi(np, gl, l, +0,-1, +1,-1, +2,+1, A);
+  find_point_in_between_8_nodes_axi(np, gl, l, +0,-1, +1,+1, +2,+1, B);
+  find_point_in_between_8_nodes_axi(np, gl, l, +0,+1, +1,-1, +2,+1, C);
+  find_point_in_between_8_nodes_axi(np, gl, l, +0,+1, +1,+1, +2,+1, D);
+  // find segments of both triangles: one triangle is A-B-D and the other triangle is A-C-D
+  for (dim=0; dim<3; dim++) {
+    AB[dim]=B[dim]-A[dim];
+    BD[dim]=D[dim]-B[dim];
+    CA[dim]=C[dim]-A[dim];
+    DC[dim]=D[dim]-C[dim];
+  }
+  // find the areas of both triangles
+  EXM_cross_product(AB, BD, ABtimesBD);
+  Amag1=0.5*EXM_vector_magnitude(ABtimesBD);
+  EXM_cross_product(CA, DC, CAtimesDC);
+  Amag2=0.5*EXM_vector_magnitude(CAtimesDC);
+  // find the unit normal vectors associated with each triangle
+  vecmag=EXM_vector_magnitude(ABtimesBD);
+  for (dim=0; dim<3; dim++) ABtimesBD[dim]/=vecmag;
+  vecmag=EXM_vector_magnitude(CAtimesDC);
+  for (dim=0; dim<3; dim++) CAtimesDC[dim]/=vecmag;
+  // make sure the unit normal vectors point in the right direction
+  if (ABtimesBD[2]<0.0) {
+    for (dim=0; dim<3; dim++) ABtimesBD[dim]=-ABtimesBD[dim]; 
+  }
+  if (CAtimesDC[2]<0.0) {
+    for (dim=0; dim<3; dim++) CAtimesDC[dim]=-CAtimesDC[dim]; 
+  }
+  // find projected area components
+  for (dim=0; dim<nd; dim++) projarea[dim]=-ABtimesBD[dim]*Amag1-CAtimesDC[dim]*Amag2;
+    
+}
+#endif
