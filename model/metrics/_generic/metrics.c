@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define METRICSMODEL_FREESTREAMPRESERVING 2
 #define METRICSMODEL_AXISYMMETRIC 3
 
-#define AXISYMMETRIC_CELL_SLICE_ANGLE (pi/100.0)
 
 
 
@@ -44,8 +43,10 @@ void write_metrics_template(FILE **controlfile){
 #ifdef _2D
   "  METRICSMODEL=METRICSMODEL_VIVIANDVINOKUR;\n"
   "    {use METRICSMODEL_AXISYMMETRIC for 2D axisymmetric flow}\n"
-  "  rmin_axisymmetric=1e-30;\n"
-  "    {keep to a low value; only used when METRICSMODEL_AXISYMMETRIC is specified}\n"
+  "  axisymmetric_min_radius=1e-30;\n"
+  "    {meters; keep to a low value; only used when METRICSMODEL_AXISYMMETRIC is specified}\n"
+  "  axisymmetric_slice_angle=pi/100.0;\n"
+  "    {radians; keep to a low value; only used when METRICSMODEL_AXISYMMETRIC is specified}\n"
 #endif
 #ifdef _3D
   "  METRICSMODEL=METRICSMODEL_FREESTREAMPRESERVING;\n"
@@ -91,7 +92,8 @@ void read_metrics(char *argum, SOAP_codex_t *codex){
       "."      
       );
 #ifdef _2D
-  find_double_var_from_codex(codex,"rmin_axisymmetric",&gl->model.metrics.rmin_axisymmetric);  
+  find_double_var_from_codex(codex,"axisymmetric_min_radius",&gl->model.metrics.axisymmetric_min_radius);  
+  find_double_var_from_codex(codex,"axisymmetric_slice_angle",&gl->model.metrics.axisymmetric_slice_angle);  
 #endif    
   SOAP_clean_added_vars(codex,numvarsinit);
 }
@@ -121,7 +123,7 @@ double _x(np_t np, long dim){
   return(tmp);
 }
 
-
+#ifdef _2D
 double _xaxi(np_t *np, gl_t *gl, long l, long dim, long dim1, long offset1, long dim2, long offset2, long dim3, long offset3){
   double tmp,r,theta;
   long fact1,fact2,fact3;
@@ -144,9 +146,9 @@ double _xaxi(np_t *np, gl_t *gl, long l, long dim, long dim1, long offset1, long
       if (dim3==2) fact3=0; else fact3=1;
       r=np[_alll(gl,l,dim1,fact1*offset1,dim2,fact2*offset2,dim3,fact3*offset3)].bs->x[1];
       theta=0.0;
-      if (dim1==2) theta=(double)offset1*AXISYMMETRIC_CELL_SLICE_ANGLE/2.0; 
-      if (dim2==2) theta=(double)offset2*AXISYMMETRIC_CELL_SLICE_ANGLE/2.0; 
-      if (dim3==2) theta=(double)offset3*AXISYMMETRIC_CELL_SLICE_ANGLE/2.0; 
+      if (dim1==2) theta=(double)offset1*gl->model.metrics.axisymmetric_slice_angle/2.0; 
+      if (dim2==2) theta=(double)offset2*gl->model.metrics.axisymmetric_slice_angle/2.0; 
+      if (dim3==2) theta=(double)offset3*gl->model.metrics.axisymmetric_slice_angle/2.0; 
       switch (dim){
         case 0:
           tmp=np[_alll(gl,l,dim1,fact1*offset1,dim2,fact2*offset2,dim3,fact3*offset3)].bs->x[0];
@@ -156,7 +158,8 @@ double _xaxi(np_t *np, gl_t *gl, long l, long dim, long dim1, long offset1, long
         break;
         case 2:
           tmp=sin(theta)*fabs(r);
-          if (fabs(r)<gl->model.metrics.rmin_axisymmetric) tmp=sin(theta)*gl->model.metrics.rmin_axisymmetric;
+          if (fabs(r)<gl->model.metrics.axisymmetric_min_radius) 
+            tmp=sin(theta)*gl->model.metrics.axisymmetric_min_radius;
         break;
         default:
           fatal_error("Problem in _xaxi() function within metrics.c");
@@ -169,7 +172,7 @@ double _xaxi(np_t *np, gl_t *gl, long l, long dim, long dim1, long offset1, long
   }
   return(tmp);
 }
-
+#endif
 
 void find_Omega_and_X_at_node(np_t *np, gl_t *gl, long l, double *Omega, dim2_t X){
 #ifdef _2D
@@ -736,8 +739,8 @@ void find_side_projected_area_of_axisymmetric_cell(np_t *np, gl_t *gl, long l, d
   // find projected area components
   for (dim=0; dim<nd; dim++) projarea[dim]=-ABtimesBD[dim]*Amag1-CAtimesDC[dim]*Amag2;
   
-  // set to the projected area to zero when r<gl->model.metrics.rmin_axisymmetric
-  if (fabs(np[l].bs->x[1])<gl->model.metrics.rmin_axisymmetric){
+  // set to the projected area to zero when r<gl->model.metrics.gl->model.metrics.axisymmetric_min_radius
+  if (fabs(np[l].bs->x[1])<gl->model.metrics.axisymmetric_min_radius){
     for (dim=0; dim<nd; dim++) projarea[dim]=0.0;
   }
 }

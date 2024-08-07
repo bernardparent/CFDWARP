@@ -12,5 +12,7 @@
 
 typedef struct {
   int METRICSMODEL;
-  double rmin_axisymmetric;
+#ifdef _2D
+  double axisymmetric_min_radius,axisymmetric_slice_angle;
+#endif
 } gl_model_metrics_t;

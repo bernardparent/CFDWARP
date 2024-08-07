@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 AUG 06c
+  * in model/metrics/_generic/metrics.c
+    - added axisymmetric_slice_angle to read_metrics() and write_metrics()
+    - renamed rmin_axisymmetric to axisymmetric_min_radius
+    
+
 2024 AUG 06b
   * in model/metrics/_generic/metrics.c
     - in write_metrics_template() and read_metrics(), added rmin_axisymmetric
