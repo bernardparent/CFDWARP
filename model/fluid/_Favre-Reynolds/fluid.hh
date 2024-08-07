@@ -46,9 +46,6 @@ typedef struct {
 
 
 typedef struct {
-#ifdef _2D
-  bool AXISYMMETRIC;
-#endif
   bool RAPCOMP,TURBSOURCE,
        REACTING,ADD_ETA_TO_ETAT_WITHIN_QK;
   double kdiv,psidiv,zetaA1,zetaA3,zetaA2,Prt,Sct;

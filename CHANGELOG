@@ -7,6 +7,23 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 AUG 07a
+  * in model/emfield/_Epotential*/emfield.c
+    - in find_Sstar_emfield(), git rid of axisymmetric source terms
+    - in write_model_emfield_template(), got rid of AXISYMMETRIC=NO line
+    - in read_model_emfield_actions(), added an fatal_error message in case AXISYMMETRIC is
+      specified in the control file
+  * in model/fluid/_*/fluid.c
+    - in write_model_fluid_template(), got rid of AXISYMMETRIC=NO line
+    - in read_model_fluid_actions(), added an fatal_error message in case AXISYMMETRIC is
+      specified in the control file
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - deleted the unused function find_Saxi_FavreReynolds()
+    - in find_Saxi() and find_dSaxi_dU(), deleted unused plasma and electron energy axisymmetric 
+      source terms
+  * deleted model/metrics/_generic/metrics.c.24aug02a
+    
+
 2024 AUG 06c
   * in model/metrics/_generic/metrics.c
     - added axisymmetric_slice_angle to read_metrics() and write_metrics()

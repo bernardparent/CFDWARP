@@ -73,9 +73,6 @@ void write_model_fluid_template(FILE **controlfile){
     "    psimin=1e-10;   psimax=9.9e99; {1/s}\n"
     "    wminN2=0.01; {make sure that the N2 mass fraction is at least 1%}\n"
     "    wmin=1.0e-50;                  {min mass fraction allowed in the domain}\n"
-#ifdef _2D
-    "    AXISYMMETRIC=NO;\n"
-#endif
     "    SetBodyForce(is,"if2DL("js,")if3DL("ks,")" ie,"if2DL("je,")if3DL("ke,")" 0.0{N/m3}"if2DL(",0.0{N/m3}")if3DL(",0.0{N/m3}")");\n"
     "    SetHeatDeposited(is,"if2DL("js,")if3DL("ks,")" ie,"if2DL("je,")if3DL("ke,")" 0.0 {W/m3});\n"
     "    {\n"
@@ -183,9 +180,8 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
     if (gl->model.fluid.DILATDISSIP!=DILATDISSIP_WILCOX && gl->model.fluid.DILATDISSIP!=DILATDISSIP_SARKAR && gl->model.fluid.DILATDISSIP!=DILATDISSIP_NONE )
       SOAP_fatal_error(codex,"DILATDISSIP must be set to either DILATDISSIP_NONE, DILATDISSIP_WILCOX, DILATDISSIP_SARKAR.");
 
-#ifdef _2D
-    find_bool_var_from_codex(codex,"AXISYMMETRIC",&gl->model.fluid.AXISYMMETRIC);
-#endif
+    if (SOAP_is_var_in_codex(codex, "AXISYMMETRIC")) fatal_error("AXISYMMETRIC within the Model(%s()) module is deprecated. Specify axisymmetric coordinates using the Metrics() module.",_FLUID_ACTIONNAME);
+
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;
   }

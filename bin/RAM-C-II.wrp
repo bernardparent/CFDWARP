@@ -237,6 +237,17 @@ Grid(
 );
 
 
+
+Metrics(
+  METRICSMODEL=METRICSMODEL_AXISYMMETRIC;
+    {use METRICSMODEL_AXISYMMETRIC for 2D axisymmetric flow}
+  axisymmetric_min_radius=1e-30;
+    {meters; keep to a low value; only used when METRICSMODEL_AXISYMMETRIC is specified}
+  axisymmetric_slice_angle=pi/100.0;
+    {radians; keep to a low value; only used when METRICSMODEL_AXISYMMETRIC is specified}
+);
+
+
 Block(
   Fluid(
   );
@@ -383,7 +394,6 @@ Model(
     kmin=1.0e-10;   kmax=9.9e99;   {m2/s2}
     psimin=1e-10;   psimax=9.9e99; {1/s}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain}
-    AXISYMMETRIC=YES;
     SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
     SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
     {
@@ -397,7 +407,6 @@ Model(
     Tmin=1.0e1;     Tmax=25.0e3;    {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-50;
-    AXISYMMETRIC=YES;
     SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
     SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
     {
@@ -431,7 +440,6 @@ Model(
     chiemin=1e-12;  chiemax=1.0;    {min and max electron molar fraction}
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
     gamma=0.1e0;    {secondary emission coefficient}
-    AXISYMMETRIC=YES;
     QENSOURCETERMS=TRUE;
     SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
     SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
@@ -460,7 +468,6 @@ Model(
     SetRelativePermittivity(is,js, ie,je, 1.0 );
     SetSolidConductivity(is,js, ie,je, 0.0 {S/m});
     SetElectroMotiveForce(is,js, ie,je, 0.0{V/m},0.0{V/m}, 1e99{max power in W/m3});
-    AXISYMMETRIC=YES;
   );
 );
 

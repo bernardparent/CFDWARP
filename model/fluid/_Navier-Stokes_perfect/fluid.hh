@@ -49,6 +49,5 @@ typedef struct {
   double gamma,R;
   int ETAMODEL;
   double eta,eta_T0,eta_C,Pr;
-  bool AXISYMMETRIC;
 } gl_model_fluid_t;
 

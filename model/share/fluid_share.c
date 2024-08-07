@@ -1065,19 +1065,6 @@ double _Qk(np_t *np, long l, gl_t *gl){
     }
   } 
 
-#ifdef _2D
-  // these additional axisymmetric terms were derived by Jason Etele and are turned off for now
-  if (gl->model.fluid.AXISYMMETRIC && FALSE) {
-    sum=0.0e0;
-    for (theta=0; theta<nd; theta++) {
-      for (vartheta=0; vartheta<nd; vartheta++) {
-        sum+=_X(np[l],theta,vartheta)*0.5*(_V(np[_al(gl,l,vartheta,+1)],vartheta)
-                                          -_V(np[_al(gl,l,vartheta,-1)],vartheta));
-      }
-    }
-    Qk-=2.0e0/3.0e0*etaeff*_V(np[l],1)/_x(np[l],1)*sum;
-  }
-#endif
   return(Qk);
 }
 
@@ -1309,92 +1296,6 @@ void find_Stcomp(np_t *np, gl_t *gl, long l, flux_t St){
 }
 
 
-#ifdef _2D
-/* this subroutine is by Jason Etele; the derivation of the terms
-   can be found in the doc subdirectory */
-void find_Saxi_FavreReynolds(np_t *np, gl_t *gl, long l, flux_t S){
-  long flux,species,theta,vartheta,lp,lm;
-  double x1, V1;
-  double sum1,sum2,sum3,sum4,sum5,sum6,sum7,sum8,sum9,sum10,sum11,sum12;
-
-  for (flux=0; flux<nf; flux++) S[flux]=0.0e0;
-
-  if (gl->model.fluid.AXISYMMETRIC) {
-   x1=np[l].bs->x[1];
-   if (fabs(x1)<1e-15) fatal_error("No node must lie on the y=0 axis when AXISYMMETRIC is set to TRUE.");
-   V1=_V(np[l],1);
-   for (flux=0; flux<nf; flux++){
-     S[flux]=(-1.0/x1)*V1*np[l].bs->U[flux];
-   }
-   // the following terms added by Jason are turned off: they need to be re-derived and their validity
-   // checked when x1 is negative
-   if (FALSE){
-    sum1=0.0e0;
-    sum2=0.0e0;
-    sum3=0.0e0;
-    sum4=0.0e0;
-    sum5=0.0e0;
-    sum6=0.0e0;
-    sum7=0.0e0;
-    sum8=0.0e0;
-    sum9=0.0e0;
-    sum10=0.0e0;
-    sum11=0.0e0;
-    sum12=0.0e0;
-    /* species continuity */
-    for (species=0; species<ns; species++) {
-      for (theta=0; theta<nd; theta++) {
-        lp=_al(gl, l, theta, +1);
-        lm=_al(gl, l, theta, -1);
-        assert_np(np[lp],np[lp].bs->x[1]>0.0e0);
-        assert_np(np[lm],np[lm].bs->x[1]>0.0e0);
-        sum1=sum1+_X(np[l],theta,1)*0.5e0*(+_w(np[lp],species)-_w(np[lm],species));
-      }
-    sum7=sum7+_nustar(np,l,gl,species)*_hk_from_T(species,_T(np[l],gl))*sum1;
-    S[species]=S[species]+(1.0/x1)*(_nustar(np,l,gl,species)*sum1);
-    }
-    /* 2 momentum equations, 1 energy */
-    for (theta=0; theta<nd; theta++) {
-      lp=_al(gl, l, theta, +1);
-      lm=_al(gl, l, theta, -1);
-      assert_np(np[lp],_x(np[lp],1)!=0.0e0);
-      assert_np(np[lm],_x(np[lm],1)!=0.0e0);
-      sum2=sum2+_X(np[l],theta,1)*0.5e0*(+_V(np[lp],0)-_V(np[lm],0));
-      sum3=sum3+_X(np[l],theta,0)*0.5e0*(+_V(np[lp],1)-_V(np[lm],1));
-      sum4=sum4+_X(np[l],theta,0)*0.5e0*(+_etastar(np,lp,gl)*_V(np[lp],1)/_x(np[lp],1)
-					 -_etastar(np,lm,gl)*_V(np[lm],1)/_x(np[lm],1));
-      sum5=sum5+_X(np[l],theta,1)*0.5e0*(+_V(np[lp],1)-_V(np[lm],1));
-      sum6=sum6+_X(np[l],theta,1)*0.5e0*(+_etastar(np,lp,gl)*_V(np[lp],1)/_x(np[lp],1)
-					 -_etastar(np,lm,gl)*_V(np[lm],1)/_x(np[lm],1));
-      sum8=sum8+_X(np[l],theta,1)*0.5e0*(+_k(np[lp])-_k(np[lm]));
-      sum9=sum9+_X(np[l],theta,0)*0.5e0*(+_V(np[lp],0)-_V(np[lm],0));
-      sum10=sum10+_X(np[l],theta,1)*0.5e0*(+_T(np[lp],gl)-_T(np[lm],gl));
-      for (vartheta=0; vartheta<nd; vartheta++)  {
-	      sum11=sum11+_X(np[l],theta,vartheta)*0.5e0*(+_etastar(np,lp,gl)*_V(np[lp],vartheta)*_V(np[lp],1)/_x(np[lp],1)
-						    -_etastar(np,lm,gl)*_V(np[lm],vartheta)*_V(np[lm],1)/_x(np[lm],1));
-      }
-      sum12=sum12+_X(np[l],theta,1)*0.5e0*(+_psi(np[lp])-_psi(np[lm]));
-    }
-    S[ns]=S[ns]+(1.0/x1)*(_etastar(np,l,gl)*(sum2+sum3)-(2.0/3.0)*x1*sum4);
-    S[ns+1]=S[ns+1]+(1.0/x1)*(2.0*_etastar(np,l,gl)*(sum5-V1/x1) -(2.0/3.0)*x1*sum6);
-    S[ns+2]=S[ns+2]+(1.0/x1)*(sum7 + (_etakstar(np,l,gl)*sum8) + _etastar(np,l,gl)*(_V(np[l],0)*(sum2+sum3)+ V1*(4.0/3.0*sum5
-				  - 2.0/3.0*sum9) + _kappastar(np,l,gl)*sum10 -(2.0/3.0)*(_etastar(np,l,gl)*V1*V1/x1 + x1*sum11)));
-    /* 2 turbulence equations */
-    if (gl->model.fluid.TURBSOURCE){
-      S[fluxtke]=S[fluxtke]+(1.0/x1)*_etakstar(np,l,gl)*sum8;
-      S[fluxpsi]=S[fluxpsi]+(1.0/x1)*_etapsistar(np,l,gl)*sum12;
-    }
-   }
-  }
-}
-#else
-void find_Saxi_FavreReynolds(np_t *np, gl_t *gl, long l, flux_t S){
-  long flux;
-  for (flux=0; flux<nf; flux++){
-    S[flux]=0.0e0;
-  }
-}
-#endif
 
 
 void find_dStnorm_dU(np_t *np, gl_t *gl, long l, sqmat_t dStnormdU){
@@ -2652,14 +2553,12 @@ void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
   long flux;
   double x1;
   dim_t Vn;
-#ifdef _FLUID_PLASMA
-  long spec;
-  EXM_vec3D_t Vk,Ve;
-#endif
+  dim_t projarea;
+  long dim;
 
   for (flux=0; flux<nf; flux++) S[flux]=0.0e0;
 
-  if (gl->model.fluid.AXISYMMETRIC) {
+  if (FALSE) {
     x1=np[l].bs->x[1];
     find_V(np[l],Vn);
     if (fabs(x1)<1e-15) fatal_error("No node must lie on the y=0 axis when AXISYMMETRIC is set to TRUE.");
@@ -2667,21 +2566,8 @@ void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
       S[flux]=(-1.0/x1)*Vn[1]*np[l].bs->U[flux];
     }
     S[fluxet]+=(-1.0/x1)*Vn[1]*_Pstar(np[l],gl);
-#ifdef _FLUID_PLASMA
-    for (spec=0; spec<ncs; spec++){
-      find_Vk(np, gl, l, spec, Vk);
-      //S[spec]=(-1.0/x1)*Vk[1]*np[l].bs->U[spec];
-    }
-    find_Ve_from_J(np, gl, l, Ve);
-    //S[speceminus]=(-1.0/x1)*Ve[1]*np[l].bs->U[speceminus];
-#endif
-#if _FLUID_EENERGY
-    find_Ve_from_J(np, gl, l, Ve);
-    //S[fluxee]=(-1.0/x1)*Ve[1]*np[l].bs->U[fluxee];
-#endif
   }
-  dim_t projarea;
-  long dim;
+
   if (gl->model.metrics.METRICSMODEL==METRICSMODEL_AXISYMMETRIC){
     if (fabs(np[l].bs->x[1])<1e-15) fatal_error("No node must lie on or below the y=0 axis when METRICSMODEL is set to METRICSMODEL_AXISYMMETRIC.");
     for (flux=0; flux<nf; flux++) S[flux]=0.0e0;
@@ -2696,10 +2582,6 @@ void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
   long flux;
   double x1;
   dim_t Vn;
-#ifdef _FLUID_PLASMA
-  long spec;
-  EXM_vec3D_t Vk,Ve;
-#endif
 
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
@@ -2707,25 +2589,13 @@ void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
     }
   }
 
-  if (gl->model.fluid.AXISYMMETRIC) {
+  if (FALSE) {
     x1=np[l].bs->x[1];
     find_V(np[l],Vn);
     if (fabs(x1)<1e-15) fatal_error("No node must lie on the y=0 axis when AXISYMMETRIC is set to TRUE.");
     for (flux=0; flux<nf; flux++){
       dS_dU[flux][flux]=min(0.0,(-1.0/x1)*Vn[1]);
     }
-#ifdef _FLUID_PLASMA
-    for (spec=0; spec<ncs; spec++){
-      find_Vk(np, gl, l, spec, Vk);
-      //dS_dU[spec][spec]=min(0.0,(-1.0/x1)*Vk[1]);
-    }
-    find_Ve_from_J(np, gl, l, Ve);
-    //dS_dU[speceminus][speceminus]=min(0.0,(-1.0/x1)*Ve[1]);
-#endif
-#if _FLUID_EENERGY
-    find_Ve_from_J(np, gl, l, Ve);
-    //dS_dU[fluxee][fluxee]=min(0.0,(-1.0/x1)*Ve[1]);
-#endif
   }
 
 

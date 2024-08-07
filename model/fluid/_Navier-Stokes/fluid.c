@@ -52,9 +52,6 @@ void write_model_fluid_template(FILE **controlfile){
     "    Tmin=1.0e1;     Tmax=26.0e3;    {K}\n"
     "    Twmin=Tmin;     Twmax=Tmax;    {K}\n"
     "    wmin=1.0e-50;\n"
-#ifdef _2D
-    "    AXISYMMETRIC=NO;\n"
-#endif
     "    SetBodyForce(is,"if2DL("js,")if3DL("ks,")" ie,"if2DL("je,")if3DL("ke,")" 0.0{N/m3}"if2DL(",0.0{N/m3}")if3DL(",0.0{N/m3}")");\n"
     "    SetHeatDeposited(is,"if2DL("js,")if3DL("ks,")" ie,"if2DL("je,")if3DL("ke,")" 0.0 {W/m3});\n"
     "    {\n"
@@ -119,9 +116,8 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
     find_bool_var_from_codex(codex,"DIFFUSION",&gl->model.fluid.DIFFUSION);
     find_bool_var_from_codex(codex,"REACTING",&gl->model.fluid.REACTING);
 
-#ifdef _2D
-    find_bool_var_from_codex(codex,"AXISYMMETRIC",&gl->model.fluid.AXISYMMETRIC);
-#endif
+    if (SOAP_is_var_in_codex(codex, "AXISYMMETRIC")) fatal_error("AXISYMMETRIC within the Model(%s()) module is deprecated. Specify axisymmetric coordinates using the Metrics() module.",_FLUID_ACTIONNAME);
+
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;
   }

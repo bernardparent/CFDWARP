@@ -43,9 +43,6 @@ typedef struct {
 
 
 typedef struct {
-#ifdef _2D
-  bool AXISYMMETRIC;
-#endif
   bool DIFFUSION,REACTING;
   double zetaA1,zetaA3,zetaA2;
   double Pmin,Pmax,Tmin,Tmax,wmin,aref,Eref,
