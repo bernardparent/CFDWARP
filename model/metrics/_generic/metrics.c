@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define METRICSMODEL_FREESTREAMPRESERVING 2
 #define METRICSMODEL_AXISYMMETRIC 3
 
-#define AXISYMMETRIC_CELL_SLICE_ANGLE (pi/180.0)
+#define AXISYMMETRIC_CELL_SLICE_ANGLE (pi/100.0)
 
 
 
@@ -44,6 +44,8 @@ void write_metrics_template(FILE **controlfile){
 #ifdef _2D
   "  METRICSMODEL=METRICSMODEL_VIVIANDVINOKUR;\n"
   "    {use METRICSMODEL_AXISYMMETRIC for 2D axisymmetric flow}\n"
+  "  rmin_axisymmetric=1e-30;\n"
+  "    {keep to a low value; only used when METRICSMODEL_AXISYMMETRIC is specified}\n"
 #endif
 #ifdef _3D
   "  METRICSMODEL=METRICSMODEL_FREESTREAMPRESERVING;\n"
@@ -88,6 +90,9 @@ void read_metrics(char *argum, SOAP_codex_t *codex){
 #endif
       "."      
       );
+#ifdef _2D
+  find_double_var_from_codex(codex,"rmin_axisymmetric",&gl->model.metrics.rmin_axisymmetric);  
+#endif    
   SOAP_clean_added_vars(codex,numvarsinit);
 }
 
@@ -150,7 +155,8 @@ double _xaxi(np_t *np, gl_t *gl, long l, long dim, long dim1, long offset1, long
           tmp=cos(theta)*r;
         break;
         case 2:
-          tmp=sin(theta)*r;
+          tmp=sin(theta)*fabs(r);
+          if (fabs(r)<gl->model.metrics.rmin_axisymmetric) tmp=sin(theta)*gl->model.metrics.rmin_axisymmetric;
         break;
         default:
           fatal_error("Problem in _xaxi() function within metrics.c");
@@ -729,6 +735,10 @@ void find_side_projected_area_of_axisymmetric_cell(np_t *np, gl_t *gl, long l, d
   }
   // find projected area components
   for (dim=0; dim<nd; dim++) projarea[dim]=-ABtimesBD[dim]*Amag1-CAtimesDC[dim]*Amag2;
-    
+  
+  // set to the projected area to zero when r<gl->model.metrics.rmin_axisymmetric
+  if (fabs(np[l].bs->x[1])<gl->model.metrics.rmin_axisymmetric){
+    for (dim=0; dim<nd; dim++) projarea[dim]=0.0;
+  }
 }
 #endif

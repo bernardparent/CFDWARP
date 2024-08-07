@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 AUG 06b
+  * in model/metrics/_generic/metrics.c
+    - in write_metrics_template() and read_metrics(), added rmin_axisymmetric
+    - in _xaxi(), fixed a bug for the cell depth: should be sin(theta)*fabs(r) not sin(theta)*r
+    - in _xaxi(), added code for rmin_axisymmetric
+    - in find_side_projected_area_of_axisymmetric_cell(), added code for rmin_axisymmetric
+    
+
 2024 AUG 06a
   * in model/metrics/_generic/metrics.c
     - in find_Omega_and_X_at_node(), made modifications to find Omega and X using the
