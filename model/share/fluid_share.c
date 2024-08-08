@@ -1528,8 +1528,13 @@ void condition_Lambda_plus_minus_Harten(jacvars_t jacvarsp0, jacvars_t jacvarsp1
   Vp0=_Vstar_from_jacvars(jacvarsp0, metrics);
   Vp1=_Vstar_from_jacvars(jacvarsp1, metrics);
 
+  /* first, make sure the eigenvalues are within physically-realistic bounds and clip them if necessary */
   aref=max(ap0,ap1);
   Vref=max(fabs(Vp0),fabs(Vp1));
+  for (flux=0; flux<nf; flux++){
+    Lambdaplus[flux][flux]=min(Lambdaplus[flux][flux],Vref+aref/notzero(jacvarsp0.zetaA2,1e-99));
+    Lambdaminus[flux][flux]=max(Lambdaminus[flux][flux],-Vref-aref/notzero(jacvarsp0.zetaA2,1e-99));
+  }
 
   /* second, add entropy correction to prevent carbuncle */
   for (flux=0; flux<nf; flux++){
@@ -1537,6 +1542,7 @@ void condition_Lambda_plus_minus_Harten(jacvars_t jacvarsp0, jacvars_t jacvarsp1
     Lambdaminus[flux][flux]-=(Vref+aref)*zetaA1;
   }
 }
+
 
 
 void condition_Lambda_absolute_Peclet(gl_t *gl, jacvars_t jacvars, metrics_t metrics, sqmat_t Lambdaabs){
@@ -1559,12 +1565,10 @@ void condition_Lambda_absolute_Peclet(gl_t *gl, jacvars_t jacvars, metrics_t met
   }
 }
 
-
 void condition_Lambda_plus_minus_Peclet(np_t *np, gl_t *gl, long lp0, long theta,  jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
   long flux,dim,dim2;
   double sum,Xmag2min,Pe,zetaA1,Xmag2;
   double aref,Vref,ap0,ap1,Vp0,Vp1,factPe;
-
 
   zetaA1=jacvarsp0.zetaA1;
   ap0=_astar_from_jacvars(jacvarsp0,metrics);
@@ -1574,6 +1578,10 @@ void condition_Lambda_plus_minus_Peclet(np_t *np, gl_t *gl, long lp0, long theta
   
   aref=max(ap0,ap1);
   Vref=max(fabs(Vp0),fabs(Vp1));
+  for (flux=0; flux<nf; flux++){
+    Lambdaplus[flux][flux]=min(Lambdaplus[flux][flux],Vref+aref/notzero(jacvarsp0.zetaA2,1e-99));
+    Lambdaminus[flux][flux]=max(Lambdaminus[flux][flux],-Vref-aref/notzero(jacvarsp0.zetaA2,1e-99));
+  }
 
   Xmag2min=1e99;
   Xmag2=0.0;
@@ -1590,8 +1598,9 @@ void condition_Lambda_plus_minus_Peclet(np_t *np, gl_t *gl, long lp0, long theta
     Lambdaplus[flux][flux]+=(aref+Vref)*zetaA1*factPe;
     Lambdaminus[flux][flux]-=(aref+Vref)*zetaA1*factPe;
   }
-  
 }
+
+
 
 
 void condition_Lambda_plus_minus_Pascal(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
@@ -1605,8 +1614,13 @@ void condition_Lambda_plus_minus_Pascal(np_t *np, gl_t *gl, long lp0, long theta
   Vp0=_Vstar_from_jacvars(jacvarsp0, metrics);
   Vp1=_Vstar_from_jacvars(jacvarsp1, metrics);
 
+  /* first, make sure the eigenvalues are within physically-realistic bounds and clip them if necessary */
   aref=max(ap0,ap1);
   Vref=max(fabs(Vp0),fabs(Vp1));
+  for (flux=0; flux<nf; flux++){
+    Lambdaplus[flux][flux]=min(Lambdaplus[flux][flux],Vref+aref/notzero(jacvarsp0.zetaA2,1e-99));
+    Lambdaminus[flux][flux]=max(Lambdaminus[flux][flux],-Vref-aref/notzero(jacvarsp0.zetaA2,1e-99));
+  }
 
   /* second, add entropy correction to prevent carbuncle */
   lp1=_al(gl,lp0,theta,+1);
@@ -1643,12 +1657,15 @@ void condition_Lambda_plus_minus_Pascal(np_t *np, gl_t *gl, long lp0, long theta
 
 void condition_Lambda_plus_minus_Parent(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
   long flux,spec,dim,lp1;
-  double ap0,ap1,Vp0,Vp1,Vref,aref,factP,Pstarmax,Pstarmin;
+  double ap0,ap1,Vp0,Vp1,Vref,aref,factP,Pstarmax,Pstarmin,factcommon;
   double lambdaadd1,lambdaadd2,lambdaadd,alphamin,alphamax,alphamass;
-  flux_t LUstarp0,LUstarp1,alpha;
+  flux_t LUstarp0,LUstarp1,alpha,fact;
   sqmat_t Lambdap0,Lambdap1;
+  bool FACTCOMMON[nf];
 
 
+  /* FIRST, make sure the eigenvalues of the waves are within same order of magnitude as the spectral radius and, 
+     if not, blend them with Steger-Warming Eigenvalues    */
   ap0=_astar_from_jacvars(jacvarsp0,metrics);
   ap1=_astar_from_jacvars(jacvarsp1,metrics);
   Vp0=_Vstar_from_jacvars(jacvarsp0, metrics);
@@ -1657,10 +1674,26 @@ void condition_Lambda_plus_minus_Parent(np_t *np, gl_t *gl, long lp0, long theta
   find_Lambda_from_jacvars(jacvarsp1, metrics, Lambdap1);
   aref=max(ap0,ap1);
   Vref=max(fabs(Vp0),fabs(Vp1));
+  for (flux=0; flux<nf; flux++) FACTCOMMON[flux]=TRUE;
+#ifdef _FLUID_PLASMA
+  for (flux=0; flux<nf; flux++) {
+    if (flux<ncs) FACTCOMMON[flux]=FALSE;
+  }
+#endif
+  factcommon=1.0;
+  for (flux=0; flux<nf; flux++){
+    fact[flux]=min(1.0,(Vref+aref/notzero(jacvarsp0.zetaA2,1e-99))/notzero(max(Lambdaplus[flux][flux],-Lambdaminus[flux][flux]),1e-99));
+    if (FACTCOMMON[flux]) factcommon=min(factcommon,fact[flux]);
+  }
+  for (flux=0; flux<nf; flux++){
+    if (FACTCOMMON[flux]) fact[flux]=factcommon;
+  }
+  for (flux=0; flux<nf; flux++){
+    Lambdaplus[flux][flux]=(1.0-fact[flux])*max(0.0,Lambdap0[flux][flux])+fact[flux]*Lambdaplus[flux][flux];
+    Lambdaminus[flux][flux]=(1.0-fact[flux])*min(0.0,Lambdap1[flux][flux])+fact[flux]*Lambdaminus[flux][flux];
+  }
 
-
-
-  /* FIRST, add eigenvalue conditioning in vicinity of pressure gradients to prevent carbuncle */
+  /* SECOND, add eigenvalue conditioning in vicinity of pressure gradients to prevent carbuncle */
   lp1=_al(gl,lp0,theta,+1);
   Pstarmax=max(_Pstar(np[lp0],gl),_Pstar(np[lp1],gl));
   for (dim=0; dim<nd; dim++){
@@ -1691,7 +1724,7 @@ void condition_Lambda_plus_minus_Parent(np_t *np, gl_t *gl, long lp0, long theta
   }
 
 
-  /* SECOND, make sure the flux is positivity-preserving in multiple dimensions by conditioning the eigenvalues */
+  /* THIRD, make sure the flux is positivity-preserving in multiple dimensions by conditioning the eigenvalues */
   find_LUstar_from_jacvars(jacvarsp1, metrics, LUstarp1);
   find_LUstar_from_jacvars(jacvarsp0, metrics, LUstarp0);
 
@@ -1725,46 +1758,6 @@ void condition_Lambda_plus_minus_Parent(np_t *np, gl_t *gl, long lp0, long theta
 }
 
 
-void condition_Lambda_plus_minus_zetaA2(np_t *np, gl_t *gl, long lp0, long theta, jacvars_t jacvarsp0, jacvars_t jacvarsp1, metrics_t metrics,  sqmat_t Lambdaplus, sqmat_t Lambdaminus){
-  long flux;
-  double ap0,ap1,Vp0,Vp1,Vref,aref,factcommon;
-  flux_t fact;
-  sqmat_t Lambdap0,Lambdap1;
-  bool FACTCOMMON[nf];
-
-
-  /* make sure the eigenvalues of the waves are within same order of magnitude as the spectral radius and, 
-     if not, blend them with Steger-Warming Eigenvalues    */
-  ap0=_astar_from_jacvars(jacvarsp0,metrics);
-  ap1=_astar_from_jacvars(jacvarsp1,metrics);
-  Vp0=_Vstar_from_jacvars(jacvarsp0, metrics);
-  Vp1=_Vstar_from_jacvars(jacvarsp1, metrics);
-  find_Lambda_from_jacvars(jacvarsp0, metrics, Lambdap0);
-  find_Lambda_from_jacvars(jacvarsp1, metrics, Lambdap1);
-  aref=max(ap0,ap1);
-  Vref=max(fabs(Vp0),fabs(Vp1));
-  for (flux=0; flux<nf; flux++) FACTCOMMON[flux]=TRUE;
-/*
-#ifdef _FLUID_PLASMA
-  for (flux=0; flux<nf; flux++) {
-    if (flux<ncs) FACTCOMMON[flux]=FALSE;
-  }
-#endif
-*/
-  factcommon=1.0;
-  for (flux=0; flux<nf; flux++){
-    fact[flux]=min(1.0,(Vref+aref/max(jacvarsp0.zetaA2,1e-99))/max(max(Lambdaplus[flux][flux],-Lambdaminus[flux][flux]),1e-99));
-    if (FACTCOMMON[flux]) factcommon=min(factcommon,fact[flux]);
-  }
-  for (flux=0; flux<nf; flux++){
-    if (FACTCOMMON[flux]) fact[flux]=factcommon;
-  }
-  for (flux=0; flux<nf; flux++){
-    Lambdaplus[flux][flux]=(1.0-fact[flux])*max(0.0,Lambdap0[flux][flux])+fact[flux]*Lambdaplus[flux][flux];
-    Lambdaminus[flux][flux]=(1.0-fact[flux])*min(0.0,Lambdap1[flux][flux])+fact[flux]*Lambdaminus[flux][flux];
-  }
-
-}
 
 
 // as defined in "Computational Aerothermodynamic Simulation Issues on Unstructured Grids" by Gnoffo and White, AIAA 2004-2371
@@ -1869,7 +1862,6 @@ void condition_Lambda_plus_minus(np_t *np, gl_t *gl, long lp0, long theta, jacva
   /* make sure zetaA2 is within valid bounds */
   if (jacvarsp0.zetaA2<0.0) fatal_error("zetaA2 can not be negative.");
   if (jacvarsp0.zetaA2>1.0) fatal_error("zetaA2 can not be greater than 1.");
-  condition_Lambda_plus_minus_zetaA2(np, gl, lp0, theta, jacvarsp0, jacvarsp1, metrics,  Lambdaplus, Lambdaminus);
   if (EIGENVALCOND==EIGENVALCOND_DEFAULT) EIGENVALCOND=gl->cycle.resconv.EIGENVALCOND;
 
   switch (EIGENVALCOND){
@@ -1894,6 +1886,7 @@ void condition_Lambda_plus_minus(np_t *np, gl_t *gl, long lp0, long theta, jacva
       fatal_error("EIGENVALCOND=%ld is not valid in condition_Lambda_plus_minus().",EIGENVALCOND);
   }
 }
+
 #else //not defined _FLUID_NEUTRALSTRANSPORT
 
 void find_conditioned_Lambda_absolute_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, int EIGENVALCOND, sqmat_t Lambdaabs){
@@ -2569,7 +2562,7 @@ void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
   }
 
   if (gl->model.metrics.METRICSMODEL==METRICSMODEL_AXISYMMETRIC){
-    if (fabs(np[l].bs->x[1])<1e-15) fatal_error("No node must lie on or below the y=0 axis when METRICSMODEL is set to METRICSMODEL_AXISYMMETRIC.");
+    if (fabs(np[l].bs->x[1])<1e-10 && gl->model.metrics.axisymmetric_min_radius<fabs(np[l].bs->x[1])) fatal_error("When METRICSMODEL is set to METRICSMODEL_AXISYMMETRIC and wishing to locate a node at a distance less than 1e-10 m from the y axis, increase  axisymmetric_min_radius to more than 1e-10 m.");
     for (flux=0; flux<nf; flux++) S[flux]=0.0e0;
     find_side_projected_area_of_axisymmetric_cell(np, gl, l, projarea);
     for (dim=0; dim<nd; dim++) S[ns+dim]=2.0*projarea[dim]*_Pstar(np[l],gl)/_Omega(np[l],gl);  

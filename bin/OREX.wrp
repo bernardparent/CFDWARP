@@ -72,7 +72,7 @@
 
 
 
-caseno=1;
+caseno=10;
 
 if(caseno==1,  Vx=7456.3; Pinf=0.0726; Tinf=192.3;  Twall=422;   scalefactsheath=1.0; {alt=? km} );
 if(caseno==2,  Vx=7454.1; Pinf=0.163;  Tinf=188.7;  Twall=492;   scalefactsheath=1.0; {alt=? km} );
@@ -130,7 +130,7 @@ dtheta=0.1/180*pi;
 Tvinf=Tinf;
 Teinf=Tinf;
 
-gammaO=0.1;
+gammaO=0.00001;
 gammaN=gammaO;
 
 Grid(
@@ -210,6 +210,15 @@ Grid(
   Join(im1,js,im2,je, i, GG,0.8,1,1);
 );
 
+Metrics(
+  METRICSMODEL=METRICSMODEL_AXISYMMETRIC;
+    {use METRICSMODEL_AXISYMMETRIC for 2D axisymmetric flow}
+  axisymmetric_min_radius=0.01;
+    {meters; keep to a low value; only used when METRICSMODEL_AXISYMMETRIC is specified}
+  axisymmetric_slice_angle=pi/100.0;
+    {radians; keep to a low value; only used when METRICSMODEL_AXISYMMETRIC is specified}
+);
+
 
 Block(
   Fluid(
@@ -221,6 +230,39 @@ Block(
 
 
 Bdry(
+  NavierStokes(
+    {
+    _________________________________________________________________________________________
+
+    Boundary Condition Type           ID  Description
+    _________________________________________________________________________________________
+
+    BDRY_INFLOWSUPERSONIC             0   Inflow, supersonic
+    BDRY_INFLOWSUBSONIC1              7   Inflow, subsonic, Tstag, Pstag fixed, 1o
+    BDRY_INFLOWSUBSONICMASSFLOWFIXED1 g   Inflow, subsonic, Pstag, Massflow/Area fixed, 1o
+    BDRY_INFLOWINJECTION1             j   Inflow, param Tstag, Pstag, specCs 
+    BDRY_OUTFLOWSUPERSONIC1           1   Outflow, supersonic, 1o
+    BDRY_OUTFLOWSUBSONIC1             4   Outflow, subsonic, P fixed, param P, 1o
+    BDRY_OUTFLOWSUBSONICMFIXED1       f   Outflow, subsonic, M fixed, param M, 1o
+    BDRY_SYMMETRICAL2                 e   Symmetrical, 2o
+    BDRY_SYMMETRICAL1                 9   Symmetrical, 1o
+    BDRY_WALLTFIXED1                  3   Wall, T specified, param Twall
+    BDRY_WALLTFIXEDCATALYTIC1         h   Wall, T specified, param Twall, specO,specO2,gammaO, ...
+    BDRY_WALLTFIXEDINJECTION1         i   Wall, T specified, param Twall, specCs,mdotCs[kg/m2s], ...
+    BDRY_WALLADIABATIC1               6   Wall, Adiabatic
+    BDRY_SLIPWALL1                    c   Slip wall, Adiabatic, 1o
+    BDRY_FREESTREAM1                  2   Freestream, 1o, params Vx,Vy, P, T
+    _________________________________________________________________________________________
+    }
+    All(BDRY_WALLTFIXED1);
+    Plane("i",is,BDRY_OUTFLOWSUPERSONIC1);
+    Plane("i",ie,BDRY_OUTFLOWSUPERSONIC1);
+    gammeminus=0.1;
+    Region(is+1,js,ie-1,js,BDRY_WALLTFIXEDCATALYTIC1,Twall,specO,specO2,gammaO,specN,specN2,gammaN);
+    Plane("j",je,BDRY_INFLOWSUPERSONIC);
+    Region(is,je,  im1-1,je, BDRY_OUTFLOWSUPERSONIC1);
+    Region(im4+1,je,  ie,je,  BDRY_OUTFLOWSUPERSONIC1);
+  );
   NavierStokesPlasma(
     {
     _________________________________________________________________________________________
@@ -275,16 +317,32 @@ Bdry(
  
  
 Model(
+  NavierStokes(
+    DIFFUSION=YES;
+    REACTING=YES;
+    Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
+    Tmin=1.0e1;     Tmax=26.0e3;    {K}
+    Twmin=Tmin;     Twmax=Tmax;    {K}
+    wmin=1.0e-50;
+    SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
+    SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
+    {
+    AddHeatPoint(0.0{x,m},0.0{y,m}, 0.1{radius,m}, 0.0{W/m});
+    }
+  );
   NavierStokesPlasma(
-    TEMODEL=TEMODEL_TRANSPORT;
+    TEMODEL=TEMODEL_TRANSPORT_PARENT2024;
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     N2VIBMODEL=N2VIBMODEL_MACHERET;
     N2VIBJOULEHEATING=YES;
+    N2VIBJOULEHEATINGMODEL=N2VIBJOULEHEATINGMODEL_PARENT2024;
     INCLUDE_E_EFFECTS_ON_ION_MOBILITY=FALSE;
     INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY=FALSE;
     SCHOTTKY_EFFECT=FALSE;
+    emissivity=0.0;
     REACTING=YES;
-    emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
+    emfieldworkfact=1.0;   {factor multiplying the emfield work and heat source terms}
+    emfieldheatfact=1.0;
     sigmadiv=1e-10; {S/m}
     etdiv=1e-1;     {J/kg}
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
@@ -292,24 +350,30 @@ Model(
     Tvmin=Tmin;     Tvmax=Tmax;  {K}
     Temin=240;     Temax=60.0e3;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
+    wminN2=1e-3;
     wmin=1.0e-50;                  {min mass fraction allowed in the domain for neutrals}
     chiimin=1e-30;  chiimax=1.0;    {min and max ion molar fraction}
     chiemin=1e-12;  chiemax=1.0;    {min and max electron molar fraction}
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
-    AXISYMMETRIC=YES;
     SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
     SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
     {
     AddHeatPoint(0.0{x,m},0.0{y,m}, 0.1{radius,m}, 0.0{W/m});
     }
     HEAT_DEPOSITED_TO_ELECTRONS=FALSE;
+    QENSOURCETERMS=TRUE;
   );
   AirPlasma11s(
     CHEMMODEL=CHEMMODEL_DUNNKANG1973;
-    ADDITIONALREACTION=FALSE; {include reactions function of EoverN}
+    for (react,1,6, ADDITIONALREACTION[react]=FALSE;); {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE generally}
     QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}
   );
+  GuptaYos(
+    LNLAMBDA=LNLAMBDA_GUPTAYOS;
+    TRANSPORTMODEL=TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED;
+  );
+
   Epotential(
     Te_buffer=300.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,Te_buffer);  
                        needed to prevent convergence hangs where |E| becomes close to 0;
@@ -319,12 +383,37 @@ Model(
     SetRelativePermittivity(is,js, ie,je, 1.0 );
     SetSolidConductivity(is,js, ie,je, 0.0 {S/m});
     SetElectroMotiveForce(is,js, ie,je, 0.0{V/m},0.0{V/m}, 1e99{max power in W/m3});
-    AXISYMMETRIC=YES;
   );
 );
 
 
 Init(
+  NavierStokes(
+    {
+    _______________________________________________________________________________________
+
+    Initial Condition Type       Parameters
+    _______________________________________________________________________________________
+
+    INIT_TYPE1                   V[1]..V[nd],  T,  rho, w[1]..w[ns]
+    INIT_TYPE2                   M[1]..M[nd],  P,  T,   w[1]..w[ns]
+    INIT_TYPE3                   M[1]..M[nd],  Re, T,   w[1]..w[ns]
+    INIT_TYPE4                   Mmag, angles, P,  T,   w[1]..w[ns]
+    INIT_TYPE5                   V[1]..V[nd],  P,  T,   w[1]..w[ns]
+    INIT_TYPE6                   V[1]..V[nd],  P,  T,   chi[1]..chi[ns]
+    _______________________________________________________________________________________
+
+    }
+    Species("O2", "N2", "default");
+    w_O2=0.2375;
+    w_N2=0.7625;
+    w_default=1e-30;
+    All(INIT_TYPE5,Vx,0,Pinf,Tinf,w_O2,w_N2,w_default);
+    {
+    Bdry(BDRY_WALLTFIXED1, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default);
+    Region(is,js,  ie,je, INIT_TYPE2,Mx,My,P,T,w_O2,w_N2,w_default);
+    }
+  );
   NavierStokesPlasma(
     {
     _______________________________________________________________________________________
@@ -373,10 +462,14 @@ Init(
 
 
 Disc(
-  NavierStokesPlasma(
+  NavierStokes(
     zetaA1=1.0e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
-    zetaD=1.0;        {conditions the Dstar eigenvalues for the charged species}
+  );
+  NavierStokesPlasma(
+    zetaA1=0.3e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
+    zetaD=0.0;        {conditions the Dstar eigenvalues for the charged species}
     for (spec,1,numspec,
       if (SPECIESTYPE[spec]==SPECIESTYPE_IONPLUS,
         betag[spec]=1.0;
@@ -412,26 +505,6 @@ Disc(
 
 
 Cycle(
-  FavreReynoldsTv(
-    xiverge=1e-3;  {residual convergence threshold}
-    rhoref=0.1;    {reference density in kg/m3}
-    Tref=300.0;    {reference temperature in K}
-    Tvref=5000.0;  {reference vibrational temperature in K}
-    kref=1e4;      {reference turbulence kinetic energy in m2/s2}
-    psiref=1e8;    {reference specific dissipation rate of the TKE in 1/s for TURBMODEL_KOMEGA*
-                    reference dissipation rate of the TKE in m2/s3 for TURBMODEL_KEPSILON}
-    aref=sqrt(1.4*287*Tref);  {reference sound speed in m/s}
-    for (spec,1,numspec,
-      Uref[spec]=rhoref;
-    );
-    for (dim,1,numdim,
-      Uref[numspec+dim]=rhoref*aref;
-    );
-    Uref[numspec+numdim+1]=rhoref*aref*aref;
-    Uref[numspec+numdim+2]=rhoref*kref;  
-    Uref[numspec+numdim+3]=rhoref*psiref;  
-    Uref[numspec+numdim+4]=rhoref*700.0*Tvref;  
-  );
   NavierStokes(
     xiverge=1e-3;  {residual convergence threshold}
     rhoref=1.0;  {reference density in kg/m3}
@@ -486,15 +559,15 @@ Cycle(
       WriteDataFile(outputfilename);
     );
     if(iter==10001,exit(EXIT_SUCCESS););
-    sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
+    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
       CFL=0.01;
     );
     if (iter<1000*mf,
-      CFLmax=1.25;
+      CFLmax=0.5;
     ,{else}
-      CFLmax=1.5;
+      CFLmax=0.5;
     );
     CFL=min(CFL*1.03,CFLmax);
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
@@ -506,8 +579,8 @@ Cycle(
       );
       Lc=1e99;      {characteristic length scale in meters used to solve the emfield equation}
       relaxEMF=0.8; {relaxation factor forced on the update of the emfield variables}
-      UpdateEMField(Lc,relaxEMF,TSEMF_SOR,20); 
-      UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,2);
+      UpdateEMField(Lc,relaxEMF,TSEMF_SOR,100); 
+      UpdateEMField(Lc,relaxEMF,TSEMF_IMAF,5);
       {if(iter==6,exit(EXIT_SUCCESS););}
       printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %E (%4ld,%4ld)  %s\n",
              CFL,iter,effiter_U,ximax,i_ximax,
@@ -524,6 +597,6 @@ Cycle(
 
 Post(
   for(i,round(ie/2),ie,
-    fprintf(postfilename,"%E %+E\n",_y(i,js),_Qheat(i,js, i,je, BDRY_WALLTFIXED1));
+    fprintf(postfilename,"%E %+E\n",_y(i,js),_Qheat(i,js, i,je, BDRY_WALLTFIXEDCATALYTIC1)/(_Area(i,js, i,je, 1,BDRY_WALLTFIXEDCATALYTIC1)^2+_Area(i,js, i,je, 2,BDRY_WALLTFIXEDCATALYTIC1)^2)^0.5);
   );
 );

@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 AUG 08a
+  * in model/share/fluid_share.c
+    - deleted condition_Lambda_plus_minus_zetaA2()
+    - in condition_Lambda_plus_minus_Harten(), condition_Lambda_plus_minus_Pascal(),
+      condition_Lambda_plus_minus_Parent(), got rid of call to condition_Lambda_plus_minus_zetaA2()
+      and reverted functions to 23jan03b version
+      
+
 2024 AUG 07a
   * in model/emfield/_Epotential*/emfield.c
     - in find_Sstar_emfield(), git rid of axisymmetric source terms
@@ -2288,12 +2296,12 @@ ________________________________________________________________________________
     - improved the coding related to pointers, reallocs, and mallocs 
       
 
-2023 JAN 02b
+2023 JAN 03b
   * in model/chem/_C2H4_Air_Plasma_36s/chem.c
     - implemented version 4 of the Adamovich model
 
 
-2023 JAN 02a
+2023 JAN 03a
   * in model/fluid/_Favre-Reynolds/fluid_conv.c
     - changed some comments related to EIGENSET
   * in model/fluid/_Navier-Stokes/fluid_conv.c
