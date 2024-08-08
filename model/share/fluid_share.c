@@ -2539,12 +2539,9 @@ void find_init_number_density_templates(char **specstr1, char **specstr2){
 
 #ifdef _2D
 
-/* see page 15 in "A new parabolized Navier-Stokes code for chemically reacting flow fields"
-by Dinesh Kumble Prabhu, Iowa State University
-*/
 void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
   long flux;
-  double x1;
+  double x1,Pstar;
   dim_t Vn;
   dim_t projarea;
   long dim;
@@ -2565,7 +2562,9 @@ void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
     if (fabs(np[l].bs->x[1])<1e-10 && gl->model.metrics.axisymmetric_min_radius<fabs(np[l].bs->x[1])) fatal_error("When METRICSMODEL is set to METRICSMODEL_AXISYMMETRIC and wishing to locate a node at a distance less than 1e-10 m from the y axis, increase  axisymmetric_min_radius to more than 1e-10 m.");
     for (flux=0; flux<nf; flux++) S[flux]=0.0e0;
     find_side_projected_area_of_axisymmetric_cell(np, gl, l, projarea);
-    for (dim=0; dim<nd; dim++) S[ns+dim]=2.0*projarea[dim]*_Pstar(np[l],gl)/_Omega(np[l],gl);  
+    Pstar=_Pstar(np[l],gl);
+    //Pstar=0.5*_Pstar(np[l],gl)+0.25*_Pstar(np[_al(gl,l,1,+1)],gl)+0.25*_Pstar(np[_al(gl,l,1,-1)],gl);
+    for (dim=0; dim<nd; dim++) S[ns+dim]=2.0*projarea[dim]*Pstar/_Omega(np[l],gl);  
   }
 }
 

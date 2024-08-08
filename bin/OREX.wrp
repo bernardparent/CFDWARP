@@ -72,7 +72,7 @@
 
 
 
-caseno=10;
+caseno=1;
 
 if(caseno==1,  Vx=7456.3; Pinf=0.0726; Tinf=192.3;  Twall=422;   scalefactsheath=1.0; {alt=? km} );
 if(caseno==2,  Vx=7454.1; Pinf=0.163;  Tinf=188.7;  Twall=492;   scalefactsheath=1.0; {alt=? km} );
@@ -213,7 +213,7 @@ Grid(
 Metrics(
   METRICSMODEL=METRICSMODEL_AXISYMMETRIC;
     {use METRICSMODEL_AXISYMMETRIC for 2D axisymmetric flow}
-  axisymmetric_min_radius=0.01;
+  axisymmetric_min_radius=0.2/mf;
     {meters; keep to a low value; only used when METRICSMODEL_AXISYMMETRIC is specified}
   axisymmetric_slice_angle=pi/100.0;
     {radians; keep to a low value; only used when METRICSMODEL_AXISYMMETRIC is specified}
@@ -467,7 +467,7 @@ Disc(
     zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
   );
   NavierStokesPlasma(
-    zetaA1=0.3e0;    {conditions the eigenvalue of the A jacobian}
+    zetaA1=1.0e0;    {conditions the eigenvalue of the A jacobian}
     zetaA2=0.1e0;     {conditions eigenvalues so they don't go out of bound; set to 0.1-0.5}
     zetaD=0.0;        {conditions the Dstar eigenvalues for the charged species}
     for (spec,1,numspec,
@@ -558,11 +558,11 @@ Cycle(
     if (mod(iter,100)==0,
       WriteDataFile(outputfilename);
     );
-    if(iter==10001,exit(EXIT_SUCCESS););
+    if(iter==20001,exit(EXIT_SUCCESS););
     sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
-      CFL=0.01;
+      CFL=0.001;
     );
     if (iter<1000*mf,
       CFLmax=0.5;
