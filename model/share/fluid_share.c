@@ -2564,7 +2564,16 @@ void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
     find_side_projected_area_of_axisymmetric_cell(np, gl, l, projarea);
     Pstar=_Pstar(np[l],gl);
     //Pstar=0.5*_Pstar(np[l],gl)+0.25*_Pstar(np[_al(gl,l,1,+1)],gl)+0.25*_Pstar(np[_al(gl,l,1,-1)],gl);
-    for (dim=0; dim<nd; dim++) S[ns+dim]=2.0*projarea[dim]*Pstar/_Omega(np[l],gl);  
+    for (dim=0; dim<nd; dim++) S[ns+dim]=2.0*projarea[dim]*Pstar/_Omega(np[l],gl); 
+    if (fabs(np[l].bs->x[1])<gl->model.metrics.axisymmetric_min_radius){
+      x1=np[l].bs->x[1];
+      find_V(np[l],Vn);
+      if (fabs(x1)<1e-15) fatal_error("No node must lie on the y=0 axis when AXISYMMETRIC is set to TRUE.");
+      for (flux=0; flux<nf; flux++){
+        S[flux]=(-1.0/x1)*Vn[1]*np[l].bs->U[flux];
+      }
+      S[fluxet]+=(-1.0/x1)*Vn[1]*_Pstar(np[l],gl);
+    }
   }
 }
 

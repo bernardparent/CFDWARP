@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 AUG 08c
+  * in model/metrics/_generic/metrics.c
+    - in find_side_projected_area_of_axisymmetric_cell(), does not set anymore the projected area 
+      to zero when r<gl->model.metrics.axisymmetric_min_radius (this is not
+      needed and should be a consequence of what values the _xaxi() function gives)
+  * in model/share/fluid_share.c
+    - in find_Saxi(), not add axisymmetric source terms when r<gl->model.metrics.axisymmetric_min_radius
+  * in bin/OREX.wrp
+    - made some changes
+    
+
 2024 AUG 08b
   * in bin/OREX.wrp
     - made some changes

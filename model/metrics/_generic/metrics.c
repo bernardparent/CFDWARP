@@ -739,9 +739,9 @@ void find_side_projected_area_of_axisymmetric_cell(np_t *np, gl_t *gl, long l, d
   // find projected area components
   for (dim=0; dim<nd; dim++) projarea[dim]=-ABtimesBD[dim]*Amag1-CAtimesDC[dim]*Amag2;
   
-  // set to the projected area to zero when r<gl->model.metrics.gl->model.metrics.axisymmetric_min_radius
-  if (fabs(np[l].bs->x[1])<gl->model.metrics.axisymmetric_min_radius){
+  // set to the projected area to zero when r<gl->model.metrics.axisymmetric_min_radius
+  /*if (fabs(np[l].bs->x[1])<gl->model.metrics.axisymmetric_min_radius){
     for (dim=0; dim<nd; dim++) projarea[dim]=0.0;
-  }
+  }*/
 }
 #endif

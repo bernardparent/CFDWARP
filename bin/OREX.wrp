@@ -213,7 +213,7 @@ Grid(
 Metrics(
   METRICSMODEL=METRICSMODEL_AXISYMMETRIC;
     {use METRICSMODEL_AXISYMMETRIC for 2D axisymmetric flow}
-  axisymmetric_min_radius=0.2/mf;
+  axisymmetric_min_radius=0.2;
     {meters; keep to a low value; only used when METRICSMODEL_AXISYMMETRIC is specified}
   axisymmetric_slice_angle=pi/100.0;
     {radians; keep to a low value; only used when METRICSMODEL_AXISYMMETRIC is specified}
