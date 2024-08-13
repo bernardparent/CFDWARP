@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 AUG 13a
+  * in model/metrics/_generic/metrics.c
+    - added RMINMODEL constant and set it by default to RMINMODEL_PARABOLIC
+    - in _xaxi(), added METRICSRMIN parameter
+    - in _xaxi(), added code for RMINMODEL_PARABOLIC
+    - in find_point_in_between_8_nodes_axi(), added parameter METRICSRMIN
+    - in find_side_projected_area_of_axisymmetric_cell(), added parameter METRICSRMIN
+  * in model/share/fluid_share.c
+    - in find_Saxi(), now finds axi projected area projarea_rminon and projarea_rminoff
+    - now blends smoothly the axisymmetric source terms (inversely propertional to the radius) 
+      using  projarea_rminon and projarea_rminoff: this avoids a sharp change in strategy at r=rmin
+    
+
 2024 AUG 08c
   * in model/metrics/_generic/metrics.c
     - in find_side_projected_area_of_axisymmetric_cell(), does not set anymore the projected area 

@@ -2541,9 +2541,9 @@ void find_init_number_density_templates(char **specstr1, char **specstr2){
 
 void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
   long flux;
-  double x1,Pstar;
+  double x1,Pstar,fact;
   dim_t Vn;
-  dim_t projarea;
+  dim_t projarea_rminon,projarea_rminoff;
   long dim;
 
   for (flux=0; flux<nf; flux++) S[flux]=0.0e0;
@@ -2561,19 +2561,25 @@ void find_Saxi(np_t *np, gl_t *gl, long l, flux_t S){
   if (gl->model.metrics.METRICSMODEL==METRICSMODEL_AXISYMMETRIC){
     if (fabs(np[l].bs->x[1])<1e-10 && gl->model.metrics.axisymmetric_min_radius<fabs(np[l].bs->x[1])) fatal_error("When METRICSMODEL is set to METRICSMODEL_AXISYMMETRIC and wishing to locate a node at a distance less than 1e-10 m from the y axis, increase  axisymmetric_min_radius to more than 1e-10 m.");
     for (flux=0; flux<nf; flux++) S[flux]=0.0e0;
-    find_side_projected_area_of_axisymmetric_cell(np, gl, l, projarea);
+    find_side_projected_area_of_axisymmetric_cell(np, gl, l, METRICSRMIN_ON, projarea_rminon);
+    find_side_projected_area_of_axisymmetric_cell(np, gl, l, METRICSRMIN_OFF, projarea_rminoff);
     Pstar=_Pstar(np[l],gl);
     //Pstar=0.5*_Pstar(np[l],gl)+0.25*_Pstar(np[_al(gl,l,1,+1)],gl)+0.25*_Pstar(np[_al(gl,l,1,-1)],gl);
-    for (dim=0; dim<nd; dim++) S[ns+dim]=2.0*projarea[dim]*Pstar/_Omega(np[l],gl); 
-    if (fabs(np[l].bs->x[1])<gl->model.metrics.axisymmetric_min_radius){
+    for (dim=0; dim<nd; dim++) S[ns+dim]=2.0*projarea_rminon[dim]*Pstar/_Omega(np[l],gl); 
+//    if (fabs(np[l].bs->x[1])<gl->model.metrics.axisymmetric_min_radius){
+      fact=1.0-sqrt((sqr(projarea_rminon[1])+sqr(projarea_rminon[0]))/notzero((sqr(projarea_rminoff[1])+sqr(projarea_rminoff[0])),1e-20));
+      assert(fact<=1.0);
+      assert(fact>=0.0);
       x1=np[l].bs->x[1];
       find_V(np[l],Vn);
-      if (fabs(x1)<1e-15) fatal_error("No node must lie on the y=0 axis when AXISYMMETRIC is set to TRUE.");
-      for (flux=0; flux<nf; flux++){
-        S[flux]=(-1.0/x1)*Vn[1]*np[l].bs->U[flux];
+      //if (fabs(x1)<1e-15) fatal_error("No node must lie on the y=0 axis when AXISYMMETRIC is set to TRUE.");
+      if (fabs(x1)>1e-15) {
+        for (flux=0; flux<nf; flux++){
+          S[flux]+=(-1.0/x1)*Vn[1]*np[l].bs->U[flux]*fact;
+        }
+        S[fluxet]+=(-1.0/x1)*Vn[1]*_Pstar(np[l],gl)*fact;
       }
-      S[fluxet]+=(-1.0/x1)*Vn[1]*_Pstar(np[l],gl);
-    }
+//    }
   }
 }
 
@@ -2582,6 +2588,8 @@ void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
   long row,col;
   long flux;
   double x1;
+  dim_t projarea_rminon,projarea_rminoff;
+  double fact;
   dim_t Vn;
 
   for (row=0; row<nf; row++){
@@ -2591,11 +2599,15 @@ void find_dSaxi_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
   }
 
   if (FALSE) {
+    find_side_projected_area_of_axisymmetric_cell(np, gl, l, METRICSRMIN_ON, projarea_rminon);
+    find_side_projected_area_of_axisymmetric_cell(np, gl, l, METRICSRMIN_OFF, projarea_rminoff);
+    fact=1.0-sqrt((sqr(projarea_rminon[1])+sqr(projarea_rminon[0]))/notzero((sqr(projarea_rminoff[1])+sqr(projarea_rminoff[0])),1e-20));
+    
     x1=np[l].bs->x[1];
     find_V(np[l],Vn);
     if (fabs(x1)<1e-15) fatal_error("No node must lie on the y=0 axis when AXISYMMETRIC is set to TRUE.");
     for (flux=0; flux<nf; flux++){
-      dS_dU[flux][flux]=min(0.0,(-1.0/x1)*Vn[1]);
+      dS_dU[flux][flux]=min(0.0,(-1.0/x1)*Vn[1])*fact;
     }
   }
 

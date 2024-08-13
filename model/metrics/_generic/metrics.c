@@ -33,7 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define METRICSMODEL_AXISYMMETRIC 3
 
 
-
+#define RMINMODEL_CONSTANT 11
+#define RMINMODEL_PARABOLIC 12
+#define RMINMODEL RMINMODEL_PARABOLIC
 
 void write_metrics_template(FILE **controlfile){
   wfprintf(*controlfile,"\n\n");
@@ -124,8 +126,9 @@ double _x(np_t np, long dim){
 }
 
 #ifdef _2D
-double _xaxi(np_t *np, gl_t *gl, long l, long dim, long dim1, long offset1, long dim2, long offset2, long dim3, long offset3){
+double _xaxi(np_t *np, gl_t *gl, long l, long dim, long dim1, long offset1, long dim2, long offset2, long dim3, long offset3, int METRICSRMIN){
   double tmp,r,theta;
+  double z2,z3,rmin,rnew;
   long fact1,fact2,fact3;
   tmp=0.0;
   if (nd==2){
@@ -154,12 +157,28 @@ double _xaxi(np_t *np, gl_t *gl, long l, long dim, long dim1, long offset1, long
           tmp=np[_alll(gl,l,dim1,fact1*offset1,dim2,fact2*offset2,dim3,fact3*offset3)].bs->x[0];
         break;
         case 1:
-          tmp=cos(theta)*r;
+          tmp=r*cos(theta);
         break;
         case 2:
-          tmp=sin(theta)*fabs(r);
-          if (fabs(r)<gl->model.metrics.axisymmetric_min_radius) 
-            tmp=sin(theta)*gl->model.metrics.axisymmetric_min_radius;
+          rnew=fabs(r)*cos(theta);
+          assert(rnew>=0.0);
+          tmp=tan(theta)*rnew;
+          if (METRICSRMIN==METRICSRMIN_ON && rnew<gl->model.metrics.axisymmetric_min_radius) {
+            switch (RMINMODEL){
+              case RMINMODEL_CONSTANT:
+                tmp=sin(theta)*gl->model.metrics.axisymmetric_min_radius;
+              break;
+              case RMINMODEL_PARABOLIC:
+                rmin=gl->model.metrics.axisymmetric_min_radius;
+                z2=rmin*tan(fabs(theta));
+                z3=z2+sqr(rmin)/notzero(z2,1e-31);
+                assert(sqr(z3-z2)+sqr(rmin)-sqr(r)>0.0);
+                tmp=sign(theta)*(z3-sqrt(sqr(z3-z2)+sqr(rmin)-sqr(rnew)));
+              break;
+              default:
+                fatal_error("Problem with RMINMODEL in _xaxi().\n");
+            }              
+          }
         break;
         default:
           fatal_error("Problem in _xaxi() function within metrics.c");
@@ -195,24 +214,24 @@ void find_Omega_and_X_at_node(np_t *np, gl_t *gl, long l, double *Omega, dim2_t 
     case METRICSMODEL_AXISYMMETRIC:
       *Omega=0.0;
       for (i=0; i<3; i++){
-        *Omega+=0.125e0*(_xaxi(np,gl,l,0,mod(i+0,3),+1,0,0,0,0)-_xaxi(np,gl,l,0,mod(i+0,3),-1,0,0,0,0))
-                     *(_xaxi(np,gl,l,1,mod(i+1,3),+1,0,0,0,0)-_xaxi(np,gl,l,1,mod(i+1,3),-1,0,0,0,0))
-                     *(_xaxi(np,gl,l,2,mod(i+2,3),+1,0,0,0,0)-_xaxi(np,gl,l,2,mod(i+2,3),-1,0,0,0,0))
-               -0.125e0*(_xaxi(np,gl,l,0,mod(i+0,3),+1,0,0,0,0)-_xaxi(np,gl,l,0,mod(i+0,3),-1,0,0,0,0))
-                     *(_xaxi(np,gl,l,1,mod(i+2,3),+1,0,0,0,0)-_xaxi(np,gl,l,1,mod(i+2,3),-1,0,0,0,0))
-                     *(_xaxi(np,gl,l,2,mod(i+1,3),+1,0,0,0,0)-_xaxi(np,gl,l,2,mod(i+1,3),-1,0,0,0,0));
+        *Omega+=0.125e0*(_xaxi(np,gl,l,0,mod(i+0,3),+1,0,0,0,0,METRICSRMIN_ON)-_xaxi(np,gl,l,0,mod(i+0,3),-1,0,0,0,0,METRICSRMIN_ON))
+                     *(_xaxi(np,gl,l,1,mod(i+1,3),+1,0,0,0,0,METRICSRMIN_ON)-_xaxi(np,gl,l,1,mod(i+1,3),-1,0,0,0,0,METRICSRMIN_ON))
+                     *(_xaxi(np,gl,l,2,mod(i+2,3),+1,0,0,0,0,METRICSRMIN_ON)-_xaxi(np,gl,l,2,mod(i+2,3),-1,0,0,0,0,METRICSRMIN_ON))
+               -0.125e0*(_xaxi(np,gl,l,0,mod(i+0,3),+1,0,0,0,0,METRICSRMIN_ON)-_xaxi(np,gl,l,0,mod(i+0,3),-1,0,0,0,0,METRICSRMIN_ON))
+                     *(_xaxi(np,gl,l,1,mod(i+2,3),+1,0,0,0,0,METRICSRMIN_ON)-_xaxi(np,gl,l,1,mod(i+2,3),-1,0,0,0,0,METRICSRMIN_ON))
+                     *(_xaxi(np,gl,l,2,mod(i+1,3),+1,0,0,0,0,METRICSRMIN_ON)-_xaxi(np,gl,l,2,mod(i+1,3),-1,0,0,0,0,METRICSRMIN_ON));
       }
       for (i=0; i<nd; i++){
         for (j=0; j<nd; j++){
           X[i][j]=0.25e0/(*Omega)*(
-            (+_xaxi(np,gl,l,mod(j+1,3),mod(i+1,3),+1,0,0,0,0)  
-             -_xaxi(np,gl,l,mod(j+1,3),mod(i+1,3),-1,0,0,0,0))
-           *(+_xaxi(np,gl,l,mod(j+2,3),mod(i+2,3),+1,0,0,0,0)
-             -_xaxi(np,gl,l,mod(j+2,3),mod(i+2,3),-1,0,0,0,0))
-           -(+_xaxi(np,gl,l,mod(j+2,3),mod(i+1,3),+1,0,0,0,0) 
-             -_xaxi(np,gl,l,mod(j+2,3),mod(i+1,3),-1,0,0,0,0))
-           *(+_xaxi(np,gl,l,mod(j+1,3),mod(i+2,3),+1,0,0,0,0)
-             -_xaxi(np,gl,l,mod(j+1,3),mod(i+2,3),-1,0,0,0,0))
+            (+_xaxi(np,gl,l,mod(j+1,3),mod(i+1,3),+1,0,0,0,0,METRICSRMIN_ON)  
+             -_xaxi(np,gl,l,mod(j+1,3),mod(i+1,3),-1,0,0,0,0,METRICSRMIN_ON))
+           *(+_xaxi(np,gl,l,mod(j+2,3),mod(i+2,3),+1,0,0,0,0,METRICSRMIN_ON)
+             -_xaxi(np,gl,l,mod(j+2,3),mod(i+2,3),-1,0,0,0,0,METRICSRMIN_ON))
+           -(+_xaxi(np,gl,l,mod(j+2,3),mod(i+1,3),+1,0,0,0,0,METRICSRMIN_ON) 
+             -_xaxi(np,gl,l,mod(j+2,3),mod(i+1,3),-1,0,0,0,0,METRICSRMIN_ON))
+           *(+_xaxi(np,gl,l,mod(j+1,3),mod(i+2,3),+1,0,0,0,0,METRICSRMIN_ON)
+             -_xaxi(np,gl,l,mod(j+1,3),mod(i+2,3),-1,0,0,0,0,METRICSRMIN_ON))
            );
         }
       }
@@ -275,12 +294,12 @@ static double _dx_dX_int_axi(np_t *np, gl_t *gl, long lL, long lR, long theta,
   double tmp;
 
   if (dimX==theta) {
-    tmp=_xaxi(np, gl, lR, dimx, 0, 0, 0, 0, 0, 0) -_xaxi(np, gl, lL, dimx, 0, 0, 0, 0, 0, 0) ;
+    tmp=_xaxi(np, gl, lR, dimx, 0, 0, 0, 0, 0, 0, METRICSRMIN_ON) -_xaxi(np, gl, lL, dimx, 0, 0, 0, 0, 0, 0, METRICSRMIN_ON) ;
   } else {
-    tmp=0.25e0*(_xaxi(np, gl, lL, dimx, dimX, +1, 0, 0, 0, 0)
-               -_xaxi(np, gl, lL, dimx, dimX, -1, 0, 0, 0, 0))
-       +0.25e0*(_xaxi(np, gl, lR, dimx, dimX, +1, 0, 0, 0, 0)
-               -_xaxi(np, gl, lR, dimx, dimX, -1, 0, 0, 0, 0));
+    tmp=0.25e0*(_xaxi(np, gl, lL, dimx, dimX, +1, 0, 0, 0, 0, METRICSRMIN_ON)
+               -_xaxi(np, gl, lL, dimx, dimX, -1, 0, 0, 0, 0, METRICSRMIN_ON))
+       +0.25e0*(_xaxi(np, gl, lR, dimx, dimX, +1, 0, 0, 0, 0, METRICSRMIN_ON)
+               -_xaxi(np, gl, lR, dimx, dimX, -1, 0, 0, 0, 0, METRICSRMIN_ON));
   }
 
   return(tmp);
@@ -307,19 +326,19 @@ static void find_point_in_between_8_nodes(np_t *np, gl_t *gl, long l, long dim1,
 #endif
 
 #ifdef _2D
-static void find_point_in_between_8_nodes_axi(np_t *np, gl_t *gl, long l, long dim1, long dim1sgn, long dim2, long dim2sgn, long dim3, long dim3sgn, EXM_vec3D_t a){
+static void find_point_in_between_8_nodes_axi(np_t *np, gl_t *gl, long l, long dim1, long dim1sgn, long dim2, long dim2sgn, long dim3, long dim3sgn, int METRICSRMIN, EXM_vec3D_t a){
   long dim; 
 
   for (dim=0; dim<3; dim++){
     a[dim]=0.125*(
-             _xaxi(np, gl, l, dim, 0, 0, 0, 0, 0, 0)
-            +_xaxi(np, gl, l, dim, dim1, dim1sgn, 0, 0, 0, 0) 
-            +_xaxi(np, gl, l, dim, dim2, dim2sgn, 0, 0, 0, 0) 
-            +_xaxi(np, gl, l, dim, dim1, dim1sgn, dim2, dim2sgn, 0, 0) 
-            +_xaxi(np, gl, l, dim, dim3, dim3sgn, 0, 0, 0, 0) 
-            +_xaxi(np, gl, l, dim, dim1, dim1sgn, dim3, dim3sgn, 0, 0) 
-            +_xaxi(np, gl, l, dim, dim2, dim2sgn, dim3, dim3sgn, 0, 0) 
-            +_xaxi(np, gl, l, dim, dim1, dim1sgn, dim2, dim2sgn, dim3, dim3sgn) 
+             _xaxi(np, gl, l, dim, 0, 0, 0, 0, 0, 0, METRICSRMIN)
+            +_xaxi(np, gl, l, dim, dim1, dim1sgn, 0, 0, 0, 0, METRICSRMIN) 
+            +_xaxi(np, gl, l, dim, dim2, dim2sgn, 0, 0, 0, 0, METRICSRMIN) 
+            +_xaxi(np, gl, l, dim, dim1, dim1sgn, dim2, dim2sgn, 0, 0, METRICSRMIN) 
+            +_xaxi(np, gl, l, dim, dim3, dim3sgn, 0, 0, 0, 0, METRICSRMIN) 
+            +_xaxi(np, gl, l, dim, dim1, dim1sgn, dim3, dim3sgn, 0, 0, METRICSRMIN) 
+            +_xaxi(np, gl, l, dim, dim2, dim2sgn, dim3, dim3sgn, 0, 0, METRICSRMIN) 
+            +_xaxi(np, gl, l, dim, dim1, dim1sgn, dim2, dim2sgn, dim3, dim3sgn, METRICSRMIN) 
            );
   }
 }
@@ -355,10 +374,10 @@ void find_Omega_and_X_at_interface(np_t *np, gl_t *gl, long lL, long lR, long th
                   *_dx_dX_int_axi(np,gl,lL,lR,theta,1,mod(i+2,3))
                   *_dx_dX_int_axi(np,gl,lL,lR,theta,2,mod(i+1,3));
       }
-      find_point_in_between_8_nodes_axi(np,gl,lL,theta,+1,mod(theta+1,3),+1,mod(theta+2,3),-1,a);
-      find_point_in_between_8_nodes_axi(np,gl,lL,theta,+1,mod(theta+1,3),+1,mod(theta+2,3),+1,b);
-      find_point_in_between_8_nodes_axi(np,gl,lL,theta,+1,mod(theta+1,3),-1,mod(theta+2,3),+1,c);
-      find_point_in_between_8_nodes_axi(np,gl,lL,theta,+1,mod(theta+1,3),-1,mod(theta+2,3),-1,d);
+      find_point_in_between_8_nodes_axi(np,gl,lL,theta,+1,mod(theta+1,3),+1,mod(theta+2,3),-1,METRICSRMIN_ON,a);
+      find_point_in_between_8_nodes_axi(np,gl,lL,theta,+1,mod(theta+1,3),+1,mod(theta+2,3),+1,METRICSRMIN_ON,b);
+      find_point_in_between_8_nodes_axi(np,gl,lL,theta,+1,mod(theta+1,3),-1,mod(theta+2,3),+1,METRICSRMIN_ON,c);
+      find_point_in_between_8_nodes_axi(np,gl,lL,theta,+1,mod(theta+1,3),-1,mod(theta+2,3),-1,METRICSRMIN_ON,d);
 
       for (i=0; i<3; i++){
         ba[i]=b[i]-a[i];
@@ -703,15 +722,15 @@ double _distance_between_near_bdry_node_and_boundary_plane(np_t *np, gl_t *gl, l
 
 
 #ifdef _2D
-void find_side_projected_area_of_axisymmetric_cell(np_t *np, gl_t *gl, long l, dim_t projarea){
+void find_side_projected_area_of_axisymmetric_cell(np_t *np, gl_t *gl, long l, int METRICSRMIN, dim_t projarea){
   EXM_vec3D_t A,B,C,D,AB,BD,CA,DC,ABtimesBD,CAtimesDC;
   double Amag1,Amag2,vecmag;
   long dim;
   // first do the face at k=+1/2
-  find_point_in_between_8_nodes_axi(np, gl, l, +0,-1, +1,-1, +2,+1, A);
-  find_point_in_between_8_nodes_axi(np, gl, l, +0,-1, +1,+1, +2,+1, B);
-  find_point_in_between_8_nodes_axi(np, gl, l, +0,+1, +1,-1, +2,+1, C);
-  find_point_in_between_8_nodes_axi(np, gl, l, +0,+1, +1,+1, +2,+1, D);
+  find_point_in_between_8_nodes_axi(np, gl, l, +0,-1, +1,-1, +2,+1, METRICSRMIN, A);
+  find_point_in_between_8_nodes_axi(np, gl, l, +0,-1, +1,+1, +2,+1, METRICSRMIN, B);
+  find_point_in_between_8_nodes_axi(np, gl, l, +0,+1, +1,-1, +2,+1, METRICSRMIN, C);
+  find_point_in_between_8_nodes_axi(np, gl, l, +0,+1, +1,+1, +2,+1, METRICSRMIN, D);
   // find segments of both triangles: one triangle is A-B-D and the other triangle is A-C-D
   for (dim=0; dim<3; dim++) {
     AB[dim]=B[dim]-A[dim];

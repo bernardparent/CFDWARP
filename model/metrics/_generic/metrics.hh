@@ -10,6 +10,9 @@
   #define METRICSMODEL_AXISYMMETRIC 3
 #endif
 
+#define METRICSRMIN_OFF 0
+#define METRICSRMIN_ON 1
+
 typedef struct {
   int METRICSMODEL;
 #ifdef _2D
