@@ -3,7 +3,7 @@
 
                                            C F D W A R P
 
-                                CFD Code for Plasma & Reactive Flow
+                      Computational Fluid Dynamics, Waves, Reactions, Plasmas
   _______________________________________________________________________________________________
 
   Version                          23oct02b
@@ -108,6 +108,13 @@ Grid(
 
 );
 
+
+Metrics(
+  METRICSMODEL=METRICSMODEL_VIVIANDVINOKUR;
+    {use METRICSMODEL_AXISYMMETRIC for 2D axisymmetric flow}
+);
+
+
 Block(
   Fluid(
     Cut(is,jm1,  im,jm2);
@@ -165,7 +172,6 @@ Model(
     kmin=1.0e-10;   kmax=9.9e99;   {min and max TKE allowed in the domain in m2/s2}
     psimin=1e-10;   psimax=9.9e99; {min and max omega/epsilon allowed in the domain}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain}
-    AXISYMMETRIC=NO;
     SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
     SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
   );

@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 AUG 30a
+  * in bin/*.wrp
+    - added the Metrics() module
+    - got rid of AXISYMMETRIC=.. within Model()
+    - added the new CFDWARP acronym in each control file
+  * in model/metrics/_generic/metrics.c
+    - in write_metrics_template(), removed axisymmetric_min_radius and 
+      axisymmetric_slice_angle
+    - in read_metrics(), now only reads in axisymmetric_min_radius and axisymmetric_slice_angle
+      if METRICSMODEL==METRICSMODEL_AXISYMMETRIC
+      
+
 2024 AUG 13a
   * in model/metrics/_generic/metrics.c
     - added RMINMODEL constant and set it by default to RMINMODEL_PARABOLIC

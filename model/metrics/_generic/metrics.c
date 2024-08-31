@@ -45,10 +45,10 @@ void write_metrics_template(FILE **controlfile){
 #ifdef _2D
   "  METRICSMODEL=METRICSMODEL_VIVIANDVINOKUR;\n"
   "    {use METRICSMODEL_AXISYMMETRIC for 2D axisymmetric flow}\n"
-  "  axisymmetric_min_radius=1e-30;\n"
-  "    {meters; keep to a low value; only used when METRICSMODEL_AXISYMMETRIC is specified}\n"
-  "  axisymmetric_slice_angle=pi/100.0;\n"
-  "    {radians; keep to a low value; only used when METRICSMODEL_AXISYMMETRIC is specified}\n"
+//  "  axisymmetric_min_radius=1e-30;\n"
+//  "    {meters; keep to a low value; only used when METRICSMODEL_AXISYMMETRIC is specified}\n"
+//  "  axisymmetric_slice_angle=pi/100.0;\n"
+//  "    {radians; keep to a low value; only used when METRICSMODEL_AXISYMMETRIC is specified}\n"
 #endif
 #ifdef _3D
   "  METRICSMODEL=METRICSMODEL_FREESTREAMPRESERVING;\n"
@@ -94,8 +94,13 @@ void read_metrics(char *argum, SOAP_codex_t *codex){
       "."      
       );
 #ifdef _2D
-  find_double_var_from_codex(codex,"axisymmetric_min_radius",&gl->model.metrics.axisymmetric_min_radius);  
-  find_double_var_from_codex(codex,"axisymmetric_slice_angle",&gl->model.metrics.axisymmetric_slice_angle);  
+  if (gl->model.metrics.METRICSMODEL==METRICSMODEL_AXISYMMETRIC) {
+    find_double_var_from_codex(codex,"axisymmetric_min_radius",&gl->model.metrics.axisymmetric_min_radius);  
+    find_double_var_from_codex(codex,"axisymmetric_slice_angle",&gl->model.metrics.axisymmetric_slice_angle);  
+  } else { 
+    gl->model.metrics.axisymmetric_min_radius=1e-30;
+    gl->model.metrics.axisymmetric_slice_angle=1e-3;  
+  }
 #endif    
   SOAP_clean_added_vars(codex,numvarsinit);
 }
