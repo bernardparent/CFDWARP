@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 SEP 04a
+  * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
+    - fixed some mistakes affecting many BOLSIG+ curve fits
+    
+
 2024 AUG 30a
   * in bin/*.wrp
     - added the Metrics() module
