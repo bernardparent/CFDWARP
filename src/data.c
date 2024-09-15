@@ -474,7 +474,7 @@ void read_data_file_mpi(char *filename, np_t *np, gl_t *gl, long level){
 
   datafile = fopen(filename, "r");
   if (datafile==NULL)
-    fatal_error("Having problems opening datafile %s.",filename);
+    fatal_error("Having problems opening mpi datafile %s.",filename);
   for (cnt=0; cnt<16; cnt++) {
     if (fscanf(datafile,"%c",&(data_format_str[cnt]))!=1) fatal_error("Problem with fscanf in read_data_file_mpi().");
   }

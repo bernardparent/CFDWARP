@@ -1298,6 +1298,11 @@ int main ( int argc, char **argv ) {
   input.READDATAFILE = FALSE;
 #ifdef UNSTEADY
   input.M1 = FALSE;
+  input.MM1 = FALSE;
+  input.M2 = FALSE;
+  input.MM2 = FALSE;
+  input.M3 = FALSE;
+  input.MM3 = FALSE;
 #endif
   if (argc==1) output_options_help(linewidth);
   if ( process_flag_string ( argc, argv, "-r", &control_filename ) ){

@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 SEP 15a
+  * in model/chem/_N2_Plasma_4s/chem.c
+    - added the option TEFROMEOVERN
+  * in src/data.c
+    - in read_data_file_mpi(), made the fatal_error() message more clear
+  * in src/test.c
+    - in main(), fixed a bug: input.MM1, input.MM2, input.MM3, input.M2, input.M3 should
+      be set to FALSE
+      
+
 2024 SEP 04a
   * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
     - fixed some mistakes affecting many BOLSIG+ curve fits

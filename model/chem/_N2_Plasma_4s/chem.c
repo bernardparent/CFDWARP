@@ -48,6 +48,7 @@ void write_model_chem_template(FILE **controlfile){
     "  %s(\n"
     "    CHEMMODEL=CHEMMODEL_MACHERET2007;\n"
     "    QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}\n"
+    "    TEFROMEOVERN=FALSE;\n"
     "  );\n"
   ,_CHEM_ACTIONNAME);
 }
@@ -83,6 +84,7 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
         && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)
       SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_MACHERET2007 or CHEMMODEL_PARENT2023 or CHEMMODEL_PARENT2023B or CHEMMODEL_RODRIGUEZ2024 or CHEMMODEL_NONE.");
     find_bool_var_from_codex(codex,"QEISOURCETERMS",&gl->model.chem.QEISOURCETERMS);
+    find_bool_var_from_codex(codex,"TEFROMEOVERN",&gl->model.chem.TEFROMEOVERN);
 
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;
@@ -117,6 +119,7 @@ void find_dW_dx_None ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
 
 
 void find_W ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
+  if (gl->model.chem.TEFROMEOVERN) Te=_Te_from_rhok_EoverN(rhok, Estar);
   switch (gl->model.chem.CHEMMODEL){
     case CHEMMODEL_MACHERET2007: 
       find_W_Macheret2007 ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
@@ -142,6 +145,7 @@ void find_W ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, do
 void find_dW_dx ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
                   double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
+  if (gl->model.chem.TEFROMEOVERN) Te=_Te_from_rhok_EoverN(rhok, Estar);
   switch (gl->model.chem.CHEMMODEL){
     case CHEMMODEL_MACHERET2007: 
       find_dW_dx_Macheret2007 ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
@@ -167,6 +171,7 @@ void find_dW_dx ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv
 void find_Qei(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, double *Qei){
   
   *Qei=0.0;  
+  if (gl->model.chem.TEFROMEOVERN) Te=_Te_from_rhok_EoverN(rhok, Estar);
   if (gl->model.chem.QEISOURCETERMS){
     switch (gl->model.chem.CHEMMODEL){
       case CHEMMODEL_MACHERET2007: 
@@ -194,6 +199,7 @@ void find_Qei(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, double *Q
 void find_dQei_dx(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe){
   long spec;
   
+  if (gl->model.chem.TEFROMEOVERN) Te=_Te_from_rhok_EoverN(rhok, Estar);
   for (spec=0; spec<ns; spec++) dQeidrhok[spec]=0.0;
   *dQeidTe=0.0;  
   
