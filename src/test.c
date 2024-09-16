@@ -1271,13 +1271,16 @@ int main ( int argc, char **argv ) {
   input.READDATAFILE = FALSE;
 #ifdef UNSTEADY
   input.M1 = FALSE;
+  input.MM1 = FALSE;
   input.name_m1 = NULL;
 #if _RESTIME_BW > 2
   input.M2 = FALSE;
+  input.MM2 = FALSE;
   input.name_m2 = NULL;
 #endif
 #if _RESTIME_BW > 3
   input.M3 = FALSE;
+  input.MM3 = FALSE;
   input.name_m3 = NULL;
 #endif
 #endif //UNSTEADY
@@ -1296,14 +1299,6 @@ int main ( int argc, char **argv ) {
   CONTROL = FALSE;
   control_filename = NULL;
   input.READDATAFILE = FALSE;
-#ifdef UNSTEADY
-  input.M1 = FALSE;
-  input.MM1 = FALSE;
-  input.M2 = FALSE;
-  input.MM2 = FALSE;
-  input.M3 = FALSE;
-  input.MM3 = FALSE;
-#endif
   if (argc==1) output_options_help(linewidth);
   if ( process_flag_string ( argc, argv, "-r", &control_filename ) ){
     CONTROL = TRUE;

@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 SEP 15b
+  * in bin/cylinderinnerflow2D.wrp
+    - added a DualTimeStepping() module in Cycle()
+  * in src/test.c
+    - in main(), fixed bugs related to input.M*
+    
+
 2024 SEP 15a
   * in model/chem/_N2_Plasma_4s/chem.c
     - added the option TEFROMEOVERN

@@ -319,12 +319,16 @@ Disc(
     POSFILTER=POSFILTER_NONE;
     POSFILTER_numiter=4;
   );
+  Trapezoidal(
+    weightm1_convection=0.5;
+    weightm1_default=0.5;
+  );
 );
 
 
 Cycle(
   NavierStokesPerfect(
-    xiverge=1e-3;  {residual convergence threshold}
+    xiverge=1e-1;  {residual convergence threshold}
     rhoref=1.0;  {reference density in kg/m3}
     aref=300.0;  {reference sound speed in m/s}
     Uref[1]=rhoref;            
@@ -333,20 +337,27 @@ Cycle(
     );
     Uref[2+numdim]=rhoref*aref*aref;
   );
-  SteadyState(
-    if (mod(iter,50)==0,
-      WriteDataFile(outputfilename);
-    );
-    sigma1=0.0;   {exponent of maximum pseudotime step in all dimensions}
+  DualTimeStepping(
+    tmax=1e-3;    {simulation time span in seconds}
+    dt=tmax/30;   {physical time step in seconds}
+    sigma1=0.3;   {exponent of maximum pseudotime step in all dimensions}
     sigma2=0.0;   {exponent of maximum pseudotime step in all fluxes}
     if (iter==1,
-      CFL=0.01;
+      CFL=0.1;
     );
-    CFL=min(CFL*1.05,0.25);
-    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
+    CFL=min(CFL*1.25,0.8);
+    UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2,dt);
     printf("%6.2f %6ld %9.3f   %E (%2ld %4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,flux_ximax,i_ximax,
            j_ximax,clipinfo);
+    if (ximax<xiverge,
+      IncreaseTimeLevel();
+      WriteDataFile(outputfilename"."round(time/dt));
+      printf("dt=%E time=%Es\n",dt,time);
+      if (time>tmax-0.1*dt,
+        exit(EXIT_SUCCESS);
+      );
+    );
   );
 );
 
