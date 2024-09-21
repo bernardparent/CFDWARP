@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 SEP 21a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Semfield(), changed call to _E_dot_J_recast() by call to _E_dot_J()
+  * in model/share/emfield_share.c
+    - added find_vector_from_vectorstar()
+    - added find_E_for_EdotJe()
+    - in _E_dot_J() replaced find_E() by find_E_for_EdotJe()
+    - in _E_dot_Je_over_mueNe(), replaced find_E_smoothed() by find_E_for_EdotJe()
+     
+
 2024 SEP 15b
   * in bin/cylinderinnerflow2D.wrp
     - added a DualTimeStepping() module in Cycle()
