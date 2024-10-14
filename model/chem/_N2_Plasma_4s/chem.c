@@ -32,12 +32,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "parent2023.h"
 #include "parent2023b.h"
 #include "rodriguez2024.h"
+#include "parent2025.h"
 
 #define CHEMMODEL_NONE 1
 #define CHEMMODEL_MACHERET2007 2
 #define CHEMMODEL_PARENT2023 3
 #define CHEMMODEL_PARENT2023B 4
 #define CHEMMODEL_RODRIGUEZ2024 5
+#define CHEMMODEL_PARENT2025 6
 
 
 #define Estarmin 1e-40
@@ -72,6 +74,7 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
     SOAP_add_int_to_vars(codex,"CHEMMODEL_PARENT2023B",CHEMMODEL_PARENT2023B); 
     SOAP_add_int_to_vars(codex,"CHEMMODEL_PARENT2023",CHEMMODEL_PARENT2023); 
     SOAP_add_int_to_vars(codex,"CHEMMODEL_RODRIGUEZ2024",CHEMMODEL_RODRIGUEZ2024); 
+    SOAP_add_int_to_vars(codex,"CHEMMODEL_PARENT2025",CHEMMODEL_PARENT2025); 
     gl->MODEL_CHEM_READ=TRUE;
 
     action_original=codex->action;
@@ -81,8 +84,8 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
 
     find_int_var_from_codex(codex,"CHEMMODEL",&gl->model.chem.CHEMMODEL);
     if (gl->model.chem.CHEMMODEL!=CHEMMODEL_MACHERET2007 && gl->model.chem.CHEMMODEL!=CHEMMODEL_PARENT2023B && gl->model.chem.CHEMMODEL!=CHEMMODEL_PARENT2023 && gl->model.chem.CHEMMODEL!=CHEMMODEL_RODRIGUEZ2024
-        && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)
-      SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_MACHERET2007 or CHEMMODEL_PARENT2023 or CHEMMODEL_PARENT2023B or CHEMMODEL_RODRIGUEZ2024 or CHEMMODEL_NONE.");
+        && gl->model.chem.CHEMMODEL!=CHEMMODEL_PARENT2025 && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)
+      SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_MACHERET2007 or CHEMMODEL_PARENT2023 or CHEMMODEL_PARENT2023B or CHEMMODEL_RODRIGUEZ2024 or CHEMMODEL_PARENT2025 or CHEMMODEL_NONE.");
     find_bool_var_from_codex(codex,"QEISOURCETERMS",&gl->model.chem.QEISOURCETERMS);
     find_bool_var_from_codex(codex,"TEFROMEOVERN",&gl->model.chem.TEFROMEOVERN);
 
@@ -133,6 +136,9 @@ void find_W ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, do
     case CHEMMODEL_RODRIGUEZ2024: 
       find_W_Rodriguez2024 ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
     break;
+    case CHEMMODEL_PARENT2025: 
+      find_W_Parent2025 ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
+    break;
     case CHEMMODEL_NONE: 
       find_W_None ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );    
     break;
@@ -158,6 +164,9 @@ void find_dW_dx ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv
     break;
     case CHEMMODEL_RODRIGUEZ2024: 
       find_dW_dx_Rodriguez2024 ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
+    break;
+    case CHEMMODEL_PARENT2025: 
+      find_dW_dx_Parent2025 ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
     break;
     case CHEMMODEL_NONE: 
       find_dW_dx_None ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
@@ -185,6 +194,9 @@ void find_Qei(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, double *Q
       break;
       case CHEMMODEL_RODRIGUEZ2024: 
         find_Qei_Rodriguez2024 ( gl, rhok, Estar, Te, Qei );
+      break;
+      case CHEMMODEL_PARENT2025: 
+        find_Qei_Parent2025 ( gl, rhok, Estar, Te, Qei );
       break;
       case CHEMMODEL_NONE: 
         *Qei=0.0;
@@ -216,6 +228,9 @@ void find_dQei_dx(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, spec_
       break;
       case CHEMMODEL_RODRIGUEZ2024: 
         find_dQei_dx_Rodriguez2024 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
+      break;
+      case CHEMMODEL_PARENT2025: 
+        find_dQei_dx_Parent2025 ( gl, rhok, Estar, Te, dQeidrhok, dQeidTe );
       break;
       case CHEMMODEL_NONE: 
         *dQeidTe=0.0;

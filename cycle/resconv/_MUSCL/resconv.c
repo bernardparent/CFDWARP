@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2015-2018 Bernard Parent
+Copyright 2015-2018, 2024 Bernard Parent
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FLUX_FDS 1
 #define FLUX_FVS 2
 #define FLUX_FDSR 3
+#define FLUX_KNP 4
 #define INTERPOL_AOWENO5 1
 #define INTERPOL_AOWENO7 2
 #define INTERPOL_AOWENO9 3
@@ -101,6 +102,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"FLUX_FDS",FLUX_FDS); 
     SOAP_add_int_to_vars(codex,"FLUX_FDSR",FLUX_FDSR); 
     SOAP_add_int_to_vars(codex,"FLUX_FVS",FLUX_FVS); 
+    SOAP_add_int_to_vars(codex,"FLUX_KNP",FLUX_KNP); 
     SOAP_add_int_to_vars(codex,"INTERPOL_TVD2_MINMOD",INTERPOL_TVD2_MINMOD); 
     SOAP_add_int_to_vars(codex,"INTERPOL_TVD2_MINMOD2",INTERPOL_TVD2_MINMOD2); 
     SOAP_add_int_to_vars(codex,"INTERPOL_TVD2_VANLEER",INTERPOL_TVD2_VANLEER); 
@@ -149,8 +151,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
 
 
     find_int_var_from_codex(codex,"FLUX",&gl->cycle.resconv.FLUX);
-    if (gl->cycle.resconv.FLUX!=FLUX_FDS && gl->cycle.resconv.FLUX!=FLUX_FVS && gl->cycle.resconv.FLUX!=FLUX_FDSR)
-      SOAP_fatal_error(codex,"FLUX must be set to either FLUX_FDS or FLUX_FDSR or FLUX_FVS.");
+    if (gl->cycle.resconv.FLUX!=FLUX_FDS && gl->cycle.resconv.FLUX!=FLUX_FVS && gl->cycle.resconv.FLUX!=FLUX_FDSR && gl->cycle.resconv.FLUX!=FLUX_KNP)
+      SOAP_fatal_error(codex,"FLUX must be set to either FLUX_FDS or FLUX_FDSR or FLUX_FVS or FLUX_KNP.");
     find_int_var_from_codex(codex,"INTERPOL",&gl->cycle.resconv.INTERPOL);
     if (
 #if (hbw_resconv_fluid>=2)
@@ -197,6 +199,7 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     if (gl->cycle.resconv.FLUX==FLUX_FDSR) gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_FDSR;
     if (gl->cycle.resconv.FLUX==FLUX_FDS && gl->cycle.resconv.POSFILTER!=POSFILTER_NONE) gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_FDSPLUS;
     if (gl->cycle.resconv.FLUX==FLUX_FVS && gl->cycle.resconv.POSFILTER!=POSFILTER_NONE) gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_FVSPLUS;
+    if (gl->cycle.resconv.FLUX==FLUX_KNP) gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_FVS;
 
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;
@@ -378,8 +381,12 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t 
       find_Fstar_interface_FVS_muscl(np, gl, l, _al(gl,l,theta,+1),  theta, musclvarsL,  musclvarsR,
                      metrics, EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
     break;
+    case FLUX_KNP:
+      find_Fstar_interface_KNP_muscl(gl, theta, musclvarsL, musclvarsR,
+                     metrics, EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
+    break;
     default:
-      fatal_error("gl->cycle.resconv.FLUX must be set to either FLUX_FDS or FLUX_FDSR or FLUX_FVS in find_Fstar_interface().");
+      fatal_error("gl->cycle.resconv.FLUX must be set to either FLUX_FDS or FLUX_FDSR or FLUX_FVS or FLUX_KNP in find_Fstar_interface().");
   }
 
 

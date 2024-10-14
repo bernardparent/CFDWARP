@@ -1547,6 +1547,51 @@ void find_Fstar_interface_FVS_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h,  l
 }
 
 
+/*
+ see SEMIDISCRETE CENTRAL-UPWIND SCHEMES FORHYPERBOLIC CONSERVATION LAWS ANDHAMILTON–JACOBI EQUATIONS
+ ALEXANDER KURGANOV, SEBASTIAN NOELLE, AND GUERGANA PETROV
+ https://epubs.siam.org/doi/epdf/10.1137/S1064827500373413
+ https://onlinelibrary.wiley.com/doi/epdf/10.1002/fld.2069
+ https://doi.org/10.1007/s00193-021-01008-8
+ https://core.ac.uk/download/pdf/222931091.pdf
+*/
+void find_Fstar_interface_KNP_muscl(gl_t *gl, long theta, flux_t musclvarsm1h, flux_t musclvarsp1h,
+                     metrics_t metrics, int EIGENVALCOND, int AVERAGING, flux_t Fint){
+  flux_t Fm1h,Fp1h,Um1h,Up1h;
+  jacvars_t jacvarsm1h,jacvarsp1h,jacvarsp0;
+  sqmat_t Lambdam1h,Lambdap1h;
+  long flux;
+  double lambdaminm1h,lambdamaxm1h,lambdaminp1h,lambdamaxp1h,ap1h,am1h;
+
+  find_jacvars_from_musclvars(musclvarsm1h, metrics, gl, theta, &jacvarsm1h);
+  find_jacvars_from_musclvars(musclvarsp1h, metrics, gl, theta, &jacvarsp1h);
+  find_jacvars_at_interface_from_jacvars(jacvarsm1h, jacvarsp1h, gl, theta, metrics, AVERAGING, &jacvarsp0);
+  
+  find_Ustar_from_musclvars(musclvarsm1h, metrics, gl, Um1h);
+  find_Ustar_from_musclvars(musclvarsp1h, metrics, gl, Up1h);
+  find_Fstar_from_jacvars(jacvarsm1h, metrics, Fm1h);
+  find_Fstar_from_jacvars(jacvarsp1h, metrics, Fp1h);
+  find_Lambda_from_jacvars(jacvarsm1h, metrics, Lambdam1h);
+  find_Lambda_from_jacvars(jacvarsp1h, metrics, Lambdap1h);
+  lambdaminm1h=1.0e99;
+  lambdamaxm1h=-1.0e99;
+  lambdaminp1h=1.0e99;
+  lambdamaxp1h=-1.0e99;
+  for (flux=0; flux<nf; flux++) {
+    lambdaminm1h=min(lambdaminm1h,Lambdam1h[flux][flux]);
+    lambdamaxm1h=max(lambdamaxm1h,Lambdam1h[flux][flux]);
+    lambdaminp1h=min(lambdaminp1h,Lambdap1h[flux][flux]);
+    lambdamaxp1h=max(lambdamaxp1h,Lambdap1h[flux][flux]);
+  }
+  ap1h=max(0.0,max(lambdamaxm1h,lambdamaxp1h));
+  am1h=min(0.0,min(lambdaminm1h,lambdaminp1h));
+  for (flux=0; flux<nf; flux++){
+    Fint[flux]=(ap1h*Fm1h[flux]-am1h*Fp1h[flux])/(ap1h-am1h);
+    Fint[flux]+=+ap1h*am1h/(ap1h-am1h)*(Up1h[flux]-Um1h[flux]);
+  }
+}
+
+
 static void find_Lambda_minus_plus_FVSplus_muscl(np_t *np, gl_t *gl, long lp0, long lp1, jacvars_t jacvarsp0, jacvars_t jacvarsp1h, jacvars_t jacvarsp1, jacvars_t jacvarsp0_RE, jacvars_t jacvarsp1h_RE, jacvars_t jacvarsp1_RE, metrics_t metrics, long theta, long numiter, int EIGENVALCOND, sqmat_t lambdaminus, sqmat_t lambdaplus){
   sqmat_t Yminus,Yplus,Zplus,Zminus,Lp0,Linvp0,Linvp1,Lp1,Linvp1_RE,Linvp0_RE,
           Lambdaabsp1_RE,Lambdaabsp0_RE,Lambdap1_RE,Lambdap0_RE;

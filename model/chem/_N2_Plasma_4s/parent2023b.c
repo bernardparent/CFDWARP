@@ -54,7 +54,7 @@ const static long specM2[]=
   };
 
 
-double _kf_high_EoverN(double Estar){
+static double _kf_high_EoverN(double Estar){
   double kf;
   double theta;
 

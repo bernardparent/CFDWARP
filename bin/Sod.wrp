@@ -65,12 +65,12 @@ tf=2.0;
 
 
 PL=10000;
-PR=10000;
+PR=1000;
 rhoL=1;
 rhoR=1;
-uL=-100;
-uR=100; 
-tmax=3e-4;   {simulation time span in seconds}
+uL=0;
+uR=0; 
+tmax=3e-3;   {simulation time span in seconds}
 timelevels=round(100*mf*tf);  
 
 TL=PL/R/rhoL;

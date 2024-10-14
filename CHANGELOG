@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 OCT 14a
+  * in cycle/resconv/_MUSCL/resconv.c
+    - added FLUX_KNP
+  * in cycle/share/res_share.c
+    - added find_Fstar_interface_KNP_muscl()
+  * in model/chem/_N2_Plasma_4s/chem.c
+    - added CHEMMODEL_PARENT2025
+  * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
+    - made various modifications
+  * in model/chem/_NH3_Plasma_32s/chem.c
+    - added ARAKONIOMPRAKASREACTIONTYPE
+  * in model/chem/_N2_Plasma_4s/
+    - added parent2025.c
+
+
 2024 SEP 21a
   * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
     - in find_Semfield(), changed call to _E_dot_J_recast() by call to _E_dot_J()
