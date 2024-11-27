@@ -1394,6 +1394,7 @@ void find_nuk_eta_kappak_muk(gl_t *gl, spec_t rhok, double T, double Te,
       }
       *kappan=0.0;
       for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
+      adjust_nuk_using_mobilities_given_muk(rhok, T, Te, muk, nuk);
     break;
     case TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_ELECTRONMOBILITIESPARENTMACHERET:
      for (spec=0; spec<ncs; spec++) {

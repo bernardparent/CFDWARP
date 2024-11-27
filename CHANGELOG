@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 NOV 26a
+  * in model/transport/_Gupta-Yos/transport.c
+    - in find_nuk_eta_kappak_muk() added call to adjust_nuk_using_mobilities_given_muk()
+      when TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_IONMOBILITIESPARENTMACHERET is selected
+  
+
 2024 OCT 14a
   * in cycle/resconv/_MUSCL/resconv.c
     - added FLUX_KNP

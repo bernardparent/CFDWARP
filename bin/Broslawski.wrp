@@ -106,7 +106,7 @@ Use no more than 5 MPI processes to achieve smooth convergence
 TEMAXHIGH=600e3;
 TEMAXLOW=100e3;
 
-dphi=1500; {voltage difference between the cathode and the anode in V}
+dphi=3000; {voltage difference between the cathode and the anode in V}
 Rballast=30000; {ballast resistor in Ohm}
 
 Relectrodebreakdown=Rballast; {in Ohm; don't change this unless absolutely needed}
@@ -115,7 +115,7 @@ gammaeminus_electrode=0.8; {Secondary Electron Emission (SEE) coefficient on ele
 gammaeminus_dielectric=0.1; {SEE coefficient on dielectric walls}
 
 
-mf=2*sqrt(2); {mesh factor}
+mf=sqrt(2); {mesh factor}
 
 is=1;
 is1=is+round(mf*40);   {start of 1st electrode}
@@ -303,6 +303,12 @@ Model(
     HEAT_DEPOSITED_TO_ELECTRONS=FALSE;
     QENSOURCETERMS=TRUE;
     TrefElectronEnergyTransport=10.0; {reference temperature used in electron energy transport Qe term}
+  );
+  AirPlasma11s(
+    CHEMMODEL=CHEMMODEL_RODRIGUEZ2024;
+    for (react,1,6, ADDITIONALREACTION[react]=FALSE;); {include reactions function of EoverN}
+    TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE generally}
+    QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}
   );
   AirPlasma8s(
     CHEMMODEL=CHEMMODEL_RODRIGUEZ2024;
