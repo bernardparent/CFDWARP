@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2024 DEC 08a
+  * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
+    - various changes
+    
+
 2024 NOV 26a
   * in model/transport/_Gupta-Yos/transport.c
     - in find_nuk_eta_kappak_muk() added call to adjust_nuk_using_mobilities_given_muk()
