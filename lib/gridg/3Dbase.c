@@ -1304,7 +1304,7 @@ static double _x(GRIDG_xyzgrid_t grid, long dim){
 
 /* this function finds the x,y,z coordinates of "ghost nodes" located outside the grid
    limits by "mirroring" the inner within the grid with respect to the boundary plane */ 
-void find_xyz_on_ghost_nodes(GRIDG_xyzgrid_t *grid, GRIDG_gl3d_t gl){
+void find_xyz_on_ghost_nodes_mirror(GRIDG_xyzgrid_t *grid, GRIDG_gl3d_t gl){
   long dim,i,j,k;
   EXM_vec3D_t pa,pb,pc,pp_o,pp_m;
 
@@ -1403,6 +1403,86 @@ void find_xyz_on_ghost_nodes(GRIDG_xyzgrid_t *grid, GRIDG_gl3d_t gl){
 }
 
 
+/* this function finds the x,y,z coordinates of "ghost nodes" located outside the grid
+   limits by extrapolating the inner within the grid with respect to the boundary plane */ 
+void find_xyz_on_ghost_nodes_extrapolate(GRIDG_xyzgrid_t *grid, GRIDG_gl3d_t gl){
+  long dim,i,j,k;
+  EXM_vec3D_t pc,pp_o;
+
+  pc[0]=0.0e0;   pc[1]=0.0e0;   pc[2]=1.0e0;
+  pp_o[0]=0.0e0; pp_o[1]=0.0e0; pp_o[2]=0.0e0;
+
+  /* here the idea is to find a plane in 3D represented
+     by 3 points which lie on the boundary surface:
+     pa,pb and pc. */
+  /* do k=aks and k=ake */  /* grid[GRIDG_ai3(gl,i,j,k)].x */
+  for (i=gl.is; i<=gl.ie; i++){
+    for (j=gl.js; j<=gl.je; j++){
+      /* do k=ake */
+      for (dim=0; dim<3; dim++){
+        pc[dim]=_x(grid[GRIDG_ai3(gl,i,j,gl.ke)],dim);
+        pp_o[dim]=_x(grid[GRIDG_ai3(gl,i,j,gl.ke-1)],dim);
+      }
+      grid[GRIDG_ai3(gl,i,j,gl.ke+1)].x=2.0*pc[0]-pp_o[0];
+      grid[GRIDG_ai3(gl,i,j,gl.ke+1)].y=2.0*pc[1]-pp_o[1];
+      grid[GRIDG_ai3(gl,i,j,gl.ke+1)].z=2.0*pc[2]-pp_o[2];
+      /* do k=aks */
+      for (dim=0; dim<3; dim++){
+        pc[dim]=_x(grid[GRIDG_ai3(gl,i,j,gl.ks)],dim);
+        pp_o[dim]=_x(grid[GRIDG_ai3(gl,i,j,gl.ks+1)],dim);
+      }
+      grid[GRIDG_ai3(gl,i,j,gl.ks-1)].x=2.0*pc[0]-pp_o[0];
+      grid[GRIDG_ai3(gl,i,j,gl.ks-1)].y=2.0*pc[1]-pp_o[1];
+      grid[GRIDG_ai3(gl,i,j,gl.ks-1)].z=2.0*pc[2]-pp_o[2];
+    }
+  }
+
+  /* do j=ajs a3 j=aje */
+  for(i=gl.is; i<=gl.ie; i++){
+    for(k=gl.ks-1; k<=gl.ke+1; k++){
+      /* do j=aje */
+      for (dim=0; dim<3; dim++){
+        pc[dim]=_x(grid[GRIDG_ai3(gl,i,gl.je,add_one(k,gl.ke+1))],dim);
+        pp_o[dim]=_x(grid[GRIDG_ai3(gl,i,gl.je-1,k)],dim);
+      }
+      grid[GRIDG_ai3(gl,i,gl.je+1,k)].x=2.0*pc[0]-pp_o[0];
+      grid[GRIDG_ai3(gl,i,gl.je+1,k)].y=2.0*pc[1]-pp_o[1];
+      grid[GRIDG_ai3(gl,i,gl.je+1,k)].z=2.0*pc[2]-pp_o[2];
+      /* do j=ajs */
+      for (dim=0; dim<3; dim++){
+        pc[dim]=_x(grid[GRIDG_ai3(gl,i,gl.js,add_one(k,gl.ke+1))],dim);
+        pp_o[dim]=_x(grid[GRIDG_ai3(gl,i,gl.js+1,k)],dim);
+      }
+      grid[GRIDG_ai3(gl,i,gl.js-1,k)].x=2.0*pc[0]-pp_o[0];
+      grid[GRIDG_ai3(gl,i,gl.js-1,k)].y=2.0*pc[1]-pp_o[1];
+      grid[GRIDG_ai3(gl,i,gl.js-1,k)].z=2.0*pc[2]-pp_o[2];
+    }
+  }
+
+  /* do i=GRIDG_ai3s and i=GRIDG_ai3e */
+  /* copy x,y,z of is plane to is-1 plane and of ie plane to ie+1 plane*/
+  for(j=gl.js-1; j<=gl.je+1; j++){
+    for(k=gl.ks-1; k<=gl.ke+1; k++){
+      /* do i=GRIDG_ai3e */
+      for (dim=0; dim<3; dim++){
+        pc[dim]=_x(grid[GRIDG_ai3(gl,gl.ie,j,add_one(k,gl.ke+1))],dim);
+        pp_o[dim]=_x(grid[GRIDG_ai3(gl,gl.ie-1,j,k)],dim);
+      }
+      grid[GRIDG_ai3(gl,gl.ie+1,j,k)].x=2.0*pc[0]-pp_o[0];
+      grid[GRIDG_ai3(gl,gl.ie+1,j,k)].y=2.0*pc[1]-pp_o[1];
+      grid[GRIDG_ai3(gl,gl.ie+1,j,k)].z=2.0*pc[2]-pp_o[2];
+      /* do i=GRIDG_ai3s */
+      for (dim=0; dim<3; dim++){
+        pc[dim]=_x(grid[GRIDG_ai3(gl,gl.is,j,add_one(k,gl.ke+1))],dim);
+        pp_o[dim]=_x(grid[GRIDG_ai3(gl,gl.is+1,j,k)],dim);
+      }
+      grid[GRIDG_ai3(gl,gl.is-1,j,k)].x=2.0*pc[0]-pp_o[0];
+      grid[GRIDG_ai3(gl,gl.is-1,j,k)].y=2.0*pc[1]-pp_o[1];
+      grid[GRIDG_ai3(gl,gl.is-1,j,k)].z=2.0*pc[2]-pp_o[2];
+    }
+  }
+}
+
 
 void RXGrid3D(char **argum, void *action_args, SOAP_codex_t *codex){
   SOAP_codex_t codex2;
@@ -1447,7 +1527,7 @@ void GRIDG_read_grid_3D_from_file(char *filename, GRIDG_gl3d_t *gl3d, GRIDG_xyzg
   read_RX_grid(filename, "Grid", &RXGrid3D, &GRIDG_write_grid_3D_to_file,
              &actionsarg3D, VERBOSE);
   verify_all_nodes_initialized(*gl3d, *xyzgrid);  
-  find_xyz_on_ghost_nodes(*xyzgrid, *gl3d);
+  find_xyz_on_ghost_nodes_extrapolate(*xyzgrid, *gl3d);
 }
 
 
@@ -1465,5 +1545,5 @@ void GRIDG_read_grid_3D_from_argum(char *argum, SOAP_codex_t *codex, GRIDG_gl3d_
   codex->function_args=&actionsarg3D;
   SOAP_process_code(argum, codex, SOAP_VARS_KEEP_ALL);
   verify_all_nodes_initialized(*gl3d, *xyzgrid);  
-  find_xyz_on_ghost_nodes(*xyzgrid, *gl3d);
+  find_xyz_on_ghost_nodes_extrapolate(*xyzgrid, *gl3d);
 }

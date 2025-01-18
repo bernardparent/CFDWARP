@@ -1334,6 +1334,7 @@ void EXM_find_plane(EXM_vec3D_t orthovect, EXM_vec3D_t p0,
   *D=(*A)*p0[0]+(*B)*p0[1]+(*C)*p0[2];
 }
 
+
 /* find pp, a point on the plane A-B-C-D which also
    lies on the line composed of vect and p0 */
 void EXM_find_point_in_plane_on_vector(EXM_vec3D_t vect, EXM_vec3D_t p0,

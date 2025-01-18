@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 JAN 17a
+  * in lib/gridg/2Dbase.c and lib/gridg/3Dbase.c
+    - renamed find_xy_on_ghost_nodes() to find_xy_on_ghost_nodes_mirror()
+    - added find_xy_on_ghost_nodes_extrapolate()
+  * in lib/gridg/2Dbase.c
+    - in GRIDG_read_grid_2D_from_argum() and GRIDG_read_grid_2D_from_file()
+      now call find_xy_on_ghost_nodes_extrapolate()
+  * in lib/gridg/3Dbase.c
+    - in GRIDG_read_grid_3D_from_argum() and GRIDG_read_grid_3D_from_file()
+      now call find_xyz_on_ghost_nodes_extrapolate()
+      
+
 2024 DEC 12a
   * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
     - bug fixes
