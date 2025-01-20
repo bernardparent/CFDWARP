@@ -2704,29 +2704,30 @@ void update_w_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, l
   spec_t nuk,rhok;
 
   assert(is_node_bdry(np[lA],TYPELEVEL_FLUID_WORK));
-  dwall=_distance_between_near_bdry_node_and_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK);
-  for (spec=0; spec<ns; spec++) rhok[spec]=wwall[spec]*_rho(np[lB]);
+  if (find_distance_between_near_bdry_node_and_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK,&dwall)){
+    for (spec=0; spec<ns; spec++) rhok[spec]=wwall[spec]*_rho(np[lB]);
   
-  find_nuk_eta_kappa(gl, rhok,Twall,Tewall,nuk,&eta,&kappa);
+    find_nuk_eta_kappa(gl, rhok,Twall,Tewall,nuk,&eta,&kappa);
 
-  if (mod(paramend-paramstart+1,3)!=0) fatal_error("Wrong number of extra parameters to catalytic boundary condition.");
-  numcat=round((double)(paramend-paramstart+1)/3.0);
-  for (cat=0; cat<numcat; cat++){
-    specr=round(_bdry_param(np,gl,lA,paramstart+cat*3,TYPELEVEL_FLUID_WORK))-1;
-    specp=round(_bdry_param(np,gl,lA,paramstart+1+cat*3,TYPELEVEL_FLUID_WORK))-1;
-    if (specr==specp) fatal_error("Wrong specification of the catalytic boundary condition. The reactant species can not be the same as the product species in a wall catalytic process.");
-    if (specr<0 || specr>=ns) fatal_error("Wrong specification of the catalytic boundary condition. The reactant species number is not within bounds.");
-    if (specp<0 || specp>=ns) fatal_error("Wrong specification of the catalytic boundary condition. The product species number is not within bounds.");
-    gamma=_bdry_param(np,gl,lA,paramstart+2+cat*3,TYPELEVEL_FLUID_WORK);
-    if (gamma==0.0) fatal_error("The catalytic recombination coefficient can not be set to zero. Set it rather to a very small positive number approaching zero.");
-    if (gamma==1.0) fatal_error("The catalytic recombination coefficient can not be set to 1. Set it rather to a positive number less then and approaching 1.");
-    if (gamma>1.0) fatal_error("The catalytic recombination coefficient can not be set to a value greater than 1.");
-    if (gamma<0.0) fatal_error("The catalytic recombination coefficient can not be set to a value less than 0.");
+    if (mod(paramend-paramstart+1,3)!=0) fatal_error("Wrong number of extra parameters to catalytic boundary condition.");
+    numcat=round((double)(paramend-paramstart+1)/3.0);
+    for (cat=0; cat<numcat; cat++){
+      specr=round(_bdry_param(np,gl,lA,paramstart+cat*3,TYPELEVEL_FLUID_WORK))-1;
+      specp=round(_bdry_param(np,gl,lA,paramstart+1+cat*3,TYPELEVEL_FLUID_WORK))-1;
+      if (specr==specp) fatal_error("Wrong specification of the catalytic boundary condition. The reactant species can not be the same as the product species in a wall catalytic process.");
+      if (specr<0 || specr>=ns) fatal_error("Wrong specification of the catalytic boundary condition. The reactant species number is not within bounds.");
+      if (specp<0 || specp>=ns) fatal_error("Wrong specification of the catalytic boundary condition. The product species number is not within bounds.");
+      gamma=_bdry_param(np,gl,lA,paramstart+2+cat*3,TYPELEVEL_FLUID_WORK);
+      if (gamma==0.0) fatal_error("The catalytic recombination coefficient can not be set to zero. Set it rather to a very small positive number approaching zero.");
+      if (gamma==1.0) fatal_error("The catalytic recombination coefficient can not be set to 1. Set it rather to a positive number less then and approaching 1.");
+      if (gamma>1.0) fatal_error("The catalytic recombination coefficient can not be set to a value greater than 1.");
+      if (gamma<0.0) fatal_error("The catalytic recombination coefficient can not be set to a value less than 0.");
     
-    wwall[specr]=max(0.0,_w(np[lB],specr)-dwall*0.25*wwall[specr]*_rho(np[lB])*sqrt(8.0*calR/_calM(specr)*Twall/pi)/(nuk[specr]/gamma-nuk[specr]));
-    //wwall[specp]=_w(np[lB],specp)+nuk[specr]/nuk[specp]*(_w(np[lB],specr)-wwall[specr]);
-    wwall[specp]=_w_product_at_catalytic_wall(np, gl, lA, lB, lC, theta, thetasgn, specr, specp, 1.0);
-    //printf("%E ",wwall[specr]);
+      wwall[specr]=max(0.0,_w(np[lB],specr)-dwall*0.25*wwall[specr]*_rho(np[lB])*sqrt(8.0*calR/_calM(specr)*Twall/pi)/(nuk[specr]/gamma-nuk[specr]));
+      //wwall[specp]=_w(np[lB],specp)+nuk[specr]/nuk[specp]*(_w(np[lB],specr)-wwall[specr]);
+      wwall[specp]=_w_product_at_catalytic_wall(np, gl, lA, lB, lC, theta, thetasgn, specr, specp, 1.0);
+      //printf("%E ",wwall[specr]);
+    }
   }
 }
 
@@ -2742,7 +2743,9 @@ void update_w_V_at_injection_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
   if (!find_unit_vector_normal_to_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK, n)){
     fatal_error("Problem finding unit vector normal to boundary plane in update_w_V_at_injection_wall().");
   }
-  dwall=_distance_between_near_bdry_node_and_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK);
+  if (!find_distance_between_near_bdry_node_and_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK,&dwall)){
+    fatal_error("Problem finding unit vector normal to boundary plane in update_w_V_at_injection_wall().");
+  }
 
   for (spec=0; spec<ns; spec++) nuk[spec]=0.5*(nukB[spec]+nukA[spec]);
   

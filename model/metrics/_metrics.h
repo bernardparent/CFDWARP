@@ -43,7 +43,7 @@ double _Omega(np_t np, gl_t *gl);
 
 bool find_unit_vector_normal_to_boundary_plane(np_t *np, gl_t *gl, long lA, long lB, long lC, int TYPELEVEL, dim_t n);
 
-double _distance_between_near_bdry_node_and_boundary_plane(np_t *np, gl_t *gl, long lA, long lB, long lC, int TYPELEVEL);
+bool find_distance_between_near_bdry_node_and_boundary_plane(np_t *np, gl_t *gl, long lA, long lB, long lC, int TYPELEVEL, double *dwall);
 		   
 #ifdef _2D
 void find_side_projected_area_of_axisymmetric_cell(np_t *np, gl_t *gl, long l, int METRICSRMIN, dim_t projarea);

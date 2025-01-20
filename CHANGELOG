@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 JAN 20a
+  * in model/metrics/_generic/metrics.c
+    - renamed _distance_between_near_bdry_node_and_boundary_plane() to 
+      find_distance_between_near_bdry_node_and_boundary_plane()
+    - in find_distance_between_near_bdry_node_and_boundary_plane(), returns 
+      FALSE should find_unit_vector_normal_to_boundary_plane() is FALSE
+  * in model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - in update_bdry_wall(), now only add thermionic emission if
+      find_distance_between_near_bdry_node_and_boundary_plane is TRUE
+  * in model/share/fluid_share.c
+    - in update_w_at_catalytic_wall(), now only updated w if
+      find_distance_between_near_bdry_node_and_boundary_plane() is TRUE
+    
+
 2025 JAN 17a
   * in lib/gridg/2Dbase.c and lib/gridg/3Dbase.c
     - renamed find_xy_on_ghost_nodes() to find_xy_on_ghost_nodes_mirror()
