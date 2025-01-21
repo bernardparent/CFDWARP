@@ -1263,6 +1263,23 @@ bool is_node_bdry(np_t np, int TYPELEVEL){
 }
 
 
+bool is_node_bdry_corner(np_t *np, gl_t *gl, long l, int TYPELEVEL){
+  bool RET;
+  long dim,nearinnernodes;
+  RET=FALSE;
+  if (is_node_bdry(np[l],TYPELEVEL)){
+    nearinnernodes=0;
+    for (dim=0; dim<nd; dim++){
+      if (is_node_inner(np[_al(gl,l,dim,+1)],TYPELEVEL)) nearinnernodes++;
+      if (is_node_inner(np[_al(gl,l,dim,-1)],TYPELEVEL)) nearinnernodes++;
+    }
+    if (nearinnernodes>1) RET=TRUE; //outer facing corner
+    if (nearinnernodes==0) RET=TRUE; //inner facing corner
+  }
+  return(RET);
+}
+
+
 bool is_node_link(np_t np, int TYPELEVEL){
   bool tmp;
   tmp=FALSE;

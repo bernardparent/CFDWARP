@@ -607,6 +607,8 @@ bool is_node_inner(np_t np, int TYPELEVEL);
 
 bool is_node_bdry(np_t np, int TYPELEVEL);
 
+bool is_node_bdry_corner(np_t *np, gl_t *gl, long l, int TYPELEVEL);
+
 bool is_node_link(np_t np, int TYPELEVEL);
 
 bool is_node_inner_near_bdry(np_t *np, gl_t *gl, long l, int TYPELEVEL);

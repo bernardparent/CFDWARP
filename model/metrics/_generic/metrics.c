@@ -705,12 +705,14 @@ bool find_distance_between_near_bdry_node_and_boundary_plane(np_t *np, gl_t *gl,
   bool RET;
   long i,j,k;
   long dim;
-  if (!find_unit_vector_normal_to_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL, n)){
-    //find_ijk_from_l_all(gl, lA, &i, &j, &k);
-    //fatal_error("Couldn't find unit vector normal to boundary plane in _distance_between_near_bdry_node_and_boundary_plane at the node (%ld,%ld,%ld). This generally occurs when the boundary node is a corner node.",i,j,k);
+  if (is_node_bdry_corner(np, gl, lA, TYPELEVEL)){
     *dwall=0.0;
     RET=FALSE;
   } else {
+    if (!find_unit_vector_normal_to_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL, n)){
+      find_ijk_from_l_all(gl, lA, &i, &j, &k);
+      fatal_error("Couldn't find unit vector normal to boundary plane in  _distance_between_near_bdry_node_and_boundary_plane at the node (%ld,%ld,%ld). This generally occurs when the boundary node is a corner node.",i,j,k);
+    }
     for (dim=0; dim<nd; dim++){
       vecBA[dim]=_x(np[lB],dim)-_x(np[lA],dim); 
     }
@@ -719,6 +721,7 @@ bool find_distance_between_near_bdry_node_and_boundary_plane(np_t *np, gl_t *gl,
     for (dim=0; dim<nd; dim++) *dwall+=vecBA[dim]*n[dim];
     if (*dwall<=0.0) {
       find_ijk_from_l_all(gl, lA, &i, &j, &k);
+      //printf("vecBA[0]=%E  vecBA[1]=%E  vecBA[2]=%E\n",vecBA[0],vecBA[1],vecBA[2]);
       fatal_error("Problem in _distance_between_near_bdry_node_and_boundary_plane at the node (%ld,%ld,%ld): dwall can not be equal to %E.",i,j,k,dwall);
     }
     RET=TRUE;
