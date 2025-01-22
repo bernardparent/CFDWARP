@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 JAN 21a
+  * in src/common.c
+    - in is_node_bdry_corner(), fixed a bug
+  * in model/metrics/_generic/metrics.c
+    - 
+
 2025 JAN 20b
   * in model/metrics/_generic/metrics.c
     - in find_distance_between_near_bdry_node_and_boundary_plane(), now uses is_node_bdry_corner()

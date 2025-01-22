@@ -722,7 +722,8 @@ bool find_distance_between_near_bdry_node_and_boundary_plane(np_t *np, gl_t *gl,
     if (*dwall<=0.0) {
       find_ijk_from_l_all(gl, lA, &i, &j, &k);
       //printf("vecBA[0]=%E  vecBA[1]=%E  vecBA[2]=%E\n",vecBA[0],vecBA[1],vecBA[2]);
-      fatal_error("Problem in _distance_between_near_bdry_node_and_boundary_plane at the node (%ld,%ld,%ld): dwall can not be equal to %E.",i,j,k,dwall);
+      //printf("n[0]=%E  n[1]=%E  n[2]=%E\n",n[0],n[1],n[2]);
+      fatal_error("Problem in find_distance_between_near_bdry_node_and_boundary_plane at the node (%ld,%ld,%ld): dwall can not be equal to %E.",i,j,k,dwall);
     }
     RET=TRUE;
   }
