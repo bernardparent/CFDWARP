@@ -7,11 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 JAN 22a
+  * in model/chem/_NH3_Plasma_21s/arakoni2007v3.c
+    - fixed bugs
+  * in model/chem/_NH3_Plasma_21s/chem.hh
+    - fixed bugs
+    
+
 2025 JAN 21a
   * in src/common.c
     - in is_node_bdry_corner(), fixed a bug
-  * in model/metrics/_generic/metrics.c
-    - 
+
 
 2025 JAN 20b
   * in model/metrics/_generic/metrics.c
