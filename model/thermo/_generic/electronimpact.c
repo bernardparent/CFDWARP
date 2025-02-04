@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
 Copyright 2024 Bernard Parent
-Copyright 2024 Felipe Martin Rodriguez Fuentes
+Copyright 2024,2025 Felipe Martin Rodriguez Fuentes
 
 
 Redistribution and use in source and binary forms, with or without modification, are
@@ -26,8 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <model/thermo/_thermo.h>
+#include <model/transport/_transport.h>
 #include "thermo.h"
 #include "electronimpact.h"
+
 
 static double _EoverN_from_Te_H_Morgan(double Te){
   double EoverN;
@@ -1414,4 +1416,158 @@ double _Te_from_rhok_EoverN(spec_t rhok, double EoverN){
   if (Nsum==0.0) fatal_error("Couldn't find any valid species when determining Te in _Te_from_rhok_EoverN().");
   Te/=Nsum;
   return(Te);
+}
+
+/* find the product of inelastic rate coefficients and the activation energy
+ * for the kth species process
+ * sum_l k_kl*e_kl 
+ * k_kl in m^3/s 
+ * e_kl in Joule */
+static double _ke_kl_N2vib_from_Te(long k, double Te) {
+  double ke_kl, Te_data[8], ke_kl_data[8]; 
+  switch (k){
+    case 1: 
+      /* log Te */
+      Te_data[0] = 4.60517018598809;
+      Te_data[1] = 7.05656529477427;
+      Te_data[2] = 7.74971247533422;
+      Te_data[3] = 8.79703146961478;
+      Te_data[4] = 9.69562262438953;
+      Te_data[5] = 10.9113828264316;
+      Te_data[6] = 12.1379696597587;
+      Te_data[7] = 13.4908977724650;
+      /* log sum_l(k_kl*e_kl) */
+      ke_kl_data[0] = -243.218401945991;
+      ke_kl_data[1] = -87.2481357490811;
+      ke_kl_data[2] = -81.5220853876085;
+      ke_kl_data[3] = -77.5517072824967;
+      ke_kl_data[4] = -76.7796570149100;
+      ke_kl_data[5] = -77.5107880551347;
+      ke_kl_data[6] = -78.3084946769275;
+      ke_kl_data[7] = -78.4493877345142;
+    break; 
+    case 2: 
+      Te_data[0] = 4.60517018598809;
+      Te_data[1] = 7.05656529477427;
+      Te_data[2] = 7.74971247533422;
+      Te_data[3] = 8.90575474590260;
+      Te_data[4] = 9.69562262438953;
+      Te_data[5] = 10.7385879614250;
+      Te_data[6] = 11.8600397420629;
+      Te_data[7] = 13.5428277045710;
+
+      ke_kl_data[0] = -243.218401945991;
+      ke_kl_data[1] = -85.5956505083057;
+      ke_kl_data[2] = -80.6536189049171;
+      ke_kl_data[3] = -77.6632511894612;
+      ke_kl_data[4] = -76.9241120277398;
+      ke_kl_data[5] = -77.4697857629106;
+      ke_kl_data[6] = -78.8367240373364;
+      ke_kl_data[7] = -80.9742637507284;
+    break;
+    case 3: 
+      Te_data[0] = 4.60517018598809;
+      Te_data[1] = 7.05656529477427;
+      Te_data[2] = 7.74971247533422;
+      Te_data[3] = 8.90575474590260;
+      Te_data[4] = 9.69562262438953;
+      Te_data[5] = 10.7385879614250;
+      Te_data[6] = 11.8600397420629;
+      Te_data[7] = 13.5428277045710;
+
+      ke_kl_data[0] = -186.125137722135;
+      ke_kl_data[1] = -84.6015917141682;
+      ke_kl_data[2] = -80.5455536743023;
+      ke_kl_data[3] = -77.9391113396379;
+      ke_kl_data[4] = -77.1740216520346;
+      ke_kl_data[5] = -77.6230658149900;
+      ke_kl_data[6] = -78.9084249617230;
+      ke_kl_data[7] = -80.9505869102379;
+    break;
+    case 4: 
+      Te_data[0] = 4.60517018598809;
+      Te_data[1] = 7.05656529477427;
+      Te_data[2] = 7.74971247533422;
+      Te_data[3] = 8.90575474590260;
+      Te_data[4] = 9.69562262438953;
+      Te_data[5] = 10.7385879614250;
+      Te_data[6] = 11.8600397420629;
+      Te_data[7] = 13.5428277045710;
+ 
+      ke_kl_data[0] = -186.125137722135;
+      ke_kl_data[1] = -83.7680810579010;
+      ke_kl_data[2] = -80.3140600507520;
+      ke_kl_data[3] = -78.8412471142294;
+      ke_kl_data[4] = -77.2946244474583;
+      ke_kl_data[5] = -77.5716954702863;
+      ke_kl_data[6] = -77.7439266485029;
+      ke_kl_data[7] = -80.6478332304041;
+    break;
+    default:
+      fatal_error("kth process level in _ke_kl_from_Te() set to invalid value.");
+  }
+  int N = sizeof(Te_data)/sizeof(Te_data[0]);
+  Te = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
+  ke_kl = exp( EXM_f_from_monotonespline(N, Te_data, ke_kl_data, Te) ); 
+  return(ke_kl);
+}
+
+/* find the fraction fk of vibrationally excited N2 level k wrt total N2 (ground state + vib. excited states)
+ * assuming a Boltzmann distribution in Tv
+ * energy e_k in eV for the transition from ground state to vib. level k */
+double _fk_N2vib_from_Tv(long k, double Tv) {
+  long l,nvib;
+  double Zvib,fk;
+  static const double e_k[] = {0.288, 0.572, 0.855, 1.133,1.4082,
+  1.6794, 1.9470, 2.2111, 2.4717, 2.7287,
+  2.9821, 3.2320, 3.4782, 3.7208, 3.9598,
+  4.1951, 4.4268, 4.6547, 4.8789, 5.0993}; // eV
+  nvib = 4;
+  if (k < 1 || k > nvib) fatal_error("Invalid vibrational energy level in _fk_from_Tv().");
+  // find partition function to ensure fractions add up to unity
+  Zvib=0.0;
+  for (l=1; l<=nvib; l++) Zvib+=exp(-fabs(_C(speceminus))*e_k[l-1]/(kB*Tv));
+  Zvib+=1.0;
+  // find fraction of vib. excited N2 state k
+  fk=exp(-fabs(_C(speceminus))*e_k[k-1]/(kB*Tv))/Zvib;
+  return(fk);
+}
+
+/* find the electron heating rate from de-excitation of vibrational N2 levels by electron impact
+ * includes transitions to ground state and intermediate transitions
+ * adjusted cooling from e-N2 collisions so that it only considers ground state N2*/
+double _QeN2vib_from_rhok_T_Tv_Te(gl_t *gl, spec_t rhok, double T, double Tv, double Te){
+  long nvib,viblevel,sum;
+  double Qe,Tref;
+  nvib=4;
+  Tref=300.0e0; //gas temperature at which the experiments or BOLSIG+ results of mueN and E/N were obtained
+  Qe=0.0;
+  sum=0.0;
+  for (viblevel=1; viblevel<=nvib; viblevel++) sum+=_fk_N2vib_from_Tv(viblevel,Tv);
+  assert(sum<1.0e0);
+  // electron heating from vibrational levels
+  for (viblevel=1; viblevel<=nvib; viblevel++) Qe-=rhok[speceminus]/_m(speceminus)*rhok[specN2]/_m(specN2)*_fk_N2vib_from_Tv(viblevel,Tv)*_ke_kl_N2vib_from_Te(viblevel,Te);
+  // adjust electron cooling for ground state N2
+  Qe-=rhok[speceminus]/_m(speceminus)*rhok[specN2]/_m(specN2)*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverNk_from_Te(specN2, Te))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*sum;
+  Qe-=3.0*kB*fabs(_C(speceminus))*(Te-T)*rhok[speceminus]*rhok[specN2]/(_m(speceminus)*sqr(_m(specN2))*_mueNk_from_Te(gl,specN2,Te))*sum;
+  return(Qe);
+}
+
+/* find derivatives of electron heating rate from de-excitation of vibrational N2 levels
+ * including adjustment of electron cooling from ground state N2 */
+void find_dQeN2vib_from_rhok_T_Tv_Te(gl_t *gl, spec_t rhok, double T, double Tv, double Te, spec_t dQeN2vibdrhok, double *dQeN2vibdT, double *dQeN2vibdTv, double *dQeN2vibdTe){
+  long spec,viblevel,nvib;
+  double dTv,dTe,sum;
+  dTe=10.0;
+  dTv=dTe;
+  nvib=4;
+  sum=0.0;
+  for (viblevel=1; viblevel<=nvib; viblevel++) sum+=_fk_N2vib_from_Tv(viblevel,Tv);
+  for (spec=0; spec<ns; spec++){
+    dQeN2vibdrhok[spec]=0.0;
+    if (spec==specN2 || spec==speceminus) dQeN2vibdrhok[spec] = _QeN2vib_from_rhok_T_Tv_Te(gl,rhok,T,Tv,Te)/rhok[spec];
+  }
+  *dQeN2vibdT=3.0*kB*fabs(_C(speceminus))*rhok[speceminus]*rhok[specN2]/(_m(speceminus)*sqr(_m(specN2))*_mueNk_from_Te(gl,specN2,Te))*sum;
+  *dQeN2vibdTv=(_QeN2vib_from_rhok_T_Tv_Te(gl,rhok,T,Tv+dTv,Te)-_QeN2vib_from_rhok_T_Tv_Te(gl,rhok,T,Tv,Te))/dTv;
+  *dQeN2vibdTe=(_QeN2vib_from_rhok_T_Tv_Te(gl,rhok,T,Tv,Te+dTe)-_QeN2vib_from_rhok_T_Tv_Te(gl,rhok,T,Tv,Te))/dTe;
 }

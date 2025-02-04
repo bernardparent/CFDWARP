@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 FEB 04a
+  * in model/chem/_C2H4_Air_Plasma_36s/chem.c
+    - added CHEMMODEL_ADAMOVICHPARENT2025
+  * in model/chem/_C2H4_Air_Plasma_36s/
+    - added adamovichparent2025.c and adamovichparent2025.h
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - added find_Qe_Rodriguez2025()
+    - modified several functions to take TEMODEL_TRANSPORT_RODRIGUEZ2025 into account
+    - added find_dSe_dU_transport_Rodriguez2025()
+  * in model/thermo/_generic/electronimpact.c
+    - added _ke_kl_N2vib_from_Te(), _fk_N2vib_from_Tv(), _QeN2vib_from_rhok_T_Tv_Te(), 
+      find_dQeN2vib_from_rhok_T_Tv_Te()
+      
+
 2025 JAN 22a
   * in model/chem/_NH3_Plasma_21s/arakoni2007v3.c
     - fixed bugs
