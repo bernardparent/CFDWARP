@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 FEB 04b
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - added TEMODEL_TRANSPORT_RODRIGUEZ2025 in various locations as needed
+  * in model/fluid/_Navier-Stokes_plasma/fluid_plasma.c
+    - added TEMODEL_TRANSPORT_RODRIGUEZ2025 in various locations as needed
+
+
 2025 FEB 04a
   * in model/chem/_C2H4_Air_Plasma_36s/chem.c
     - added CHEMMODEL_ADAMOVICHPARENT2025
