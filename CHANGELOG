@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 FEB 06a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Qe_Rodriguez2025(), made improvements
+    - in find_dSe_dU_transport_Rodriguez2025(), made improvements
+  * in model/thermo/_generic/electronimpact.c
+    - in _ke_kl_N2vib_from_Te(), made improvements
+    - in _QeN2vib_from_rhok_T_Tv_Te(), made improvements
+    - in find_dQeN2vib_from_rhok_T_Tv_Te(), made improvements
+    
+
 2025 FEB 04b
   * in model/fluid/_Navier-Stokes_plasma/fluid.c
     - added TEMODEL_TRANSPORT_RODRIGUEZ2025 in various locations as needed

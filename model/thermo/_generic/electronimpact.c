@@ -1418,97 +1418,145 @@ double _Te_from_rhok_EoverN(spec_t rhok, double EoverN){
   return(Te);
 }
 
-/* find the product of inelastic rate coefficients and the activation energy
- * for the kth species process
- * sum_l k_kl*e_kl 
- * k_kl in m^3/s 
- * e_kl in Joule */
+/* find the product of inelastic forward (k_kl) and backward (kb_lk) rate coefficients and the activation energy
+ * for the kth N2vib species process
+ * sum_l (k_kl*e_kl-kb_lk*e_lk) (cooling-heating from N2vib)
+ * k_kl, kb_lk in m^3/s 
+ * e_kl, e_lk in Joule */
 static double _ke_kl_N2vib_from_Te(long k, double Te) {
-  double ke_kl, Te_data[8], ke_kl_data[8]; 
+  double ke_kl, Te_data[14], ke_kl_data[14]; 
   switch (k){
     case 1: 
-      /* log Te */
-      Te_data[0] = 4.60517018598809;
-      Te_data[1] = 7.05656529477427;
-      Te_data[2] = 7.74971247533422;
-      Te_data[3] = 8.79703146961478;
-      Te_data[4] = 9.69562262438953;
-      Te_data[5] = 10.9113828264316;
-      Te_data[6] = 12.1379696597587;
-      Te_data[7] = 13.4908977724650;
-      /* log sum_l(k_kl*e_kl) */
-      ke_kl_data[0] = -243.218401945991;
-      ke_kl_data[1] = -87.2481357490811;
-      ke_kl_data[2] = -81.5220853876085;
-      ke_kl_data[3] = -77.5517072824967;
-      ke_kl_data[4] = -76.7796570149100;
-      ke_kl_data[5] = -77.5107880551347;
-      ke_kl_data[6] = -78.3084946769275;
-      ke_kl_data[7] = -78.4493877345142;
+      /* Te */
+      Te_data[0] =  618.908000328523;
+      Te_data[1] =  2262.88237620116;
+      Te_data[2] =  3371.50133178963;
+      Te_data[3] =  4438.34399735592;
+      Te_data[4] =  6282.68983833492;
+      Te_data[5] =  8943.22060474715;
+      Te_data[6] =  19696.7471104552;
+      Te_data[7] =  28887.5309153338;
+      Te_data[8] =  37250.5252697730;
+      Te_data[9] =  45319.5383240561;
+      Te_data[10] = 62679.9077332711;
+      Te_data[11] = 156506.360583075;
+      Te_data[12] = 373510.978198263;
+      Te_data[13] = 1059879.95056260;
+      /* sum_l(k_kl*e_kl) */
+      ke_kl_data[0] =   8.91699416535870e-42;
+      ke_kl_data[1] =  -1.70432917313655e-36;
+      ke_kl_data[2] =   1.37357807186088e-36;
+      ke_kl_data[3] =   1.43680797272169e-35;
+      ke_kl_data[4] =   6.71910422618799e-35;
+      ke_kl_data[5] =   1.72383551343784e-34;
+      ke_kl_data[6] =   3.49340836324648e-34;
+      ke_kl_data[7] =   3.53621371637705e-34;
+      ke_kl_data[8] =   3.21752476210811e-34;
+      ke_kl_data[9] =   2.81368172191871e-34;
+      ke_kl_data[10] =  2.00034236128683e-34;
+      ke_kl_data[11] =  1.57846121546353e-35;
+      ke_kl_data[12] = -5.40441736086305e-35;
+      ke_kl_data[13] = -6.84031145203270e-35;
     break; 
     case 2: 
-      Te_data[0] = 4.60517018598809;
-      Te_data[1] = 7.05656529477427;
-      Te_data[2] = 7.74971247533422;
-      Te_data[3] = 8.90575474590260;
-      Te_data[4] = 9.69562262438953;
-      Te_data[5] = 10.7385879614250;
-      Te_data[6] = 11.8600397420629;
-      Te_data[7] = 13.5428277045710;
+      Te_data[0] =  618.908000328523;
+      Te_data[1] =  2262.88237620116;
+      Te_data[2] =  3371.50133178963;
+      Te_data[3] =  4438.34399735592;
+      Te_data[4] =  6282.68983833492;
+      Te_data[5] =  8943.22060474715;
+      Te_data[6] =  19696.7471104552;
+      Te_data[7] =  28887.5309153338;
+      Te_data[8] =  37250.5252697730;
+      Te_data[9] =  45319.5383240561;
+      Te_data[10] = 62679.9077332711;
+      Te_data[11] = 156506.360583075;
+      Te_data[12] = 373510.978198263;
+      Te_data[13] = 1059879.95056260;
 
-      ke_kl_data[0] = -243.218401945991;
-      ke_kl_data[1] = -85.5956505083057;
-      ke_kl_data[2] = -80.6536189049171;
-      ke_kl_data[3] = -77.6632511894612;
-      ke_kl_data[4] = -76.9241120277398;
-      ke_kl_data[5] = -77.4697857629106;
-      ke_kl_data[6] = -78.8367240373364;
-      ke_kl_data[7] = -80.9742637507284;
+      ke_kl_data[0] =  -1.01257563268800e-43;
+      ke_kl_data[1] =  -1.29299691848918e-35;
+      ke_kl_data[2] =  -7.70935673183447e-35;
+      ke_kl_data[3] =  -1.80171427548097e-34;
+      ke_kl_data[4] =  -3.62237717357694e-34;
+      ke_kl_data[5] =  -4.92662265377810e-34;
+      ke_kl_data[6] =  -4.06897910377454e-34;
+      ke_kl_data[7] =  -2.82188326410815e-34;
+      ke_kl_data[8] =  -1.95617115257576e-34;
+      ke_kl_data[9] =  -1.36113556812124e-34;
+      ke_kl_data[10] = -6.43003150699854e-35;
+      ke_kl_data[11] = -6.22254963289554e-36;
+      ke_kl_data[12] = -8.63653314557700e-37;
+      ke_kl_data[13] =  2.28995901944352e-37;
     break;
     case 3: 
-      Te_data[0] = 4.60517018598809;
-      Te_data[1] = 7.05656529477427;
-      Te_data[2] = 7.74971247533422;
-      Te_data[3] = 8.90575474590260;
-      Te_data[4] = 9.69562262438953;
-      Te_data[5] = 10.7385879614250;
-      Te_data[6] = 11.8600397420629;
-      Te_data[7] = 13.5428277045710;
+      Te_data[0] =  618.908000328523;
+      Te_data[1] =  2262.88237620116;
+      Te_data[2] =  3371.50133178963;
+      Te_data[3] =  4438.34399735592;
+      Te_data[4] =  6282.68983833492;
+      Te_data[5] =  12269.8511065130;
+      Te_data[6] =  19696.7471104552;
+      Te_data[7] =  28887.5309153338;
+      Te_data[8] =  37250.5252697730;
+      Te_data[9] =  45319.5383240561;
+      Te_data[10] = 62679.9077332711;
+      Te_data[11] = 156506.360583075;
+      Te_data[12] = 373510.978198263;
+      Te_data[13] = 1059879.95056260;
 
-      ke_kl_data[0] = -186.125137722135;
-      ke_kl_data[1] = -84.6015917141682;
-      ke_kl_data[2] = -80.5455536743023;
-      ke_kl_data[3] = -77.9391113396379;
-      ke_kl_data[4] = -77.1740216520346;
-      ke_kl_data[5] = -77.6230658149900;
-      ke_kl_data[6] = -78.9084249617230;
-      ke_kl_data[7] = -80.9505869102379;
+      ke_kl_data[0] =  -9.02458032633180e-42;
+      ke_kl_data[1] =  -5.06243404007705e-35;
+      ke_kl_data[2] =  -2.30178356365543e-34;
+      ke_kl_data[3] =  -4.69510780972978e-34;
+      ke_kl_data[4] =  -8.52275296973685e-34;
+      ke_kl_data[5] =  -1.19595436150910e-33;
+      ke_kl_data[6] =  -1.05864013352746e-33;
+      ke_kl_data[7] =  -8.25496196277683e-34;
+      ke_kl_data[8] =  -6.40319504837904e-34;
+      ke_kl_data[9] =  -4.99215968899187e-34;
+      ke_kl_data[10] = -3.04855600993321e-34;
+      ke_kl_data[11] = -7.33050444278219e-35;
+      ke_kl_data[12] = -2.24841457932390e-35;
+      ke_kl_data[13] = -5.95457117126933e-36;
     break;
     case 4: 
-      Te_data[0] = 4.60517018598809;
-      Te_data[1] = 7.05656529477427;
-      Te_data[2] = 7.74971247533422;
-      Te_data[3] = 8.90575474590260;
-      Te_data[4] = 9.69562262438953;
-      Te_data[5] = 10.7385879614250;
-      Te_data[6] = 11.8600397420629;
-      Te_data[7] = 13.5428277045710;
- 
-      ke_kl_data[0] = -186.125137722135;
-      ke_kl_data[1] = -83.7680810579010;
-      ke_kl_data[2] = -80.3140600507520;
-      ke_kl_data[3] = -78.8412471142294;
-      ke_kl_data[4] = -77.2946244474583;
-      ke_kl_data[5] = -77.5716954702863;
-      ke_kl_data[6] = -77.7439266485029;
-      ke_kl_data[7] = -80.6478332304041;
+      Te_data[0] =  618.908000328523;
+      Te_data[1] =  2262.88237620116;
+      Te_data[2] =  3371.50133178963;
+      Te_data[3] =  4438.34399735592;
+      Te_data[4] =  6282.68983833492;
+      Te_data[5] =  12269.8511065130;
+      Te_data[6] =  19696.7471104552;
+      Te_data[7] =  28887.5309153338;
+      Te_data[8] =  37250.5252697730;
+      Te_data[9] =  45319.5383240561;
+      Te_data[10] = 62679.9077332711;
+      Te_data[11] = 156506.360583075;
+      Te_data[12] = 373510.978198263;
+      Te_data[13] = 1059879.95056260;
+
+      ke_kl_data[0] =  -1.78213311353088e-41;
+      ke_kl_data[1] =  -1.29077325753885e-34;
+      ke_kl_data[2] =  -4.53261377376819e-34;
+      ke_kl_data[3] =  -8.15407930884039e-34;
+      ke_kl_data[4] =  -1.33123734995416e-33;
+      ke_kl_data[5] =  -1.75979076036975e-33;
+      ke_kl_data[6] =  -1.57887617921174e-33;
+      ke_kl_data[7] =  -1.26480934431422e-33;
+      ke_kl_data[8] =  -1.00712743104408e-33;
+      ke_kl_data[9] =  -8.05337609868695e-34;
+      ke_kl_data[10] = -5.17348875324510e-34;
+      ke_kl_data[11] = -1.39626681561028e-34;
+      ke_kl_data[12] = -4.58876413673634e-35;
+      ke_kl_data[13] = -1.41882305935205e-35;
     break;
     default:
-      fatal_error("kth process level in _ke_kl_from_Te() set to invalid value.");
+      fatal_error("kth N2vib process level in _ke_kl_from_Te() set to invalid value.");
   }
   int N = sizeof(Te_data)/sizeof(Te_data[0]);
-  Te = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
-  ke_kl = exp( EXM_f_from_monotonespline(N, Te_data, ke_kl_data, Te) ); 
+  Te = ( min( Te_data[N-1], max( Te , Te_data[0] ) ) );
+  ke_kl = EXM_f_from_monotonespline(N, Te_data, ke_kl_data, Te); 
   return(ke_kl);
 }
 
@@ -1533,9 +1581,8 @@ double _fk_N2vib_from_Tv(long k, double Tv) {
   return(fk);
 }
 
-/* find the electron heating rate from de-excitation of vibrational N2 levels by electron impact
- * includes transitions to ground state and intermediate transitions
- * adjusted cooling from e-N2 collisions so that it only considers ground state N2*/
+/* find Qe from excitation and de-excitation of vibrational N2 levels by electron impact
+ * and include Qe from ground state N2VO = N2*(1-sum_fk)*/
 double _QeN2vib_from_rhok_T_Tv_Te(gl_t *gl, spec_t rhok, double T, double Tv, double Te){
   long nvib,viblevel,sum;
   double Qe,Tref;
@@ -1545,16 +1592,16 @@ double _QeN2vib_from_rhok_T_Tv_Te(gl_t *gl, spec_t rhok, double T, double Tv, do
   sum=0.0;
   for (viblevel=1; viblevel<=nvib; viblevel++) sum+=_fk_N2vib_from_Tv(viblevel,Tv);
   assert(sum<1.0e0);
-  // electron heating from vibrational levels
-  for (viblevel=1; viblevel<=nvib; viblevel++) Qe-=rhok[speceminus]/_m(speceminus)*rhok[specN2]/_m(specN2)*_fk_N2vib_from_Tv(viblevel,Tv)*_ke_kl_N2vib_from_Te(viblevel,Te);
-  // adjust electron cooling for ground state N2
-  Qe-=rhok[speceminus]/_m(speceminus)*rhok[specN2]/_m(specN2)*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverNk_from_Te(specN2, Te))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*sum;
-  Qe-=3.0*kB*fabs(_C(speceminus))*(Te-T)*rhok[speceminus]*rhok[specN2]/(_m(speceminus)*sqr(_m(specN2))*_mueNk_from_Te(gl,specN2,Te))*sum;
+  // electron cooling-heating source term from N2 vibrational levels
+  for (viblevel=1; viblevel<=nvib; viblevel++) Qe+=rhok[speceminus]/_m(speceminus)*rhok[specN2]/_m(specN2)*_fk_N2vib_from_Tv(viblevel,Tv)*_ke_kl_N2vib_from_Te(viblevel,Te);
+  // electron cooling-heating source term from N2 in ground state
+  Qe+=rhok[speceminus]/_m(speceminus)*rhok[specN2]/_m(specN2)*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverNk_from_Te(specN2, Te))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*(1.0-sum);
+  Qe+=3.0*kB*fabs(_C(speceminus))*(Te-T)*rhok[speceminus]*rhok[specN2]/(_m(speceminus)*sqr(_m(specN2))*_mueNk_from_Te(gl,specN2,Te))*(1.0-sum);
   return(Qe);
 }
 
-/* find derivatives of electron heating rate from de-excitation of vibrational N2 levels
- * including adjustment of electron cooling from ground state N2 */
+/* find derivatives of Qe from excitation and de-excitation of vibrational N2 levels by electron impact
+ * and include the derivatives of Qe from ground state N2VO = N2*(1-sum_fk)*/
 void find_dQeN2vib_from_rhok_T_Tv_Te(gl_t *gl, spec_t rhok, double T, double Tv, double Te, spec_t dQeN2vibdrhok, double *dQeN2vibdT, double *dQeN2vibdTv, double *dQeN2vibdTe){
   long spec,viblevel,nvib;
   double dTv,dTe,sum;
@@ -1564,10 +1611,10 @@ void find_dQeN2vib_from_rhok_T_Tv_Te(gl_t *gl, spec_t rhok, double T, double Tv,
   sum=0.0;
   for (viblevel=1; viblevel<=nvib; viblevel++) sum+=_fk_N2vib_from_Tv(viblevel,Tv);
   for (spec=0; spec<ns; spec++){
-    dQeN2vibdrhok[spec]=0.0;
     if (spec==specN2 || spec==speceminus) dQeN2vibdrhok[spec] = _QeN2vib_from_rhok_T_Tv_Te(gl,rhok,T,Tv,Te)/rhok[spec];
+    else dQeN2vibdrhok[spec]=0.0;
   }
-  *dQeN2vibdT=3.0*kB*fabs(_C(speceminus))*rhok[speceminus]*rhok[specN2]/(_m(speceminus)*sqr(_m(specN2))*_mueNk_from_Te(gl,specN2,Te))*sum;
+  *dQeN2vibdT=3.0*kB*fabs(_C(speceminus))*rhok[speceminus]*rhok[specN2]/(_m(speceminus)*sqr(_m(specN2))*_mueNk_from_Te(gl,specN2,Te))*(1.0-sum);
   *dQeN2vibdTv=(_QeN2vib_from_rhok_T_Tv_Te(gl,rhok,T,Tv+dTv,Te)-_QeN2vib_from_rhok_T_Tv_Te(gl,rhok,T,Tv,Te))/dTv;
   *dQeN2vibdTe=(_QeN2vib_from_rhok_T_Tv_Te(gl,rhok,T,Tv,Te+dTe)-_QeN2vib_from_rhok_T_Tv_Te(gl,rhok,T,Tv,Te))/dTe;
 }
