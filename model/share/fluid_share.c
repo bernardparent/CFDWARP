@@ -2641,10 +2641,12 @@ double _w_product_at_catalytic_wall(np_t *np, gl_t *gl, long lA, long lB, long l
   double wP;
   dim_t n;
   long dim,dim2;
-  double VnormalR,VnormalP,coeffwA;
+  double VnormalR,VnormalP,coeffwA,dwall;
   
+  assert(is_node_bdry(np[lA],TYPELEVEL_FLUID_WORK));
   // first find unit normal vector pointing towards fluid
-  if (!find_unit_vector_normal_to_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK, n)){
+  if (!find_unit_vector_normal_to_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK, n)
+   || !find_distance_between_near_bdry_node_and_boundary_plane(np, gl, lA, lB, lC, TYPELEVEL_FLUID_WORK,&dwall)){
     //fatal_error("couldn't find unit vector normal to boundary place in _w_product_at_catalytic_wall");
     
     return(_w(np[lB],specP)); 

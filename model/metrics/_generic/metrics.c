@@ -688,6 +688,7 @@ bool find_unit_vector_normal_to_boundary_plane(np_t *np, gl_t *gl, long lA, long
   EXM_cross_product(vecA2, vecA3, vecnormal);
   // now normalize the vector
   vecmag=EXM_vector_magnitude(vecnormal);
+  if (vecmag==0.0) return(FALSE);
   for (dim=0; dim<3; dim++) vecnormal[dim]/=vecmag;
   // now make sure the vector points towards node lB
   if (EXM_dot_product(vecnormal,vecB)<0.0){

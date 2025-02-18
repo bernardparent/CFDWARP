@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 FEB 17b
+  * in model/metrics/_generic/metrics.c
+    - in find_unit_vector_normal_to_boundary_plane(), fixed a bug by adding the line
+      'if (vecmag==0.0) return(FALSE);'
+  * in model/share/fluid_share.c
+    - added the call to find_distance_between_near_bdry_node_and_boundary_plane() to determine
+      if the bdry node is valid or not
+      
+
 2025 FEB 17a
   * in model/thermo/_generic/electronimpact.c
     - in _ke_kl_N2vib_from_Te(), improved the curve fits
