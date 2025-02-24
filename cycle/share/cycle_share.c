@@ -2312,7 +2312,7 @@ void initialize_residual_emfield(np_t *np, gl_t *gl, long theta, long ls, long l
 
 void update_bdry_node_emfield(np_t *np, gl_t *gl, long l){
   long dim,l_C,l_B,l_A;
-  long dimsgn; 
+  long dimsgn;
   bool BDRYDIRECFOUND;
 #ifdef _2DL
   long dim1; long dim2;

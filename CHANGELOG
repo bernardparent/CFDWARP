@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 FEB 24a
+  * in /model/emfield/_Epotential*/emfield.c
+    - in find_linearization_coefficients_bdry_node_emfield(), fixed a bug related to link nodes
+      (should not change the value of the node properties when is_node_link() is TRUE)
+
+
 2025 FEB 17b
   * in model/metrics/_generic/metrics.c
     - in find_unit_vector_normal_to_boundary_plane(), fixed a bug by adding the line
