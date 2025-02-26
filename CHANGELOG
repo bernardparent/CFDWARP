@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 FEB 26a
+  * in model/chem/_NH3_Plasma_32s/chem.c
+    - added CHEMMODEL_RODRIGUEZ2024V2
+  * in model/chem/_NH3_Plasma_32s/rodriguez2024.c
+    - removed the definitions of HMINUSFROMEXCITEDSTATES* because they are now in chem.h
+  * in model/chem/_NH3_Plasma_32s, added rodriguez2024v2.c
+  * in model/chem/_NH3_Plasma_32s, added chem.h
+    
+
 2025 FEB 25a
   * in model/emfield/_Epotential*/emfield.c
     - in is_node_bdry_dielectric(), fixed a bug: must only return TRUE if the node is not a link
