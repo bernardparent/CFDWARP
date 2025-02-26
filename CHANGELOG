@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 FEB 25a
+  * in model/emfield/_Epotential*/emfield.c
+    - in is_node_bdry_dielectric(), fixed a bug: must only return TRUE if the node is not a link
+      node
+
+
 2025 FEB 24a
   * in /model/emfield/_Epotential*/emfield.c
     - in find_linearization_coefficients_bdry_node_emfield(), fixed a bug related to link nodes
