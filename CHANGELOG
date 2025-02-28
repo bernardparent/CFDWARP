@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+
+2025 FEB 28a
+  * in model/chem/_NH3_Plasma_32s/rodriguez2024v2.c
+    - made changes so that it is more similar to rodriguez2024.c (only differences now are some
+      small errors in R31, R106, R108, R109, R116, R119.)
+
+
 2025 FEB 26a
   * in model/chem/_NH3_Plasma_32s/chem.c
     - added CHEMMODEL_RODRIGUEZ2024V2
