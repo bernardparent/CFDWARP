@@ -7,7 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
-
+2025 MAR 03a
+  * in model/emfield/
+    - deleted _Epotential-Bfixed_old
+  * in model/emfield/doc/Electrodynamics/report.tex
+    - improved the induced magnetic field section
+  * in model/emfield/
+    - added _Epotential-B/
+  * in src/common.h
+    - in npbs_t, added variables needed for _EMFIELD_EPOTENTIAL_B
+    
+    
 2025 FEB 28a
   * in model/chem/_NH3_Plasma_32s/rodriguez2024v2.c
     - made changes so that it is more similar to rodriguez2024.c (only differences now are some
