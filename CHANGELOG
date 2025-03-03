@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 MAR 03b
+  * in model/share/transport_share.c
+    - updated mueN for NH3 and NH3v
+  * in model/thermo/_generic/electronimpact.c
+    - updated _EoverN_from_Te_NH3_Morgan(), _Te_from_EoverN_NH3_Morgan()
+      _EoverN_from_Te_NH3v_Morgan(), _Te_from_EoverN_NH3v_Morgan()
+  * in model/thermo/doc/electronimpact.tex
+    - improved the documentation for NH3 and NH3v
+  * in model/transport/doc/report.tex
+    - improved the documentation for NH3 and NH3v
+    
+
 2025 MAR 03a
   * in model/emfield/
     - deleted _Epotential-Bfixed_old
