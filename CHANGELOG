@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 MAR 03c
+  * in model/chem/_NH3_Plasma_32s/rodriguez2024v2.c
+    - updated the reaction rates for reactions 2 and 3
+    
+
 2025 MAR 03b
   * in model/share/transport_share.c
     - updated mueN for NH3 and NH3v
