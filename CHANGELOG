@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 MAR 04a
+  * in model/chem/_NH3_Plasma_32s/chem.c
+    - added rodriguez2024v3.c
+  * in model/chem/_NH3_Plasma_32s/
+    - added rodriguez2024v3.c and rodriguez2024v3.h
+
+
 2025 MAR 03c
   * in model/chem/_NH3_Plasma_32s/rodriguez2024v2.c
     - updated the reaction rates for reactions 2 and 3
