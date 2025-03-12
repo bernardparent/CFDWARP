@@ -470,7 +470,7 @@ double _sigma_interface(np_t *np, gl_t *gl, long l, long dim){
 }
 
 
-void find_linearization_coefficients_inner_node_emfield(np_t *np, gl_t *gl, long l, double *coeff, EXM_gl3D_t *coeffgl){
+void find_linearization_coefficients_inner_node_emfield(np_t *np, gl_t *gl, long l, long flux, double *coeff, EXM_gl3D_t *coeffgl){
   long n,coeffl,inter,coefflL,coefflR,theta,j,lL,lR,i,k;
   double sigmaint;
   metrics_t metrics;

@@ -388,7 +388,7 @@ typedef struct {
    dim_t Esmoothedmem;
 #endif
 #ifdef _EMFIELD_EPOTENTIAL_B
-   EXM_vec3D_t Bfixed,E,J;
+   EXM_vec3D_t Bapplied,E,J;
    dim_t EMFoverL;
    double EMFmaxpower;
    double sigmasolid,epsilonr;

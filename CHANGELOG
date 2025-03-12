@@ -7,6 +7,21 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 MAR 11a
+  * in cycle/share/cycle_share.c
+    - added flux to the parameters given to find_linearization_coefficients_inner_node_emfield()
+  * in cycle/share/tsemf_share.c
+    - added flux to the parameters given to find_linearization_coefficients_inner_node_emfield()
+  * in model/_model.h
+    - added flux to the parameters given to find_linearization_coefficients_inner_node_emfield()
+  * in model/emfield/_Epotential-B/emfield.c
+    - various fixes
+  * in model/emfield/_Epotential*/emfield.c
+    - added flux to the parameters given to find_linearization_coefficients_inner_node_emfield()
+  * in src/common.h
+    - in npbs_t, renamed Bfixed to Bapplied
+    
+
 2025 MAR 04a
   * in model/chem/_NH3_Plasma_32s/chem.c
     - added rodriguez2024v3.c

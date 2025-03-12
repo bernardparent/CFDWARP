@@ -788,7 +788,6 @@ void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
   long i,cnt,ilocal,numsubiter,numcycle,cycle;
 
   find_tsemf_SOR_numsubiter_numcycle(gl->numsubiter_tsemf, TSEMF_SOR_NUMSUBITEROPT, &numsubiter, &numcycle);
-
   for (cycle=0; cycle<numcycle; cycle++){
 
     for (i=zone.is; i<=zone.ie+(numsubiter-1)*2; i++){
@@ -815,6 +814,7 @@ void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
       }
     }
   }
+  
 }
 
 
@@ -1145,7 +1145,7 @@ void update_dUstar_emfield_Newton_ij_3(np_t *np, gl_t *gl, long k, long flux, zo
           }
 
           if (TRUE){
-          find_linearization_coefficients_inner_node_emfield(np, gl, l, coeff, &coeffgl);
+          find_linearization_coefficients_inner_node_emfield(np, gl, l, flux, coeff, &coeffgl);
           /* i+0,j+0 */
           xdma[EXM_ai2(xdmagl,hbw,line)]=coeff[EXM_ai3(coeffgl,0,0,0)]+1.0/dtau;
           /* i-1,j+0 */ 

@@ -252,7 +252,7 @@ void find_linearization_coefficients_bdry_node_emfield(np_t *np, gl_t *gl, long 
 
 void find_linearization_coefficients_inner_node_emfield_interface(np_t *np, gl_t *gl, long l, long theta, long flux, double *valC, double *valB, double *valA);
 
-void find_linearization_coefficients_inner_node_emfield(np_t *np, gl_t *gl, long l, double *coeff, EXM_gl3D_t *coeffgl);
+void find_linearization_coefficients_inner_node_emfield(np_t *np, gl_t *gl, long l, long flux, double *coeff, EXM_gl3D_t *coeffgl);
 
 #endif
 
