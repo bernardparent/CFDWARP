@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 MAR 12a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - added _ke_kl_N2vib_from_Te(), _fk_N2vib_from_Tv(), _QeN2vib_from_rhok_T_Tv_Te()
+  * in model/thermo/_generic/electronimpact.c
+    - removed _ke_kl_N2vib_from_Te(), _fk_N2vib_from_Tv(), _QeN2vib_from_rhok_T_Tv_Te()
+    
+
 2025 MAR 11a
   * in cycle/share/cycle_share.c
     - added flux to the parameters given to find_linearization_coefficients_inner_node_emfield()
