@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 MAR 16a
+  * in cycle/share/cycle_share.c
+    - in update_prim_emfield_mem_in_zone_4(), fixed a bug which occurs when nfe>1
+  * in model/emfield/_Epotential-B/emfield.c
+    - fixed a few issues
+    
+
 2025 MAR 12a
   * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
     - added _ke_kl_N2vib_from_Te(), _fk_N2vib_from_Tv(), _QeN2vib_from_rhok_T_Tv_Te()

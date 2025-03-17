@@ -2240,7 +2240,11 @@ void update_prim_emfield_mem_in_zone_3(np_t *np, gl_t *gl, long theta, long ls, 
 
 #ifdef _TSEMF_STORE_COEFFICIENTS
 void update_prim_emfield_mem_in_zone_4(np_t *np, gl_t *gl, long theta, long ls, long le){
-  long l,dim,flux;
+  long l,dim,flux,cnt;
+  long i,j,k;
+  double *coeff;
+
+  coeff=(double *)malloc(150*sizeof(double));
   for (l=ls; l!=_l_plus_one(le,gl,theta); l=_l_plus_one(l,gl,theta)){
     if (is_node_inner(np[l],TYPELEVEL_EMFIELD)){ 
       for (flux=0; flux<nfe; flux++){
@@ -2250,10 +2254,19 @@ void update_prim_emfield_mem_in_zone_4(np_t *np, gl_t *gl, long theta, long ls, 
           find_linearization_coefficients_inner_node_emfield_interface(np, gl, l, dim, flux, &(np[l].bs->coeffm1[dim][flux]), &(np[l].bs->coeffp0[dim][flux]), &(np[l].bs->coeffp1[dim][flux]));
           np[l].bs->coeffp0sum[flux]+=np[l].bs->coeffp0[dim][flux];
         }
-        find_linearization_coefficients_inner_node_emfield(np, gl, l, flux, &(np[l].bs->tsemfcoeff[0][flux]), &(gl->tsemfcoeffzone));
+        find_linearization_coefficients_inner_node_emfield(np, gl, l, flux, coeff, &(gl->tsemfcoeffzone));         
+        for_1DL (i,gl->tsemfcoeffzone.is,gl->tsemfcoeffzone.ie){
+          for_2DL (j,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
+            for_3DL (k,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
+              np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,i,j,k)][flux]=coeff[EXM_ai3(gl->tsemfcoeffzone,i,j,k)];
+            } 
+          }
+        }
       }
     }
   }
+  free(coeff);
+
 }
 #endif
 

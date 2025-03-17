@@ -731,7 +731,7 @@ void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, z
   long j,k,l,dim,theta,thetasgn;
   double sum,RHS,Cp0,Cp1,dtau;
   long ioffset,joffset,koffset;
-
+  assert(flux<nfe);
   for_2DL(j,zone.js,zone.je){
     for_3DL(k,zone.ks,zone.ke){
       l=0;  // to avoid compiler warning
@@ -787,6 +787,7 @@ void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, z
 void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
   long i,cnt,ilocal,numsubiter,numcycle,cycle;
 
+  assert(flux<nfe);
   find_tsemf_SOR_numsubiter_numcycle(gl->numsubiter_tsemf, TSEMF_SOR_NUMSUBITEROPT, &numsubiter, &numcycle);
   for (cycle=0; cycle<numcycle; cycle++){
 
