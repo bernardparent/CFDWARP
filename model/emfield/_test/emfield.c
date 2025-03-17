@@ -478,13 +478,13 @@ void find_linearization_coefficients_inner_node_emfield(np_t *np, gl_t *gl, long
   double epsilonr;
 #endif
   
-  coeffgl->is=-2;
-  coeffgl->ie=+2;
-  coeffgl->js=-2;
-  coeffgl->je=+2;
+  coeffgl->is=-tsemfcoeffhbw;
+  coeffgl->ie=+tsemfcoeffhbw;
+  coeffgl->js=-tsemfcoeffhbw;
+  coeffgl->je=+tsemfcoeffhbw;
 #ifdef _3D
-  coeffgl->ks=-2;
-  coeffgl->ke=+2;
+  coeffgl->ks=-tsemfcoeffhbw;
+  coeffgl->ke=+tsemfcoeffhbw;
 #else
   coeffgl->ks=0;
   coeffgl->ke=0;

@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 MAR 17a
+  * in cycle/share/cycle_share.c
+    - in update_prim_emfield_mem_in_zone_4(), made the malloc function of tsemfcoeffhbw
+  * in model/emfield/_*/emfield.c
+    - made coeffgl function of tsemfcoeffhbw
+  * in src/common.h
+    - in npbs_t, made tsemfcoeff function of tsemfcoeffhbw
+  * in model/emfield/_Epotential-Bfixed/emfield.c
+    - in find_Jstar_emf_interface_DELTAVK(), fixed (j=0; j<3; j++) to (j=0; j<nd; j++) 
+
+
 2025 MAR 16a
   * in cycle/share/cycle_share.c
     - in update_prim_emfield_mem_in_zone_4(), fixed a bug which occurs when nfe>1

@@ -368,7 +368,7 @@ typedef struct {
    fluxemfield_t coeffm1[nd],coeffp0[nd],coeffp1[nd];
    fluxemfield_t coeffp0sum;   
    fluxemfield_t dtauemfield;
-   fluxemfield_t tsemfcoeff[125];
+   fluxemfield_t tsemfcoeff[(tsemfcoeffhbw*2+1)*(tsemfcoeffhbw*2+1)*(tsemfcoeffhbw*2+1)];
 #endif
 
 #if (defined(_TSEMF_IMAF) || defined(_TSEMF_IMAF_ADI))
