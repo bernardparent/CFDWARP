@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 MAR 17c
+  * in model/emfield/_Epotential-Bfixed/emfield.c
+    - implemented extrapolated boundary conditions for the induced magnetic fields
+      except for the BC BDRYEMF_DIELECTRICBFIXED
+
+
 2025 MAR 17b
   * in model/emfield/_Epotential-Bfixed/emfield.c
     - added the induced magnetic field contribution to B
