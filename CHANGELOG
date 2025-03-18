@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 MAR 17b
+  * in model/emfield/_Epotential-Bfixed/emfield.c
+    - added the induced magnetic field contribution to B
+    - added the BDRYEMF_DIELECTRICBFIXED boundary condition
+
+
 2025 MAR 17a
   * in cycle/share/cycle_share.c
     - in update_prim_emfield_mem_in_zone_4(), made the malloc function of tsemfcoeffhbw
