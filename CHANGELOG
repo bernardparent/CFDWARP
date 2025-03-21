@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 MAR 21b
+  * in model/emfield/_Epotential-B/emfield.c
+    - included the effect of a time-varying electric field to the B field equations
+
+
 2025 MAR 21a
   * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
     - made improvements to find_Qe_Rodriguez2025() and find_dSe_dU_transport_Rodriguez2025()
