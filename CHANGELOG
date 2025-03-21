@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 MAR 21a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - made improvements to find_Qe_Rodriguez2025() and find_dSe_dU_transport_Rodriguez2025()
+    
+
 2025 MAR 17c
   * in model/emfield/_Epotential-Bfixed/emfield.c
     - implemented extrapolated boundary conditions for the induced magnetic fields

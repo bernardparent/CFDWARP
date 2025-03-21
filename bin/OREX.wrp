@@ -72,7 +72,7 @@
 
 
 
-caseno=1;
+caseno=9;
 
 if(caseno==1,  Vx=7456.3; Pinf=0.0726; Tinf=192.3;  Twall=422;   scalefactsheath=1.0; {alt=? km} );
 if(caseno==2,  Vx=7454.1; Pinf=0.163;  Tinf=188.7;  Twall=492;   scalefactsheath=1.0; {alt=? km} );
@@ -87,7 +87,7 @@ if(caseno==10, Vx=5561.6; Pinf=23.60;  Tinf=248.12; Twall=1519;  scalefactsheath
 
 
 
-mf=2;
+mf=1;
 
 is=1;
 im1=round(40*mf/2);
