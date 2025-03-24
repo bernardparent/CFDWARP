@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 MAR 23a
+  * in model/emfield/doc/Electrodynamics/report.tex
+    - Added the Coulomb gauge and improved the section on the magnetic potential equations
+    
+
 2025 MAR 21b
   * in model/emfield/_Epotential-B/emfield.c
     - included the effect of a time-varying electric field to the B field equations
