@@ -387,6 +387,14 @@ typedef struct {
    double sigmamem,Eemagmem,Eemagsmoothedmem;
    dim_t Esmoothedmem;
 #endif
+#ifdef _EMFIELD_EPOTENTIAL_BPOTENTIAL
+   EXM_vec3D_t Bapplied,Binduced,E,J;
+   dim_t EMFoverL;
+   double EMFmaxpower;
+   double sigmasolid,epsilonr;
+   double sigmamem,Eemagmem,Eemagsmoothedmem;
+   dim_t Esmoothedmem;
+#endif
 #ifdef _EMFIELD_EPOTENTIAL_B
    EXM_vec3D_t Bapplied,E,J;
    dim_t EMFoverL;

@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+
+2025 MAR 25a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - improved the TEMODEL_RODRIGUEZ2025 model
+  * in src/common.h
+    - in npbs_t, added variables for _EMFIELD_EPOTENTIAL_BPOTENTIAL
+  * in model/emfield/
+    - added _Epotential-Bpotential
+
+
 2025 MAR 23a
   * in model/emfield/doc/Electrodynamics/report.tex
     - Added the Coulomb gauge and improved the section on the magnetic potential equations
