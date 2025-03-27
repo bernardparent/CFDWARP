@@ -1296,6 +1296,7 @@ void find_interpolation_weight(np_t *np, gl_t *gl, long l, dim_t x_file, dim_t d
 #endif
     }
     EXM_init_matrix(&mat1inv, nd, nd);
+    
     EXM_invert_matrix_analytical(mat1, &mat1inv);
     EXM_init_matrix(&mat2, nd, 1);
     for (dim=0; dim<nd; dim++){
@@ -1979,6 +1980,16 @@ if (ISREAD_EMFIELD) {
 }
 
 
+static double _dxlength2(dim_t dx){
+  double dxl;
+  dxl=dx[0]*dx[0]+dx[1]*dx[1];
+#ifdef _3D
+  dxl+=dx[2]*dx[2];
+#endif
+  return(dxl);
+}
+
+
 void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
   FILE *datafile;
   long i,j,k,cnt;
@@ -2220,11 +2231,14 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 #endif
             }
             wfwrite(x, sizeof(dim_t), 1, datafile);
+            if (_dxlength2(dx1)==0.0) fatal_error("Problem with two nodes being at exact same position at location i=%ld, j=%ld, k=%ld\n",i,j,k);
             wfwrite(dx1, sizeof(dim_t), 1, datafile);
 #ifdef _2DL
+            if (_dxlength2(dx2)==0.0) fatal_error("Problem with two nodes being at exact same position at location i=%ld, j=%ld, k=%ld\n",i,j,k);
             wfwrite(dx2, sizeof(dim_t), 1, datafile);
 #endif
 #ifdef _3DL
+            if (_dxlength2(dx3)==0.0) fatal_error("Problem with two nodes being at exact same position at location i=%ld, j=%ld, k=%ld\n",i,j,k);
             wfwrite(dx3, sizeof(dim_t), 1, datafile);
 #endif
           } //end if nodevalid

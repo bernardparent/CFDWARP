@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 MAR 26a
+  * in model/emfield/_Epotential-Bpotential/emfield.c
+    - in write_bdry_emfield_template(), fixed a bug
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - at the beginning of _zetav() added zetav=0.0 to prevent a compilation error
+  * in src/data.c
+    - added function _dxlength2()
+    - in write_data_file_interpolation(), calls  _dxlength2() and outputs an error should it be
+      zero
+
 
 2025 MAR 25a
   * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
