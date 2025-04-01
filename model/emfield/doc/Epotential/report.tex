@@ -88,6 +88,351 @@ abstract
 
 
 
+\section{Maxwell Equations}
+
+
+Maxwell-Faraday equation:
+%
+\begin{equation}
+\vec{\nabla} \times \vec{E} = -\frac{\partial \vec{B}}{\partial t}
+\end{equation}
+%
+Ampere's circuital law:
+%
+\begin{equation}
+\vec{\nabla} \times \vec{B} = \mu_0 \epsilon_0 \epsilon_{\rm r} \frac{\partial \vec{E}}{\partial t} + \mu_0 \vec{J}
+\end{equation}
+%
+Gauss's law:
+%
+\begin{equation}
+\vec{\nabla} \cdot \left( \epsilon_{\rm r} \epsilon_0 \vec{E} \right) = \rho_{\rm c}
+\end{equation}
+%
+Gauss's law for magnetism:
+%
+\begin{equation}
+\vec{\nabla} \cdot \vec{B} = 0
+\end{equation}
+%
+
+
+\section{Magnetic Potential Equations}
+
+
+We'll here derive some potential equations for electrodynamics as in \cite{book:2007:brown}.
+Start from the Maxwell-Faraday equation (also known as the Faraday's law of induction):
+%
+\begin{equation}
+ \nabla \times \vec{E} = -\frac{\partial \vec{B}}{\partial t}
+ \label{eqn:faradaylaw}
+\end{equation}
+%
+Also, note that another fundamental law of electromagnetism is Gauss's law for magnetism:
+%
+\begin{equation}
+  \vec{\nabla} \cdot \vec{B}=0
+  \label{eqn:gausslawmagnetism}
+\end{equation}
+%
+To ensure that the latter two are satisfied, we will first define the vector magnetic potential $\vec{A}$ such that
+%
+\begin{equation}
+ \vec{B}=\vec{\nabla} \times \vec{A}
+ \label{eqn:magneticpotential}
+\end{equation}
+%
+Note that should we take the divergence on both sides, the latter would always satisfy Gauss's law for magnetism.
+Substitute the latter in the Faraday's law of induction:
+%
+\begin{equation}
+ \nabla \times \vec{E} = -\frac{\partial}{\partial t}(\vec{\nabla} \times \vec{A})
+\end{equation}
+%
+or
+%
+\begin{equation}
+ \nabla \times \vec{E} = -\vec{\nabla} \times \frac{\partial \vec{A}}{\partial t} 
+\end{equation}
+%
+or
+%
+\begin{equation}
+ \nabla \times \left( \vec{E} + \frac{\partial \vec{A}}{\partial t} \right)= 0
+\end{equation}
+%
+Because the curl of $\vec{E} + \frac{\partial \vec{A}}{\partial t}$ is zero, a scalar potential exists such that:
+%
+\begin{equation}
+  -\vec{\nabla} \phi = \vec{E} + \frac{\partial \vec{A}}{\partial t}
+\end{equation}
+%
+with $\phi$ the non-static electric potential.
+Isolate $\vec{E}$:
+%
+\begin{equation}
+\frameeqn{
+\vec{E}=  -\vec{\nabla} \phi -\frac{\partial \vec{A}}{\partial t} 
+}
+\label{eqn:Bpotential:E}
+\end{equation}
+%
+We can substitute the latter into Gauss's law to obtain the electric field potential equation. Then, solving the latter would automatically satisfy Faraday's law of induction and Gauss's law.
+
+
+Another law of electromagnetism that needs to be satisfied is Ampere's circuital law:
+%
+\begin{equation}
+\vec{\nabla} \times \vec{B} = \mu_0 \vec{J} + \mu_0 \epsilon_0 \epsilon_{\rm r} \frac{\partial \vec{E}}{\partial t}
+\label{eqn:amperelaw}
+\end{equation}
+% 
+Substitute the former in the latter and note that $\vec{B}=\vec{\nabla}\times\vec{A}$:
+%
+\begin{equation}
+\vec{\nabla} \times (\vec{\nabla}\times\vec{A}) = \mu_0 \vec{J} + \mu_0 \epsilon_0 \epsilon_{\rm r} \frac{\partial }{\partial t}\left(-\vec{\nabla} \phi -\frac{\partial \vec{A}}{\partial t} \right)
+\end{equation}
+% 
+But note that the following is always true:
+%
+\begin{equation}
+\vec{\nabla} \times (\vec{\nabla} \times \vec{u})= \vec{\nabla}(\vec{\nabla}\cdot\vec{u}) -  (\vec{\nabla}\cdot\vec{\nabla}) \vec{u}
+\end{equation}
+%
+Thus, the former becomes:
+%
+\begin{equation}
+\vec{\nabla}(\vec{\nabla}\cdot\vec{A}) -  (\vec{\nabla}\cdot\vec{\nabla}) \vec{A} = \mu_0 \vec{J} + \mu_0 \epsilon_0 \epsilon_{\rm r} \frac{\partial }{\partial t}\left(-\vec{\nabla} \phi -\frac{\partial \vec{A}}{\partial t} \right)
+\end{equation}
+% 
+Or
+%
+\begin{equation}
+\frameeqn{
+\vec{\nabla}\left(\vec{\nabla}\cdot\vec{A}+\mu_0\epsilon_0 \epsilon_{\rm r}  \frac{\partial \phi}{\partial t}\right)  = \mu_0 \vec{J} - \mu_0 \epsilon_0 \epsilon_{\rm r} \frac{\partial^2 \vec{A} }{\partial t^2} +   (\vec{\nabla}\cdot\vec{\nabla}) \vec{A}
+}
+\label{eqn:Bpotential:A}
+\end{equation}
+% 
+Solving the latter vector equation for the magnetic potential would automatically satisfy Gauss's law of magnetism as well as Ampere's law. 
+
+Thus, solving (\ref{eqn:Bpotential:A}) and the electric field potential equation obtained from Gauss's law while finding the electric field from Eq.~(\ref{eqn:Bpotential:E}) would satisfy the four laws composing the Maxwell equations: the Gauss law, the Gauss law of magnetism, the Faraday induction law, and the Ampere law.
+
+
+
+
+\subsection{Lorenz Gauge}
+
+
+To have Lorentz invariance, the time derivatives and spatial derivatives must be treated equally (i.e. of the same order). Therefore, it is convenient to impose the Lorenz gauge condition:
+%
+\begin{equation}
+\frameeqn{
+\vec{\nabla}\cdot\vec{A}=-\mu_0\epsilon_0 \epsilon_{\rm r}  \frac{\partial \phi}{\partial t}
+}
+\label{eqn:lorenzgauge}
+\end{equation}
+%
+Then, substituting the latter in (\ref{eqn:Bpotential:A}), we get:
+%
+\begin{equation}
+0  = \mu_0 \vec{J} - \mu_0 \epsilon_0 \epsilon_{\rm r}  \frac{\partial^2 \vec{A} }{\partial t^2} +   (\vec{\nabla}\cdot\vec{\nabla}) \vec{A}
+\end{equation}
+% 
+or
+%
+\begin{equation}
+ \mu_0 \epsilon_0 \epsilon_{\rm r} \frac{\partial^2 \vec{A} }{\partial t^2} -   (\vec{\nabla}\cdot\vec{\nabla}) \vec{A}  = \mu_0 \vec{J} 
+\end{equation}
+% 
+But recall from Eq.~(\ref{eqn:Bpotential:E}) that $\partial_t \vec{A} = -\vec{E}-\vec{\nabla}\phi$:
+%
+\begin{equation}
+\frameeqn{
+  -   (\vec{\nabla}\cdot\vec{\nabla}) \vec{A}  = \mu_0 \left(\vec{J} +\epsilon_0 \epsilon_{\rm r} \frac{\partial }{\partial t}\left( \vec{E}+\vec{\nabla}\phi \right)\right)
+ }
+\label{eqn:Bpotential:A:Lorenz}
+\end{equation}
+% 
+
+
+To use the latter equation to find the magnetic vector potential $\vec{A}$ it is important to make sure that the Lorenz gauge (\ref{eqn:lorenzgauge}) is satisfied.
+
+We can make sure that (\ref{eqn:lorenzgauge}) is always satisfied simply by adding some terms to $\vec{A}$ and $\phi$ that will not affect the fields. Do the following transformations:
+%
+\begin{equation}
+  \vec{A}=\vec{A}^\prime + \vec{\nabla} \Lambda
+\end{equation}
+%
+%
+\begin{equation}
+  \phi=\phi^\prime - \frac{\partial\Lambda}{\partial t}
+\end{equation}
+%
+Substitute in the expression for the electric field (\ref{eqn:Bpotential:E}):
+%
+\begin{equation}
+\vec{E}=  -\vec{\nabla} \left( \phi^\prime - \frac{\partial\Lambda}{\partial t}\right) -\frac{\partial }{\partial t}\left( \vec{A}^\prime + \vec{\nabla} \Lambda \right) 
+\end{equation}
+%
+Because of the commutativity of differentiation, the latter becomes:
+%
+\begin{equation}
+\vec{E}=  -\vec{\nabla} \phi^\prime  -\frac{\partial \vec{A}^\prime}{\partial t}
+\end{equation}
+%
+Also, the magnetic field is determined from the curl of $\vec{A}$. Substitute $\vec{A}=\vec{A}^\prime + \vec{\nabla} \Lambda$:
+%
+\begin{equation}
+\vec{B}=\vec{\nabla} \times \left( \vec{A}^\prime + \vec{\nabla} \Lambda\right)=\nabla \times  \vec{A}^\prime
+\end{equation}
+%
+Thus, because $\vec{E}$ and $\vec{B}$ do not depend of $\Lambda$, the addition of the $\Lambda$ terms do not affect the fields. Now, let's find how $\Lambda$ should be specified in order to satisfy the Lorenz gauge. Recall the Lorenz gauge condition:
+%
+\begin{equation}
+\vec{\nabla}\cdot\vec{A}=-\mu_0\epsilon_0\epsilon_{\rm r}  \frac{\partial \phi}{\partial t}
+\end{equation}
+%
+Substitute $\vec{A}=\vec{A}^\prime + \vec{\nabla} \Lambda$ and $\phi=\phi^\prime - \frac{\partial\Lambda}{\partial t}$ in the latter:
+%
+\begin{equation}
+  \vec{\nabla}\cdot\vec{A}^\prime 
++ \vec{\nabla}\cdot \vec{\nabla} \Lambda
+=
+-\mu_0\epsilon_0 \epsilon_{\rm r} \frac{\partial \phi^\prime}{\partial t}
++\mu_0\epsilon_0 \epsilon_{\rm r} \frac{\partial }{\partial t} \left( \frac{\partial\Lambda}{\partial t} \right)
+\end{equation}
+%
+The latter can be rewritten as follows:
+%
+\begin{equation}
++ (\vec{\nabla}\cdot \vec{\nabla}) \Lambda
+- \mu_0\epsilon_0 \epsilon_{\rm r} \frac{\partial }{\partial t} \left( \frac{\partial\Lambda}{\partial t} \right)
+=
+-\mu_0\epsilon_0 \epsilon_{\rm r} \frac{\partial \phi^\prime}{\partial t}
+-\vec{\nabla}\cdot\vec{A}^\prime 
+\end{equation}
+%
+Thus, knowing $\phi^\prime$ and $\vec{A}^\prime$ (that satisfy the Maxwell equations), we can find $\Lambda$ and this will satisfy the Lorenz gauge condition. Thus the Lorenz gauge is always satisfied. The difficulty is in finding $\phi^\prime$ and $\vec{A}^\prime$ that satisfy the Lorenz gauge at the boundaries. Some numerical techniques that involve changing the boundary conditions to ensure that the Lorenz gauge is satisfied are outlined in \cite{book:2018:garcia}.
+
+
+
+\subsection{Coulomb Gauge}
+
+It is convenient to impose the Coulomb gauge condition:
+%
+\begin{equation}
+\frameeqn{
+\vec{\nabla}\cdot\vec{A}=0
+}
+\label{eqn:coulombgauge}
+\end{equation}
+%
+Then, substituting the latter in (\ref{eqn:Bpotential:A}), we get:
+%
+\begin{equation}
+\vec{\nabla}\left(\mu_0\epsilon_0 \epsilon_{\rm r} \frac{\partial \phi}{\partial t}\right)  = \mu_0 \vec{J} - \mu_0 \epsilon_0 \epsilon_{\rm r} \frac{\partial^2 \vec{A} }{\partial t^2} +   (\vec{\nabla}\cdot\vec{\nabla}) \vec{A}
+\end{equation}
+% 
+
+or
+%
+\begin{equation}
+ \mu_0 \epsilon_0 \epsilon_{\rm r} \frac{\partial^2 \vec{A} }{\partial t^2} -   (\vec{\nabla}\cdot\vec{\nabla}) \vec{A}  = \mu_0 \vec{J} - \vec{\nabla}\left(\mu_0\epsilon_0 \epsilon_{\rm r} \frac{\partial \phi}{\partial t}\right)
+\end{equation}
+% 
+But recall from Eq.~(\ref{eqn:Bpotential:E}) that $\partial_t \vec{A} = -\vec{E}-\vec{\nabla}\phi$:
+%
+\begin{equation}
+ \mu_0 \epsilon_0 \epsilon_{\rm r} \frac{\partial }{\partial t}\left( -\vec{E}-\vec{\nabla}\phi \right) -   (\vec{\nabla}\cdot\vec{\nabla}) \vec{A}  = \mu_0 \vec{J} - \vec{\nabla}\left(\mu_0\epsilon_0 \epsilon_{\rm r} \frac{\partial \phi}{\partial t}\right)
+\end{equation}
+% 
+Noting that $\mu_0$ and $\epsilon_0$ are constants, we can rewrite the latter as:
+%
+\begin{equation}
+ \mu_0 \epsilon_0 \epsilon_{\rm r} \frac{\partial }{\partial t}\left( -\vec{E}-\vec{\nabla}\phi \right) -   (\vec{\nabla}\cdot\vec{\nabla}) \vec{A}  = \mu_0 \vec{J} 
+ - \mu_0\epsilon_0 \vec{\nabla}\left( \epsilon_{\rm r} \frac{\partial \phi}{\partial t}\right)
+\end{equation}
+% 
+Expand the last term on the RHS:
+%
+\begin{equation}
+ \mu_0 \epsilon_0 \epsilon_{\rm r} \frac{\partial }{\partial t}\left( -\vec{E}-\vec{\nabla}\phi \right) -   (\vec{\nabla}\cdot\vec{\nabla}) \vec{A}  = \mu_0 \vec{J} 
+ - \mu_0\epsilon_0 \epsilon_{\rm r} \vec{\nabla}\left(  \frac{\partial \phi}{\partial t}\right)
+ - \mu_0\epsilon_0 \frac{\partial \phi}{\partial t} \vec{\nabla}\epsilon_{\rm r}
+\end{equation}
+% 
+Then, using the commutativity of differentiation, the latter becomes:
+%
+\begin{equation}
+\frameeqn{
+ -   (\vec{\nabla}\cdot\vec{\nabla}) \vec{A}  = \mu_0 \left(\vec{J} + \epsilon_0 \epsilon_{\rm r} \frac{\partial \vec{E}}{\partial t}  + \epsilon_0 \frac{\partial \phi}{\partial t} \vec{\nabla}\epsilon_{\rm r}\right)
+}
+\label{eqn:Bpotential:A:Coulomb}
+\end{equation}
+% 
+
+
+To use the latter equation to find the magnetic vector potential $\vec{A}$ it is important to make sure that the Coulomb gauge (\ref{eqn:coulombgauge}) is satisfied.
+
+We can make sure that (\ref{eqn:coulombgauge}) is always satisfied simply by adding some terms to $\vec{A}$ and $\phi$ that will not affect the fields. Do the following transformations:
+%
+\begin{equation}
+  \vec{A}=\vec{A}^\prime + \vec{\nabla} \Lambda
+\end{equation}
+%
+%
+\begin{equation}
+  \phi=\phi^\prime - \frac{\partial\Lambda}{\partial t}
+\end{equation}
+%
+Substitute in the expression for the electric field (\ref{eqn:Bpotential:E}):
+%
+\begin{equation}
+\vec{E}=  -\vec{\nabla} \left( \phi^\prime - \frac{\partial\Lambda}{\partial t}\right) -\frac{\partial }{\partial t}\left( \vec{A}^\prime + \vec{\nabla} \Lambda \right) 
+\end{equation}
+%
+Because of the commutativity of differentiation, the latter becomes:
+%
+\begin{equation}
+\vec{E}=  -\vec{\nabla} \phi^\prime  -\frac{\partial \vec{A}^\prime}{\partial t}
+\end{equation}
+%
+Also, the magnetic field is determined from the curl of $\vec{A}$. Substitute $\vec{A}=\vec{A}^\prime + \vec{\nabla} \Lambda$:
+%
+\begin{equation}
+\vec{B}=\vec{\nabla} \times \left( \vec{A}^\prime + \vec{\nabla} \Lambda\right)=\nabla \times  \vec{A}^\prime
+\end{equation}
+%
+Thus, because $\vec{E}$ and $\vec{B}$ do not depend of $\Lambda$, the addition of the $\Lambda$ terms do not affect the fields. Now, let's find how $\Lambda$ should be specified in order to satisfy the Coulomb gauge. Recall the Coulomb gauge condition:
+%
+\begin{equation}
+\vec{\nabla}\cdot\vec{A}=0
+\end{equation}
+%
+Substitute $\vec{A}=\vec{A}^\prime + \vec{\nabla} \Lambda$ in the latter:
+%
+\begin{equation}
+  \vec{\nabla}\cdot\vec{A}^\prime 
++ \vec{\nabla}\cdot \vec{\nabla} \Lambda
+=
+0
+\end{equation}
+%
+The latter can be rewritten as follows:
+%
+\begin{equation}
+- (\vec{\nabla}\cdot \vec{\nabla}) \Lambda
+=
+\vec{\nabla}\cdot\vec{A}^\prime 
+\end{equation}
+%
+Thus after finding $\vec{A}^\prime$  (that satisfies the Maxwell equations), we can find $\Lambda$ from the latter and this will satisfy the Coulomb gauge condition. Therefore, there is always a solution to $\Lambda$ which satisfied the Coulomb gauge once $\vec{A}^\prime$ is found. The only difficulty lies in finding some boundary condition for $\vec{A}$ which satisfies the Coulomb gauge. 
+
+
+
+
+
 
 \section{Charged Species Momentum Conservation Equation}
 
@@ -233,16 +578,16 @@ where $\epsilon_r$ is the relative permittivity (a non-dimensional term) and $\e
 \sum_{k=1}^\ns C_k N_k
 \end{equation}
 %
-In electrostatics, the curl of the electric field is zero leading to the existence of an electric field potential. Thus, the electric field can be written as the negative of the gradient of the potential, resulting in the following form of Gauss's law:
+As shown above in Eq.~(\ref{eqn:Bpotential:E}), the non-static electric field potential corresponds to $\vec{E}=  -\vec{\nabla} \phi -\frac{\partial \vec{A}}{\partial t}$. Such is valid for electrodynamics.  This results in the following form of Gauss's law:
 %
 \begin{equation}
- \sum_{i=1}^3 \frac{\partial }{\partial x_i}\left(\epsilon_0 \epsilon_r \frac{\partial \phi}{\partial x_i} \right)=   -\rho_{\rm c} 
+ \sum_{i=1}^3 \frac{\partial }{\partial x_i}\left(\epsilon_0 \epsilon_r \frac{\partial \phi}{\partial x_i} + \epsilon_0 \epsilon_r\frac{\partial A_i}{\partial t} \right)=   -\rho_{\rm c} 
 \end{equation}
 %
 But $\epsilon_0$ is a constant:
 %
 \begin{equation}
- \sum_{i=1}^3 \frac{\partial }{\partial x_i}\left( \epsilon_r \frac{\partial \phi}{\partial x_i} \right)=   -\frac{\rho_{\rm c}}{\epsilon_0} 
+ \sum_{i=1}^3 \frac{\partial }{\partial x_i}\left( \epsilon_r \frac{\partial \phi}{\partial x_i} + \epsilon_r\frac{\partial A_i}{\partial t} \right)=   -\frac{\rho_{\rm c}}{\epsilon_0} 
 \end{equation}
 %
 
@@ -317,10 +662,10 @@ Define the conductivity as:
 \sigma \equiv \sum_{k=1}^\ns |C_k| N_k \mu_k
 \end{equation}
 %
-and assume that a potential exists such that:
+and recall the relationship between the electric field and the potential:
 %
 \begin{equation}
-\vec{E}_i = -\frac{\partial \phi}{\partial x_i}
+\vec{E}_i = -\frac{\partial \phi}{\partial x_i} -\frac{\partial A_i}{\partial t}
 \end{equation}
 %
 Then:
@@ -328,7 +673,7 @@ Then:
 \begin{equation}
 \frameeqn{
   \frac{\partial \rho_{\rm c}}{\partial t} 
-- \sum_{i=1}^3 \frac{\partial}{\partial x_i}\left( \sigma  \frac{\partial \phi}{\partial x_i}   \right)
+- \sum_{i=1}^3 \frac{\partial}{\partial x_i}\left( \sigma  \frac{\partial \phi}{\partial x_i} + \sigma  \frac{\partial A_i}{\partial t}   \right)
 + \sum_{k=1}^\ns\sum_{i=1}^3 \frac{\partial}{\partial x_i} C_k N_k \left(\Delta \vec{V}^k_i+\vec{V}^{\rm n}_i \right) 
 - \sum_{k=1}^\ns\sum_{i=1}^3 \frac{\partial}{\partial x_i}  \left({s_k \mu_k} \frac{\partial P_k}{\partial x_i} \right) 
 = 0

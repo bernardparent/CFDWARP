@@ -642,6 +642,79 @@ static double _EoverN_from_Te_N2(double Te){
   return(EoverN);
 }
 
+
+/* 
+Compute the influence of the ionization degree on E/N vs Te for N2
+E/N vs Te splines are obtained for electron molar fractions of 1e-6 to 1e-2
+Given the electron molar fraction chieminus, interpolate at a given Te to find E/N 
+*/
+static double _EoverN_from_Te_chieminus_N2(double Te, double chieminus){
+  double EoverN,Te_data[12],EoverN_data[12];
+  long k;
+  double chie_data[] = {1.000E-6,1.000E-5,1.000E-4,1.000E-3,1.000E-2};
+  int N_chie = sizeof(chie_data)/sizeof(chie_data[0]);
+  double EoverN_chie_data[N_chie];
+  // spline data at chieminus = 1e-6,1e-5,1e-4,1e-3,1e-2
+  for (k=0; k<N_chie; k++){  
+    switch (k){
+      case 0:
+        Te_data[0]=5.7683209957938; Te_data[1]=5.9895807688236; Te_data[2]=6.5808712966722; Te_data[3]=7.1628887632684;
+        Te_data[4]=8.0619851978272; Te_data[5]=8.4079571483189; Te_data[6]=9.0635173434530; Te_data[7]=9.8359370093448;
+        Te_data[8]=10.2153848302326; Te_data[9]=11.3844718843909; Te_data[10]=12.2033581841564; Te_data[11]=13.8155105579643;
+        
+        EoverN_data[0]=-51.8608448501949; EoverN_data[1]=-51.0557104756815; EoverN_data[2]=-50.1104688751939; EoverN_data[3]=-49.3864420173586;
+        EoverN_data[4]=-48.3392573343656; EoverN_data[5]=-47.8592084179916; EoverN_data[6]=-46.6399631066307; EoverN_data[7]=-44.0774427408722;
+        EoverN_data[8]=-43.4726005050452; EoverN_data[9]=-42.4528700839551; EoverN_data[10]=-41.3655827304183; EoverN_data[11]=-39.8080228556486;
+      break;
+      case 1:
+        Te_data[0]=5.7683209957938; Te_data[1]=5.9895807688236; Te_data[2]=6.5808712966722; Te_data[3]=7.1628887632684;
+        Te_data[4]=8.0619851978272; Te_data[5]=8.4079571483189; Te_data[6]=9.0635173434530; Te_data[7]=9.6333495008421;
+        Te_data[8]=10.2153848302326; Te_data[9]=11.3844718843909; Te_data[10]=12.2033581841564; Te_data[11]=13.8155105579643;
+        
+        EoverN_data[0]=-51.8608448501949; EoverN_data[1]=-51.0557104756815; EoverN_data[2]=-50.1085328420543; EoverN_data[3]=-49.3801397401679;
+        EoverN_data[4]=-48.3083794171069; EoverN_data[5]=-47.7656757851313; EoverN_data[6]=-46.3349910379067; EoverN_data[7]=-44.5138801470076;
+        EoverN_data[8]=-43.4726005050452; EoverN_data[9]=-42.4528700839551; EoverN_data[10]=-41.3655827304183; EoverN_data[11]=-39.8080228556486;
+      break;
+      case 2:
+        Te_data[0]=5.7683209957938; Te_data[1]=5.9895807688236; Te_data[2]=6.5808712966722; Te_data[3]=7.1628887632684;
+        Te_data[4]=8.0619851978272; Te_data[5]=8.4079571483189; Te_data[6]=9.0635173434530; Te_data[7]=9.5975225839140;
+        Te_data[8]=10.2153848302326; Te_data[9]=11.3844718843909; Te_data[10]=12.2033581841564; Te_data[11]=13.8155105579643;
+        
+        EoverN_data[0]=-51.8608448501949; EoverN_data[1]=-51.0557104756815; EoverN_data[2]=-50.1069099506727; EoverN_data[3]=-49.3727751273235;
+        EoverN_data[4]=-48.2419739062285; EoverN_data[5]=-47.4771310463929; EoverN_data[6]=-45.6569866292733; EoverN_data[7]=-44.3535890924510;
+        EoverN_data[8]=-43.4775996021468; EoverN_data[9]=-42.4528700839551; EoverN_data[10]=-41.3655827304183; EoverN_data[11]=-39.8080228556486;
+      break;
+      case 3:
+        Te_data[0]=5.7683209957938; Te_data[1]=5.9895807688236; Te_data[2]=6.5808712966722; Te_data[3]=7.1628887632684;
+        Te_data[4]=8.0619851978272; Te_data[5]=8.4079571483189; Te_data[6]=9.0635173434530; Te_data[7]=9.8359370093448;
+        Te_data[8]=10.2153848302326; Te_data[9]=11.3844718843909; Te_data[10]=12.2033581841564; Te_data[11]=13.8155105579643;
+        
+        EoverN_data[0]=-51.8608448501949; EoverN_data[1]=-51.0557104756815; EoverN_data[2]=-50.1064620441829; EoverN_data[3]=-49.3691609881841;
+        EoverN_data[4]=-48.1138496265006; EoverN_data[5]=-47.0154858747258; EoverN_data[6]=-45.0964427747303; EoverN_data[7]=-43.9094349253216;
+        EoverN_data[8]=-43.4724699527492; EoverN_data[9]=-42.4528700839551; EoverN_data[10]=-41.3655827304183; EoverN_data[11]=-39.8080228556486;
+      break;
+      case 4:
+        Te_data[0]=5.7683209957938; Te_data[1]=5.9895807688236; Te_data[2]=6.5808712966722; Te_data[3]=7.1628887632684;
+        Te_data[4]=8.0619851978272; Te_data[5]=8.4079571483189; Te_data[6]=9.0635173434530; Te_data[7]=9.8359370093448;
+        Te_data[8]=10.2153848302326; Te_data[9]=11.3844718843909; Te_data[10]=12.2033581841564; Te_data[11]=13.8155105579643;
+
+        EoverN_data[0]=-51.8608448501949; EoverN_data[1]=-51.0557104756815; EoverN_data[2]=-50.1064682435513; EoverN_data[3]=-49.3685992138692;
+        EoverN_data[4]=-48.0548406010350; EoverN_data[5]=-46.8277415123705; EoverN_data[6]=-44.8901986329883; EoverN_data[7]=-43.8229867640502;
+        EoverN_data[8]=-43.4632414442052; EoverN_data[9]=-42.4528700839551; EoverN_data[10]=-41.3655827304183; EoverN_data[11]=-39.8080228556486;
+      break;
+      default:
+        fatal_error("Couldn't find EoverN from electron molar fraction data in _EoverN_from_Te_chieminus_N2().");
+    }
+    int N = sizeof(Te_data)/sizeof(Te_data[0]);
+    Te = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
+    // inerpolate over Te to find E/N at each ionization fraction data
+    EoverN_chie_data[k] = exp( EXM_f_from_monotonespline(N, Te_data, EoverN_data, Te) );
+  }
+  // interpolate over chieminus to find final E/N
+  EoverN = EXM_f_from_monotonespline(N_chie, chie_data, EoverN_chie_data, max(chie_data[0],min( chieminus, chie_data[N_chie-1])));
+  return(EoverN);
+};
+
 static double _Te_from_EoverN_N2(double EoverN){
   double Te;
   /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections */
@@ -1367,6 +1440,19 @@ double _EoverNk_from_Te(long spec, double Te){
 }
 
 
+double _EoverNk_from_Te_chieminus(long spec, double Te, double chieminus){
+  double Estar;
+  switch (smap[spec]){
+    case SMAP_N2:
+      Estar=_EoverN_from_Te_chieminus_N2(Te, chieminus);
+    break;
+    default:
+      Estar=_EoverNk_from_Te(spec, Te);
+  }
+  return(Estar);
+}
+
+
 double _Tek_from_EoverN(long spec, double EoverN){
   double Te;
   switch (smap[spec]){
@@ -1447,4 +1533,3 @@ double _Te_from_rhok_EoverN(spec_t rhok, double EoverN){
   Te/=Nsum;
   return(Te);
 }
-

@@ -128,5 +128,7 @@ double _Te_from_rhok_EoverN(spec_t rhok, double EoverN);
 
 double _EoverNk_from_Te(long spec, double Te);
 
+double _EoverNk_from_Te_chieminus(long spec, double Te, double chieminus);
+
 
 #endif /* _THERMO_H */

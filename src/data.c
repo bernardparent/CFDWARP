@@ -2231,14 +2231,14 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 #endif
             }
             wfwrite(x, sizeof(dim_t), 1, datafile);
-            if (_dxlength2(dx1)==0.0) fatal_error("Problem with two nodes being at exact same position at location i=%ld, j=%ld, k=%ld\n",i,j,k);
+            if (_dxlength2(dx1)==0.0) fatal_error("Two adjacent nodes on the grid have the same x,y,z position at the location i=%ld, j=%ld, k=%ld\n",i,j,k);
             wfwrite(dx1, sizeof(dim_t), 1, datafile);
 #ifdef _2DL
-            if (_dxlength2(dx2)==0.0) fatal_error("Problem with two nodes being at exact same position at location i=%ld, j=%ld, k=%ld\n",i,j,k);
+            if (_dxlength2(dx2)==0.0) fatal_error("Two adjacent nodes on the grid have the same x,y,z position at the location i=%ld, j=%ld, k=%ld\n",i,j,k);
             wfwrite(dx2, sizeof(dim_t), 1, datafile);
 #endif
 #ifdef _3DL
-            if (_dxlength2(dx3)==0.0) fatal_error("Problem with two nodes being at exact same position at location i=%ld, j=%ld, k=%ld\n",i,j,k);
+            if (_dxlength2(dx3)==0.0) fatal_error("Two adjacent nodes on the grid have the same x,y,z position at the location i=%ld, j=%ld, k=%ld\n",i,j,k);
             wfwrite(dx3, sizeof(dim_t), 1, datafile);
 #endif
           } //end if nodevalid

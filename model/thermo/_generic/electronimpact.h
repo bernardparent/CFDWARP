@@ -9,6 +9,8 @@ double _Te_from_Nk_EoverN(spec_t N, double EoverN);
 
 double _EoverNk_from_Te(long spec, double Te);
 
+double _EoverNk_from_Te_chieminus(long spec, double Te, double chieminus);
+
 double _Tek_from_EoverN(long spec, double EoverN);
 
 double _fk_from_Tv(long k, double Tv);
