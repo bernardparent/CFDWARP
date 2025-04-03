@@ -700,29 +700,33 @@ Within the transport equation for the potential outlined in Eq.\ (\ref{eqn:phitr
   \rho_{\rm c} =  \sum_{i=1}^3 \frac{\partial }{\partial x_i} \epsilon_r \epsilon_0 \vec{E}_i
 \end{equation}
 %
-where $\epsilon_r$ is the relative permittivity (a non-dimensional term) and $\epsilon_0$ is the permittivity of free space. Then note that the electric field corresponds to the negative of the gradient of the potential. Thus:
+where $\epsilon_r$ is the relative permittivity (a non-dimensional term) and $\epsilon_0$ is the permittivity of free space. Then recall the electric field potential $\vec{E}_i = -\frac{\partial \phi}{\partial x_i} -\frac{\partial A_i}{\partial t}$
 %
 \begin{equation}
-  \rho_{\rm c} = - \sum_{i=1}^3 \frac{\partial }{\partial x_i}\left(\epsilon_0 \epsilon_r \frac{\partial \phi}{\partial x_i} \right)
+  \rho_{\rm c} = - \sum_{i=1}^3 \frac{\partial }{\partial x_i}
+  \left(\epsilon_0 \epsilon_r \frac{\partial \phi}{\partial x_i}
+       +\epsilon_0 \epsilon_r \frac{\partial A_i}{\partial t} \right)
 \end{equation}
 %
 Taking the time derivative on both sides yields:
 %
 \begin{equation}
-  \frac{\partial \rho_{\rm c}}{\partial t} = - \frac{\partial }{\partial t}\sum_{i=1}^3 \frac{\partial }{\partial x_i}\left(\epsilon_0 \epsilon_r \frac{\partial \phi}{\partial x_i} \right)
+  \frac{\partial \rho_{\rm c}}{\partial t} = - \frac{\partial }{\partial t}\sum_{i=1}^3 \frac{\partial }{\partial x_i}\left(\epsilon_0 \epsilon_r \frac{\partial \phi}{\partial x_i} 
+            +\epsilon_0 \epsilon_r \frac{\partial A_i}{\partial t} \right)
 \end{equation}
 %
 Or, should $\epsilon_r$ not vary in time at a specific location, the latter can also be written as:
 %
 \begin{equation}
-  \frac{\partial \rho_{\rm c}}{\partial t} = - \sum_{i=1}^3 \frac{\partial }{\partial x_i}\left(\epsilon_0 \epsilon_r \frac{\partial (\partial_t \phi)}{\partial x_i} \right)
+  \frac{\partial \rho_{\rm c}}{\partial t} = - \sum_{i=1}^3 \frac{\partial }{\partial x_i}\left(\epsilon_0   \epsilon_r \frac{\partial (\partial_t \phi)}{\partial x_i} 
+  +\epsilon_0 \epsilon_r \frac{\partial^2 A_i}{\partial t^2}\right)
 \label{eqn:drhocdt}
 \end{equation}
 %
 Where $\partial_t(\cdot)$ stands for $\partial (\cdot)/\partial t$.  Now, substitute Eq.\ (\ref{eqn:drhocdt}) in Eq.\ (\ref{eqn:phitransport}):
 %
 \begin{align}
-- \sum_{i=1}^3 \frac{\partial }{\partial x_i}\left(\epsilon_0 \epsilon_r \frac{\partial (\partial_t \phi)}{\partial x_i} \right)
+- \sum_{i=1}^3 \frac{\partial }{\partial x_i}\left(\epsilon_0 \epsilon_r \frac{\partial (\partial_t \phi)}{\partial x_i} +\epsilon_0 \epsilon_r \frac{\partial^2 A_i}{\partial t^2}\right)
 &- \sum_{i=1}^3 \frac{\partial}{\partial x_i}\left( \sigma  \frac{\partial \phi}{\partial x_i}   \right)
 + \sum_{k=1}^\ns\sum_{i=1}^3 \frac{\partial}{\partial x_i} C_k N_k \left(\Delta \vec{V}^k_i+\vec{V}^{\rm n}_i \right) \nonumber\alb
 &- \sum_{k=1}^\ns\sum_{i=1}^3 \frac{\partial}{\partial x_i}  \left({s_k \mu_k} \frac{\partial P_k}{\partial x_i} \right) 
@@ -748,7 +752,8 @@ with $\vec{J}^{\rm d}$ the displacement current:
 %
 \begin{equation}
  \vec{J}_i^{\rm d} \equiv 
-  -~\epsilon_0 \epsilon_r \frac{\partial (\partial_t \phi)}{\partial x_i}
+  -\epsilon_0 \epsilon_r \frac{\partial (\partial_t \phi)}{\partial x_i}
+  -\epsilon_0 \epsilon_r \frac{\partial^2 A_i}{\partial t^2}
 \label{eqn:Jdisplacement}
 \end{equation}
 %

@@ -649,11 +649,10 @@ E/N vs Te splines are obtained for electron molar fractions of 1e-6 to 1e-2
 Given the electron molar fraction chieminus, interpolate at a given Te to find E/N 
 */
 static double _EoverN_from_Te_chieminus_N2(double Te, double chieminus){
-  double EoverN,Te_data[12],EoverN_data[12];
   long k;
   double chie_data[] = {1.000E-6,1.000E-5,1.000E-4,1.000E-3,1.000E-2};
   int N_chie = sizeof(chie_data)/sizeof(chie_data[0]);
-  double EoverN_chie_data[N_chie];
+  double EoverN_chie_data[N_chie],Tek[N_chie],EoverN,Te_data[12],EoverN_data[12];
   // spline data at chieminus = 1e-6,1e-5,1e-4,1e-3,1e-2
   for (k=0; k<N_chie; k++){  
     switch (k){
@@ -706,9 +705,9 @@ static double _EoverN_from_Te_chieminus_N2(double Te, double chieminus){
         fatal_error("Couldn't find EoverN from electron molar fraction data in _EoverN_from_Te_chieminus_N2().");
     }
     int N = sizeof(Te_data)/sizeof(Te_data[0]);
-    Te = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
+    Tek[k] = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
     // inerpolate over Te to find E/N at each ionization fraction data
-    EoverN_chie_data[k] = exp( EXM_f_from_monotonespline(N, Te_data, EoverN_data, Te) );
+    EoverN_chie_data[k] = exp( EXM_f_from_monotonespline(N, Te_data, EoverN_data, Tek[k]) );
   }
   // interpolate over chieminus to find final E/N
   EoverN = EXM_f_from_monotonespline(N_chie, chie_data, EoverN_chie_data, max(chie_data[0],min( chieminus, chie_data[N_chie-1])));

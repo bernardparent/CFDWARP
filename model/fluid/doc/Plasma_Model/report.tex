@@ -245,7 +245,7 @@ and with the mobility tensor equal to:
 \label{eqn:mutilde}
 \end{equation}
 %
-In the latter, the magnetic field $\vec{B}$ corresponds to the externally applied magnetic field, as the induced magnetic field can be shown to have negligible impact on many weakly-ionized plasmas (the so-called low magnetic Reynolds number approximation). When the induced magnetic field plays a negligible role, and when the applied (external) magnetic field does not vary in time, it can be demonstrated that the Maxwell equations reduce to the solution of Gauss's law:
+In the latter, the magnetic field $\vec{B}$ corresponds to the externally applied magnetic field, as the induced magnetic field can be shown to have negligible impact on many weakly-ionized plasmas (the so-called low magnetic Reynolds number approximation). One of the laws composing the Maxwell equations is Gauss's law:
 %
 \begin{equation}
 \sum_{j=1}^3 \frac{\partial }{\partial x_j} \epsilon_r \vec{E}_j=\frac{1}{\epsilon_0} \sum_{k=1}^\ns C_k N_k 
@@ -255,11 +255,11 @@ In the latter, the magnetic field $\vec{B}$ corresponds to the externally applie
 in which the electric field vector can be expressed in terms of a potential function as follows:  
 %
 \begin{equation}
-  \vec{E}_j=-\frac{\partial \phi}{\partial x_j}
+  \vec{E}_j=-\frac{\partial \phi}{\partial x_j} - \frac{\partial \vec{A}_j}{\partial t}
   \label{eqn:potential}
 \end{equation}
 %
-The electric field potential $\phi$ exists as long as the curl of the electric field is zero, which is the case when the magnetic field does not vary in time.  
+Such is also valid when the magnetic field varies in time.  
 Although not required to solve the system of equations outlined above, one physical parameter that is often used when analyzing plasma flowfields is the current density $\vec{J}$, which is defined as:
 %
 \begin{equation}
@@ -303,7 +303,7 @@ P_k = N_k k_{\rm B} T_k
 %
 where $T_k$ is the species temperature.
 
-Commonly used to simulate weakly-ionized plasmas in the presence of magnetic field, the physical model outlined above can predict accurately not only quasi-neutral phenomena such as ambipolar diffusion and ambipolar drift but also non-neutral phenomena within cathode and anode sheaths. It can also be used to simulate multicomponent plasmas in which there are several types of ions (either negative or positive) as well as unsteady plasmas in which the displacement current is significant. Nonetheless, it is pointed out that the physical model used herein is subject to several assumptions, with the most critical being the following: (i) the forces due to collisions between charged species are small compared to forces due to collisions  between the charged species and the neutrals; (ii) the induced magnetic field is negligible; (iii) within the momentum equation, the terms related to the inertia change are negligible compared to the terms related to collision forces. As was demonstrated in Ref.\ \cite{jcp:2011:parent}, such assumptions are well justified as long as the plasma remains weakly-ionized (i.e. the ionization fraction should remain lower than $10^{-3}$ or so), which is the case for a wide variety of plasmas used in industrial applications.     
+Commonly used to simulate weakly-ionized plasmas in the presence of magnetic field, the physical model outlined above can predict accurately not only quasi-neutral phenomena such as ambipolar diffusion and ambipolar drift but also non-neutral phenomena within cathode and anode sheaths. It can also be used to simulate multicomponent plasmas in which there are several types of ions (either negative or positive) as well as unsteady plasmas in which the displacement current is significant. Nonetheless, it is pointed out that the physical model used herein is subject to several assumptions, with the most critical being the following: (i) the forces due to collisions between charged species are small compared to forces due to collisions  between the charged species and the neutrals; (ii) within the momentum equation, the terms related to the inertia change are negligible compared to the terms related to collision forces. As was demonstrated in Ref.\ \cite{jcp:2011:parent}, such assumptions are well justified as long as the plasma remains weakly-ionized (i.e. the ionization fraction should remain lower than $10^{-3}$ or so), which is the case for a wide variety of plasmas used in industrial applications.     
 
 
 
@@ -360,7 +360,7 @@ where the notation $[M]_{k,k}$ denotes the diagonal element on the $k$th row of 
 The electric field is obtained from the potential as in Eq.\ (\ref{eqn:potential}) which itself is found by integrating the potential equation concurrently to the mass conservation equations. To ensure that Gauss's law is satisfied within the non-neutral regions, it is necessary to obtain the potential equation from Gauss's law by substituting Eq.\ (\ref{eqn:potential}) into Eq.\ (\ref{eqn:gauss}):
 %
 \begin{equation}
-\sum_{j=1}^3 \frac{\partial }{\partial x_j}\left(\epsilon_r \frac{\partial \phi}{\partial x_j}\right)=-\frac{\rho_{\rm c}}{\epsilon_0}  
+\sum_{j=1}^3 \frac{\partial }{\partial x_j}\left(\epsilon_r \frac{\partial \phi}{\partial x_j} + \epsilon_r \frac{\partial \vec{A}_j}{\partial t}\right)=-\frac{\rho_{\rm c}}{\epsilon_0}  
 \label{eqn:potentialgauss}
 \end{equation}
 %  

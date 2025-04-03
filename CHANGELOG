@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 APR 03a
+  * in model/thermo/_generic/electronimpact.c
+    - in _EoverN_from_Te_chieminus_N2(), fixed a bug
+  * in model/emfield/doc/Epotential/report.tex
+    - made modifications to incorporate the contribution of A to the electric potential
+  * in model/fluid/doc/Plasma_Model/report.tex
+    - made modifications to incorporate the contribution of A to the electric potential
+    
+
 2025 APR 01a
   * renamed bin/cylinderinnerflow2D.wrp to bin/discinnerflow2D.wrp
   * in model/emfield/doc/Epotential/report.tex, added Maxwell equations and the magnetic field
