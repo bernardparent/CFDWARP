@@ -1297,6 +1297,9 @@ void find_interpolation_weight(np_t *np, gl_t *gl, long l, dim_t x_file, dim_t d
     }
     EXM_init_matrix(&mat1inv, nd, nd);
     
+    //printf("%E %E %E\n",dx1_file[0],dx1_file[1],dx1_file[2]);  //????????
+    //printf("%E %E %E\n",dx2_file[0],dx2_file[1],dx2_file[2]);
+    //printf("%E %E %E\n",dx3_file[0],dx3_file[1],dx3_file[2]);
     EXM_invert_matrix_analytical(mat1, &mat1inv);
     EXM_init_matrix(&mat2, nd, 1);
     for (dim=0; dim<nd; dim++){
@@ -2164,7 +2167,9 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
               for (dim=0; dim<nd; dim++) x[dim]=_x(np[_ai(gl,i,j,k)],dim);
               for (dim=0; dim<nd; dim++){
 	        if ((i<gl->domain_all.ie && NODEVALID[_ai_all(gl,i+1,j,k)]) && (i>gl->domain_all.is && NODEVALID[_ai_all(gl,i-1,j,k)])) {
-	          dx1[dim]=0.5*(np[_ai(gl,i+1,j,k)].bs->x[dim]-np[_ai(gl,i-1,j,k)].bs->x[dim]);
+	          dx1[dim]=0.5*sign(np[_ai(gl,i+1,j,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])
+                        *(fabs(np[_ai(gl,i+1,j,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])
+                        + fabs(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i-1,j,k)].bs->x[dim]));
                 } else {
                   if (i<gl->domain_all.ie && NODEVALID[_ai_all(gl,i+1,j,k)]) {
                     dx1[dim]=(np[_ai(gl,i+1,j,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim]);
@@ -2178,7 +2183,8 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 	        }
 #ifdef _2DL
                 if ((j<gl->domain_all.je && NODEVALID[_ai_all(gl,i,j+1,k)]) && (j>gl->domain_all.js && NODEVALID[_ai_all(gl,i,j-1,k)])) {
-                  dx2[dim]=0.5*(np[_ai(gl,i,j+1,k)].bs->x[dim]-np[_ai(gl,i,j-1,k)].bs->x[dim]);
+                  dx2[dim]=0.5*sign(np[_ai(gl,i,j+1,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])
+                   *(fabs(np[_ai(gl,i,j+1,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])+fabs(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i,j-1,k)].bs->x[dim]));
                 } else {
                   if (j<gl->domain_all.je && NODEVALID[_ai_all(gl,i,j+1,k)]) {
 	            dx2[dim]=(np[_ai(gl,i,j+1,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim]);
@@ -2193,7 +2199,8 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 #endif
 #ifdef _3DL
 	        if ((k<gl->domain_all.ke && NODEVALID[_ai_all(gl,i,j,k+1)]) && (k>gl->domain_all.ks && NODEVALID[_ai_all(gl,i,j,k-1)])) {
-                  dx3[dim]=0.5*(np[_ai(gl,i,j,k+1)].bs->x[dim]-np[_ai(gl,i,j,k-1)].bs->x[dim]);
+                  dx3[dim]=0.5*sign(np[_ai(gl,i,k+1,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])
+                     *(fabs(np[_ai(gl,i,k+1,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])+fabs(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i,j,k-1)].bs->x[dim]));
                 } else {
                   if (k<gl->domain_all.ke && NODEVALID[_ai_all(gl,i,j,k+1)]) {
                     dx3[dim]=(np[_ai(gl,i,j,k+1)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim]);

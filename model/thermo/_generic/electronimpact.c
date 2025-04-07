@@ -712,7 +712,8 @@ static double _EoverN_from_Te_chieminus_N2(double Te, double chieminus){
   // interpolate over chieminus to find final E/N
   EoverN = EXM_f_from_monotonespline(N_chie, chie_data, EoverN_chie_data, max(chie_data[0],min( chieminus, chie_data[N_chie-1])));
   return(EoverN);
-};
+}
+
 
 static double _Te_from_EoverN_N2(double EoverN){
   double Te;

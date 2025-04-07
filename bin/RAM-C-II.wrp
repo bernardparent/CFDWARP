@@ -418,7 +418,7 @@ Model(
     INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY=FALSE;
     SCHOTTKY_EFFECT=FALSE;
     N2VIBJOULEHEATING=YES;
-    N2VIBJOULEHEATINGMODEL=N2VIBJOULEHEATINGMODEL_ALEKSANDROV;
+    N2VIBJOULEHEATINGMODEL=N2VIBJOULEHEATINGMODEL_PARENT2024;
     REACTING=YES;
     emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
     sigmadiv=1e-10; {S/m}
@@ -430,7 +430,7 @@ Model(
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e1;     Tmax=35.0e3;    {K}
     Tvmin=Tmin;     Tvmax=Tmax;  {K}
-    Temin=240;     Temax=20.0e3;  {K}
+    Temin=240;     Temax=100.0e3;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain for neutrals}
     chiimin=1e-30;  chiimax=1.0;    {min and max ion molar fraction}
@@ -447,7 +447,7 @@ Model(
     TrefElectronEnergyTransport=50.0;
   );
   AirPlasma11s(
-    CHEMMODEL=CHEMMODEL_PARENTPARK2021;
+    CHEMMODEL=CHEMMODEL_RODRIGUEZ2024;
     for (react,1,6, ADDITIONALREACTION[react]=FALSE;); {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE generally}
     QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}

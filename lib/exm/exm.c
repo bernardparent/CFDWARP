@@ -1274,7 +1274,10 @@ void EXM_invert_matrix_analytical(EXM_mat_t mat, EXM_mat_t *matinv){
          +mat.cont[EXM_aim(mat.glm,1,0)]*mat.cont[EXM_aim(mat.glm,0,2)]*mat.cont[EXM_aim(mat.glm,2,1)]
          +mat.cont[EXM_aim(mat.glm,2,0)]*mat.cont[EXM_aim(mat.glm,0,1)]*mat.cont[EXM_aim(mat.glm,1,2)]
          -mat.cont[EXM_aim(mat.glm,2,0)]*mat.cont[EXM_aim(mat.glm,0,2)]*mat.cont[EXM_aim(mat.glm,1,1)];
-      assert(den!=0.0);
+      if (den==0.0) {
+        EXM_display_matrix(mat); 
+        EXM_fatal_error("Above matrix can not be inverted in EXM_invert_matrix_analytical() because its determinant is zero.");
+      }      
       matinv->cont[EXM_aim(mat.glm,0,0)]=(mat.cont[EXM_aim(mat.glm,1,1)]*mat.cont[EXM_aim(mat.glm,2,2)]-mat.cont[EXM_aim(mat.glm,1,2)]*mat.cont[EXM_aim(mat.glm,2,1)])/den;
       matinv->cont[EXM_aim(mat.glm,0,1)]=(mat.cont[EXM_aim(mat.glm,2,1)]*mat.cont[EXM_aim(mat.glm,0,2)]-mat.cont[EXM_aim(mat.glm,2,2)]*mat.cont[EXM_aim(mat.glm,0,1)])/den;
       matinv->cont[EXM_aim(mat.glm,0,2)]=(mat.cont[EXM_aim(mat.glm,0,1)]*mat.cont[EXM_aim(mat.glm,1,2)]-mat.cont[EXM_aim(mat.glm,0,2)]*mat.cont[EXM_aim(mat.glm,1,1)])/den;
