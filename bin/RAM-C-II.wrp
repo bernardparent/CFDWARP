@@ -102,7 +102,7 @@ J. THERMOPHYSICS VOL. 5, page 266, 1991.}
 
 
 
-mf=1;
+mf=2;
 
 
 is=1;  
@@ -240,7 +240,7 @@ Grid(
 
 Metrics(
   METRICSMODEL=METRICSMODEL_AXISYMMETRIC;
-  axisymmetric_min_radius=0.02;
+  axisymmetric_min_radius=0.1e10;
   axisymmetric_slice_angle=pi/100.0;
 );
 
