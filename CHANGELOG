@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 APR 21a
+  * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
+    - implemented a third set of reactions
+    
+
 2025 APR 20a
   * in bin/RAM-C-II.wrp
     - in Metrics(), changed the minimum radius to 0.1e10
