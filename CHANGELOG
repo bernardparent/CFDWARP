@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 APR 22a
+  * in model/chem/_NH3_Plasma_32s/chem.hh
+    - changed maxreactarakoni2007omprakas from 100 to 200
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - added TEMODEL_TRANSPORT_PETERS2019
+  * in model/fluid/_Navier-Stokes_plasma/fluid_plasma.c
+    - added TEMODEL_TRANSPORT_PETERS2019
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - added TEMODEL_TRANSPORT_PETERS2019
+    - added _K_l()
+    - added find_Qe_Peters2019()
+    - added find_dSe_dU_transport_Peters2019()
+    
+
 2025 APR 21a
   * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
     - implemented a third set of reactions
