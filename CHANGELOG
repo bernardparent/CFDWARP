@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 APR 22b
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_dSe_dU_transport_Peters2019(), made the inelastic terms implicit
+    
+
 2025 APR 22a
   * in model/chem/_NH3_Plasma_32s/chem.hh
     - changed maxreactarakoni2007omprakas from 100 to 200
