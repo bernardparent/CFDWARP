@@ -33,7 +33,7 @@ Bdry(
     {
     ———————————————————————————————————————————————————————————————————————————————————
     Boundary Condition Type          Description
-    ———————————————————————————————————————————————————————————————————————————————————
+    ——————————————————————————————————————————————————————————————————————————————————
     BDRY_INFLOWSUPERSONIC            Inflow, supersonic
     BDRY_INFLOWSUBSONIC1             Inflow, subsonic, Tstag, Pstag fixed
     BDRY_INFLOWSUBSONICMASSFLOWFIXED1   Inflow, subsonic, Pstag, Massflow/Area fixed
@@ -67,7 +67,7 @@ Model(
     DILATDISSIP=DILATDISSIP_WILCOX;
     RAPCOMP=NO;
     TURBSOURCE=YES;
-    N2VIBMODEL=N2VIBMODEL_MACHERET;
+    N2VIBMODEL=N2VIBMODEL_PARENT2024;
     REACTING=YES;
     Prt=0.9e0;
     Sct=1.0e0;

@@ -4,7 +4,7 @@
   #include <src/common.h>
   #include <model/fluid/_fluid.h>
 
-  #define N2VIBMODEL_MACHERET 1
+  #define N2VIBMODEL_PARENT2024 1
   #define N2VIBMODEL_MILLIKAN 2
   #define TEMODEL_TEQUILIBRIUM 1
   #define TEMODEL_TVEQUILIBRIUM 2

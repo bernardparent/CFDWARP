@@ -218,7 +218,7 @@ Model(
     MHDTURB=NO;
     TURBSOURCE=YES;
     TEMODEL=TEMODEL_LOCAL;
-    N2VIBMODEL=N2VIBMODEL_MACHERET;
+    N2VIBMODEL=N2VIBMODEL_PARENT2024;
     N2VIBJOULEHEATING=NO;
     REACTING=YES;
     emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}

@@ -234,7 +234,7 @@ Model(
   NavierStokesPlasma(
     TEMODEL=TEMODEL_TRANSPORT;
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
-    N2VIBMODEL=N2VIBMODEL_MACHERET;
+    N2VIBMODEL=N2VIBMODEL_PARENT2024;
     N2VIBJOULEHEATING=YES;
     REACTING=YES;
     emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}

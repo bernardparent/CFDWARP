@@ -225,7 +225,7 @@ Bdry(
 Model(
   NavierStokesPlasma(
     TEMODEL=TEMODEL_LOCAL;    {set TEMODEL to TEMODEL_LOCAL, TEMODEL_TRANSPORT, or TEMODEL_CONSTANT}
-    N2VIBMODEL=N2VIBMODEL_MACHERET;
+    N2VIBMODEL=N2VIBMODEL_PARENT2024;
     emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
     N2VIBJOULEHEATING=YES; {solve the nitrogen vibration energy joule heating source terms?}
     REACTING=YES;   {solve chemical reactions?}

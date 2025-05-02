@@ -7,6 +7,19 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 MAY 01a
+  * in various files:
+    - renamed N2VIBMODEL_MACHERET to N2VIBMODEL_PARENT2024
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - removed N2VIBJOULEHEATING and N2VIBJOULEHEATINGMODEL
+    - added N2VIBMODEL_RODRIGUEZ2025
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Semfield() and find_dSemfield_dU(), added N2VIBMODEL_RODRIGUEZ2025
+    - in _K_l(), updated the splines
+    - deleted _zetav()
+    - in find_Qe_Rodriguez2025(), now apply the heating to all inelastic cooling terms
+  
+
 2025 APR 24a
   * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
     - updated the function _K_l() by extrapolating the rates linearly down to 300 K

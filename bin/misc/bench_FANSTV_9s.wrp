@@ -95,7 +95,7 @@ Model(
     TURBSOURCE=YES; {solve the turbulence source terms? if set to NO and if the turbulence 
                      kinetic energy k is set to zero in the freestream, then will solve the 
                      flow as laminar}
-    N2VIBMODEL=N2VIBMODEL_MACHERET;      {the nitrogen vibration energy source terms can be set to N2VIBMODEL_MACHERET or N2VIBMODEL_MILLIKAN } 
+    N2VIBMODEL=N2VIBMODEL_PARENT2024;      {the nitrogen vibration energy source terms can be set to N2VIBMODEL_PARENT2024 or N2VIBMODEL_MILLIKAN } 
     
     REACTING=YES;   {reacting flow? say either YES or NO -> only effective when a chemical solver is used}
     Prt=0.9e0;      {the turbulent Prandtl number;

@@ -149,7 +149,7 @@ Model(
                      kinetic energy k is set to zero in the freestream, then will solve the 
                      flow as laminar}
     TEMODEL=TEMODEL_LOCAL;    {set TE to TEMODEL_LOCAL, TEMODEL_TRANSPORT, or TEMODEL_CONSTANT}
-    N2VIBMODEL=N2VIBMODEL_MACHERET;      {solve the nitrogen vibration energy source terms?} 
+    N2VIBMODEL=N2VIBMODEL_PARENT2024;      {solve the nitrogen vibration energy source terms?} 
     N2VIBJOULEHEATING=YES; {solve the nitrogen vibration energy joule heating source terms?  } 
     REACTING=YES;
     Prt=0.9e0;      {the turbulent Prandtl number;

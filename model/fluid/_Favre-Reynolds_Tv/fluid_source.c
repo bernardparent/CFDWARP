@@ -42,7 +42,7 @@ double _tauvt(np_t np, gl_t *gl){
   T=_T(np,gl);
   tauvt=1.0e99;
   switch (gl->model.fluid.N2VIBMODEL){ 
-    case N2VIBMODEL_MACHERET:
+    case N2VIBMODEL_PARENT2024:
       N_O=0.0;
 #ifdef specO
       N_O=_rhok(np,specO)*calA/_calM(specO);
@@ -155,7 +155,7 @@ static void find_dSvib_dU(np_t *np, gl_t *gl, long l, sqmat_t dSvibdU){
     dSvibdU[fluxev][flux]+=fact_evzero*1.0/_tauvt(np[l],gl)*_rhok(np[l],specN2)*_dev_dTv_from_Tv(_T(np[l],gl))*dTdU[flux];
 
   /* wrt to (1/tauvt) */
-  if (gl->model.fluid.N2VIBMODEL==N2VIBMODEL_MACHERET) {
+  if (gl->model.fluid.N2VIBMODEL==N2VIBMODEL_PARENT2024) {
  
     for (spec=0; spec<ns; spec++)
       dSvibdU[fluxev][spec]+=

@@ -56,7 +56,7 @@ void write_model_fluid_template(FILE **controlfile){
     "    DILATDISSIP=DILATDISSIP_WILCOX;\n"
     "    RAPCOMP=NO;\n"
     "    TURBSOURCE=YES;\n"
-    "    N2VIBMODEL=N2VIBMODEL_MACHERET;\n"
+    "    N2VIBMODEL=N2VIBMODEL_PARENT2024;\n"
     "    TEMODEL=TEMODEL_TVEQUILIBRIUM;\n" 
     "    SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL=TRUE;\n"
     "    REACTING=YES;\n"
@@ -132,7 +132,7 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
     SOAP_add_int_to_vars(codex,"TURBMODEL_KOMEGA1988",TURBMODEL_KOMEGA1988); 
     SOAP_add_int_to_vars(codex,"TURBMODEL_KOMEGA2008",TURBMODEL_KOMEGA2008); 
     SOAP_add_int_to_vars(codex,"TURBMODEL_SST1994",TURBMODEL_SST1994); 
-    SOAP_add_int_to_vars(codex,"N2VIBMODEL_MACHERET",N2VIBMODEL_MACHERET);
+    SOAP_add_int_to_vars(codex,"N2VIBMODEL_PARENT2024",N2VIBMODEL_PARENT2024);
     SOAP_add_int_to_vars(codex,"N2VIBMODEL_MILLIKAN",N2VIBMODEL_MILLIKAN);
     SOAP_add_int_to_vars(codex,"TEMODEL_TEQUILIBRIUM",TEMODEL_TEQUILIBRIUM);
     SOAP_add_int_to_vars(codex,"TEMODEL_TVEQUILIBRIUM",TEMODEL_TVEQUILIBRIUM);
@@ -166,8 +166,8 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
     find_bool_var_from_codex(codex,"TURBSOURCE",&gl->model.fluid.TURBSOURCE);
     find_bool_var_from_codex(codex,"SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL",&gl->model.fluid.SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL);
     find_int_var_from_codex(codex,"N2VIBMODEL",&gl->model.fluid.N2VIBMODEL);
-    if (gl->model.fluid.N2VIBMODEL!=N2VIBMODEL_MACHERET && gl->model.fluid.N2VIBMODEL!=N2VIBMODEL_MILLIKAN)
-      SOAP_fatal_error(codex,"N2VIBMODEL must be set to either N2VIBMODEL_MACHERET or N2VIBMODEL_MILLIKAN.");
+    if (gl->model.fluid.N2VIBMODEL!=N2VIBMODEL_PARENT2024 && gl->model.fluid.N2VIBMODEL!=N2VIBMODEL_MILLIKAN)
+      SOAP_fatal_error(codex,"N2VIBMODEL must be set to either N2VIBMODEL_PARENT2024 or N2VIBMODEL_MILLIKAN.");
     find_int_var_from_codex(codex,"TEMODEL",&gl->model.fluid.TEMODEL);
     if (gl->model.fluid.TEMODEL!=TEMODEL_TEQUILIBRIUM && gl->model.fluid.TEMODEL!=TEMODEL_TVEQUILIBRIUM)
       SOAP_fatal_error(codex,"TEMODEL must be set to either TEMODEL_TEQUILIBRIUM or TEMODEL_TVEQUILIBRIUM.");

@@ -175,7 +175,7 @@ Model(
     TURBSOURCE=YES; {solve the turbulence source terms? if set to NO and if the turbulence 
                      kinetic energy k is set to zero in the freestream, then will solve the 
                      flow as laminar}
-    N2VIBMODEL=N2VIBMODEL_MACHERET;      {solve the nitrogen vibration energy source terms? YES or NO 
+    N2VIBMODEL=N2VIBMODEL_PARENT2024;      {solve the nitrogen vibration energy source terms? YES or NO 
                      If NO, the nitrogen vibrational energy source terms are set to zero}
     TEMODEL=TEMODEL_LOCAL;
     N2VIBJOULEHEATING=YES; {solve the nitrogen vibration energy joule heating source terms? YES or NO } 
