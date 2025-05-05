@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 MAY 05a
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Qe_Rodriguez2025() and find_Qe_Rodriguez2025_ADHOC(), limited the inelastic heating
+      to N2 only
+      
+
 2025 MAY 01a
   * in various files:
     - renamed N2VIBMODEL_MACHERET to N2VIBMODEL_PARENT2024
