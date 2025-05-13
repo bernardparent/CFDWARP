@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 MAY 13b
+  * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
+    - added version 12 which corresponds to rodriguezv2
+    
+
 2025 MAY 13a
   * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
     - in find_Semfield(), now calls _zetav_Rodriguez2025() for the N2VIBMODEL_RODRIGUEZ2025
