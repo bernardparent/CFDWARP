@@ -1014,7 +1014,43 @@ double _s_from_w_T(spec_t w, double T){
   return(smix);
 }
 
-
+double _zetav_from_Te_Rodriguez2025(double Te){
+  double zetav;
+  double Te_control[] = 
+  { 
+    300.000000000000,
+    10405.7712366020,
+    12758.1826500507,
+    21673.3788660228,
+    38350.1739856647,
+    55346.9270284963,
+    83199.8600309798,
+    115277.848348167,
+    188009.918441261,
+    407883.388080480,
+    638657.488862754,
+    1000000.00000000,
+  };
+  double zetav_control[] = 
+  {
+    1.000000000000000,
+    0.999706109630770,
+    0.998096040585763,
+    0.808391768288578,
+    0.483534318118858,
+    0.246928559228925,
+    0.0700695413621944,
+    0.0223991633144689,
+    0.00502283344748368,
+    0.000793648704787836,
+    0.000337593322464755,
+    0.000158976912844893
+  };  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(Te,Te_control[0]));
+  zetav = EXM_f_from_monotonespline(N, Te_control, zetav_control, Te);
+  return(zetav);
+}
 
 double _zetav_from_Te_Parent2024(double Te){
   double zetav;
@@ -1264,7 +1300,3 @@ double _ionizationpot(long k){
   }
   return(ionizationenergy/echarge);
 }
-
-
-
-
