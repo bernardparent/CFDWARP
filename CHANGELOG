@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 JUN 09a
+  * in model/thermo/_generic/electronimpact.c
+    - added _EoverN_from_Te_chieminus_O2()
+    - added _EoverN_from_Te_chieminus_NO()
+    - in _EoverNk_from_Te_chieminus(), added calls to _EoverN_from_Te_chieminus_O2() and to
+      _EoverN_from_Te_chieminus_NO()
+      
+
 2025 MAY 13b
   * in model/chem/_NH3_Plasma_32s/arakoni2007omprakas.c
     - added version 12 which corresponds to rodriguezv2
