@@ -205,6 +205,16 @@ void find_A_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t A){
 }
 
 
+double _Pstar_from_jacvars(jacvars_t jacvars){
+  return(jacvars.P);
+}
+
+
+double _rho_from_jacvars(jacvars_t jacvars){
+  return(jacvars.rho);
+}
+
+
 double _a_from_jacvars(jacvars_t jacvars){
   double ret;
   long dim,spec;

@@ -139,6 +139,14 @@ void find_Fstar_from_jacvars(jacvars_t jacvars, metrics_t metrics, flux_t F);
 
 void find_jacvars_from_U(flux_t U, metrics_t metrics, gl_t *gl, long theta, jacvars_t *jacvars);
 
+double _Pstar_from_jacvars(jacvars_t jacvars);
+
+double _rho_from_jacvars(jacvars_t jacvars);
+
+double _a_from_jacvars(jacvars_t jacvars);
+
+double _V_from_jacvars(jacvars_t jacvars, long dim);
+
 void find_A_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t A);
 
 void find_Linv_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t R);

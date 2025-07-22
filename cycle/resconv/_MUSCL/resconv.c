@@ -39,6 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FLUX_FVS 2
 #define FLUX_FDSR 3
 #define FLUX_KNP 4
+#define FLUX_HLLC 5
+#define FLUX_HLL 6
+#define FLUX_HLLC_HYBRID 7
 #define INTERPOL_AOWENO5 1
 #define INTERPOL_AOWENO7 2
 #define INTERPOL_AOWENO9 3
@@ -103,6 +106,9 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     SOAP_add_int_to_vars(codex,"FLUX_FDSR",FLUX_FDSR); 
     SOAP_add_int_to_vars(codex,"FLUX_FVS",FLUX_FVS); 
     SOAP_add_int_to_vars(codex,"FLUX_KNP",FLUX_KNP); 
+    SOAP_add_int_to_vars(codex,"FLUX_HLLC",FLUX_HLLC); 
+    SOAP_add_int_to_vars(codex,"FLUX_HLL",FLUX_HLL); 
+    SOAP_add_int_to_vars(codex,"FLUX_HLLC_HYBRID",FLUX_HLLC_HYBRID); 
     SOAP_add_int_to_vars(codex,"INTERPOL_TVD2_MINMOD",INTERPOL_TVD2_MINMOD); 
     SOAP_add_int_to_vars(codex,"INTERPOL_TVD2_MINMOD2",INTERPOL_TVD2_MINMOD2); 
     SOAP_add_int_to_vars(codex,"INTERPOL_TVD2_VANLEER",INTERPOL_TVD2_VANLEER); 
@@ -151,8 +157,8 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
 
 
     find_int_var_from_codex(codex,"FLUX",&gl->cycle.resconv.FLUX);
-    if (gl->cycle.resconv.FLUX!=FLUX_FDS && gl->cycle.resconv.FLUX!=FLUX_FVS && gl->cycle.resconv.FLUX!=FLUX_FDSR && gl->cycle.resconv.FLUX!=FLUX_KNP)
-      SOAP_fatal_error(codex,"FLUX must be set to either FLUX_FDS or FLUX_FDSR or FLUX_FVS or FLUX_KNP.");
+    if (gl->cycle.resconv.FLUX!=FLUX_FDS && gl->cycle.resconv.FLUX!=FLUX_FVS && gl->cycle.resconv.FLUX!=FLUX_FDSR && gl->cycle.resconv.FLUX!=FLUX_HLLC && gl->cycle.resconv.FLUX!=FLUX_HLL && gl->cycle.resconv.FLUX!=FLUX_HLLC_HYBRID && gl->cycle.resconv.FLUX!=FLUX_KNP)
+      SOAP_fatal_error(codex,"FLUX must be set to either FLUX_FDS or FLUX_FDSR or FLUX_HLLC or FLUX_HLL or FLUX_HLLC_HYBRID or FLUX_FVS or FLUX_KNP.");
     find_int_var_from_codex(codex,"INTERPOL",&gl->cycle.resconv.INTERPOL);
     if (
 #if (hbw_resconv_fluid>=2)
@@ -206,6 +212,208 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
   }
 
 }
+
+
+void find_Fstar_interface_HLLC_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h,  long theta, flux_t musclvarsm1h, 
+                     flux_t musclvarsp1h, metrics_t metrics, int EIGENVALCOND, int AVERAGING, flux_t Fint){
+  dim_t n;
+  long dim,flux;
+  double metricsmag,UnL,UnR,rhoL,rhoR,PL,PR,aL,aR,SL,SR,SM,Pstar;
+  bool FOUND;
+  jacvars_t jacvarsL,jacvarsR;
+  flux_t UL,UR,UstarL,UstarR;
+  metricsmag=0.0;
+  for (dim=0; dim<nd; dim++){
+    metricsmag+=sqr(metrics.X2[theta][dim]);
+  }
+  metricsmag=sqrt(metricsmag);
+  for (dim=0; dim<nd; dim++){
+    n[dim]=metrics.X2[theta][dim]/metricsmag;
+  }
+  find_jacvars_from_musclvars(musclvarsm1h, metrics, gl, theta, &jacvarsL);
+  find_jacvars_from_musclvars(musclvarsp1h, metrics, gl, theta, &jacvarsR);
+  
+  // find the magnitude of the velocity vector normal to the interface for the left and right nodes 
+  UnL=0.0;
+  for (dim=0; dim<nd; dim++) UnL+=_V_from_jacvars(jacvarsL, dim)*n[dim];
+  UnR=0.0;
+  for (dim=0; dim<nd; dim++) UnR+=_V_from_jacvars(jacvarsR, dim)*n[dim];
+  aL=_a_from_jacvars(jacvarsL);
+  aR=_a_from_jacvars(jacvarsR);
+  PL=_Pstar_from_jacvars(jacvarsL);
+  PR=_Pstar_from_jacvars(jacvarsR);
+  rhoL=_rho_from_jacvars(jacvarsL);
+  rhoR=_rho_from_jacvars(jacvarsR);
+  SL=UnL-aL;
+  SR=UnR+aR;
+  SM=(PR-PL+rhoL*UnL*(SL-UnL)-rhoR*UnR*(SR-UnR))/(rhoL*(SL-UnL)-rhoR*(SR-UnR));
+  Pstar=PL+rhoL*(UnL-SL)*(UnL-SM);
+  find_Ustar_from_jacvars(jacvarsL,  metrics, UL);
+  find_Ustar_from_jacvars(jacvarsR,  metrics, UR);
+  for (flux=0; flux<nf; flux++) UstarL[flux]=UL[flux]*(SL-UnL)/(SL-SM);
+  for (flux=0; flux<nf; flux++) UstarR[flux]=UR[flux]*(SR-UnR)/(SR-SM);
+  for (dim=0; dim<nd; dim++) UstarL[fluxmom+dim]+=metrics.Omega*n[dim]*(Pstar-PL)/(SL-SM);
+  for (dim=0; dim<nd; dim++) UstarR[fluxmom+dim]+=metrics.Omega*n[dim]*(Pstar-PR)/(SR-SM);
+  UstarL[fluxet]+=metrics.Omega*(-PL*UnL+Pstar*SM)/(SL-SM);
+  UstarR[fluxet]+=metrics.Omega*(-PR*UnR+Pstar*SM)/(SR-SM);
+  FOUND=FALSE;
+  if (SL>=0.0){
+    find_Fstar_from_jacvars(jacvarsL,  metrics, Fint);
+    FOUND=TRUE;
+  }
+  if (SL<=0.0 && SM>=0.0){
+    find_Fstar_from_jacvars(jacvarsL,  metrics, Fint);
+    for (flux=0; flux<nf; flux++) Fint[flux]+=SL*metricsmag*(UstarL[flux]-UL[flux]);
+    FOUND=TRUE;
+  }
+  if (SM<=0.0 && SR>=0.0){
+    find_Fstar_from_jacvars(jacvarsR,  metrics, Fint);
+    for (flux=0; flux<nf; flux++) Fint[flux]+=SR*metricsmag*(UstarR[flux]-UR[flux]);
+    FOUND=TRUE;
+  }
+  if (SR<=0.0){
+    find_Fstar_from_jacvars(jacvarsR,  metrics, Fint);
+    FOUND=TRUE;
+  }
+  if (!FOUND) fatal_error("Problem finding Fint in find_Fstar_interface_HLLC_muscl).");
+}
+
+
+void find_Fstar_interface_HLLC_HYBRID_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h,  long theta, flux_t musclvarsm1h, 
+                     flux_t musclvarsp1h, metrics_t metrics, int EIGENVALCOND, int AVERAGING, flux_t Fint){
+  dim_t n;
+  long dim,flux;
+  double fact,Pratiomin,Pratiomax,Pratio,metricsmag,UnL,UnR,rhoL,rhoR,PL,PR,aL,aR,SL,SR,SM,Pstar;
+  bool FOUND;
+  jacvars_t jacvarsL,jacvarsR;
+  flux_t UL,UR,UstarL,UstarR;
+  metricsmag=0.0;
+  for (dim=0; dim<nd; dim++){
+    metricsmag+=sqr(metrics.X2[theta][dim]);
+  }
+  metricsmag=sqrt(metricsmag);
+  for (dim=0; dim<nd; dim++){
+    n[dim]=metrics.X2[theta][dim]/metricsmag;
+  }
+  find_jacvars_from_musclvars(musclvarsm1h, metrics, gl, theta, &jacvarsL);
+  find_jacvars_from_musclvars(musclvarsp1h, metrics, gl, theta, &jacvarsR);
+  
+  // find the magnitude of the velocity vector normal to the interface for the left and right nodes 
+  UnL=0.0;
+  for (dim=0; dim<nd; dim++) UnL+=_V_from_jacvars(jacvarsL, dim)*n[dim];
+  UnR=0.0;
+  for (dim=0; dim<nd; dim++) UnR+=_V_from_jacvars(jacvarsR, dim)*n[dim];
+  aL=_a_from_jacvars(jacvarsL);
+  aR=_a_from_jacvars(jacvarsR);
+  PL=_Pstar_from_jacvars(jacvarsL);
+  PR=_Pstar_from_jacvars(jacvarsR);
+
+  Pratio=max(PL,PR)/min(PL,PR);
+  if (FALSE){
+    // linear change from the HLLC to the Rusanov flux
+    Pratiomin=2.0;
+    Pratiomax=10.0;
+    fact=max(0.0,min(1.0,(Pratio-Pratiomin)/(Pratiomax-Pratiomin)));
+    SL=(1.0-fact)*min(UnL-aL,UnR-aR)+fact*(min(UnL,UnR)-max(aL,aR));
+    SR=(1.0-fact)*max(UnL+aL,UnR+aR)+fact*(max(UnL,UnR)+max(aL,aR));
+  } else {
+    // abrupt change from the HLLC flux to the Rusanov flux to prevent carbuncles
+    if (Pratio<5.0){
+      // HLLC flux
+      //SL=UnL-aL;
+      //SR=UnR+aR;
+      SL=min(UnL-aL,UnR-aR);
+      SR=max(UnL+aL,UnR+aR);
+    } else {
+      // Rusanov flux
+      SL=min(UnL,UnR)-max(aL,aR);
+      SR=max(UnL,UnR)+max(aL,aR);    
+    }
+  }
+
+  rhoL=_rho_from_jacvars(jacvarsL);
+  rhoR=_rho_from_jacvars(jacvarsR);
+  SM=(PR-PL+rhoL*UnL*(SL-UnL)-rhoR*UnR*(SR-UnR))/(rhoL*(SL-UnL)-rhoR*(SR-UnR));
+  Pstar=PL+rhoL*(UnL-SL)*(UnL-SM);
+  find_Ustar_from_jacvars(jacvarsL,  metrics, UL);
+  find_Ustar_from_jacvars(jacvarsR,  metrics, UR);
+  for (flux=0; flux<nf; flux++) UstarL[flux]=UL[flux]*(SL-UnL)/(SL-SM);
+  for (flux=0; flux<nf; flux++) UstarR[flux]=UR[flux]*(SR-UnR)/(SR-SM);
+  for (dim=0; dim<nd; dim++) UstarL[fluxmom+dim]+=metrics.Omega*n[dim]*(Pstar-PL)/(SL-SM);
+  for (dim=0; dim<nd; dim++) UstarR[fluxmom+dim]+=metrics.Omega*n[dim]*(Pstar-PR)/(SR-SM);
+  UstarL[fluxet]+=metrics.Omega*(-PL*UnL+Pstar*SM)/(SL-SM);
+  UstarR[fluxet]+=metrics.Omega*(-PR*UnR+Pstar*SM)/(SR-SM);
+  FOUND=FALSE;
+  if (SL>=0.0){
+    find_Fstar_from_jacvars(jacvarsL,  metrics, Fint);
+    FOUND=TRUE;
+  }
+  if (SL<=0.0 && SM>=0.0){
+    find_Fstar_from_jacvars(jacvarsL,  metrics, Fint);
+    for (flux=0; flux<nf; flux++) Fint[flux]+=SL*metricsmag*(UstarL[flux]-UL[flux]);
+    FOUND=TRUE;
+  }
+  if (SM<=0.0 && SR>=0.0){
+    find_Fstar_from_jacvars(jacvarsR,  metrics, Fint);
+    for (flux=0; flux<nf; flux++) Fint[flux]+=SR*metricsmag*(UstarR[flux]-UR[flux]);
+    FOUND=TRUE;
+  }
+  if (SR<=0.0){
+    find_Fstar_from_jacvars(jacvarsR,  metrics, Fint);
+    FOUND=TRUE;
+  }
+  if (!FOUND) fatal_error("Problem finding Fint in find_Fstar_interface_HLLC_HYBRID_muscl).");
+}
+
+
+void find_Fstar_interface_HLL_muscl(np_t *np, gl_t *gl, long lm1h, long lp1h,  long theta, flux_t musclvarsm1h, 
+                     flux_t musclvarsp1h, metrics_t metrics, int EIGENVALCOND, int AVERAGING, flux_t Fint){
+  dim_t n;
+  long dim,flux;
+  double metricsmag,UnL,UnR,aL,aR,SL,SR;
+  bool FOUND;
+  jacvars_t jacvarsL,jacvarsR;
+  flux_t UL,UR,FL,FR;
+  metricsmag=0.0;
+  for (dim=0; dim<nd; dim++){
+    metricsmag+=sqr(metrics.X2[theta][dim]);
+  }
+  metricsmag=sqrt(metricsmag);
+  for (dim=0; dim<nd; dim++){
+    n[dim]=metrics.X2[theta][dim]/metricsmag;
+  }
+  find_jacvars_from_musclvars(musclvarsm1h, metrics, gl, theta, &jacvarsL);
+  find_jacvars_from_musclvars(musclvarsp1h, metrics, gl, theta, &jacvarsR);
+  
+  // find the magnitude of the velocity vector normal to the interface for the left and right nodes 
+  UnL=0.0;
+  for (dim=0; dim<nd; dim++) UnL+=_V_from_jacvars(jacvarsL, dim)*n[dim];
+  UnR=0.0;
+  for (dim=0; dim<nd; dim++) UnR+=_V_from_jacvars(jacvarsR, dim)*n[dim];
+  aL=_a_from_jacvars(jacvarsL);
+  aR=_a_from_jacvars(jacvarsR);
+  SL=UnL-aL;
+  SR=UnR+aR;
+  find_Ustar_from_jacvars(jacvarsL,  metrics, UL);
+  find_Ustar_from_jacvars(jacvarsR,  metrics, UR);
+  FOUND=FALSE;
+  if (SL>=0.0){
+    find_Fstar_from_jacvars(jacvarsL,  metrics, Fint);
+    FOUND=TRUE;
+  }
+  if (SL<0.0 && SR>0.0){
+    find_Fstar_from_jacvars(jacvarsL,  metrics, FL);
+    find_Fstar_from_jacvars(jacvarsR,  metrics, FR);
+    for (flux=0; flux<nf; flux++) Fint[flux]=(SR*FL[flux] - SL*FR[flux] + SL*SR*metricsmag*(UR[flux] - UL[flux])) / (SR - SL);
+    FOUND=TRUE;
+  }
+  if (SR<=0.0){
+    find_Fstar_from_jacvars(jacvarsR,  metrics, Fint);
+    FOUND=TRUE;
+  }
+  if (!FOUND) fatal_error("Problem finding Fint in find_Fstar_interface_HLL_muscl).");
+}
+
 
 
 static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t musclvarsm9h, flux_t musclvarsm7h, flux_t musclvarsm5h, flux_t musclvarsm3h, flux_t musclvarsm1h, flux_t musclvarsp1h, flux_t musclvarsp3h, flux_t musclvarsp5h, flux_t musclvarsp7h, flux_t musclvarsp9h, flux_t Fint){
@@ -377,6 +585,21 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t 
       find_Fstar_interface_FDSR_muscl(np, gl, l, _al(gl,l,theta,+1),  theta, musclvarsL, musclvarsR,
                      metrics, EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
     break;
+    case FLUX_HLLC:
+      find_Fstar_interface_HLLC_muscl(np, gl, l, _al(gl,l,theta,+1),  theta, musclvarsL, musclvarsR,
+                     metrics, EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
+                                          
+    break;
+    case FLUX_HLL:
+      find_Fstar_interface_HLL_muscl(np, gl, l, _al(gl,l,theta,+1),  theta, musclvarsL, musclvarsR,
+                     metrics, EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
+                                          
+    break;
+    case FLUX_HLLC_HYBRID:
+      find_Fstar_interface_HLLC_HYBRID_muscl(np, gl, l, _al(gl,l,theta,+1),  theta, musclvarsL, musclvarsR,
+                     metrics, EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
+                                          
+    break;
     case FLUX_FVS:
       find_Fstar_interface_FVS_muscl(np, gl, l, _al(gl,l,theta,+1),  theta, musclvarsL,  musclvarsR,
                      metrics, EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
@@ -386,7 +609,7 @@ static void find_Fstar_interface(np_t *np, gl_t *gl, long l, long theta, flux_t 
                      metrics, EIGENVALCOND, gl->cycle.resconv.AVERAGING, Fint);
     break;
     default:
-      fatal_error("gl->cycle.resconv.FLUX must be set to either FLUX_FDS or FLUX_FDSR or FLUX_FVS or FLUX_KNP in find_Fstar_interface().");
+      fatal_error("gl->cycle.resconv.FLUX must be set to either FLUX_FDS or FLUX_FDSR or FLUX_HLLC or FLUX_HLL or FLUX_HLLC_HYBRID or FLUX_FVS or FLUX_KNP in find_Fstar_interface().");
   }
 
 

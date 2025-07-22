@@ -294,6 +294,14 @@ void find_A_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t A){
 
 }
 
+double _Pstar_from_jacvars(jacvars_t jacvars){
+  return(jacvars.a2*jacvars.rho/jacvars.gamma);
+}
+
+
+double _rho_from_jacvars(jacvars_t jacvars){
+  return(jacvars.rho);
+}
 
 
 double _a_from_jacvars(jacvars_t jacvars){

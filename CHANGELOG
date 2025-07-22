@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 JUL 21a
+  * in cycle/resconv/_MUSCL/resconv.c
+    - added schemes HLL, HLLC, HLLC_HYBRID
+  * in model/fluid/_*/fluid_conv.c
+    - added _Pstar_from_jacvars() and _rho_from_jacvars()
+    
+
 2025 JUN 13a
   * in model/chem/_NH3_Plasma_32s
     - moved rodriguez2024v3.c to rodriguez2024v4.c
