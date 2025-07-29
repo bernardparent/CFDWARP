@@ -465,6 +465,94 @@ void find_dFstar_dUstar_FDSR_interface(np_t *np, gl_t *gl, long theta, long l, s
 }
 
 
+
+void find_dFstar_dUstar_HLL_interface(np_t *np, gl_t *gl, long theta, long l, sqmat_t B, sqmat_t C){
+  sqmat_t AL,AR;
+  double OmegaL,OmegaR,Omega;
+  long lp0,lp1;
+  metrics_t metrics;
+  long row,col;
+  dim_t n;
+  long dim;
+  double metricsmag,UnL,UnR,aL,aR,SL,SR;
+  bool FOUND;
+  jacvars_t jacvarsL,jacvarsR;
+  
+  
+  lp0=_al(gl,l,theta,+0);
+  lp1=_al(gl,l,theta,+1);
+
+  OmegaL=_Omega(np[lp0],gl);
+  OmegaR=_Omega(np[lp1],gl);
+  
+  find_metrics_at_interface(np,gl,lp0,lp1,theta,&metrics);
+  Omega=metrics.Omega;
+
+  metricsmag=0.0;
+  for (dim=0; dim<nd; dim++){
+    metricsmag+=sqr(metrics.X2[theta][dim]);
+  }
+  metricsmag=sqrt(metricsmag);
+  for (dim=0; dim<nd; dim++){
+    n[dim]=metrics.X2[theta][dim]/metricsmag;
+  }
+  find_jacvars(np[lp0], gl, metrics, theta, &jacvarsL);
+  find_jacvars(np[lp1], gl, metrics, theta, &jacvarsR);
+  
+  // find the magnitude of the velocity vector normal to the interface for the left and right nodes 
+  UnL=0.0;
+  for (dim=0; dim<nd; dim++) UnL+=_V_from_jacvars(jacvarsL, dim)*n[dim];
+  UnR=0.0;
+  for (dim=0; dim<nd; dim++) UnR+=_V_from_jacvars(jacvarsR, dim)*n[dim];
+  aL=_a_from_jacvars(jacvarsL);
+  aR=_a_from_jacvars(jacvarsR);
+  SL=UnL-aL;
+  SR=UnR+aR;
+
+  FOUND=FALSE;
+  if (SL>=0.0){
+    find_dFstar_dUstar(np[lp0], gl, theta, AL);
+    for (row=0; row<nf; row++){
+      for (col=0; col<nf; col++){
+        B[row][col]=AL[row][col]/OmegaL*Omega;
+        C[row][col]=0.0;
+      }
+    }
+    FOUND=TRUE;
+  }
+  if (SL<0.0 && SR>0.0){
+    find_dFstar_dUstar(np[lp0], gl, theta, AL);
+    find_dFstar_dUstar(np[lp1], gl, theta, AR);
+//    for (flux=0; flux<nf; flux++) Fint[flux]=(SR*FL[flux] - SL*FR[flux] + SL*SR*metricsmag*(UR[flux] - UL[flux])) / (SR - SL);
+    for (row=0; row<nf; row++){
+      for (col=0; col<nf; col++){
+        B[row][col]=+SR*AL[row][col]/(SR-SL)/OmegaL*Omega;
+        C[row][col]=-SL*AR[row][col]/(SR-SL)/OmegaR*Omega;
+      }
+      B[row][row]+=-SL*SR*metricsmag/(SR-SL)/OmegaL*Omega;
+      C[row][row]+=+SL*SR*metricsmag/(SR-SL)/OmegaR*Omega;
+    }
+    FOUND=TRUE;
+  }
+  if (SR<=0.0){
+    find_dFstar_dUstar(np[lp1], gl, theta, AR);
+    for (row=0; row<nf; row++){
+      for (col=0; col<nf; col++){
+        B[row][col]=0.0;
+        C[row][col]=AR[row][col]/OmegaR*Omega;
+      }
+    }
+    FOUND=TRUE;
+  }
+  if (!FOUND) fatal_error("Problem in find_dFstar_dUstar_HLL_interface).");
+
+
+#if (defined(_RESTIME_CDF))
+  fatal_error("find_dFstar_dUstar_HLL_interface() is not compatible with CDF time stepping.");
+#endif  
+}
+
+
 static void find_Aplus_from_jacvars(gl_t *gl, jacvars_t jacvars, metrics_t metrics, sqmat_t Aplus){
   sqmat_t Lambdap,Lambda,mattmp,Linv,L;
   long flux;
@@ -723,6 +811,10 @@ void add_dFstar_dUstar_to_TDMA(np_t *np, gl_t *gl, long theta, long l, double fa
       find_dFstar_dUstar_FDSplus_interface(np, gl, theta, l, Bp1h, Cp1h);
       find_dFstar_dUstar_FDSplus_interface(np, gl, theta, _al(gl,l,theta,-1), Am1h, Bm1h);
     break;
+    case CONVJACOBIAN_HLL:
+      find_dFstar_dUstar_HLL_interface(np, gl, theta, l, Bp1h, Cp1h);
+      find_dFstar_dUstar_HLL_interface(np, gl, theta, _al(gl,l,theta,-1), Am1h, Bm1h);
+    break;
     default:
       fatal_error("gl->cycle.resconv.CONVJACOBIAN can not be set to %d.",gl->cycle.resconv.CONVJACOBIAN);
   }
@@ -778,6 +870,9 @@ void find_TDMA_jacobians_conservative(np_t *np, gl_t *gl, long theta, long l, sq
       break;
       case CONVJACOBIAN_FDSPLUS:
         find_dFstar_dUstar_FDSplus_interface(np, gl, theta, l, B1, C1);
+      break;
+      case CONVJACOBIAN_HLL:
+        find_dFstar_dUstar_HLL_interface(np, gl, theta, l, B1, C1);
       break;
       default:
         fatal_error("gl->cycle.resconv.CONVJACOBIAN can not be set to %d.",gl->cycle.resconv.CONVJACOBIAN);

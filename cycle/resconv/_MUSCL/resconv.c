@@ -206,6 +206,9 @@ void read_disc_resconv_actions(char *actionname, char **argum, SOAP_codex_t *cod
     if (gl->cycle.resconv.FLUX==FLUX_FDS && gl->cycle.resconv.POSFILTER!=POSFILTER_NONE) gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_FDSPLUS;
     if (gl->cycle.resconv.FLUX==FLUX_FVS && gl->cycle.resconv.POSFILTER!=POSFILTER_NONE) gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_FVSPLUS;
     if (gl->cycle.resconv.FLUX==FLUX_KNP) gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_FVS;
+    if (gl->cycle.resconv.FLUX==FLUX_HLL) gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_HLL;
+    if (gl->cycle.resconv.FLUX==FLUX_HLLC) gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_HLL;
+    if (gl->cycle.resconv.FLUX==FLUX_HLLC_HYBRID) gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_HLL;
 
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;

@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 JUL 29a
+  * in cycle/resconv/_MUSCL/resconv.c
+    - in read_disc_resconv_actions(), now set gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_HLL
+      for the HLL, HLLC, and HLLC_HYBRID fluxes
+  * in cycle/share/ts_share.c
+    - added find_dFstar_dUstar_HLL_interface()
+    - in add_dFstar_dUstar_to_TDMA() and in find_TDMA_jacobians_conservative() added calls to
+      find_dFstar_dUstar_HLL_interface()
+  * in cycle/share/ts_share.hh
+    - added CONVJACOBIAN_HLL
+    
+
 2025 JUL 21a
   * in cycle/resconv/_MUSCL/resconv.c
     - added schemes HLL, HLLC, HLLC_HYBRID
