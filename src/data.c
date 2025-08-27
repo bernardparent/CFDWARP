@@ -2200,7 +2200,7 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 #ifdef _3DL
 	        if ((k<gl->domain_all.ke && NODEVALID[_ai_all(gl,i,j,k+1)]) && (k>gl->domain_all.ks && NODEVALID[_ai_all(gl,i,j,k-1)])) {
                   dx3[dim]=0.5*sign(np[_ai(gl,i,k+1,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])
-                     *(fabs(np[_ai(gl,i,k+1,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])+fabs(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i,j,k-1)].bs->x[dim]));
+                     *(fabs(np[_ai(gl,i,j,k+1)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])+fabs(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i,j,k-1)].bs->x[dim]));
                 } else {
                   if (k<gl->domain_all.ke && NODEVALID[_ai_all(gl,i,j,k+1)]) {
                     dx3[dim]=(np[_ai(gl,i,j,k+1)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim]);

@@ -145,7 +145,7 @@ Bdry(
 Model(
    NavierStokes(
     DIFFUSION=NO;
-    REACTING=NO;
+    REACTING=YES;
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e1;     Tmax=26.0e3;    {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
@@ -347,7 +347,7 @@ Cycle(
       CFL=0.1;
     );
     system("date");
-    CFL=min(CFL*1.1,0.3);
+    CFL=min(CFL*1.1,0.5);
     UpdateFluid(CFL,PRECONDITIONER,sigma1,sigma2);
     printf("%6.2f %6ld %9.3f   %E (%4ld,%4ld)  %s\n",
            CFL,iter,effiter_U,ximax,i_ximax,

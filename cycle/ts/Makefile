@@ -10,7 +10,9 @@ clean:
 cleanall:
 	( cd _none; make cleanall )
 	( cd _explicit; make cleanall )
+	( cd _point_implicit; make cleanall )
 	( cd _block_ADI; make cleanall )
+	( cd _block_ADI_split; make cleanall )
 	( cd _block_DDADI ; make cleanall )
 	( cd _block_IMAF ; make cleanall)
 	( cd doc ; make clean )

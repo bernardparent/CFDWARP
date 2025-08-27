@@ -7,6 +7,18 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 AUG 26a
+  * in model/chem/_CO2_Plasma_23s_Park/chem.c
+    - added a missing parameter to the functions find_W() and find_dW_dx()
+  * in src/data.c
+    - in write_data_file_interpolation(), fixed a bug affecting the interpolation in 3D
+  * in cycle/ts
+    - added _block_ADI_split
+    - added _point_implicit
+  * in bin
+    - added wedge_reacting.wrp
+    
+
 2025 JUL 29a
   * in cycle/resconv/_MUSCL/resconv.c
     - in read_disc_resconv_actions(), now set gl->cycle.resconv.CONVJACOBIAN=CONVJACOBIAN_HLL
