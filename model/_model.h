@@ -48,7 +48,7 @@ double _X(np_t np, long dim1, long dim2);
 
 double _varphi(np_t *np, gl_t *gl, long l, long dim);
 
-void find_dSchem_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU);
+//void find_dSchem_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU);
 
 void find_dFstar_dUstar(np_t np, gl_t *gl, long theta, sqmat_t A);
 

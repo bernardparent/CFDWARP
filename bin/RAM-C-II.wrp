@@ -391,6 +391,7 @@ Model(
     kmin=1.0e-10;   kmax=9.9e99;   {m2/s2}
     psimin=1e-10;   psimax=9.9e99; {1/s}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain}
+    wminN2=0.01;
     SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
     SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
     {

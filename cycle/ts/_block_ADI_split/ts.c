@@ -55,6 +55,17 @@ static double _w_local(np_t np, long spec){
   return(ret);
 }
 
+static void find_w_from_U_and_dU(np_t *np, long l, gl_t *gl, spec_t w){
+  double sum;
+  long spec;
+  sum=0.0;
+//  for (spec=0; spec<ns; spec++) sum+=np[l].bs->U[spec]+np[l].wk->dUstar[spec]/_Omega(np[l],gl);
+//  for (spec=0; spec<ns; spec++) w[spec]=(np[l].bs->U[spec]+np[l].wk->dUstar[spec]/_Omega(np[l],gl))/sum;
+  for (spec=0; spec<ns; spec++) sum+=np[l].bs->U[spec];
+  for (spec=0; spec<ns; spec++) w[spec]=(np[l].bs->U[spec])/sum;
+}
+
+
 void set_matrices_in_block_TDMA_line_split(np_t *np, gl_t *gl, long theta, long l, 
                     sqmat_t M1, sqmat_t M2, sqmat_t M3, sqmat_t M4, long L,
                     double *AA, double *BB, double *CC, double *RHS){
@@ -475,7 +486,7 @@ void update_dUtilde_chem(np_t *np, gl_t *gl, long theta, long ls, long le){
       Omega=_Omega(np[l],gl);
       for (flux=0; flux<nf; flux++) {
         np[l].bs->U[flux]+=matdU2.cont[EXM_aim(matdU2.glm,flux,0)]/Omega;
-        np[l].wk->dUstar[flux]=0.0;
+        np[l].wk->dUstar[flux]=-np[l].wk->Res[flux]*np[l].wk->dtau;
         //np[l].wk->dUstar[flux]=matdU2.cont[EXM_aim(matdU2.glm,flux,0)];
       }
       thread_lock_node_unset(np,l,THREADTYPE_ZONE);
@@ -492,6 +503,7 @@ void update_dUtilde_chem(np_t *np, gl_t *gl, long theta, long ls, long le){
 void update_dUtilde_nochem(np_t *np, gl_t *gl, long theta, long ls, long le){
   long is,ie,js,je,ks,ke;
   long jj,l,flux,maxsize,row,col,spec;
+  spec_t w;
   sqmat_t A1,B1,C1,D1,A2,B2,C2,garb,Mtmp,Am1h,Bm1h,Bp1h,Cp1h;
   double *AA, *BB, *CC, *RHS;
   double dtau;
@@ -604,7 +616,8 @@ void update_dUtilde_nochem(np_t *np, gl_t *gl, long theta, long ls, long le){
     thread_lock_node_set(np,l,THREADTYPE_ZONE);
     //for (flux=0; flux<=fluxmass; flux++) np[l].wk->dUstar[flux]=0.0;
     for (flux=0; flux<nfr; flux++) np[l].wk->dUstar[flux+fluxmass]=RHS[EXM_mi(nfr,jj,flux,0)];
-    for (spec=0; spec<ns; spec++) np[l].wk->dUstar[spec]=_w_local(np[l],spec)*RHS[EXM_mi(nfr,jj,0,0)];
+    find_w_from_U_and_dU(np, l, gl, w);
+    for (spec=0; spec<ns; spec++) np[l].wk->dUstar[spec]=w[spec]*RHS[EXM_mi(nfr,jj,0,0)];
     thread_lock_node_unset(np,l,THREADTYPE_ZONE);
   }
 

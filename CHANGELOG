@@ -6,6 +6,13 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2025 AUG 28a
+  * in cycle/ts/_block_ADI_split/ts.c
+    - made small changes and moved this directory to experimental
+  * in model/chem/_NH3_Plasma_32s/rodriguez2024v3.c
+    - fixed various bugs
+  * 
+
 
 2025 AUG 26a
   * in model/chem/_CO2_Plasma_23s_Park/chem.c
