@@ -725,6 +725,15 @@ void find_Sstar_emfield(np_t *np, gl_t *gl, long l, fluxemfield_t S){
 }
 
 
+void find_Ve_from_J(np_t *np, gl_t *gl, long l, EXM_vec3D_t Ve){
+  find_Ve_from_J_mem(np, gl, l, Ve);
+}
+
+
+void find_Vk_from_Vk_at_interfaces(np_t *np, gl_t *gl, long l, long spec, EXM_vec3D_t Vk){
+  find_Vk_from_Vk_at_interfaces_mem(np, gl, l, spec, Vk);
+}
+
 
 void update_bdry_emfield(np_t *np, gl_t *gl, long lA, long lB, long lC, long theta, long thetasgn, bool BDRYDIRECFOUND, int TYPELEVEL){
 

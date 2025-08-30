@@ -46,6 +46,10 @@
 
   double _Te_EMF(np_t np, gl_t *gl);
 
+  void find_Ve_from_J(np_t *np, gl_t *gl, long l, EXM_vec3D_t Ve);
+
+  void find_Vk_from_Vk_at_interfaces(np_t *np, gl_t *gl, long l, long spec, EXM_vec3D_t Vk);
+
 #ifdef UNSTEADY
   double _phim1(np_t np, gl_t *gl);
 #endif

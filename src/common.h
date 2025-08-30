@@ -465,6 +465,10 @@ typedef struct {
 #ifdef _FLUID_WALLDISTANCE
    double walldistance2;
 #endif
+#ifdef _EMFIELD_EPOTENTIAL
+   EXM_vec3D_t Ve_from_J_mem;
+   EXM_vec3D_t Vk_from_Vk_interfaces_mem[ncs];
+#endif
 } npbs_t;
 
 

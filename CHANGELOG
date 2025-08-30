@@ -6,12 +6,30 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2025 AUG 29a
+  * in model/emfield/_Epotential-B*/emfield.c and model/emfield/_test/emfield.c
+    - added function find_Ve_from_J() which simply calls find_Ve_from_J_mem()
+    - added function find_Vk_from_Vk_at_interfaces() which simply calls 
+      find_Vk_from_Vk_at_interfaces_mem()
+  * in model/emfield/_Epotential/emfield.c
+    - added function find_Ve_from_J() which returns np[l].bs->Ve_from_J_mem[dim]
+    - added function find_Vk_from_Vk_at_interfaces() which returns 
+      np[l].bs->Vk_from_Vk_interfaces_mem[spec][dim]
+    - in find_prim_emfield_mem_3(), finds np[l].bs->Ve_from_J_mem and 
+      np[l].bs->Vk_from_Vk_interfaces_mem
+  * in model/share/emfield_share.c
+    - renamed find_Ve_from_J() to find_Ve_from_J_mem()
+    - renamed find_Vk_from_Vk_at_interfaces() to find_Vk_from_Vk_at_interfaces_mem()
+  * in src/common.h
+    - in npbs_t, added Ve_from_J_mem and Vk_from_Vk_interfaces_mem[ncs]
+    
+
 2025 AUG 28a
   * in cycle/ts/_block_ADI_split/ts.c
     - made small changes and moved this directory to experimental
   * in model/chem/_NH3_Plasma_32s/rodriguez2024v3.c
     - fixed various bugs
-  * 
 
 
 2025 AUG 26a
