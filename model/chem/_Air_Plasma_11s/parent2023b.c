@@ -98,7 +98,7 @@ double _kf_high_EoverN(double Estar){
 void find_W_Parent2023b ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, 
                        double Qbeam, spec_t W ) {
   double N[ns];
-  double R,kf;
+  double R;
   long k;
   spec_t X;
   double theta;
@@ -258,13 +258,10 @@ void find_dW_dx_Parent2023b ( gl_t *gl, spec_t rhok, double T, double Te, double
                   double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, s;                    
-  spec_t N;
-  double R,kf,dkfdTe,dkfdT,dkfdTv;
+  double R;
   spec_t X;
-  double theta;
 
   Estar = max ( Estarmin, Estar );
-  theta=log(Estar);
 
   for ( k = 0; k < ns; k++ ) {
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
@@ -280,11 +277,6 @@ void find_dW_dx_Parent2023b ( gl_t *gl, spec_t rhok, double T, double Te, double
     for ( k = 0; k < ns; k++ ) {
       dWdrhok[s][k] = 0.0;
     }
-  }
-
-  /* find properties needed by add_to_dW* functions in proper units */
-  for ( k = 0; k < ns; k++ ) {
-    N[k] = rhok[k] / _calM ( k ) * 1e-6 * calA;
   }
 
 

@@ -136,15 +136,13 @@ void add_W_Additional ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, d
   double theta,R;
   long k;
   spec_t X;
-  double Estar_from_Te,Te_from_Estar;
+  double Te_from_Estar;
   
   R=Rchem;
   for ( k = 0; k < ns; k++ ) {
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
   }
   
-  Estar_from_Te=_EoverN_from_rhok_Te(rhok, Te);
-  //if (Estar_from_Te>Estar) Estar=Estar_from_Te;   //??? needs to be verified
   Te_from_Estar=_Te_from_rhok_EoverN(rhok, Estar);
   
   
@@ -329,7 +327,7 @@ void find_W ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, do
     default:
       fatal_error("Problem with CHEMMODEL in find_W() within chem.c");
   }
-  if (gl->model.chem.ADDITIONALREACTION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  
+  if (gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  
     add_W_Additional ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
 }
 
@@ -383,7 +381,7 @@ void find_dW_dx ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv
     default:
       fatal_error("Problem with CHEMMODEL in find_W() within chem.c");
   }
-  if (gl->model.chem.ADDITIONALREACTION  && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  
+  if (gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  
     add_dW_dx_Additional ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
 
 }
@@ -446,7 +444,7 @@ void find_Qei(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, double *Q
 
     theta=log(Estar);
 
-    if (gl->model.chem.ADDITIONALREACTION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
+    if (gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
       if (gl->model.chem.ADDITIONALREACTION[1]) 
         add_to_Qei(gl,Te,specN2,_ionizationpot(specN2), exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), rhok, Qei);
       if (gl->model.chem.ADDITIONALREACTION[2]) 
@@ -521,7 +519,7 @@ void find_dQei_dx(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, spec_
   
     theta=log(Estar);
 
-    if (gl->model.chem.ADDITIONALREACTION && gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
+    if (gl->model.chem.CHEMMODEL!=CHEMMODEL_NONE)  {
       if (gl->model.chem.ADDITIONALREACTION[1]) 
         add_to_dQei(gl,Te,specN2,_ionizationpot(specN2), exp(-0.0105809*sqr(theta)-2.40411e-75*pow(theta,46.0)), 0.0, rhok, dQeidrhok, dQeidTe);
       if (gl->model.chem.ADDITIONALREACTION[2]) 

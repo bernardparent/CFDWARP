@@ -318,7 +318,7 @@ static double _kf30(np_t np, gl_t *gl, double Te){
 void find_W_RodriguezPark2024 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, 
                        double Qbeam, spec_t W ) {
   double N[ns];
-  double R,kf,TTv,TvTe,TTe;
+  double R,kf,TTv,TTe;
   long k;
   spec_t X;
 
@@ -326,7 +326,6 @@ void find_W_RodriguezPark2024 ( np_t np, gl_t *gl, spec_t rhok, double T, double
   R=Rchem;
   TTv=pow(T,EXPON_TTV)*pow(Tv,1.0-EXPON_TTV);
   TTe=pow(T,EXPON_TTE)*pow(Te,1.0-EXPON_TTE);
-  TvTe=pow(Tv,EXPON_TVTE)*pow(Te,1.0-EXPON_TVTE);
 
   
   for ( k = 0; k < ns; k++ ) {

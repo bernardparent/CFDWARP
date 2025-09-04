@@ -2240,7 +2240,7 @@ void update_prim_emfield_mem_in_zone_3(np_t *np, gl_t *gl, long theta, long ls, 
 
 #ifdef _TSEMF_STORE_COEFFICIENTS
 void update_prim_emfield_mem_in_zone_4(np_t *np, gl_t *gl, long theta, long ls, long le){
-  long l,dim,flux,cnt;
+  long l,dim,flux;
   long i,j,k;
   double *coeff;
 

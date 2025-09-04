@@ -1043,9 +1043,6 @@ void find_k_psi_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, double 
 double _Qk(np_t *np, long l, gl_t *gl){
   long i,j,k;
   double sum,Qk,etaeff;
-#ifdef _2D
-  long theta,vartheta;
-#endif
 
   if (gl->model.fluid.ADD_ETA_TO_ETAT_WITHIN_QK) {
     etaeff=_etastar(np,l,gl);

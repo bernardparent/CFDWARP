@@ -627,14 +627,14 @@ Disc(
                        discretizing the electron pressure gradients within the potential equation}
   );
   MUSCL(
-    FLUX=FLUX_FDS;
+    FLUX=FLUX_HLLC_HYBRID;
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.95;
     AOWENO_gammahi=0.999;
     INTERPOL=INTERPOL_TVD2_VANLEER;
-    EIGENVALCOND=EIGENVALCOND_PARENT;
-    POSFILTER=POSFILTER_PARENT;
+    EIGENVALCOND=EIGENVALCOND_PECLET;
+    POSFILTER=POSFILTER_NONE;
     POSFILTER_numiter=4;
   );
 );
@@ -721,7 +721,7 @@ Cycle(
       CFL=0.01;
     );
     if (iter<2000,
-      CFLmax=1.0;
+      CFLmax=0.5;
     ,{else}
       CFLmax=3.0;
     );

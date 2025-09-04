@@ -728,7 +728,7 @@ void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
 
 
 void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, zone_t zone, int SOR_SWEEP, long iter){
-  long j,k,l,dim,theta,thetasgn;
+  long j,k,l,theta,thetasgn;
   double sum,RHS,Cp0,Cp1,dtau;
   long ioffset,joffset,koffset;
   assert(flux<nfe);

@@ -7,6 +7,33 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 SEP 03a
+  * in bin/RAM-C-II.wrp
+    - changed the FDS scheme to HLLC_HYBRID
+  * in cycle/share/cycle_share.c
+    - in update_prim_emfield_mem_in_zone_4() got rid of variable cnt (not needed anymore)
+  * in cycle/share/tsemf_share.c
+    - in update_dUstar_emfield_SOR_istation() got rid of variable dim (not needed anymore)
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - got rid of some statements such as if (gl->model.chem.ADDITIONALREACTION) and variables 
+      such as Estar_from_Te causing a compiler warning but had no effect
+  * in model/chem/_Air_Plasma_11s/parent2023b.c
+    - got rid of unused variables that were causing a compiler warning
+  * in model/chem/_Air_Plasma_11s/rodriguez2024.c
+    - got rid of Teblim which was not used
+  * in model/chem/_Air_Plasma_11s/rodriguezpark2024.c
+    - got rid of TvTe which was not used
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - got rid of k, rhok, T, Emag that were not used
+  * in model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - in find_post_variable_value_fluid(), got rid of N which was not used
+  * in model/share/emfield_share.c
+    - in find_vector_from_vectorstar(), fixed a bug: added malloc and free for matX and matXinv
+      (this function is obsolete thus because it is not used anywhere)
+  * in model/share/fluid_share.c
+    - in _Qk(), removed the variables theta and vartheta (not used anymore)
+    
+
 2025 AUG 29a
   * in model/emfield/_Epotential-B*/emfield.c and model/emfield/_test/emfield.c
     - added function find_Ve_from_J() which simply calls find_Ve_from_J_mem()

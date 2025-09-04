@@ -389,7 +389,7 @@ static double _kf29(np_t np, gl_t *gl, double Te){
 void find_W_Rodriguez2024 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, 
                        double Qbeam, spec_t W ) {
   double N[ns];
-  double R,kb,TTv,Tblim,Teblim;
+  double R,kb,TTv,Tblim;
   long k;
   spec_t X;
 
@@ -397,7 +397,6 @@ void find_W_Rodriguez2024 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te,
   R=1.987192004e0;
   TTv=sqrt(Tv*T);
   Tblim=min(max(300.0,T),32000.0);
-  Teblim=min(max(300.0,Te),32000.0);
   
   for ( k = 0; k < ns; k++ ) {
     X[k] = rhok[k] / _calM ( k ) * 1.0e-06;     /* mole/cm3 */
@@ -742,7 +741,7 @@ void find_dW_dx_Rodriguez2024 ( np_t np, gl_t *gl, spec_t rhok, double T, double
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
   long k, s, spec;                    
   spec_t N;
-  double TTv,TTe,TvTe,Tblim,Teblim,R,kb,dkbdT, dkbdTv, dkbdTe, dkfdTe, dkfdT, dkfdTv;
+  double TTv,TTe,TvTe,Tblim,R,kb,dkbdT, dkbdTv, dkbdTe, dkfdTe, dkfdT, dkfdTv;
   spec_t dWdTTv,dWdTTe,dWdTvTe;
   spec_t X;
 
@@ -755,7 +754,6 @@ void find_dW_dx_Rodriguez2024 ( np_t np, gl_t *gl, spec_t rhok, double T, double
   TTe=sqrt(T*Te);
   TvTe=sqrt(Tv*Te);
   Tblim=min(max(300.0,T),32000.0);
-  Teblim=min(max(300.0,Te),32000.0);
   /* initialize all derivatives to zero */
   for ( s = 0; s < ns; s++ ) {
     dWdTTv[s] = 0.0;
