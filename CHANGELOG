@@ -6,6 +6,15 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2025 SEP 05a
+  * in config/config.c
+    - changed print_section_title(type_str title) to print_section_title(char *title)
+  * in model/chem/_NH3_Plasma_32s/rodriguez2024v4.c
+    - restarted from rodriguez2024v3.c and incorporated updated recombination reactions (more
+      recent than Arakoni)
+  * in USAGE
+    - added --npernode 1 to mpiexec example
+    
 
 2025 SEP 03a
   * in bin/RAM-C-II.wrp

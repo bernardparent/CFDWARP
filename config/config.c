@@ -460,7 +460,7 @@ static void find_default_option(type_str current, type_str *option, long numopti
 static void process_config_files(FILE *scriptfile_applyconfig, FILE *scriptfile_removeproprietary, type_str dirname);
 
 
-static void print_section_title(type_str title){
+static void print_section_title(char *title){
   printf("\n  %s%s%s\n\n",FONT_BOLD,title,FONT_STANDARD);  
 }
 

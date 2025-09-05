@@ -205,7 +205,7 @@ The latter shares the work and memory on four processes that will be
 distributed on one machine or on several machines depending on how MPI was 
 configured on your server. To run the code on several nodes, run CFDWARP as follows:
 
-mpiexec.mpich --hostfile hosts -np 4 ./warp -r control.wrp -i data.01 -o data.02
+mpiexec.mpich --hostfile hosts --npernode 1 -np 4 ./warp -r control.wrp -i data.01 -o data.02
        
 where each line of the file ``hosts'' has the IP number of the node:
 
