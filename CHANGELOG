@@ -6,6 +6,13 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2025 SEP 18a
+  * in lib/gridg/2Dbase.c
+    - fixed a bug in ReverseIndex_argum(): the number of arguments should be 5 not 7
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - added more complete linearization of all terms in find_dSe_dU_transport_Rodriguez2025()
+    
+
 2025 SEP 05a
   * in config/config.c
     - changed print_section_title(type_str title) to print_section_title(char *title)

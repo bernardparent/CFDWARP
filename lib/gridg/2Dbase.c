@@ -487,7 +487,7 @@ static void ReverseIndex_argum(char **argum, SOAP_codex_t *codex,
   for (cnt=0; cnt<4; cnt++) SOAP_substitute_argum(argum, cnt, codex);
 
   if (sscanf(*argum,"%ld,%ld,%ld,%ld,%c%n",
-         &is,&js,&ie,&je,&index,&eos)!=7 || (*argum)[eos]!=EOS){
+         &is,&js,&ie,&je,&index,&eos)!=5 || (*argum)[eos]!=EOS){
     SOAP_fatal_error(codex,"One or more argument(s) could not be read properly in ReverseIndex().");
   }
   verify_zone_validity(is, js, ie, je, gl2d, codex);
