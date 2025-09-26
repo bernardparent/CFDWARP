@@ -17,6 +17,7 @@ cleanall:
 	( cd _Air_Plasma_8s ; make cleanall )
 	( cd _Air_Plasma_9s ; make cleanall )
 	( cd _Air_Plasma_11s ; make cleanall )
+	( cd _Air_Plasma_kinetic_11s ; make cleanall )
 	( cd _N2_Plasma_4s ; make cleanall )
 	( cd _N2_Plasma_8s ; make cleanall )
 	( cd _H2_Air_3s_0r ; make cleanall )

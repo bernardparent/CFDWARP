@@ -69,6 +69,10 @@ https://ntrs.nasa.gov/api/citations/19900017748/downloads/19900017748.pdf
 #define TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_ELECTRONMOBILITIESPARENTMACHERET 109  //same as TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED except that mue (electron moblity) is found from the Parent-Macheret model
 
 
+#ifndef speceminus
+   #error the Gupta-Yos transport module can only be used with a chemical solver that includes electrons
+#endif
+
 void write_model_transport_template(FILE **controlfile){
   wfprintf(*controlfile,
     "  %s(\n"
@@ -866,8 +870,9 @@ double EXM_matrix_determinant(EXM_mat_t mat){//improve this, triangular matrix i
 
 
 static double _lnLambda_local(gl_t *gl, spec_t rhok, double Te){
+  double lnLambda;
 #ifdef speceminus  
-  double Pe,rhoe,lnLambda;
+  double Pe,rhoe;
   rhoe=rhok[speceminus];
   Pe = max(1e-10,rhoe*calR*Te/_calM(speceminus)/101325.0e0); //electron pressure, atm
   /*electron pressure correction for the collision integrals of ionic species*/ /*Eq(24b)*/

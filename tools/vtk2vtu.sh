@@ -33,15 +33,16 @@ if [ $# -gt 0 ]
 then
 {
 
+# This block now uses Python 3 print() function syntax
 echo "import sys
 from paraview.simple import *
 
-print 'Number of files to be converted:', len(sys.argv) - 1
+print('Number of files to be converted:', len(sys.argv) - 1)
 
-for x in range(1, len(sys.argv)):        
+for x in range(1, len(sys.argv)):
     inputFile = str(sys.argv[x])
     outputFile = inputFile[:-1] + 'u'
-    print x,': Converting ', inputFile, '  ->  ', outputFile
+    print(x, ': Converting ', inputFile, '  ->  ', outputFile)
     reader = LegacyVTKReader( FileNames= inputFile )
     writer = XMLUnstructuredGridWriter()
     writer.FileName = outputFile
@@ -49,8 +50,7 @@ for x in range(1, len(sys.argv)):
     Delete(reader)
     Delete(writer)" > .vtk2vtu.py
 
-
-pvpython .vtk2vtu.py "$@"
+pvpython  .vtk2vtu.py "$@"
 
 rm -f .vtk2vtu.py
 
@@ -67,5 +67,5 @@ else
   echo ""
   echo "will create the post files post.vtu, post2.vtu, etc from the post files post.vtk, post2.vtk, etc."
   echo ""
-} fi;
-
+}
+fi;

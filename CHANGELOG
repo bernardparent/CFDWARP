@@ -6,6 +6,24 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2025 SEP 26a
+  * in lib/gridg/share.c
+    - in read_RX_grid(), added a fatal_error if the file can not be opened
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - added the model CHEMMODEL_RODRIGUEZ2026
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - added the model rodriguez2026
+  * in model/transport/_Gupta-Yos/transport.c
+    - added a compile time error message if the chemical solver does not have electrons
+  * in tools/vtk2vtu.sh
+    - made changes so that the script is compatible with Python 3.
+  * in model/chem/_Air_Plasma_11s/
+    - added _Air_Plasma_kinetic_11s
+  * in model/fluid
+    - added _Navier-Stokes_plasma_kinetic
+    
+
 2025 SEP 18a
   * in lib/gridg/2Dbase.c
     - fixed a bug in ReverseIndex_argum(): the number of arguments should be 5 not 7

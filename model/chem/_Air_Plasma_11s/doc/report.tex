@@ -1262,7 +1262,7 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 \fontsizetable
 \begin{center}
 \begin{threeparttable}
-\tablecaption{Rodriguez 11-species plasma chemical model (corrected reaction rates for the Kim 2021 model)\tnote{a,b,c}}
+\tablecaption{Rodriguez (2024) 11-species plasma chemical model (corrected reaction rates for the Kim 2021 model)\tnote{a,b,c}}
 \begin{tabular}{cccccccc} 
 \toprule
 
@@ -1333,7 +1333,7 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 \fontsizetable
 \begin{center}
 \begin{threeparttable}
-\tablecaption{Rodriguez-Park 11-species plasma chemical model (corrected reaction rates for the Parent-Park model)\tnote{a,b,c}}
+\tablecaption{Rodriguez-Park (2024) 11-species plasma chemical model (corrected reaction rates for the Parent-Park model)\tnote{a,b,c}}
 \begin{tabular}{cccccccc} 
 \toprule
 
@@ -1362,6 +1362,40 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 \end{center}
 \end{table}
 %
+
+
+\begin{table}[t]
+\fontsizetable
+\begin{center}
+\begin{threeparttable}
+\tablecaption{Rodriguez (2026) 11-species plasma chemical model (corrected 2-body recombination rates of Parent (2023b))\tnote{a,b,c}}
+\begin{tabular}{cccccccc} 
+\toprule
+
+\multicolumn{2}{c}{Reaction} & $T$ & $A$ & $n$ & $E$ & \multicolumn{1}{c}{Refs.}\\ 
+\midrule              
+
+10 & $\rm NO^{+} + e^- \rightarrow  N + O $  &$T_{\rm e}$ & $3.00 \cdot 10^{-7} \cdot {\cal A} \cdot300^{0.56}$ & $-0.56$ & $0.0$ & \cite{jgr:2004:sheehan} \\
+                                          
+11 & $\rm  O_2^{+}+e^- \rightarrow  O + O $ &$T_{\rm e}$ & $2.40 \cdot 10^{-7} \cdot {\cal A}\cdot300^{0.70} $ & $-0.70$ & $0.0$ & \cite{aip:2001:peverall} \\
+                                      
+12 & $\rm N_2^{+}+e^-\rightarrow N + N $  &$T_{\rm e}$ &  \multicolumn{3}{p{8cm}}{Rate given as spline-fit through rate data from Fig.~3 in Ref. \cite{aip:1998:peterson}} & \cite{aip:1998:peterson} \\
+                                          
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol. $A$ has units of $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$. $E$ has units of cal/mole. The rate is given by $A T^n \exp(-E/RT)$. ${\cal A}$ is Avogadro's number and it is approximately $6.022 \cdot 10^{23}~{\rm mol^{-1}}$.
+\item[{b}] The spline control points for each reaction can be found in Table \ref{tab:correctedreactionratessplinecontrolpoints}. The corresponding reaction rates are obtained with BOLSIG+ using cross-section data from the indicated references or by directly fitting a cubic spline through experimentally measured reaction rate values.
+\item[{c}] Corrected reaction rates for the Parent (2023b) model listed in Table \ref{tab:parent2023b}.
+\end{tablenotes}
+\label{tab:rodriguez2026}
+\end{threeparttable}
+\end{center}
+\end{table}
+%
+
+
+
 
 %
 \begin{table}[!ht]

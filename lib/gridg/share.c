@@ -757,6 +757,7 @@ void read_RX_grid(char *filename, char *actionname,
     fprintf(stdout,"Module missing from control file %s. "
                    "Appending defaults.\n",filename);
     file_a = fopen(filename, "a");
+    if (file_a == NULL) GRIDG_fatal_error("Could not open file %s for appending.", filename);
     fprintf(file_a,"\n{ the following has been automatically appended }");
     (*WriteRXaction)(&file_a);
     fclose(file_a);

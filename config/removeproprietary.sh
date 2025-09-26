@@ -1,4 +1,8 @@
 #!/bin/sh
+echo "Removing proprietary directory .././model/chem/_Air_Plasma_kinetic_11s"
+rm -rf .././model/chem/_Air_Plasma_kinetic_11s 
+cp -a _proprietary .././model/chem/_Air_Plasma_kinetic_11s 
+( printf "current Air_Plasma_kinetic_11s\nEND" ) > .././model/chem/_Air_Plasma_kinetic_11s/.config 
 echo "Removing proprietary directory .././model/chem/_C12H23_Cs_Air_Plasma_21s"
 rm -rf .././model/chem/_C12H23_Cs_Air_Plasma_21s 
 cp -a _proprietary .././model/chem/_C12H23_Cs_Air_Plasma_21s 
@@ -55,6 +59,10 @@ echo "Removing proprietary directory .././model/fluid/_Navier-Stokes_plasma"
 rm -rf .././model/fluid/_Navier-Stokes_plasma 
 cp -a _proprietary .././model/fluid/_Navier-Stokes_plasma 
 ( printf "current Navier-Stokes_plasma\nEND" ) > .././model/fluid/_Navier-Stokes_plasma/.config 
+echo "Removing proprietary directory .././model/fluid/_Navier-Stokes_plasma_kinetic"
+rm -rf .././model/fluid/_Navier-Stokes_plasma_kinetic 
+cp -a _proprietary .././model/fluid/_Navier-Stokes_plasma_kinetic 
+( printf "current Navier-Stokes_plasma_kinetic\nEND" ) > .././model/fluid/_Navier-Stokes_plasma_kinetic/.config 
 echo "Removing proprietary directory .././model/fluid/_Favre-Reynolds_plasma"
 rm -rf .././model/fluid/_Favre-Reynolds_plasma 
 cp -a _proprietary .././model/fluid/_Favre-Reynolds_plasma 
