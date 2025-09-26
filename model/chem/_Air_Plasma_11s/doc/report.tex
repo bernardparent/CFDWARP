@@ -1368,25 +1368,70 @@ No. & Reaction\tnote{(b)} & Forward          & Backward    & $A$, $\textrm{cm}^3
 \fontsizetable
 \begin{center}
 \begin{threeparttable}
-\tablecaption{Rodriguez (2026) 11-species plasma chemical model (corrected 2-body recombination rates of Parent (2023b))\tnote{a,b,c}}
-\begin{tabular}{cccccccc} 
+\tablecaption{Rodriguez (2026) 11-species high-temperature air model.}
+\begin{tabular}{cccccccccc} 
 \toprule
+~&~&\multicolumn{4}{c}{Forward reaction} & \multicolumn{4}{c}{Backward reaction} \\
+ \cmidrule(lr){3-6}\cmidrule(lr){7-10}
+\multicolumn{2}{c}{Reaction} & $T$ & $A$ & $n$ & $E$ & $T$  & $A$ & $n$ & $E$ \\ 
+\midrule
+1 & $\rm N_2 + M_1 \rightleftarrows N + N + M_1$ & $T$   & 3.0 $\cdot$ 10$^{22}$  & $-1.6$ & $113200 \, R$  & $T$ &\multicolumn{3}{c}{Equilibrium constant} \\
 
-\multicolumn{2}{c}{Reaction} & $T$ & $A$ & $n$ & $E$ & \multicolumn{1}{c}{Refs.}\\ 
-\midrule              
+2 & $\rm N_2 + M_2 \rightleftarrows N + N + M_2$ & $T$  & 7.0 $\cdot$ 10$^{21}$  & $-1.6$ & $113200 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}  \\
 
-10 & $\rm NO^{+} + e^- \rightarrow  N + O $  &$T_{\rm e}$ & $3.00 \cdot 10^{-7} \cdot {\cal A} \cdot300^{0.56}$ & $-0.56$ & $0.0$ & \cite{jgr:2004:sheehan} \\
-                                          
-11 & $\rm  O_2^{+}+e^- \rightarrow  O + O $ &$T_{\rm e}$ & $2.40 \cdot 10^{-7} \cdot {\cal A}\cdot300^{0.70} $ & $-0.70$ & $0.0$ & \cite{aip:2001:peverall} \\
+3 & $\rm N_2 + e^- \rightleftarrows N + N + e^-$ & $T_{\rm e}$ & 3.0 $\cdot$ 10$^{24}$  & $-1.6$ & $113200 \, R$ & $T_{\rm e}$ & \multicolumn{3}{c}{Equilibrium constant} \\
+
+4 & $\rm O_2 + M_1 \rightleftarrows O + O + M_1$ & $T$  & 1.0 $\cdot$ 10$^{22}$  & $-1.5$ & $59500 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant} \\
+
+5 & $\rm O_2 + M_2 \rightleftarrows O + O + M_2$ & $T$  & 2.0 $\cdot$ 10$^{21}$  & $-1.5$ & $59500 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant} \\
+
+6 & $\rm NO + M_3 \rightleftarrows N + O + M_3$ & $T$  & 1.1 $\cdot$ 10$^{17}$  & 0.0 & $75500 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant} \\
+
+7 & $\rm NO + M_4 \rightleftarrows N + O + M_4$ & $T$  & 5.0 $\cdot$ 10$^{15}$  & 0.0 & $75500 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}  \\
+
+8 & $\rm NO + O \rightleftarrows N + O_2 $ & $T$  & 8.4 $\cdot$ 10$^{12}$  & 0.0 & $19400 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}  \\
+
+9 & $\rm N_2 + O \rightleftarrows NO + N $ & $T$  & 5.7 $\cdot$ 10$^{12}$  & $0.42$ & $42938 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant} \\
+
+10 & $\rm N + O \rightleftarrows NO^+ + e^- $ & $T$  & 5.3 $\cdot$ 10$^{12}$  & 0.0 & $32000 \, R$ & $T_{\rm e}$ & $3.00 \cdot 10^{-7} \cdot {\cal A} \cdot300^{0.56}$ & $-0.56$ & $0.0$ \\
+
+11 & $\rm O + O \rightleftarrows O_2^+ + e^- $ & $T$  & 1.1 $\cdot$ 10$^{13}$  & 0.0 & $81200 \, R$ & $T_{\rm e}$ & $2.40 \cdot 10^{-7} \cdot {\cal A}\cdot300^{0.70} $ & $-0.70$ & $0.0$  \\
+
+12 & $\rm N + N \rightleftarrows N_2^+ + e^- $ & $T$ & 2.0 $\cdot$ 10$^{13}$  & 0.0 & $67700 \, R$ & $T_{\rm e}$ &  \multicolumn{3}{c}{Rate given in spline-fit form, Table \ref{tab:correctedreactionratessplinecontrolpoints}} \\
                                       
-12 & $\rm N_2^{+}+e^-\rightarrow N + N $  &$T_{\rm e}$ &  \multicolumn{3}{p{8cm}}{Rate given as spline-fit through rate data from Fig.~3 in Ref. \cite{aip:1998:peterson}} & \cite{aip:1998:peterson} \\
+13 & $\rm NO^+ + O \rightleftarrows N^+ + O_2 $ & $T$   & 1.0 $\cdot$ 10$^{12}$  & 0.5 & $77200 \, R$ & $T$& \multicolumn{3}{c}{Equilibrium constant}\\
+
+14 & $\rm N^+ + N_2 \rightleftarrows N_2^+ + N $ & $T$   & 1.0 $\cdot$ 10$^{12}$  & 0.5 & $12200 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\\
+
+15 & $\rm O_2^+ + N \rightleftarrows N^+ + O_2 $ & $T$   & 8.7 $\cdot$ 10$^{13}$  & 0.14 & $28600 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\\
+
+16 & $\rm O^+ + NO \rightleftarrows N^+ + O_2 $ & $T$  & 1.4 $\cdot$ 10$^{5}$  & 1.90 & $26600 \, R$ & $T$  & \multicolumn{3}{c}{Equilibrium constant}\\
+
+17 & $\rm O_2^+ + N_2 \rightleftarrows N_2^+ + O_2 $ & $T$   & 9.9 $\cdot$ 10$^{12}$  & 0.00 & $40700 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\\
+
+18 & $\rm O_2^+ + O \rightleftarrows O^+ + O_2 $ & $T$   & 4.0 $\cdot$ 10$^{12}$  & $-0.09$ & $18000 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\\
+
+19 & $\rm NO^+ + N \rightleftarrows O^+ + N_2 $ & $T$   & 3.4 $\cdot$ 10$^{13}$  & $-1.08$ & $12800 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\\
+
+20 & $\rm NO^+ + O_2 \rightleftarrows O_2^+ + NO $ & $T$   & 2.4 $\cdot$ 10$^{13}$  & 0.41 & $32600 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\\
+
+21 & $\rm NO^+ + O \rightleftarrows O_2^+ + N $ & $T$   & 7.2 $\cdot$ 10$^{12}$  & 0.29 & $48600 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\\
+
+22 & $\rm O^+ + N_2 \rightleftarrows N_2^+ + O $ & $T$  & 9.1 $\cdot$ 10$^{11}$  & 0.36 & $22800 \, R$ & $T$  & \multicolumn{3}{c}{Equilibrium constant}\\
+
+23 & $\rm NO^+ + N \rightleftarrows N_2^+ + O $  & $T$  & 7.2 $\cdot$ 10$^{13}$  & 0.00 & $35500 \, R$ & $T$ & \multicolumn{3}{c}{Equilibrium constant}\\
+
+24 & $\rm O_2 + e^- \rightleftarrows O_2^+ + e^- + e^-$ &\multicolumn{4}{c}{$\min\left(k_{\rm i},~{\rm exp}(-0.0102785\cdot {\rm ln}^2 E^\star - 2.42260\cdot 10^{-75} \cdot {\rm ln}^{46}E^\star)\right)$~cm$^3$/s} 
+                                          &$T_{\rm e}$ & $2.2 \cdot 10^{40}$  & $-4.5$  & 0.0\\
+25 & $\rm N_2 + e^- \rightleftarrows N_2^+ + e^- + e^-$ &\multicolumn{4}{c}{$\min\left(k_{\rm i},~{\rm exp}(-0.0105809\cdot {\rm ln}^2 E^\star - 2.40411\cdot 10^{-75} \cdot {\rm ln}^{46}E^\star)\right)$~cm$^3$/s} 
+                                          &$T_{\rm e}$ & $2.2 \cdot 10^{40}$  & $-4.5$  & 0.0\\
                                           
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol. $A$ has units of $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$. $E$ has units of cal/mole. The rate is given by $A T^n \exp(-E/RT)$. ${\cal A}$ is Avogadro's number and it is approximately $6.022 \cdot 10^{23}~{\rm mol^{-1}}$.
-\item[{b}] The spline control points for each reaction can be found in Table \ref{tab:correctedreactionratessplinecontrolpoints}. The corresponding reaction rates are obtained with BOLSIG+ using cross-section data from the indicated references or by directly fitting a cubic spline through experimentally measured reaction rate values.
-\item[{c}] Corrected reaction rates for the Parent (2023b) model listed in Table \ref{tab:parent2023b}.
+\item[{a}] The universal gas constant $R$ must be set to 1.9872	cal/K$\cdot$mol. $A$ has units of $\textrm{cm}^3\cdot(\textrm{mole}\cdot \textrm{s})^{-1}\cdot \textrm{K}^{-n}$. $E$ has units of cal/mole. The rate is given by $A T^n \exp(-E/RT).$ The reduced electric field $E^\star$ has units of V~m$^2$. ${\cal A}$ is Avogadro's number and it is approximately $6.022 \cdot 10^{23}~{\rm mol^{-1}}$.
+\item[{b}] $\rm M_1=N,~O,~N^+,~O^+$; $\rm M_2=N_2,~O_2,~NO,~N_2^+,~O_2^+,~NO^+$; $\rm M_3= N,~O,~NO,~N^+,~O^+$; $\rm M_4=N_2,O_2,N_2^+,~O_2^+,~NO^+$.
+\item[{c}] The forward reactions for 10, 11, and 12 are taken from \cite{pf:2007:boyd}. The backward reaction rates for reactions for 10 and 11 are sourced from \cite{jgr:2004:sheehan} and \cite{aip:2001:peverall}. The backward reaction rate for reaction 12 is found with a spline fit through \cite{aip:1998:peterson} rate data. The backward reactions for 24--25 are taken from \cite{nasa:1973:dunn}. Reaction 8 is taken from \cite{jcp:1997:bose} and reaction 9 from \cite{jcp:1996:bose}. The forward reactions 24--25 are found from \cite{jcp:2014:parent}. Other reactions are taken from \cite{book:1990:park}. The Townsend ionization rate at very high electric fields $k_{\rm i}=E^\star\cdot(1.875\cdot 10^6 \cdot (-\ln (E^\star)-30)^4+6\cdot 10^{26}\cdot E^\star)\cdot \exp(-7.3\cdot 10^{-19}/E^\star - 5.474\cdot 10^{16}\cdot E^\star)$ is obtained from \cite{ps:2005:tarasenko}.
 \end{tablenotes}
 \label{tab:rodriguez2026}
 \end{threeparttable}
