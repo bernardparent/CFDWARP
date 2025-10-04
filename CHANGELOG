@@ -7,6 +7,42 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 OCT 04a
+  * in model/chem/*/chem.hh
+    - deleted all the #define CHEM_NEUTRAL
+  * in model/emfield/*/emfield.c
+    - got rid of the code that was executed when CHEM_NEUTRAL was TRUE
+  * in model/fluid/*plasma*/fluid.c
+    - added the function double _Nk()
+    - in find_prim_fluid_mem() removed Nkmem code
+  * in model/fluid/_drift-diffusion/fluid.c
+    - fixed a bug in the parameters of find_dTe_dU: spec_t should be flux_t
+  * in model/fluid/_drift-diffusion/fluid.h
+    - fixed a bug in the parameters of find_U(): flux_t should be spec_t
+  * in model/fluid/_fluid.h
+    - removed _Nk_from_U()
+  * in model/share/fluid_share.c
+    - removed _betac()
+    - in _rhoc(), got rid of CHEM_NEUTRAL statement
+  * in model/share/fluid_share.h
+    - moved _betac() here
+  * in model/share/transport_share.c
+    - got rid of statements related to CHEM_NEUTRAL
+  * in model/thermo/_generic/thermo.c
+    - removed the constants calM, ck, numatoms
+    - removed the functions _calM(), _numatoms(), _m(), _C(), _Charge_number(), _s()
+  * in model/thermo/_thermo.h
+    - added the constants numatoms, calM, ck
+    - added the inline functions _calM(), _m(), _C(), _numatoms(), _Charge_number(), _s()
+  * in src/common.h
+    - removed Nkmem from npwk_t
+      
+  
+2025 SEP 26b
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - improved the documentation for rodriguez2026
+
+
 2025 SEP 26a
   * in lib/gridg/share.c
     - in read_RX_grid(), added a fatal_error if the file can not be opened

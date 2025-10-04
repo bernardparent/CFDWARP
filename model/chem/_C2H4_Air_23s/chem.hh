@@ -2,7 +2,7 @@
 #define _CHEM_METHOD "C2H4-Air 23 species 66 reactions Zettervall [zettervall2017a] and Zettervall-Konnov"
 #define _CHEM_ACTIONNAME "C2H4Air23s"
 
-#define CHEM_NEUTRAL TRUE
+ 
 #define ns 26
 #define ncs 0
 

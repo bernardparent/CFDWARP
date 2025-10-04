@@ -3,7 +3,7 @@
 #define _CHEM_PLASMA
 #define _CHEM_ACTIONNAME "AirPlasma8s"
 
-#define CHEM_NEUTRAL FALSE
+ 
 
 #define ns 8
 #define ncs 4

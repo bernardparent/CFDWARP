@@ -141,9 +141,6 @@ double _sigma(np_t *np, gl_t *gl, long l){
       sigma+=fabs(_C(spec))*max(0.0,_Nk(np[l],gl,spec))*_mu(np,gl,l,spec);
     }
   }
-  if (CHEM_NEUTRAL){
-    sigma+=fabs(_C(speceminus))*max(0.0,_Nk(np[l],gl,speceminus))*_mu(np,gl,l,speceminus);
-  }
 #else
   sigma=0.0;
 #endif

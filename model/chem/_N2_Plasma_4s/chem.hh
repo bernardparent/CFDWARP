@@ -3,7 +3,7 @@
 #define _CHEM_PLASMA
 #define _CHEM_ACTIONNAME "N2Plasma4s"
 
-#define CHEM_NEUTRAL FALSE
+ 
 
 #define ns 4
 #define ncs 2

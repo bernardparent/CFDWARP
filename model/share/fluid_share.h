@@ -124,7 +124,11 @@ void set_jacvars_eigenconditioning_constants(gl_t *gl, jacvars_t *jacvars);
 #ifdef _FLUID_PLASMA
 double _betan(long k);
 
-double _betac(long k);
+static inline double _betac(long k){
+  double betac;
+  if (speciestype[k]!=SPECIES_NEUTRAL) betac=1.0; else betac=0.0;
+  return(betac);
+}
 
 double _betag(gl_t *gl, long k);
 

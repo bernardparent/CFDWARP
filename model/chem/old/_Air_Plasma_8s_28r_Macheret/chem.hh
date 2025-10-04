@@ -2,7 +2,7 @@
 #define _CHEM_METHOD "Air Plasma 8 species 28 reactions Macheret [parent2016a]"
 #define _CHEM_PLASMA
 
-#define CHEM_NEUTRAL FALSE
+ 
 
 #define ns 8
 #define ncs 4

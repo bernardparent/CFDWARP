@@ -1,7 +1,7 @@
 #define _CHEM_CH4_AIR_20S_52R_YUNGSTER
 #define _CHEM_METHOD "CH4-Air 20 species 52 reaction Yungster [yungster1994a]"
 
-#define CHEM_NEUTRAL TRUE
+ 
 #define ns 20
 #define ncs 0
 

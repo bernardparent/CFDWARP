@@ -3,7 +3,7 @@
 
 #define ns 2
 #define ncs 0
-#define CHEM_NEUTRAL TRUE
+ 
 
 #define specNH3 0
 #define specN2 1

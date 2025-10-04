@@ -6,7 +6,7 @@
 
 #define ns 11
 #define ncs 6
-#define CHEM_NEUTRAL FALSE
+ 
 
 #define speceminus 0
 #define specOplus 1

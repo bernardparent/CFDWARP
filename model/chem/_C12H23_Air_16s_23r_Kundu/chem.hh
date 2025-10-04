@@ -1,7 +1,7 @@
 #define _CHEM_C12H23_AIR_16S_23R_KUNDU
 #define _CHEM_METHOD "C12H23-Air 16 species 23 reactions Kundu [kundu1999a]"
 
-#define CHEM_NEUTRAL TRUE
+ 
 #define ns 16
 #define ncs 0
 

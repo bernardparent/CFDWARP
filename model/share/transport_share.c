@@ -328,12 +328,6 @@ double _muk_from_rhok_T_Te_ParentMacheret(spec_t rhok, double T, double Te, long
   }
   Ni=max(1e0,Ni);
 
-#ifdef speceminus
-  if (CHEM_NEUTRAL && k==speceminus){
-    /* electrons */
-    mu=_mue_from_Te_rhok(Te,rhok);
-  } else {
-#endif
     switch (smap[k]){
       case SMAP_eminus:
         mu=_mue_from_Te_rhok(Te,rhok);
@@ -353,9 +347,6 @@ double _muk_from_rhok_T_Te_ParentMacheret(spec_t rhok, double T, double Te, long
       default:
         mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 2.2e10/sqrt(_m(k)), T, -0.5,  _m(k));
     }
-#ifdef speceminus
-  }
-#endif
   return(mu);
 }
 
@@ -459,12 +450,6 @@ void find_dmuk_from_rhok_Tk_Ek_ParentMacheret(spec_t rhok, double Tk, double Ek,
   }
   Ni=max(1e0,Ni);
   Ekstar=Ek/N;
-#ifdef speceminus
-  if (CHEM_NEUTRAL && k==speceminus){
-    /* electrons */
-    find_dmue_from_Nn_Ni_Te(Nn, Ni, Tk, dmukdTk, dmukdrhok);
-  } else {
-#endif
     for (spec=0; spec<ns; spec++) dmukdrhok[spec]=0.0;
     switch (smap[k]){
       case SMAP_eminus:
@@ -488,9 +473,6 @@ void find_dmuk_from_rhok_Tk_Ek_ParentMacheret(spec_t rhok, double Tk, double Ek,
       default:
         find_dmui_from_Nn_Ni_Ti(Nn, Ni, 2.2e10/sqrt(_m(k)), Tk, -0.5, 0.55/sqrt(_m(k)), Ekstar, -0.5, _m(k),  dmukdTk, dmukdrhok);
     }
-#ifdef speceminus
-  }
-#endif
 
 
 }

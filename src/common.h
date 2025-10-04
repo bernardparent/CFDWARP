@@ -311,7 +311,6 @@ typedef struct {
 #ifdef _FLUID_PLASMA
    double Temem;
    chargedspec_t mumem;
-   chargedspec_t Nkmem;
    chargedspec_t Pkmem;
    chargedspec_t kappacmem;
    double Nmem,Nnmem,kappanmem;

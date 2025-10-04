@@ -4,7 +4,7 @@
 
 #define ns 5
 #define ncs 0
-#define CHEM_NEUTRAL TRUE
+ 
 
 #define specO 0
 #define specN 1

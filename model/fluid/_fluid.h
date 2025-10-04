@@ -11,16 +11,14 @@
  
   /* total number density */
   double _N(np_t np, gl_t *gl);
-  
-  double _Nk(np_t np, gl_t *gl, long spec);
-  
+    
   double _rhok (np_t np, long spec);
-
-  double _Nk_from_U (flux_t U, long spec);
 
   double _Tk(np_t *np, gl_t *gl, long l, long spec);
   
   double _Pk(np_t *np, gl_t *gl, long l, long spec);
+
+  double _Nk (np_t np, gl_t *gl, long spec);
 
   double _rho (np_t np);
   

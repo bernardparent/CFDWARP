@@ -2020,11 +2020,6 @@ double _betai(long k){
   return(betai);
 }
 
-double _betac(long k){
-  double betac;
-  if (speciestype[k]!=SPECIES_NEUTRAL) betac=1.0; else betac=0.0;
-  return(betac);
-}
 
 
 /* determines whether the gauss's law terms are added to the continuity equations */
@@ -2052,7 +2047,6 @@ double _rhoc(np_t np, gl_t *gl){
   for (spec=0; spec<ns; spec++){
     rhoc+=_C(spec)*_Nk(np, gl, spec);
   }
-  if (CHEM_NEUTRAL) rhoc=0.0;
 
   return(rhoc);
 }

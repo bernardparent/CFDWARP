@@ -3,7 +3,7 @@
 
 #define ns 1
 #define ncs 0
-#define CHEM_NEUTRAL TRUE
+ 
 
 
 const static long smap[ns] = {

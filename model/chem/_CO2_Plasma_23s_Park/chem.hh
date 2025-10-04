@@ -2,7 +2,7 @@
 #define _CHEM_METHOD "CO2 Plasma 23s Park [park1994a]"
 #define _CHEM_PLASMA
 
-#define CHEM_NEUTRAL FALSE
+ 
 
 #define ns 23    /* number of species */
 #define ncs 11    /* number of charged species (electrons, ions) */

@@ -2,7 +2,7 @@
 #define _CHEM_METHOD "H2-Air 9 species Jachimowski [jachimowski1988a]"
 #define _CHEM_ACTIONNAME "H2Air9s"
 
-#define CHEM_NEUTRAL TRUE
+ 
 #define ns 9
 #define ncs 0
 
