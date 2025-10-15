@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 OCT 14a
+  * in model/share/chem_share.c
+    - added the function minlocal()
+    - made various modifications within the dW functions to exclude the contributions to the Jacobian
+      that are positive, to improve stability
+      
+
 2025 OCT 04a
   * in model/chem/*/chem.hh
     - deleted all the #define CHEM_NEUTRAL

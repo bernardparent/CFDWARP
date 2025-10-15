@@ -728,7 +728,7 @@ Cycle(
     CFL=min(CFL*1.03,CFLmax);
     system("date");
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
-    if (iter==15, exit(0); );
+    {if (iter==15, exit(0); );}
     if (EMFIELD,
       if (iter<2000,
         Cycle(NavierStokesPlasma(relaxTe=0.1;););
