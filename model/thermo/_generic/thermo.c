@@ -152,7 +152,11 @@ const static speciesname_t speciesname[SMAP_NS]=
    "H2v2",
    "H2(B1Sigma)",
    "H2v",
-   "H2v3"
+   "H2v3",
+   "Ar(4S)",
+   "Ar(4P)",
+   "Ar2+",
+   "Ar2star"
   };
 
 
@@ -914,6 +918,9 @@ double _ionizationpot(long k){
     break;
     case SMAP_H2B1Sigma:
       ionizationenergy=1.7624e-18;
+    break;
+    case SMAP_Ar:
+      ionizationenergy=2.5247e-18;
     break;
     default:
       ionizationenergy=0.0;

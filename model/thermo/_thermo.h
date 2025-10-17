@@ -120,7 +120,11 @@ const static long numatoms[SMAP_NS]=
    2,    /* H2v2 */
    2,    /* H2(B1SIGMA) */
    2,    /* H2v */
-   2    /* H2v3 */
+   2,    /* H2v3 */
+   1,    /* Ar(4S) */
+   1,    /* Ar(4P) */
+   2,    /* Ar2+ */
+   2    /* Ar2star */
   }; 
 
 
@@ -230,7 +234,11 @@ static const double calM[SMAP_NS]=
    2.01588E-3,    /*H2v2*/
    2.01588E-3,   /*H2(B1Sigma)*/   
    2.01588E-3,   /*H2v*/
-   2.01588E-3   /*H2v3*/
+   2.01588E-3,   /*H2v3*/
+   39.94800E-3,   /*Ar(4S)*/
+   39.94800E-3,   /*Ar(4P)*/
+   79.89545E-3,   /*Ar2+*/
+   79.89600E-3   /*Ar2star*/
   };
 
 /* the species number of charges */
@@ -340,7 +348,11 @@ static const long ck[SMAP_NS]=
    0,    /* H2v2 */
    0,   /* H2(B1SIGMA) */
    0,    /* H2v */
-   0    /* H2v3 */
+   0,    /* H2v3 */
+   0,    /* Ar(4S) */
+   0,    /* Ar(4P) */
+   1,    /* Ar2+ */
+   0     /* Ar2star */
   };
 
 

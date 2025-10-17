@@ -81,6 +81,10 @@ CFDWARP/model/transport/ref/SAND86-8246.pdf
 the transport properties of  C4H8O, C6H12O, C8H16, C3H5 and C12H24
 are calculated as            C4H8, C2H5OC2H5, C6H12, C3H6 and C6H12 respectively
 
+Argon dimer Ar2star, Ar2+, fixed sigma to equilibrium intermolecular distance from reference
+Ulrich, B., et al. "Double-ionization mechanisms of the argon dimer in intense laser fields." 
+Physical Review A—Atomic, Molecular, and Optical Physics 82.1 (2010): 013412.
+
 */
 
 /*The epsilon parameter values below are sourced from one of two tables above and include
@@ -197,6 +201,10 @@ const static double Peps[SMAP_NS]=
    59.7e0,      /*H2(B1SIGMA)*/ /* !! unknown value: fixed to the one of H2 */
    59.7e0,      /*H2v*/ /* !! unknown value: fixed to the one of H2 */
    59.7e0,      /*H2v3*/ /* !! unknown value: fixed to the one of H2 */
+   93.3,        /*Ar(4S)*/  /* !! unknown value: fixed to the one of Ar */
+   93.3,        /*Ar(4P)*/  /* !! unknown value: fixed to the one of Ar */
+   93.3,        /*Ar2+*/    /* !! unknown value: fixed to the one of Ar */
+   93.3,        /*Ar2star*/  /* !! unknown value: fixed to the one of Ar */
   };
 
 
@@ -308,6 +316,10 @@ const static double Psig[SMAP_NS]=
    0.2827E+0,   /*H2(B1SIGMA)*/ /* !! unknown value: fixed to the one of H2 */
    0.2827E+0,   /*H2v*/ /* !! unknown value: fixed to the one of H2 */
    0.2827E+0,   /*H2v3*/ /* !! unknown value: fixed to the one of H2 */
+   0.3542E+0,     /*Ar(4S)*/  /* !! unknown value: fixed to the one of Ar */
+   0.3542E+0,     /*Ar(4P)*/  /* !! unknown value: fixed to the one of Ar */
+   0.3761E+0,     /*Ar2+*/    /* !! unknown value: fixed to equilibrium intermolecular distance of Argon dimer Ar2 */
+   0.3761E+0,     /*Ar2star*/ /* !! unknown value: fixed to equilibrium intermolecular distance of Argon dimer Ar2 */
   };
 
 

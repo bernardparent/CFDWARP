@@ -6,6 +6,19 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2025 OCT 17a
+  * in model/thermo/_generic/enthalpy.c
+    - added species Ar(4S), Ar(4P), Ar2+, Ar2star
+  * in model/thermo/_generic/thermo.c
+    - added species Ar(4S), Ar(4P), Ar2+, Ar2star to speciesname
+    - in _ionizationpot(), added species Ar
+  * in model/thermo/_generic/thermo.hh
+    - added species Ar(4S), Ar(4P), Ar2+, Ar2star to SMAP
+  * in model/thermo/_thermo.h
+    - added species Ar(4S), Ar(4P), Ar2+, Ar2star 
+  * in model/transport/_Dixon-Lewis/transport.c
+    - added species Ar(4S), Ar(4P), Ar2+, Ar2star to Peps and Psig
+    
 
 2025 OCT 14a
   * in model/share/chem_share.c
