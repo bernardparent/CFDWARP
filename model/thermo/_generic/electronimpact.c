@@ -1536,6 +1536,128 @@ static double _Te_from_EoverN_CO_Morgan(double EoverN){
   return(Te);
 }
 
+static double _EoverN_from_Te_Ar(double Te){
+  double EoverN;
+  /* Data in log-log coordinates. Obtained with BOLSIG+ using Phelps database LXCat cross-sections and data from
+  Boeuf, J. P., and L. C. Pitchford. "Two-dimensional model of a capacitively coupled rf discharge and comparisons with 
+  experiments in the Gaseous Electronics Conference reference reactor." Physical Review E 51.2 (1995): 1376.
+  Milloy, H. B., Crompton, R. W., Aust. J. Phys., 30, 51, (1977); */
+  /* log K */
+  double Te_data[] = 
+  { 
+    5.703782474656201,
+    6.249952843580852,
+    6.447729115135703,
+    6.684602223547260,
+    7.572171274411614,
+    7.980335981903133,
+    8.455961698052533,
+    9.076695960671204,
+    9.475483483882210,
+    10.512175101275869,
+    10.684956680248844,
+    10.857734948728098,
+    11.030514662622968,
+    11.203298301488957,
+    11.376078024059792,
+    11.548859013190386,
+    11.894409472808903,
+    12.282317344817987,
+    12.521328868958854,
+    12.760347769431354
+  };
+  /* log Vm^2*/
+  double EoverN_data[] = 
+  { 
+    -56.345285235395721,
+    -55.141312431069785,
+    -54.799367266787762,
+    -54.550013436237855,
+    -53.862345090609900,
+    -53.356663940844271,
+    -52.198200476890293,
+    -50.763466767289970,
+    -49.920124334498418,
+    -47.841217847596660,
+    -47.485251363918415,
+    -47.108991799227113,
+    -46.223520367311593,
+    -44.367572145754728,
+    -43.303629984429215,
+    -42.567766943317537,
+    -41.728868060019849,
+    -41.174773211860405,
+    -40.907077777781353,
+    -40.666711506924216
+  };
+  
+  int N = sizeof(Te_data)/sizeof(Te_data[0]);
+  Te = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
+  EoverN = exp( EXM_f_from_monotonespline(N, Te_data, EoverN_data, Te) );
+  return(EoverN);
+}
+
+static double _Te_from_EoverN_Ar(double EoverN){
+  double Te;
+  /* Data in log-log coordinates. Obtained with BOLSIG+ using Phelps database LXCat cross-sections and data from
+  Boeuf, J. P., and L. C. Pitchford. "Two-dimensional model of a capacitively coupled rf discharge and comparisons with 
+  experiments in the Gaseous Electronics Conference reference reactor." Physical Review E 51.2 (1995): 1376.
+  Milloy, H. B., Crompton, R. W., Aust. J. Phys., 30, 51, (1977); */
+  /* log Vm^2*/
+  double EoverN_data[] = 
+  { 
+    -56.345285235395721,
+    -55.141312431069785,
+    -54.799367266787762,
+    -54.550013436237855,
+    -53.862345090609900,
+    -53.356663940844271,
+    -52.198200476890293,
+    -50.763466767289970,
+    -49.920124334498418,
+    -47.841217847596660,
+    -47.485251363918415,
+    -47.108991799227113,
+    -46.223520367311593,
+    -44.367572145754728,
+    -43.303629984429215,
+    -42.567766943317537,
+    -41.728868060019849,
+    -41.174773211860405,
+    -40.907077777781353,
+    -40.666711506924216
+  };
+  /* log K */
+  double Te_data[] = 
+  { 
+    5.703782474656201,
+    6.249952843580852,
+    6.447729115135703,
+    6.684602223547260,
+    7.572171274411614,
+    7.980335981903133,
+    8.455961698052533,
+    9.076695960671204,
+    9.475483483882210,
+    10.512175101275869,
+    10.684956680248844,
+    10.857734948728098,
+    11.030514662622968,
+    11.203298301488957,
+    11.376078024059792,
+    11.548859013190386,
+    11.894409472808903,
+    12.282317344817987,
+    12.521328868958854,
+    12.760347769431354
+  };
+
+  int N = sizeof(EoverN_data)/sizeof(EoverN_data[0]);
+  EoverN = ( min( EoverN_data[N-1], max( log( EoverN) , EoverN_data[0] ) ) );
+  Te = exp( EXM_f_from_monotonespline(N, EoverN_data, Te_data, EoverN) );
+  return(Te);
+}
+
 double _EoverNk_from_Te(long spec, double Te){
   double Estar;
   switch (smap[spec]){
@@ -1574,6 +1696,9 @@ double _EoverNk_from_Te(long spec, double Te){
     break;
     case SMAP_CO:
       Estar=_EoverN_from_Te_CO_Morgan(Te);
+    break;
+    case SMAP_Ar:
+      Estar=_EoverN_from_Te_Ar(Te);
     break;
     default:
       Estar=0.0;
@@ -1639,6 +1764,9 @@ double _Tek_from_EoverN(long spec, double EoverN){
     break;
     case SMAP_CO:
       Te=_Te_from_EoverN_CO_Morgan(EoverN);
+    break;
+    case SMAP_Ar:
+      Te=_Te_from_EoverN_Ar(EoverN);
     break;
     default:
       Te=0.0;

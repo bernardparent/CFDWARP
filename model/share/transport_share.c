@@ -1150,6 +1150,68 @@ static double _mueN_CO(double Te){
   return(exp( mueN_CO ));
 }
 
+static double _mueN_Ar(double Te){
+  double mueN_Ar;
+  /* Obtained with BOLSIG+ using Phelps LXCat database cross-sections at 300 K */
+  /* log K */
+  double Te_control[] = 
+  { 
+    5.703782474656201,
+    6.187625649505295,
+    7.037695823268306,
+    7.764437175778443,
+    8.017872383185614,
+    8.413958223693541,
+    8.832273621488913,
+    9.279516630698174,
+    9.760648433584878,
+    10.257300080509509,
+    10.744055338531414,
+    11.008781437778618,
+    11.111722738526501,
+    11.198593175653226,
+    11.353750755580124,
+    11.591264172992179,
+    12.073610735151512,
+    12.204519207939088,
+    12.344614183749762,
+    12.502880667914631,
+    12.671407146996684,
+    12.721121268124049
+  };
+  /* log m^-1 V^-1 s^-1*/
+  double mueN_control[] = 
+  { 
+    60.027859095773287,
+    60.168109288952479,
+    60.428814802618326,
+    60.282667459982697,
+    60.033370716796725,
+    59.282777928120481,
+    58.539556707806675,
+    57.823933070661461,
+    57.101435641529918,
+    56.363733110134802,
+    55.616038591590069,
+    55.303366500216725,
+    55.267576887355574,
+    55.117638231784490,
+    54.984509810326912,
+    54.865326238381179,
+    54.735791585088293,
+    54.709882329598045,
+    54.682105872515599,
+    54.651125517926054,
+    54.617544253150911,
+    54.607176862281243
+  };
+  
+  int N = sizeof(Te_control)/sizeof(Te_control[0]);
+  Te=min(Te_control[N-1],max(log( Te ),Te_control[0]));
+  mueN_Ar = EXM_f_from_monotonespline(N, Te_control, mueN_control, Te);
+  return(exp( mueN_Ar ));
+}
+
 double _mueNk_from_Te_ParentMacheret(long spec, double Te){
   double mueN;
   switch (smap[spec]){
@@ -1188,6 +1250,9 @@ double _mueNk_from_Te_ParentMacheret(long spec, double Te){
     break;
     case SMAP_CO:
       mueN=_mueN_CO(Te);
+    break;
+    case SMAP_Ar:
+      mueN=_mueN_Ar(Te);
     break;
     default:
       mueN=_mueN_N2(Te); //3.74E19*exp(33.5/sqrt(log(Te)));

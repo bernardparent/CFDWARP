@@ -6,6 +6,13 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2025 OCT 20a
+  * in model/share/transport_share.c
+    - added _mueN_Ar() 
+  * in model/thermo/_generic/electronimpact.c
+    - added _EoverN_from_Te_Ar() and _Te_from_EoverN_Ar()
+
+
 2025 OCT 17a
   * in model/thermo/_generic/enthalpy.c
     - added species Ar(4S), Ar(4P), Ar2+, Ar2star
