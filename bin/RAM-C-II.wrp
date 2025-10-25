@@ -429,7 +429,7 @@ Model(
     Pmin=1.0e-2;    Pmax=9.9e99;   {Pa}
     Tmin=1.0e1;     Tmax=35.0e3;    {K}
     Tvmin=Tmin;     Tvmax=Tmax;  {K}
-    Temin=240;     Temax=100.0e3;  {K}
+    Temin=240;     Temax=25.0e3;  {K}
     Twmin=Tmin;     Twmax=Tmax;    {K}
     wmin=1.0e-50;                  {min mass fraction allowed in the domain for neutrals}
     chiimin=1e-30;  chiimax=1.0;    {min and max ion molar fraction}
@@ -453,7 +453,7 @@ Model(
   );
   GuptaYos(
     LNLAMBDA=LNLAMBDA_GUPTAYOS;
-    TRANSPORTMODEL=TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED;
+    TRANSPORTMODEL=TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_ELECTRONMOBILITIESPARENTMACHERET;
   );
   Epotential(
     Te_buffer=300.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,Te_buffer);  
@@ -723,7 +723,7 @@ Cycle(
     if (iter<2000,
       CFLmax=0.5;
     ,{else}
-      CFLmax=3.0;
+      CFLmax=2.0;
     );
     CFL=min(CFL*1.03,CFLmax);
     system("date");

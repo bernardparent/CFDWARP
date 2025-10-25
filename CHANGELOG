@@ -6,6 +6,20 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2025 OCT 24a
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - added code for N2VIBMODEL_RODRIGUEZ2026
+  * in model/fluid/_Navier-Stokes_plasma/fluid.h
+    - added constant N2VIBMODEL_RODRIGUEZ2026
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - added _tauvt_Macheret()
+    - added _tauvt_Gnoffo()
+    - in find_Svib(), implemented the Gnoff N2 vib model
+    - added find_tauvt_d1overtauvt()
+    - in find_dSvib_dU(), implemented the Gnoff N2 vib model
+    
+  
 2025 OCT 20a
   * in model/share/transport_share.c
     - added _mueN_Ar() 
