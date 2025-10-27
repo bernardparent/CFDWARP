@@ -156,7 +156,8 @@ const static speciesname_t speciesname[SMAP_NS]=
    "Ar(4S)",
    "Ar(4P)",
    "Ar2+",
-   "Ar2star"
+   "Ar2star",
+   "Ar2"
   };
 
 
@@ -921,6 +922,15 @@ double _ionizationpot(long k){
     break;
     case SMAP_Ar:
       ionizationenergy=2.5247e-18;
+    break;
+    case SMAP_Ar4S:
+      ionizationenergy=6.6643e-19; /* this is the ionization energy of ground state Ar minus the energy to reach the 4S state from Ar */
+    break;
+    case SMAP_Ar4P:
+      ionizationenergy=4.2613e-19; /* this is the ionization energy of ground state Ar minus the energy to reach the 4P state from Ar */
+    break;
+    case SMAP_Ar2star:
+      ionizationenergy=4.6474e-19; /* this is the ionization energy of ground state Ar2 minus the energy to reach the 4S state from Ar, assuming Ar-Ar(4S) bond */
     break;
     default:
       ionizationenergy=0.0;

@@ -205,6 +205,7 @@ const static double Peps[SMAP_NS]=
    93.3,        /*Ar(4P)*/  /* !! unknown value: fixed to the one of Ar */
    93.3,        /*Ar2+*/    /* !! unknown value: fixed to the one of Ar */
    93.3,        /*Ar2star*/  /* !! unknown value: fixed to the one of Ar */
+   93.3,        /*Ar2*/  /* !! unknown value: fixed to the one of Ar */
   };
 
 
@@ -320,6 +321,7 @@ const static double Psig[SMAP_NS]=
    0.3542E+0,     /*Ar(4P)*/  /* !! unknown value: fixed to the one of Ar */
    0.3761E+0,     /*Ar2+*/    /* !! unknown value: fixed to equilibrium intermolecular distance of Argon dimer Ar2 */
    0.3761E+0,     /*Ar2star*/ /* !! unknown value: fixed to equilibrium intermolecular distance of Argon dimer Ar2 */
+   0.3761E+0,     /*Ar2*/ /* !! unknown value: fixed to equilibrium intermolecular distance of Argon dimer Ar2 */
   };
 
 

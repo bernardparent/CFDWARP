@@ -3,7 +3,7 @@
 
 #define THERMO_P_REF 100000.0
 
-#define SMAP_NS 109
+#define SMAP_NS 110
 
 #define SMAP_eminus   0
 #define SMAP_O2       1
@@ -114,3 +114,4 @@
 #define SMAP_Ar4P     106
 #define SMAP_Ar2plus  107
 #define SMAP_Ar2star  108
+#define SMAP_Ar2  109

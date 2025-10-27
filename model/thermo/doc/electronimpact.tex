@@ -37,6 +37,49 @@ All remaining parameters are kept to the default value.
 The electron energy range in which BOLSIG+ results are valid depend on the energy range of the corresponding cross-section data. Here, only the converged runs are kept, and any results extrapolated by BOLSIG+ are discarded. For higher electron temperatures for which there is no BOLSIG+ solution, the data is extrapolated by placing a spline control point for an electron temperature of $5\cdot10^6$ K, and a corresponding $E/N$ value that reflects the trend of the converged BOLSIG+ results. This last control point can be be modified to get the desired accuracy at very high temperatures. Results for several mixtures are shown below.
 
 %
+
+\subsection{Argon ($\rm Ar$)}
+
+All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableAr}. The reduced electric field results are shown in Fig. \ref{fig:electronimpact_Ar}.
+
+\begin{table*}[!htbp]
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{$\rm Ar$ electron impact processes with available cross-section data.}
+    \label{tab:tableAr}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}llll}
+    \toprule
+    {no.}  & {process} & {type} &  {eV threshold}  &  {ref.} \\
+    \midrule
+    
+      1 & $\rm e^- + Ar \rightarrow e^- + Ar$  &  momentum transfer   &  0.0  & \cite{pr:tachibana:1986}\\  
+      2 & $\rm e^- + Ar \rightarrow e^- + Ar(1s5)$  &  4s metastable excitation   &  11.54  & \cite{pr:tachibana:1986}\\ 
+      3 & $\rm e^- + Ar \rightarrow e^- + Ar(1s4)$  &  4s excitation   &  11.62  & \cite{pr:tachibana:1986}\\ 
+      4 & $\rm e^- + Ar \rightarrow e^- + Ar(1s3)$  &  4s metastable excitation   &  11.78  & \cite{pr:tachibana:1986}\\ 
+      5 & $\rm e^- + Ar \rightarrow e^- + Ar(1s2)$  &  4s excitation   &  11.87  & \cite{pr:tachibana:1986}\\ 
+      6 & $\rm e^- + Ar \rightarrow e^- + Ar(A)$  &  excitation of allowed levels   &  14.0  & \cite{pr:tachibana:1986}\\ 
+      7 & $\rm e^- + Ar \rightarrow e^- + Ar(F)$  &  excitation of forbidden levels (4p)   &  12.9  & \cite{pr:tachibana:1986}\\ 
+      8 & $\rm e^- + Ar \rightarrow Ar^+ + e^- + e^-$  &  ionization  &  15.8  &  \cite{jcp:1965:rapp} \\ 
+ 
+
+
+
+    \bottomrule
+    \end{tabular*}
+   \end{threeparttable}
+\end{table*}
+
+%
+
+\begin{figure}[!htbp]
+ \center
+\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.49]{electronimpact_figs/electronimpact_figureAr.png}
+\caption{$E/N$ results for $\rm Ar$, showing reduced electric field as a function of the electron temperature. Experimental $\rm Ar$ data points are taken from \citen{ajp:1977:milloy} and simulation data from \citen{pr:1995:boeuf}.}
+\label{fig:electronimpact_Ar}
+\end{figure}
+
+
 \subsection{Atomic hydrogen ($\rm H$)}
 
 All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableH}. The reduced electric field results are shown in Fig. \ref{fig:electronimpact_H}.
@@ -516,12 +559,48 @@ The reduced electric field results are shown in Fig. \ref{fig:electronimpact_CO}
     \tablecaption{Coordinates of control points for monotone cubic spline interpolation of electron impact processes\tnote{a}.}
     \label{tab:spline_tab}
     \fontsizetable
-    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}lcll}
+    \begin{tabular*}{1.1\textwidth}{l@{\extracolsep{\fill}}lcll}
     \toprule
    No.~~ & Process ~& Variable & Spline control point coordinates  \\
         \midrule
 
-        
+    \multirow{2}{*}{1} &  \multirow{2}{*}{ $\rm e^- + Ar  $   } & ${\rm ln}~T_{\rm e}$  & \tiny       5.703
+    6.249
+    6.447
+    6.684
+    7.980
+    8.455
+    9.076
+    9.475
+    10.512
+    10.684
+    10.857
+    11.030
+    11.203
+    11.376
+    11.548
+    12.282
+    12.521
+    12.76034\\
+  &  & ${\rm ln}~E^\star$     & \tiny     -56.3452
+    -55.1413
+    -54.7993
+    -54.5500
+    -53.3566
+    -52.1982
+    -50.7634
+    -49.9201
+    -47.8412
+    -47.4852
+    -47.1089
+    -46.2235
+    -44.3675
+    -43.3036
+    -42.5677
+    -41.1747
+    -40.9070
+    -40.6667\\     
+  \midrule        
 
   \multirow{2}{*}{1} &  \multirow{2}{*}{ $\rm e^- + N  $   } & ${\rm ln}~T_{\rm e}$  & \tiny      6.1322    6.2124    6.4474    7.5872    8.7256    9.2774    9.4778    9.5934   10.0915   11.1390   11.7497   13.5255   15.4249
  \\
