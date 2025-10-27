@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 OCT 27a
+  * in bin/Broslawski.wrp
+    - made improvements so that this control file can be used with AirPlasma11s
+  * in model/chem/_Air_Plasma_11s/chem.c
+    - added user-defined Tminchem and Teminchem
+  * in model/chem/_Air_Plasma_11s/chem.hh
+    - added user-defined Tminchem and Teminchem
+
+
 2025 OCT 24a
   * in model/fluid/_Navier-Stokes_plasma/fluid.c
     - added code for N2VIBMODEL_RODRIGUEZ2026

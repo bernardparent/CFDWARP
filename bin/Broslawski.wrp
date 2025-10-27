@@ -274,8 +274,6 @@ Model(
     TEMODEL=TEMODEL_TRANSPORT_PARENT2024;
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     N2VIBMODEL=N2VIBMODEL_PARENT2024;
-    N2VIBJOULEHEATING=YES;
-    N2VIBJOULEHEATINGMODEL=N2VIBJOULEHEATINGMODEL_PARENT2024;
     REACTING=YES;
     INCLUDE_E_EFFECTS_ON_ION_MOBILITY=YES; 
     INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY=NO; 
@@ -308,7 +306,9 @@ Model(
     CHEMMODEL=CHEMMODEL_RODRIGUEZ2024;
     for (react,1,6, ADDITIONALREACTION[react]=FALSE;); {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE generally}
-    QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}
+    QEISOURCETERMS=FALSE; {include electron energy cooling due to electron impact}
+    Tminchem=300.0;
+    Teminchem=300.0;
   );
   AirPlasma8s(
     CHEMMODEL=CHEMMODEL_RODRIGUEZ2024;
@@ -316,6 +316,10 @@ Model(
     TOWNSENDIMPLICIT=FALSE;
     Tminchem=300.0;
     Teminchem=300.0;
+  );
+  GuptaYos(
+    LNLAMBDA=LNLAMBDA_GUPTAYOS;
+    TRANSPORTMODEL=TRANSPORTMODEL_NONEQUILIBRIUMCORRECTED_ELECTRONMOBILITIESPARENTMACHERET;
   );
   Epotential(
     Te_buffer=300.0;    {"buffer" electron temp. in K needed when determining mue: Te=max(Te,Te_buffer);  
@@ -431,7 +435,7 @@ Disc(
                        can lead to spurrious oscillations.}
   );
   MUSCL(
-    FLUX=FLUX_FDS;
+    FLUX=FLUX_HLLC_HYBRID;
     AVERAGING=AVERAGING_ROE;
     AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;
     AOWENO_gammalo=0.85;
@@ -512,6 +516,11 @@ Cycle(
         SetSolidConductivity(is3,js0, is4,js1, Helectrode/(Relectrodelocal*elecdepth*elecwidth) {S/m});
       );
     );
+    {uncomment the following for chemical solvers where the Townsend ionization is determined from E/N
+     make sure that CHEMMODEL within the Model() unit above is set to CHEMMODEL_RODRIGUEZ2024}
+{    if (iter>1300*mf,
+      Model(AirPlasma11s(CHEMMODEL=CHEMMODEL_RODRIGUEZ2026;););
+    );}
     UpdateFluid(CFL,PRECON_LOCALTIMESTEP,sigma1,sigma2);
     Lc=1e99;      {characteristic length scale in meters used to solve the emfield equation}
     relaxEMF=1.0; {relaxation factor forced on the update of the emfield variables}

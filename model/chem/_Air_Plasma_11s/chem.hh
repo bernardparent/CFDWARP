@@ -71,5 +71,6 @@ typedef struct {
   bool ADDITIONALREACTION[7];
   bool TOWNSENDIONIZATIONIMPLICIT;
   bool QEISOURCETERMS;
+  double Tminchem,Teminchem;
 } gl_model_chem_t;
 

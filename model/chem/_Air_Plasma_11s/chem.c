@@ -72,6 +72,8 @@ void write_model_chem_template(FILE **controlfile){
     "    for (react,1,6, ADDITIONALREACTION[react]=FALSE;); {include reactions function of EoverN}\n"
     "    TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE generally}\n"
     "    QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}\n"
+    "    Tminchem=0.0;\n"
+    "    Teminchem=0.0;\n"
     "  );\n"
   ,_CHEM_ACTIONNAME);
 }
@@ -127,6 +129,8 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
     }
     find_bool_var_from_codex(codex,"TOWNSENDIONIZATIONIMPLICIT",&gl->model.chem.TOWNSENDIONIZATIONIMPLICIT);
     find_bool_var_from_codex(codex,"QEISOURCETERMS",&gl->model.chem.QEISOURCETERMS);
+    find_double_var_from_codex(codex,"Tminchem",&gl->model.chem.Tminchem);
+    find_double_var_from_codex(codex,"Teminchem",&gl->model.chem.Teminchem);
 
     SOAP_clean_added_vars(codex,numvarsinit);
     codex->ACTIONPROCESSED=TRUE;
@@ -285,6 +289,8 @@ void find_dW_dx_None ( gl_t *gl, spec_t rhok, double T, double Te, double Tv,
 
 
 void find_W ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, spec_t W ) {
+  T=max(T,gl->model.chem.Tminchem);
+  Te=max(Te,gl->model.chem.Teminchem);
   switch (gl->model.chem.CHEMMODEL){
     case CHEMMODEL_DUNNKANG1973: 
       find_W_DunnKang1973 ( gl, rhok, T, Te, Tv, Estar, Qbeam, W );
@@ -342,6 +348,8 @@ void find_W ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, do
 void find_dW_dx ( np_t np, gl_t *gl, spec_t rhok, double T, double Te, double Tv, 
                   double Estar, double Qbeam,
                   spec2_t dWdrhok, spec_t dWdT, spec_t dWdTe, spec_t dWdTv, spec_t dWdQbeam ) {
+  T=max(T,gl->model.chem.Tminchem);
+  Te=max(Te,gl->model.chem.Teminchem);
   switch (gl->model.chem.CHEMMODEL){
     case CHEMMODEL_DUNNKANG1973: 
       find_dW_dx_DunnKang1973 ( gl, rhok, T, Te, Tv, Estar, Qbeam, dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam );
