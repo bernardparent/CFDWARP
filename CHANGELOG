@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 OCT 28a
+  * in model/chem/_Ar_Plasma_8s/rodriguez2025.c
+    - fixed a few bugs
+  * in cycle/resconv/_MUSCL/resconv.c
+    - in write_disc_resconv_template(), changed the default FLUX to FLUX_HLLC_HYBRID
+
+
 2025 OCT 27c
   * in model/thermo/_generic/thermo.c
     - in _ionizationpot(), removed all excited species because the activation energies listed

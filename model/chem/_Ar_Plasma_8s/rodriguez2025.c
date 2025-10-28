@@ -457,7 +457,7 @@ void find_W_rodriguez2025 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te,
 
   if (REACTION[8]){
      // add_to_W_2r3p ( speceminus, specAr2star, specAr, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf8", &_kf8), N, W );
-     add_to_W_fw_2r3p ( speceminus, specAr2star, specAr, specAr, speceminus, 1.0000E-7 * calA, 0.0, 0.0 * R, Te, X, W );
+     add_to_W_fw_2r3p ( speceminus, specAr2star, specAr, specAr, speceminus, 1.0000E-9 * calA, 0.0, 0.0 * R, Te, X, W );
   }
 
   if (REACTION[9]){
@@ -496,7 +496,7 @@ void find_W_rodriguez2025 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te,
   /* Three-body neutral reactions */  
 
   if (REACTION[16]){
-     add_to_W_fw_3r2p ( specAr4S, specAr, specAr, specAr2plus, specAr, 1.0000E-32 * sqr(calA), 0.0, 0.0 * R, T, X, W );
+     add_to_W_fw_3r2p ( specAr4S, specAr, specAr, specAr2star, specAr, 1.0000E-32 * sqr(calA), 0.0, 0.0 * R, T, X, W );
   }
 
   if (REACTION[17]){
@@ -614,7 +614,7 @@ void find_dW_dx_rodriguez2025 ( np_t np, gl_t *gl, spec_t rhok, double T, double
      dkfdT = 0.0;
      dkfdTv = 0.0;
      // add_to_dW_2r3p ( speceminus, specAr2star, specAr, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf8", &_kf8), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
-     add_to_dW_fw_2r3p ( speceminus, specAr2star, specAr, specAr, speceminus, 1.0000E-7 * calA, 0.0, 0.0 * R, Te, X, dWdTe, dWdrhok );
+     add_to_dW_fw_2r3p ( speceminus, specAr2star, specAr, specAr, speceminus, 1.0000E-9 * calA, 0.0, 0.0 * R, Te, X, dWdTe, dWdrhok );
   }
 
   if (REACTION[9]){
@@ -662,7 +662,7 @@ void find_dW_dx_rodriguez2025 ( np_t np, gl_t *gl, spec_t rhok, double T, double
   /* Three-body neutral reactions */
 
   if (REACTION[16]){
-     add_to_dW_fw_3r2p ( specAr4S, specAr, specAr, specAr2plus, specAr, 1.0000E-32 * sqr(calA), 0.0, 0.0 * R, T, X, dWdT, dWdrhok );
+     add_to_dW_fw_3r2p ( specAr4S, specAr, specAr, specAr2star, specAr, 1.0000E-32 * sqr(calA), 0.0, 0.0 * R, T, X, dWdT, dWdrhok );
   }
 
   if (REACTION[17]){
@@ -683,10 +683,48 @@ void find_Qei_rodriguez2025(np_t np, gl_t *gl, spec_t rhok, double Estar, double
   *Qei=0.0;  
 
   if (gl->model.chem.TE_FROM_TOWNSEND) Te=_Te_from_rhok_EoverN(rhok, Estar);  
+
+  if (REACTION[1]) {
+    // add_to_Qei(gl,Te, specAr, 11.6, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), rhok, Qei);
+    add_to_Qei(gl,Te, specAr, 11.6, _kf1(np,gl,Te), rhok, Qei); // Ar->Ar(4s) (11.6 eV)
+  }
+
+  if (REACTION[2]) {
+    // add_to_Qei(gl,Te, specAr, 13.1, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), rhok, Qei);
+    add_to_Qei(gl,Te, specAr, 13.1, _kf2(np,gl,Te), rhok, Qei); // Ar->Ar(4p) (13.1 eV)
+  }
+
+  if (REACTION[3]) {
+    // add_to_Qei(gl,Te, specAr4S, 1.5, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), rhok, Qei);
+    add_to_Qei(gl,Te, specAr4S, 1.5, _kf3(np,gl,Te), rhok, Qei); // Ar(4s)->Ar(4p) (1.5 eV)
+  }
+
   if (REACTION[4]) {
     // add_to_Qei(gl,Te, specAr, _ionizationpot(specAr), _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf4", &_kf4), rhok, Qei);
-    add_to_Qei(gl,Te, specAr, _ionizationpot(specAr), _kf4(np,gl,Te), rhok, Qei);
+    add_to_Qei(gl,Te, specAr, _ionizationpot(specAr), _kf4(np,gl,Te), rhok, Qei); // ground ionization 15.8 eV
   }
+
+  if (REACTION[5]) {
+    // add_to_Qei(gl,Te, specAr4S, 4.2, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf5", &_kf5), rhok, Qei);
+    add_to_Qei(gl,Te, specAr4S, 4.2, _kf5(np,gl,Te), rhok, Qei); // Ar(4s)->Ar+ (15.8 - 11.6 = 4.2 eV)
+  }
+
+  if (REACTION[6]) {
+    // add_to_Qei(gl,Te, specAr4P, 2.7, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf6", &_kf6), rhok, Qei);
+    add_to_Qei(gl,Te, specAr4P, 2.7, _kf6(np,gl,Te), rhok, Qei); // Ar(4p)->Ar+ (15.8 - 13.1 = 2.7 eV)
+  }
+
+  if (REACTION[7]) {
+    // add_to_Qei(gl,Te, specAr2star, 4.2, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf7", &_kf7), rhok, Qei);
+    add_to_Qei(gl,Te, specAr2star, 4.2, 9.0000E-8 * pow (TeV, -0.7) * pow (Te, 0.7) * exp ( -3.66 * TeV / Te ), rhok, Qei); // (15.8 - 11.6 = 4.2 eV) estimate assuming Ar2* = Ar-Ar(4s)
+  }
+
+  if (REACTION[8]) {
+    // add_to_Qei(gl,Te, specAr2star, 4.2, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf8", &_kf8), rhok, Qei);
+    add_to_Qei(gl,Te, specAr2star, 4.2, 1.0000E-9, rhok, Qei); // (15.8 - 11.6 = 4.2 eV) estimate assuming Ar2* = Ar-Ar(4s)
+  }
+
+  /* electron-ion recombination reactions are excluded here */
   
 }
 
@@ -696,13 +734,51 @@ void find_dQei_dx_rodriguez2025(np_t np, gl_t *gl, spec_t rhok, double Estar, do
   long spec;
 
   if (gl->model.chem.TE_FROM_TOWNSEND) Te=_Te_from_rhok_EoverN(rhok, Estar);  
+
   for (spec=0; spec<ns; spec++) dQeidrhok[spec]=0.0;
   *dQeidTe=0.0;  
 
+  if (REACTION[1]) {
+    // add_to_dQei(gl,Te, specAr, 11.6,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), 0.0,  rhok, dQeidrhok, dQeidTe);
+    add_to_dQei(gl,Te, specAr, 11.6, _kf1(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe); // Ar->Ar(4s) (11.6 eV)
+  }
+
+  if (REACTION[2]) {
+    // add_to_dQei(gl,Te, specAr, 13.1,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), 0.0,  rhok, dQeidrhok, dQeidTe);
+    add_to_dQei(gl,Te, specAr, 13.1, _kf2(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe); // Ar->Ar(4p) (13.1 eV)
+  }
+
+  if (REACTION[3]) {
+    // add_to_dQei(gl,Te, specAr4S, 1.5,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), 0.0,  rhok, dQeidrhok, dQeidTe);
+    add_to_dQei(gl,Te, specAr4S, 1.5, _kf3(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe); // Ar(4s)->Ar(4p) (1.5 eV)
+  }
+
   if (REACTION[4]) {
     // add_to_dQei(gl,Te, specAr, _ionizationpot(specAr),  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf4", &_kf4), 0.0,  rhok, dQeidrhok, dQeidTe);
-    add_to_dQei(gl,Te, specAr, _ionizationpot(specAr), _kf4(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe);
+    add_to_dQei(gl,Te, specAr, _ionizationpot(specAr), _kf4(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe); // ground ionization 15.8 eV
   }
+
+  if (REACTION[5]) {
+    // add_to_dQei(gl,Te, specAr4S, 4.2,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf5", &_kf5), 0.0,  rhok, dQeidrhok, dQeidTe);
+    add_to_dQei(gl,Te, specAr4S, 4.2, _kf5(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe); // Ar(4s)->Ar+ (15.8 - 11.6 = 4.2 eV)
+  }
+
+  if (REACTION[6]) {
+    // add_to_dQei(gl,Te, specAr4P, 2.7,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf6", &_kf6), 0.0,  rhok, dQeidrhok, dQeidTe);
+    add_to_dQei(gl,Te, specAr4P, 2.7, _kf6(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe); // Ar(4p)->Ar+ (15.8 - 13.1 = 2.7 eV)
+  }
+
+  if (REACTION[7]) {
+    // add_to_dQei(gl,Te, specAr2star, 4.2,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf7", &_kf7), 0.0,  rhok, dQeidrhok, dQeidTe);
+    add_to_dQei(gl,Te, specAr2star, 4.2, 9.0000E-8 * pow (TeV, -0.7) * pow (Te, 0.7) * exp ( -3.66 * TeV / Te ), 0.0,  rhok, dQeidrhok, dQeidTe); // (15.8 - 11.6 = 4.2 eV) estimate assuming Ar2* = Ar-Ar(4s)
+  }
+
+  if (REACTION[8]) {
+    // add_to_dQei(gl,Te, specAr2star, 4.2,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf8", &_kf8), 0.0,  rhok, dQeidrhok, dQeidTe);
+    add_to_dQei(gl,Te, specAr2star, 4.2, 1.0000E-9, 0.0,  rhok, dQeidrhok, dQeidTe); // (15.8 - 11.6 = 4.2 eV) estimate assuming Ar2* = Ar-Ar(4s)
+  }
+
+  /* electron-ion recombination reactions are excluded here */
   
 }
 

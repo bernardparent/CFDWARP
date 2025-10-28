@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void write_disc_resconv_template(FILE **controlfile){
   wfprintf(*controlfile,
     "  %s(\n"
-    "    FLUX=FLUX_FDS;\n"
+    "    FLUX=FLUX_HLLC_HYBRID;\n"
     "    AVERAGING=AVERAGING_ROE;\n"
     "    AOWENO_TYPE=AOWENO_TYPE_DIFFUSIVE;\n"
     "    AOWENO_gammalo=0.85;\n"
