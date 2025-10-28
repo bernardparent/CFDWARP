@@ -908,29 +908,11 @@ double _ionizationpot(long k){
     case SMAP_H:
       ionizationenergy=2.1789e-18;
     break;
-    case SMAP_H2C1Pi:
-      ionizationenergy=1.6343e-18;
-    break;
     case SMAP_NH:
       ionizationenergy=2.1592e-18;
     break;
-    case SMAP_H2P:
-      ionizationenergy=5.4497e-19;
-    break;
-    case SMAP_H2B1Sigma:
-      ionizationenergy=1.7624e-18;
-    break;
     case SMAP_Ar:
       ionizationenergy=2.5247e-18;
-    break;
-    case SMAP_Ar4S:
-      ionizationenergy=6.6643e-19; /* this is the ionization energy of ground state Ar minus the energy to reach the 4S state from Ar */
-    break;
-    case SMAP_Ar4P:
-      ionizationenergy=4.2613e-19; /* this is the ionization energy of ground state Ar minus the energy to reach the 4P state from Ar */
-    break;
-    case SMAP_Ar2star:
-      ionizationenergy=4.6474e-19; /* this is the ionization energy of ground state Ar2 minus the energy to reach the 4S state from Ar, assuming Ar-Ar(4S) bond */
     break;
     default:
       ionizationenergy=0.0;

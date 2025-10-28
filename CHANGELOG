@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 OCT 27c
+  * in model/thermo/_generic/thermo.c
+    - in _ionizationpot(), removed all excited species because the activation energies listed
+      were not the ionization energies of these species
+       
+
 2025 OCT 27b
   * in model/thermo/_generic/enthalpy.c
     - fixed bugs in enthalpies of Ar species
