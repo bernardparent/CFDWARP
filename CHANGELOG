@@ -7,6 +7,14 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 OCT 29a
+  * in model/chem/_Air_Plasma_11s/rodriguez2026.c
+    - changed the temperature T to TTv where appropriate to make the model closer to the
+      Park model
+  * in model/chem/_Air_Plasma_11s/doc/report.tex
+    - modified the documentation for the rodriguez2026 model (sqrt(T*Tv) modifications)
+    
+
 2025 OCT 28a
   * in model/chem/_Ar_Plasma_8s/rodriguez2025.c
     - fixed a few bugs
