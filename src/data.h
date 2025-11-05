@@ -44,6 +44,7 @@ void read_data_file_interpolation(input_t input, np_t *np, gl_t *gl);
 
 void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl);
 
+void write_data_file_interpolation_zone(char *filename, np_t *np, gl_t *gl, long i_min, long j_min, long k_min, long i_max, long j_max, long k_max);
 
 #endif /* _DATA_H */
 

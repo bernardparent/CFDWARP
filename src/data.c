@@ -2262,3 +2262,281 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
   free(initvar_names);
 }
 
+void write_data_file_interpolation_zone(char *filename, np_t *np, gl_t *gl, long i_min, long j_min, long k_min, long i_max, long j_max, long k_max){
+  FILE *datafile;
+  long i,j,k,cnt;
+  initvarname_t *initvar_names;
+  dim_t dx1,x;
+#ifdef _2DL
+  dim_t dx2;
+#endif
+#ifdef _3DL
+  dim_t dx3;
+#endif
+  double tmp_time, tmp_dt;
+  long numnodes,dim;
+  int TYPELEVEL,pass,passmax;
+  bool *NODEVALID;
+  initvar_t initvar;
+  double effiter_U,effiter_R;
+#ifdef EMFIELD
+  double effiter_U_emfield,effiter_R_emfield;
+  initvar_emfield_t initvar_emfield;
+#endif
+#ifdef DISTMPI
+  int rank;
+  MPI_Status MPI_Status1;
+#endif
+
+  /* nodes may be suspended. Hence, ensure that appropriate nodes are
+     resumed. */
+  resume_nodes_in_zone(np,gl,gl->domain);
+
+  NODEVALID=(bool *)malloc(sizeof(bool)*(gl->domain_lim_all.ie-gl->domain_lim_all.is+1) 
+#ifdef _2DL 
+    *(gl->domain_lim_all.je-gl->domain_lim_all.js+1)
+#endif
+#ifdef _3DL
+    *(gl->domain_lim_all.ke-gl->domain_lim_all.ks+1)
+#endif
+  );
+
+  effiter_U=gl->effiter_U;
+  effiter_R=gl->effiter_R;
+#ifdef EMFIELD
+  effiter_U_emfield=gl->effiter_U_emfield;
+  effiter_R_emfield=gl->effiter_R_emfield;
+#endif
+#ifdef DISTMPI
+  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Allreduce(&gl->effiter_U, &effiter_U, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce(&gl->effiter_R, &effiter_R, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+#ifdef EMFIELD
+  MPI_Allreduce(&gl->effiter_U_emfield, &effiter_U_emfield, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce(&gl->effiter_R_emfield, &effiter_R_emfield, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+#endif
+#endif
+  datafile = wfopen(filename, "w");
+  wfprintf(stdout,"Writing to CFDWARP interpolation zone data file %s..",filename);
+
+#ifdef EMFIELD
+  passmax=2;
+#else
+  passmax=1;
+#endif
+  for (pass=1; pass<=passmax; pass++){
+    if (pass==1){
+      TYPELEVEL=TYPELEVEL_FLUID;
+    } else {
+#ifdef EMFIELD
+      TYPELEVEL=TYPELEVEL_EMFIELD;
+#endif
+    }
+#ifdef DISTMPI
+    MPI_Barrier(MPI_COMM_WORLD);
+#endif
+    find_NODEVALID_on_domain_all(np, gl, TYPELEVEL, NODEVALID);
+
+    numnodes=0;
+    //for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
+    for (i=i_min; i<=i_max; i++) {
+      for (j=j_min; j<=j_max; j++) {
+        for (k=k_min; k<=k_max; k++) {
+          if (NODEVALID[_ai_all(gl,i,j,k)]) {
+                  numnodes++;
+          }
+        }
+      }
+    }
+
+    if (pass==1){
+#ifdef UNSTEADY
+      tmp_time=gl->time;
+      tmp_dt=gl->dt;
+#else
+      tmp_time=0.0;
+      tmp_dt=dt_steady;
+#endif
+      wfprintf(datafile,"WARPINTFORMAT001 numnodes=%ld nf=%ld nd=%ld ns=%ld windowis=%ld windowie=%ld iter=%ld effiter_U=%E effiter_R=%E CFL=%E time=%E dt=%E ",numnodes,nf,nd, ns,gl->window.is,gl->window.ie,gl->iter,effiter_U,effiter_R,gl->CFL,tmp_time,tmp_dt);
+      wfprintf(datafile,"vars_fluid=\"");
+      initvar_names = (initvarname_t *) malloc(sizeof(initvarname_t) * numinitvar * sizeof(char));   
+      find_default_initvar_name(initvar_names); 
+      for (cnt=0; cnt<numinitvar; cnt++) {
+        wfprintf(datafile,"%s ", initvar_names[cnt]);   
+      }
+      wfprintf(datafile,"\"");   
+      wfprintf(datafile," vars_emfield=\"");
+#ifdef EMFIELD           
+      initvar_names = (initvarname_t *) malloc(sizeof(initvarname_t) * numinitvar_emfield * sizeof(char));   
+      find_default_initvar_name_emfield(initvar_names);            
+      for (cnt=0; cnt<numinitvar_emfield; cnt++) {
+        wfprintf(datafile,"%s ", initvar_names[cnt]);   
+      }
+      wfprintf(datafile,"\"\n");
+#else
+      wfprintf(datafile,"NONE\"\n");
+#endif
+    } else {
+#ifdef EMFIELD
+      wfprintf(datafile,"WARPINTFORMAT001 numnodes_emfield=%ld nfe=%ld nd=%ld Lc=%E effiter_U_emfield=%E effiter_R_emfield=%E\n",numnodes,nfe,nd,gl->Lc,effiter_U_emfield,effiter_R_emfield);
+#endif
+    }
+
+    for (i=i_min; i<=i_max; i++) {
+      for (j=j_min; j<=j_max; j++) {
+        for (k=k_min; k<=k_max; k++) {
+#ifdef DISTMPI
+          if (pass==1){
+            if (_node_rank(gl,i,j,k)==rank) {
+	      if (NODEVALID[_ai_all(gl,i,j,k)]) {
+	        find_default_initvar(np, gl, _ai(gl,i,j,k), initvar); 
+              } else {
+                for (cnt=0; cnt<numinitvar; cnt++) initvar[cnt]=0.0;
+	      }
+              if (rank!=0) {
+                MPI_Ssend(initvar,numinitvar,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
+              }
+            }
+            if (rank==0 && _node_rank(gl,i,j,k)!=0){
+              MPI_Recv(initvar,numinitvar,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
+            }
+          } else {
+#ifdef EMFIELD
+            if (_node_rank(gl,i,j,k)==rank) {
+	      if (NODEVALID[_ai_all(gl,i,j,k)]) {
+	        find_default_initvar_emfield(np, gl, _ai(gl,i,j,k),initvar_emfield); 
+              } else {
+                for (cnt=0; cnt<numinitvar_emfield; cnt++) initvar_emfield[cnt]=0.0;
+	      }
+              if (rank!=0) {
+                MPI_Ssend(initvar_emfield,numinitvar_emfield,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
+              }
+            }
+            if (rank==0 && _node_rank(gl,i,j,k)!=0){
+              MPI_Recv(initvar_emfield,numinitvar_emfield,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
+            }
+#endif
+          }
+#else
+          if (pass==1){
+            if (NODEVALID[_ai_all(gl,i,j,k)]) {
+	      find_default_initvar(np, gl, _ai(gl,i,j,k), initvar); 
+            } else {
+              for (cnt=0; cnt<numinitvar; cnt++) initvar[cnt]=0.0;
+            }
+          } else {
+#ifdef EMFIELD
+            if (NODEVALID[_ai_all(gl,i,j,k)]) {
+              find_default_initvar_emfield(np, gl, _ai(gl,i,j,k), initvar_emfield); 
+            } else {
+              for (cnt=0; cnt<numinitvar_emfield; cnt++) initvar_emfield[cnt]=0.0;
+	    }
+#endif
+          }
+#endif
+
+          if (NODEVALID[_ai_all(gl,i,j,k)]) {
+#ifdef DISTMPI
+            if (_node_rank(gl,i,j,k)==rank) {
+#endif
+              for (dim=0; dim<nd; dim++) x[dim]=_x(np[_ai(gl,i,j,k)],dim);
+              for (dim=0; dim<nd; dim++){
+	        if ((i<gl->domain_all.ie && NODEVALID[_ai_all(gl,i+1,j,k)]) && (i>gl->domain_all.is && NODEVALID[_ai_all(gl,i-1,j,k)])) {
+	          dx1[dim]=0.5*sign(np[_ai(gl,i+1,j,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])
+                        *(fabs(np[_ai(gl,i+1,j,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])
+                        + fabs(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i-1,j,k)].bs->x[dim]));
+                } else {
+                  if (i<gl->domain_all.ie && NODEVALID[_ai_all(gl,i+1,j,k)]) {
+                    dx1[dim]=(np[_ai(gl,i+1,j,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim]);
+                  } else {
+                    if (i>gl->domain_all.is && NODEVALID[_ai_all(gl,i-1,j,k)]) {
+	              dx1[dim]=(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i-1,j,k)].bs->x[dim]);
+		    } else {
+                      fatal_error("Couldn't find adjacent valid node along i needed for interpolation.");
+		    }
+                  }
+	        }
+#ifdef _2DL
+                if ((j<gl->domain_all.je && NODEVALID[_ai_all(gl,i,j+1,k)]) && (j>gl->domain_all.js && NODEVALID[_ai_all(gl,i,j-1,k)])) {
+                  dx2[dim]=0.5*sign(np[_ai(gl,i,j+1,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])
+                   *(fabs(np[_ai(gl,i,j+1,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])+fabs(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i,j-1,k)].bs->x[dim]));
+                } else {
+                  if (j<gl->domain_all.je && NODEVALID[_ai_all(gl,i,j+1,k)]) {
+	            dx2[dim]=(np[_ai(gl,i,j+1,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim]);
+                  } else {
+                    if (j>gl->domain_all.js && NODEVALID[_ai_all(gl,i,j-1,k)]) {
+                      dx2[dim]=(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i,j-1,k)].bs->x[dim]);
+                    } else {
+                      fatal_error("Couldn't find adjacent valid node along j needed for interpolation.");
+		    }
+                  }
+                }
+#endif
+#ifdef _3DL
+	        if ((k<gl->domain_all.ke && NODEVALID[_ai_all(gl,i,j,k+1)]) && (k>gl->domain_all.ks && NODEVALID[_ai_all(gl,i,j,k-1)])) {
+                  dx3[dim]=0.5*sign(np[_ai(gl,i,k+1,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])
+                     *(fabs(np[_ai(gl,i,j,k+1)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])+fabs(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i,j,k-1)].bs->x[dim]));
+                } else {
+                  if (k<gl->domain_all.ke && NODEVALID[_ai_all(gl,i,j,k+1)]) {
+                    dx3[dim]=(np[_ai(gl,i,j,k+1)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim]);
+                  } else {
+                    if (k>gl->domain_all.ks && NODEVALID[_ai_all(gl,i,j,k-1)]) {
+                      dx3[dim]=(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i,j,k-1)].bs->x[dim]);
+                    } else {
+                      fatal_error("Couldn't find adjacent valid node along k needed for interpolation.");
+                    }
+                  }
+                }
+#endif
+	      }
+#ifdef DISTMPI
+	    }
+            if (rank!=0 && _node_rank(gl,i,j,k)==rank) MPI_Ssend(x,nd,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
+            if (rank==0 && _node_rank(gl,i,j,k)!=0) MPI_Recv(x,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
+            if (rank!=0 && _node_rank(gl,i,j,k)==rank) MPI_Ssend(dx1,nd,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
+            if (rank==0 && _node_rank(gl,i,j,k)!=0) MPI_Recv(dx1,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
+#ifdef _2DL  
+            if (rank!=0 && _node_rank(gl,i,j,k)==rank) MPI_Ssend(dx2,nd,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
+            if (rank==0 && _node_rank(gl,i,j,k)!=0) MPI_Recv(dx2,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
+#endif
+#ifdef _3DL  
+            if (rank!=0 && _node_rank(gl,i,j,k)==rank) MPI_Ssend(dx3,nd,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
+            if (rank==0 && _node_rank(gl,i,j,k)!=0) MPI_Recv(dx3,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
+#endif
+
+#endif
+            if (pass==1) {
+              wfwrite(initvar, sizeof(initvar_t), 1, datafile);
+            } else {
+#ifdef EMFIELD
+              wfwrite(initvar_emfield, sizeof(initvar_emfield_t), 1, datafile);
+#endif
+            }
+            wfwrite(x, sizeof(dim_t), 1, datafile);
+            if (_dxlength2(dx1)==0.0) fatal_error("Two adjacent nodes on the grid have the same x,y,z position at the location i=%ld, j=%ld, k=%ld\n",i,j,k);
+            wfwrite(dx1, sizeof(dim_t), 1, datafile);
+#ifdef _2DL
+            if (_dxlength2(dx2)==0.0) fatal_error("Two adjacent nodes on the grid have the same x,y,z position at the location i=%ld, j=%ld, k=%ld\n",i,j,k);
+            wfwrite(dx2, sizeof(dim_t), 1, datafile);
+#endif
+#ifdef _3DL
+            if (_dxlength2(dx3)==0.0) fatal_error("Two adjacent nodes on the grid have the same x,y,z position at the location i=%ld, j=%ld, k=%ld\n",i,j,k);
+            wfwrite(dx3, sizeof(dim_t), 1, datafile);
+#endif
+          } //end if nodevalid
+  //  } // for_ijk
+        } // for k within specified zone
+      } // for j within specified zone
+    } // for i within specified zone
+  }//pass
+
+#ifdef DISTMPI
+  MPI_Barrier(MPI_COMM_WORLD);
+#endif
+  wfclose(datafile);
+  wfprintf(stdout,"done.\n");
+
+  free(NODEVALID);
+  free(initvar_names);
+}

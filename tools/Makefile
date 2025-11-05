@@ -6,12 +6,12 @@ LFLAGSLOCAL = -L../lib -lsoap -lexm -lgridg -lpthread -lm
 ####### Files
 
 HEADERS =       share.h
-SOURCES =	share.c bdrylayer.c normalshock.c shearlayer.c obliqueshock.c inlet.c injector.c compressionfan.c cathode.c ringleb.c tauvt.c calc.c tecgrid2D.c tecgrid3D.c mpitest.c average.c equilairplasma.c soap.c thermionic.c chemkin2cfdwarp.c atten.c
-OBJECTS =	share.o bdrylayer.o normalshock.o shearlayer.o obliqueshock.o inlet.o injector.o compressionfan.o cathode.o ringleb.o tauvt.o calc.o tecgrid2D.o tecgrid3D.o mpitest.o average.o equilairplasma.o soap.o thermionic.o chemkin2cfdwarp.o atten.o
-TARGETS  =	bdrylayer normalshock shearlayer obliqueshock inlet injector compressionfan cathode ringleb tauvt openmptest calc tecgrid2D tecgrid3D mpitest average equilairplasma soap thermionic chemkin2cfdwarp atten
+SOURCES =	share.c bdrylayer.c normalshock.c shearlayer.c obliqueshock.c inlet.c injector.c compressionfan.c cathode.c ringleb.c tauvt.c calc.c tecgrid2D.c tecgrid3D.c mpitest.c average.c equilairplasma.c soap.c thermionic.c chemkin2cfdwarp.c atten.c warp2fluent.c
+OBJECTS =	share.o bdrylayer.o normalshock.o shearlayer.o obliqueshock.o inlet.o injector.o compressionfan.o cathode.o ringleb.o tauvt.o calc.o tecgrid2D.o tecgrid3D.o mpitest.o average.o equilairplasma.o soap.o thermionic.o chemkin2cfdwarp.o atten.o warp2fluent.o
+TARGETS  =	bdrylayer normalshock shearlayer obliqueshock inlet injector compressionfan cathode ringleb tauvt openmptest calc tecgrid2D tecgrid3D mpitest average equilairplasma soap thermionic chemkin2cfdwarp atten warp2fluent
 ####### Build rules
 
-all: bdrylayer normalshock shearlayer obliqueshock inlet injector compressionfan cathode ringleb tauvt openmptest calc tecgrid2D tecgrid3D mpitest average equilairplasma soap thermionic chemkin2cfdwarp atten
+all: bdrylayer normalshock shearlayer obliqueshock inlet injector compressionfan cathode ringleb tauvt openmptest calc tecgrid2D tecgrid3D mpitest average equilairplasma soap thermionic chemkin2cfdwarp atten warp2fluent
 
 tecgrid2D: tecgrid2D.o 
 	$(L) tecgrid2D.o -o tecgrid2D $(LFLAGS) $(LFLAGSLOCAL)
@@ -76,6 +76,9 @@ chemkin2cfdwarp: chemkin2cfdwarp.o
 
 atten: atten.o
 	$(L) atten.o -o atten $(LFLAGS) $(LFLAGSLOCAL)
+	
+warp2fluent: warp2fluent.o
+	$(L) warp2fluent.o -o warp2fluent $(LFLAGS) $(LFLAGSLOCAL)
 	
 cleanall: clean
 	(rm -f centveldist.plt eqchemfinal.plt nozzlecont.plt rocketsum.out subnozzlecont.plt ringleb.init ringleb.grid ringleb.dat)

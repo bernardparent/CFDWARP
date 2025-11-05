@@ -5,6 +5,7 @@ Copyright 2020 Minindu Weerakoon
 Copyright 2001 Giovanni Fusina
 Copyright 2002 Thomas E. Schwartzentruber
 Copyright 2021 Prasanna Thoguluva Rajendran
+Copyright 2025 Felipe Martin Rodriguez Fuentes
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -968,6 +969,7 @@ void increase_time_level(np_t *np, gl_t *gl){
 
 void runtime_actions(char *actionname, char **argum, SOAP_codex_t *codex){
   char *oldfilename;
+  zone_t zone;
   
   oldfilename=(char *)malloc(sizeof(char)*(5+strlen((((readcontrolarg_t *)codex->action_args)->gl->output_filename))));
   strcpy(oldfilename,(((readcontrolarg_t *)codex->action_args)->gl->output_filename));
@@ -981,6 +983,18 @@ void runtime_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     }
     write_data_file(*((readcontrolarg_t *)codex->action_args)->np,
                     ((readcontrolarg_t *)codex->action_args)->gl);
+    codex->ACTIONPROCESSED=TRUE;
+  }
+
+
+  if (strcmp(actionname,"WriteInterpolationFile")==0) {
+    if (SOAP_number_argums(*argum)!=nd*2+1)
+      SOAP_fatal_error(codex,"Number of arguments not equal to %ld in WriteInterpolationFile(); action.",nd*2+1);   
+    SOAP_substitute_all_argums(argum, codex);    
+    SOAP_get_argum_string(codex,&(((readcontrolarg_t *)codex->action_args)->gl->output_filename),*argum,0);
+    find_zone_from_argum(*argum, 1, ((readcontrolarg_t *)codex->action_args)->gl, codex, &zone);
+    write_data_file_interpolation_zone((((readcontrolarg_t *)codex->action_args)->gl->output_filename),*((readcontrolarg_t *)codex->action_args)->np,
+                                       ((readcontrolarg_t *)codex->action_args)->gl,zone.is,zone.js,zone.ks,zone.ie,zone.je,zone.ke);
     codex->ACTIONPROCESSED=TRUE;
   }
   strcpy((((readcontrolarg_t *)codex->action_args)->gl->output_filename),oldfilename);

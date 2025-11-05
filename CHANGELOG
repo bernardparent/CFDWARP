@@ -7,6 +7,17 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 NOV 05a
+  * in cycle/share/cycle_share.c
+    - in runtime_actions(), added the action WriteInterpolationFile()
+  * in tools
+    - added warp2fluent.c
+  * in src/data.c
+    - added function write_data_file_interpolation_zone()
+  * in tools/Makefile
+    - added code for warp2fluent
+    
+
 2025 OCT 29a
   * in model/chem/_Air_Plasma_11s/rodriguez2026.c
     - changed the temperature T to TTv where appropriate to make the model closer to the
