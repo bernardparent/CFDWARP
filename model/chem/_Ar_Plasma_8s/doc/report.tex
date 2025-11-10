@@ -92,6 +92,10 @@ abstract
 
 \section{Overview}
 
+% $$\sigma_{\mathrm{superelastic}}(E) = 
+% \frac{E + \Delta E}{E} \,
+% \sigma_{\mathrm{forward}}(E + \Delta E)$$
+
 \begin{table*}[!ht]
   \center\fontsizetable
   \begin{threeparttable}
@@ -126,9 +130,7 @@ indicated at the top of the table. Diagram taken from \cite{pr:1998:piech}.}
      \label{fig:atomdata}
 \end{figure}
 
-For the Ar(4s) states, these are lumped together. The statistical weight $g$ is required for the BOLSIG+ superelastic rate calculations. This would be:
 
-$$g = \sum (2J+1) = 5 + 3 + 1 + 3 = 12$$
 
 \begin{figure}[ht]
      \centering
@@ -145,21 +147,21 @@ $$g = \sum (2J+1) = 5 + 3 + 1 + 3 = 12$$
 \begin{figure}[ht]
      \centering
      \includegraphics[width=0.5\textwidth]{figs/reaction1.pdf}
-     \caption{Reaction 1: $\rm e^- + Ar \leftrightarrow Ar(4s) + e^-$; comparison of total excitation and superelastic rates to 4s levels of Argon obtained with BOLSIG+ using cross section data from \cite{pr:tachibana:1986} at 300 K. Spline fitted to BOLSIG+ data.}
+     \caption{Reaction 1: $\rm e^- + Ar \leftrightarrow Ar(4s) + e^-$; comparison of total excitation and superelastic rates to 4s levels of Argon obtained with BOLSIG+ using cross section data from \cite{pr:tachibana:1986} at 300 K. Splines fitted to BOLSIG+ data.}
      \label{fig:rate_R1}
 \end{figure}
 
 \begin{figure}[ht]
      \centering
      \includegraphics[width=0.5\textwidth]{figs/reaction2.pdf}
-     \caption{Reaction 2: $\rm e^- + Ar \rightarrow Ar(4p) + e^-$; comparison of total excitation and superelastic rates to 4p levels of Argon obtained with BOLSIG+ using cross section data from \cite{pr:tachibana:1986} at 300 K. Spline fitted to BOLSIG+ data.}
+     \caption{Reaction 2: $\rm e^- + Ar \rightarrow Ar(4p) + e^-$; comparison of total excitation and superelastic rates to 4p levels of Argon obtained with BOLSIG+ using cross section data from \cite{pr:tachibana:1986} at 300 K. Splines fitted to BOLSIG+ data.}
      \label{fig:rate_R2}
 \end{figure}
 
 \begin{figure}[ht]
      \centering
      \includegraphics[width=0.5\textwidth]{figs/reaction3.pdf}
-     \caption{Reaction 2: $\rm e^- + Ar(4s) \rightarrow Ar(4p) + e^-$; comparison of total excitation rate from 4s to 4p levels of Argon obtained with BOLSIG+ using cross section data from \cite{pr:2014:zatsarinny} at 300 K. Spline fitted to BOLSIG+ data.}
+     \caption{Reaction 2: $\rm e^- + Ar(4s) \rightarrow Ar(4p) + e^-$; comparison of total excitation and superelastic rate from 4s to 4p levels of Argon obtained with BOLSIG+ using cross section data from \cite{pr:2014:zatsarinny} at 300 K. Splines fitted to BOLSIG+ data.}
      \label{fig:rate_R3}
 \end{figure}
 
@@ -184,38 +186,6 @@ $$g = \sum (2J+1) = 5 + 3 + 1 + 3 = 12$$
      \label{fig:rate_R6}
 \end{figure}
 
-% \section{Electron swarm parameters in Argon gas at 300 K}
-
-% \subsection{Reduced electric field function of electron temperature (local approximation)}
-
-% \begin{figure}[ht]
-%      \centering
-%      \includegraphics[width=0.5\textwidth]{figs/Estar_Te.pdf}
-%      \caption{Reduced electric field function of electron temperature for Argon gas at 300 K. Comparisons with data from refs. \cite{ajp:1977:milloy} and \cite{pr:1995:boeuf}.}
-%      \label{fig:estar_te}
-% \end{figure}
-
-% \subsection{Reduced electron mobility function of electron temperature}
-
-
-% \begin{figure}[ht]
-%      \centering
-%      \includegraphics[width=0.5\textwidth]{figs/mueN_Te.pdf}
-%      \caption{Reduced electron mobility function of electron temperature for Argon gas at 300 K. Comparisons with data from refs. \cite{pr:1961:pack}, \cite{purdue:1951:errett} and \cite{jop:1981:kucukarpaci}.}
-%      \label{fig:muen_te}
-% \end{figure}
-
-
-
-
-
-
-
-
-
-
-
-
 
 \begin{table*}[!ht]
   \center\fontsizetable
@@ -229,12 +199,6 @@ $$g = \sum (2J+1) = 5 + 3 + 1 + 3 = 12$$
     No.~~~~& Reaction & $T,~\textrm{K}$ & $A$  & $n$ & $E$ & Cross-section ref. \\
     \midrule
 
-  
-% \multicolumn{3}{p{3cm}}{Electron impact reactions} 
-%        & 
-%        & 
-%        & \\     
-%    \midrule
     
      1  & $\rm e^- +Ar \leftrightarrow Ar(4s) + e^-$
        & $T_{\rm e}$
@@ -269,10 +233,7 @@ $$g = \sum (2J+1) = 5 + 3 + 1 + 3 = 12$$
        & \multicolumn{3}{p{6cm}}{Rate obtained with BOLSIG+}       
        & \cite{pr:hyman:1979} \\
 
-   % 7  & $\rm e^- +Ar_2^\star \rightarrow Ar_2^+ + e^- + e^-$
-   %     & $T_{\rm e}$ 
-   %     & \multicolumn{3}{p{8cm}}{$9.0\cdot10^{-8}\cdot T_{\rm e}^{0.7}\cdot \exp (-3.66/T_{\rm e})~~\rm cm^3/s$}       
-   %     & \cite{jof:2007:arakoni} \\
+
 
    7  & $\rm e^- +Ar_2^\star \rightarrow Ar_2^+ + e^- + e^-$
        & $T_{\rm e}$ in eV
@@ -283,10 +244,10 @@ $$g = \sum (2J+1) = 5 + 3 + 1 + 3 = 12$$
 
    8  & $\rm e^- +Ar_2^\star \rightarrow Ar + Ar + e^-$
        & $T_{\rm e}$ in eV
-       & $1.0\cdot10^{-7}\cdot N_A$
+       & $1.0\cdot10^{-9}\cdot N_A$
                        &0.0
        &0.0   
-       & \cite{jof:2007:arakoni} \\
+       & \cite{ieee:2003:kannari} \\
 
    9  & $\rm e^- +Ar_2^+ \rightarrow Ar(4p) + Ar$
        & $T_{\rm e}$  in eV
@@ -382,8 +343,7 @@ $$g = \sum (2J+1) = 5 + 3 + 1 + 3 = 12$$
     \end{tabular*}
 \begin{tablenotes}
 \item[{a}] The reaction rate is given by $A T^n \exp(-E/RT)$ when not presented in spline-fit form. The universal gas constant is $R = 1.987~{\rm cal~K^{-1}~mol^{-1}}.$ $N_A$ is Avogadro's number and it is approximately $6.022 \cdot 10^{23}~{\rm mol^{-1}}$. The units of $A$ are $\rm cm^3~ mol^{-1} ~s^{-1}$ for 2-body reactions and $\rm cm^6 ~mol^{-2} ~ s^{-1}$ for 3-body reactions. The units of $E$ are ${\rm cal~mol^{-1}}$.
-% \item[{b}] The third body species $\rm M^+$ are all positive ions. Efficiencies are set to 1.0 for all species involved.
-% \item[{c}] The third body species M are $\rm NH_3$, $\rm NH_3$$(v)$, $\rm NH_2$ and $\rm NH$ with the  corresponding positive ions. Efficiencies are set to 1.0 for all species involved.
+
 
 \end{tablenotes}
    \end{threeparttable}
@@ -405,7 +365,7 @@ Process & Reaction ~ & ${\rm ln}~T_{\rm e}$ & ${\rm ln}~k$ \\
         \midrule
         
 
-Ground Excitation & ~{$\rm e^- + Ar \rightarrow Ar(4s) + e^- + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
+Ground Excitation & ~{$\rm e^- + Ar \rightarrow Ar(4s) + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
       10.4268
       10.4485
       10.4702
@@ -456,7 +416,52 @@ Ground Excitation & ~{$\rm e^- + Ar \rightarrow Ar(4s) + e^- + e^-$  } &   \begi
 \end{minipage} \\         
 ~\\
 
-Ground Excitation & ~{$\rm e^- + Ar \rightarrow Ar(4p) + e^- + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
+Superelastic collision & ~{$\rm e^- + Ar(4s) \rightarrow Ar  + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
+      7.0565
+      7.1440
+      7.2314
+      7.3188
+      7.7560
+      8.1932
+      8.6304
+      9.0676
+      9.5048
+      9.9420
+      10.3792
+      10.8164
+      11.2536
+      11.6908
+      12.1280
+      12.5652
+      13.0024
+      13.4396
+      13.8768
+
+ \end{minipage}  & \begin{minipage}[t]{0.28\textwidth}\raggedright 
+      -22.8246
+      -22.7760
+      -22.7259
+      -22.6744
+      -22.4000
+      -22.1156
+      -21.8242
+      -21.4756
+      -21.1749
+      -20.9107
+      -20.6336
+      -20.4455
+      -20.3895
+      -20.3213
+      -20.2344
+      -20.1566
+      -20.0965
+      -20.0569
+      -20.0419
+
+\end{minipage} \\         
+~\\
+
+Ground Excitation & ~{$\rm e^- + Ar \rightarrow Ar(4p) + e^- $  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
       10.5458
       10.5516
       10.5634
@@ -506,7 +511,41 @@ Ground Excitation & ~{$\rm e^- + Ar \rightarrow Ar(4p) + e^- + e^-$  } &   \begi
       -18.2066
 \end{minipage} \\         
 ~\\
-4s-4p Excitation & ~{$\rm e^- + Ar(4s) \rightarrow Ar(4p) + e^- + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
+
+Superelastic collision & ~{$\rm e^- + Ar(4p) \rightarrow Ar  + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
+7.0565
+7.1440
+7.2314
+7.3188
+7.4063
+8.1058
+8.8053
+9.5048
+10.2044
+10.9039
+11.6034
+12.3029
+13.0024
+13.7020
+ \end{minipage}  & \begin{minipage}[t]{0.28\textwidth}\raggedright 
+-23.2620
+-23.2112
+-23.1584
+-23.1034
+-23.0462
+-22.4730
+-21.6743
+-20.9347
+-20.2629
+-19.8943
+-19.7052
+-19.6164
+-19.5943
+-19.6220
+\end{minipage} \\         
+~\\
+
+4s-4p Excitation & ~{$\rm e^- + Ar(4s) \rightarrow Ar(4p) + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
 8.6415
 8.6660
 8.7284
@@ -543,6 +582,45 @@ Ground Excitation & ~{$\rm e^- + Ar \rightarrow Ar(4p) + e^- + e^-$  } &   \begi
 \end{minipage} \\         
 ~\\
 
+Superelastic collision & ~{$\rm e^- + Ar(4p) \rightarrow Ar(4s)  + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
+7.0565
+7.1440
+7.2314
+7.3188
+7.7560
+8.1932
+8.6304
+9.0676
+9.5048
+9.9420
+10.3792
+10.8164
+11.2536
+11.6908
+12.1280
+12.5652
+13.0024
+
+ \end{minipage}  & \begin{minipage}[t]{0.28\textwidth}\raggedright 
+-13.0732
+-13.0966
+-13.1222
+-13.1503
+-13.3336
+-13.5664
+-13.7441
+-13.8804
+-13.9589
+-13.9919
+-13.9674
+-13.8969
+-13.8070
+-13.7215
+-13.6425
+-13.5704
+-13.5091
+\end{minipage} \\         
+~\\
 
 Ground ionization & ~{$\rm e^- + Ar \rightarrow Ar^+ + e^- + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
 
@@ -593,7 +671,7 @@ Ground ionization & ~{$\rm e^- + Ar \rightarrow Ar^+ + e^- + e^-$  } &   \begin{
 ~\\
 
 
-Step. ionization & ~{$\rm e^- + Ar(4s) \rightarrow Ar^+ + e^- + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
+Stepwise ionization & ~{$\rm e^- + Ar(4s) \rightarrow Ar^+ + e^- + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
       8.9802
       9.0676
       9.1551
@@ -630,7 +708,7 @@ Step. ionization & ~{$\rm e^- + Ar(4s) \rightarrow Ar^+ + e^- + e^-$  } &   \beg
 \end{minipage} \\ 
 ~\\
 
-Step. ionization & ~{$\rm e^- + Ar(4p) \rightarrow Ar^+ + e^- + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
+Stepwise ionization & ~{$\rm e^- + Ar(4p) \rightarrow Ar^+ + e^- + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
       7.0565
       7.1440
       7.2314
@@ -685,7 +763,6 @@ Step. ionization & ~{$\rm e^- + Ar(4p) \rightarrow Ar^+ + e^- + e^-$  } &   \beg
 \end{table*}
 
 
-% \section{GEC Reference Reactor Validation Results}
 
 
  \clearpage

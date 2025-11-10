@@ -2,8 +2,41 @@
 #define _CHEM_METHOD "Ar Plasma 8 species [rodriguez2025]"
 #define _CHEM_PLASMA
 #define _CHEM_ACTIONNAME "ArPlasma8s"
-
+#define _AVERAGEDRATES
+#define _AVERAGEDRATES_CHEM
  
+#define numaveragedrates_chem 28
+
+const static averagedrates_id_type averagedrates_chem_id[numaveragedrates_chem] = {
+  "kf1",
+  "kf1b",
+  "kf2",
+  "kf2b",
+  "kf3",
+  "kf3b",
+  "kf4",
+  "kf5",
+  "kf6",
+  "kf7",
+  "kf8",
+  "kf9",
+  "kf10",
+  "kf11",
+  "Nekf1",
+  "Nekf1b",
+  "Nekf2",
+  "Nekf2b",
+  "Nekf3",
+  "Nekf3b",
+  "Nekf4",
+  "Nekf5",
+  "Nekf6",
+  "Nekf7",
+  "Nekf8",
+  "Nekf9",
+  "Nekf10",
+  "Nekf11"
+};
 
 #define ns 9
 #define ncs 3
@@ -62,7 +95,7 @@ const static long speciestype[ns] = {
 
 typedef struct {
   int CHEMMODEL;
-  bool QEISOURCETERMS,TE_FROM_TOWNSEND,SUPERELASTIC_COLLISIONS;
+  bool QEISOURCETERMS,TE_FROM_TOWNSEND,SUPERELASTIC_COLLISIONS, RATE_AVERAGING;
   double EoverNmin;
 } gl_model_chem_t;
 
