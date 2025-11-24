@@ -1,0 +1,468 @@
+\documentclass{warpdoc}
+\newlength\lengthfigure                  % declare a figure width unit
+\setlength\lengthfigure{0.158\textwidth} % make the figure width unit scale with the textwidth
+\usepackage{psfrag}         % use it to substitute a string in a eps figure
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage[innercaption]{sidecap} % the cute space-saving side captions
+\usepackage{scalefnt}
+\usepackage{bm}
+\usepackage{amsmath}     
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{rotating}
+\usepackage{bm}
+\usepackage{pdfpages}
+%\usepackage{caption}
+\usepackage{float}
+\pdfminorversion=7
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\ordi}{{\rm d}}
+%\let\vec\bf
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\mfa}{\scriptscriptstyle}
+\newcommand{\mfb}{\scriptstyle}
+\newcommand{\mfc}{\textstyle}
+\newcommand{\mfd}{\displaystyle}
+\newcommand{\hlinex}{\vspace{-0.34cm}~~\\ \hline \vspace{-0.31cm}~~\\}
+\newcommand{\hlinextop}{\vspace{-0.46cm}~~\\ \hline \hline \vspace{-0.32cm}~~\\}
+\newcommand{\hlinexbot}{\vspace{-0.37cm}~~\\ \hline \hline \vspace{-0.50cm}~~\\}
+\newcommand{\tablespacing}{\vspace{-0.4cm}}
+\renewcommand{\fontsizetable}{\footnotesize\scalefont{0.9}}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\author{
+ Felipe Martín Rodríguez Fuentes
+}
+
+\email{
+  fmrodriguez@arizona.edu
+}
+
+\department{
+  Aerospace and Mechanical Engineering
+}
+
+\institution{
+  University of Arizona
+}
+
+\title{Four Species Argon Plasma Kinetics 
+}
+
+\date{
+Octorber 2025
+}
+
+%\setlength\nomenclaturelabelwidth{0.13\hsize}  % optional, default is 0.03\hsize
+%\setlength\nomenclaturecolumnsep{0.09\hsize}  % optional, default is 0.06\hsize
+
+\nomenclature{
+
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+%  \maketitle
+  \makewarpdoctitle
+%  \makeabstract
+ \tableofcontents
+%  \makenomenclature
+ % \listoftables
+ % \listoffigures
+%
+
+\section{Overview}
+
+% $$V(t) = V_{\rm dc} + V_{\rm rf}\cos (\omega t +\phi)$$
+
+% $$\sigma_{\mathrm{superelastic}}(E) = 
+% \frac{E + \Delta E}{E} \,
+% \sigma_{\mathrm{forward}}(E + \Delta E)$$
+
+\begin{table*}[!ht]
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Species included in the reaction mechanism.}
+    \label{tab:species}
+    \fontsizetable
+ 
+    \begin{tabular*}{0.3\textwidth}{@{}l@{\extracolsep{\fill}}l@{}}
+    
+    \toprule
+
+charged${}^-$ & $\rm e^-$\\
+
+charged${}^+$ & $\rm Ar^+$\\
+      
+neutral, atomic & $\rm Ar$, $\rm Ar(4s)$\\
+    
+
+    \bottomrule
+    \end{tabular*}
+   \end{threeparttable}
+\end{table*}
+
+\begin{figure}[ht]
+     \centering
+     \includegraphics[width=0.5\textwidth]{figs/argon_atomics.png}
+     \caption{Energy level diagram for Ar showing the first two
+excited configurations. The two metastable levels are indicated
+by the letter. The Paschen designation for each level is
+indicated at the top of the table. Diagram taken from \cite{pr:1998:piech}.}
+     \label{fig:atomdata}
+\end{figure}
+
+
+
+% \begin{figure}[ht]
+%      \centering
+%      \includegraphics[width=0.5\textwidth]{figs/cs.pdf}
+%      \caption{Relevant cross sections used for the BOLSIG+ calculations.}
+%      \label{fig:cs_Ar}
+% \end{figure}
+
+
+\section{Argon chemical reactions}
+
+ The list of reactions is given in Table~\ref{tab:Ar_tab}. When reaction rate data is given as a function of the reduced electric field $E/N$, this is converted to reaction rates function of electron energy (or temperature) through the characteristic Ar energy curve $E/N = f(T_{\rm e})$ at 300 K. 
+ 
+ % \cite{ijae:2011:katsonis}, \cite{jap:1993:lymberopoulos}
+
+\begin{figure}[ht]
+     \centering
+     \includegraphics[width=0.5\textwidth]{figs/reaction1.pdf}
+     \caption{Reaction 1: $\rm e^- + Ar \leftrightarrow Ar(4s) + e^-$; comparison of total excitation and superelastic rates to 4s levels of Argon obtained with BOLSIG+ using cross section data from \cite{pr:tachibana:1986} at 300 K. Splines fitted to BOLSIG+ data.}
+     \label{fig:rate_R1}
+\end{figure}
+
+
+
+
+\begin{figure}[ht]
+     \centering
+     \includegraphics[width=0.5\textwidth]{figs/reaction4.pdf}
+     \caption{Reaction 2: $\rm e^- + Ar \rightarrow Ar^+ + 2e^-$; comparison of ionization rate of Ar obtained with BOLSIG+ using cross section data from \cite{jcp:1965:rapp} at 300 K. Reference data from \cite{jap:1993:lymberopoulos, pop:2012:adams}.}
+     \label{fig:rate_R4}
+\end{figure}
+
+\begin{figure}[ht]
+     \centering
+     \includegraphics[width=0.5\textwidth]{figs/reaction5.pdf}
+     \caption{Reaction 3: $\rm e^- + Ar(4s) \rightarrow Ar^+ + 2e^-$; comparison of ionization rate of Ar(4s) obtained with BOLSIG+ using cross section data from \cite{pr:hyman:1979} at 300 K. Spline fitted to BOLSIG+ data.}
+     \label{fig:rate_R5}
+\end{figure}
+
+
+
+
+\begin{table*}[!ht]
+  \center\fontsizetable
+  \begin{threeparttable}
+  \renewcommand{\arraystretch}{1.1}
+    \tablecaption{Argon chemical kinetics\tnote{a}.}
+    \label{tab:Ar_tab}
+    \fontsizetable
+    \begin{tabular*}{1.05\textwidth}{l@{\extracolsep{\fill}}lllccr}
+    \toprule
+    No.~~~~& Reaction & $T,~\textrm{K}$ & $A$  & $n$ & $E$ & Cross-section/rate ref. \\
+    \midrule
+
+    
+     1  & $\rm e^- +Ar \leftrightarrow Ar(4s) + e^-$
+       & $T_{\rm e}$
+       & \multicolumn{3}{p{6cm}}{Rates obtained with BOLSIG+ and detailed balance}
+       & \cite{pr:tachibana:1986}\\   
+
+
+
+
+
+
+
+  2  & $\rm e^- +Ar \rightarrow Ar^+ + e^- + e^-$
+       & $T_{\rm e}$
+       & \multicolumn{3}{p{6cm}}{Rate obtained with BOLSIG+}       
+       & \cite{jcp:1965:rapp} \\
+
+    3  & $\rm e^- +Ar(4s) \rightarrow Ar^+ + e^- + e^-$
+       & $T_{\rm e}$
+       & \multicolumn{3}{p{6cm}}{Rate obtained with BOLSIG+}       
+       & \cite{pr:hyman:1979} \\
+
+
+
+
+
+
+       
+
+
+         4 & $\rm Ar(4s) + Ar(4s) \rightarrow Ar^+ +Ar + e^- $
+       & $T$ 
+       & $1.0\cdot10^{-9}\cdot N_A $    
+       &0.0
+       &0.0       
+       & \cite{jof:2007:arakoni} \\
+
+         5 & $\rm Ar(4s) + Ar \rightarrow Ar +Ar  $
+       & $T$ 
+       & $2.3\cdot10^{-15}\cdot N_A $    
+       &0.0
+       &0.0       
+       & \cite{pr:1995:bogaerts} \\
+
+
+
+
+
+ 
+    \bottomrule
+    \end{tabular*}
+\begin{tablenotes}
+\item[{a}] The reaction rate is given by $A T^n \exp(-E/RT)$ when not presented in spline-fit form. The universal gas constant is $R = 1.987~{\rm cal~K^{-1}~mol^{-1}}.$ $N_A$ is Avogadro's number and it is approximately $6.022 \cdot 10^{23}~{\rm mol^{-1}}$. The units of $A$ are $\rm cm^3~ mol^{-1} ~s^{-1}$ for 2-body reactions and $\rm cm^6 ~mol^{-2} ~ s^{-1}$ for 3-body reactions. The units of $E$ are ${\rm cal~mol^{-1}}$.
+
+
+\end{tablenotes}
+   \end{threeparttable}
+\end{table*}
+
+
+\begin{table*}[!ht]
+  \center\fontsizetable
+  
+  \begin{threeparttable}
+    \tablecaption{Coordinates of spline control points for Argon electron impact reactions.\tnote{a}}
+    \label{tab:ei_splines_Ar}
+    \fontsizetable
+ 
+    \begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}lll@{}}
+    
+    \toprule
+Process & Reaction ~ & ${\rm ln}~T_{\rm e}$ & ${\rm ln}~k$ \\
+        \midrule
+        
+
+Ground Excitation & ~{$\rm e^- + Ar \rightarrow Ar(4s) + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
+      10.4268
+      10.4485
+      10.4702
+      10.4919
+      10.5135
+      10.5352
+      10.5569
+      10.6648
+      10.7727
+      10.8755
+      10.9536
+      11.0001
+      11.0270
+      11.0510
+      11.0942
+      11.1474
+      11.2135
+      11.2963
+      11.4088
+      11.5797
+      11.8688
+      12.4147
+      13.2881
+ \end{minipage}  & \begin{minipage}[t]{0.28\textwidth}\raggedright 
+      -56.8696
+      -54.4046
+      -52.1035
+      -49.9593
+      -47.9647
+      -46.1123
+      -44.3839
+      -37.5377
+      -33.0186
+      -30.1382
+      -28.3493
+      -27.2040
+      -26.3998
+      -25.6123
+      -24.4623
+      -23.5214
+      -22.6969
+      -21.9640
+      -21.3009
+      -20.6658
+      -20.0016
+      -19.3066
+      -18.7517
+\end{minipage} \\         
+~\\
+
+Superelastic collision & ~{$\rm e^- + Ar(4s) \rightarrow Ar  + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
+      7.0565
+      7.1440
+      7.2314
+      7.3188
+      7.7560
+      8.1932
+      8.6304
+      9.0676
+      9.5048
+      9.9420
+      10.3792
+      10.8164
+      11.2536
+      11.6908
+      12.1280
+      12.5652
+      13.0024
+      13.4396
+      13.8768
+
+ \end{minipage}  & \begin{minipage}[t]{0.28\textwidth}\raggedright 
+      -22.8246
+      -22.7760
+      -22.7259
+      -22.6744
+      -22.4000
+      -22.1156
+      -21.8242
+      -21.4756
+      -21.1749
+      -20.9107
+      -20.6336
+      -20.4455
+      -20.3895
+      -20.3213
+      -20.2344
+      -20.1566
+      -20.0965
+      -20.0569
+      -20.0419
+
+\end{minipage} \\         
+~\\
+
+
+
+
+Ground ionization & ~{$\rm e^- + Ar \rightarrow Ar^+ + e^- + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
+
+10.8750
+10.9124
+10.9498
+11.0114
+11.0455
+11.0726
+11.1022
+11.1367
+11.1764
+11.3050
+11.4034
+11.5300
+11.7013
+11.9025
+12.0413
+12.6518
+12.9347
+13.2406
+13.5674
+13.9179
+ \end{minipage}  & \begin{minipage}[t]{0.28\textwidth}\raggedright 
+-58.8256
+-55.3326
+-51.6404
+-43.8976
+-37.8100
+-33.5388
+-30.3825
+-27.9742
+-26.0716
+-23.3203
+-21.9406
+-20.5902
+-19.4518
+-18.5862
+-18.1199
+-17.2191
+-16.9601
+-16.7451
+-16.5707
+-16.4356
+
+
+\end{minipage} \\         
+~\\
+
+
+Stepwise ionization & ~{$\rm e^- + Ar(4s) \rightarrow Ar^+ + e^- + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
+      8.9802
+      9.0676
+      9.1551
+      9.2425
+      9.3299
+      9.4174
+      9.8546
+      10.2918
+      10.7290
+      11.1662
+      11.6034
+      12.0406
+      12.4778
+      12.9150
+      13.3522
+      13.7894
+ \end{minipage}  & \begin{minipage}[t]{0.28\textwidth}\raggedright 
+      -47.4567
+      -42.7722
+      -38.2715
+      -34.2096
+      -30.8706
+      -28.2804
+      -21.6398
+      -18.7954
+      -17.3209
+      -16.5828
+      -16.1777
+      -15.9052
+      -15.6982
+      -15.5401
+      -15.4256
+      -15.3526
+\end{minipage} \\ 
+ \alb 
+    \bottomrule
+    \end{tabular*}
+\begin{tablenotes}
+\item[{a}] The reaction rate $k$ has units of $\textrm{cm}^3\cdot \textrm{s}^{-1}$. The electron temperature $T_{\rm e}$ is in Kelvin.
+
+\end{tablenotes}
+\label{tab:reactionratessplinecontrolpoints}
+   \end{threeparttable}
+\end{table*}
+
+
+
+
+ \clearpage
+\bibliographystyle{warpdoc}
+\bibliography{all}
+
+
+\end{document}
+
+

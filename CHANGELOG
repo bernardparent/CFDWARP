@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 NOV 24a
+  * in model/chem
+    - added _Ar_Plasma_4s
+    
+
 2025 NOV 10a
   * in model/chem/_Ar_Plasma_8s/
     - made modifications to include averaged rates algorithm within the reaction rates
