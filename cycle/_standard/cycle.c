@@ -114,6 +114,10 @@ void write_runtime_template(FILE **controlfile){
   ",\n"
 #ifdef _AVERAGEDRATES
   "      {SetAveragedRatesToZero();}\n"
+  "      {ResetRelaxedAveragedRates(period,alpha);}\n"
+  "          {- use instead of SetAveragedRatesToZero() if relaxation is desired}\n"
+  "          {- period is the time in seconds during which rates are averaged}\n"
+  "          {- alpha is a relaxation factor between 0 and 1}\n"
   "      {AddToAveragedRates();}\n"
 #endif
   "      IncreaseTimeLevel();\n"
@@ -136,6 +140,9 @@ void write_runtime_template(FILE **controlfile){
 void runtime_actions_cycle_specific(char *actionname, char **argum, SOAP_codex_t *codex){
 #ifdef DISTMPI
   double delta_effiter_U,effiter_U_mem,delta_effiter_U_max;
+#endif
+#if defined(UNSTEADY) && defined(_AVERAGEDRATES)
+  double period,alpha;
 #endif
   gl_t *gl;
   np_t *np;
@@ -219,6 +226,16 @@ void runtime_actions_cycle_specific(char *actionname, char **argum, SOAP_codex_t
 #if defined(UNSTEADY) && defined(_AVERAGEDRATES)
   if (strcmp(actionname,"SetAveragedRatesToZero")==0) {
     set_averaged_rates_to_zero(np, gl);
+    codex->ACTIONPROCESSED=TRUE;
+  }
+
+  if (strcmp(actionname,"ResetRelaxedAveragedRates")==0) {
+    SOAP_substitute_all_argums(argum, codex);
+    period=SOAP_get_argum_double(codex,*argum,0);
+    alpha=SOAP_get_argum_double(codex,*argum,1);
+    if (alpha>0.99999999999) fatal_error("In the action ResetRelaxedAveragedRates(), alpha can not be set higher than 0.99999999999.");
+    if (alpha<0.0) fatal_error("In the action ResetRelaxedAveragedRates(), alpha can not be set lowers than 0.0.");
+    gl->averagedrates_time=period*alpha/(1.0-alpha);
     codex->ACTIONPROCESSED=TRUE;
   }
 

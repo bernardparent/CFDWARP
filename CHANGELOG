@@ -6,6 +6,10 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2025 DEC 01a
+  * in cycle/_standard/cycle.c
+    - in runtime_actions_cycle_specific(), added the action ResetRelaxedAveragedRates()
+    
 
 2025 NOV 24a
   * in model/chem
