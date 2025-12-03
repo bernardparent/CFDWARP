@@ -6,6 +6,20 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2025 DEC 03a
+  * in model/thermo/_generic/enthalpy.c
+    - added species N2v1 through N2v8
+  * in model/thermo/_generic/thermo.c
+    - added species N2v1 through N2v8 to speciesname
+  * in model/thermo/_generic/thermo.hh
+    - added species N2v1 through N2v8 to SMAP
+  * in model/thermo/_thermo.h
+    - added N2v1 through N2v8
+  * in model/transport/_Dixon-Lewis/transport.c
+    - added species N2v1 through N2v8 to Peps and Psig
+    
+    
 2025 DEC 01a
   * in cycle/_standard/cycle.c
     - in runtime_actions_cycle_specific(), added the action ResetRelaxedAveragedRates()

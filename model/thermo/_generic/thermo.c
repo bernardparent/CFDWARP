@@ -157,7 +157,15 @@ const static speciesname_t speciesname[SMAP_NS]=
    "Ar(4P)",
    "Ar2+",
    "Ar2star",
-   "Ar2"
+   "Ar2",
+   "N2v1",
+   "N2v2",
+   "N2v3",
+   "N2v4",
+   "N2v5",
+   "N2v6",
+   "N2v7",
+   "N2v8"
   };
 
 

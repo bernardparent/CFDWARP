@@ -206,6 +206,14 @@ const static double Peps[SMAP_NS]=
    93.3,        /*Ar2+*/    /* !! unknown value: fixed to the one of Ar */
    93.3,        /*Ar2star*/  /* !! unknown value: fixed to the one of Ar */
    93.3,        /*Ar2*/  /* !! unknown value: fixed to the one of Ar */
+   71.4,        /* N2(v1) */  /* !! unknown value: fixed to the one of N2 */
+   71.4,        /* N2(v2) */  /* !! unknown value: fixed to the one of N2 */
+   71.4,        /* N2(v3) */  /* !! unknown value: fixed to the one of N2 */
+   71.4,        /* N2(v4) */  /* !! unknown value: fixed to the one of N2 */
+   71.4,        /* N2(v5) */  /* !! unknown value: fixed to the one of N2 */
+   71.4,        /* N2(v6) */  /* !! unknown value: fixed to the one of N2 */
+   71.4,        /* N2(v7) */  /* !! unknown value: fixed to the one of N2 */
+   71.4,        /* N2(v8) */  /* !! unknown value: fixed to the one of N2 */
   };
 
 
@@ -322,6 +330,14 @@ const static double Psig[SMAP_NS]=
    0.3761E+0,     /*Ar2+*/    /* !! unknown value: fixed to equilibrium intermolecular distance of Argon dimer Ar2 */
    0.3761E+0,     /*Ar2star*/ /* !! unknown value: fixed to equilibrium intermolecular distance of Argon dimer Ar2 */
    0.3761E+0,     /*Ar2*/ /* !! unknown value: fixed to equilibrium intermolecular distance of Argon dimer Ar2 */
+   0.3798e0,    /* N2(v1) */  /* !! unknown value: fixed to the one of N2 */
+   0.3798e0,    /* N2(v2) */  /* !! unknown value: fixed to the one of N2 */
+   0.3798e0,    /* N2(v3) */  /* !! unknown value: fixed to the one of N2 */
+   0.3798e0,    /* N2(v4) */  /* !! unknown value: fixed to the one of N2 */
+   0.3798e0,    /* N2(v5) */  /* !! unknown value: fixed to the one of N2 */
+   0.3798e0,    /* N2(v6) */  /* !! unknown value: fixed to the one of N2 */
+   0.3798e0,    /* N2(v7) */  /* !! unknown value: fixed to the one of N2 */
+   0.3798e0,    /* N2(v8) */  /* !! unknown value: fixed to the one of N2 */
   };
 
 
