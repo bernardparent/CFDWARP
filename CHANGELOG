@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 DEC 03b
+  * in model/thermo/_generic/electronimpact.c
+    - added _EoverN_from_Te_N2v1(), _EoverN_from_Te_N2v2() and _EoverN_from_Te_N2v3()
+    - added _EoverN_from_Te_chieminus_N2v1(), _EoverN_from_Te_chieminus_N2v2() and _EoverN_from_Te_chieminus_N2v3()
+    - in _EoverNk_from_Te() and _EoverNk_from_Te_chieminus() added calls to the above splines
+  * in model/thermo/doc/electronimpact.tex
+    - added documentation for N2v1, N2v2 and N2v3 E/N
+
+
 2025 DEC 03a
   * in model/thermo/_generic/enthalpy.c
     - added species N2v1 through N2v8

@@ -292,6 +292,19 @@ Experimental data for $E/N$ vs electron temperature is available from Ch.\ 21 of
 \label{fig:electronimpact_1}
 \end{figure}
 %
+
+\subsection{Vibrationally Excited Nitrogen molecule (${\rm N_2}$$(v)$)}
+
+Collision cross-sections are sourced from the Morgan LXCat database for all cases but the vibrational excitation cross sections are replaced with those of Ref. \cite{psst:2012:laporta}.
+
+\begin{figure}[!htbp]
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.32]{electronimpact_figs/electronimpact_figureN2v1.png}}
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.32]{electronimpact_figs/electronimpact_figureN2v2.png}}
+\subfigure[]{\includegraphics[width=0.99\linewidth, angle=0.0,scale=0.32]{electronimpact_figs/electronimpact_figureN2v3.png}}
+\caption{$E/N$ results for the first three levels of vibrationally excited $\rm N_2$, showing the effect of the ionization fractions on the reduced electric field as a function of the electron temperature}
+\label{fig:electronimpact_N2vib123}
+\end{figure}
+
 \subsection{Oxygen molecule ($\rm O_2$)}
 
 All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableO2}. Experimental data for $E/N$ vs electron temperature is available from Ch.\ 21 of Ref.\ \citen{book:1997:grigoriev} for $\rm O_2$. A cubic spline is fitted through the experimental data points and also through the remaining lower and upper ranges, if any, for which there is BOLSIG+ data.  The reduced electric field results are shown in Fig. \ref{fig:electronimpact_2}. In this case, no experimental data is available for $T_{\rm e}<1000$ K. Rather than make use of the BOLSIG+ results at low electron temperature which might not be accurate, we here prefer to extrapolate from the experimental data to lower $T_{\rm e}$. To do this, the experimental results for air are used and the corresponding $E/N$ value is obtained by summing the $\rm N_2$, $\rm O_2$ $E/N$ results weighed by their corresponding composition in dry air. The extrapolation of the $\rm O_2$ curve for $T_{\rm e}<1000$ K is such that there is good agreement between the experimental data and spline curve fit for air. The latter is shown in Fig. \ref{fig:electronimpact_2}. All the processes involving cross-sections used in the BOLSIG+ calculation are given in Table \ref{tab:tableO2}.
@@ -616,6 +629,149 @@ The reduced electric field results are shown in Fig. \ref{fig:electronimpact_CO}
   &  & ${\rm ln}~E^\star$     & \tiny       -51.8608  -51.0135  -49.5583  -46.7448  -44.4423  -43.7491  -42.3992  -41.6848  -39.5410  -38.7385
 \\
   \midrule  
+  
+  \multirow{2}{*}{3} &  \multirow{2}{*}{ $\rm e^- + N_2(v=1) $   } & ${\rm ln}~T_{\rm e}$  & \tiny              5.7037
+    5.9886
+    6.2586
+    6.6853
+    7.0816
+    7.4328
+    7.8363
+    8.2583
+    8.6119
+    8.9150
+    9.1796
+    9.4141
+    9.5841
+    9.7411
+    9.9896
+    10.298
+    11.014
+    11.380
+    11.688
+    12.191
+    12.844
+    15.424
+\\
+  &  & ${\rm ln}~E^\star$     & \tiny           -51.860
+    -51.86
+    -51.05
+    -50.53
+    -49.99
+    -49.51
+    -49.05
+    -48.55
+    -48.02
+    -47.52
+    -46.92
+    -45.84
+    -44.68
+    -44.32
+    -44.06
+    -43.72
+    -43.38
+    -42.79
+    -42.45
+    -42.03
+    -41.37
+    -40.68
+    -38.73
+\\
+  \midrule    
+  
+    \multirow{2}{*}{3} &  \multirow{2}{*}{ $\rm e^- + N_2(v=2) $   } & ${\rm ln}~T_{\rm e}$  & \tiny       5.7037     5.9886
+    6.2586
+    6.6853
+    7.0816
+    7.4328
+    7.8363
+    8.2583
+    8.6119
+    8.9150
+    9.1796
+    9.4141
+    9.5841
+    9.7411
+    9.9896
+    10.298
+    11.014
+    11.380
+    11.688
+    12.191
+    12.844
+    15.424
+\\
+  &  & ${\rm ln}~E^\star$     & \tiny       -51.86
+    -51.05
+    -50.53
+    -49.99
+    -49.50
+    -49.02
+    -48.50
+    -47.97
+    -47.45
+    -46.69
+    -45.37
+    -44.65
+    -44.35
+    -44.10
+    -43.75
+    -43.38
+    -42.79
+    -42.45
+    -42.03
+    -41.37
+    -40.68
+    -38.73
+\\
+  \midrule 
+  
+  \multirow{2}{*}{3} &  \multirow{2}{*}{ $\rm e^- + N_2(v=3) $   } & ${\rm ln}~T_{\rm e}$  & \tiny        5.7037     5.9886
+    6.2586
+    6.6853
+    7.0816
+    7.4328
+    7.8363
+    8.2583
+    8.6119
+    8.9150
+    9.1796
+    9.4141
+    9.5841
+    9.7411
+    9.9896
+    10.298
+    11.014
+    11.380
+    11.688
+    12.191
+    12.844
+    15.424
+\\
+  &  & ${\rm ln}~E^\star$     & \tiny        -51.86
+    -51.05
+    -50.53
+    -49.99
+    -49.50
+    -48.99
+    -48.45
+    -47.93
+    -47.35
+    -46.36
+    -45.20
+    -44.68
+    -44.40
+    -44.15
+    -43.78
+    -43.38
+    -42.79
+    -42.45
+    -42.03
+    -41.37
+    -40.68
+    -38.73
+\\
+  \midrule 
   
   \multirow{2}{*}{4} &  \multirow{2}{*}{ $\rm e^- + O_2  $   } & ${\rm ln}~T_{\rm e}$  & \tiny         6.1549    7.3930    8.6458    9.4545   10.2346   10.9063   11.1835   11.8793   12.6550   13.6691   14.3029   15.4249 \\ 
 

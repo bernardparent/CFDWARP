@@ -642,9 +642,195 @@ static double _EoverN_from_Te_N2(double Te){
   return(EoverN);
 }
 
+static double _EoverN_from_Te_N2v1(double Te){
+  double EoverN;
+  /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections with Laporta vib. exc. cross-sections */
+  /* log K */
+  double Te_data[] = 
+  { 
+    5.703782474656201,
+    5.988679354506802,
+    6.258617131922874,
+    6.685375345769157,
+    7.081678154216439,
+    7.432806365556831,
+    7.836365818912340,
+    8.258302847322318,
+    8.611937642824694,
+    8.915021480274522,
+    9.179631228196067,
+    9.414150370411491,
+    9.584183041217965,
+    9.741129186577597,
+    9.989612561945394,
+    10.298782743821404,
+    11.014567428782978,
+    11.380157541548199,
+    11.688881877002203,
+    12.191086835433678,
+    12.844305248995735,
+    15.424948470398375
+  };
+  /* log Vm^2*/
+  double EoverN_data[] = 
+  { 
+    -51.860844850194901,
+    -51.058091063911071,
+    -50.537925857175892,
+    -49.999696491550942,
+    -49.516632081902728,
+    -49.050487109577311,
+    -48.552932656123915,
+    -48.027894166875143,
+    -47.526116827716919,
+    -46.927708935901727,
+    -45.849127359579235,
+    -44.683840174196298,
+    -44.326420947248167,
+    -44.064407847045892,
+    -43.728778523898306,
+    -43.383738652751845,
+    -42.796535458589460,
+    -42.457666526277450,
+    -42.030920509059420,
+    -41.379553075460663,
+    -40.682458841152304,
+    -38.738481472790617
+  };
+  
+  int N = sizeof(Te_data)/sizeof(Te_data[0]);
+  Te = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
+  EoverN = exp( EXM_f_from_monotonespline(N, Te_data, EoverN_data, Te) );
+  return(EoverN);
+}
+
+static double _EoverN_from_Te_N2v2(double Te){
+  double EoverN;
+  /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections */
+  /* log K */
+  double Te_data[] = 
+  { 
+    5.703782474656201,
+    5.988679354506802,
+    6.258617131922874,
+    6.685375345769157,
+    7.081678154216439,
+    7.432806365556831,
+    7.836365818912340,
+    8.258302847322318,
+    8.611937642824694,
+    8.915021480274522,
+    9.179631228196067,
+    9.414150370411491,
+    9.584183041217965,
+    9.741129186577597,
+    9.989612561945394,
+    10.298782743821404,
+    11.014567428782978,
+    11.380157541548199,
+    11.688881877002203,
+    12.191086835433678,
+    12.844305248995735,
+    15.424948470398375
+  };
+  /* log Vm^2*/
+  double EoverN_data[] = 
+  { 
+    -51.860844850194901,
+    -51.058091063911071,
+    -50.537924676589640,
+    -49.999131909909082,
+    -49.509458093405925,
+    -49.023852060598102,
+    -48.501353508794267,
+    -47.973945337576133,
+    -47.454599799962658,
+    -46.694918878173425,
+    -45.373114702042102,
+    -44.652768210797404,
+    -44.355149422736531,
+    -44.107782471281560,
+    -43.756996521783556,
+    -43.383948978580570,
+    -42.796535458589460,
+    -42.457666526277450,
+    -42.030920509059420,
+    -41.379553075460663,
+    -40.682458841152304,
+    -38.738481472790617
+  };
+  
+  int N = sizeof(Te_data)/sizeof(Te_data[0]);
+  Te = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
+  EoverN = exp( EXM_f_from_monotonespline(N, Te_data, EoverN_data, Te) );
+  return(EoverN);
+}
+
+static double _EoverN_from_Te_N2v3(double Te){
+  double EoverN;
+  /* Data in log-log coordinates. Obtained with BOLSIG+ using Morgan LXCat cross-sections */
+  /* log K */
+  double Te_data[] = 
+  { 
+    5.703782474656201,
+    5.988679354506802,
+    6.258617131922874,
+    6.685375345769157,
+    7.081678154216439,
+    7.432806365556831,
+    7.836365818912340,
+    8.258302847322318,
+    8.611937642824694,
+    8.915021480274522,
+    9.179631228196067,
+    9.414150370411491,
+    9.584183041217965,
+    9.741129186577597,
+    9.989612561945394,
+    10.298782743821404,
+    11.014567428782978,
+    11.380157541548199,
+    11.688881877002203,
+    12.191086835433678,
+    12.844305248995735,
+    15.424948470398375
+  };
+  /* log Vm^2*/
+  double EoverN_data[] = 
+  { 
+    -51.860844850194901,
+    -51.058091247324498,
+    -50.537912130868285,
+    -49.998644281725646,
+    -49.503151339119484,
+    -48.999383967255362,
+    -48.457664377601361,
+    -47.930743050347239,
+    -47.358356429598125,
+    -46.360863195668415,
+    -45.208431159185558,
+    -44.680140358836361,
+    -44.407700914246263,
+    -44.159499673841474,
+    -43.784738377603560,
+    -43.384302566322198,
+    -42.796535458589460,
+    -42.457666526277450,
+    -42.030920509059420,
+    -41.379553075460663,
+    -40.682458841152304,
+    -38.738481472790617
+  };
+  
+  int N = sizeof(Te_data)/sizeof(Te_data[0]);
+  Te = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
+  EoverN = exp( EXM_f_from_monotonespline(N, Te_data, EoverN_data, Te) );
+  return(EoverN);
+}
+
 
 /* 
-Compute the influence of the ionization degree on E/N vs Te for N2
+Compute the influence of the ionization degree on E/N vs Te for N2V0
 E/N vs Te splines are obtained for electron molar fractions of 1e-6 to 1e-2
 Given the electron molar fraction chieminus, interpolate at a given Te to find E/N 
 */
@@ -703,6 +889,144 @@ static double _EoverN_from_Te_chieminus_N2(double Te, double chieminus){
       break;
       default:
         fatal_error("Couldn't find EoverN from electron molar fraction data in _EoverN_from_Te_chieminus_N2().");
+    }
+    int N = sizeof(Te_data)/sizeof(Te_data[0]);
+    Tek[k] = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
+    // inerpolate over Te to find E/N at each ionization fraction data
+    EoverN_chie_data[k] = exp( EXM_f_from_monotonespline(N, Te_data, EoverN_data, Tek[k]) );
+  }
+  // interpolate over chieminus to find final E/N
+  EoverN = EXM_f_from_monotonespline(N_chie, chie_data, EoverN_chie_data, max(chie_data[0],min( chieminus, chie_data[N_chie-1])));
+  return(EoverN);
+}
+
+/* 
+Compute the influence of the ionization degree on E/N vs Te for N2v1
+E/N vs Te splines are obtained for electron molar fractions of 1e-6 to 1e-2
+Given the electron molar fraction chieminus, interpolate at a given Te to find E/N 
+*/
+static double _EoverN_from_Te_chieminus_N2v1(double Te, double chieminus){
+  long k;
+  double chie_data[] = {1.000E-6,1.000E-5,1.000E-4,1.000E-3,1.000E-2};
+  int N_chie = sizeof(chie_data)/sizeof(chie_data[0]);
+  double EoverN_chie_data[N_chie],Tek[N_chie],EoverN,Te_data[22],EoverN_data[22];
+  // spline data at chieminus = 1e-6,1e-5,1e-4,1e-3,1e-2
+  for (k=0; k<N_chie; k++){  
+    switch (k){
+      case 0:
+        Te_data[0]=5.70378247; Te_data[1]=5.98867935; Te_data[2]=6.25861713; Te_data[3]=6.68537535; Te_data[4]=7.08167815; Te_data[5]=7.43280637; Te_data[6]=7.83636582; Te_data[7]=8.25830285; Te_data[8]=8.61193764; Te_data[9]=8.91502148; Te_data[10]=9.17963123; Te_data[11]=9.41415037; Te_data[12]=9.58418304; Te_data[13]=9.74112919; Te_data[14]=9.98961256; Te_data[15]=10.29878274; Te_data[16]=11.01456743; Te_data[17]=11.38015754; Te_data[18]=11.68888188; Te_data[19]=12.19108684; Te_data[20]=12.84430525; Te_data[21]=15.42494847;
+        EoverN_data[0]=-51.86084485; EoverN_data[1]=-51.05809106; EoverN_data[2]=-50.53792586; EoverN_data[3]=-49.99969649; EoverN_data[4]=-49.51663208; EoverN_data[5]=-49.05048711; EoverN_data[6]=-48.55293266; EoverN_data[7]=-48.02789417; EoverN_data[8]=-47.52611683; EoverN_data[9]=-46.92770894; EoverN_data[10]=-45.84912736; EoverN_data[11]=-44.68384017; EoverN_data[12]=-44.32642095; EoverN_data[13]=-44.06440785; EoverN_data[14]=-43.72877852; EoverN_data[15]=-43.38373865; EoverN_data[16]=-42.79653546; EoverN_data[17]=-42.45766653; EoverN_data[18]=-42.03092051; EoverN_data[19]=-41.37955308; EoverN_data[20]=-40.68245884; EoverN_data[21]=-38.73848147;
+      break;
+      case 1:
+        Te_data[0]=5.70378247; Te_data[1]=5.98867935; Te_data[2]=6.25861713; Te_data[3]=6.68537535; Te_data[4]=7.08167815; Te_data[5]=7.43280637; Te_data[6]=7.83636582; Te_data[7]=8.25830285; Te_data[8]=8.61193764; Te_data[9]=8.91502148; Te_data[10]=9.17963123; Te_data[11]=9.41415037; Te_data[12]=9.58418304; Te_data[13]=9.74112919; Te_data[14]=9.98961256; Te_data[15]=10.29878274; Te_data[16]=11.01456743; Te_data[17]=11.38015754; Te_data[18]=11.68888188; Te_data[19]=12.19108684; Te_data[20]=12.84430525; Te_data[21]=15.42494847;
+        EoverN_data[0]=-51.22283298; EoverN_data[1]=-50.79574658; EoverN_data[2]=-50.40751571; EoverN_data[3]=-49.93847738; EoverN_data[4]=-49.47436078; EoverN_data[5]=-49.01539109; EoverN_data[6]=-48.50447411; EoverN_data[7]=-47.89205015; EoverN_data[8]=-47.19275858; EoverN_data[9]=-46.41015760; EoverN_data[10]=-45.48882856; EoverN_data[11]=-44.68276579; EoverN_data[12]=-44.33283915; EoverN_data[13]=-44.07223057; EoverN_data[14]=-43.73315378; EoverN_data[15]=-43.38726226; EoverN_data[16]=-42.79778328; EoverN_data[17]=-42.45899043; EoverN_data[18]=-42.03092131; EoverN_data[19]=-41.37955308; EoverN_data[20]=-40.68245408; EoverN_data[21]=-38.73848147; 
+      break;
+      case 2:
+        Te_data[0]=5.70378247; Te_data[1]=5.98867935; Te_data[2]=6.25861713; Te_data[3]=6.68537535; Te_data[4]=7.08167815; Te_data[5]=7.43280637; Te_data[6]=7.83636582; Te_data[7]=8.25830285; Te_data[8]=8.61193764; Te_data[9]=8.91502148; Te_data[10]=9.17963123; Te_data[11]=9.41415037; Te_data[12]=9.58418304; Te_data[13]=9.74112919; Te_data[14]=9.98961256; Te_data[15]=10.29878274; Te_data[16]=11.01456743; Te_data[17]=11.38015754; Te_data[18]=11.68888188; Te_data[19]=12.19108684; Te_data[20]=12.84430525; Te_data[21]=15.42494847; 
+        EoverN_data[0]=-51.15056834; EoverN_data[1]=-50.72813675; EoverN_data[2]=-50.34642853; EoverN_data[3]=-49.87784847; EoverN_data[4]=-49.42081759; EoverN_data[5]=-48.97029703; EoverN_data[6]=-48.43257301; EoverN_data[7]=-47.56238815; EoverN_data[8]=-46.61684774; EoverN_data[9]=-45.81193620; EoverN_data[10]=-45.11587967; EoverN_data[11]=-44.66280406; EoverN_data[12]=-44.38619662; EoverN_data[13]=-44.11288845; EoverN_data[14]=-43.75868595; EoverN_data[15]=-43.40228918; EoverN_data[16]=-42.80118405; EoverN_data[17]=-42.45926687; EoverN_data[18]=-42.03092042; EoverN_data[19]=-41.37992840; EoverN_data[20]=-40.68245897; EoverN_data[21]=-38.73869698;
+      break;
+      case 3:
+        Te_data[0]=5.70378247; Te_data[1]=5.98867935; Te_data[2]=6.25861713; Te_data[3]=6.68537535; Te_data[4]=7.08167815; Te_data[5]=7.43280637; Te_data[6]=7.83636582; Te_data[7]=8.25830285; Te_data[8]=8.61193764; Te_data[9]=8.91502148; Te_data[10]=9.17963123; Te_data[11]=9.41415037; Te_data[12]=9.58418304; Te_data[13]=9.74112919; Te_data[14]=9.98961256; Te_data[15]=10.29878274; Te_data[16]=11.01456743; Te_data[17]=11.38015754; Te_data[18]=11.68888188; Te_data[19]=12.19108684; Te_data[20]=12.84430525; Te_data[21]=15.42494847;
+        EoverN_data[0]=-51.13743316; EoverN_data[1]=-50.71392299; EoverN_data[2]=-50.33110919; EoverN_data[3]=-49.85698877; EoverN_data[4]=-49.39576562; EoverN_data[5]=-48.94299696; EoverN_data[6]=-48.34915816; EoverN_data[7]=-47.20817932; EoverN_data[8]=-46.17121213; EoverN_data[9]=-45.41649581; EoverN_data[10]=-44.86696573; EoverN_data[11]=-44.56831708; EoverN_data[12]=-44.35802911; EoverN_data[13]=-44.10976840; EoverN_data[14]=-43.77174486; EoverN_data[15]=-43.42337403; EoverN_data[16]=-42.81225707; EoverN_data[17]=-42.45993169; EoverN_data[18]=-42.03074704; EoverN_data[19]=-41.37957428; EoverN_data[20]=-40.68247868; EoverN_data[21]=-38.73911211;
+      break;
+      case 4:
+        Te_data[0]=5.70378247; Te_data[1]=5.98867935; Te_data[2]=6.25861713; Te_data[3]=6.68537535; Te_data[4]=7.08167815; Te_data[5]=7.43280637; Te_data[6]=7.83636582; Te_data[7]=8.25830285; Te_data[8]=8.61193764; Te_data[9]=8.91502148; Te_data[10]=9.17963123; Te_data[11]=9.41415037; Te_data[12]=9.58418304; Te_data[13]=9.74112919; Te_data[14]=9.98961256; Te_data[15]=10.29878274; Te_data[16]=11.01456743; Te_data[17]=11.38015754; Te_data[18]=11.68888188; Te_data[19]=12.19108684; Te_data[20]=12.84430525; Te_data[21]=15.42494847;
+        EoverN_data[0]=-51.13743316; EoverN_data[1]=-50.71392299; EoverN_data[2]=-50.33110919; EoverN_data[3]=-49.85698877; EoverN_data[4]=-49.39576562; EoverN_data[5]=-48.94299696; EoverN_data[6]=-48.35173319; EoverN_data[7]=-47.08511622; EoverN_data[8]=-46.01248973; EoverN_data[9]=-45.25633857; EoverN_data[10]=-44.73055356; EoverN_data[11]=-44.43309865; EoverN_data[12]=-44.22820542; EoverN_data[13]=-44.00470853; EoverN_data[14]=-43.70703175; EoverN_data[15]=-43.39662183; EoverN_data[16]=-42.78317292; EoverN_data[17]=-42.43850440; EoverN_data[18]=-42.02496840; EoverN_data[19]=-41.37947317; EoverN_data[20]=-40.68261191; EoverN_data[21]=-38.73910075;
+      break;
+      default:
+        fatal_error("Couldn't find EoverN from electron molar fraction data in _EoverN_from_Te_chieminus_N2V1().");
+    }
+    int N = sizeof(Te_data)/sizeof(Te_data[0]);
+    Tek[k] = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
+    // inerpolate over Te to find E/N at each ionization fraction data
+    EoverN_chie_data[k] = exp( EXM_f_from_monotonespline(N, Te_data, EoverN_data, Tek[k]) );
+  }
+  // interpolate over chieminus to find final E/N
+  EoverN = EXM_f_from_monotonespline(N_chie, chie_data, EoverN_chie_data, max(chie_data[0],min( chieminus, chie_data[N_chie-1])));
+  return(EoverN);
+}
+
+/* 
+Compute the influence of the ionization degree on E/N vs Te for N2v2
+E/N vs Te splines are obtained for electron molar fractions of 1e-6 to 1e-2
+Given the electron molar fraction chieminus, interpolate at a given Te to find E/N 
+*/
+static double _EoverN_from_Te_chieminus_N2v2(double Te, double chieminus){
+  long k;
+  double chie_data[] = {1.000E-6,1.000E-5,1.000E-4,1.000E-3,1.000E-2};
+  int N_chie = sizeof(chie_data)/sizeof(chie_data[0]);
+  double EoverN_chie_data[N_chie],Tek[N_chie],EoverN,Te_data[22],EoverN_data[22];
+  // spline data at chieminus = 1e-6,1e-5,1e-4,1e-3,1e-2
+  for (k=0; k<N_chie; k++){  
+    switch (k){
+      case 0:
+        Te_data[0]=5.70378247; Te_data[1]=5.98867935; Te_data[2]=6.25861713; Te_data[3]=6.68537535; Te_data[4]=7.08167815; Te_data[5]=7.43280637; Te_data[6]=7.83636582; Te_data[7]=8.25830285; Te_data[8]=8.61193764; Te_data[9]=8.91502148; Te_data[10]=9.17963123; Te_data[11]=9.41415037; Te_data[12]=9.58418304; Te_data[13]=9.74112919; Te_data[14]=9.98961256; Te_data[15]=10.29878274; Te_data[16]=11.01456743; Te_data[17]=11.38015754; Te_data[18]=11.68888188; Te_data[19]=12.19108684; Te_data[20]=12.84430525; Te_data[21]=15.42494847;
+        EoverN_data[0]=-51.86084485; EoverN_data[1]=-51.05809106; EoverN_data[2]=-50.53792468; EoverN_data[3]=-49.99913191; EoverN_data[4]=-49.50945809; EoverN_data[5]=-49.02385206; EoverN_data[6]=-48.50135351; EoverN_data[7]=-47.97394534; EoverN_data[8]=-47.45459980; EoverN_data[9]=-46.69491888; EoverN_data[10]=-45.37311470; EoverN_data[11]=-44.65276821; EoverN_data[12]=-44.35514942; EoverN_data[13]=-44.10778247; EoverN_data[14]=-43.75699652; EoverN_data[15]=-43.38394898; EoverN_data[16]=-42.79653546; EoverN_data[17]=-42.45766653; EoverN_data[18]=-42.03092051; EoverN_data[19]=-41.37955308; EoverN_data[20]=-40.68245884; EoverN_data[21]=-38.73848147;
+      break;
+      case 1:
+        Te_data[0]=5.70378247; Te_data[1]=5.98867935; Te_data[2]=6.25861713; Te_data[3]=6.68537535; Te_data[4]=7.08167815; Te_data[5]=7.43280637; Te_data[6]=7.83636582; Te_data[7]=8.25830285; Te_data[8]=8.61193764; Te_data[9]=8.91502148; Te_data[10]=9.17963123; Te_data[11]=9.41415037; Te_data[12]=9.58418304; Te_data[13]=9.74112919; Te_data[14]=9.98961256; Te_data[15]=10.29878274; Te_data[16]=11.01456743; Te_data[17]=11.38015754; Te_data[18]=11.68888188; Te_data[19]=12.19108684; Te_data[20]=12.84430525; Te_data[21]=15.42494847;
+        EoverN_data[0]=-51.22283301; EoverN_data[1]=-50.79570021; EoverN_data[2]=-50.40704513; EoverN_data[3]=-49.93245310; EoverN_data[4]=-49.45242775; EoverN_data[5]=-48.97897411; EoverN_data[6]=-48.44379017; EoverN_data[7]=-47.75083817; EoverN_data[8]=-46.97948147; EoverN_data[9]=-46.15730353; EoverN_data[10]=-45.26080902; EoverN_data[11]=-44.65583117; EoverN_data[12]=-44.36635504; EoverN_data[13]=-44.11242479; EoverN_data[14]=-43.76031421; EoverN_data[15]=-43.38800435; EoverN_data[16]=-42.79607454; EoverN_data[17]=-42.45883750; EoverN_data[18]=-42.03091975; EoverN_data[19]=-41.37955308; EoverN_data[20]=-40.68245428; EoverN_data[21]=-38.73848147;
+      break;
+      case 2:
+        Te_data[0]=5.70378247; Te_data[1]=5.98867935; Te_data[2]=6.25861713; Te_data[3]=6.68537535; Te_data[4]=7.08167815; Te_data[5]=7.43280637; Te_data[6]=7.83636582; Te_data[7]=8.25830285; Te_data[8]=8.61193764; Te_data[9]=8.91502148; Te_data[10]=9.17963123; Te_data[11]=9.41415037; Te_data[12]=9.58418304; Te_data[13]=9.74112919; Te_data[14]=9.98961256; Te_data[15]=10.29878274; Te_data[16]=11.01456743; Te_data[17]=11.38015754; Te_data[18]=11.68888188; Te_data[19]=12.19108684; Te_data[20]=12.84430525; Te_data[21]=15.42494847;
+        EoverN_data[0]=-51.15053816; EoverN_data[1]=-50.72809603; EoverN_data[2]=-50.34598157; EoverN_data[3]=-49.87187488; EoverN_data[4]=-49.39851273; EoverN_data[5]=-48.93122169; EoverN_data[6]=-48.33725945; EoverN_data[7]=-47.37651231; EoverN_data[8]=-46.45732825; EoverN_data[9]=-45.70317709; EoverN_data[10]=-45.06986220; EoverN_data[11]=-44.66189848; EoverN_data[12]=-44.40816433; EoverN_data[13]=-44.15128437; EoverN_data[14]=-43.78398378; EoverN_data[15]=-43.40099274; EoverN_data[16]=-42.79920969; EoverN_data[17]=-42.45906137; EoverN_data[18]=-42.03091538; EoverN_data[19]=-41.37956142; EoverN_data[20]=-40.68246390; EoverN_data[21]=-38.73848147;
+      break;
+      case 3:
+        Te_data[0]=5.70378247; Te_data[1]=5.98867935; Te_data[2]=6.25861713; Te_data[3]=6.68537535; Te_data[4]=7.08167815; Te_data[5]=7.43280637; Te_data[6]=7.83636582; Te_data[7]=8.25830285; Te_data[8]=8.61193764; Te_data[9]=8.91502148; Te_data[10]=9.17963123; Te_data[11]=9.41415037; Te_data[12]=9.58418304; Te_data[13]=9.74112919; Te_data[14]=9.98961256; Te_data[15]=10.29878274; Te_data[16]=11.01456743; Te_data[17]=11.38015754; Te_data[18]=11.68888188; Te_data[19]=12.19108684; Te_data[20]=12.84430525; Te_data[21]=15.42494847;
+        EoverN_data[0]=-51.13743268; EoverN_data[1]=-50.71388173; EoverN_data[2]=-50.33066204; EoverN_data[3]=-49.85104292; EoverN_data[4]=-49.37331946; EoverN_data[5]=-48.90238265; EoverN_data[6]=-48.24305548; EoverN_data[7]=-47.08838696; EoverN_data[8]=-46.12278299; EoverN_data[9]=-45.42038173; EoverN_data[10]=-44.90010183; EoverN_data[11]=-44.60216363; EoverN_data[12]=-44.39457280; EoverN_data[13]=-44.15542250; EoverN_data[14]=-43.79826489; EoverN_data[15]=-43.42008917; EoverN_data[16]=-42.80978923; EoverN_data[17]=-42.45953555; EoverN_data[18]=-42.03074989; EoverN_data[19]=-41.37957407; EoverN_data[20]=-40.68248344; EoverN_data[21]=-38.73885165;
+      break;
+      case 4:
+        Te_data[0]=5.70378247; Te_data[1]=5.98867935; Te_data[2]=6.25861713; Te_data[3]=6.68537535; Te_data[4]=7.08167815; Te_data[5]=7.43280637; Te_data[6]=7.83636582; Te_data[7]=8.25830285; Te_data[8]=8.61193764; Te_data[9]=8.91502148; Te_data[10]=9.17963123; Te_data[11]=9.41415037; Te_data[12]=9.58418304; Te_data[13]=9.74112919; Te_data[14]=9.98961256; Te_data[15]=10.29878274; Te_data[16]=11.01456743; Te_data[17]=11.38015754; Te_data[18]=11.68888188; Te_data[19]=12.19108684; Te_data[20]=12.84430525; Te_data[21]=15.42494847;
+        EoverN_data[0]=-51.13743268; EoverN_data[1]=-50.71388173; EoverN_data[2]=-50.33066204; EoverN_data[3]=-49.85104292; EoverN_data[4]=-49.37331946; EoverN_data[5]=-48.90238265; EoverN_data[6]=-48.21634189; EoverN_data[7]=-47.00137261; EoverN_data[8]=-46.00495629; EoverN_data[9]=-45.29069341; EoverN_data[10]=-44.78098956; EoverN_data[11]=-44.48226535; EoverN_data[12]=-44.27883044; EoverN_data[13]=-44.05999499; EoverN_data[14]=-43.74228108; EoverN_data[15]=-43.39816551; EoverN_data[16]=-42.78062946; EoverN_data[17]=-42.43808696; EoverN_data[18]=-42.02497428; EoverN_data[19]=-41.37948084; EoverN_data[20]=-40.68265643; EoverN_data[21]=-38.73910022;
+      break;
+      default:
+        fatal_error("Couldn't find EoverN from electron molar fraction data in _EoverN_from_Te_chieminus_N2V2().");
+    }
+    int N = sizeof(Te_data)/sizeof(Te_data[0]);
+    Tek[k] = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
+    // inerpolate over Te to find E/N at each ionization fraction data
+    EoverN_chie_data[k] = exp( EXM_f_from_monotonespline(N, Te_data, EoverN_data, Tek[k]) );
+  }
+  // interpolate over chieminus to find final E/N
+  EoverN = EXM_f_from_monotonespline(N_chie, chie_data, EoverN_chie_data, max(chie_data[0],min( chieminus, chie_data[N_chie-1])));
+  return(EoverN);
+}
+
+/* 
+Compute the influence of the ionization degree on E/N vs Te for N2v3
+E/N vs Te splines are obtained for electron molar fractions of 1e-6 to 1e-2
+Given the electron molar fraction chieminus, interpolate at a given Te to find E/N
+*/
+static double _EoverN_from_Te_chieminus_N2v3(double Te, double chieminus){
+  long k;
+  double chie_data[] = {1.000E-6,1.000E-5,1.000E-4,1.000E-3,1.000E-2};
+  int N_chie = sizeof(chie_data)/sizeof(chie_data[0]);
+  double EoverN_chie_data[N_chie],Tek[N_chie],EoverN,Te_data[22],EoverN_data[22];
+  // spline data at chieminus = 1e-6,1e-5,1e-4,1e-3,1e-2
+  for (k=0; k<N_chie; k++){  
+    switch (k){
+      case 0:
+        Te_data[0]=5.70378247; Te_data[1]=5.98867935; Te_data[2]=6.25861713; Te_data[3]=6.68537535; Te_data[4]=7.08167815; Te_data[5]=7.43280637; Te_data[6]=7.83636582; Te_data[7]=8.25830285; Te_data[8]=8.61193764; Te_data[9]=8.91502148; Te_data[10]=9.17963123; Te_data[11]=9.41415037; Te_data[12]=9.58418304; Te_data[13]=9.74112919; Te_data[14]=9.98961256; Te_data[15]=10.29878274; Te_data[16]=11.01456743; Te_data[17]=11.38015754; Te_data[18]=11.68888188; Te_data[19]=12.19108684; Te_data[20]=12.84430525; Te_data[21]=15.42494847;
+        EoverN_data[0]=-51.86084485; EoverN_data[1]=-51.05809125; EoverN_data[2]=-50.53791213; EoverN_data[3]=-49.99864428; EoverN_data[4]=-49.50315134; EoverN_data[5]=-48.99938397; EoverN_data[6]=-48.45766438; EoverN_data[7]=-47.93074305; EoverN_data[8]=-47.35835643; EoverN_data[9]=-46.36086320; EoverN_data[10]=-45.20843116; EoverN_data[11]=-44.68014036; EoverN_data[12]=-44.40770091; EoverN_data[13]=-44.15949967; EoverN_data[14]=-43.78473838; EoverN_data[15]=-43.38430257; EoverN_data[16]=-42.79653546; EoverN_data[17]=-42.45766653; EoverN_data[18]=-42.03092051; EoverN_data[19]=-41.37955308; EoverN_data[20]=-40.68245884; EoverN_data[21]=-38.73848147;
+      break;
+      case 1:
+        Te_data[0]=5.70378247; Te_data[1]=5.98867935; Te_data[2]=6.25861713; Te_data[3]=6.68537535; Te_data[4]=7.08167815; Te_data[5]=7.43280637; Te_data[6]=7.83636582; Te_data[7]=8.25830285; Te_data[8]=8.61193764; Te_data[9]=8.91502148; Te_data[10]=9.17963123; Te_data[11]=9.41415037; Te_data[12]=9.58418304; Te_data[13]=9.74112919; Te_data[14]=9.98961256; Te_data[15]=10.29878274; Te_data[16]=11.01456743; Te_data[17]=11.38015754; Te_data[18]=11.68888188; Te_data[19]=12.19108684; Te_data[20]=12.84430525; Te_data[21]=15.42494847;
+        EoverN_data[0]=-51.22283245; EoverN_data[1]=-50.79565471; EoverN_data[2]=-50.40658498; EoverN_data[3]=-49.92657244; EoverN_data[4]=-49.43186502; EoverN_data[5]=-48.94504645; EoverN_data[6]=-48.37965338; EoverN_data[7]=-47.61824438; EoverN_data[8]=-46.80089465; EoverN_data[9]=-45.95749229; EoverN_data[10]=-45.16853762; EoverN_data[11]=-44.68475358; EoverN_data[12]=-44.41711210; EoverN_data[13]=-44.16423707; EoverN_data[14]=-43.78792907; EoverN_data[15]=-43.38773041; EoverN_data[16]=-42.79676469; EoverN_data[17]=-42.45890201; EoverN_data[18]=-42.03092019; EoverN_data[19]=-41.37955308; EoverN_data[20]=-40.68245753; EoverN_data[21]=-38.73848147;
+      break;
+      case 2:
+        Te_data[0]=5.70378247; Te_data[1]=5.98867935; Te_data[2]=6.25861713; Te_data[3]=6.68537535; Te_data[4]=7.08167815; Te_data[5]=7.43280637; Te_data[6]=7.83636582; Te_data[7]=8.25830285; Te_data[8]=8.61193764; Te_data[9]=8.91502148; Te_data[10]=9.17963123; Te_data[11]=9.41415037; Te_data[12]=9.58418304; Te_data[13]=9.74112919; Te_data[14]=9.98961256; Te_data[15]=10.29878274; Te_data[16]=11.01456743; Te_data[17]=11.38015754; Te_data[18]=11.68888188; Te_data[19]=12.19108684; Te_data[20]=12.84430525; Te_data[21]=15.42494847;
+        EoverN_data[0]=-51.15053818; EoverN_data[1]=-50.72805441; EoverN_data[2]=-50.34553640; EoverN_data[3]=-49.86604804; EoverN_data[4]=-49.37754564; EoverN_data[5]=-48.89313648; EoverN_data[6]=-48.23338396; EoverN_data[7]=-47.21683369; EoverN_data[8]=-46.33597477; EoverN_data[9]=-45.63844805; EoverN_data[10]=-45.06507653; EoverN_data[11]=-44.69637537; EoverN_data[12]=-44.45815211; EoverN_data[13]=-44.20247589; EoverN_data[14]=-43.81061846; EoverN_data[15]=-43.40456468; EoverN_data[16]=-42.79953723; EoverN_data[17]=-42.45908108; EoverN_data[18]=-42.03091150; EoverN_data[19]=-41.37956145; EoverN_data[20]=-40.68246339; EoverN_data[21]=-38.73848147;
+      break;
+      case 3:
+        Te_data[0]=5.70378247; Te_data[1]=5.98867935; Te_data[2]=6.25861713; Te_data[3]=6.68537535; Te_data[4]=7.08167815; Te_data[5]=7.43280637; Te_data[6]=7.83636582; Te_data[7]=8.25830285; Te_data[8]=8.61193764; Te_data[9]=8.91502148; Te_data[10]=9.17963123; Te_data[11]=9.41415037; Te_data[12]=9.58418304; Te_data[13]=9.74112919; Te_data[14]=9.98961256; Te_data[15]=10.29878274; Te_data[16]=11.01456743; Te_data[17]=11.38015754; Te_data[18]=11.68888188; Te_data[19]=12.19108684; Te_data[20]=12.84430525; Te_data[21]=15.42494847;
+        EoverN_data[0]=-51.13743270; EoverN_data[1]=-50.71384102; EoverN_data[2]=-50.33022536; EoverN_data[3]=-49.84524039; EoverN_data[4]=-49.35220359; EoverN_data[5]=-48.86182028; EoverN_data[6]=-48.12494650; EoverN_data[7]=-46.97855974; EoverN_data[8]=-46.08599982; EoverN_data[9]=-45.43349244; EoverN_data[10]=-44.93923476; EoverN_data[11]=-44.64947430; EoverN_data[12]=-44.45019967; EoverN_data[13]=-44.20998026; EoverN_data[14]=-43.82578712; EoverN_data[15]=-43.41836344; EoverN_data[16]=-42.80873077; EoverN_data[17]=-42.45942901; EoverN_data[18]=-42.03075031; EoverN_data[19]=-41.37957369; EoverN_data[20]=-40.68345790; EoverN_data[21]=-38.73887436;
+      break;
+      case 4:
+        Te_data[0]=5.70378247; Te_data[1]=5.98867935; Te_data[2]=6.25861713; Te_data[3]=6.68537535; Te_data[4]=7.08167815; Te_data[5]=7.43280637; Te_data[6]=7.83636582; Te_data[7]=8.25830285; Te_data[8]=8.61193764; Te_data[9]=8.91502148; Te_data[10]=9.17963123; Te_data[11]=9.41415037; Te_data[12]=9.58418304; Te_data[13]=9.74112919; Te_data[14]=9.98961256; Te_data[15]=10.29878274; Te_data[16]=11.01456743; Te_data[17]=11.38015754; Te_data[18]=11.68888188; Te_data[19]=12.19108684; Te_data[20]=12.84430525; Te_data[21]=15.42494847;
+        EoverN_data[0]=-51.13743270; EoverN_data[1]=-50.71384102; EoverN_data[2]=-50.33022536; EoverN_data[3]=-49.84524039; EoverN_data[4]=-49.35220359; EoverN_data[5]=-48.86182028; EoverN_data[6]=-48.09958645; EoverN_data[7]=-46.91316330; EoverN_data[8]=-45.99364009; EoverN_data[9]=-45.32176889; EoverN_data[10]=-44.82831673; EoverN_data[11]=-44.53536928; EoverN_data[12]=-44.33907063; EoverN_data[13]=-44.11855616; EoverN_data[14]=-43.77484675; EoverN_data[15]=-43.39848968; EoverN_data[16]=-42.77924835; EoverN_data[17]=-42.43766022; EoverN_data[18]=-42.02495748; EoverN_data[19]=-41.37946381; EoverN_data[20]=-40.68265595; EoverN_data[21]=-38.73909970;  
+      break;
+      default:
+        fatal_error("Couldn't find EoverN from electron molar fraction data in _EoverN_from_Te_chieminus_N2V3().");
     }
     int N = sizeof(Te_data)/sizeof(Te_data[0]);
     Tek[k] = ( min( Te_data[N-1], max( log( Te ), Te_data[0] ) ) );
@@ -1670,6 +1994,15 @@ double _EoverNk_from_Te(long spec, double Te){
     case SMAP_N2:
       Estar=_EoverN_from_Te_N2(Te);
     break;
+    case SMAP_N2v1:
+      Estar=_EoverN_from_Te_N2v1(Te);
+    break;
+    case SMAP_N2v2:
+      Estar=_EoverN_from_Te_N2v2(Te);
+    break;
+    case SMAP_N2v3:
+      Estar=_EoverN_from_Te_N2v3(Te);
+    break;
     case SMAP_O2:
       Estar=_EoverN_from_Te_O2(Te);
     break;
@@ -1712,6 +2045,15 @@ double _EoverNk_from_Te_chieminus(long spec, double Te, double chieminus){
   switch (smap[spec]){
     case SMAP_N2:
       Estar=_EoverN_from_Te_chieminus_N2(Te, chieminus);
+    break;
+    case SMAP_N2v1:
+      Estar=_EoverN_from_Te_chieminus_N2v1(Te, chieminus);
+    break;
+    case SMAP_N2v2:
+      Estar=_EoverN_from_Te_chieminus_N2v2(Te, chieminus);
+    break;
+    case SMAP_N2v3:
+      Estar=_EoverN_from_Te_chieminus_N2v3(Te, chieminus);
     break;
     case SMAP_O2:
       Estar=_EoverN_from_Te_chieminus_O2(Te, chieminus);
