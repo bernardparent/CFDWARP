@@ -7,6 +7,25 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 DEC 03c
+  * in model/fluid/_Navier-Stokes_plasma/fluid.c
+    - added TEMODEL_TRANSPORT_RODRIGUEZ2026
+  * in model/fluid/_Navier-Stokes_plasma/fluid.h
+    - added TEMODEL_TRANSPORT_RODRIGUEZ2026
+  * in model/fluid/_Navier-Stokes_plasma/fluid_plasma.c
+    - added TEMODEL_TRANSPORT_RODRIGUEZ2026
+  * in model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Semfield(), added N2VIBMODEL_RODRIGUEZ2026
+    - added find_Qe_Rodriguez2026()
+    - in find_Qe() added call to find_Qe_Rodriguez2026()
+    - in find_Se(), added call to find_Qe_Rodriguez2026()
+    - added find_dSe_dU_transport_Rodriguez2026()
+    - in find_dSe_dU(),added call to find_dSe_dU_transport_Rodriguez2026()
+    - in find_dSemfield_dU(), added code for N2VIBMODEL_RODRIGUEZ2026()
+  * in model/thermo/_generic/electronimpact.c
+    - changed 'double' to 'static double' for the functions _EoverN_from_Te_chieminus_N2v*()
+
+
 2025 DEC 03b
   * in model/thermo/_generic/electronimpact.c
     - added _EoverN_from_Te_N2v1(), _EoverN_from_Te_N2v2() and _EoverN_from_Te_N2v3()

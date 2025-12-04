@@ -905,7 +905,7 @@ Compute the influence of the ionization degree on E/N vs Te for N2v1
 E/N vs Te splines are obtained for electron molar fractions of 1e-6 to 1e-2
 Given the electron molar fraction chieminus, interpolate at a given Te to find E/N 
 */
-static double _EoverN_from_Te_chieminus_N2v1(double Te, double chieminus){
+double _EoverN_from_Te_chieminus_N2v1(double Te, double chieminus){
   long k;
   double chie_data[] = {1.000E-6,1.000E-5,1.000E-4,1.000E-3,1.000E-2};
   int N_chie = sizeof(chie_data)/sizeof(chie_data[0]);
@@ -951,7 +951,7 @@ Compute the influence of the ionization degree on E/N vs Te for N2v2
 E/N vs Te splines are obtained for electron molar fractions of 1e-6 to 1e-2
 Given the electron molar fraction chieminus, interpolate at a given Te to find E/N 
 */
-static double _EoverN_from_Te_chieminus_N2v2(double Te, double chieminus){
+double _EoverN_from_Te_chieminus_N2v2(double Te, double chieminus){
   long k;
   double chie_data[] = {1.000E-6,1.000E-5,1.000E-4,1.000E-3,1.000E-2};
   int N_chie = sizeof(chie_data)/sizeof(chie_data[0]);
@@ -997,7 +997,7 @@ Compute the influence of the ionization degree on E/N vs Te for N2v3
 E/N vs Te splines are obtained for electron molar fractions of 1e-6 to 1e-2
 Given the electron molar fraction chieminus, interpolate at a given Te to find E/N
 */
-static double _EoverN_from_Te_chieminus_N2v3(double Te, double chieminus){
+double _EoverN_from_Te_chieminus_N2v3(double Te, double chieminus){
   long k;
   double chie_data[] = {1.000E-6,1.000E-5,1.000E-4,1.000E-3,1.000E-2};
   int N_chie = sizeof(chie_data)/sizeof(chie_data[0]);

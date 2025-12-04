@@ -2,6 +2,12 @@
 
 #define ELECTRONIMPACT_H
 #include <src/common.h>
+
+double _EoverN_from_Te_chieminus_N2v1(double Te, double chieminus);
+
+double _EoverN_from_Te_chieminus_N2v2(double Te, double chieminus);
+
+double _EoverN_from_Te_chieminus_N2v3(double Te, double chieminus);
   
 double _EoverN_from_Nk_Te(spec_t N, double Te);
 
