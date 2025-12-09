@@ -293,37 +293,20 @@ void find_W_rodriguez2025 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te,
   /* Metastable excitation and inverse reaction */    
   
   if (REACTION[1]){
-     if (gl->model.chem.RATE_AVERAGING) {
-       if (gl->model.chem.EXCITED_STATES) {
-          add_to_W_2r2p ( speceminus, specAr, specAr4S, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), N, W );
-          if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_W_2r2p ( speceminus, specAr4S, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf1b", &_kf1b), N, W );
-       }
-     } else {
-       if (gl->model.chem.EXCITED_STATES) {
-          add_to_W_2r2p ( speceminus, specAr, specAr4S, speceminus, _kf1(np,gl,Te), N, W);
-          if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_W_2r2p ( speceminus, specAr4S, specAr, speceminus, _kf1b(np,gl,Te), N, W);
-       }
-     } 
+     add_to_W_2r2p ( speceminus, specAr, specAr4S, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), N, W );
+     if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_W_2r2p ( speceminus, specAr4S, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf1b", &_kf1b), N, W );
   }
 
   /* Ground ionization */
 
   if (REACTION[2]){
-     if (gl->model.chem.RATE_AVERAGING){
-       add_to_W_2r3p ( speceminus, specAr, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), N, W );
-     } else {
-       add_to_W_2r3p ( speceminus, specAr, specArplus, speceminus, speceminus, _kf2(np,gl,Te), N, W );
-     }
+     add_to_W_2r3p ( speceminus, specAr, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), N, W );
   }
 
   /* Stepwise ionization */
 
   if (REACTION[3]){
-     if (gl->model.chem.RATE_AVERAGING){
-       if (gl->model.chem.EXCITED_STATES) add_to_W_2r3p ( speceminus, specAr4S, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), N, W );
-     } else {
-       if (gl->model.chem.EXCITED_STATES) add_to_W_2r3p ( speceminus, specAr4S, specArplus, speceminus, speceminus, _kf3(np,gl,Te), N, W );
-     }
+     add_to_W_2r3p ( speceminus, specAr4S, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), N, W );
   }
 
   /* Penning ionization */  
@@ -346,7 +329,7 @@ void find_dW_dx_rodriguez2025 ( np_t np, gl_t *gl, spec_t rhok, double T, double
   long k, s;                    /* counters */
   spec_t X, N, Nlimit;
   double R;
-  double dkfdTe,dkfdT,dkfdTv;
+  double dkfdTe,dkbdTe,dkfdT,dkfdTv,dTe;
   
   if (gl->model.chem.TE_FROM_TOWNSEND) Te=_Te_from_rhok_EoverN(rhok, Estar);  
 
@@ -369,6 +352,7 @@ void find_dW_dx_rodriguez2025 ( np_t np, gl_t *gl, spec_t rhok, double T, double
 
   /* find properties needed by add_to_dW* functions in proper units */
   R=Rchem;
+  dTe=0.001*Te;
   
   for ( k = 0; k < ns; k++ ) {
     N[k] = rhok[k] / _calM ( k ) * 1e-6 * calA; /* particules/cm^3 */
@@ -378,42 +362,26 @@ void find_dW_dx_rodriguez2025 ( np_t np, gl_t *gl, spec_t rhok, double T, double
   /* Ar electron impact reactions */    
   
   if (REACTION[1]){
-     dkfdTe = 0.0;
+     dkfdTe = (_kf1(np,gl,Te+dTe)-_kf1(np,gl,Te))/dTe;
+     dkbdTe = (_kf1b(np,gl,Te+dTe)-_kf1b(np,gl,Te))/dTe;
      dkfdT = 0.0;
      dkfdTv = 0.0;
-     if (gl->model.chem.RATE_AVERAGING) {
-        if (gl->model.chem.EXCITED_STATES) {
-          add_to_dW_2r2p ( speceminus, specAr, specAr4S, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-          if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_dW_2r2p ( speceminus, specAr4S, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf1b", &_kf1b), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-        }
-     } else {
-       if (gl->model.chem.EXCITED_STATES) {
-          add_to_dW_2r2p ( speceminus, specAr, specAr4S, speceminus, _kf1(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-          if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_dW_2r2p ( speceminus, specAr4S, specAr, speceminus, _kf1b(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-       }
-     } 
+     add_to_dW_2r2p ( speceminus, specAr, specAr4S, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
+     if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_dW_2r2p ( speceminus, specAr4S, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf1b", &_kf1b), N, dkfdT, dkfdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
   }
 
   if (REACTION[2]){
-     dkfdTe = 0.0;
+     dkfdTe = (_kf2(np,gl,Te+dTe)-_kf2(np,gl,Te))/dTe;
      dkfdT = 0.0;
      dkfdTv = 0.0;
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dW_2r3p ( speceminus, specAr, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-     } else {
-       add_to_dW_2r3p ( speceminus, specAr, specArplus, speceminus, speceminus, _kf2(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-     }
+     add_to_dW_2r3p ( speceminus, specAr, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
   }
 
   if (REACTION[3]){
-     dkfdTe = 0.0;
+     dkfdTe = (_kf3(np,gl,Te+dTe)-_kf3(np,gl,Te))/dTe;
      dkfdT = 0.0;
      dkfdTv = 0.0;
-     if (gl->model.chem.RATE_AVERAGING) {
-       if (gl->model.chem.EXCITED_STATES) add_to_dW_2r3p ( speceminus, specAr4S, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-     } else {
-       if (gl->model.chem.EXCITED_STATES) add_to_dW_2r3p ( speceminus, specAr4S, specArplus, speceminus, speceminus, _kf3(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-     }
+     add_to_dW_2r3p ( speceminus, specAr4S, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
   }
 
   /* Penning ionization */
@@ -438,27 +406,15 @@ void find_Qei_rodriguez2025(np_t np, gl_t *gl, spec_t rhok, double Estar, double
   if (gl->model.chem.TE_FROM_TOWNSEND) Te=_Te_from_rhok_EoverN(rhok, Estar);  
 
   if (REACTION[1]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-        if (gl->model.chem.EXCITED_STATES) add_to_Qei(gl,Te, specAr, 11.6, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), rhok, Qei);
-     } else {
-        if (gl->model.chem.EXCITED_STATES) add_to_Qei(gl,Te, specAr, 11.6, _kf1(np,gl,Te), rhok, Qei); // Ar->Ar(4s) (11.6 eV)
-     }
+    add_to_Qei(gl,Te, specAr, 11.6, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), rhok, Qei); // Ar->Ar(4s) (11.6 eV)
   }
 
   if (REACTION[2]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_Qei(gl,Te, specAr, _ionizationpot(specAr), _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), rhok, Qei);
-     } else {
-       add_to_Qei(gl,Te, specAr, _ionizationpot(specAr), _kf2(np,gl,Te), rhok, Qei); // ground ionization 15.8 eV
-     } 
+    add_to_Qei(gl,Te, specAr, _ionizationpot(specAr), _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), rhok, Qei); // ground ionization 15.8 eV
   }
 
   if (REACTION[3]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       if (gl->model.chem.EXCITED_STATES) add_to_Qei(gl,Te, specAr4S, 4.2, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), rhok, Qei);
-     } else {
-       if (gl->model.chem.EXCITED_STATES) add_to_Qei(gl,Te, specAr4S, 4.2, _kf3(np,gl,Te), rhok, Qei); // Ar(4s)->Ar+ (15.8 - 11.6 = 4.2 eV)
-     } 
+    add_to_Qei(gl,Te, specAr4S, 4.2, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), rhok, Qei); // Ar(4s)->Ar+ (15.8 - 11.6 = 4.2 eV)
   }
 
 }
@@ -474,27 +430,15 @@ void find_dQei_dx_rodriguez2025(np_t np, gl_t *gl, spec_t rhok, double Estar, do
   *dQeidTe=0.0;  
 
   if (REACTION[1]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dQei(gl,Te, specAr, 11.6,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), 0.0,  rhok, dQeidrhok, dQeidTe);
-     } else {
-       add_to_dQei(gl,Te, specAr, 11.6, _kf1(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe); // Ar->Ar(4s) (11.6 eV)
-     } 
+    add_to_dQei(gl,Te, specAr, 11.6,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), 0.0,  rhok, dQeidrhok, dQeidTe); // Ar->Ar(4s) (11.6 eV)
   }
 
   if (REACTION[2]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dQei(gl,Te, specAr, _ionizationpot(specAr),  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), 0.0,  rhok, dQeidrhok, dQeidTe);
-     } else {
-       add_to_dQei(gl,Te, specAr, _ionizationpot(specAr), _kf2(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe); // ground ionization 15.8 eV
-     } 
+    add_to_dQei(gl,Te, specAr, _ionizationpot(specAr),  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), 0.0,  rhok, dQeidrhok, dQeidTe); // ground ionization 15.8 eV
   }
 
   if (REACTION[3]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       if (gl->model.chem.EXCITED_STATES) add_to_dQei(gl,Te, specAr4S, 4.2,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), 0.0,  rhok, dQeidrhok, dQeidTe);
-     } else {
-       if (gl->model.chem.EXCITED_STATES) add_to_dQei(gl,Te, specAr4S, 4.2, _kf3(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe); // Ar(4s)->Ar+ (15.8 - 11.6 = 4.2 eV)
-     } 
+    add_to_dQei(gl,Te, specAr4S, 4.2,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), 0.0,  rhok, dQeidrhok, dQeidTe); // Ar(4s)->Ar+ (15.8 - 11.6 = 4.2 eV
   }
 
 }

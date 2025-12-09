@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 DEC 09a
+  * in model/chem/_Ar_Plasma_4s/
+    - got rid of gl->model.chem.RATE_AVERAGING
+  * in model/chem/_Ar_Plasma_4s/rodriguez2025.c
+    - in find_dW_dx_rodriguez2025(), added the dWdTe terms that were missing
+  * in model/share/transport_share.c
+    - in _mueNk_from_Te_ParentMacheret(), added SMAP_N2v1, ..., SMAP_N2v9 to the call to _mueN_N2()
+      
+
 2025 DEC 03c
   * in model/fluid/_Navier-Stokes_plasma/fluid.c
     - added TEMODEL_TRANSPORT_RODRIGUEZ2026

@@ -45,9 +45,7 @@ void write_model_chem_template(FILE **controlfile){
     "    CHEMMODEL=CHEMMODEL_RODRIGUEZ2025;\n"
     "    QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}\n"
     "    TE_FROM_TOWNSEND=FALSE; {find electron temperature from E/N using local approximation}\n"
-    "    EXCITED_STATES=FALSE; {test the effect of Argon excited state 4s}\n"
     "    SUPERELASTIC_COLLISIONS=FALSE; {test the effect of backward reaction rates}\n"
-    "    RATE_AVERAGING=FALSE;\n"
     "    EoverNmin=1e-99; {Vm2}\n"
     "  );\n"
   ,_CHEM_ACTIONNAME);
@@ -81,9 +79,7 @@ void read_model_chem_actions(char *actionname, char **argum, SOAP_codex_t *codex
       SOAP_fatal_error(codex,"CHEMMODEL must be set to either CHEMMODEL_RODRIGUEZ2025 or CHEMMODEL_NONE.");
     find_bool_var_from_codex(codex,"QEISOURCETERMS",&gl->model.chem.QEISOURCETERMS);
     find_bool_var_from_codex(codex,"TE_FROM_TOWNSEND",&gl->model.chem.TE_FROM_TOWNSEND);
-    find_bool_var_from_codex(codex,"EXCITED_STATES",&gl->model.chem.EXCITED_STATES);
     find_bool_var_from_codex(codex,"SUPERELASTIC_COLLISIONS",&gl->model.chem.SUPERELASTIC_COLLISIONS);
-    find_bool_var_from_codex(codex,"RATE_AVERAGING",&gl->model.chem.RATE_AVERAGING);
     find_double_var_from_codex(codex,"EoverNmin",&gl->model.chem.EoverNmin);
 
     SOAP_clean_added_vars(codex,numvarsinit);

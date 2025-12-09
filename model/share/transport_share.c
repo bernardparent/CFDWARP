@@ -1216,6 +1216,14 @@ double _mueNk_from_Te_ParentMacheret(long spec, double Te){
   double mueN;
   switch (smap[spec]){
     case SMAP_N2:
+    case SMAP_N2v1:
+    case SMAP_N2v2:
+    case SMAP_N2v3:
+    case SMAP_N2v4:
+    case SMAP_N2v5:
+    case SMAP_N2v6:
+    case SMAP_N2v7:
+    case SMAP_N2v8:
       mueN=_mueN_N2(Te);
     break;
     case SMAP_O2:

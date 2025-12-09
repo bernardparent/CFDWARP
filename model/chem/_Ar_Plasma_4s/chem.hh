@@ -63,7 +63,7 @@ const static long speciestype[ns] = {
 
 typedef struct {
   int CHEMMODEL;
-  bool QEISOURCETERMS,TE_FROM_TOWNSEND, EXCITED_STATES, SUPERELASTIC_COLLISIONS, RATE_AVERAGING;
+  bool QEISOURCETERMS,TE_FROM_TOWNSEND,SUPERELASTIC_COLLISIONS;
   double EoverNmin;
 } gl_model_chem_t;
 
