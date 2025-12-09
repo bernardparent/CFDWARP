@@ -234,8 +234,8 @@ void runtime_actions_cycle_specific(char *actionname, char **argum, SOAP_codex_t
     period=SOAP_get_argum_double(codex,*argum,0);
     alpha=SOAP_get_argum_double(codex,*argum,1);
     if (alpha>0.99999999999) fatal_error("In the action ResetRelaxedAveragedRates(), alpha can not be set higher than 0.99999999999.");
-    if (alpha<0.0) fatal_error("In the action ResetRelaxedAveragedRates(), alpha can not be set lowers than 0.0.");
-    gl->averagedrates_time=period*alpha/(1.0-alpha);
+    if (alpha<0.0) fatal_error("In the action ResetRelaxedAveragedRates(), alpha can not be set lower than 0.0.");
+    gl->averagedrates_time=period*(1.0-alpha)/alpha;
     codex->ACTIONPROCESSED=TRUE;
   }
 

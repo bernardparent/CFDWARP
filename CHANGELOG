@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 DEC 09b
+  * in cycle/_standard/cycle.c
+    - in runtime_actions_cycle_specific(), fixed a bug in the action ResetRelaxedAveragedRates()
+      related to the multiplicator of the averaged rates time function of alpha
+      
+
 2025 DEC 09a
   * in model/chem/_Ar_Plasma_4s/
     - got rid of gl->model.chem.RATE_AVERAGING
