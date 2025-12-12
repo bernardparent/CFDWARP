@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cycle/_cycle.h>
 #include <cycle/share/cycle_share.h>
 #include <src/bdry.h>
-
+#include <model/share/emfield_share.h>
 
 #define FSTAR_METRICS_INTERFACE 0
 #define FSTAR_METRICS_EXTRAPOLATED 1
@@ -1346,6 +1346,57 @@ static void integrate_pressure_force_on_bdry(np_t *np, gl_t *gl, zone_t zone,
 
 #endif
 
+
+#ifdef EMFIELD
+
+static void integrate_Jtotal_to_surface_on_bdry(np_t *np, gl_t *gl, zone_t zone,
+                                                double *Jtot, long BDRYTYPE){
+  long i,j,k;
+  long theta,thetasgn;
+  long l;
+  metrics_t metricsp1h;
+  double Jtstar;
+#ifdef DISTMPI
+  int rank;
+  double tempsum;
+#endif
+
+#ifdef DISTMPI
+  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+#endif
+  *Jtot=0.0;
+  for_ijk(zone,is,js,ks,ie,je,ke){
+        l=_ai(gl,i,j,k);
+#ifdef DISTMPI
+        if (_node_rank(gl,i,j,k)==rank) {
+#endif
+          if (_node_type(np[l], TYPELEVEL_FLUID)==BDRYTYPE) {
+            if (find_bdry_direc(np, gl, l, TYPELEVEL_FLUID, &theta, &thetasgn)) {
+              if (thetasgn>0) {
+                find_metrics_at_interface(np, gl, _al(gl,l,theta,+0), _al(gl,l,theta,+1), theta, &metricsp1h);
+                Jtstar=_Jtstar_interface(np, gl, metricsp1h, l, theta);
+              } else { 
+                find_metrics_at_interface(np, gl, _al(gl,l,theta,-1), _al(gl,l,theta,+0), theta, &metricsp1h);
+                Jtstar=_Jtstar_interface(np, gl, metricsp1h, _al(gl,l,theta,thetasgn), theta);              
+              }
+              (*Jtot)+=metricsp1h.Omega*thetasgn*Jtstar;
+            }
+          }
+#ifdef DISTMPI
+        }
+#endif
+  }
+  /* here sum up all the contributions in heat_to_surface from the different processes */
+#ifdef DISTMPI
+  MPI_Allreduce(&(*Jtot), &tempsum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+  *Jtot=tempsum;
+#endif
+}
+#endif
+
+
+
 #if (fluxet>=0)
 static void integrate_metotal(np_t *np, gl_t *gl, zone_t zone, double *metotal){
   long i,j,k;
@@ -1487,6 +1538,7 @@ void write_post_template(FILE **controlfile){
   "  fprintf(postfilename,\"Qbeam     = %%+E W"if2D("/m")"\\n\",_Qbeam(is,js,"if3D("ks,")" ie,je"if3D(",ke")"));\n"
   "  fprintf(postfilename,\"EdotJ     = %%+E W"if2D("/m")"\\n\",_EdotJ(is,js,"if3D("ks,")" ie,je"if3D(",ke")"));\n"
   "  fprintf(postfilename,\"Wemfield  = %%+E W"if2D("/m")"\\n\",_Wemfield(is,js,"if3D("ks,")" ie,je"if3D(",ke")")); {Wemfield=Femfield dot Vn}\n"
+  "  fprintf(postfilename,\"Jtot      = %%+E A\\n\",_Jtot(is,js,"if3D("ks,")" ie,je,"if3D("ke,")" BDRY_WALLTFIXED1));\n"
 #endif
   "  fprintf(postfilename,\"\\n\");\n"
   "  {\n"
@@ -1915,7 +1967,7 @@ static void read_post_functions(char *functionname, char **argum,
 #endif
 #ifdef EMFIELD
   dim_t Femfield;
-  double Qbeam,EdotJ,Wemfield;
+  double Jtot,Qbeam,EdotJ,Wemfield;
 #endif
   int eos=EOS;
  
@@ -2130,6 +2182,16 @@ static void read_post_functions(char *functionname, char **argum,
     *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
     integrate_emfield_work(np, &gl, *domain_post, &Wemfield);
     sprintf(*returnstr,"%E",Wemfield);
+  }
+
+  if (strcmp(functionname,"_Jtot")==0) {
+    if (SOAP_number_argums(*argum)!=2*nd+1) SOAP_fatal_error(codex,"_Jtot() expects the following arguments: the zone limits [is,js,"if3D("ks,")" ie,je"if3D(",ke")"], and the boundary condition type of the surface [eg. BDRY_WALLTFIXED1, BDRY_SYMMETRICAL1, etc].");
+    SOAP_substitute_all_argums(argum,codex);
+    find_zone_from_argum(*argum, 0, &gl, codex, domain_post);
+    BDRYTYPE_SURFACE=SOAP_get_argum_long(codex,*argum,2*nd);
+    *returnstr=(char *)realloc(*returnstr,40*sizeof(char));
+    integrate_Jtotal_to_surface_on_bdry(np, &gl, *domain_post, &Jtot, BDRYTYPE_SURFACE);
+    sprintf(*returnstr,"%E",Jtot);
   }
 
 #endif

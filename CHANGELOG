@@ -7,6 +7,12 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2025 DEC 12a
+  * in src/post.c
+    - added integrate_Jtotal_to_surface_on_bdry()
+    - in read_post_functions(), added function _Jtot()
+    
+
 2025 DEC 09b
   * in cycle/_standard/cycle.c
     - in runtime_actions_cycle_specific(), fixed a bug in the action ResetRelaxedAveragedRates()
