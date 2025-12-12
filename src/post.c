@@ -1235,11 +1235,11 @@ static void integrate_heat_to_surface_on_bdry(np_t *np, gl_t *gl, zone_t zone,
                   find_metrics_at_interface(np, gl, _al(gl,l,theta,-1), _al(gl,l,theta,+0), theta, &metricsp1h);
 
                 find_Kstar_interface(np,gl,_al(gl,l,theta,+0),_al(gl,l,theta,thetasgn),metricsp1h,theta,vartheta,Kp1h,CYCLELEVEL_RES);
-                for (row=0; row<nf; row++){
+                /*for (row=0; row<nf; row++){
                   for (col=0; col<nf; col++){
                     if (row!=col) Kp1h[row][col]=0.0;
                   }
-                }
+                }*/
                 if (theta==vartheta) {
                   find_G(np[_al(gl,l,theta,thetasgn)],gl,Gp1);
                   find_G(np[_al(gl,l,theta,+0)],gl,Gp0);

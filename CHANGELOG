@@ -7,6 +7,13 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+
+2025 DEC 12b
+  * in src/post.c
+    - in integrate_heat_to_surface_on_bdry(), removed the code that made the K matrix diagonal
+      (and removed the contributions to the heat flux coming from mass diffusion)
+
+
 2025 DEC 12a
   * in src/post.c
     - added integrate_Jtotal_to_surface_on_bdry()
