@@ -606,97 +606,50 @@ void find_W_rodriguez2025 ( np_t np, gl_t *gl, spec_t rhok, double T, double Te,
   /* Ar electron impact reactions */    
   
   if (REACTION[1]){
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_W_2r2p ( speceminus, specAr, specAr4S, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), N, W );
-       if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_W_2r2p ( speceminus, specAr4S, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf1b", &_kf1b), N, W );
-     } else {
-       add_to_W_2r2p ( speceminus, specAr, specAr4S, speceminus, _kf1(np,gl,Te), N, W);
-       if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_W_2r2p ( speceminus, specAr4S, specAr, speceminus, _kf1b(np,gl,Te), N, W);
-     } 
+     add_to_W_2r2p ( speceminus, specAr, specAr4S, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), N, W );
+     if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_W_2r2p ( speceminus, specAr4S, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf1b", &_kf1b), N, W );
   }
 
   if (REACTION[2]){
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_W_2r2p ( speceminus, specAr, specAr4P, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), N, W );
-       if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_W_2r2p ( speceminus, specAr4P, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf2b", &_kf2b), N, W );
-     } else {
-       add_to_W_2r2p ( speceminus, specAr, specAr4P, speceminus, _kf2(np,gl,Te), N, W );
-       if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_W_2r2p ( speceminus, specAr4P, specAr, speceminus, _kf2b(np,gl,Te), N, W);
-     } 
+     add_to_W_2r2p ( speceminus, specAr, specAr4P, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), N, W );
+     if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_W_2r2p ( speceminus, specAr4P, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf2b", &_kf2b), N, W );
   }
 
   if (REACTION[3]){
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_W_2r2p ( speceminus, specAr4S, specAr4P, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), N, W );
-       if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_W_2r2p ( speceminus, specAr4P, specAr4S, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf3b", &_kf3b), N, W );
-     } else {
-       add_to_W_2r2p ( speceminus, specAr4S, specAr4P, speceminus, _kf3(np,gl,Te), N, W );
-       if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_W_2r2p ( speceminus, specAr4P, specAr4S, speceminus, _kf3b(np,gl,Te), N, W);
-     } 
+     add_to_W_2r2p ( speceminus, specAr4S, specAr4P, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), N, W );
+     if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_W_2r2p ( speceminus, specAr4P, specAr4S, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf3b", &_kf3b), N, W );
   }
 
   if (REACTION[4]){
-     if (gl->model.chem.RATE_AVERAGING){
-       add_to_W_2r3p ( speceminus, specAr, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf4", &_kf4), N, W );
-     } else {
-       add_to_W_2r3p ( speceminus, specAr, specArplus, speceminus, speceminus, _kf4(np,gl,Te), N, W );
-     }
+     add_to_W_2r3p ( speceminus, specAr, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf4", &_kf4), N, W );
   }
 
   if (REACTION[5]){
-     if (gl->model.chem.RATE_AVERAGING){
-       add_to_W_2r3p ( speceminus, specAr4S, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf5", &_kf5), N, W );
-     } else {
-       add_to_W_2r3p ( speceminus, specAr4S, specArplus, speceminus, speceminus, _kf5(np,gl,Te), N, W );
-     }
+     add_to_W_2r3p ( speceminus, specAr4S, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf5", &_kf5), N, W );
   }
 
   if (REACTION[6]){
-     if (gl->model.chem.RATE_AVERAGING){
-       add_to_W_2r3p ( speceminus, specAr4P, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf6", &_kf6), N, W );
-     } else {
-       add_to_W_2r3p ( speceminus, specAr4P, specArplus, speceminus, speceminus, _kf6(np,gl,Te), N, W );
-     }
+     add_to_W_2r3p ( speceminus, specAr4P, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf6", &_kf6), N, W );
   }
 
   if (REACTION[7]){
-     if (gl->model.chem.RATE_AVERAGING){
-       add_to_W_2r3p ( speceminus, specAr2star, specAr2plus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf7", &_kf7), N, W );
-     } else {
-       add_to_W_fw_2r3p ( speceminus, specAr2star, specAr2plus, speceminus, speceminus, 9.0000E-8 * calA * pow (TeV, -0.7), 0.7, 3.66 * R * TeV, Te, X, W );
-     }
+     add_to_W_2r3p ( speceminus, specAr2star, specAr2plus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf7", &_kf7), N, W );
   }
 
   if (REACTION[8]){
-     if (gl->model.chem.RATE_AVERAGING){
-       add_to_W_2r3p ( speceminus, specAr2star, specAr, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf8", &_kf8), N, W );
-     } else {
-       add_to_W_fw_2r3p ( speceminus, specAr2star, specAr, specAr, speceminus, 1.0000E-9 * calA, 0.0, 0.0 * R, Te, X, W );
-     }
+     add_to_W_2r3p ( speceminus, specAr2star, specAr, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf8", &_kf8), N, W );
   }
 
   if (REACTION[9]){
-     if (gl->model.chem.RATE_AVERAGING){
-       add_to_W_2r2p ( speceminus, specAr2plus, specAr4P, specAr, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2plus, "kf9", &_kf9), N, W );
-     } else {
-       add_to_W_fw_2r2p ( speceminus, specAr2plus, specAr4P, specAr, 5.4000E-8 * calA * pow (TeV, 0.66), -0.66, 0.0 * R, Te, X, W );
-     }
+     add_to_W_2r2p ( speceminus, specAr2plus, specAr4P, specAr, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2plus, "kf9", &_kf9), N, W );
   }
 
   if (REACTION[10]){
-     if (gl->model.chem.RATE_AVERAGING){
-       add_to_W_2r1p ( speceminus, specArplus, specAr4P, _averaged_rate_local(np, gl, Te, rhok, speceminus, specArplus, "kf10", &_kf10), N, W );
-     } else {
-       add_to_W_fw_2r1p ( speceminus, specArplus, specAr4P, 4.0000E-13 * calA * pow (TeV, 0.5), -0.5, 0.0 * R, Te, X, W );
-     }
+     add_to_W_2r1p ( speceminus, specArplus, specAr4P, _averaged_rate_local(np, gl, Te, rhok, speceminus, specArplus, "kf10", &_kf10), N, W );
   }
 
   if (REACTION[11]){
-     if (gl->model.chem.RATE_AVERAGING){
-       add_to_W_3r2p ( speceminus, speceminus, specArplus, specAr4P, speceminus, _averaged_rate_local_3r(np, gl, Te, rhok, speceminus, speceminus, specArplus, "kf11", &_kf11), N, W);
-     } else {
-       add_to_W_fw_3r2p ( speceminus, speceminus, specArplus, specAr4P, speceminus, 5.0000E-27 * sqr(calA) * pow (TeV, 4.5), -4.5, 0.0 * R, Te, X, W );
-     }
+     add_to_W_3r2p ( speceminus, speceminus, specArplus, specAr4P, speceminus, _averaged_rate_local_3r(np, gl, Te, rhok, speceminus, speceminus, specArplus, "kf11", &_kf11), N, W);
   }
 
   /* Penning ionization */  
@@ -741,7 +694,7 @@ void find_dW_dx_rodriguez2025 ( np_t np, gl_t *gl, spec_t rhok, double T, double
   long k, s;                    /* counters */
   spec_t X, N, Nlimit;
   double R;
-  double dkfdTe,dkfdT,dkfdTv;
+  double dkfdTe,dkbdTe,dkfdT,dkfdTv,dTe;
   
   if (gl->model.chem.TE_FROM_TOWNSEND) Te=_Te_from_rhok_EoverN(rhok, Estar);  
 
@@ -764,6 +717,7 @@ void find_dW_dx_rodriguez2025 ( np_t np, gl_t *gl, spec_t rhok, double T, double
 
   /* find properties needed by add_to_dW* functions in proper units */
   R=Rchem;
+  dTe=0.001*Te;
   
   for ( k = 0; k < ns; k++ ) {
     N[k] = rhok[k] / _calM ( k ) * 1e-6 * calA; /* particules/cm^3 */
@@ -773,130 +727,85 @@ void find_dW_dx_rodriguez2025 ( np_t np, gl_t *gl, spec_t rhok, double T, double
   /* Ar electron impact reactions */    
   
   if (REACTION[1]){
-     dkfdTe = 0.0;
+     dkfdTe = (_kf1(np,gl,Te+dTe)-_kf1(np,gl,Te))/dTe;
+     dkbdTe = (_kf1b(np,gl,Te+dTe)-_kf1b(np,gl,Te))/dTe;
      dkfdT = 0.0;
      dkfdTv = 0.0;
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dW_2r2p ( speceminus, specAr, specAr4S, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-       if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_dW_2r2p ( speceminus, specAr4S, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf1b", &_kf1b), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-     } else {
-       add_to_dW_2r2p ( speceminus, specAr, specAr4S, speceminus, _kf1(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-       if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_dW_2r2p ( speceminus, specAr4S, specAr, speceminus, _kf1b(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-     } 
+     add_to_dW_2r2p ( speceminus, specAr, specAr4S, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
+     if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_dW_2r2p ( speceminus, specAr4S, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf1b", &_kf1b), N, dkfdT, dkfdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
   }
 
   if (REACTION[2]){
-     dkfdTe = 0.0;
+     dkfdTe = (_kf2(np,gl,Te+dTe)-_kf2(np,gl,Te))/dTe;
+     dkbdTe = (_kf2b(np,gl,Te+dTe)-_kf2b(np,gl,Te))/dTe;
      dkfdT = 0.0;
      dkfdTv = 0.0;
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dW_2r2p ( speceminus, specAr, specAr4P, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-       if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_dW_2r2p ( speceminus, specAr4P, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf2b", &_kf2b), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-     } else {
-       add_to_dW_2r2p ( speceminus, specAr, specAr4P, speceminus, _kf2(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-       if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_dW_2r2p ( speceminus, specAr4P, specAr, speceminus, _kf2b(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-     } 
+     add_to_dW_2r2p ( speceminus, specAr, specAr4P, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
+     if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_dW_2r2p ( speceminus, specAr4P, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf2b", &_kf2b), N, dkfdT, dkfdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
   }  
 
   if (REACTION[3]){
-     dkfdTe = 0.0;
-     dkfdT = 0.0;
+     dkfdTe = (_kf3(np,gl,Te+dTe)-_kf3(np,gl,Te))/dTe;
+     dkbdTe = (_kf3b(np,gl,Te+dTe)-_kf3b(np,gl,Te))/dTe;
      dkfdTv = 0.0;
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dW_2r2p ( speceminus, specAr4S, specAr4P, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-       if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_dW_2r2p ( speceminus, specAr4P, specAr4S, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf3b", &_kf3b), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-     } else {
-       add_to_dW_2r2p ( speceminus, specAr4S, specAr4P, speceminus, _kf3(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-       if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_dW_2r2p ( speceminus, specAr4P, specAr4S, speceminus, _kf3b(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-     } 
+     add_to_dW_2r2p ( speceminus, specAr4S, specAr4P, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
+     if (gl->model.chem.SUPERELASTIC_COLLISIONS) add_to_dW_2r2p ( speceminus, specAr4P, specAr4S, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf3b", &_kf3b), N, dkfdT, dkfdTv, dkbdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
   }
 
   if (REACTION[4]){
-     dkfdTe = 0.0;
+     dkfdTe = (_kf4(np,gl,Te+dTe)-_kf4(np,gl,Te))/dTe;
      dkfdT = 0.0;
      dkfdTv = 0.0;
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dW_2r3p ( speceminus, specAr, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf4", &_kf4), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-     } else {
-       add_to_dW_2r3p ( speceminus, specAr, specArplus, speceminus, speceminus, _kf4(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-     }
+     add_to_dW_2r3p ( speceminus, specAr, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf4", &_kf4), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
   }
 
   if (REACTION[5]){
-     dkfdTe = 0.0;
+     dkfdTe = (_kf5(np,gl,Te+dTe)-_kf5(np,gl,Te))/dTe;
      dkfdT = 0.0;
      dkfdTv = 0.0;
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dW_2r3p ( speceminus, specAr4S, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf5", &_kf5), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-     } else {
-       add_to_dW_2r3p ( speceminus, specAr4S, specArplus, speceminus, speceminus, _kf5(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-     }
+     add_to_dW_2r3p ( speceminus, specAr4S, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf5", &_kf5), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
   }
 
   if (REACTION[6]){
-     dkfdTe = 0.0;
+     dkfdTe = (_kf6(np,gl,Te+dTe)-_kf6(np,gl,Te))/dTe;
      dkfdT = 0.0;
      dkfdTv = 0.0;
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dW_2r3p ( speceminus, specAr4P, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf6", &_kf6), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-     } else {
-       add_to_dW_2r3p ( speceminus, specAr4P, specArplus, speceminus, speceminus, _kf6(np,gl,Te), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
-     }
+     add_to_dW_2r3p ( speceminus, specAr4P, specArplus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf6", &_kf6), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe  );
   }
 
   if (REACTION[7]){
-     dkfdTe = 0.0;
+     dkfdTe =  (_kf7(np,gl,Te+dTe)-_kf7(np,gl,Te))/dTe;
      dkfdT = 0.0;
      dkfdTv = 0.0;
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dW_2r3p ( speceminus, specAr2star, specAr2plus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf7", &_kf7), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
-     } else {
-       add_to_dW_fw_2r3p ( speceminus, specAr2star, specAr2plus, speceminus, speceminus, 9.0000E-8 * calA * pow (TeV, -0.7), 0.7, 3.66 * R * TeV, Te, X, dWdTe, dWdrhok );
-     }
+     add_to_dW_2r3p ( speceminus, specAr2star, specAr2plus, speceminus, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf7", &_kf7), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
   }
 
   if (REACTION[8]){
      dkfdTe = 0.0;
      dkfdT = 0.0;
      dkfdTv = 0.0;
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dW_2r3p ( speceminus, specAr2star, specAr, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf8", &_kf8), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
-     } else {
-       add_to_dW_fw_2r3p ( speceminus, specAr2star, specAr, specAr, speceminus, 1.0000E-9 * calA, 0.0, 0.0 * R, Te, X, dWdTe, dWdrhok );
-     }
+     add_to_dW_2r3p ( speceminus, specAr2star, specAr, specAr, speceminus, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf8", &_kf8), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
   }
 
   if (REACTION[9]){
-     dkfdTe = 0.0;
+     dkfdTe = (_kf9(np,gl,Te+dTe)-_kf9(np,gl,Te))/dTe;
      dkfdT = 0.0;
      dkfdTv = 0.0;
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dW_2r2p ( speceminus, specAr2plus, specAr4P, specAr, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2plus, "kf9", &_kf9), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
-     } else {
-       add_to_dW_fw_2r2p ( speceminus, specAr2plus, specAr4P, specAr, 5.4000E-8 * calA * pow (TeV, 0.66), -0.66, 0.0 * R, Te, X, dWdTe, dWdrhok );
-     }
+     add_to_dW_2r2p ( speceminus, specAr2plus, specAr4P, specAr, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2plus, "kf9", &_kf9), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
   }
 
   if (REACTION[10]){
-     dkfdTe = 0.0;
+     dkfdTe = (_kf10(np,gl,Te+dTe)-_kf10(np,gl,Te))/dTe;
      dkfdT = 0.0;
      dkfdTv = 0.0;
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dW_2r1p ( speceminus, specArplus, specAr4P, _averaged_rate_local(np, gl, Te, rhok, speceminus, specArplus, "kf10", &_kf10), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
-     } else {
-       add_to_dW_fw_2r1p ( speceminus, specArplus, specAr4P, 4.0000E-13 * calA * pow (TeV, 0.5), -0.5, 0.0 * R, Te, X, dWdTe, dWdrhok );
-     }
+     add_to_dW_2r1p ( speceminus, specArplus, specAr4P, _averaged_rate_local(np, gl, Te, rhok, speceminus, specArplus, "kf10", &_kf10), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
   }
 
   if (REACTION[11]){
-     dkfdTe = 0.0;
+     dkfdTe = (_kf11(np,gl,Te+dTe)-_kf11(np,gl,Te))/dTe;
      dkfdT = 0.0;
      dkfdTv = 0.0;
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dW_3r2p ( speceminus, speceminus, specArplus, specAr4P, speceminus, _averaged_rate_local_3r(np, gl, Te, rhok, speceminus, speceminus, specArplus, "kf11", &_kf11), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
-     } else {
-      add_to_dW_fw_3r2p ( speceminus, speceminus, specArplus, specAr4P, speceminus, 5.0000E-27 * sqr(calA) * pow (TeV, 4.5), -4.5, 0.0 * R, Te, X, dWdTe, dWdrhok );
-     }
+     add_to_dW_3r2p ( speceminus, speceminus, specArplus, specAr4P, speceminus, _averaged_rate_local_3r(np, gl, Te, rhok, speceminus, speceminus, specArplus, "kf11", &_kf11), N, dkfdT, dkfdTv, dkfdTe, dWdrhok, dWdT, dWdTv, dWdTe );
   }
 
   /* Penning ionization */
@@ -943,67 +852,35 @@ void find_Qei_rodriguez2025(np_t np, gl_t *gl, spec_t rhok, double Estar, double
   if (gl->model.chem.TE_FROM_TOWNSEND) Te=_Te_from_rhok_EoverN(rhok, Estar);  
 
   if (REACTION[1]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_Qei(gl,Te, specAr, 11.6, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), rhok, Qei);
-     } else {
-       add_to_Qei(gl,Te, specAr, 11.6, _kf1(np,gl,Te), rhok, Qei); // Ar->Ar(4s) (11.6 eV)
-     }
+    add_to_Qei(gl,Te, specAr, 11.6, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), rhok, Qei);
   }
 
   if (REACTION[2]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_Qei(gl,Te, specAr, 13.1, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), rhok, Qei);
-     } else {
-       add_to_Qei(gl,Te, specAr, 13.1, _kf2(np,gl,Te), rhok, Qei); // Ar->Ar(4p) (13.1 eV)
-     }
+    add_to_Qei(gl,Te, specAr, 13.1, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), rhok, Qei);
   }
 
   if (REACTION[3]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_Qei(gl,Te, specAr4S, 1.5, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), rhok, Qei);
-     } else {
-       add_to_Qei(gl,Te, specAr4S, 1.5, _kf3(np,gl,Te), rhok, Qei); // Ar(4s)->Ar(4p) (1.5 eV)
-     }
+    add_to_Qei(gl,Te, specAr4S, 1.5, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), rhok, Qei);
   }
 
   if (REACTION[4]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_Qei(gl,Te, specAr, _ionizationpot(specAr), _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf4", &_kf4), rhok, Qei);
-     } else {
-       add_to_Qei(gl,Te, specAr, _ionizationpot(specAr), _kf4(np,gl,Te), rhok, Qei); // ground ionization 15.8 eV
-     } 
+    add_to_Qei(gl,Te, specAr, _ionizationpot(specAr), _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf4", &_kf4), rhok, Qei);
   }
 
   if (REACTION[5]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_Qei(gl,Te, specAr4S, 4.2, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf5", &_kf5), rhok, Qei);
-     } else {
-       add_to_Qei(gl,Te, specAr4S, 4.2, _kf5(np,gl,Te), rhok, Qei); // Ar(4s)->Ar+ (15.8 - 11.6 = 4.2 eV)
-     } 
+    add_to_Qei(gl,Te, specAr4S, 4.2, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf5", &_kf5), rhok, Qei);
   }
 
   if (REACTION[6]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_Qei(gl,Te, specAr4P, 2.7, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf6", &_kf6), rhok, Qei);
-     } else {
-       add_to_Qei(gl,Te, specAr4P, 2.7, _kf6(np,gl,Te), rhok, Qei); // Ar(4p)->Ar+ (15.8 - 13.1 = 2.7 eV)
-     } 
+    add_to_Qei(gl,Te, specAr4P, 2.7, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf6", &_kf6), rhok, Qei);
   }
 
   if (REACTION[7]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_Qei(gl,Te, specAr2star, 4.2, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf7", &_kf7), rhok, Qei);
-     } else {
-       add_to_Qei(gl,Te, specAr2star, 4.2, 9.0000E-8 * pow (TeV, -0.7) * pow (Te, 0.7) * exp ( -3.66 * TeV / Te ), rhok, Qei); // (15.8 - 11.6 = 4.2 eV) estimate assuming Ar2* = Ar-Ar(4s)
-     } 
+    add_to_Qei(gl,Te, specAr2star, 4.2, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf7", &_kf7), rhok, Qei);
   }
 
   if (REACTION[8]) {     
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_Qei(gl,Te, specAr2star, 4.2, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf8", &_kf8), rhok, Qei);
-     } else {
-       add_to_Qei(gl,Te, specAr2star, 4.2, 1.0000E-9, rhok, Qei); // (15.8 - 11.6 = 4.2 eV) estimate assuming Ar2* = Ar-Ar(4s)
-     } 
+    add_to_Qei(gl,Te, specAr2star, 4.2, _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf8", &_kf8), rhok, Qei);
   }
   
 }
@@ -1019,67 +896,35 @@ void find_dQei_dx_rodriguez2025(np_t np, gl_t *gl, spec_t rhok, double Estar, do
   *dQeidTe=0.0;  
 
   if (REACTION[1]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dQei(gl,Te, specAr, 11.6,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), 0.0,  rhok, dQeidrhok, dQeidTe);
-     } else {
-       add_to_dQei(gl,Te, specAr, 11.6, _kf1(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe); // Ar->Ar(4s) (11.6 eV)
-     } 
+    add_to_dQei(gl,Te, specAr, 11.6,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf1", &_kf1), 0.0,  rhok, dQeidrhok, dQeidTe);
   }
 
   if (REACTION[2]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dQei(gl,Te, specAr, 13.1,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), 0.0,  rhok, dQeidrhok, dQeidTe);
-     } else {
-       add_to_dQei(gl,Te, specAr, 13.1, _kf2(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe); // Ar->Ar(4p) (13.1 eV)
-     } 
+    add_to_dQei(gl,Te, specAr, 13.1,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf2", &_kf2), 0.0,  rhok, dQeidrhok, dQeidTe);
   }
 
   if (REACTION[3]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dQei(gl,Te, specAr4S, 1.5,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), 0.0,  rhok, dQeidrhok, dQeidTe);
-     } else {
-       add_to_dQei(gl,Te, specAr4S, 1.5, _kf3(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe); // Ar(4s)->Ar(4p) (1.5 eV)
-     } 
+    add_to_dQei(gl,Te, specAr4S, 1.5,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf3", &_kf3), 0.0,  rhok, dQeidrhok, dQeidTe);
   }
 
   if (REACTION[4]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dQei(gl,Te, specAr, _ionizationpot(specAr),  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf4", &_kf4), 0.0,  rhok, dQeidrhok, dQeidTe);
-     } else {
-       add_to_dQei(gl,Te, specAr, _ionizationpot(specAr), _kf4(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe); // ground ionization 15.8 eV
-     } 
+    add_to_dQei(gl,Te, specAr, _ionizationpot(specAr),  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr, "kf4", &_kf4), 0.0,  rhok, dQeidrhok, dQeidTe);
   }
 
   if (REACTION[5]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dQei(gl,Te, specAr4S, 4.2,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf5", &_kf5), 0.0,  rhok, dQeidrhok, dQeidTe);
-     } else {
-       add_to_dQei(gl,Te, specAr4S, 4.2, _kf5(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe); // Ar(4s)->Ar+ (15.8 - 11.6 = 4.2 eV)
-     } 
+    add_to_dQei(gl,Te, specAr4S, 4.2,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4S, "kf5", &_kf5), 0.0,  rhok, dQeidrhok, dQeidTe);
   }
 
   if (REACTION[6]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dQei(gl,Te, specAr4P, 2.7,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf6", &_kf6), 0.0,  rhok, dQeidrhok, dQeidTe);
-     } else {
-       add_to_dQei(gl,Te, specAr4P, 2.7, _kf6(np,gl,Te), 0.0,  rhok, dQeidrhok, dQeidTe); // Ar(4p)->Ar+ (15.8 - 13.1 = 2.7 eV)
-     } 
+    add_to_dQei(gl,Te, specAr4P, 2.7,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr4P, "kf6", &_kf6), 0.0,  rhok, dQeidrhok, dQeidTe);
   }
 
   if (REACTION[7]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dQei(gl,Te, specAr2star, 4.2,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf7", &_kf7), 0.0,  rhok, dQeidrhok, dQeidTe);
-     } else {
-       add_to_dQei(gl,Te, specAr2star, 4.2, 9.0000E-8 * pow (TeV, -0.7) * pow (Te, 0.7) * exp ( -3.66 * TeV / Te ), 0.0,  rhok, dQeidrhok, dQeidTe); // (15.8 - 11.6 = 4.2 eV) estimate assuming Ar2* = Ar-Ar(4s)
-     } 
+    add_to_dQei(gl,Te, specAr2star, 4.2,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf7", &_kf7), 0.0,  rhok, dQeidrhok, dQeidTe);
   }
 
   if (REACTION[8]) {
-     if (gl->model.chem.RATE_AVERAGING) {
-       add_to_dQei(gl,Te, specAr2star, 4.2,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf8", &_kf8), 0.0,  rhok, dQeidrhok, dQeidTe);
-     } else {
-       add_to_dQei(gl,Te, specAr2star, 4.2, 1.0000E-9, 0.0,  rhok, dQeidrhok, dQeidTe); // (15.8 - 11.6 = 4.2 eV) estimate assuming Ar2* = Ar-Ar(4s)
-     } 
+    add_to_dQei(gl,Te, specAr2star, 4.2,  _averaged_rate_local(np, gl, Te, rhok, speceminus, specAr2star, "kf8", &_kf8), 0.0,  rhok, dQeidrhok, dQeidTe);
   }
 
 }
