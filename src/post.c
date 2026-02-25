@@ -1203,7 +1203,7 @@ static void integrate_heat_to_surface_on_bdry(np_t *np, gl_t *gl, zone_t zone,
                                               double *heat_to_surface, long BDRYTYPE){
   long i,j,k;
   long theta,thetasgn;
-  long row,col,l,vartheta,flux;
+  long l,vartheta,flux;
   flux_t Gp1,Gp0,dGp1h,tmpp1h;
   flux_t Gp0p1,Gp0m1,Gp1p1,Gp1m1;
   sqmat_t Kp1h;
