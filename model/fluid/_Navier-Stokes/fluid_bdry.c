@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BDRY_INFLOWSUBSONICMASSFLOWFIXED1 16
 #define BDRY_OUTFLOWSUPERSONIC1 1
 #define BDRY_OUTFLOWSUBSONIC1 4
+#define BDRY_OUTFLOWSUBSONIC2 5
 #define BDRY_OUTFLOWSUBSONICMFIXED1 15
 #define BDRY_SYMMETRICAL1 9
 #define BDRY_SYMMETRICAL2 14
@@ -69,6 +70,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    BDRY_INFLOWINJECTION1             %c   Inflow, param Tstag, Pstag, specCs \n"
     "    BDRY_OUTFLOWSUPERSONIC1           %c   Outflow, supersonic, 1o\n"
     "    BDRY_OUTFLOWSUBSONIC1             %c   Outflow, subsonic, P fixed, param P, 1o\n"
+    "    BDRY_OUTFLOWSUBSONIC2             %c   Outflow, subsonic, P fixed, 1o\n"
     "    BDRY_OUTFLOWSUBSONICMFIXED1       %c   Outflow, subsonic, M fixed, param M, 1o\n"
     "    BDRY_SYMMETRICAL2                 %c   Symmetrical, 2o\n"
     "    BDRY_SYMMETRICAL1                 %c   Symmetrical, 1o\n"
@@ -95,7 +97,7 @@ void write_bdry_fluid_template(FILE **controlfile){
     "    }\n"
     "  );\n",_bdry_ID(BDRY_INFLOWSUPERSONIC),_bdry_ID(BDRY_INFLOWSUBSONIC1),
              _bdry_ID(BDRY_INFLOWSUBSONICMASSFLOWFIXED1),_bdry_ID(BDRY_INFLOWINJECTION1),_bdry_ID(BDRY_OUTFLOWSUPERSONIC1),
-             _bdry_ID(BDRY_OUTFLOWSUBSONIC1),_bdry_ID(BDRY_OUTFLOWSUBSONICMFIXED1),
+             _bdry_ID(BDRY_OUTFLOWSUBSONIC1),_bdry_ID(BDRY_OUTFLOWSUBSONIC2),_bdry_ID(BDRY_OUTFLOWSUBSONICMFIXED1),
              _bdry_ID(BDRY_SYMMETRICAL2),_bdry_ID(BDRY_SYMMETRICAL1),_bdry_ID(BDRY_WALLTFIXED1),_bdry_ID(BDRY_WALLTFIXEDCATALYTIC1),
              _bdry_ID(BDRY_WALLTFIXEDINJECTION1),
              _bdry_ID(BDRY_WALLADIABATIC1),_bdry_ID(BDRY_SLIPWALL1),_bdry_ID(BDRY_FREESTREAM1)
@@ -110,6 +112,7 @@ void add_bdry_types_fluid_to_codex(SOAP_codex_t *codex){
   add_int_to_codex(codex,"BDRY_INFLOWINJECTION1",  BDRY_INFLOWINJECTION1 );
   add_int_to_codex(codex,"BDRY_OUTFLOWSUPERSONIC1",  BDRY_OUTFLOWSUPERSONIC1 );
   add_int_to_codex(codex,"BDRY_OUTFLOWSUBSONIC1",  BDRY_OUTFLOWSUBSONIC1 );
+  add_int_to_codex(codex,"BDRY_OUTFLOWSUBSONIC2",  BDRY_OUTFLOWSUBSONIC2 );
   add_int_to_codex(codex,"BDRY_OUTFLOWSUBSONICMFIXED1",  BDRY_OUTFLOWSUBSONICMFIXED1 );
   add_int_to_codex(codex,"BDRY_SYMMETRICAL1", BDRY_SYMMETRICAL1  );
   add_int_to_codex(codex,"BDRY_SYMMETRICAL2", BDRY_SYMMETRICAL2  );
@@ -136,7 +139,7 @@ bool is_node_bdry_no_cross(np_t np, int TYPELEVEL){
 }
 
 
-static void update_bdry_back_pressure(np_t *np, gl_t *gl, long lA, long lB, long lC, long theta, int ACCURACY){
+static void update_bdry_back_pressure(np_t *np, gl_t *gl, long lA, long lB, long lC, long theta, int ACCURACY, bool PRESSUREFROMPARAM){
   long spec,dim;
   spec_t rhok;
   double P;
@@ -144,7 +147,8 @@ static void update_bdry_back_pressure(np_t *np, gl_t *gl, long lA, long lB, long
   bool ref_flag;
 
   assert_np(np[lA],is_node_resumed(np[lA]));
-  P=_bdry_param(np,gl,lA,0,TYPELEVEL_FLUID_WORK);
+  if (PRESSUREFROMPARAM) P=_bdry_param(np,gl,lA,0,TYPELEVEL_FLUID_WORK);
+    else  P=_P(np[lA],gl);
   for (spec=0; spec<ns; spec++){
     rhok[spec]=_f_extrapol(ACCURACY,_rhok(np[lB],spec),_rhok(np[lC],spec));
   }
@@ -156,6 +160,7 @@ static void update_bdry_back_pressure(np_t *np, gl_t *gl, long lA, long lB, long
 
   find_U_3(np, lA, gl, rhok, V, P);
 }
+
 
 
 static void update_bdry_outflow_Mach(np_t *np, gl_t *gl, long lA, long lB, long lC, long theta, int ACCURACY){
@@ -444,7 +449,11 @@ void update_bdry_fluid(np_t *np, gl_t *gl, long lA, long lB, long lC, long lD, l
     break;
 
     case BDRY_OUTFLOWSUBSONIC1:
-      update_bdry_back_pressure(np, gl, lA, lB, lC, theta, ACCURACY_FIRSTORDER);
+      update_bdry_back_pressure(np, gl, lA, lB, lC, theta, ACCURACY_FIRSTORDER, TRUE);
+    break;
+
+    case BDRY_OUTFLOWSUBSONIC2:
+      update_bdry_back_pressure(np, gl, lA, lB, lC, theta, ACCURACY_FIRSTORDER, FALSE);
     break;
 
     case BDRY_INFLOWSUBSONIC1:

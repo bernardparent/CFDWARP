@@ -1982,6 +1982,495 @@ if (ISREAD_EMFIELD) {
   free(radiusmax2_file);
 }
 
+void read_data_file_interpolation_zone(input_t input, np_t *np, gl_t *gl, long i_min, long j_min, long k_min, long i_max, long j_max, long k_max){  
+  FILE *datafile;
+  char data_format_str[100], initvar_fluid_str_file[500], initvar_emfield_str_file[500];
+  long i,j,k,l_file,cnt,dim,cntzone;
+  long numsubzone, numflux_read,numspec_read,numdim_read,numnodes,numvars_fluid_file;
+  double tmp_dt,tmp_time;
+  double *weight,*radiusmax2_file,thisweight;
+  zone_t *subzone;
+  dim_t *xmin,*xmax;
+  initvar_t *initvar;
+  //initvar_t *initvar_file;
+  zone_t zone;
+  long numsubzone_desired;
+#ifdef EMFIELD
+  bool ISREAD_EMFIELD = FALSE;
+  long numvars_emfield_file;
+  initvar_emfield_t *initvar_emfield;
+ // initvar_emfield_t *initvar_emfield_file;
+#endif
+  bool FORMAT001;
+  dim_t *dx1_file,*x_file;
+#ifdef _2DL
+  dim_t *dx2_file;
+#endif
+#ifdef _3DL
+  dim_t *dx3_file;
+#endif
+  int cnterror;
+#ifdef OPENMPTHREADS
+  omp_lock_t *nodelock;
+#endif
+#ifdef DISTMPI
+  int rank,numproc;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &numproc);
+  MPI_Barrier(MPI_COMM_WORLD);
+#endif
+  weight=(double *)malloc(sizeof(double)*(gl->domain_lim.ie+4) 
+#ifdef _2DL 
+    *(gl->domain_lim.je+4)
+#endif
+#ifdef _3DL
+    *(gl->domain_lim.ke+4)
+#endif
+    );
+
+#ifdef OPENMPTHREADS
+  nodelock=(omp_lock_t *)malloc(sizeof(double)*(gl->domain_lim.ie+4) 
+#ifdef _2DL 
+    *(gl->domain_lim.je+4)
+#endif
+#ifdef _3DL
+    *(gl->domain_lim.ke+4)
+#endif
+    );
+#endif
+
+  datafile = fopen(input.name, "r");
+  if (datafile==NULL)
+    fatal_error("Having problems opening interpolation datafile %s for zone interpolation.",input.name);
+
+/* first do the fluid properties */
+
+  mapvar_t *map_fluid = (mapvar_t*)malloc(numinitvar * sizeof(mapvar_t));
+#ifdef EMFIELD  
+  mapvar_t *map_emfield = (mapvar_t*)malloc(numinitvar_emfield * sizeof(mapvar_t));
+#endif  
+  initvar=(initvar_t *)malloc(sizeof(initvar_t)*(gl->domain_lim.ie+4) 
+#ifdef _2DL 
+    *(gl->domain_lim.je+4)
+#endif
+#ifdef _3DL
+    *(gl->domain_lim.ke+4)
+#endif
+    );
+
+
+  for (cnt=0; cnt<16; cnt++){
+    if (fscanf(datafile,"%c",&(data_format_str[cnt]))!=1) {
+      fatal_error("Problem with fscanf in read_data_file_interpolation_zone().");
+    }
+  }
+  data_format_str[16]=EOS;
+  wfprintf(stdout,"Reading zone interpolation data file %s..",input.name);
+  FORMAT001=FALSE;  
+  if (strcmp("WARPINTFORMAT001",data_format_str)==0) {
+//    wfprintf(stdout,"in CFDWARP format 001..\n");
+    FORMAT001=TRUE;
+  }
+
+  if (FORMAT001) {
+      if (fscanf(datafile," numnodes=%ld nf=%ld nd=%ld ns=%ld windowis=%ld windowie=%ld iter=%ld effiter_U=%lg effiter_R=%lg CFL=%lg time=%lg dt=%lg vars_fluid=\"%[^\"]\" vars_emfield=\"%[^\"]\"%*[^\n]",
+             &numnodes,&numflux_read,&numdim_read,&numspec_read,&(gl->window.is),&(gl->window.ie),
+             &(gl->iter),&(gl->effiter_U),&(gl->effiter_R),&(gl->CFL),&(tmp_time),&tmp_dt,initvar_fluid_str_file,initvar_emfield_str_file)!=14) fatal_error("Problem reading interpolation data file.");
+
+        find_interpolation_map(input.interpolationvarsmap, initvar_fluid_str_file, numinitvar, &numvars_fluid_file, map_fluid, INITVARTYPE_FLUID);
+#ifdef EMFIELD
+        find_interpolation_map(input.interpolationvarsmap, initvar_emfield_str_file, numinitvar_emfield, &numvars_emfield_file, map_emfield, INITVARTYPE_EMFIELD);
+        if (strcmp(initvar_emfield_str_file,"NONE")!=0) ISREAD_EMFIELD = TRUE;
+#endif            
+
+#ifdef UNSTEADY
+      gl->time=tmp_time;
+      gl->dt=tmp_dt;
+#endif
+
+    fgetc(datafile);
+    if (numdim_read!=nd) fatal_error("Number of dimensions read (%ld) does not equal current number of dimensions (%ld).",numdim_read,nd);
+   // if (numspec_read!=ns) fatal_error("Number of species read (%ld) does not equal current number of species (%ld).",numspec_read,ns);
+   // if (numflux_read!=nf) fatal_error("Number of fluxes read (%ld) does not equal current number of fluxes (%ld).",numflux_read,nf);
+  } else {
+    fatal_error("Interpolation file format unknown.");
+  }
+
+  /* read data and store in ram */
+  //initvar_file=(initvar_t *)malloc(numnodes*sizeof(initvar_t));
+  double(*initvar_file)[numvars_fluid_file] = malloc(numnodes*numvars_fluid_file*sizeof(double));
+  x_file=(dim_t *)malloc(numnodes*sizeof(dim_t));
+  dx1_file=(dim_t *)malloc(numnodes*sizeof(dim_t));
+#ifdef _2DL
+  dx2_file=(dim_t *)malloc(numnodes*sizeof(dim_t));
+#endif
+#ifdef _3DL
+  dx3_file=(dim_t *)malloc(numnodes*sizeof(dim_t));
+#endif
+  radiusmax2_file=(double *)malloc(numnodes*sizeof(double));
+  for (l_file=0; l_file<numnodes; l_file++){
+    cnterror=0;
+    if (fread(initvar_file[l_file], numvars_fluid_file*sizeof(double), 1, datafile)!=1) cnterror++;
+    if (fread(x_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
+    if (fread(dx1_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
+#ifdef _2DL
+    if (fread(dx2_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
+#endif
+#ifdef _3DL
+    if (fread(dx3_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
+#endif
+    if (cnterror>0) fatal_error("Could not read all data properly.");
+    radiusmax2_file[l_file]=0.0e0;
+    for (dim=0; dim<nd; dim++) 
+      radiusmax2_file[l_file]+=sqr(fabs(dx1_file[l_file][dim])
+#ifdef _2DL
+        +fabs(dx2_file[l_file][dim])
+#endif
+#ifdef _3DL
+        +fabs(dx3_file[l_file][dim])
+#endif
+      );
+    radiusmax2_file[l_file]*=1.1;
+
+  }
+  //for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
+  for (i=i_min; i<=i_max; i++) {
+    for (j=j_min; j<=j_max; j++) {
+      for (k=k_min; k<=k_max; k++) {
+        weight[_ai(gl,i,j,k)]=0.0e0;
+#ifdef OPENMPTHREADS
+        omp_init_lock(&(nodelock[_ai(gl,i,j,k)]));
+#endif
+        for (cnt=0; cnt<numinitvar; cnt++) (initvar[_ai(gl,i,j,k)])[cnt]=0.0;
+      }
+    }
+  }
+
+  zone=_zone_intersection(gl->domain_all,gl->domain_lim);
+
+  subzone=(zone_t *)malloc(sizeof(zone_t));
+  find_subzones_in_zone_given_zonelength(SUBZONE_DESIRED_WIDTH, zone, &numsubzone, &subzone);
+
+#ifdef OPENMPTHREADS
+  numsubzone_desired=MIN_NUMSUBZONE_PER_THREAD*omp_get_max_threads();
+#else
+  numsubzone_desired=MIN_NUMSUBZONE_PER_THREAD;
+#endif
+  if (numsubzone<numsubzone_desired)
+    find_subzones_in_zone_given_numsubzone(zone, numsubzone_desired, &numsubzone, &subzone);
+
+  xmin=(dim_t *)malloc(numsubzone*sizeof(dim_t));
+  xmax=(dim_t *)malloc(numsubzone*sizeof(dim_t));
+
+  for (cntzone=0; cntzone<numsubzone; cntzone++){
+    for (dim=0; dim<nd; dim++){
+      xmin[cntzone][dim]=1e99;
+      xmax[cntzone][dim]=-1e99;
+    }
+    //for_ijk(subzone[cntzone],is,js,ks,ie,je,ke){
+    for (i=i_min; i<=i_max; i++) {
+      for (j=j_min; j<=j_max; j++) {
+        for (k=k_min; k<=k_max; k++) {
+          if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)){
+            for (dim=0; dim<nd; dim++){
+              xmin[cntzone][dim]=min(xmin[cntzone][dim],_x(np[_ai(gl,i,j,k)],dim));
+              xmax[cntzone][dim]=max(xmax[cntzone][dim],_x(np[_ai(gl,i,j,k)],dim));
+            }
+          } // end is_node_valid
+        } // end k
+      } // end j
+    } // end i
+  }
+
+#ifdef DISTMPI
+  MPI_Barrier(MPI_COMM_WORLD);
+  wfprintf(stdout,"Fluid/%ld",numsubzone*numproc);
+#else
+  wfprintf(stdout,"Fluid/%ld",numsubzone);
+#endif
+
+#if defined(OPENMPTHREADS) 
+#pragma omp parallel for private(l_file,cntzone,dim,zone,i,j,k,cnt,thisweight) schedule(dynamic) 
+#endif
+  for (cntzone=0; cntzone<numsubzone; cntzone++){
+    for (l_file=0; l_file<numnodes; l_file++){
+      if (is_data_point_in_domain(x_file[l_file],xmin[cntzone],xmax[cntzone],radiusmax2_file[l_file])){
+        zone=subzone[cntzone];
+        if (find_interpolation_zone(np,gl,TYPELEVEL_FLUID,x_file[l_file],radiusmax2_file[l_file],&zone)){
+          //for_jik(zone,is,js,ks,ie,je,ke){
+          for (i=i_min; i<=i_max; i++) {
+            for (j=j_min; j<=j_max; j++) {
+              for (k=k_min; k<=k_max; k++) {
+            
+                if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)){
+                  find_interpolation_weight(np,gl,_ai(gl,i,j,k),x_file[l_file],dx1_file[l_file],
+#ifdef _2DL
+                    dx2_file[l_file],
+#endif
+#ifdef _3DL
+                    dx3_file[l_file],
+#endif
+                    radiusmax2_file[l_file],&thisweight);
+#ifdef OPENMPTHREADS 
+                  omp_set_lock(&(nodelock[_ai(gl,i,j,k)]));
+#endif
+                  if (thisweight>1e-99) {
+                    weight[_ai(gl,i,j,k)]+=thisweight;
+                    for (cnt=0; cnt<numinitvar; cnt++) 
+                      initvar[_ai(gl,i,j,k)][cnt]+=thisweight*_map_interpolation_var(initvar_file[l_file],map_fluid,cnt);
+                  }
+#ifdef OPENMPTHREADS 
+                  omp_unset_lock(&(nodelock[_ai(gl,i,j,k)]));
+#endif
+                } // end is_node_valid()
+              } // end k
+            } // end j
+          } // end i
+        } // end find_interpolation_zone()
+      } // is_data_point_in_domain()
+    } // end l_file loop
+    fprintf(stdout,".");
+    fflush(stdout);
+  }
+  gl->REFORMAT_INITVAR_SPECIES_SUM_CHECK=FALSE;
+#ifdef OPENMPTHREADS
+  #pragma omp parallel for private(i,j,k,cnt) schedule(static) 
+#endif
+  //for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
+  for (i=i_min; i<=i_max; i++) {
+    for (j=j_min; j<=j_max; j++) {
+      for (k=k_min; k<=k_max; k++) {
+        if (weight[_ai(gl,i,j,k)]>1e-99 && is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) {
+          for (cnt=0; cnt<numinitvar; cnt++) initvar[_ai(gl,i,j,k)][cnt]=initvar[_ai(gl,i,j,k)][cnt]/weight[_ai(gl,i,j,k)];
+          init_node_fluid(np,_ai(gl,i,j,k), gl, defaultinitvartypefluid, initvar[_ai(gl,i,j,k)]);
+          np[_ai(gl,i,j,k)].INIT_FLUID=TRUE;
+        }
+      }
+    }
+  }
+  gl->REFORMAT_INITVAR_SPECIES_SUM_CHECK=TRUE;
+
+  free(initvar);
+  free(initvar_file);
+  free(map_fluid);
+
+/* second do the emfield properties */
+#ifdef EMFIELD
+
+  initvar_emfield=(initvar_emfield_t *)malloc(sizeof(initvar_emfield_t)*(gl->domain_lim.ie+4) 
+#ifdef _2DL 
+    *(gl->domain_lim.je+4)
+#endif
+#ifdef _3DL
+    *(gl->domain_lim.ke+4)
+#endif
+    );
+
+if (ISREAD_EMFIELD) {
+  for (cnt=0; cnt<16; cnt++){
+    if (fscanf(datafile,"%c",&(data_format_str[cnt]))!=1){
+      fatal_error("Problem with fscanf in emfield part of read_data_file_interpolation_zone().");
+    }
+  }
+  data_format_str[16]=EOS;
+  FORMAT001=FALSE;  
+  if (strcmp("WARPINTFORMAT001",data_format_str)==0) {
+    FORMAT001=TRUE;
+  }
+
+  if (FORMAT001) {
+    if (fscanf(datafile," numnodes_emfield=%ld nfe=%ld nd=%ld Lc=%lg effiter_U_emfield=%lg effiter_R_emfield=%lg%*[^\n]",
+             &numnodes,&numflux_read,&numdim_read,&(gl->Lc),&(gl->effiter_U_emfield),&(gl->effiter_R_emfield))!=6){
+      fatal_error("Problem reading emfield preambule in interpolating file.");
+    }
+    fgetc(datafile);
+    if (numdim_read!=nd) fatal_error("Number of dimensions read (%ld) does not equal current number of dimensions (%ld).",numdim_read,nd);
+    //if (numflux_read!=nfe) fatal_error("Number of fluxes read (%ld) does not equal current number of emfield fluxes (%ld).",numflux_read,nfe);
+    gl->Lc=1.0e0;
+
+  } else {
+    fatal_error("Interpolation file format unknown for EMfield variables.");
+  }
+}
+  /* read data and store in ram */
+  double(*initvar_emfield_file)[numvars_emfield_file] = malloc(numnodes*numvars_emfield_file*sizeof(double));
+  //initvar_emfield_file=(initvar_emfield_t *)malloc(numnodes*sizeof(initvar_emfield_t));
+if (ISREAD_EMFIELD) {
+  x_file=(dim_t *)realloc(x_file,numnodes*sizeof(dim_t));
+  dx1_file=(dim_t *)realloc(dx1_file,numnodes*sizeof(dim_t));
+#ifdef _2DL
+  dx2_file=(dim_t *)realloc(dx2_file,numnodes*sizeof(dim_t));
+#endif
+#ifdef _3DL
+  dx3_file=(dim_t *)realloc(dx3_file,numnodes*sizeof(dim_t));
+#endif
+  radiusmax2_file=(double *)realloc(radiusmax2_file,numnodes*sizeof(double));
+
+  for (l_file=0; l_file<numnodes; l_file++){
+    cnterror=0;
+    if (fread(initvar_emfield_file[l_file], numvars_emfield_file*sizeof(double), 1, datafile)!=1) cnterror++;
+    if (fread(x_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
+    if (fread(dx1_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
+#ifdef _2DL
+    if (fread(dx2_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
+#endif
+#ifdef _3DL
+    if (fread(dx3_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
+#endif
+    if (cnterror>0) fatal_error("Could not read all data properly.");
+    radiusmax2_file[l_file]=0.0e0;
+    for (dim=0; dim<nd; dim++) 
+      radiusmax2_file[l_file]+=sqr(fabs(dx1_file[l_file][dim])
+#ifdef _2DL
+        +fabs(dx2_file[l_file][dim])
+#endif
+#ifdef _3DL
+        +fabs(dx3_file[l_file][dim])
+#endif
+      );
+    radiusmax2_file[l_file]*=1.1;
+  }
+}
+  //for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
+  for (i=i_min; i<=i_max; i++) {
+    for (j=j_min; j<=j_max; j++) {
+      for (k=k_min; k<=k_max; k++) {
+        weight[_ai(gl,i,j,k)]=0.0e0;
+        for (cnt=0; cnt<numinitvar_emfield; cnt++) (initvar_emfield[_ai(gl,i,j,k)])[cnt]=0.0;
+      }
+    }
+  }
+
+  for (cntzone=0; cntzone<numsubzone; cntzone++){
+    for (dim=0; dim<nd; dim++){
+      xmin[cntzone][dim]=1e99;
+      xmax[cntzone][dim]=-1e99;
+    }
+    //for_ijk(subzone[cntzone],is,js,ks,ie,je,ke){
+    for (i=i_min; i<=i_max; i++) {
+      for (j=j_min; j<=j_max; j++) {
+        for (k=k_min; k<=k_max; k++) {
+          if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
+            for (dim=0; dim<nd; dim++){
+              xmin[cntzone][dim]=min(xmin[cntzone][dim],_x(np[_ai(gl,i,j,k)],dim));
+              xmax[cntzone][dim]=max(xmax[cntzone][dim],_x(np[_ai(gl,i,j,k)],dim));
+            }
+          }
+        }
+      }
+    }
+  }
+
+#ifdef DISTMPI
+  MPI_Barrier(MPI_COMM_WORLD);
+  wfprintf(stdout,"EMfield/%ld",numsubzone*numproc);
+#else
+  wfprintf(stdout,"EMfield/%ld",numsubzone);
+#endif
+
+#if defined(OPENMPTHREADS) //&& !defined(DISTMPI)
+#pragma omp parallel for private(l_file,cntzone,cnt,thisweight,dim,zone,i,j,k) schedule(dynamic) 
+#endif
+  for (cntzone=0; cntzone<numsubzone; cntzone++){
+    for (l_file=0; l_file<numnodes; l_file++){
+      if (is_data_point_in_domain(x_file[l_file],xmin[cntzone],xmax[cntzone],radiusmax2_file[l_file])){
+        zone=subzone[cntzone];
+        if (find_interpolation_zone(np,gl,TYPELEVEL_EMFIELD,x_file[l_file],radiusmax2_file[l_file],&zone)){
+          //for_jik(zone,is,js,ks,ie,je,ke){
+          for (i=i_min; i<=i_max; i++) {
+            for (j=j_min; j<=j_max; j++) {
+              for (k=k_min; k<=k_max; k++) {
+                if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
+                  find_interpolation_weight(np,gl,_ai(gl,i,j,k),x_file[l_file],dx1_file[l_file],
+#ifdef _2DL
+                                            dx2_file[l_file],
+#endif
+#ifdef _3DL
+                                            dx3_file[l_file],
+#endif
+                                            radiusmax2_file[l_file],&thisweight);
+#ifdef OPENMPTHREADS 
+                  omp_set_lock(&(nodelock[_ai(gl,i,j,k)]));
+#endif
+                  if (thisweight>1e-99) {
+                    weight[_ai(gl,i,j,k)]+=thisweight;
+                    for (cnt=0; cnt<numinitvar_emfield; cnt++) 
+                      initvar_emfield[_ai(gl,i,j,k)][cnt]+=thisweight*_map_interpolation_var(initvar_emfield_file[l_file],map_emfield,cnt);
+                  }
+#ifdef OPENMPTHREADS 
+                  omp_unset_lock(&(nodelock[_ai(gl,i,j,k)]));
+#endif
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    fprintf(stdout,".");
+    fflush(stdout);
+  }
+
+#ifdef OPENMPTHREADS
+#pragma omp parallel for private(i,j,k,cnt) schedule(static) 
+#endif
+  //for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
+  for (i=i_min; i<=i_max; i++) {
+    for (j=j_min; j<=j_max; j++) {
+      for (k=k_min; k<=k_max; k++) {
+        if (weight[_ai(gl,i,j,k)]>1e-99 && is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) {
+          for (cnt=0; cnt<numinitvar_emfield; cnt++) initvar_emfield[_ai(gl,i,j,k)][cnt]=initvar_emfield[_ai(gl,i,j,k)][cnt]/weight[_ai(gl,i,j,k)];
+          init_node_emfield(np[_ai(gl,i,j,k)], gl, defaultinitvartypeemfield, initvar_emfield[_ai(gl,i,j,k)]);
+          np[_ai(gl,i,j,k)].INIT_EMFIELD=TRUE;
+        }
+      }
+    }
+  }
+  free(initvar_emfield);
+  free(map_emfield);
+  free(initvar_emfield_file);
+#endif //EMFIELD
+  free(subzone);
+  free(xmin);
+  free(xmax);
+  fclose(datafile);
+  free(weight);
+#ifdef OPENMPTHREADS
+  //for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
+  for (i=i_min; i<=i_max; i++) {
+    for (j=j_min; j<=j_max; j++) {
+      for (k=k_min; k<=k_max; k++) {
+        omp_destroy_lock(&(nodelock[_ai(gl,i,j,k)]));
+      }
+    }
+  }
+  free(nodelock);
+#endif
+#ifdef DISTMPI
+  MPI_Barrier(MPI_COMM_WORLD);
+  if (rank!=0) {
+    gl->effiter_U=0.0;
+    gl->effiter_R=0.0;
+    #ifdef EMFIELD
+    gl->effiter_U_emfield=0.0;
+    gl->effiter_R_emfield=0.0;   
+    #endif
+  }
+#endif
+  wfprintf(stdout,"done;\n");
+
+  free(x_file);
+  free(dx1_file);
+#ifdef _2DL
+  free(dx2_file);
+#endif
+#ifdef _3DL
+  free(dx3_file);
+#endif
+  free(radiusmax2_file);
+}
+
+
 
 static double _dxlength2(dim_t dx){
   double dxl;

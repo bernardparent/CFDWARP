@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 FEB 25b
+  * in cycle/share/cycle_share.c
+    - in runtime_actions(), added action ReadInterpolationFile and ReadInterpolationFileZone
+  * in model/fluid/_Navier-Stokes/fluid_bdry.c and model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - added BDRY_OUTFLOWSUBSONIC2 
+    - in update_bdry_back_pressure(), added a new parameter PRESSUREFROMPARAM
+  * in src/data.c
+    - added the function read_data_file_interpolation_zone()
+      
+
 2026 FEB 25a
   * in lib/exm/exm.c
     - fixed bugs in find_words_from_string()

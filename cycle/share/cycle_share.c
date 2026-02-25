@@ -970,6 +970,32 @@ void increase_time_level(np_t *np, gl_t *gl){
 void runtime_actions(char *actionname, char **argum, SOAP_codex_t *codex){
   char *oldfilename;
   zone_t zone;
+
+  if (strcmp(actionname,"ReadInterpolationFile")==0) {
+    if (SOAP_number_argums(*argum)>1)
+      SOAP_fatal_error(codex,"Action ReadInterpolationFile() can not be called with more than 1 argument.");   
+    SOAP_substitute_all_argums(argum, codex);
+    readcontrolarg_t *args = (readcontrolarg_t *)codex->action_args;
+    args->input->name = malloc(256);
+    if (!args->input->name) SOAP_fatal_error(codex, "Failed to allocate memory for input->name.");
+    SOAP_get_argum_string(codex,&(((readcontrolarg_t *)codex->action_args)->input->name),*argum,0);
+    //find_zone_from_argum(*argum, 1, ((readcontrolarg_t *)codex->action_args)->gl, codex, &zone);
+    read_data_file_interpolation(*(((readcontrolarg_t *)codex->action_args)->input),*((readcontrolarg_t *)codex->action_args)->np,((readcontrolarg_t *)codex->action_args)->gl);
+    codex->ACTIONPROCESSED=TRUE;
+  }  
+
+  if (strcmp(actionname,"ReadInterpolationFileZone")==0) {
+    if (SOAP_number_argums(*argum)!=nd*2+1)
+      SOAP_fatal_error(codex,"Number of arguments not equal to %ld in ReadInterpolationFileZone(); action.",nd*2+1);   
+    SOAP_substitute_all_argums(argum, codex);
+    readcontrolarg_t *args = (readcontrolarg_t *)codex->action_args;
+    args->input->name = malloc(256);
+    if (!args->input->name) SOAP_fatal_error(codex, "Failed to allocate memory for input->name.");
+    SOAP_get_argum_string(codex,&(((readcontrolarg_t *)codex->action_args)->input->name),*argum,0);
+    //find_zone_from_argum(*argum, 1, ((readcontrolarg_t *)codex->action_args)->gl, codex, &zone);
+    read_data_file_interpolation_zone(*(((readcontrolarg_t *)codex->action_args)->input),*((readcontrolarg_t *)codex->action_args)->np,((readcontrolarg_t *)codex->action_args)->gl,zone.is,zone.js,zone.ks,zone.ie,zone.je,zone.ke);
+    codex->ACTIONPROCESSED=TRUE;
+  } 
   
   oldfilename=(char *)malloc(sizeof(char)*(5+strlen((((readcontrolarg_t *)codex->action_args)->gl->output_filename))));
   strcpy(oldfilename,(((readcontrolarg_t *)codex->action_args)->gl->output_filename));
