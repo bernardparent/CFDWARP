@@ -7,6 +7,11 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 AUG 11a
+  * in lib/gridg/eg/
+    - added grid.1D.cluster, printgrid1D.c, tecgrid1D.c
+
+
 2026 FEB 25b
   * in cycle/share/cycle_share.c
     - in runtime_actions(), added action ReadInterpolationFile and ReadInterpolationFileZone

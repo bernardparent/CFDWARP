@@ -447,6 +447,8 @@ Model(
   );
   AirPlasma11s(
     CHEMMODEL=CHEMMODEL_RODRIGUEZ2024;
+    Tminchem=200;
+    Teminchem=200;
     for (react,1,6, ADDITIONALREACTION[react]=FALSE;); {include reactions function of EoverN}
     TOWNSENDIONIZATIONIMPLICIT=FALSE; {keep this to FALSE generally}
     QEISOURCETERMS=TRUE; {include electron energy cooling due to electron impact}

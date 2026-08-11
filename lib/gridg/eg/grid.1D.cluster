@@ -1,0 +1,12 @@
+
+is=1;
+ie=40;
+
+Acs=1.0;
+
+Grid(
+  Size ( is, ie );
+  Point( is, 0.0, Acs );
+  Point( ie, 0.3, Acs );
+  JoinCorners( is, ie, FE, 0.5, 0.001, Acs );
+);
