@@ -5422,11 +5422,11 @@ static void find_Pa_index(long spec, double *T, long *index, double *dTplus, lon
   }
 }
 
-double _cpk_from_T(long spec, double T){
+static double _cpk_from_T_eval(long spec, double T){
   double cpk,dTplus;
   long index,index2;
   double T2,T3,T4,weight2;
-  
+
   find_Pa_index(spec, &T,&index,&dTplus,&index2,&weight2);
   T2=T*T;
   T3=T2*T;
@@ -5464,6 +5464,35 @@ double _cpk_from_T(long spec, double T){
 }
 
 
+/* _cpk_from_T() and _hk_from_T() depend only on the species index and on the
+   temperature: the NASA polynomial coefficients are compile-time constants and
+   the model flags do not change during a run. Both are called of the order of
+   ten times per species per node per iteration, always with the same
+   temperature within a node (e.g. find_dP_dx() evaluates the mixture cp twice
+   at the same T through find_de_drhok_at_constant_P() and
+   _de_dP_at_constant_rho()). The values are therefore memoized for the last
+   temperature seen: a call with a temperature already in the cache returns the
+   same bits it would have computed. The cache is thread-local so that the
+   OpenMP builds behave as the serial one. */
+
+double _cpk_from_T(long spec, double T){
+  static __thread double Tcpkcache=0.0;
+  static __thread spec_t cpkcache;
+  static __thread bool cpkcachevalid[ns]={FALSE};
+  long cnt;
+
+  if (T!=Tcpkcache) {
+    Tcpkcache=T;
+    for (cnt=0; cnt<ns; cnt++) cpkcachevalid[cnt]=FALSE;
+  }
+  if (!cpkcachevalid[spec]) {
+    cpkcache[spec]=_cpk_from_T_eval(spec,T);
+    cpkcachevalid[spec]=TRUE;
+  }
+  return(cpkcache[spec]);
+}
+
+
 double _cpk_from_T_equilibrium(long spec, double T){
   double cpk,dTplus;
   long index,index2;
@@ -5497,13 +5526,13 @@ double _cpk_from_T_equilibrium(long spec, double T){
 
 
 
-double _hk_from_T(long spec, double T){
+static double _hk_from_T_eval(long spec, double T){
   double tmp,dTplus;
   long index,index2;
   double T2,T3,T4,T5,weight2;
-  
 
-  find_Pa_index(spec, &T,&index,&dTplus,&index2,&weight2);  
+
+  find_Pa_index(spec, &T,&index,&dTplus,&index2,&weight2);
   T2=T*T;
   T3=T2*T;
   T4=T3*T;
@@ -5547,6 +5576,26 @@ double _hk_from_T(long spec, double T){
     tmp=tmp+_cpk_from_T(spec, T)*dTplus;
   }
   return(tmp);
+}
+
+
+/* memoized on the last temperature, see the comment above _cpk_from_T() */
+
+double _hk_from_T(long spec, double T){
+  static __thread double Thkcache=0.0;
+  static __thread spec_t hkcache;
+  static __thread bool hkcachevalid[ns]={FALSE};
+  long cnt;
+
+  if (T!=Thkcache) {
+    Thkcache=T;
+    for (cnt=0; cnt<ns; cnt++) hkcachevalid[cnt]=FALSE;
+  }
+  if (!hkcachevalid[spec]) {
+    hkcache[spec]=_hk_from_T_eval(spec,T);
+    hkcachevalid[spec]=TRUE;
+  }
+  return(hkcache[spec]);
 }
 
 

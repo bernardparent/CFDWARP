@@ -516,10 +516,15 @@ double _de_dT_at_constant_rho(spec_t rhok, double T){
 }
 
 
+/* the mixture enthalpy and the species enthalpies are obtained in one pass over
+   the species instead of three (_cp_from_w_T(), _h_from_w_T(), and the loop
+   below each walked the species separately): the same terms are summed in the
+   same order, so the result is unchanged to the last bit */
+
 void find_de_drhok_at_constant_P(spec_t rhok, double T, spec_t dedrhok){
   double rho,cp,R,h;
   long spec;
-  spec_t w;
+  spec_t w,hk;
 
   rho=0.0e0;
   for (spec=0; spec<ns; spec++){
@@ -528,11 +533,16 @@ void find_de_drhok_at_constant_P(spec_t rhok, double T, spec_t dedrhok){
   for (spec=0; spec<ns; spec++){
     w[spec]=rhok[spec]/rho;
   }
-  cp=_cp_from_w_T(w,T);
-  R=_R(w);
-  h=_h_from_w_T(w,T);
+  cp=0.0e0;
+  h=0.0e0;
   for (spec=0; spec<ns; spec++){
-    dedrhok[spec]=_hk_from_T(spec,T)/rho-h/rho+R*T/rho-cp*T*_Rk(spec)/rho/R;
+    hk[spec]=_hk_from_T(spec,T);
+    cp=cp+w[spec]*_cpk_from_T(spec,T);
+    h=h+w[spec]*hk[spec];
+  }
+  R=_R(w);
+  for (spec=0; spec<ns; spec++){
+    dedrhok[spec]=hk[spec]/rho-h/rho+R*T/rho-cp*T*_Rk(spec)/rho/R;
   }
 #ifdef speceminus
   if (_FLUID_EENERGY) dedrhok[speceminus]=_hk_from_T(speceminus,T)/rho-h/rho+R*T/rho;
@@ -540,10 +550,12 @@ void find_de_drhok_at_constant_P(spec_t rhok, double T, spec_t dedrhok){
 }
 
 
+/* same one-pass rewrite as in find_de_drhok_at_constant_P() above */
+
 void find_de_drhok_at_constant_T(spec_t rhok, double T, spec_t dedrhok){
   double rho,R,h;
   long spec;
-  spec_t w;
+  spec_t w,hk;
 
   rho=0.0e0;
   for (spec=0; spec<ns; spec++){
@@ -553,9 +565,13 @@ void find_de_drhok_at_constant_T(spec_t rhok, double T, spec_t dedrhok){
     w[spec]=rhok[spec]/rho;
   }
   R=_R(w);
-  h=_h_from_w_T(w,T);
+  h=0.0e0;
   for (spec=0; spec<ns; spec++){
-    dedrhok[spec]=_hk_from_T(spec,T)/rho-h/rho+R*T/rho-_Rk(spec)*T/rho;
+    hk[spec]=_hk_from_T(spec,T);
+    h=h+w[spec]*hk[spec];
+  }
+  for (spec=0; spec<ns; spec++){
+    dedrhok[spec]=hk[spec]/rho-h/rho+R*T/rho-_Rk(spec)*T/rho;
   }
 #ifdef speceminus
   if (_FLUID_EENERGY) dedrhok[speceminus]=_hk_from_T(speceminus,T)/rho-h/rho+R*T/rho;

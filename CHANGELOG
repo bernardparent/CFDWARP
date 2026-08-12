@@ -7,6 +7,36 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 AUG 12c
+  * in model/thermo/_generic/enthalpy.c
+    - _hk_from_T() and _cpk_from_T() are now memoized on the last temperature seen. Both
+      depend on nothing but the species index and the temperature, the NASA polynomial
+      coefficients being compile-time constants and the model flags not changing during a
+      run, yet they were evaluated over and over at the very same temperature because each
+      routine needing them walks the species on its own. The bodies were renamed
+      _hk_from_T_eval() and _cpk_from_T_eval() and are now called only on a cache miss; a hit
+      returns the bits the routine would have computed, so nothing moves numerically. The
+      cache holds one temperature and one value per species, is invalidated as a whole when
+      the temperature differs from the cached one, and is compared on exact equality rather
+      than on a tolerance, which is what makes it bit-exact. It is __thread, so an OpenMP
+      build behaves exactly as the serial one.
+  * in model/thermo/_generic/thermo.c
+    - in find_de_drhok_at_constant_P() and find_de_drhok_at_constant_T(), fused the species
+      loops. Each walked the species three times, once inside _cp_from_w_T(), once inside
+      _h_from_w_T() and once in its own loop, evaluating hk twice per species; they now walk
+      the species once, forming hk and cpk and accumulating h=sum(w[k]*hk[k]) and
+      cp=sum(w[k]*cpk[k]) on the way. The same terms are added in the same order, so the
+      result is unchanged to the last bit.
+    - both changes only remove repeated evaluations of quantities that are functions of the
+      species index and of the temperature alone, hence the residual history and all outputs
+      are bitwise identical to those of the previous version. On a 3D ethylene-air case
+      (26 species, HLLC_HYBRID, block ADI, nf=30, 60x16x16) the calls to _hk_from_T() and to
+      find_Pa_index() roughly halve and the time per iteration of the whole solver drops by
+      about 5 percent; applied on top of the 2026 AUG 12a and 12b entries, where the block
+      algebra no longer dominates, it removes about 9 percent of the time per iteration that
+      remains.
+      
+
 2026 AUG 12b
   * in lib/exm/exm.c
     - in EXM_solve_block_TDMA(), the inverse of each pivot block BB[line] is now formed once
