@@ -7,6 +7,50 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 AUG 12b
+  * in lib/exm/exm.c
+    - in EXM_solve_block_TDMA(), the inverse of each pivot block BB[line] is now formed once
+      and stored in the new array BBINV instead of being recomputed by mat_inv_tdma() at each
+      of its three uses: once in the downward sweep, once in the upward sweep, and once in the
+      final pass that applied the inverse to the right-hand side. The contents of BB[line] are
+      identical at the three uses, so this only removes repeated work: about two Gauss-Jordan
+      inversions of a k x k block per line, that is about 4*k^3 multiply-adds per line. As a
+      side effect BB is left as it was rather than reduced to the identity, which no caller
+      uses. Added find_multfact_from_inv(), which does what find_multfact() does but takes the
+      inverse of the pivot block as an argument rather than computing it.
+    - in EXM_solve_block_TDMA(), the right-hand side is now carried as the single column it
+      actually is whenever it is one. The right-hand side is stored as a full k x k block per
+      line although every caller fills only its first column, so the three products per line
+      were k x k x k products of which one column is ever used. The new
+      find_whether_RHS_is_one_column() checks at entry, in k^2 operations per line, that
+      columns 1 to k-1 of every block are exactly zero; those columns then stay zero
+      throughout the solve and the new mat_mult_col0_tdma(), mat_add_col0_tdma() and
+      mat_equal_col0_tdma() carry the first column alone, k^2 instead of k^3 multiply-adds per
+      product. If a caller ever supplies a fuller right-hand side, the general path is taken
+      and nothing changes.
+    - in mat_mult_tdma(), reordered the loops so that the innermost index is the row. The
+      blocks are stored column-major within a line, EXM_mi() returning line*k*k+col*k+row, so
+      the left operand and the result are now accessed with unit stride instead of with a
+      stride of k, the entry of the right operand is a broadcast scalar, and the innermost
+      loop vectorizes. For a given entry of the product the terms are still summed in the
+      order cnt=0,1,...,k-1.
+    - in mat_inv_tdma(), turned the Gauss-Jordan elimination into a rank-one update. The
+      elimination factors of one pivot row depend only on the pivot column, which the
+      elimination of that same pivot row does not modify, so they are all formed first and the
+      update then runs with the eliminated-row index innermost, hence unit-stride; the factor
+      of the pivot row itself is set to zero so that no branch is needed in the innermost
+      loop. Each entry is updated once, with the same two operands, in the same order as
+      before. The final division by the pivots was likewise reordered to run over columns.
+    - all of the above either remove redundant work or change only the order in which memory
+      is walked, so the solution returned is bit for bit that of the previous version and the
+      residual history and all outputs are unchanged. On a 3D ethylene-air case (26 species,
+      HLLC_HYBRID, block ADI, nf=30, 60x16x16) the block tridiagonal solve is 4.84 times
+      faster on its own and the time per iteration of the whole solver drops by about
+      29 percent.
+    - the same threefold inversion of the pivot block is present in EXM_solve_block_PDMA(),
+      which was left untouched.
+      
+      
 2026 AUG 12a
   * in src/common.c
     - in multiply_matrix_and_matrix(), interchanged the two inner loops: the accumulation is

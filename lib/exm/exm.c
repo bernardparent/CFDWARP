@@ -700,16 +700,26 @@ static void mat_add_tdma(double *mat1, long line1, double *mat2, long line2,
 
 
 
+/* The blocks are stored column-major within one line: element (row,col) of the
+   block of line L sits at mat[L*k*k+col*k+row].  The loops below are therefore
+   ordered so that the innermost index is row, which makes every access to the
+   left operand and to the result unit-stride and lets the compiler vectorize.
+   For a given entry of the product the terms are still summed in the order
+   cnt=0,1,...,k-1, so the result is bit for bit that of the original loop. */
 static void mat_mult_tdma(double *mat1, long line1, double *mat2,long line2,
                  double *mat3, long line3, long k){
   long row,col,cnt;
-  for (row=0; row<k; row++){
-    for (col=0; col<k; col++){
-       mat3[EXM_mi(k,line3,row,col)]=0.0e0;
-       for (cnt=0; cnt<k; cnt++){
-           mat3[EXM_mi(k,line3,row,col)]=mat3[EXM_mi(k,line3,row,col)]+
-             mat1[EXM_mi(k,line1,row,cnt)]*mat2[EXM_mi(k,line2,cnt,col)];
-       }
+  double *m1,*m2,*m3;
+  double m2val;
+  m1=&mat1[line1*k*k];
+  m2=&mat2[line2*k*k];
+  m3=&mat3[line3*k*k];
+  for (col=0; col<k; col++){
+    m2val=m2[col*k];
+    for (row=0; row<k; row++) m3[col*k+row]=0.0e0+m1[row]*m2val;
+    for (cnt=1; cnt<k; cnt++){
+      m2val=m2[col*k+cnt];
+      for (row=0; row<k; row++) m3[col*k+row]+=m1[cnt*k+row]*m2val;
     }
   }
 }
@@ -732,37 +742,52 @@ static void mat_init_i_tdma(double *mat1, long line1, long k){
 
 
 
+/* Same Gauss-Jordan elimination as before, but with the row2 loop moved inside
+   the col loop.  The elimination factors of one pivot row depend only on the
+   pivot column, which the elimination of that same pivot row does not touch, so
+   they can all be formed before the update; each entry is then updated once,
+   with the same two operands and in the same order as in the original loop.
+   The update becomes a rank-one update whose innermost index is row2, hence
+   unit-stride and vectorizable.  The factor of the pivot row itself is set to
+   zero so that no branch is needed within the innermost loop. */
 static void mat_inv_tdma(double *mat1,long line1,double *mat2,long line2,long k){
   long row,row2,col;
-  double multfact;
+  double *m1,*m2;
+  double multfact1,multfact2,pivot;
+  double mf[k];
+  double pivotinv[k];
+  m1=&mat1[line1*k*k];
+  m2=&mat2[line2*k*k];
 /*
-     Idea: init mat2 as identity; gaussian elimination on mat1/mat2 
+     Idea: init mat2 as identity; gaussian elimination on mat1/mat2
 */
   mat_init_i_tdma(mat2,line2,k);
   for (row=0; row<k; row++){
-    for (row2=0; row2<k; row2++){
-      if (row2 != row) {
-        multfact=-mat1[EXM_mi(k,line1,row2,row)]
-                 /(mat1[EXM_mi(k,line1,row,row)]+0.0e-30);
+    pivot=m1[row*k+row]+0.0e-30;
+    for (row2=0; row2<k; row2++) mf[row2]=-m1[row*k+row2]/pivot;
+    mf[row]=0.0e0;
 /*
            Add line row*multfact to line row2
-*/ 
-        for (col=0; col<k; col++){
-          mat1[EXM_mi(k,line1,row2,col)]=mat1[EXM_mi(k,line1,row2,col)]+
-                      mat1[EXM_mi(k,line1,row,col)]*multfact;
-          mat2[EXM_mi(k,line2,row2,col)]=mat2[EXM_mi(k,line2,row2,col)]+
-                     mat2[EXM_mi(k,line2,row,col)]*multfact;
-        }
+*/
+    for (col=0; col<k; col++){
+      multfact1=m1[col*k+row];
+      multfact2=m2[col*k+row];
+      for (row2=0; row2<k; row2++){
+        m1[col*k+row2]+=multfact1*mf[row2];
+        m2[col*k+row2]+=multfact2*mf[row2];
       }
     }
   }
 
   for (row=0; row<k; row++){
-    for (col=0; col<k; col++){
-      assert(mat1[EXM_mi(k,line1,row,row)]!=0.0e0);
-      mat2[EXM_mi(k,line2,row,col)]=mat2[EXM_mi(k,line2,row,col)]/(mat1[EXM_mi(k,line1,row,row)]);
+    assert(m1[row*k+row]!=0.0e0);
+    pivotinv[row]=m1[row*k+row];
+    m1[row*k+row]=1.e0;
+  }
+  for (col=0; col<k; col++){
+    for (row=0; row<k; row++){
+      m2[col*k+row]=m2[col*k+row]/pivotinv[row];
     }
-    mat1[EXM_mi(k,line1,row,row)]=1.e0;
   }
 }
 
@@ -795,46 +820,148 @@ static void find_multfact(double *mat1,long line1,double *mat2,long line2,
   }
 }
 
+/* find mat3[line3]=-mat2[line2]*mat1inv[line1], with the inverse of the pivot
+   block supplied rather than recomputed */
+static void find_multfact_from_inv(double *matinv,long line1,double *mat2,long line2,
+                   double *mat3,long line3, long k){
+  long row,col;
+  mat_mult_tdma(mat2,line2,matinv,line1,mat3,line3,k);
+  for (row=0; row<k; row++){
+    for (col=0; col<k; col++){
+      mat3[EXM_mi(k,line3,row,col)]=-mat3[EXM_mi(k,line3,row,col)];
+    }
+  }
+}
+
+
+/* mat3[line3] column 0 = mat1[line1] * mat2[line2] column 0; the terms of one
+   entry are summed over cnt in the same order as in mat_mult_tdma, so this
+   returns bit for bit the first column of the full product */
+static void mat_mult_col0_tdma(double *mat1, long line1, double *mat2,long line2,
+                 double *mat3, long line3, long k){
+  long row,cnt;
+  double *m1,*m2,*m3;
+  double m2val;
+  m1=&mat1[line1*k*k];
+  m2=&mat2[line2*k*k];
+  m3=&mat3[line3*k*k];
+  m2val=m2[0];
+  for (row=0; row<k; row++) m3[row]=0.0e0+m1[row]*m2val;
+  for (cnt=1; cnt<k; cnt++){
+    m2val=m2[cnt];
+    for (row=0; row<k; row++) m3[row]+=m1[cnt*k+row]*m2val;
+  }
+}
+
+
+static void mat_add_col0_tdma(double *mat1, long line1, double *mat2, long line2,
+                  double *mat3, long line3, long k){
+  long row;
+  for (row=0; row<k; row++){
+     mat3[line3*k*k+row]=mat1[line1*k*k+row]+mat2[line2*k*k+row];
+  }
+}
+
+
+static void mat_equal_col0_tdma(double *mat1,long line1,double *mat2,long line2, long k){
+  long row;
+  for (row=0; row<k; row++){
+    mat2[line2*k*k+row]=mat1[line1*k*k+row];
+  }
+}
+
+
+/* TRUE if every column but the first of every RHS block is exactly zero, in
+   which case the columns 1..k-1 of the RHS stay zero throughout the solve and
+   only the first column needs to be carried */
+static bool find_whether_RHS_is_one_column(double *RHS, long linemax, long k){
+  long line,row,col;
+  bool RET;
+  RET=TRUE;
+  for (line=0; line<=linemax; line++){
+    for (col=1; col<k; col++){
+      for (row=0; row<k; row++){
+        if (RHS[EXM_mi(k,line,row,col)]!=0.0e0) RET=FALSE;
+      }
+    }
+  }
+  return(RET);
+}
+
+
 /* solve block TDMA with first line at line=0 and last line at
    line=linemax */
+/* Each pivot block BB[line] is used three times with identical contents: once
+   in the downward sweep, once in the upward sweep, and once in the final
+   normalization pass, and the original code inverted it anew every time.  The
+   inverse of each pivot block is now formed once, in the downward sweep, and
+   stored in BBINV for the other two uses.  The arithmetic performed on AA, CC
+   and RHS is unchanged, so the solution is bit for bit the one the original
+   routine returns; the number of Gauss-Jordan inversions drops from about
+   three per line to one.  BB is left untouched instead of being reduced to the
+   identity, which no caller relies on. */
 void EXM_solve_block_TDMA(double *AA, double *BB, double *CC, double *RHS,
                     long linemax, long k){
   long line;
-  double *TMP;
+  double *TMP,*BBINV;
+  bool ONECOL;
 
   TMP=(double *) malloc(6*k*k*sizeof(double));
+  BBINV=(double *) malloc((linemax+1)*k*k*sizeof(double));
+  ONECOL=find_whether_RHS_is_one_column(RHS,linemax,k);
 
 /*  --------------------------------------------------------------
     Sweep Downward
     -------------------------------------------------------------- */
   for (line=0; line<linemax; line++){
-    find_multfact(BB,line,AA,line+1,TMP,1,k);
+    mat_equal_tdma(BB,line,TMP,5,k);
+    mat_inv_tdma(TMP,5,BBINV,line,k);
+    find_multfact_from_inv(BBINV,line,AA,line+1,TMP,1,k);
     mat_mult_tdma(TMP,1,CC,line,TMP,2,k);
     mat_add_tdma(TMP,2,BB,line+1,TMP,3,k);
     mat_equal_tdma(TMP,3,BB,line+1,k);
-    mat_mult_tdma(TMP,1,RHS,line,TMP,2,k);
-    mat_add_tdma(TMP,2,RHS,line+1,TMP,3,k);
-    mat_equal_tdma(TMP,3,RHS,line+1,k);
+    if (ONECOL){
+      mat_mult_col0_tdma(TMP,1,RHS,line,TMP,2,k);
+      mat_add_col0_tdma(TMP,2,RHS,line+1,TMP,3,k);
+      mat_equal_col0_tdma(TMP,3,RHS,line+1,k);
+    } else {
+      mat_mult_tdma(TMP,1,RHS,line,TMP,2,k);
+      mat_add_tdma(TMP,2,RHS,line+1,TMP,3,k);
+      mat_equal_tdma(TMP,3,RHS,line+1,k);
+    }
   }
+  mat_equal_tdma(BB,linemax,TMP,5,k);
+  mat_inv_tdma(TMP,5,BBINV,linemax,k);
 
 /*   --------------------------------------------------------------
      Sweep Upward
      -------------------------------------------------------------- */
   for (line=linemax; line>0; line--){
-    find_multfact(BB,line,CC,line-1,TMP,1,k);
-    mat_mult_tdma(TMP,1,RHS,line,TMP,2,k);
-    mat_add_tdma(TMP,2,RHS,line-1,TMP,3,k);
-    mat_equal_tdma(TMP,3,RHS,line-1,k);
+    find_multfact_from_inv(BBINV,line,CC,line-1,TMP,1,k);
+    if (ONECOL){
+      mat_mult_col0_tdma(TMP,1,RHS,line,TMP,2,k);
+      mat_add_col0_tdma(TMP,2,RHS,line-1,TMP,3,k);
+      mat_equal_col0_tdma(TMP,3,RHS,line-1,k);
+    } else {
+      mat_mult_tdma(TMP,1,RHS,line,TMP,2,k);
+      mat_add_tdma(TMP,2,RHS,line-1,TMP,3,k);
+      mat_equal_tdma(TMP,3,RHS,line-1,k);
+    }
   }
 /*   --------------------------------------------------------------
-     Make BB identity
+     Multiply the RHS by the inverse of the pivot block
      -------------------------------------------------------------- */
   for (line=0; line<=linemax; line++){
-    mat_inv_tdma(BB,line,TMP,1,k);
-    mat_mult_tdma(TMP,1,RHS,line,TMP,2,k);
-    mat_equal_tdma(TMP,2,RHS,line,k);
+    if (ONECOL){
+      mat_mult_col0_tdma(BBINV,line,RHS,line,TMP,2,k);
+      mat_equal_col0_tdma(TMP,2,RHS,line,k);
+    } else {
+      mat_mult_tdma(BBINV,line,RHS,line,TMP,2,k);
+      mat_equal_tdma(TMP,2,RHS,line,k);
+    }
   }
   free(TMP);
+  free(BBINV);
 }
 
 
