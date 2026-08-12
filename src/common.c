@@ -576,13 +576,25 @@ void multiply_matrix_and_matrix(sqmat_t A, sqmat_t B, sqmat_t C){
   long row,col,flux;
   double tmp;
 
+  /* the accumulation is done over the last index of B and C so that both are
+     accessed with unit stride; for a given row and col the terms are still summed
+     in the order flux=0,1,...,nf-1, so the result is the same as with the
+     row,col,flux ordering */
   for (row=0; row<nf; row++){
+    tmp=A[row][0];
     for (col=0; col<nf; col++){
-      tmp=0.0e0;
-      for (flux=0; flux<nf; flux++){
-        tmp=tmp+A[row][flux]*B[flux][col];
+      C[row][col]=tmp*B[0][col];
+    }
+    for (flux=1; flux<nf; flux++){
+      tmp=A[row][flux];
+      /* skipping the vanishing entries of A is exact: A is sparse for a
+         multispecies mixture and adding tmp*B[flux][col] with tmp=0 changes
+         nothing as long as B holds finite entries */
+      if (tmp!=0.0e0){
+        for (col=0; col<nf; col++){
+          C[row][col]+=tmp*B[flux][col];
+        }
       }
-      C[row][col]=tmp;
     }
   }
 }
