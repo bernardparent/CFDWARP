@@ -661,6 +661,21 @@ void find_nuk_eta_kappa(gl_t *gl, spec_t rhok, double T, double Te,
 }
 
 
+/* return the mixture viscosity alone; when charged species are present this is
+   the same as what find_nuk_eta_kappa() returns in *eta, but without forming
+   the diffusion coefficients and the thermal conductivity */
+double _eta_from_rhok_T_Te(gl_t *gl, spec_t rhok, double T, double Te){
+  double eta,kappa;
+  spec_t nuk;
+  if (ncs==0){
+    eta=_etan_from_rhok_T_Te(rhok,T,Te);
+  } else {
+    find_nuk_eta_kappa(gl, rhok, T, Te, nuk, &eta, &kappa);
+  }
+  return(eta);
+}
+
+
 void find_dmuk_from_rhok_Tk_Ek(gl_t *gl, spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok){
   find_dmuk_from_rhok_Tk_Ek_ParentMacheret(rhok, Tk, Ek, k, dmukdTk, dmukdrhok);
 }

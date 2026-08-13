@@ -1433,6 +1433,24 @@ void find_nuk_eta_kappa(gl_t *gl, spec_t rhok, double T, double Te,
 }
 
 
+/* return the mixture viscosity alone: the same value find_nuk_eta_kappa() puts in *eta,
+   formed by the same operations in the same order, but without the collision integrals
+   evaluated at Te, the species collision frequencies, the mobilities and the thermal
+   conductivity, all of which that routine also forms */
+double _eta_from_rhok_T_Te(gl_t *gl, spec_t rhok, double T, double Te){
+  long spec;
+  spec_t chik;
+  spec2_t Delta1,Delta2;
+  double N,eta;
+  N=0.0;
+  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
+  for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
+  find_Delta1_Delta2(N,T,_lnLambda_local(gl, rhok, Te),Delta1,Delta2);
+  eta=_eta_from_chik_N_T_Te_Delta1_Delta2(chik, N, T, Te, Delta1, Delta2);
+  return(eta);
+}
+
+
 void find_dmuk_from_rhok_Tk_Ek(gl_t *gl, spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok){
   long spec;
   *dmukdTk=0.0;

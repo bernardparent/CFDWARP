@@ -1123,7 +1123,7 @@ double _kappan_from_rhok_T_Te(spec_t rhok, double T, double Te){
 
 }
 
-double _eta_from_rhok_T_Te(spec_t rhok, double T, double Te){
+double _eta_from_rhok_T_Te(gl_t *gl, spec_t rhok, double T, double Te){
   return(1.0);
 
 }

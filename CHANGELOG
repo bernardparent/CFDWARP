@@ -7,6 +7,48 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 AUG 13a
+  * in model/fluid/_*/fluid_conv.c, in model/transport/_transport.h, in
+    model/transport/_Dixon-Lewis/transport.c, in model/transport/_Gupta-Yos/transport.c and
+    in model/transport/_Capitelli/transport.c
+    - the eigenvalue conditioning needs the mixture viscosity alone, but obtained it by
+      calling find_nuk_eta_kappa(), which also forms the ns x ns binary diffusion
+      coefficients, the species collision frequencies, the mixture thermal conductivity and
+      the mobilities: all of these were dropped on return. This was done in _Pe_from_jacvars(),
+      which forms the Peclet number of the EIGENVALCOND_PECLET conditioning, and in
+      _eta_from_jacvars(), which is called by _Re_edge_from_jacvars() of the
+      EIGENVALCOND_GNOFFO conditioning, in each of the three fluid modules that hold a
+      multispecies transport package, that is _Navier-Stokes, _Favre-Reynolds and
+      _Favre-Reynolds_Tv. The _Navier-Stokes_perfect module needs no change, its
+      _Pe_from_jacvars() and _eta_from_jacvars() reading the viscosity off jacvars.eta.
+    - added the transport entry _eta_from_rhok_T_Te(), which returns the mixture viscosity
+      and nothing else, and called it from the six functions above. In the _Dixon-Lewis
+      module, when no charged species are present it calls _etan_from_rhok_T_Te() and nothing
+      else; when there are charged species the charged contributions to eta need the
+      mobilities and it falls back on find_nuk_eta_kappa(). In the _Gupta-Yos module it forms
+      the number density, the molar fractions and the collision integrals at T with the same
+      calls in the same order as find_nuk_eta_kappak_muk(), and then calls the same
+      _eta_from_chik_N_T_Te_Delta1_Delta2(); what it skips is the second set of collision
+      integrals evaluated at Te, the aij and Ai of the conductivity, the species collision
+      frequencies, the mobilities and the thermal conductivity. In both modules the value
+      returned is the one find_nuk_eta_kappa() puts in eta, to the last bit. In the
+      _Capitelli module, which holds a stub returning 1.0, the stub was given the gl argument
+      of the new prototype so that the module keeps agreeing with model/transport/_transport.h.
+    - this only removes repeated work, hence the residual history and all outputs are bitwise
+      identical to those of the previous version. On the same 3D ethylene-air case as the
+      2026 AUG 12c entry (26 species, HLLC_HYBRID, block ADI, nf=30, 60x16x16, 5 iterations,
+      one core, _Navier-Stokes with _Dixon-Lewis), 341040 of the 437192 calls to
+      find_nuk_eta_kappa() came from _Pe_from_jacvars() and are removed by this alone; the
+      screen output is byte for byte identical to that of the previous version, and the
+      average of three repetitions goes from 31.85 s to 24.42 s, that is 23 percent less time
+      per iteration, a factor 1.30. The screen output is byte for byte identical as well on a
+      2D _Favre-Reynolds run of bin/shearlayer.wrp with _Dixon-Lewis and on a 2D
+      _Navier-Stokes run of bin/RAM-C-II.wrp with _Gupta-Yos, both over five iterations. On
+      the latter, which is an 11 species air plasma and where the entry skips more, the
+      average of two repetitions goes from 11.25 s to 7.73 s, that is 31 percent less time
+      per iteration, a factor 1.45.
+      
+      
 2026 AUG 12c
   * in model/thermo/_generic/enthalpy.c
     - _hk_from_T() and _cpk_from_T() are now memoized on the last temperature seen. Both
