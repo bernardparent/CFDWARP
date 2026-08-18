@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 AUG 18a
+  * in model/chem
+    - added _Ar_Plasma_3s
+    - updated ground ionization rate in _Ar_Plasma_3s, _Ar_Plasma_4s, _Ar_Plasma_8s
+  * in model/share/transport_share.c
+    - updated _mueN_Ar()
+  * in model/thermo/_generic/electronimpact.c
+    - updated _EoverN_from_Te_Ar() and _Te_from_EoverN_Ar()
+  * in model/chem/_Ar_Plasma_*s/doc/report.tex
+    - modified the documentation for the ground ionization rate
+  * in model/thermo/doc/
+    - updated electronimpact.tex
+
+
 2026 AUG 13a
   * in model/fluid/_*/fluid_conv.c, in model/transport/_transport.h, in
     model/transport/_Dixon-Lewis/transport.c, in model/transport/_Gupta-Yos/transport.c and

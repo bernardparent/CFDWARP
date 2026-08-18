@@ -45,5 +45,6 @@ cleanall:
 	( cd _NH3_Plasma_34s ; make cleanall )
 	( cd _Ar_Plasma_8s ; make cleanall )
 	( cd _Ar_Plasma_4s ; make cleanall )
+	( cd _Ar_Plasma_3s ; make cleanall )
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.

@@ -55,7 +55,7 @@
   University of Arizona
 }
 
-\title{Four Species Argon Plasma Kinetics 
+\title{Three Species Argon Plasma Kinetics 
 }
 
 \date{
@@ -113,7 +113,7 @@ charged${}^-$ & $\rm e^-$\\
 
 charged${}^+$ & $\rm Ar^+$\\
       
-neutral, atomic & $\rm Ar$, $\rm Ar(4s)$\\
+neutral, atomic & $\rm Ar$\\
     
 
     \bottomrule
@@ -121,15 +121,13 @@ neutral, atomic & $\rm Ar$, $\rm Ar(4s)$\\
    \end{threeparttable}
 \end{table*}
 
-\begin{figure}[ht]
-     \centering
-     \includegraphics[width=0.5\textwidth]{figs/argon_atomics.png}
-     \caption{Energy level diagram for Ar showing the first two
-excited configurations. The two metastable levels are indicated
-by the letter. The Paschen designation for each level is
-indicated at the top of the table. Diagram taken from \cite{pr:1998:piech}.}
-     \label{fig:atomdata}
-\end{figure}
+This is the three species version of the argon mechanism: it is obtained from the four
+species mechanism by removing the metastable $\rm Ar(4s)$ and every reaction in which it
+takes part, so that the only process left is the ionization of ground state argon by
+electron impact. The energy lost by the electrons to the inelastic processes other than
+ionization is not accounted for here; it enters through the source term of the electron
+temperature transport model, in the manner of the $-n_{\rm e} N k L$ term of Boeuf and
+Pitchford \cite{pr:1995:boeuf}.
 
 
 
@@ -147,12 +145,7 @@ indicated at the top of the table. Diagram taken from \cite{pr:1998:piech}.}
  
  % \cite{ijae:2011:katsonis}, \cite{jap:1993:lymberopoulos}
 
-\begin{figure}[ht]
-     \centering
-     \includegraphics[width=0.5\textwidth]{figs/reaction1.pdf}
-     \caption{Reaction 1: $\rm e^- + Ar \leftrightarrow Ar(4s) + e^-$; comparison of total excitation and superelastic rates to 4s levels of Argon obtained with BOLSIG+ using cross section data from \cite{pr:tachibana:1986} at 300 K. Splines fitted to BOLSIG+ data.}
-     \label{fig:rate_R1}
-\end{figure}
+
 
 
 
@@ -160,16 +153,11 @@ indicated at the top of the table. Diagram taken from \cite{pr:1998:piech}.}
 \begin{figure}[ht]
      \centering
      \includegraphics[width=0.5\textwidth]{figs/reaction4.pdf}
-     \caption{Reaction 2: $\rm e^- + Ar \rightarrow Ar^+ + 2e^-$; comparison of ionization rate of Ar obtained with BOLSIG+ using cross section data from \cite{jcp:1965:rapp} at 300 K. Reference data from \cite{jap:1993:lymberopoulos}.}
+     \caption{Reaction 1: $\rm e^- + Ar \rightarrow Ar^+ + 2e^-$; comparison of ionization rate of Ar obtained with bolsigminus using cross section data from \cite{jcp:1965:rapp} at 300 K. Reference data from \cite{jap:1993:lymberopoulos}.}
      \label{fig:rate_R4}
 \end{figure}
 
-\begin{figure}[ht]
-     \centering
-     \includegraphics[width=0.5\textwidth]{figs/reaction5.pdf}
-     \caption{Reaction 3: $\rm e^- + Ar(4s) \rightarrow Ar^+ + 2e^-$; comparison of ionization rate of Ar(4s) obtained with BOLSIG+ using cross section data from \cite{pr:hyman:1979} at 300 K. Spline fitted to BOLSIG+ data.}
-     \label{fig:rate_R5}
-\end{figure}
+
 
 
 
@@ -186,52 +174,12 @@ indicated at the top of the table. Diagram taken from \cite{pr:1998:piech}.}
     No.~~~~& Reaction & $T,~\textrm{K}$ & $A$  & $n$ & $E$ & Cross-section/rate ref. \\
     \midrule
 
-    
-     1  & $\rm e^- +Ar \leftrightarrow Ar(4s) + e^-$
-       & $T_{\rm e}$
-       & \multicolumn{3}{p{6cm}}{Rates obtained with BOLSIG+ and detailed balance}
-       & \cite{pr:tachibana:1986}\\   
 
 
-
-
-
-
-
-  2  & $\rm e^- +Ar \rightarrow Ar^+ + e^- + e^-$
+  1  & $\rm e^- +Ar \rightarrow Ar^+ + e^- + e^-$
        & $T_{\rm e}$
        & \multicolumn{3}{p{6cm}}{Rate obtained with bolsigminus}       
        & \cite{jcp:1965:rapp} \\
-
-    3  & $\rm e^- +Ar(4s) \rightarrow Ar^+ + e^- + e^-$
-       & $T_{\rm e}$
-       & \multicolumn{3}{p{6cm}}{Rate obtained with BOLSIG+}       
-       & \cite{pr:hyman:1979} \\
-
-
-
-
-
-
-       
-
-
-         4 & $\rm Ar(4s) + Ar(4s) \rightarrow Ar^+ +Ar + e^- $
-       & $T$ 
-       & $1.0\cdot10^{-9}\cdot N_A $    
-       &0.0
-       &0.0       
-       & \cite{jof:2007:arakoni} \\
-
-         5 & $\rm Ar(4s) + Ar \rightarrow Ar +Ar  $
-       & $T$ 
-       & $2.3\cdot10^{-15}\cdot N_A $    
-       &0.0
-       &0.0       
-       & \cite{pr:1995:bogaerts} \\
-
-
-
 
 
  
@@ -261,105 +209,6 @@ Process & Reaction ~ & ${\rm ln}~T_{\rm e}$ & ${\rm ln}~k$ \\
         \midrule
         
 
-Ground Excitation & ~{$\rm e^- + Ar \rightarrow Ar(4s) + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
-      10.4268
-      10.4485
-      10.4702
-      10.4919
-      10.5135
-      10.5352
-      10.5569
-      10.6648
-      10.7727
-      10.8755
-      10.9536
-      11.0001
-      11.0270
-      11.0510
-      11.0942
-      11.1474
-      11.2135
-      11.2963
-      11.4088
-      11.5797
-      11.8688
-      12.4147
-      13.2881
- \end{minipage}  & \begin{minipage}[t]{0.28\textwidth}\raggedright 
-      -56.8696
-      -54.4046
-      -52.1035
-      -49.9593
-      -47.9647
-      -46.1123
-      -44.3839
-      -37.5377
-      -33.0186
-      -30.1382
-      -28.3493
-      -27.2040
-      -26.3998
-      -25.6123
-      -24.4623
-      -23.5214
-      -22.6969
-      -21.9640
-      -21.3009
-      -20.6658
-      -20.0016
-      -19.3066
-      -18.7517
-\end{minipage} \\         
-~\\
-
-Superelastic collision & ~{$\rm e^- + Ar(4s) \rightarrow Ar  + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
-      7.0565
-      7.1440
-      7.2314
-      7.3188
-      7.7560
-      8.1932
-      8.6304
-      9.0676
-      9.5048
-      9.9420
-      10.3792
-      10.8164
-      11.2536
-      11.6908
-      12.1280
-      12.5652
-      13.0024
-      13.4396
-      13.8768
-
- \end{minipage}  & \begin{minipage}[t]{0.28\textwidth}\raggedright 
-      -22.8246
-      -22.7760
-      -22.7259
-      -22.6744
-      -22.4000
-      -22.1156
-      -21.8242
-      -21.4756
-      -21.1749
-      -20.9107
-      -20.6336
-      -20.4455
-      -20.3895
-      -20.3213
-      -20.2344
-      -20.1566
-      -20.0965
-      -20.0569
-      -20.0419
-
-\end{minipage} \\         
-~\\
-
-
-
-
 Ground ionization & ~{$\rm e^- + Ar \rightarrow Ar^+ + e^- + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
     10.82646
     10.96672
@@ -388,42 +237,7 @@ Ground ionization & ~{$\rm e^- + Ar \rightarrow Ar^+ + e^- + e^-$  } &   \begin{
 ~\\
 
 
-Stepwise ionization & ~{$\rm e^- + Ar(4s) \rightarrow Ar^+ + e^- + e^-$  } &   \begin{minipage}[t]{0.28\textwidth}\raggedright  
-      8.9802
-      9.0676
-      9.1551
-      9.2425
-      9.3299
-      9.4174
-      9.8546
-      10.2918
-      10.7290
-      11.1662
-      11.6034
-      12.0406
-      12.4778
-      12.9150
-      13.3522
-      13.7894
- \end{minipage}  & \begin{minipage}[t]{0.28\textwidth}\raggedright 
-      -47.4567
-      -42.7722
-      -38.2715
-      -34.2096
-      -30.8706
-      -28.2804
-      -21.6398
-      -18.7954
-      -17.3209
-      -16.5828
-      -16.1777
-      -15.9052
-      -15.6982
-      -15.5401
-      -15.4256
-      -15.3526
-\end{minipage} \\ 
- \alb 
+\alb 
     \bottomrule
     \end{tabular*}
 \begin{tablenotes}
