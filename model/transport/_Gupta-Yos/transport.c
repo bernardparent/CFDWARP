@@ -1032,24 +1032,20 @@ double _kappa_from_chik_N_T_Te_aav_Ai_Delta1_TRANSPORTMODEL_EQUILIBRIUM_EQ30(spe
 
 
 // Eq(27), first Chapman-Enskog approximation, bug: off by factor of -1 : needs fixing
-double _kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ27(gl_t *gl, spec_t rhok, double T, double Te){
-  long spec,i,j,l;
-  spec_t chik,  Ai;
-  spec2_t Delta1,Delta2;
-  double N, den, kappa_tr, kappa_int, aav;
-  
+// given the molar fractions, the number density and the collision integrals, which the
+// caller has already formed
+double _kappa_from_chik_N_T_Te_Delta1_Delta2_TRANSPORTMODEL_EQUILIBRIUM_EQ27(spec_t chik, double N, double T, double Te, spec2_t Delta1, spec2_t Delta2){
+  long i,j,l;
+  spec_t Ai;
+  double den, kappa_tr, kappa_int, aav;
+
   double Aij[ns][ns];
   EXM_mat_t tmp1,tmp2;
   double tmp3=0.0;
   spec2_t aij;
 
-  N=0.0;
-  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
-  for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
-
-  find_Delta1_Delta2(N,T,_lnLambda_local(gl, rhok, Te),Delta1,Delta2);
   find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
-  
+
 
   kappa_tr     = 0.0e0;
   kappa_int    = 0.0e0;
@@ -1089,27 +1085,34 @@ double _kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ27(gl_t *gl, spec_t rh
     den=0.0;
   }
   kappa_int*=2.3901E-8*kBol;
-  
+
   return((kappa_tr+kappa_int)*418.4); // cal/cm-s-K to W/m-K
 }
 
 
-// Eq(40a), approximation to method 1 ??? or method 2??
-double _kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ40A(gl_t *gl, spec_t rhok, double T, double Te){
-  long spec,i,j;
-  spec_t chik,  Ai;
+double _kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ27(gl_t *gl, spec_t rhok, double T, double Te){
+  long spec;
+  spec_t chik;
   spec2_t Delta1,Delta2;
-  double N, den, kappa_tr, kappa_int;
-  double asr,aav;
-  spec2_t aij;
+  double N;
 
   N=0.0;
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
   for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
 
   find_Delta1_Delta2(N,T,_lnLambda_local(gl, rhok, Te),Delta1,Delta2);
-  find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
-  
+  return(_kappa_from_chik_N_T_Te_Delta1_Delta2_TRANSPORTMODEL_EQUILIBRIUM_EQ27(chik, N, T, Te, Delta1, Delta2));
+}
+
+
+// Eq(40a), approximation to method 1 ??? or method 2??
+// given the molar fractions, the number density and the collision integrals, which the
+// caller has already formed; note that this expression needs the collision integrals only,
+// and not the aij and Ai that find_aij_Ai_for_kappa() forms
+double _kappa_from_chik_N_T_Te_Delta1_Delta2_TRANSPORTMODEL_EQUILIBRIUM_EQ40A(spec_t chik, double N, double T, double Te, spec2_t Delta1, spec2_t Delta2){
+  long i,j;
+  double den, kappa_tr, kappa_int;
+  double asr;
 
   kappa_tr     = 0.0e0;
   kappa_int    = 0.0e0;
@@ -1136,8 +1139,23 @@ double _kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ40A(gl_t *gl, spec_t r
     den=0.0;
   }
   kappa_int*=2.3901E-8*kBol;
-    
+
   return((kappa_tr+kappa_int)*418.4); // cal/cm-s-K to W/m-K
+}
+
+
+double _kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ40A(gl_t *gl, spec_t rhok, double T, double Te){
+  long spec;
+  spec_t chik;
+  spec2_t Delta1,Delta2;
+  double N;
+
+  N=0.0;
+  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
+  for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
+
+  find_Delta1_Delta2(N,T,_lnLambda_local(gl, rhok, Te),Delta1,Delta2);
+  return(_kappa_from_chik_N_T_Te_Delta1_Delta2_TRANSPORTMODEL_EQUILIBRIUM_EQ40A(chik, N, T, Te, Delta1, Delta2));
 }
 
 
@@ -1316,14 +1334,15 @@ void find_nuk_eta_kappak_muk(gl_t *gl, spec_t rhok, double T, double Te,
   spec_t kappak;
   N=0.0;
   for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
-  for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N; 
+  for (spec=0; spec<ns; spec++) chik[spec]=rhok[spec]/_m(spec)/N;
 
   find_Delta1_Delta2(N,T,_lnLambda_local(gl, rhok, Te),Delta1,Delta2);
-  find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);  
-
   find_Delta1_Delta2(N,Te,_lnLambda_local(gl, rhok, Te),Delta1_e,Delta2_e);
-  find_aij_Ai_for_kappa(chik, N, Te, Delta1_e, Delta2_e, aij_e, Ai_e, &aav_e);  
-  
+  /* the aij, the Ai and the aav of the conductivity, at T and at Te, used to be formed
+     here for every transport model although only the EQ30 one needs them: they are now
+     formed in that case alone, where they are formed by the same calls on the same
+     operands as before */
+
   *eta=_eta_from_chik_N_T_Te_Delta1_Delta2(chik, N, T, Te, Delta1, Delta2);
   find_nuk_from_chik_N_T_Te_Delta1(chik, N, T, Te, Delta1, nuk);
 
@@ -1331,13 +1350,15 @@ void find_nuk_eta_kappak_muk(gl_t *gl, spec_t rhok, double T, double Te,
   
   switch (gl->model.transport.TRANSPORTMODEL){
     case TRANSPORTMODEL_EQUILIBRIUM_EQ27:
-      (*kappan)=_kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ27(gl, rhok, T, Te);
+      (*kappan)=_kappa_from_chik_N_T_Te_Delta1_Delta2_TRANSPORTMODEL_EQUILIBRIUM_EQ27(chik, N, T, Te, Delta1, Delta2);
       for (k=0; k<ncs; k++){
         kappac[k]=_kappak_from_chik_Delta1_Delta2_GUPTAYOSNONEQUILIBRIUM(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
         (*kappan)-=kappac[k];
       }
     break;
     case TRANSPORTMODEL_EQUILIBRIUM_EQ30:
+      find_aij_Ai_for_kappa(chik, N, T, Delta1, Delta2, aij, Ai, &aav);
+      find_aij_Ai_for_kappa(chik, N, Te, Delta1_e, Delta2_e, aij_e, Ai_e, &aav_e);
       for (k=0; k<ns; k++) {
         if (speciestype[k]==SPECIES_ELECTRON) 
           kappak[k]=_kappak_from_chik_N_T_Te_aav_Ai_Delta1_TRANSPORTMODEL_EQUILIBRIUM_EQ30(chik, N, T, Te, aav_e, Ai_e, Delta1_e, k);
@@ -1349,7 +1370,7 @@ void find_nuk_eta_kappak_muk(gl_t *gl, spec_t rhok, double T, double Te,
       for (spec=ncs; spec<ns; spec++) (*kappan)+=kappak[spec];
     break;
     case TRANSPORTMODEL_EQUILIBRIUM_EQ40A:
-      (*kappan)=_kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ40A(gl, rhok, T, Te);
+      (*kappan)=_kappa_from_chik_N_T_Te_Delta1_Delta2_TRANSPORTMODEL_EQUILIBRIUM_EQ40A(chik, N, T, Te, Delta1, Delta2);
       for (k=0; k<ncs; k++){
         kappac[k]=_kappak_from_chik_Delta1_Delta2_GUPTAYOSNONEQUILIBRIUM(T, chik, Delta1, Delta2, Delta1_e, Delta2_e, k); 
         (*kappan)-=kappac[k];

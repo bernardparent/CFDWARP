@@ -7,6 +7,91 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 AUG 18b
+  * in model/transport/_Dixon-Lewis/transport.c
+    - the mixture viscosity and the mixture thermal conductivity are now formed in one pass
+      by the new find_etan_kappan_from_w_T() rather than by one call each to
+      _etan_from_rhok_T_Te() and _kappan_from_rhok_T_Te(). The two Wilke-type mixture rules
+      differ only by the 1.0654 factor in the denominator of the conductivity, so the double
+      sum over the species pairs, which is what these two routines cost, was written out
+      twice and evaluated twice per node: it is now formed once and used for both. The fused
+      routine skips the conductivity altogether when it is passed a NULL kappan, which is
+      the path taken by the eigenvalue conditioning of the 2026 AUG 13a entry, and
+      _etan_from_rhok_T_Te() and _kappan_from_rhok_T_Te() are kept as wrappers of it so that
+      nothing outside the module sees a changed interface. Every term is accumulated in the
+      same order on the same operands as before, so eta and kappa are unchanged to the last
+      bit.
+    - the species viscosities and the species thermal conductivities are formed for all
+      species in one pass by the new find_etak_kappak_from_T() and memoized on the last
+      temperature seen, as _hk_from_T() and _cpk_from_T() are in
+      model/thermo/_generic/enthalpy.c, and the species conductivity reuses the species
+      viscosity just formed through the new _kappak_from_etak_T() rather than having
+      _kappak_from_T() call _etak_from_T() a second time to obtain it. On the case below, 56
+      percent of the calls find the species viscosities already in the cache, and the number
+      of evaluations of _etak_from_T(), each of which is a collision integral polynomial,
+      goes from 16.4 million to 5.1 million per five iterations. The cache is thread-local
+      and compared on exact equality, so a hit returns the bits the routine would have
+      computed and an OpenMP build behaves as the serial one.
+    - the density and the mass fractions, which _etan_from_rhok_T_Te(),
+      _kappan_from_rhok_T_Te() and find_nuk_from_rhok_T_Te() each formed again from rhok,
+      are now formed once by find_nuk_eta_kappak_muk() and given to all three;
+      find_nuk_from_rhok_T_Te() is kept as a wrapper of the new
+      find_nuk_from_rhok_w_rho_T_Te(), which takes them as arguments.
+    - find_nuk_from_rhok_T_Te() rewrites rhok as rho times the mass fractions, and the
+      previous version formed the conductivity after that rewrite while it formed the
+      viscosity before it. The rewrite leaves the mass fractions where they were except when
+      the sum of the rewritten densities moves by an ulp, which happens at about 10 percent
+      of the nodes of the case below: find_nuk_eta_kappak_muk() compares them and forms the
+      conductivity a second time in that case alone, so that kappa holds the bits it held
+      before at every node and not merely almost everywhere.
+    - the factors of the mixture rules and of the binary diffusion coefficients that depend
+      on nothing but the two species indices, namely sqrt(8*(1+calM_k/calM_l)),
+      (calM_l/calM_k)^(1/4), sqrt(eps_k*eps_l), 1/calM_l+1/calM_k and sigma_k+sigma_l, are
+      built once into ns x ns tables on the first call instead of being evaluated per node
+      and per pair of species. The exponent 1/4 in particular was a genuine call into libm,
+      ns*(ns-1) of them per node, that gcc cannot turn into multiplications. Each table entry
+      is formed by the same expression, in the same order, as the one it replaces, so it
+      holds the same bits, and the tables are thread-local as the memoization above is. T^3
+      is likewise formed once per node rather than once per pair of species.
+    - in find_nuk_from_rhok_w_rho_T_Te(), only the upper triangle of the binary diffusion
+      coefficient matrix is evaluated and the lower triangle is copied from it, which halves
+      the number of collision integral evaluations from ns^2 to ns*(ns+1)/2 per node. Every
+      factor of calD[k][l] is symmetric in the two species indices and the operations are
+      ordered symmetrically as well, so the copy holds the bits the evaluation would have
+      produced. The ion-ion Coulomb correction, which is the one term that is not symmetric
+      in the two indices, was moved to a loop of its own after the symmetric one and is
+      compiled only when METHOD2 is selected rather than tested at run time.
+  * in model/transport/_Gupta-Yos/transport.c
+    - find_nuk_eta_kappak_muk() formed the aij, the Ai and the aav of the conductivity
+      twice, once at T and once at Te, whatever the transport model, although only
+      TRANSPORTMODEL_EQUILIBRIUM_EQ30 uses them: the two calls to find_aij_Ai_for_kappa(),
+      each of which forms ns x ns collision cross section ratios, are now made in that
+      branch alone and by the same calls on the same operands as before.
+    - _kappa_from_rhok_T_Te_TRANSPORTMODEL_EQUILIBRIUM_EQ27() and its EQ40A counterpart
+      formed the number density, the molar fractions and the collision integrals again
+      although find_nuk_eta_kappak_muk() had just formed them and passes through them on
+      every node. Their bodies now live in
+      _kappa_from_chik_N_T_Te_Delta1_Delta2_TRANSPORTMODEL_EQUILIBRIUM_EQ27() and in the
+      EQ40A counterpart of it, which take these as arguments and are what
+      find_nuk_eta_kappak_muk() calls; the two routines taking rhok are kept as wrappers of
+      them. The EQ40A expression needs the collision integrals alone, so the call to
+      find_aij_Ai_for_kappa() it made, whose results it never used, is gone.
+  * all of the above only remove repeated work, hence the residual history and all outputs
+    are bitwise identical to those of the previous version. On the same 3D ethylene-air case
+    as the 2026 AUG 13a entry (26 species, HLLC_HYBRID, block ADI, nf=30, 60x16x16, 5
+    iterations, one core, _Navier-Stokes with _Dixon-Lewis), the screen output is byte for
+    byte identical to that of the previous version and the average of three repetitions goes
+    from 24.46 s to 17.82 s, that is 27 percent less time per iteration, a factor 1.37, of
+    which the fusing and the memoization account for a factor 1.06 and the pair constant
+    tables and the symmetry of the diffusion matrix for a further factor 1.30. The screen
+    output is byte for byte identical as well on a 2D _Favre-Reynolds run of
+    bin/shearlayer.wrp with _Dixon-Lewis and on a 2D _Navier-Stokes run of bin/RAM-C-II.wrp
+    with _Gupta-Yos, both over five iterations; on the latter, which is an 11 species air
+    plasma and does not use the _Dixon-Lewis module, so that what is measured there is the
+    _Gupta-Yos part alone, the average of three repetitions goes from 7.70 s to 7.31 s, that
+    is 5.2 percent.
+    
+    
 2026 AUG 18a
   * in model/chem
     - added _Ar_Plasma_3s

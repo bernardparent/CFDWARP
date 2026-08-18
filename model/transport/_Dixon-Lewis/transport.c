@@ -413,6 +413,32 @@ static double _Omega22(double T, double eps){
 }
 
 
+/* The mixture rules of find_etan_kappan_from_w_T() and the binary diffusion coefficients of
+   find_nuk_from_rhok_w_rho_T_Te() contain factors that depend on the two species indices
+   only, and not on the temperature or on the composition: they are evaluated here once on
+   the first call and stored in tables. Each table entry is formed by the same expression, in
+   the same order, as the one it replaces, so the tables hold the bits the expressions gave.
+   The tables are __thread so that an OpenMP build behaves exactly as the serial one. */
+static __thread double PAIRsqrt8[ns][ns];    /* sqrt(8*(1+calM_k/calM_l))    */
+static __thread double PAIRcalM14[ns][ns];   /* (calM_l/calM_k)^(1/4)        */
+static __thread double PAIReps[ns][ns];      /* sqrt(eps_k*eps_l)            */
+static __thread double PAIRinvcalM[ns][ns];  /* 1/calM_l+1/calM_k            */
+static __thread double PAIRsig[ns][ns];      /* sigma_k+sigma_l              */
+static __thread bool PAIRneedinit=TRUE;
+
+static void find_pair_constants(void){
+  long k,l;
+  for (k=0; k<ns; k++){
+    for (l=0; l<ns; l++){
+      PAIRsqrt8[k][l]=sqrt((1.0e0+_calM(k)/_calM(l))*8.0e0);
+      PAIRcalM14[k][l]=pow(_calM(l)/_calM(k),0.25e0);
+      PAIReps[k][l]=sqrt(Peps[smap[k]]*Peps[smap[l]]);
+      PAIRinvcalM[k][l]=1.0e0/_calM(l)+1.0e0/_calM(k);
+      PAIRsig[k][l]=Psig[smap[k]]+Psig[smap[l]];
+    }
+  }
+  PAIRneedinit=FALSE;
+}
 
 
 static double _etak_from_T(long spec, double T){
@@ -441,9 +467,10 @@ static double _etak_from_T(long spec, double T){
 }
 
 
-static double _kappak_from_T(long spec, double T){
-  double etak,kappak;
-  etak=_etak_from_T(spec,T);
+/* same as _kappak_from_T() was, but takes the species viscosity as an argument rather
+   than calling _etak_from_T() a second time to obtain it */
+static double _kappak_from_etak_T(long spec, double etak, double T){
+  double kappak;
   switch (speciestype[spec]) {
     case SPECIES_NEUTRAL:
       if (_numatoms(spec)>1) {
@@ -455,81 +482,67 @@ static double _kappak_from_T(long spec, double T){
     break;
     default:
       kappak=0.0;
-      fatal_error("Wrong speciestype in _kappak_from_T().");
+      fatal_error("Wrong speciestype in _kappak_from_etak_T().");
   }
-    
+
   return(kappak);
 }
 
 
-/* find kappa for the neutral species mixture */
-double _kappan_from_rhok_T_Te(spec_t rhok, double T, double Te){
-  long spec,k,l;
-  spec_t etak,kappak,chik,w;
-  double chisum,kappamix,sum,sum2,rho;
-  
-  rho=0.0;
-  for (spec=0; spec<ns; spec++) rho+=rhok[spec];
-  for (spec=0; spec<ns; spec++) w[spec]=rhok[spec]/rho;
-  
-  for (spec=ncs; spec<ns; spec++){
-    kappak[spec]=_kappak_from_T(spec,T); 
-    etak[spec]=_etak_from_T(spec,T);
-  }
-  chisum=0.0e0;
-  for (spec=0; spec<ns; spec++){
-    if (speciestype[spec]==SPECIES_NEUTRAL) 
-      chisum+=w[spec]/_calM(spec);
-  }
-  assert(chisum!=0.0e0);
-  for (spec=0; spec<ns; spec++){
-    chik[spec]=w[spec]/_calM(spec)/chisum;
-  }
-  kappamix=0.0e0;
-  for (k=ncs; k<ns; k++){
-    sum=0.0e0;
-    for (l=0; l<ns; l++){
-      if (l!=k && (speciestype[l]==SPECIES_NEUTRAL)) { 
-        assert(etak[l]!=0.0e0);
-        assert((1.0e0+_calM(k)/_calM(l))*8.0e0>0.0e0);
-        assert((etak[k]/etak[l])>0.0e0);
-        sum=sum+chik[l]/sqrt((1.0e0+_calM(k)/_calM(l))*8.0e0)*
-              pow(1.0e0+sqrt(etak[k]/etak[l])*pow(_calM(l)/_calM(k),0.25e0),2.0e0);
-      }
-    }	
-    assert((chik[k]+1.0654e0*sum)!=0.0e0);
-    kappamix=kappamix+chik[k]*kappak[k]/(chik[k]+1.0654e0*sum);
-  }
+/* The species viscosities and the species thermal conductivities depend on nothing but the
+   species index and the temperature, and the mixture rules below need all of them at once.
+   They are therefore evaluated here for all species in one pass, the conductivity reusing
+   the viscosity just formed instead of evaluating it a second time, and memoized on the
+   last temperature seen exactly as _hk_from_T() and _cpk_from_T() are in
+   model/thermo/_generic/enthalpy.c: a call at a temperature already in the cache returns
+   the bits the routine would have computed. The conductivities are formed only when they
+   are asked for, since the eigenvalue conditioning needs the viscosity alone. The cache is
+   thread-local, so an OpenMP build behaves as the serial one. */
+static void find_etak_kappak_from_T(double T, bool kappakneeded, spec_t etak, spec_t kappak){
+  static __thread double Tcache=0.0;
+  static __thread spec_t etakcache,kappakcache;
+  static __thread bool etakcachevalid=FALSE,kappakcachevalid=FALSE;
+  long spec;
 
-  /* make an adjustment to *kappa when charged species are not included */
-  sum=0.0;
-  sum2=0.0;
-  for (k=0; k<ns; k++){
-    if (speciestype[k]==SPECIES_NEUTRAL) { 
-      sum+=w[k]/_calM(k);
-    }    
-    sum2+=w[k]/_calM(k);
+  if (T!=Tcache) {
+    Tcache=T;
+    etakcachevalid=FALSE;
+    kappakcachevalid=FALSE;
   }
-  return(kappamix*sum/sum2);
+  if (!etakcachevalid) {
+    for (spec=ncs; spec<ns; spec++) etakcache[spec]=_etak_from_T(spec,T);
+    etakcachevalid=TRUE;
+  }
+  if (kappakneeded && !kappakcachevalid) {
+    for (spec=ncs; spec<ns; spec++) kappakcache[spec]=_kappak_from_etak_T(spec,etakcache[spec],T);
+    kappakcachevalid=TRUE;
+  }
+  for (spec=ncs; spec<ns; spec++) etak[spec]=etakcache[spec];
+  if (kappakneeded) for (spec=ncs; spec<ns; spec++) kappak[spec]=kappakcache[spec];
 }
 
 
-/* find eta for the neutral species mixture */
-double _etan_from_rhok_T_Te(spec_t rhok, double T, double Te){
+/* Find eta and kappa for the neutral species mixture in one pass over the species pairs.
+   The two Wilke-type mixture rules, the one of the viscosity and the one of the thermal
+   conductivity, are the same double sum over the species pairs, the only difference being
+   the 1.0654 factor that the conductivity carries in its denominator: the sum, which is
+   what these routines cost, was written out twice and evaluated twice per node, and is now
+   formed once and used for both. When kappan is NULL the conductivity is not wanted, which
+   is the path the Peclet number of the eigenvalue conditioning takes, and neither the
+   species conductivities nor the conductivity mixture are formed. Every term is
+   accumulated in the same order on the same operands as before, so both eta and kappa are
+   what _etan_from_rhok_T_Te() and _kappan_from_rhok_T_Te() gave separately, to the last
+   bit. */
+static void find_etan_kappan_from_w_T(spec_t w, double T, double *etan, double *kappan){
   long spec,k,l;
-  spec_t etak,chik,w;
-  double chisum,etamix,sum,sum2,rho;
+  spec_t etak,kappak,chik;
+  double chisum,etamix,kappamix,sum,sum2,phi;
 
-  rho=0.0;
-  for (spec=0; spec<ns; spec++) rho+=rhok[spec];
-  for (spec=0; spec<ns; spec++) w[spec]=rhok[spec]/rho;
-  
-  for (spec=ncs; spec<ns; spec++){
-    etak[spec]=_etak_from_T(spec,T);
-  }
+  if (PAIRneedinit) find_pair_constants();
+  find_etak_kappak_from_T(T, (bool)(kappan!=NULL), etak, kappak);
   chisum=0.0e0;
   for (spec=0; spec<ns; spec++){
-    if (speciestype[spec]==SPECIES_NEUTRAL) 
+    if (speciestype[spec]==SPECIES_NEUTRAL)
       chisum+=w[spec]/_calM(spec);
   }
   assert(chisum!=0.0e0);
@@ -537,44 +550,79 @@ double _etan_from_rhok_T_Te(spec_t rhok, double T, double Te){
     chik[spec]=w[spec]/_calM(spec)/chisum;
   }
   etamix=0.0e0;
+  kappamix=0.0e0;
   for (k=ncs; k<ns; k++){
     sum=0.0e0;
     for (l=0; l<ns; l++){
-      if (l!=k && (speciestype[l]==SPECIES_NEUTRAL)) { 
+      if (l!=k && (speciestype[l]==SPECIES_NEUTRAL)) {
         assert(etak[l]!=0.0e0);
         assert((1.0e0+_calM(k)/_calM(l))*8.0e0>0.0e0);
         assert((etak[k]/etak[l])>0.0e0);
-        sum=sum+chik[l]/sqrt((1.0e0+_calM(k)/_calM(l))*8.0e0)*
-              pow(1.0e0+sqrt(etak[k]/etak[l])*pow(_calM(l)/_calM(k),0.25e0),2.0e0);
+        phi=1.0e0+sqrt(etak[k]/etak[l])*PAIRcalM14[k][l];
+        sum=sum+chik[l]/PAIRsqrt8[k][l]*(phi*phi);
       }
-    }	
+    }
     assert((chik[k]+sum)!=0.0e0);
     etamix+=chik[k]*etak[k]/(chik[k]+sum);
+    if (kappan!=NULL){
+      assert((chik[k]+1.0654e0*sum)!=0.0e0);
+      kappamix=kappamix+chik[k]*kappak[k]/(chik[k]+1.0654e0*sum);
+    }
   }
-  /* make an adjustment to *eta when charged species are not included */
+  /* make an adjustment to eta and kappa when charged species are not included */
   sum=0.0;
   sum2=0.0;
   for (k=0; k<ns; k++){
-    if (speciestype[k]==SPECIES_NEUTRAL) { 
+    if (speciestype[k]==SPECIES_NEUTRAL) {
       sum+=w[k]/_calM(k);
-    }    
+    }
     sum2+=w[k]/_calM(k);
   }
-  return(etamix*sum/sum2);
+  *etan=etamix*sum/sum2;
+  if (kappan!=NULL) *kappan=kappamix*sum/sum2;
 }
 
 
-void find_nuk_from_rhok_T_Te(spec_t rhok, double T, double Te, spec_t nuk){
-  long spec,k,l;
-  spec_t chik,w;
-  double P,rho,N;
-  double chisum,sum;
-  double calD[ns][ns];
+/* find kappa for the neutral species mixture */
+double _kappan_from_rhok_T_Te(spec_t rhok, double T, double Te){
+  long spec;
+  spec_t w;
+  double rho,etan,kappan;
 
   rho=0.0;
   for (spec=0; spec<ns; spec++) rho+=rhok[spec];
   for (spec=0; spec<ns; spec++) w[spec]=rhok[spec]/rho;
-  
+  find_etan_kappan_from_w_T(w, T, &etan, &kappan);
+  return(kappan);
+}
+
+
+/* find eta for the neutral species mixture */
+double _etan_from_rhok_T_Te(spec_t rhok, double T, double Te){
+  long spec;
+  spec_t w;
+  double rho,etan;
+
+  rho=0.0;
+  for (spec=0; spec<ns; spec++) rho+=rhok[spec];
+  for (spec=0; spec<ns; spec++) w[spec]=rhok[spec]/rho;
+  find_etan_kappan_from_w_T(w, T, &etan, NULL);
+  return(etan);
+}
+
+
+/* same as find_nuk_from_rhok_T_Te() but given the density and the mass fractions, which
+   the caller has already formed from rhok; note that rhok is rewritten as rho times the
+   mass fractions here, as it was before */
+static void find_nuk_from_rhok_w_rho_T_Te(spec_t rhok, spec_t w, double rho, double T, double Te, spec_t nuk){
+  long spec,k,l;
+  spec_t chik;
+  double P,N,T3;
+  double chisum,sum;
+  double calD[ns][ns];
+
+  if (PAIRneedinit) find_pair_constants();
+
   // first make sure the temperature is not out of polynomial bounds
   P=_P_from_w_rho_T(w,rho,T);
   assert(P!=0.0);
@@ -589,28 +637,44 @@ void find_nuk_from_rhok_T_Te(spec_t rhok, double T, double Te, spec_t nuk){
   N=0.0;
   for (spec=0; spec<ns; spec++){
     chik[spec]=w[spec]/_calM(spec)/chisum;
+#if (METHOD==METHOD2)
     N+=rhok[spec]/_m(spec);
+#endif
   }
-  
+  (void)N;
+
+  /* calD[k][l] is symmetric: every factor it is made of is symmetric in the two species
+     indices and the terms are combined in an order that is itself symmetric, so the lower
+     triangle is a copy of the upper one rather than a second evaluation, which halves the
+     number of collision integral evaluations from ns^2 to ns*(ns+1)/2. The pair constants
+     sqrt(eps_k*eps_l), 1/calM_l+1/calM_k and sigma_k+sigma_l are read from the tables and
+     T^3 is formed once for all pairs rather than once per pair; each remaining operation is
+     written in the same order on the same operands as before, so calD is unchanged to the
+     last bit. */
+  T3=T*T*T;
   for (k=0; k<ns; k++){
-    for (l=0; l<ns; l++){
-        assert(Peps[smap[k]]*Peps[smap[l]]>0.0e0);
+    for (l=k; l<ns; l++){
         assert(P!=0.0e0);
-        assert(_Omega11(T,sqrt(Peps[smap[k]]*Peps[smap[l]])));
-        assert((P*_Omega11(T,sqrt(Peps[smap[k]]*Peps[smap[l]]))
-               *(Psig[smap[k]]+Psig[smap[l]])*(Psig[smap[k]]+Psig[smap[l]]))!=0.0e0);
-        assert(T*T*T*(1.0e0/_calM(l)+1.0e0/_calM(k))>0.0e0);
-        calD[k][l]=2.381112E-5*sqrt(T*T*T*(1.0e0/_calM(l)+1.0e0/_calM(k)))
-                 /(P*_Omega11(T,sqrt(Peps[smap[k]]*Peps[smap[l]]))
-                 *(Psig[smap[k]]+Psig[smap[l]])*(Psig[smap[k]]+Psig[smap[l]]));
-  // implement a correction for ion-ion coulomb collisions 
-        if (METHOD==METHOD2) {
-          if ((speciestype[k]==SPECIES_IONPLUS) && (speciestype[l]==SPECIES_IONPLUS)) calD[k][l]=kB*T/fabs(_C(k))*14.3/sqrt(_m(k))*pow(T,1.5)/N;
-        }
+        assert(_Omega11(T,PAIReps[k][l]));
+        assert((P*_Omega11(T,PAIReps[k][l])*PAIRsig[k][l]*PAIRsig[k][l])!=0.0e0);
+        assert(T3*PAIRinvcalM[k][l]>0.0e0);
+        calD[k][l]=2.381112E-5*sqrt(T3*PAIRinvcalM[k][l])
+                 /(P*_Omega11(T,PAIReps[k][l])
+                 *PAIRsig[k][l]*PAIRsig[k][l]);
+        calD[l][k]=calD[k][l];
     }
   }
-  
-  
+  // implement a correction for ion-ion coulomb collisions
+  // (kept out of the symmetric loop above because it is not symmetric in k and l)
+#if (METHOD==METHOD2)
+  for (k=0; k<ns; k++){
+    for (l=0; l<ns; l++){
+      if ((speciestype[k]==SPECIES_IONPLUS) && (speciestype[l]==SPECIES_IONPLUS)) calD[k][l]=kB*T/fabs(_C(k))*14.3/sqrt(_m(k))*pow(T,1.5)/N;
+    }
+  }
+#endif
+
+
   for (k=0; k<ns; k++){
     sum=0.0e0;
     for (l=0; l<ns; l++){
@@ -621,17 +685,55 @@ void find_nuk_from_rhok_T_Te(spec_t rhok, double T, double Te, spec_t nuk){
     }
     assert((sum+1.0E-20)!=0.0e0);
     nuk[k]=rho*(1.0e0-chik[k])/(sum+1.0E-20);
-    
+
   }
+}
+
+
+void find_nuk_from_rhok_T_Te(spec_t rhok, double T, double Te, spec_t nuk){
+  long spec;
+  spec_t w;
+  double rho;
+
+  rho=0.0;
+  for (spec=0; spec<ns; spec++) rho+=rhok[spec];
+  for (spec=0; spec<ns; spec++) w[spec]=rhok[spec]/rho;
+  find_nuk_from_rhok_w_rho_T_Te(rhok, w, rho, T, Te, nuk);
 }
 
 
 void find_nuk_eta_kappak_muk(gl_t *gl, spec_t rhok, double T, double Te,
                    spec_t nuk, double *eta, double *kappan, chargedspec_t kappac, chargedspec_t muk){
   long spec;
-  
-  *eta=_etan_from_rhok_T_Te(rhok,T,Te);
-  find_nuk_from_rhok_T_Te(rhok, T, Te, nuk);
+  spec_t w,w2;
+  double rho,rho2,etan,etandiscarded,kappanmix;
+  bool wchanged;
+
+  /* eta, kappan and the collision frequencies are functions of the same density and mass
+     fractions, which each of the three routines used to form again from rhok; eta and
+     kappan share in addition the double sum over the species pairs, and are now obtained
+     from one call instead of one call each */
+  rho=0.0;
+  for (spec=0; spec<ns; spec++) rho+=rhok[spec];
+  for (spec=0; spec<ns; spec++) w[spec]=rhok[spec]/rho;
+  find_etan_kappan_from_w_T(w, T, &etan, &kappanmix);
+  *eta=etan;
+  find_nuk_from_rhok_w_rho_T_Te(rhok, w, rho, T, Te, nuk);
+  /* find_nuk_from_rhok_T_Te() rewrites rhok as rho times the mass fractions, and the
+     previous version formed the conductivity from that rewritten rhok while it formed the
+     viscosity from the original one. The rewrite leaves the mass fractions where they were
+     unless the sum of the rewritten densities moves by an ulp, which happens for a few
+     percent of the mixtures: it is checked for here, and in that case the conductivity is
+     formed a second time from the rewritten mass fractions so that it holds the bits it
+     held before. */
+  rho2=0.0;
+  for (spec=0; spec<ns; spec++) rho2+=rhok[spec];
+  wchanged=FALSE;
+  for (spec=0; spec<ns; spec++) {
+    w2[spec]=rhok[spec]/rho2;
+    if (w2[spec]!=w[spec]) wchanged=TRUE;
+  }
+  if (wchanged) find_etan_kappan_from_w_T(w2, T, &etandiscarded, &kappanmix);
   find_muk_from_nuk(nuk, rhok, T, Te, muk);
 #ifdef speceminus
   if (METHOD==METHOD2)
@@ -644,7 +746,7 @@ void find_nuk_eta_kappak_muk(gl_t *gl, spec_t rhok, double T, double Te,
     kappac[spec]=_kappac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
     (*eta)+=_etac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
   }
-  *kappan=_kappan_from_rhok_T_Te(rhok, T, Te);
+  *kappan=kappanmix;
 
   adjust_nuk_using_mobilities_given_muk(rhok, T, Te, muk, nuk);
 }
