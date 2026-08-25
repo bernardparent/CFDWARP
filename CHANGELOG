@@ -7,6 +7,16 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 AUG 24a
+  * in lib/exm/exm.c and lib/exm/exm.h
+    - added mat_lu_tdma(), find_multfact_from_lu(), mat_solve_lu_tdma(), mat_mult_sub_col_tdma()
+    - added EXM_solve_block_TDMA_LU() with calls to the above four functions
+    - renamed EXM_solve_block_TDMA() to EXM_solve_block_TDMA_standard()
+    - added EXM_solve_block_TDMA(), which now calls EXM_solve_block_TDMA_LU()
+    - in EXM_solve_block_TDMA_LU() each pivot block is factorized once as B=L*U by the new 
+      mat_lu_tdma(), about k^3/3 operations against the 2*k^3 of the standard inversion
+
+
 2026 AUG 18b
   * in model/transport/_Dixon-Lewis/transport.c
     - the mixture viscosity and the mixture thermal conductivity are now formed in one pass

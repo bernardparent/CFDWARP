@@ -793,6 +793,108 @@ static void mat_inv_tdma(double *mat1,long line1,double *mat2,long line2,long k)
 
 
 
+/* LU factorization of the block of line1 of mat1 into line2 of mat2, without
+   pivoting, which is what the Gauss-Jordan elimination of mat_inv_tdma() does as
+   well: both eliminate with the diagonal entry of the block as it stands and
+   neither exchanges rows, so a block that one of them can process is a block the
+   other can process.  The factors are stored in place of each other, the unit
+   diagonal of L being implicit: the element (row,col) of mat2 holds U[row][col]
+   for row<=col and L[row][col] for row>col.  The block being stored column-major
+   within one line, the elimination is written column by column so that the
+   innermost index is the row, hence unit-stride and vectorizable. */
+static void mat_lu_tdma(double *mat1, long line1, double *mat2, long line2, long k){
+  long row,col,piv;
+  double *m1,*m2;
+  double pivot,multfact;
+  m1=&mat1[line1*k*k];
+  m2=&mat2[line2*k*k];
+  for (col=0; col<k*k; col++) m2[col]=m1[col];
+  for (piv=0; piv<k; piv++){
+    pivot=m2[piv*k+piv];
+    assert(pivot!=0.0e0);
+    for (row=piv+1; row<k; row++) m2[piv*k+row]=m2[piv*k+row]/pivot;
+    for (col=piv+1; col<k; col++){
+      multfact=m2[col*k+piv];
+      for (row=piv+1; row<k; row++) m2[col*k+row]-=m2[piv*k+row]*multfact;
+    }
+  }
+}
+
+
+/* find mat3[line3]=-mat2[line2]*inv(B), with the pivot block B given through its
+   LU factors in matlu[line1] rather than through its inverse.  Writing B=LU, the
+   product X=-mat2*inv(B) is the solution of X*L*U=-mat2, which is obtained by one
+   forward substitution over the columns of X, Z*U=-mat2, followed by one backward
+   substitution, X*L=Z, done in place.  Both substitutions have the row as their
+   innermost index, so they are unit-stride and vectorize as mat_mult_tdma() does.
+   The element (row,col) of the factors holds U[row][col] for row<=col and
+   L[row][col] for row>col, and is at matlu[line1*k*k+col*k+row] in both cases. */
+static void find_multfact_from_lu(double *matlu,long line1,double *mat2,long line2,
+                   double *mat3,long line3, long k){
+  long row,col,cnt;
+  double *lu,*m2,*m3;
+  double luval,pivot;
+  lu=&matlu[line1*k*k];
+  m2=&mat2[line2*k*k];
+  m3=&mat3[line3*k*k];
+  for (col=0; col<k; col++){
+    for (row=0; row<k; row++) m3[col*k+row]=-m2[col*k+row];
+    for (cnt=0; cnt<col; cnt++){
+      luval=lu[col*k+cnt];
+      for (row=0; row<k; row++) m3[col*k+row]-=m3[cnt*k+row]*luval;
+    }
+    pivot=lu[col*k+col];
+    for (row=0; row<k; row++) m3[col*k+row]=m3[col*k+row]/pivot;
+  }
+  for (col=k-1; col>=0; col--){
+    for (cnt=col+1; cnt<k; cnt++){
+      luval=lu[col*k+cnt];
+      for (row=0; row<k; row++) m3[col*k+row]-=m3[cnt*k+row]*luval;
+    }
+  }
+}
+
+
+/* replace the column col of the block of line2 of rhs by inv(B) times it, the
+   pivot block B being given through its LU factors in matlu[line1]: one forward
+   substitution L*y=rhs followed by one backward substitution U*x=y, both in
+   place.  This replaces the multiplication of the right hand side by the
+   explicitly formed inverse. */
+static void mat_solve_lu_tdma(double *matlu,long line1,double *rhs,long line2,
+                   long col, long k){
+  long row,cnt;
+  double *lu,*r;
+  lu=&matlu[line1*k*k];
+  r=&rhs[line2*k*k+col*k];
+  for (cnt=0; cnt<k; cnt++){
+    for (row=cnt+1; row<k; row++) r[row]-=lu[cnt*k+row]*r[cnt];
+  }
+  for (cnt=k-1; cnt>=0; cnt--){
+    r[cnt]=r[cnt]/lu[cnt*k+cnt];
+    for (row=0; row<cnt; row++) r[row]-=lu[cnt*k+row]*r[cnt];
+  }
+}
+
+
+/* subtract from the column col of the block of line3 of mat3 the block of line1
+   of mat1 times the column col of the block of line2 of mat2.  The terms are
+   summed over cnt in the order of mat_mult_tdma() and the innermost index is the
+   row, so the loop is unit-stride as that one is. */
+static void mat_mult_sub_col_tdma(double *mat1, long line1, double *mat2, long line2,
+                 double *mat3, long line3, long col, long k){
+  long row,cnt;
+  double *m1,*m2,*m3;
+  double m2val;
+  m1=&mat1[line1*k*k];
+  m2=&mat2[line2*k*k+col*k];
+  m3=&mat3[line3*k*k+col*k];
+  for (cnt=0; cnt<k; cnt++){
+    m2val=m2[cnt];
+    for (row=0; row<k; row++) m3[row]-=m1[cnt*k+row]*m2val;
+  }
+}
+
+
 static void mat_equal_tdma(double *mat1,long line1,double *mat2,long line2, long k){
   long row,col;
   for (row=0; row<k; row++){
@@ -900,7 +1002,7 @@ static bool find_whether_RHS_is_one_column(double *RHS, long linemax, long k){
    routine returns; the number of Gauss-Jordan inversions drops from about
    three per line to one.  BB is left untouched instead of being reduced to the
    identity, which no caller relies on. */
-void EXM_solve_block_TDMA(double *AA, double *BB, double *CC, double *RHS,
+void EXM_solve_block_TDMA_standard(double *AA, double *BB, double *CC, double *RHS,
                     long linemax, long k){
   long line;
   double *TMP,*BBINV;
@@ -962,6 +1064,89 @@ void EXM_solve_block_TDMA(double *AA, double *BB, double *CC, double *RHS,
   }
   free(TMP);
   free(BBINV);
+}
+
+
+
+/* solve block TDMA with first line at line=0 and last line at line=linemax,
+   through the LU factorization of the pivot blocks; same arguments, same
+   conventions and the same effect on AA, BB, CC and RHS as
+   EXM_solve_block_TDMA_standard() above, with which it is interchangeable */
+/* The inverse of the pivot block is no longer formed at all: each pivot block is
+   factorized once as B=LU, in about k^3/3 operations instead of the 2*k^3 of the
+   Gauss-Jordan inversion, and the two products by inv(B) of the sweeps and the
+   normalization of the right hand side are obtained by substitution against
+   those factors, in as many operations as the multiplication by the inverse they
+   replace.  Same algorithm, same elimination without pivoting, same operation
+   count everywhere but on the inversion itself. */
+void EXM_solve_block_TDMA_LU(double *AA, double *BB, double *CC, double *RHS,
+                    long linemax, long k){
+  long line,col;
+  double *TMP,*BBLU;
+  bool ONECOL;
+
+  TMP=(double *) malloc(6*k*k*sizeof(double));
+  BBLU=(double *) malloc((linemax+1)*k*k*sizeof(double));
+  ONECOL=find_whether_RHS_is_one_column(RHS,linemax,k);
+
+/*  --------------------------------------------------------------
+    Sweep Downward
+    -------------------------------------------------------------- */
+  for (line=0; line<linemax; line++){
+    mat_lu_tdma(BB,line,BBLU,line,k);
+    find_multfact_from_lu(BBLU,line,AA,line+1,TMP,1,k);
+    mat_mult_tdma(TMP,1,CC,line,TMP,2,k);
+    mat_add_tdma(TMP,2,BB,line+1,TMP,3,k);
+    mat_equal_tdma(TMP,3,BB,line+1,k);
+    if (ONECOL){
+      mat_mult_col0_tdma(TMP,1,RHS,line,TMP,2,k);
+      mat_add_col0_tdma(TMP,2,RHS,line+1,TMP,3,k);
+      mat_equal_col0_tdma(TMP,3,RHS,line+1,k);
+    } else {
+      mat_mult_tdma(TMP,1,RHS,line,TMP,2,k);
+      mat_add_tdma(TMP,2,RHS,line+1,TMP,3,k);
+      mat_equal_tdma(TMP,3,RHS,line+1,k);
+    }
+  }
+  mat_lu_tdma(BB,linemax,BBLU,linemax,k);
+
+/*   --------------------------------------------------------------
+     Sweep Upward, the right hand side being normalized on the way up
+     -------------------------------------------------------------- */
+/*   After the downward sweep the system is block upper bidiagonal,
+     BB[line]*x[line]+CC[line]*x[line+1]=RHS[line], and the upward sweep of the
+     original routine eliminated CC[line-1] by forming the whole k x k block
+     -CC[line-1]*inv(BB[line]) and multiplying it by the right hand side of the
+     line, which is one column: k^3 operations to produce k^2 of them.  Since
+     the right hand side of a line is complete once the lines above it have been
+     treated, x[line]=inv(BB[line])*RHS[line] can be formed first and subtracted
+     from the line below as CC[line-1]*x[line], which is a matrix times a vector.
+     This is the back substitution of the block Thomas algorithm and it returns
+     the same solution as the elimination it replaces; the normalization pass of
+     the original routine is subsumed in it. */
+  for (line=linemax; line>=0; line--){
+    if (ONECOL){
+      mat_solve_lu_tdma(BBLU,line,RHS,line,0,k);
+      if (line>0) mat_mult_sub_col_tdma(CC,line-1,RHS,line,RHS,line-1,0,k);
+    } else {
+      for (col=0; col<k; col++) mat_solve_lu_tdma(BBLU,line,RHS,line,col,k);
+      if (line>0){
+        for (col=0; col<k; col++) mat_mult_sub_col_tdma(CC,line-1,RHS,line,RHS,line-1,col,k);
+      }
+    }
+  }
+  free(TMP);
+  free(BBLU);
+}
+
+
+/* the block TDMA solver used throughout the code; it calls the LU based routine
+   above, EXM_solve_block_TDMA_standard() being kept as the previous
+   implementation and remaining callable in its place */
+void EXM_solve_block_TDMA(double *AA, double *BB, double *CC, double *RHS,
+                    long linemax, long k){
+  //EXM_solve_block_TDMA_standard(AA, BB, CC, RHS, linemax, k);
+  EXM_solve_block_TDMA_LU(AA, BB, CC, RHS, linemax, k);
 }
 
 
