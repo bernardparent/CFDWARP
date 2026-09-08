@@ -161,19 +161,19 @@ static double _kf1b(np_t np, gl_t *gl, double Te){
 /* Reaction 2: e- + Ar -> Ar+ + e- + e-, ground ionization (15.8 eV) */
 static double _kf2(np_t np, gl_t *gl, double Te){
   double kf2;
-  double Te_control[] = 
+  double Te_control[] =
   {
-    10.82646,
-    10.96672,
-    10.99798,
-    11.06005,
-    11.11007,
-    11.19590,
-    11.32563,
-    11.52376,
-    11.88015,
-    13.52579,
-    16.11810
+    10.42099,
+    10.56125,
+    10.59251,
+    10.65458,
+    10.70460,
+    10.79043,
+    10.92016,
+    11.11829,
+    11.47468,
+    13.12032,
+    15.71263
   };
   double kf_control[] =
   {

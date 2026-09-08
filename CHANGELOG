@@ -6,7 +6,19 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
-
+2026 SEP 08a   
+  * in model/chem
+    - updated ground ionization rate in _Ar_Plasma_3s, _Ar_Plasma_4s, _Ar_Plasma_8s
+  * in model/share/transport_share.c
+    - updated _mueN_Ar()
+  * in model/thermo/_generic/electronimpact.c
+    - updated _EoverN_from_Te_Ar() and _Te_from_EoverN_Ar()
+  * in model/chem/_Ar_Plasma_*s/doc/report.tex
+    - modified the documentation for the ground ionization rate
+  * in model/thermo/doc/
+    - updated electronimpact.tex
+ 
+    
 2026 AUG 24a
   * in lib/exm/exm.c and lib/exm/exm.h
     - added mat_lu_tdma(), find_multfact_from_lu(), mat_solve_lu_tdma(), mat_mult_sub_col_tdma()
