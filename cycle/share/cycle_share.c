@@ -5,7 +5,7 @@ Copyright 2020 Minindu Weerakoon
 Copyright 2001 Giovanni Fusina
 Copyright 2002 Thomas E. Schwartzentruber
 Copyright 2021 Prasanna Thoguluva Rajendran
-Copyright 2025 Felipe Martin Rodriguez Fuentes
+Copyright 2025, 2026 Felipe Martin Rodriguez Fuentes
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -968,19 +968,20 @@ void increase_time_level(np_t *np, gl_t *gl){
 
 
 void runtime_actions(char *actionname, char **argum, SOAP_codex_t *codex){
-  char *oldfilename;
+  char *oldfilename,*interpfilename;
   zone_t zone;
+  input_t input_local;
 
-  if (strcmp(actionname,"ReadInterpolationFile")==0) {
+if (strcmp(actionname,"ReadInterpolationFile")==0) {
     if (SOAP_number_argums(*argum)>1)
       SOAP_fatal_error(codex,"Action ReadInterpolationFile() can not be called with more than 1 argument.");   
     SOAP_substitute_all_argums(argum, codex);
-    readcontrolarg_t *args = (readcontrolarg_t *)codex->action_args;
-    args->input->name = malloc(256);
-    if (!args->input->name) SOAP_fatal_error(codex, "Failed to allocate memory for input->name.");
-    SOAP_get_argum_string(codex,&(((readcontrolarg_t *)codex->action_args)->input->name),*argum,0);
-    //find_zone_from_argum(*argum, 1, ((readcontrolarg_t *)codex->action_args)->gl, codex, &zone);
-    read_data_file_interpolation(*(((readcontrolarg_t *)codex->action_args)->input),*((readcontrolarg_t *)codex->action_args)->np,((readcontrolarg_t *)codex->action_args)->gl);
+    input_local=*(((readcontrolarg_t *)codex->action_args)->input);
+    interpfilename=NULL;
+    SOAP_get_argum_string(codex,&interpfilename,*argum,0);
+    input_local.name=interpfilename;
+    read_data_file_interpolation_zone(input_local,*((readcontrolarg_t *)codex->action_args)->np,((readcontrolarg_t *)codex->action_args)->gl,((readcontrolarg_t *)codex->action_args)->gl->domain_all.is,((readcontrolarg_t *)codex->action_args)->gl->domain_all.js,((readcontrolarg_t *)codex->action_args)->gl->domain_all.ks,((readcontrolarg_t *)codex->action_args)->gl->domain_all.ie,((readcontrolarg_t *)codex->action_args)->gl->domain_all.je,((readcontrolarg_t *)codex->action_args)->gl->domain_all.ke);
+    free(interpfilename);
     codex->ACTIONPROCESSED=TRUE;
   }  
 
@@ -988,12 +989,13 @@ void runtime_actions(char *actionname, char **argum, SOAP_codex_t *codex){
     if (SOAP_number_argums(*argum)!=nd*2+1)
       SOAP_fatal_error(codex,"Number of arguments not equal to %ld in ReadInterpolationFileZone(); action.",nd*2+1);   
     SOAP_substitute_all_argums(argum, codex);
-    readcontrolarg_t *args = (readcontrolarg_t *)codex->action_args;
-    args->input->name = malloc(256);
-    if (!args->input->name) SOAP_fatal_error(codex, "Failed to allocate memory for input->name.");
-    SOAP_get_argum_string(codex,&(((readcontrolarg_t *)codex->action_args)->input->name),*argum,0);
-    //find_zone_from_argum(*argum, 1, ((readcontrolarg_t *)codex->action_args)->gl, codex, &zone);
-    read_data_file_interpolation_zone(*(((readcontrolarg_t *)codex->action_args)->input),*((readcontrolarg_t *)codex->action_args)->np,((readcontrolarg_t *)codex->action_args)->gl,zone.is,zone.js,zone.ks,zone.ie,zone.je,zone.ke);
+    input_local=*(((readcontrolarg_t *)codex->action_args)->input);
+    interpfilename=NULL;
+    SOAP_get_argum_string(codex,&interpfilename,*argum,0);
+    input_local.name=interpfilename;
+    find_zone_from_argum(*argum, 1, ((readcontrolarg_t *)codex->action_args)->gl, codex, &zone);
+    read_data_file_interpolation_zone(input_local,*((readcontrolarg_t *)codex->action_args)->np,((readcontrolarg_t *)codex->action_args)->gl,zone.is,zone.js,zone.ks,zone.ie,zone.je,zone.ke);
+    free(interpfilename);
     codex->ACTIONPROCESSED=TRUE;
   } 
   
@@ -1014,8 +1016,18 @@ void runtime_actions(char *actionname, char **argum, SOAP_codex_t *codex){
 
 
   if (strcmp(actionname,"WriteInterpolationFile")==0) {
+    if (SOAP_number_argums(*argum)>1)
+      SOAP_fatal_error(codex,"Action WriteInterpolationFile() can not be called with more than 1 argument. Call WriteInterpolationFileZone() to write out part of the domain.");
+    SOAP_substitute_all_argums(argum, codex);
+    SOAP_get_argum_string(codex,&(((readcontrolarg_t *)codex->action_args)->gl->output_filename),*argum,0);
+    write_data_file_interpolation((((readcontrolarg_t *)codex->action_args)->gl->output_filename),*((readcontrolarg_t *)codex->action_args)->np,
+                                  ((readcontrolarg_t *)codex->action_args)->gl);
+    codex->ACTIONPROCESSED=TRUE;
+  }
+
+  if (strcmp(actionname,"WriteInterpolationFileZone")==0) {
     if (SOAP_number_argums(*argum)!=nd*2+1)
-      SOAP_fatal_error(codex,"Number of arguments not equal to %ld in WriteInterpolationFile(); action.",nd*2+1);   
+      SOAP_fatal_error(codex,"Number of arguments not equal to %ld in WriteInterpolationFileZone(); action.",nd*2+1);   
     SOAP_substitute_all_argums(argum, codex);    
     SOAP_get_argum_string(codex,&(((readcontrolarg_t *)codex->action_args)->gl->output_filename),*argum,0);
     find_zone_from_argum(*argum, 1, ((readcontrolarg_t *)codex->action_args)->gl, codex, &zone);
@@ -1023,6 +1035,9 @@ void runtime_actions(char *actionname, char **argum, SOAP_codex_t *codex){
                                        ((readcontrolarg_t *)codex->action_args)->gl,zone.is,zone.js,zone.ks,zone.ie,zone.je,zone.ke);
     codex->ACTIONPROCESSED=TRUE;
   }
+  /* SOAP_get_argum_string() above realloc'd gl->output_filename to the length of the name
+     given to the action, which may be shorter than the name restored here. */
+  ((readcontrolarg_t *)codex->action_args)->gl->output_filename=(char *)realloc(((readcontrolarg_t *)codex->action_args)->gl->output_filename,sizeof(char)*(strlen(oldfilename)+1));
   strcpy((((readcontrolarg_t *)codex->action_args)->gl->output_filename),oldfilename);
   free(oldfilename);
   if (strcmp(actionname,"Init")==0) {
@@ -1452,7 +1467,13 @@ void process_code_runtime(np_t *np, gl_t *gl, char *code_runtime, SOAP_codex_t *
   Runtimearg.np=&np;
   Runtimearg.gl=gl;
   Runtimearg.input=(input_t *)malloc(sizeof(input_t));
+  Runtimearg.input->name=NULL;
+  Runtimearg.input->interpolationvarsmap=NULL;
   Runtimearg.input->READDATAFILE=FALSE;
+  Runtimearg.input->BINARYMPI=FALSE;
+  Runtimearg.input->ASCII=FALSE;
+  Runtimearg.input->INTERPOLATION=FALSE;
+  Runtimearg.input->INTERPOLATIONMAP=FALSE;
   Runtimearg.TYPELEVEL=TYPELEVEL_FLUID;
   Runtimearg.module_level=0;
   Runtimearg.POSTMODULE=FALSE;
@@ -2575,6 +2596,3 @@ void solve_TDMA_emfield(np_t *np, gl_t *gl, long theta, long ls, long le, int TY
 #endif
 }
 #endif//EMFIELD
-
-
-

@@ -1443,8 +1443,14 @@ bool is_data_point_in_domain(dim_t x_file, dim_t xmin, dim_t xmax, double radius
 }
 
 
-void find_interpolation_map(char* initvar_str_userinput, char* initvar_str_file, long numvars, long* numvars_file, mapvar_t map[], int INITVARTYPE){
-  long cnt, cntr, cntp, numvars_userinput; 
+/* find_interpolation_map() returns the number of the current set of variables that were
+   given a value, either by the interpolation file or by the user after the -imap flag. With
+   FATALIFNOTFOUND set, which is how a variable set that the file carries is read, a variable
+   left without a value stops the run as before. Cleared, the count is returned instead, so
+   that the caller can tell a variable set that -imap supplies in full from one it does not
+   mention at all. */
+long find_interpolation_map(char* initvar_str_userinput, char* initvar_str_file, long numvars, long* numvars_file, mapvar_t map[], int INITVARTYPE, bool FATALIFNOTFOUND){
+  long cnt, cntr, cntp, numvars_userinput, numvarsfound; 
   bool FOUND_FILE, FOUND_USERINPUT, FOUND_WDEFAULT, FOUND_NAME;
   char **initvar_names_file = NULL;
   char **initvar_names_userinput = NULL;
@@ -1462,6 +1468,7 @@ void find_interpolation_map(char* initvar_str_userinput, char* initvar_str_file,
     default: fatal_error("INITVARTYPE must be either INITVARTYPE_FLUID or INITVARTYPE_EMFIELD.");
     }
 
+  numvarsfound=0;
   find_words_from_string(initvar_str_file, " ", &initvar_names_file, numvars_file);
   find_words_from_string(initvar_str_userinput, ",= ", &initvar_names_userinput, &numvars_userinput);
 
@@ -1516,9 +1523,12 @@ void find_interpolation_map(char* initvar_str_userinput, char* initvar_str_file,
 
     /* check if a variable within memory is not present in read variables and was not given a value by user
       (it wasn't found in input, nor in the interpolation file variables, and isn't a species assigned to w_default) */
-    if (!FOUND_USERINPUT && !FOUND_FILE && !FOUND_WDEFAULT) fatal_error("Variable %s was not found in the data file and was not given a value after the -imap flag.",initvar_names[cnt]);  
-      
-    if (map[cnt].newindex==-1) wfprintf(stdout,"%s=%lg..", initvar_names[cnt], map[cnt].newvalue); 
+    if (!FOUND_USERINPUT && !FOUND_FILE && !FOUND_WDEFAULT) {
+      if (FATALIFNOTFOUND) fatal_error("Variable %s was not found in the data file and was not given a value after the -imap flag.",initvar_names[cnt]);
+    } else {
+      numvarsfound++;
+      if (map[cnt].newindex==-1) wfprintf(stdout,"%s=%lg..", initvar_names[cnt], map[cnt].newvalue);
+    }
   } 
 
   for (cnt=0; cnt<*numvars_file; cnt++) free(initvar_names_file[cnt]); 
@@ -1526,6 +1536,7 @@ void find_interpolation_map(char* initvar_str_userinput, char* initvar_str_file,
   free(initvar_names_file); 
   free(initvar_names_userinput); 
   free(initvar_names);
+  return(numvarsfound);
 }
 
 
@@ -1537,7 +1548,16 @@ double _map_interpolation_var(initvar_t initvars_file, mapvar_t map[], long coun
 }
 
 
-void read_data_file_interpolation(input_t input, np_t *np, gl_t *gl){  
+/* read_data_file_interpolation() reads an interpolation file over the whole domain: it is
+   read_data_file_interpolation_zone() called on gl->domain_all*/
+void read_data_file_interpolation(input_t input, np_t *np, gl_t *gl){
+  input.INTERPOLATION=TRUE;
+  read_data_file_interpolation_zone(input, np, gl,
+                                    gl->domain_all.is, gl->domain_all.js, gl->domain_all.ks,
+                                    gl->domain_all.ie, gl->domain_all.je, gl->domain_all.ke);
+}
+
+void read_data_file_interpolation_zone(input_t input, np_t *np, gl_t *gl, long i_min, long j_min, long k_min, long i_max, long j_max, long k_max){  
   FILE *datafile;
   char data_format_str[100], initvar_fluid_str_file[500], initvar_emfield_str_file[500];
   long i,j,k,l_file,cnt,dim,cntzone;
@@ -1548,11 +1568,16 @@ void read_data_file_interpolation(input_t input, np_t *np, gl_t *gl){
   dim_t *xmin,*xmax;
   initvar_t *initvar;
   //initvar_t *initvar_file;
-  zone_t zone;
+  zone_t zone,zoneread;
   long numsubzone_desired;
+  long windowis_file,windowie_file,iter_file;
+  double effiter_U_file,effiter_R_file,CFL_file;
+  bool ZONEEMPTY;
 #ifdef EMFIELD
   bool ISREAD_EMFIELD = FALSE;
-  long numvars_emfield_file;
+  bool SETCONST_EMFIELD = FALSE;
+  long numvars_emfield_mapped;
+  long numvars_emfield_file=0;
   initvar_emfield_t *initvar_emfield;
  // initvar_emfield_t *initvar_emfield_file;
 #endif
@@ -1584,7 +1609,7 @@ void read_data_file_interpolation(input_t input, np_t *np, gl_t *gl){
     );
 
 #ifdef OPENMPTHREADS
-  nodelock=(omp_lock_t *)malloc(sizeof(double)*(gl->domain_lim.ie+4) 
+  nodelock=(omp_lock_t *)malloc(sizeof(omp_lock_t)*(gl->domain_lim.ie+4) 
 #ifdef _2DL 
     *(gl->domain_lim.je+4)
 #endif
@@ -1616,456 +1641,11 @@ void read_data_file_interpolation(input_t input, np_t *np, gl_t *gl){
 
   for (cnt=0; cnt<16; cnt++){
     if (fscanf(datafile,"%c",&(data_format_str[cnt]))!=1) {
-      fatal_error("Problem with fscanf in read_data_file_interpolation().");
-    }
-  }
-  data_format_str[16]=EOS;
-  wfprintf(stdout,"Reading interpolation data file %s..",input.name);
-  FORMAT001=FALSE;  
-  if (strcmp("WARPINTFORMAT001",data_format_str)==0) {
-//    wfprintf(stdout,"in CFDWARP format 001..\n");
-    FORMAT001=TRUE;
-  }
-
-  if (FORMAT001) {
-      if (fscanf(datafile," numnodes=%ld nf=%ld nd=%ld ns=%ld windowis=%ld windowie=%ld iter=%ld effiter_U=%lg effiter_R=%lg CFL=%lg time=%lg dt=%lg vars_fluid=\"%[^\"]\" vars_emfield=\"%[^\"]\"%*[^\n]",
-             &numnodes,&numflux_read,&numdim_read,&numspec_read,&(gl->window.is),&(gl->window.ie),
-             &(gl->iter),&(gl->effiter_U),&(gl->effiter_R),&(gl->CFL),&(tmp_time),&tmp_dt,initvar_fluid_str_file,initvar_emfield_str_file)!=14) fatal_error("Problem reading interpolation data file.");
-
-        find_interpolation_map(input.interpolationvarsmap, initvar_fluid_str_file, numinitvar, &numvars_fluid_file, map_fluid, INITVARTYPE_FLUID);
-#ifdef EMFIELD
-        find_interpolation_map(input.interpolationvarsmap, initvar_emfield_str_file, numinitvar_emfield, &numvars_emfield_file, map_emfield, INITVARTYPE_EMFIELD);
-        if (strcmp(initvar_emfield_str_file,"NONE")!=0) ISREAD_EMFIELD = TRUE;
-#endif            
-
-#ifdef UNSTEADY
-      gl->time=tmp_time;
-      gl->dt=tmp_dt;
-#endif
-
-    fgetc(datafile);
-    if (numdim_read!=nd) fatal_error("Number of dimensions read (%ld) does not equal current number of dimensions (%ld).",numdim_read,nd);
-   // if (numspec_read!=ns) fatal_error("Number of species read (%ld) does not equal current number of species (%ld).",numspec_read,ns);
-   // if (numflux_read!=nf) fatal_error("Number of fluxes read (%ld) does not equal current number of fluxes (%ld).",numflux_read,nf);
-  } else {
-    fatal_error("Interpolation file format unknown.");
-  }
-
-  /* read data and store in ram */
-  //initvar_file=(initvar_t *)malloc(numnodes*sizeof(initvar_t));
-  double(*initvar_file)[numvars_fluid_file] = malloc(numnodes*numvars_fluid_file*sizeof(double));
-  x_file=(dim_t *)malloc(numnodes*sizeof(dim_t));
-  dx1_file=(dim_t *)malloc(numnodes*sizeof(dim_t));
-#ifdef _2DL
-  dx2_file=(dim_t *)malloc(numnodes*sizeof(dim_t));
-#endif
-#ifdef _3DL
-  dx3_file=(dim_t *)malloc(numnodes*sizeof(dim_t));
-#endif
-  radiusmax2_file=(double *)malloc(numnodes*sizeof(double));
-  for (l_file=0; l_file<numnodes; l_file++){
-    cnterror=0;
-    if (fread(initvar_file[l_file], numvars_fluid_file*sizeof(double), 1, datafile)!=1) cnterror++;
-    if (fread(x_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
-    if (fread(dx1_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
-#ifdef _2DL
-    if (fread(dx2_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
-#endif
-#ifdef _3DL
-    if (fread(dx3_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
-#endif
-    if (cnterror>0) fatal_error("Could not read all data properly.");
-    radiusmax2_file[l_file]=0.0e0;
-    for (dim=0; dim<nd; dim++) 
-      radiusmax2_file[l_file]+=sqr(fabs(dx1_file[l_file][dim])
-#ifdef _2DL
-        +fabs(dx2_file[l_file][dim])
-#endif
-#ifdef _3DL
-        +fabs(dx3_file[l_file][dim])
-#endif
-      );
-    radiusmax2_file[l_file]*=1.1;
-
-  }
-
-  for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
-        weight[_ai(gl,i,j,k)]=0.0e0;
-#ifdef OPENMPTHREADS
-        omp_init_lock(&(nodelock[_ai(gl,i,j,k)]));
-#endif
-        for (cnt=0; cnt<numinitvar; cnt++) (initvar[_ai(gl,i,j,k)])[cnt]=0.0;
-  }
-
-  zone=_zone_intersection(gl->domain_all,gl->domain_lim);
-
-  subzone=(zone_t *)malloc(sizeof(zone_t));
-  find_subzones_in_zone_given_zonelength(SUBZONE_DESIRED_WIDTH, zone, &numsubzone, &subzone);
-
-#ifdef OPENMPTHREADS
-  numsubzone_desired=MIN_NUMSUBZONE_PER_THREAD*omp_get_max_threads();
-#else
-  numsubzone_desired=MIN_NUMSUBZONE_PER_THREAD;
-#endif
-  if (numsubzone<numsubzone_desired)
-    find_subzones_in_zone_given_numsubzone(zone, numsubzone_desired, &numsubzone, &subzone);
-
-  xmin=(dim_t *)malloc(numsubzone*sizeof(dim_t));
-  xmax=(dim_t *)malloc(numsubzone*sizeof(dim_t));
-
-  for (cntzone=0; cntzone<numsubzone; cntzone++){
-    for (dim=0; dim<nd; dim++){
-      xmin[cntzone][dim]=1e99;
-      xmax[cntzone][dim]=-1e99;
-    }
-    for_ijk(subzone[cntzone],is,js,ks,ie,je,ke){
-          if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)){
-            for (dim=0; dim<nd; dim++){
-              xmin[cntzone][dim]=min(xmin[cntzone][dim],_x(np[_ai(gl,i,j,k)],dim));
-              xmax[cntzone][dim]=max(xmax[cntzone][dim],_x(np[_ai(gl,i,j,k)],dim));
-            }
-          }
-    }
-  }
-
-#ifdef DISTMPI
-  MPI_Barrier(MPI_COMM_WORLD);
-  wfprintf(stdout,"Fluid/%ld",numsubzone*numproc);
-#else
-  wfprintf(stdout,"Fluid/%ld",numsubzone);
-#endif
-
-#if defined(OPENMPTHREADS) 
-#pragma omp parallel for private(l_file,cntzone,dim,zone,i,j,k,cnt,thisweight) schedule(dynamic) 
-#endif
-  for (cntzone=0; cntzone<numsubzone; cntzone++){
-    for (l_file=0; l_file<numnodes; l_file++){
-      if (is_data_point_in_domain(x_file[l_file],xmin[cntzone],xmax[cntzone],radiusmax2_file[l_file])){
-        zone=subzone[cntzone];
-        if (find_interpolation_zone(np,gl,TYPELEVEL_FLUID,x_file[l_file],radiusmax2_file[l_file],&zone)){
-          for_jik(zone,is,js,ks,ie,je,ke){
-                if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)){
-                  find_interpolation_weight(np,gl,_ai(gl,i,j,k),x_file[l_file],dx1_file[l_file],
-#ifdef _2DL
-                    dx2_file[l_file],
-#endif
-#ifdef _3DL
-                    dx3_file[l_file],
-#endif
-                    radiusmax2_file[l_file],&thisweight);
-#ifdef OPENMPTHREADS 
-                  omp_set_lock(&(nodelock[_ai(gl,i,j,k)]));
-#endif
-                  if (thisweight>1e-99) {
-                    weight[_ai(gl,i,j,k)]+=thisweight;
-                    for (cnt=0; cnt<numinitvar; cnt++) 
-                      initvar[_ai(gl,i,j,k)][cnt]+=thisweight*_map_interpolation_var(initvar_file[l_file],map_fluid,cnt);
-                  }
-#ifdef OPENMPTHREADS 
-                  omp_unset_lock(&(nodelock[_ai(gl,i,j,k)]));
-#endif
-                }
-          }
-        }
-      } 
-    }
-    fprintf(stdout,".");
-    fflush(stdout);
-//    if (mod(cntzone,numsubzone/100+1)==0) wfprintf(stdout,".");
-  }
-  gl->REFORMAT_INITVAR_SPECIES_SUM_CHECK=FALSE;
-#ifdef OPENMPTHREADS
-  #pragma omp parallel for private(i,j,k,cnt) schedule(static) 
-#endif
-  for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
-	  if (weight[_ai(gl,i,j,k)]>1e-99 && is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) {
-            for (cnt=0; cnt<numinitvar; cnt++) initvar[_ai(gl,i,j,k)][cnt]=initvar[_ai(gl,i,j,k)][cnt]/weight[_ai(gl,i,j,k)];
-            init_node_fluid(np,_ai(gl,i,j,k), gl, defaultinitvartypefluid, initvar[_ai(gl,i,j,k)]);
-            np[_ai(gl,i,j,k)].INIT_FLUID=TRUE;
-          }
-  }
-  gl->REFORMAT_INITVAR_SPECIES_SUM_CHECK=TRUE;
-
-  free(initvar);
-  free(initvar_file);
-  free(map_fluid);
-
-/* second do the emfield properties */
-#ifdef EMFIELD
-
-  initvar_emfield=(initvar_emfield_t *)malloc(sizeof(initvar_emfield_t)*(gl->domain_lim.ie+4) 
-#ifdef _2DL 
-    *(gl->domain_lim.je+4)
-#endif
-#ifdef _3DL
-    *(gl->domain_lim.ke+4)
-#endif
-    );
-
-if (ISREAD_EMFIELD) {
-  for (cnt=0; cnt<16; cnt++){
-    if (fscanf(datafile,"%c",&(data_format_str[cnt]))!=1){
-      fatal_error("Problem with fscanf in emfield part of read_data_file_interpolation().");
-    }
-  }
-  data_format_str[16]=EOS;
-  FORMAT001=FALSE;  
-  if (strcmp("WARPINTFORMAT001",data_format_str)==0) {
-    FORMAT001=TRUE;
-  }
-
-  if (FORMAT001) {
-    if (fscanf(datafile," numnodes_emfield=%ld nfe=%ld nd=%ld Lc=%lg effiter_U_emfield=%lg effiter_R_emfield=%lg%*[^\n]",
-             &numnodes,&numflux_read,&numdim_read,&(gl->Lc),&(gl->effiter_U_emfield),&(gl->effiter_R_emfield))!=6){
-      fatal_error("Problem reading emfield preambule in interpolating file.");
-    }
-    fgetc(datafile);
-    if (numdim_read!=nd) fatal_error("Number of dimensions read (%ld) does not equal current number of dimensions (%ld).",numdim_read,nd);
-    //if (numflux_read!=nfe) fatal_error("Number of fluxes read (%ld) does not equal current number of emfield fluxes (%ld).",numflux_read,nfe);
-    gl->Lc=1.0e0;
-
-  } else {
-    fatal_error("Interpolation file format unknown for EMfield variables.");
-  }
-}
-  /* read data and store in ram */
-  double(*initvar_emfield_file)[numvars_emfield_file] = malloc(numnodes*numvars_emfield_file*sizeof(double));
-  //initvar_emfield_file=(initvar_emfield_t *)malloc(numnodes*sizeof(initvar_emfield_t));
-if (ISREAD_EMFIELD) {
-  x_file=(dim_t *)realloc(x_file,numnodes*sizeof(dim_t));
-  dx1_file=(dim_t *)realloc(dx1_file,numnodes*sizeof(dim_t));
-#ifdef _2DL
-  dx2_file=(dim_t *)realloc(dx2_file,numnodes*sizeof(dim_t));
-#endif
-#ifdef _3DL
-  dx3_file=(dim_t *)realloc(dx3_file,numnodes*sizeof(dim_t));
-#endif
-  radiusmax2_file=(double *)realloc(radiusmax2_file,numnodes*sizeof(double));
-
-  for (l_file=0; l_file<numnodes; l_file++){
-    cnterror=0;
-    if (fread(initvar_emfield_file[l_file], numvars_emfield_file*sizeof(double), 1, datafile)!=1) cnterror++;
-    if (fread(x_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
-    if (fread(dx1_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
-#ifdef _2DL
-    if (fread(dx2_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
-#endif
-#ifdef _3DL
-    if (fread(dx3_file[l_file], sizeof(dim_t), 1, datafile)!=1) cnterror++;
-#endif
-    if (cnterror>0) fatal_error("Could not read all data properly.");
-    radiusmax2_file[l_file]=0.0e0;
-    for (dim=0; dim<nd; dim++) 
-      radiusmax2_file[l_file]+=sqr(fabs(dx1_file[l_file][dim])
-#ifdef _2DL
-        +fabs(dx2_file[l_file][dim])
-#endif
-#ifdef _3DL
-        +fabs(dx3_file[l_file][dim])
-#endif
-      );
-    radiusmax2_file[l_file]*=1.1;
-  }
-}
-  for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
-        weight[_ai(gl,i,j,k)]=0.0e0;
-        for (cnt=0; cnt<numinitvar_emfield; cnt++) (initvar_emfield[_ai(gl,i,j,k)])[cnt]=0.0;
-  }
-
-  for (cntzone=0; cntzone<numsubzone; cntzone++){
-    for (dim=0; dim<nd; dim++){
-      xmin[cntzone][dim]=1e99;
-      xmax[cntzone][dim]=-1e99;
-    }
-    for_ijk(subzone[cntzone],is,js,ks,ie,je,ke){
-          if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
-            for (dim=0; dim<nd; dim++){
-              xmin[cntzone][dim]=min(xmin[cntzone][dim],_x(np[_ai(gl,i,j,k)],dim));
-              xmax[cntzone][dim]=max(xmax[cntzone][dim],_x(np[_ai(gl,i,j,k)],dim));
-            }
-          }
-    }
-  }
-
-#ifdef DISTMPI
-  MPI_Barrier(MPI_COMM_WORLD);
-  wfprintf(stdout,"EMfield/%ld",numsubzone*numproc);
-#else
-  wfprintf(stdout,"EMfield/%ld",numsubzone);
-#endif
-
-#if defined(OPENMPTHREADS) //&& !defined(DISTMPI)
-#pragma omp parallel for private(l_file,cntzone,cnt,thisweight,dim,zone,i,j,k) schedule(dynamic) 
-#endif
-  for (cntzone=0; cntzone<numsubzone; cntzone++){
-    for (l_file=0; l_file<numnodes; l_file++){
-      if (is_data_point_in_domain(x_file[l_file],xmin[cntzone],xmax[cntzone],radiusmax2_file[l_file])){
-        zone=subzone[cntzone];
-        if (find_interpolation_zone(np,gl,TYPELEVEL_EMFIELD,x_file[l_file],radiusmax2_file[l_file],&zone)){
-          for_jik(zone,is,js,ks,ie,je,ke){
-                if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
-                  find_interpolation_weight(np,gl,_ai(gl,i,j,k),x_file[l_file],dx1_file[l_file],
-#ifdef _2DL
-                                            dx2_file[l_file],
-#endif
-#ifdef _3DL
-                                            dx3_file[l_file],
-#endif
-                                            radiusmax2_file[l_file],&thisweight);
-#ifdef OPENMPTHREADS 
-                  omp_set_lock(&(nodelock[_ai(gl,i,j,k)]));
-#endif
-                  if (thisweight>1e-99) {
-                    weight[_ai(gl,i,j,k)]+=thisweight;
-                    for (cnt=0; cnt<numinitvar_emfield; cnt++) 
-                      initvar_emfield[_ai(gl,i,j,k)][cnt]+=thisweight*_map_interpolation_var(initvar_emfield_file[l_file],map_emfield,cnt);
-                  }
-#ifdef OPENMPTHREADS 
-                  omp_unset_lock(&(nodelock[_ai(gl,i,j,k)]));
-#endif
-                }
-          }
-        }
-      }
-    }
-//    if (mod(cntzone,numsubzone/100+1)==0) wfprintf(stdout,".");
-    fprintf(stdout,".");
-    fflush(stdout);
-  }
-
-#ifdef OPENMPTHREADS
-#pragma omp parallel for private(i,j,k,cnt) schedule(static) 
-#endif
-  for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
-        if (weight[_ai(gl,i,j,k)]>1e-99 && is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) {
-          for (cnt=0; cnt<numinitvar_emfield; cnt++) initvar_emfield[_ai(gl,i,j,k)][cnt]=initvar_emfield[_ai(gl,i,j,k)][cnt]/weight[_ai(gl,i,j,k)];
-          init_node_emfield(np[_ai(gl,i,j,k)], gl, defaultinitvartypeemfield, initvar_emfield[_ai(gl,i,j,k)]);
-          np[_ai(gl,i,j,k)].INIT_EMFIELD=TRUE;
-        }
-  }
-  free(initvar_emfield);
-  free(map_emfield);
-  free(initvar_emfield_file);
-#endif //EMFIELD
-  free(subzone);
-  free(xmin);
-  free(xmax);
-  fclose(datafile);
-  free(weight);
-#ifdef OPENMPTHREADS
-  for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
-        omp_destroy_lock(&(nodelock[_ai(gl,i,j,k)]));
-  }
-  free(nodelock);
-#endif
-#ifdef DISTMPI
-  MPI_Barrier(MPI_COMM_WORLD);
-  if (rank!=0) {
-    gl->effiter_U=0.0;
-    gl->effiter_R=0.0;
-    #ifdef EMFIELD
-    gl->effiter_U_emfield=0.0;
-    gl->effiter_R_emfield=0.0;   
-    #endif
-  }
-#endif
-  wfprintf(stdout,"done;\n");
-
-  free(x_file);
-  free(dx1_file);
-#ifdef _2DL
-  free(dx2_file);
-#endif
-#ifdef _3DL
-  free(dx3_file);
-#endif
-  free(radiusmax2_file);
-}
-
-void read_data_file_interpolation_zone(input_t input, np_t *np, gl_t *gl, long i_min, long j_min, long k_min, long i_max, long j_max, long k_max){  
-  FILE *datafile;
-  char data_format_str[100], initvar_fluid_str_file[500], initvar_emfield_str_file[500];
-  long i,j,k,l_file,cnt,dim,cntzone;
-  long numsubzone, numflux_read,numspec_read,numdim_read,numnodes,numvars_fluid_file;
-  double tmp_dt,tmp_time;
-  double *weight,*radiusmax2_file,thisweight;
-  zone_t *subzone;
-  dim_t *xmin,*xmax;
-  initvar_t *initvar;
-  //initvar_t *initvar_file;
-  zone_t zone;
-  long numsubzone_desired;
-#ifdef EMFIELD
-  bool ISREAD_EMFIELD = FALSE;
-  long numvars_emfield_file;
-  initvar_emfield_t *initvar_emfield;
- // initvar_emfield_t *initvar_emfield_file;
-#endif
-  bool FORMAT001;
-  dim_t *dx1_file,*x_file;
-#ifdef _2DL
-  dim_t *dx2_file;
-#endif
-#ifdef _3DL
-  dim_t *dx3_file;
-#endif
-  int cnterror;
-#ifdef OPENMPTHREADS
-  omp_lock_t *nodelock;
-#endif
-#ifdef DISTMPI
-  int rank,numproc;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &numproc);
-  MPI_Barrier(MPI_COMM_WORLD);
-#endif
-  weight=(double *)malloc(sizeof(double)*(gl->domain_lim.ie+4) 
-#ifdef _2DL 
-    *(gl->domain_lim.je+4)
-#endif
-#ifdef _3DL
-    *(gl->domain_lim.ke+4)
-#endif
-    );
-
-#ifdef OPENMPTHREADS
-  nodelock=(omp_lock_t *)malloc(sizeof(double)*(gl->domain_lim.ie+4) 
-#ifdef _2DL 
-    *(gl->domain_lim.je+4)
-#endif
-#ifdef _3DL
-    *(gl->domain_lim.ke+4)
-#endif
-    );
-#endif
-
-  datafile = fopen(input.name, "r");
-  if (datafile==NULL)
-    fatal_error("Having problems opening interpolation datafile %s for zone interpolation.",input.name);
-
-/* first do the fluid properties */
-
-  mapvar_t *map_fluid = (mapvar_t*)malloc(numinitvar * sizeof(mapvar_t));
-#ifdef EMFIELD  
-  mapvar_t *map_emfield = (mapvar_t*)malloc(numinitvar_emfield * sizeof(mapvar_t));
-#endif  
-  initvar=(initvar_t *)malloc(sizeof(initvar_t)*(gl->domain_lim.ie+4) 
-#ifdef _2DL 
-    *(gl->domain_lim.je+4)
-#endif
-#ifdef _3DL
-    *(gl->domain_lim.ke+4)
-#endif
-    );
-
-
-  for (cnt=0; cnt<16; cnt++){
-    if (fscanf(datafile,"%c",&(data_format_str[cnt]))!=1) {
       fatal_error("Problem with fscanf in read_data_file_interpolation_zone().");
     }
   }
   data_format_str[16]=EOS;
-  wfprintf(stdout,"Reading zone interpolation data file %s..",input.name);
+  wfprintf(stdout,"Reading %sinterpolation data file %s..",(input.INTERPOLATION?"":"zone "),input.name);
   FORMAT001=FALSE;  
   if (strcmp("WARPINTFORMAT001",data_format_str)==0) {
 //    wfprintf(stdout,"in CFDWARP format 001..\n");
@@ -2074,19 +1654,45 @@ void read_data_file_interpolation_zone(input_t input, np_t *np, gl_t *gl, long i
 
   if (FORMAT001) {
       if (fscanf(datafile," numnodes=%ld nf=%ld nd=%ld ns=%ld windowis=%ld windowie=%ld iter=%ld effiter_U=%lg effiter_R=%lg CFL=%lg time=%lg dt=%lg vars_fluid=\"%[^\"]\" vars_emfield=\"%[^\"]\"%*[^\n]",
-             &numnodes,&numflux_read,&numdim_read,&numspec_read,&(gl->window.is),&(gl->window.ie),
-             &(gl->iter),&(gl->effiter_U),&(gl->effiter_R),&(gl->CFL),&(tmp_time),&tmp_dt,initvar_fluid_str_file,initvar_emfield_str_file)!=14) fatal_error("Problem reading interpolation data file.");
+             &numnodes,&numflux_read,&numdim_read,&numspec_read,&windowis_file,&windowie_file,
+             &iter_file,&effiter_U_file,&effiter_R_file,&CFL_file,&tmp_time,&tmp_dt,initvar_fluid_str_file,initvar_emfield_str_file)!=14) fatal_error("Problem reading interpolation data file.");
 
-        find_interpolation_map(input.interpolationvarsmap, initvar_fluid_str_file, numinitvar, &numvars_fluid_file, map_fluid, INITVARTYPE_FLUID);
+        find_interpolation_map(input.interpolationvarsmap, initvar_fluid_str_file, numinitvar, &numvars_fluid_file, map_fluid, INITVARTYPE_FLUID, TRUE);
 #ifdef EMFIELD
-        find_interpolation_map(input.interpolationvarsmap, initvar_emfield_str_file, numinitvar_emfield, &numvars_emfield_file, map_emfield, INITVARTYPE_EMFIELD);
-        if (strcmp(initvar_emfield_str_file,"NONE")!=0) ISREAD_EMFIELD = TRUE;
+        if (strcmp(initvar_emfield_str_file,"NONE")!=0) {
+          find_interpolation_map(input.interpolationvarsmap, initvar_emfield_str_file, numinitvar_emfield, &numvars_emfield_file, map_emfield, INITVARTYPE_EMFIELD, TRUE);
+          ISREAD_EMFIELD = TRUE;
+        } else {
+          /* the file carries no emfield variables, but can still be interpolated into an
+             emfield case: build the emfield map out of the -imap string */
+          numvars_emfield_mapped=find_interpolation_map(input.interpolationvarsmap, "", numinitvar_emfield, &numvars_emfield_file, map_emfield, INITVARTYPE_EMFIELD, FALSE);
+          if (numvars_emfield_mapped==numinitvar_emfield) {
+            SETCONST_EMFIELD=TRUE;
+          } else {
+            /* a restart read must leave every emfield variable with a value, and an -imap
+               string naming some of them but not all is a mistake either way: build the map
+               again and let it stop the run naming the one left without a value */
+            if (input.INTERPOLATION || numvars_emfield_mapped>0)
+              find_interpolation_map(input.interpolationvarsmap, "", numinitvar_emfield, &numvars_emfield_file, map_emfield, INITVARTYPE_EMFIELD, TRUE);
+          }
+        }
 #endif            
 
+      /* the iteration state stored in the file belongs to the run that wrote it: adopt it
+         only when restarting the run from the file. A zone read happens in the middle of a
+         converging run and must leave iter, CFL, effiter, window, time and dt alone. */
+      if (input.INTERPOLATION){
+        gl->window.is=windowis_file;
+        gl->window.ie=windowie_file;
+        gl->iter=iter_file;
+        gl->effiter_U=effiter_U_file;
+        gl->effiter_R=effiter_R_file;
+        gl->CFL=CFL_file;
 #ifdef UNSTEADY
-      gl->time=tmp_time;
-      gl->dt=tmp_dt;
+        gl->time=tmp_time;
+        gl->dt=tmp_dt;
 #endif
+      }
 
     fgetc(datafile);
     if (numdim_read!=nd) fatal_error("Number of dimensions read (%ld) does not equal current number of dimensions (%ld).",numdim_read,nd);
@@ -2133,20 +1739,30 @@ void read_data_file_interpolation_zone(input_t input, np_t *np, gl_t *gl, long i
     radiusmax2_file[l_file]*=1.1;
 
   }
-  //for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
-  for (i=i_min; i<=i_max; i++) {
-    for (j=j_min; j<=j_max; j++) {
-      for (k=k_min; k<=k_max; k++) {
+  /* the zone to be read into: the one asked for, clipped to what this process holds */
+  zoneread.is=i_min;  zoneread.js=j_min;  zoneread.ks=k_min;
+  zoneread.ie=i_max;  zoneread.je=j_max;  zoneread.ke=k_max;
+  ZONEEMPTY=(find_zone_intersection(zoneread,_zone_intersection(gl->domain_all,gl->domain_lim),&zoneread)!=0);
+  if (ZONEEMPTY){
+    /* this process holds no part of the zone asked for: make the zone empty, so that every
+       loop below runs zero times while all collective calls are still reached */
+    zoneread.is=1;  zoneread.js=1;  zoneread.ks=1;
+    zoneread.ie=0;  zoneread.je=0;  zoneread.ke=0;
+  } else {
+    /* nodes may be suspended: write_data_file_interpolation() resumes them before touching
+       them and a read in the middle of a run must do the same */
+    if (!input.INTERPOLATION) resume_nodes_in_zone(np,gl,zoneread);
+  }
+
+  for_ijk(zoneread,is,js,ks,ie,je,ke){
         weight[_ai(gl,i,j,k)]=0.0e0;
 #ifdef OPENMPTHREADS
         omp_init_lock(&(nodelock[_ai(gl,i,j,k)]));
 #endif
         for (cnt=0; cnt<numinitvar; cnt++) (initvar[_ai(gl,i,j,k)])[cnt]=0.0;
-      }
-    }
   }
 
-  zone=_zone_intersection(gl->domain_all,gl->domain_lim);
+  zone=zoneread;
 
   subzone=(zone_t *)malloc(sizeof(zone_t));
   find_subzones_in_zone_given_zonelength(SUBZONE_DESIRED_WIDTH, zone, &numsubzone, &subzone);
@@ -2167,19 +1783,14 @@ void read_data_file_interpolation_zone(input_t input, np_t *np, gl_t *gl, long i
       xmin[cntzone][dim]=1e99;
       xmax[cntzone][dim]=-1e99;
     }
-    //for_ijk(subzone[cntzone],is,js,ks,ie,je,ke){
-    for (i=i_min; i<=i_max; i++) {
-      for (j=j_min; j<=j_max; j++) {
-        for (k=k_min; k<=k_max; k++) {
+    for_ijk(subzone[cntzone],is,js,ks,ie,je,ke){
           if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)){
             for (dim=0; dim<nd; dim++){
               xmin[cntzone][dim]=min(xmin[cntzone][dim],_x(np[_ai(gl,i,j,k)],dim));
               xmax[cntzone][dim]=max(xmax[cntzone][dim],_x(np[_ai(gl,i,j,k)],dim));
             }
-          } // end is_node_valid
-        } // end k
-      } // end j
-    } // end i
+          }
+    }
   }
 
 #ifdef DISTMPI
@@ -2197,11 +1808,10 @@ void read_data_file_interpolation_zone(input_t input, np_t *np, gl_t *gl, long i
       if (is_data_point_in_domain(x_file[l_file],xmin[cntzone],xmax[cntzone],radiusmax2_file[l_file])){
         zone=subzone[cntzone];
         if (find_interpolation_zone(np,gl,TYPELEVEL_FLUID,x_file[l_file],radiusmax2_file[l_file],&zone)){
-          //for_jik(zone,is,js,ks,ie,je,ke){
-          for (i=i_min; i<=i_max; i++) {
-            for (j=j_min; j<=j_max; j++) {
-              for (k=k_min; k<=k_max; k++) {
-            
+          /* find_interpolation_zone() widens the zone in i over the whole domain: clip
+             it back to the zone being read into */
+          if (!find_zone_intersection(zone,zoneread,&zone)){
+            for_jik(zone,is,js,ks,ie,je,ke){
                 if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)){
                   find_interpolation_weight(np,gl,_ai(gl,i,j,k),x_file[l_file],dx1_file[l_file],
 #ifdef _2DL
@@ -2223,9 +1833,8 @@ void read_data_file_interpolation_zone(input_t input, np_t *np, gl_t *gl, long i
                   omp_unset_lock(&(nodelock[_ai(gl,i,j,k)]));
 #endif
                 } // end is_node_valid()
-              } // end k
-            } // end j
-          } // end i
+            }
+          }
         } // end find_interpolation_zone()
       } // is_data_point_in_domain()
     } // end l_file loop
@@ -2236,17 +1845,12 @@ void read_data_file_interpolation_zone(input_t input, np_t *np, gl_t *gl, long i
 #ifdef OPENMPTHREADS
   #pragma omp parallel for private(i,j,k,cnt) schedule(static) 
 #endif
-  //for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
-  for (i=i_min; i<=i_max; i++) {
-    for (j=j_min; j<=j_max; j++) {
-      for (k=k_min; k<=k_max; k++) {
+  for_ijk(zoneread,is,js,ks,ie,je,ke){
         if (weight[_ai(gl,i,j,k)]>1e-99 && is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_FLUID)) {
           for (cnt=0; cnt<numinitvar; cnt++) initvar[_ai(gl,i,j,k)][cnt]=initvar[_ai(gl,i,j,k)][cnt]/weight[_ai(gl,i,j,k)];
           init_node_fluid(np,_ai(gl,i,j,k), gl, defaultinitvartypefluid, initvar[_ai(gl,i,j,k)]);
           np[_ai(gl,i,j,k)].INIT_FLUID=TRUE;
         }
-      }
-    }
   }
   gl->REFORMAT_INITVAR_SPECIES_SUM_CHECK=TRUE;
 
@@ -2331,14 +1935,10 @@ if (ISREAD_EMFIELD) {
     radiusmax2_file[l_file]*=1.1;
   }
 }
-  //for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
-  for (i=i_min; i<=i_max; i++) {
-    for (j=j_min; j<=j_max; j++) {
-      for (k=k_min; k<=k_max; k++) {
+if (ISREAD_EMFIELD) {
+  for_ijk(zoneread,is,js,ks,ie,je,ke){
         weight[_ai(gl,i,j,k)]=0.0e0;
         for (cnt=0; cnt<numinitvar_emfield; cnt++) (initvar_emfield[_ai(gl,i,j,k)])[cnt]=0.0;
-      }
-    }
   }
 
   for (cntzone=0; cntzone<numsubzone; cntzone++){
@@ -2346,18 +1946,13 @@ if (ISREAD_EMFIELD) {
       xmin[cntzone][dim]=1e99;
       xmax[cntzone][dim]=-1e99;
     }
-    //for_ijk(subzone[cntzone],is,js,ks,ie,je,ke){
-    for (i=i_min; i<=i_max; i++) {
-      for (j=j_min; j<=j_max; j++) {
-        for (k=k_min; k<=k_max; k++) {
+    for_ijk(subzone[cntzone],is,js,ks,ie,je,ke){
           if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
             for (dim=0; dim<nd; dim++){
               xmin[cntzone][dim]=min(xmin[cntzone][dim],_x(np[_ai(gl,i,j,k)],dim));
               xmax[cntzone][dim]=max(xmax[cntzone][dim],_x(np[_ai(gl,i,j,k)],dim));
             }
           }
-        }
-      }
     }
   }
 
@@ -2376,10 +1971,10 @@ if (ISREAD_EMFIELD) {
       if (is_data_point_in_domain(x_file[l_file],xmin[cntzone],xmax[cntzone],radiusmax2_file[l_file])){
         zone=subzone[cntzone];
         if (find_interpolation_zone(np,gl,TYPELEVEL_EMFIELD,x_file[l_file],radiusmax2_file[l_file],&zone)){
-          //for_jik(zone,is,js,ks,ie,je,ke){
-          for (i=i_min; i<=i_max; i++) {
-            for (j=j_min; j<=j_max; j++) {
-              for (k=k_min; k<=k_max; k++) {
+          /* find_interpolation_zone() widens the zone in i over the whole domain: clip
+             it back to the zone being read into */
+          if (!find_zone_intersection(zone,zoneread,&zone)){
+            for_jik(zone,is,js,ks,ie,je,ke){
                 if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
                   find_interpolation_weight(np,gl,_ai(gl,i,j,k),x_file[l_file],dx1_file[l_file],
 #ifdef _2DL
@@ -2401,7 +1996,6 @@ if (ISREAD_EMFIELD) {
                   omp_unset_lock(&(nodelock[_ai(gl,i,j,k)]));
 #endif
                 }
-              }
             }
           }
         }
@@ -2414,18 +2008,32 @@ if (ISREAD_EMFIELD) {
 #ifdef OPENMPTHREADS
 #pragma omp parallel for private(i,j,k,cnt) schedule(static) 
 #endif
-  //for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
-  for (i=i_min; i<=i_max; i++) {
-    for (j=j_min; j<=j_max; j++) {
-      for (k=k_min; k<=k_max; k++) {
+  for_ijk(zoneread,is,js,ks,ie,je,ke){
         if (weight[_ai(gl,i,j,k)]>1e-99 && is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) {
           for (cnt=0; cnt<numinitvar_emfield; cnt++) initvar_emfield[_ai(gl,i,j,k)][cnt]=initvar_emfield[_ai(gl,i,j,k)][cnt]/weight[_ai(gl,i,j,k)];
           init_node_emfield(np[_ai(gl,i,j,k)], gl, defaultinitvartypeemfield, initvar_emfield[_ai(gl,i,j,k)]);
           np[_ai(gl,i,j,k)].INIT_EMFIELD=TRUE;
         }
-      }
-    }
   }
+} /* end of if (ISREAD_EMFIELD): none of the emfield work above may run on a file
+     written with vars_emfield="NONE", or map_emfield and initvar_emfield_file are read unset */
+
+if (SETCONST_EMFIELD) {
+  /* the file holds no emfield data to interpolate: every emfield variable was given a
+     constant after -imap, so put it on each valid emfield node of the zone read. Unlike the
+     interpolated path there is no coverage test to make, a constant being defined
+     everywhere; the nodes of the zone that the fluid data does not reach are caught by the
+     fluid half of the run, not here. */
+  for_ijk(zoneread,is,js,ks,ie,je,ke){
+        if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)) {
+          for (cnt=0; cnt<numinitvar_emfield; cnt++)
+            initvar_emfield[_ai(gl,i,j,k)][cnt]=map_emfield[cnt].newvalue;
+          init_node_emfield(np[_ai(gl,i,j,k)], gl, defaultinitvartypeemfield, initvar_emfield[_ai(gl,i,j,k)]);
+          np[_ai(gl,i,j,k)].INIT_EMFIELD=TRUE;
+        }
+  }
+  wfprintf(stdout,"EMfield constants..");
+}
   free(initvar_emfield);
   free(map_emfield);
   free(initvar_emfield_file);
@@ -2436,13 +2044,8 @@ if (ISREAD_EMFIELD) {
   fclose(datafile);
   free(weight);
 #ifdef OPENMPTHREADS
-  //for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
-  for (i=i_min; i<=i_max; i++) {
-    for (j=j_min; j<=j_max; j++) {
-      for (k=k_min; k<=k_max; k++) {
+  for_ijk(zoneread,is,js,ks,ie,je,ke){
         omp_destroy_lock(&(nodelock[_ai(gl,i,j,k)]));
-      }
-    }
   }
   free(nodelock);
 #endif
@@ -2482,7 +2085,15 @@ static double _dxlength2(dim_t dx){
 }
 
 
+/* write_data_file_interpolation() writes an interpolation file over the whole domain: it
+   is write_data_file_interpolation_zone() called on gl->domain_all. */
 void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
+  write_data_file_interpolation_zone(filename, np, gl,
+                                     gl->domain_all.is, gl->domain_all.js, gl->domain_all.ks,
+                                     gl->domain_all.ie, gl->domain_all.je, gl->domain_all.ke);
+}
+
+void write_data_file_interpolation_zone(char *filename, np_t *np, gl_t *gl, long i_min, long j_min, long k_min, long i_max, long j_max, long k_max){
   FILE *datafile;
   long i,j,k,cnt;
   initvarname_t *initvar_names;
@@ -2497,6 +2108,8 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
   long numnodes,dim;
   int TYPELEVEL,pass,passmax;
   bool *NODEVALID;
+  zone_t zonewrite;
+  bool WHOLEDOMAIN;
   initvar_t initvar;
   double effiter_U,effiter_R;
 #ifdef EMFIELD
@@ -2507,6 +2120,23 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
   int rank;
   MPI_Status MPI_Status1;
 #endif
+
+  zonewrite.is=i_min;  zonewrite.js=j_min;  zonewrite.ks=k_min;
+  zonewrite.ie=i_max;  zonewrite.je=j_max;  zonewrite.ke=k_max;
+  if (find_zone_intersection(zonewrite,gl->domain_all,&zonewrite)!=0){
+    zonewrite.is=1;  zonewrite.js=1;  zonewrite.ks=1;
+    zonewrite.ie=0;  zonewrite.je=0;  zonewrite.ke=0;
+    WHOLEDOMAIN=FALSE;
+  } else {
+    WHOLEDOMAIN=(zonewrite.is==gl->domain_all.is && zonewrite.ie==gl->domain_all.ie
+#ifdef _2DL
+              && zonewrite.js==gl->domain_all.js && zonewrite.je==gl->domain_all.je
+#endif
+#ifdef _3DL
+              && zonewrite.ks==gl->domain_all.ks && zonewrite.ke==gl->domain_all.ke
+#endif
+                );
+  }
 
   /* nodes may be suspended. Hence, ensure that appropriate nodes are
      resumed. */
@@ -2538,7 +2168,7 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 #endif
 #endif
   datafile = wfopen(filename, "w");
-  wfprintf(stdout,"Writing to CFDWARP interpolation data file %s..",filename);
+  wfprintf(stdout,"Writing to CFDWARP interpolation %sdata file %s..",(WHOLEDOMAIN?"":"zone "),filename);
 
 #ifdef EMFIELD
   passmax=2;
@@ -2559,10 +2189,10 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
     find_NODEVALID_on_domain_all(np, gl, TYPELEVEL, NODEVALID);
 
     numnodes=0;
-    for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
-	  if (NODEVALID[_ai_all(gl,i,j,k)]) {
-            numnodes++;
-	  }
+    for_ijk(zonewrite,is,js,ks,ie,je,ke){
+      if (NODEVALID[_ai_all(gl,i,j,k)]) {
+        numnodes++;
+      }
     }
 
     if (pass==1){
@@ -2598,7 +2228,7 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 #endif
     }
 
-    for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
+    for_ijk(zonewrite,is,js,ks,ie,je,ke){
 #ifdef DISTMPI
           if (pass==1){
             if (_node_rank(gl,i,j,k)==rank) {
@@ -2739,285 +2369,6 @@ void write_data_file_interpolation(char *filename, np_t *np, gl_t *gl){
 #endif
           } //end if nodevalid
     } // for_ijk
-  }//pass
-
-#ifdef DISTMPI
-  MPI_Barrier(MPI_COMM_WORLD);
-#endif
-  wfclose(datafile);
-  wfprintf(stdout,"done.\n");
-
-  free(NODEVALID);
-  free(initvar_names);
-}
-
-void write_data_file_interpolation_zone(char *filename, np_t *np, gl_t *gl, long i_min, long j_min, long k_min, long i_max, long j_max, long k_max){
-  FILE *datafile;
-  long i,j,k,cnt;
-  initvarname_t *initvar_names;
-  dim_t dx1,x;
-#ifdef _2DL
-  dim_t dx2;
-#endif
-#ifdef _3DL
-  dim_t dx3;
-#endif
-  double tmp_time, tmp_dt;
-  long numnodes,dim;
-  int TYPELEVEL,pass,passmax;
-  bool *NODEVALID;
-  initvar_t initvar;
-  double effiter_U,effiter_R;
-#ifdef EMFIELD
-  double effiter_U_emfield,effiter_R_emfield;
-  initvar_emfield_t initvar_emfield;
-#endif
-#ifdef DISTMPI
-  int rank;
-  MPI_Status MPI_Status1;
-#endif
-
-  /* nodes may be suspended. Hence, ensure that appropriate nodes are
-     resumed. */
-  resume_nodes_in_zone(np,gl,gl->domain);
-
-  NODEVALID=(bool *)malloc(sizeof(bool)*(gl->domain_lim_all.ie-gl->domain_lim_all.is+1) 
-#ifdef _2DL 
-    *(gl->domain_lim_all.je-gl->domain_lim_all.js+1)
-#endif
-#ifdef _3DL
-    *(gl->domain_lim_all.ke-gl->domain_lim_all.ks+1)
-#endif
-  );
-
-  effiter_U=gl->effiter_U;
-  effiter_R=gl->effiter_R;
-#ifdef EMFIELD
-  effiter_U_emfield=gl->effiter_U_emfield;
-  effiter_R_emfield=gl->effiter_R_emfield;
-#endif
-#ifdef DISTMPI
-  MPI_Barrier(MPI_COMM_WORLD);
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Allreduce(&gl->effiter_U, &effiter_U, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-  MPI_Allreduce(&gl->effiter_R, &effiter_R, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-#ifdef EMFIELD
-  MPI_Allreduce(&gl->effiter_U_emfield, &effiter_U_emfield, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-  MPI_Allreduce(&gl->effiter_R_emfield, &effiter_R_emfield, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-#endif
-#endif
-  datafile = wfopen(filename, "w");
-  wfprintf(stdout,"Writing to CFDWARP interpolation zone data file %s..",filename);
-
-#ifdef EMFIELD
-  passmax=2;
-#else
-  passmax=1;
-#endif
-  for (pass=1; pass<=passmax; pass++){
-    if (pass==1){
-      TYPELEVEL=TYPELEVEL_FLUID;
-    } else {
-#ifdef EMFIELD
-      TYPELEVEL=TYPELEVEL_EMFIELD;
-#endif
-    }
-#ifdef DISTMPI
-    MPI_Barrier(MPI_COMM_WORLD);
-#endif
-    find_NODEVALID_on_domain_all(np, gl, TYPELEVEL, NODEVALID);
-
-    numnodes=0;
-    //for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
-    for (i=i_min; i<=i_max; i++) {
-      for (j=j_min; j<=j_max; j++) {
-        for (k=k_min; k<=k_max; k++) {
-          if (NODEVALID[_ai_all(gl,i,j,k)]) {
-                  numnodes++;
-          }
-        }
-      }
-    }
-
-    if (pass==1){
-#ifdef UNSTEADY
-      tmp_time=gl->time;
-      tmp_dt=gl->dt;
-#else
-      tmp_time=0.0;
-      tmp_dt=dt_steady;
-#endif
-      wfprintf(datafile,"WARPINTFORMAT001 numnodes=%ld nf=%ld nd=%ld ns=%ld windowis=%ld windowie=%ld iter=%ld effiter_U=%E effiter_R=%E CFL=%E time=%E dt=%E ",numnodes,nf,nd, ns,gl->window.is,gl->window.ie,gl->iter,effiter_U,effiter_R,gl->CFL,tmp_time,tmp_dt);
-      wfprintf(datafile,"vars_fluid=\"");
-      initvar_names = (initvarname_t *) malloc(sizeof(initvarname_t) * numinitvar * sizeof(char));   
-      find_default_initvar_name(initvar_names); 
-      for (cnt=0; cnt<numinitvar; cnt++) {
-        wfprintf(datafile,"%s ", initvar_names[cnt]);   
-      }
-      wfprintf(datafile,"\"");   
-      wfprintf(datafile," vars_emfield=\"");
-#ifdef EMFIELD           
-      initvar_names = (initvarname_t *) malloc(sizeof(initvarname_t) * numinitvar_emfield * sizeof(char));   
-      find_default_initvar_name_emfield(initvar_names);            
-      for (cnt=0; cnt<numinitvar_emfield; cnt++) {
-        wfprintf(datafile,"%s ", initvar_names[cnt]);   
-      }
-      wfprintf(datafile,"\"\n");
-#else
-      wfprintf(datafile,"NONE\"\n");
-#endif
-    } else {
-#ifdef EMFIELD
-      wfprintf(datafile,"WARPINTFORMAT001 numnodes_emfield=%ld nfe=%ld nd=%ld Lc=%E effiter_U_emfield=%E effiter_R_emfield=%E\n",numnodes,nfe,nd,gl->Lc,effiter_U_emfield,effiter_R_emfield);
-#endif
-    }
-
-    for (i=i_min; i<=i_max; i++) {
-      for (j=j_min; j<=j_max; j++) {
-        for (k=k_min; k<=k_max; k++) {
-#ifdef DISTMPI
-          if (pass==1){
-            if (_node_rank(gl,i,j,k)==rank) {
-	      if (NODEVALID[_ai_all(gl,i,j,k)]) {
-	        find_default_initvar(np, gl, _ai(gl,i,j,k), initvar); 
-              } else {
-                for (cnt=0; cnt<numinitvar; cnt++) initvar[cnt]=0.0;
-	      }
-              if (rank!=0) {
-                MPI_Ssend(initvar,numinitvar,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
-              }
-            }
-            if (rank==0 && _node_rank(gl,i,j,k)!=0){
-              MPI_Recv(initvar,numinitvar,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
-            }
-          } else {
-#ifdef EMFIELD
-            if (_node_rank(gl,i,j,k)==rank) {
-	      if (NODEVALID[_ai_all(gl,i,j,k)]) {
-	        find_default_initvar_emfield(np, gl, _ai(gl,i,j,k),initvar_emfield); 
-              } else {
-                for (cnt=0; cnt<numinitvar_emfield; cnt++) initvar_emfield[cnt]=0.0;
-	      }
-              if (rank!=0) {
-                MPI_Ssend(initvar_emfield,numinitvar_emfield,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
-              }
-            }
-            if (rank==0 && _node_rank(gl,i,j,k)!=0){
-              MPI_Recv(initvar_emfield,numinitvar_emfield,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
-            }
-#endif
-          }
-#else
-          if (pass==1){
-            if (NODEVALID[_ai_all(gl,i,j,k)]) {
-	      find_default_initvar(np, gl, _ai(gl,i,j,k), initvar); 
-            } else {
-              for (cnt=0; cnt<numinitvar; cnt++) initvar[cnt]=0.0;
-            }
-          } else {
-#ifdef EMFIELD
-            if (NODEVALID[_ai_all(gl,i,j,k)]) {
-              find_default_initvar_emfield(np, gl, _ai(gl,i,j,k), initvar_emfield); 
-            } else {
-              for (cnt=0; cnt<numinitvar_emfield; cnt++) initvar_emfield[cnt]=0.0;
-	    }
-#endif
-          }
-#endif
-
-          if (NODEVALID[_ai_all(gl,i,j,k)]) {
-#ifdef DISTMPI
-            if (_node_rank(gl,i,j,k)==rank) {
-#endif
-              for (dim=0; dim<nd; dim++) x[dim]=_x(np[_ai(gl,i,j,k)],dim);
-              for (dim=0; dim<nd; dim++){
-	        if ((i<gl->domain_all.ie && NODEVALID[_ai_all(gl,i+1,j,k)]) && (i>gl->domain_all.is && NODEVALID[_ai_all(gl,i-1,j,k)])) {
-	          dx1[dim]=0.5*sign(np[_ai(gl,i+1,j,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])
-                        *(fabs(np[_ai(gl,i+1,j,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])
-                        + fabs(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i-1,j,k)].bs->x[dim]));
-                } else {
-                  if (i<gl->domain_all.ie && NODEVALID[_ai_all(gl,i+1,j,k)]) {
-                    dx1[dim]=(np[_ai(gl,i+1,j,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim]);
-                  } else {
-                    if (i>gl->domain_all.is && NODEVALID[_ai_all(gl,i-1,j,k)]) {
-	              dx1[dim]=(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i-1,j,k)].bs->x[dim]);
-		    } else {
-                      fatal_error("Couldn't find adjacent valid node along i needed for interpolation.");
-		    }
-                  }
-	        }
-#ifdef _2DL
-                if ((j<gl->domain_all.je && NODEVALID[_ai_all(gl,i,j+1,k)]) && (j>gl->domain_all.js && NODEVALID[_ai_all(gl,i,j-1,k)])) {
-                  dx2[dim]=0.5*sign(np[_ai(gl,i,j+1,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])
-                   *(fabs(np[_ai(gl,i,j+1,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])+fabs(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i,j-1,k)].bs->x[dim]));
-                } else {
-                  if (j<gl->domain_all.je && NODEVALID[_ai_all(gl,i,j+1,k)]) {
-	            dx2[dim]=(np[_ai(gl,i,j+1,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim]);
-                  } else {
-                    if (j>gl->domain_all.js && NODEVALID[_ai_all(gl,i,j-1,k)]) {
-                      dx2[dim]=(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i,j-1,k)].bs->x[dim]);
-                    } else {
-                      fatal_error("Couldn't find adjacent valid node along j needed for interpolation.");
-		    }
-                  }
-                }
-#endif
-#ifdef _3DL
-	        if ((k<gl->domain_all.ke && NODEVALID[_ai_all(gl,i,j,k+1)]) && (k>gl->domain_all.ks && NODEVALID[_ai_all(gl,i,j,k-1)])) {
-                  dx3[dim]=0.5*sign(np[_ai(gl,i,k+1,k)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])
-                     *(fabs(np[_ai(gl,i,j,k+1)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim])+fabs(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i,j,k-1)].bs->x[dim]));
-                } else {
-                  if (k<gl->domain_all.ke && NODEVALID[_ai_all(gl,i,j,k+1)]) {
-                    dx3[dim]=(np[_ai(gl,i,j,k+1)].bs->x[dim]-np[_ai(gl,i,j,k)].bs->x[dim]);
-                  } else {
-                    if (k>gl->domain_all.ks && NODEVALID[_ai_all(gl,i,j,k-1)]) {
-                      dx3[dim]=(np[_ai(gl,i,j,k)].bs->x[dim]-np[_ai(gl,i,j,k-1)].bs->x[dim]);
-                    } else {
-                      fatal_error("Couldn't find adjacent valid node along k needed for interpolation.");
-                    }
-                  }
-                }
-#endif
-	      }
-#ifdef DISTMPI
-	    }
-            if (rank!=0 && _node_rank(gl,i,j,k)==rank) MPI_Ssend(x,nd,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
-            if (rank==0 && _node_rank(gl,i,j,k)!=0) MPI_Recv(x,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
-            if (rank!=0 && _node_rank(gl,i,j,k)==rank) MPI_Ssend(dx1,nd,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
-            if (rank==0 && _node_rank(gl,i,j,k)!=0) MPI_Recv(dx1,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
-#ifdef _2DL  
-            if (rank!=0 && _node_rank(gl,i,j,k)==rank) MPI_Ssend(dx2,nd,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
-            if (rank==0 && _node_rank(gl,i,j,k)!=0) MPI_Recv(dx2,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
-#endif
-#ifdef _3DL  
-            if (rank!=0 && _node_rank(gl,i,j,k)==rank) MPI_Ssend(dx3,nd,MPI_DOUBLE,0,5753,MPI_COMM_WORLD);
-            if (rank==0 && _node_rank(gl,i,j,k)!=0) MPI_Recv(dx3,nd,MPI_DOUBLE,_node_rank(gl,i,j,k),5753,MPI_COMM_WORLD,&MPI_Status1);
-#endif
-
-#endif
-            if (pass==1) {
-              wfwrite(initvar, sizeof(initvar_t), 1, datafile);
-            } else {
-#ifdef EMFIELD
-              wfwrite(initvar_emfield, sizeof(initvar_emfield_t), 1, datafile);
-#endif
-            }
-            wfwrite(x, sizeof(dim_t), 1, datafile);
-            if (_dxlength2(dx1)==0.0) fatal_error("Two adjacent nodes on the grid have the same x,y,z position at the location i=%ld, j=%ld, k=%ld\n",i,j,k);
-            wfwrite(dx1, sizeof(dim_t), 1, datafile);
-#ifdef _2DL
-            if (_dxlength2(dx2)==0.0) fatal_error("Two adjacent nodes on the grid have the same x,y,z position at the location i=%ld, j=%ld, k=%ld\n",i,j,k);
-            wfwrite(dx2, sizeof(dim_t), 1, datafile);
-#endif
-#ifdef _3DL
-            if (_dxlength2(dx3)==0.0) fatal_error("Two adjacent nodes on the grid have the same x,y,z position at the location i=%ld, j=%ld, k=%ld\n",i,j,k);
-            wfwrite(dx3, sizeof(dim_t), 1, datafile);
-#endif
-          } //end if nodevalid
-  //  } // for_ijk
-        } // for k within specified zone
-      } // for j within specified zone
-    } // for i within specified zone
   }//pass
 
 #ifdef DISTMPI

@@ -6,6 +6,25 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2026 SEP 10a   
+  * in /src/data.c
+    - in read_data_file_interpolation(), now calls read_data_file_interpolation_zone(), with the 
+      zone set to the whole domain
+    - in write_data_file_interpolation(), now calls write_data_file_interpolation_zone(), with the 
+      zone set to the whole domain
+    - fixed bug in the -imap interpolation mapping: when the file carries no emfield variables, it 
+      can now be interpolated into an emfield case using the -imap string, without a fatal error
+  * in cycle/share/cycle_share.c
+    - in runtime_actions(), in ReadInterpolationFileZone() and ReadInterpolationFileZone(): the malloc 
+      on input->name was removed, the file name is read into a local instead and freed after the call
+    - in runtime_actions(), in ReadInterpolationFile(), now calls read_data_file_interpolation_zone()
+      with the zone set to the whole domain
+    - in runtime_actions(), in WriteInterpolationFile(), now calls write_data_file_interpolation_zone()
+      with the zone set to the whole domain
+    - in runtime_actions(), added WriteInterpolationFileZone()
+    - in process_code_runtime(), every field of the Runtimearg.input is now initialized
+
+
 2026 SEP 08a   
   * in model/chem
     - updated ground ionization rate in _Ar_Plasma_3s, _Ar_Plasma_4s, _Ar_Plasma_8s
