@@ -54,6 +54,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CO_num 7
 
 
+#define COMPILER_SUPPORTS_LTO(compiler) \
+  ((compiler)==CO_GCC || (compiler)==CO_MPICC || (compiler)==CO_MPICC_MPICH || (compiler)==CO_MPICC_OPENMPI)
+
+/* Link time optimization is added only at the highest optimization level, -O3
+   lower levels are the ones used to debug, to profile and to run under valgrind, */
+#define LTO_FLAGS_WANTED(compiler,opt) (COMPILER_SUPPORTS_LTO(compiler) && (opt)==3)
+
+
 #define mod(a,b) ((((a)%(b))+(b))%(b))
 
 #if (OPENMP==TRUE)
@@ -749,6 +757,7 @@ static void output_makefileheader(FILE *scriptfile_applyconfig, long nd, long nu
   if (COMPILER==CO_GCC || COMPILER==CO_ICC || COMPILER==CO_MPICC || COMPILER==CO_MPICC_MPICH || COMPILER==CO_MPICC_OPENMPI) fprintf(scriptfile_applyconfig, " -Wall -funroll-all-loops -Wfatal-errors");
   if (COMPILER==CO_CCC) fprintf(scriptfile_applyconfig, " -ieee");
   if (COMPILER==CO_MPICC || COMPILER==CO_MPICC_MPICH || COMPILER==CO_MPICC_OPENMPI) fprintf(scriptfile_applyconfig, " -DDISTMPI");
+  if (LTO_FLAGS_WANTED(COMPILER,numopt)) fprintf(scriptfile_applyconfig, " -flto");
   if (PROFIL) fprintf(scriptfile_applyconfig," -pg");
   if (DEBUGGER) fprintf(scriptfile_applyconfig," -g");
   if (DEBUGGER && (COMPILER==CO_GCC || COMPILER==CO_MPICC || COMPILER==CO_MPICC_MPICH || COMPILER==CO_MPICC_OPENMPI)) fprintf(scriptfile_applyconfig," -fno-omit-frame-pointer"); 
@@ -794,6 +803,7 @@ static void output_makefileheader(FILE *scriptfile_applyconfig, long nd, long nu
     }
 //    if (COMPILER==CO_GCC) fprintf(scriptfile_applyconfig," -s");
   }
+  if (LTO_FLAGS_WANTED(COMPILER,numopt)) fprintf(scriptfile_applyconfig," -flto=4");
   if (STATIC) fprintf(scriptfile_applyconfig," -static");
   if (DEBUGGER) fprintf(scriptfile_applyconfig," -g");
   if (DEBUGGER && (COMPILER==CO_GCC || COMPILER==CO_MPICC || COMPILER==CO_MPICC_MPICH || COMPILER==CO_MPICC_OPENMPI)) fprintf(scriptfile_applyconfig," -fno-omit-frame-pointer -rdynamic"); 

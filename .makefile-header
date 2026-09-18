@@ -17,11 +17,11 @@
 MAKEFLAGS += --stop
 MAKEFLAGS += --no-print-directory
 SHELL = /bin/sh -e
-CFLAGS = -O3 -Wall -funroll-all-loops -Wfatal-errors -DOPENMPTHREADS -fopenmp
+CFLAGS = -O3 -Wall -funroll-all-loops -Wfatal-errors -flto -DOPENMPTHREADS -fopenmp
 CC = gcc
 CFLAGSCFD = -D_2D 
 L = gcc
-LFLAGS = -fopenmp 
+LFLAGS = -fopenmp -flto=4 
 
 #####################################################################
 ## Implicit Rules                                                  ##

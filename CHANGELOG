@@ -6,6 +6,13 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2026 SEP 18a   
+  * in /config/config.c
+    - added link time optimization (-flto) to the gcc options used with -O3 only
+  * in /.makefile-header-default
+    - appended -flto and -flto=4 to CFLAGS and LFLAGS lines
+
+
 2026 SEP 17a
   * in /tools/warp2fluent.c
     - added improved error checking, UDF compilation timestamps and simulation exit messages
