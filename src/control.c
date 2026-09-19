@@ -364,7 +364,7 @@ void write_license ( FILE * outputfile ) {
   int linewidth,term_width,term_height;
   find_terminal_window_size(&term_width,&term_height);
   linewidth=min(MAX_LINE_WIDTH,max(40,term_width-2));
-  if (outputfile!=stdout) linewidth=MAX_LINE_WIDTH;
+  if (outputfile!=stdout || term_width<=0) linewidth=MAX_LINE_WIDTH;
 
   wfprintf(outputfile,"\n");
   sprintf(linestr,"  Copyright 1998-2024 Bernard Parent\n"
@@ -420,7 +420,7 @@ void write_modules(FILE *outputfile){
 #endif
   find_terminal_window_size(&term_width,&term_height);
   linewidth=min(MAX_LINE_WIDTH,max(50,term_width-2));
-  if (outputfile!=stdout) linewidth=MAX_LINE_WIDTH;
+  if (outputfile!=stdout || term_width<=0) linewidth=MAX_LINE_WIDTH;
   for (cnt=0; cnt<numbib; cnt++) cite[cnt]=0;
 
   write_hline(outputfile, linewidth, 2);

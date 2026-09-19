@@ -2151,7 +2151,7 @@ char *strind(char *str, int indent){
 /* add line breaks without breaking words with width the maximum number of characters per line 
    and indent the number of indented characters (either negative or positive)  */
 char *strwrpind(char *str, int width, int indent){
-  long cnt,cnt2,cntbreak;
+  long cnt,cnt2,cntbreak,cntindentend;
   bool CONTINUE;
   static char whitespace[2];
   strcpy(whitespace," ");
@@ -2162,15 +2162,29 @@ char *strwrpind(char *str, int width, int indent){
 
   CONTINUE=TRUE;
   cntbreak=0;
+  cntindentend=0;
   cnt=0;
   do {
     cnt++;
-    if (str[cnt]=='\n') cntbreak=cnt;
+    if (str[cnt]=='\n') {
+      cntbreak=cnt;
+      cntindentend=cnt;
+    }
     if (cnt-cntbreak>width-1){
       cntbreak=cnt;
       do {
         cntbreak--;
       } while(str[cntbreak]!=' ' && str[cntbreak]!='-' && cntbreak>0);
+      if (indent<0 && cntbreak<=cntindentend){
+        /* No whitespace was found past the hang indent of the current line: the
+           word is longer than the room the hang indent leaves.  Break the word
+           itself.  Without this, the break lands on one of the spaces of the
+           previous hang indent, a new hang indent is inserted there, cnt makes
+           no progress, and the string grows by -indent characters per pass
+           until it runs past the end of the caller's buffer. */
+        strins("\n",str,cnt);
+        cntbreak=cnt;
+      }
       if (cntbreak>0){
         if (str[cntbreak]=='-') {
           strins("\n",str,cntbreak+1);
@@ -2183,6 +2197,7 @@ char *strwrpind(char *str, int width, int indent){
           for (cnt2=0; cnt2<-indent; cnt2++){
             strins(whitespace,str,cntbreak+1);
           }
+          cntindentend=cntbreak-indent;
         }
       } else {
         // problem breaking line..
@@ -2231,9 +2246,16 @@ void find_words_from_string(char* str, char* delimiters, char*** words, long* nu
 
 void find_terminal_window_size(int *width, int *height){
   struct winsize w;
-  ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-  *width=w.ws_col;
-  *height=w.ws_row;
+  /* When stdout is not a terminal (a pipe or a file) the ioctl fails and leaves w
+     untouched, so reading it back gives whatever was on the stack.  Return zero
+     instead and let the caller decide what to do without a terminal. */
+  if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w)!=0){
+    *width=0;
+    *height=0;
+  } else {
+    *width=w.ws_col;
+    *height=w.ws_row;
+  }
 }
 
 

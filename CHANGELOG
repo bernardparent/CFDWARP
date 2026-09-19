@@ -6,6 +6,21 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2026 SEP 18b   
+  * in /src/control.c
+    - in write_license(), added || term_width<0 to the outputfile linewidth=MAX_LINE_WIDTH
+      if condition
+    - in write_modules(), added || term_width<0 to the outputfile linewidth=MAX_LINE_WIDTH 
+      if condition
+  * in /lib/exm/exm.c
+    - in *strwrpind(), fixed a bug: when a line gets too long, the search for a 
+      break point no longer runs backwards
+    - in find_terminal_window_size(), height and width is set to zero when stdout
+      is not a terminal
+    - the above fixes a silent segfault visible when running 
+      ./warp -v > /tmp/v.txt ; echo "exit $?" output to terminal
+
+
 2026 SEP 18a   
   * in /config/config.c
     - added link time optimization (-flto) to the gcc options used with -O3 only
