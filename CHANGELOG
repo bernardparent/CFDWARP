@@ -6,6 +6,12 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2026 SEP 22a  
+  * in /model/share/model_share.c
+    - in _averaged_rate(), fixed a BDF compile error related to AVERAGEDRATES when using a plasma 
+      chemical model
+
+
 2026 SEP 21a  
   * in /model/emfield/_test/emfield.hh  and /model/emfield/_Epotential/emfield.hh
     - set tsemfcoeffhbw to 1

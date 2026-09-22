@@ -133,9 +133,11 @@ double _averaged_rate(np_t np, gl_t *gl, char* id, double rate){
   assert(id_map<numaveragedrates);  
 
   if (!FOUND) {
+#ifdef _AVERAGEDRATES_FLUID
     for (cntfluid=0; cntfluid<numaveragedrates_fluid; cntfluid++){
       printf("%s\n",averagedrates_fluid_id[cntfluid]);
     }
+#endif
     for (cntchem=0; cntchem<numaveragedrates_chem; cntchem++){
       printf("%s\n",averagedrates_chem_id[cntchem]);
     }
