@@ -11,7 +11,7 @@
 #define totalpostvaremfield (2+nd)
 #define totalinitvartypeemfield 1
 #define defaultinitvartypeemfield 1
-#define tsemfcoeffhbw 2 
+#define tsemfcoeffhbw 1 
 
 typedef double fluxemfield_t[nfe];
 

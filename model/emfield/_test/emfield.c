@@ -700,7 +700,8 @@ static double _Jstar_interface(np_t *np, gl_t *gl, metrics_t metrics, long l, lo
 }
 
 
-static double _Jtstar_interface(np_t *np, gl_t *gl, metrics_t metrics, long l, long i){
+/* EMFIELD TEST: not static: src/post.c calls this through the prototype in model/share/emfield_share.h */
+double _Jtstar_interface(np_t *np, gl_t *gl, metrics_t metrics, long l, long i){
   double Jtstar;
   Jtstar=_Jstar_interface(np, gl, metrics, l, i);
 #ifdef UNSTEADY
@@ -725,13 +726,16 @@ void find_Sstar_emfield(np_t *np, gl_t *gl, long l, fluxemfield_t S){
 }
 
 
+
 void find_Ve_from_J(np_t *np, gl_t *gl, long l, EXM_vec3D_t Ve){
-  find_Ve_from_J_mem(np, gl, l, Ve);
+  long dim;
+  for (dim=0; dim<3; dim++) Ve[dim]=0.0;
 }
 
 
 void find_Vk_from_Vk_at_interfaces(np_t *np, gl_t *gl, long l, long spec, EXM_vec3D_t Vk){
-  find_Vk_from_Vk_at_interfaces_mem(np, gl, l, spec, Vk);
+  long dim;
+  for (dim=0; dim<3; dim++) Vk[dim]=0.0;
 }
 
 

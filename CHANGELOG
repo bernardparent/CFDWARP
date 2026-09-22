@@ -6,6 +6,16 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2026 SEP 21a  
+  * in /model/emfield/_test/emfield.hh  and /model/emfield/_Epotential/emfield.hh
+    - set tsemfcoeffhbw to 1
+  * in /model/emfield/_test/emfield.c
+    - implemented changes to make the test emfield module usable under make configx:
+    - in _Jtstar_interface(), removed static declaration
+    - in find_Ve_from_J(), set Ve[dim] to zero
+    - in find_Vk_from_Vk_at_interfaces(), set Vk[dim] to zero
+
+
 2026 SEP 18b   
   * in /src/control.c
     - in write_license(), added || term_width<0 to the outputfile linewidth=MAX_LINE_WIDTH
