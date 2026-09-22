@@ -1112,6 +1112,7 @@ static double mesh_mean_spacing(const double *x, long n, long nd) {
 static void write_fluent2warp_udf_file(const char *udf_filename, const char *vars_fluid_str,
                                        char **varnames, long numvars, long numdim, long numspec,
                                        double xstation, double *dx1mean, double *dx2mean,
+                                       double *dx3mean,
                                        long nf, long windowis, long windowie, long iter,
                                        double effiter_U, double effiter_R, double CFL,
                                        double dxwarp, double dxfluent, long numfaces,
@@ -1173,7 +1174,7 @@ static void write_fluent2warp_udf_file(const char *udf_filename, const char *var
   reclen = numvars + (numdim + 1) * numdim; /* vars, then x, dx1, dx2 [, dx3] */
   hmax = 0.0;
   for (cnt = 0; cnt < numdim; cnt++)
-    hmax = max(hmax, fabs(dx1mean[cnt]) + fabs(dx2mean[cnt]));
+    hmax = max(hmax, fabs(dx1mean[cnt]) + fabs(dx2mean[cnt]) + fabs(dx3mean[cnt]));
   dxscale = 1.0;
   if (hmax > 0.0 && dxwarp > 0.0) dxscale = 0.5*dxwarp/hmax;
 
@@ -1315,6 +1316,14 @@ static void write_fluent2warp_udf_file(const char *udf_filename, const char *var
   for (cnt = 0; cnt < numdim; cnt++)
     fprintf(udf, "#define WARP_DX2_%ld    %.8E   /* %.8E * WARP_DXSCALE */\n",
             cnt, dx2mean[cnt]*dxscale, dx2mean[cnt]);
+  /* dx3 exists only in 3D.  Left at zero -- which is what this tool used to
+     write into every record -- it makes the matrix [dx1 dx2 dx3] that
+     find_interpolation_weight() inverts singular, and the CFDWARP side stops
+     on a zero determinant at the first zone read. */
+  if (numdim > 2)
+    for (cnt = 0; cnt < numdim; cnt++)
+      fprintf(udf, "#define WARP_DX3_%ld    %.8E   /* %.8E * WARP_DXSCALE */\n",
+              cnt, dx3mean[cnt]*dxscale, dx3mean[cnt]);
 
   /* Unit vectors of the two support directions */
   {
@@ -1328,6 +1337,27 @@ static void write_fluent2warp_udf_file(const char *udf_filename, const char *var
     for (cnt = 0; cnt < numdim; cnt++)
       fprintf(udf, "#define WARP_DX2U_%ld   %.8E\n", cnt,
               (n2 > 0.0) ? dx2mean[cnt]/n2 : (cnt == 1 ? 1.0 : 0.0));
+    if (numdim > 2) {
+      double n3 = 0.0;
+      for (cnt = 0; cnt < numdim; cnt++) n3 += sqr(dx3mean[cnt]);
+      n3 = sqrt(n3);
+      for (cnt = 0; cnt < numdim; cnt++)
+        fprintf(udf, "#define WARP_DX3U_%ld   %.8E\n", cnt,
+                (n3 > 0.0) ? dx3mean[cnt]/n3 : (cnt == 2 ? 1.0 : 0.0));
+    }
+    /* The three lists below are what the warp_dxNu[] arrays are built from, so
+       that one declaration serves both 2D and 3D. */
+    if (numdim > 2) {
+      fprintf(udf, "#define WARP_DX1U      WARP_DX1U_0, WARP_DX1U_1, WARP_DX1U_2\n");
+      fprintf(udf, "#define WARP_DX2U      WARP_DX2U_0, WARP_DX2U_1, WARP_DX2U_2\n");
+      fprintf(udf, "#define WARP_DX3U      WARP_DX3U_0, WARP_DX3U_1, WARP_DX3U_2\n");
+      fprintf(udf, "#define WARP_DX2MAG    sqrt(WARP_DX2_0*WARP_DX2_0 + WARP_DX2_1*WARP_DX2_1"
+                   " + WARP_DX2_2*WARP_DX2_2)\n");
+    } else {
+      fprintf(udf, "#define WARP_DX1U      WARP_DX1U_0, WARP_DX1U_1\n");
+      fprintf(udf, "#define WARP_DX2U      WARP_DX2U_0, WARP_DX2U_1\n");
+      fprintf(udf, "#define WARP_DX2MAG    sqrt(WARP_DX2_0*WARP_DX2_0 + WARP_DX2_1*WARP_DX2_1)\n");
+    }
   }
   fprintf(udf,
     "\n/* WARP_LOCALDX 1: the constants above are NOT what is sent.  Every face gets\n"
@@ -1453,8 +1483,11 @@ static void write_fluent2warp_udf_file(const char *udf_filename, const char *var
       "static double warp_pmin_seen = 0.0; /* lowest absolute P this sweep saw     */\n"
       "static int    warp_nzerop = 0;   /* faces whose absolute P was exactly 0    */\n"
       "#if WARP_LOCALDX\n"
-      "static const double warp_dx1u[WARP_ND] = { WARP_DX1U_0, WARP_DX1U_1 };\n"
-      "static const double warp_dx2u[WARP_ND] = { WARP_DX2U_0, WARP_DX2U_1 };\n"
+      "static const double warp_dx1u[WARP_ND] = { WARP_DX1U };\n"
+      "static const double warp_dx2u[WARP_ND] = { WARP_DX2U };\n"
+      "#if WARP_ND > 2\n"
+      "static const double warp_dx3u[WARP_ND] = { WARP_DX3U };\n"
+      "#endif\n"
       "static int    warp_dx_reported = 0;  /* the support banner, printed once    */\n"
       "#endif\n"
       "\n"
@@ -1546,7 +1579,7 @@ static void write_fluent2warp_udf_file(const char *udf_filename, const char *var
     fprintf(udf, "  r[WARP_NUMVARS + %ld*WARP_ND + %ld] = WARP_DX2_%ld;\n", (long)2, cnt, cnt);
   if (numdim > 2) {
     for (cnt = 0; cnt < numdim; cnt++)
-      fprintf(udf, "  r[WARP_NUMVARS + 3*WARP_ND + %ld] = 0.0;   /* dx3 */\n", cnt);
+      fprintf(udf, "  r[WARP_NUMVARS + 3*WARP_ND + %ld] = WARP_DX3_%ld;\n", cnt, cnt);
   }
   fprintf(udf,
     "\n"
@@ -1814,6 +1847,9 @@ static void write_fluent2warp_udf_file(const char *udf_filename, const char *var
     "    for (dim = 0; dim < WARP_ND; dim++) {\n"
     "      warp_buf[i*WARP_RECLEN + WARP_NUMVARS + 1*WARP_ND + dim] = warp_dx1u[dim]*h;\n"
     "      warp_buf[i*WARP_RECLEN + WARP_NUMVARS + 2*WARP_ND + dim] = warp_dx2u[dim]*h;\n"
+    "#if WARP_ND > 2\n"
+    "      warp_buf[i*WARP_RECLEN + WARP_NUMVARS + 3*WARP_ND + dim] = warp_dx3u[dim]*h;\n"
+    "#endif\n"
     "    }\n"
     "    if (hmax == 0.0) { hmin = h; hmax = h; }\n"
     "    if (h < hmin) hmin = h;\n"
@@ -1824,7 +1860,7 @@ static void write_fluent2warp_udf_file(const char *udf_filename, const char *var
     "    WARP_PRINT(\"warp: per-face support, local spacing %%.4E to %%.4E m over %%d\"\n"
     "               \" faces; the single WARP_DX pair was %%.4E m everywhere.\\n\",\n"
     "               hmin, hmax, warp_nrec,\n"
-    "               sqrt(WARP_DX2_0*WARP_DX2_0 + WARP_DX2_1*WARP_DX2_1));\n"
+    "               WARP_DX2MAG);\n"
     "  }\n"
     "}\n"
     "#endif\n"
@@ -2196,7 +2232,7 @@ int main(int argc, char **argv) {
   char **initvar_fluid_names_file = NULL;
   char **initvar_fluid_names_orig = NULL;
   long numvars_fluid_orig;
-  double xstation,dx1mean[3],dx2mean[3];
+  double xstation,dx1mean[3],dx2mean[3],dx3mean[3];
   char **initvar_emfield_names_file = NULL;
   int RET;
   options = NULL;
@@ -2779,17 +2815,19 @@ int main(int argc, char **argv) {
 
   // UDF that has FLUENT write a CFDWARP interpolation file
   xstation=0.0;
-  for (dim=0; dim<numdim_read; dim++){ dx1mean[dim]=0.0; dx2mean[dim]=0.0; }
+  for (dim=0; dim<numdim_read; dim++){ dx1mean[dim]=0.0; dx2mean[dim]=0.0; dx3mean[dim]=0.0; }
   for (l_file=0; l_file<numnodes; l_file++){
     xstation+=x_file[l_file][0];
     for (dim=0; dim<numdim_read; dim++){
       dx1mean[dim]+=dx1_file[l_file][dim];
       dx2mean[dim]+=dx2_file[l_file][dim];
+      dx3mean[dim]+=dx3_file[l_file][dim];
     }
   }
   if (numnodes>0){
     xstation/=(double)numnodes;
-    for (dim=0; dim<numdim_read; dim++){ dx1mean[dim]/=(double)numnodes; dx2mean[dim]/=(double)numnodes; }
+    for (dim=0; dim<numdim_read; dim++){ dx1mean[dim]/=(double)numnodes; dx2mean[dim]/=(double)numnodes;
+                                         dx3mean[dim]/=(double)numnodes; }
   }
   dxwarp=mesh_mean_spacing((const double *)x_file,numnodes,numdim_read);
   dxfluent=mesh_mean_spacing((const double *)x_mesh,numfaces,numdim_read);
@@ -2836,6 +2874,7 @@ int main(int argc, char **argv) {
     fprintf ( stdout, "Writing FLUENT-to-CFDWARP UDF...");
     write_fluent2warp_udf_file("UDF_fluent2warp.c",initvar_fluid_str_file,initvar_fluid_names_orig,
                                numvars_fluid_file,numdim_read,numspec_read,xstation,dx1mean,dx2mean,
+                               dx3mean,
                                numflux_read,windowis,windowie,iter,effiter_U,effiter_R,CFL,
                                dxwarp,dxfluent,numfaces,CLAMP,pfloor_use,tfloor_use,pmean_file);
     fprintf ( stdout, "done.\n");
