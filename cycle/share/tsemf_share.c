@@ -729,7 +729,7 @@ void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
 
 void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, zone_t zone, int SOR_SWEEP, long iter){
   long j,k,l,theta,thetasgn;
-  double sum,RHS,Cp0,Cp1,dtau;
+  double sum,RHS,Cp0,Cp1,dtau,tsemfcf;
   long ioffset,joffset,koffset;
   assert(flux<nfe);
   for_2DL(j,zone.js,zone.je){
@@ -756,8 +756,10 @@ void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, z
           for_1DL (ioffset,gl->tsemfcoeffzone.is,gl->tsemfcoeffzone.ie){
             for_2DL (joffset,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
               for_3DL (koffset,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
-                if (is_node_valid(np[_alll(gl,l,0,ioffset,1,joffset,2,koffset)],TYPELEVEL_EMFIELD) && !(ioffset==0 && joffset==0 && koffset==0))
-                  sum-=np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,ioffset,joffset,koffset)][flux]*np[_alll(gl,l,0,ioffset,1,joffset,2,koffset)].bs->dUstaremfield[flux];
+                tsemfcf=np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,ioffset,joffset,koffset)][flux];
+                if (tsemfcf!=0.0)
+                  if (is_node_valid(np[_alll(gl,l,0,ioffset,1,joffset,2,koffset)],TYPELEVEL_EMFIELD) && !(ioffset==0 && joffset==0 && koffset==0))
+                  sum-=tsemfcf*np[_alll(gl,l,0,ioffset,1,joffset,2,koffset)].bs->dUstaremfield[flux];
               }
             }
           }

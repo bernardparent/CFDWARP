@@ -6,6 +6,12 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2026 SEP 23a  
+  * in /cycle/share/tsemf_share.c
+    - in update_dUstar_emfield_SOR_istation(), now only stores per-node list of offsets 
+      whose coefficient is nonzero
+
+
 2026 SEP 22b  
   * in /tools/warp2fluent.c
     - in write_fluent2warp_udf_file(), fixed a bug when reading the grid spacing metrics for
