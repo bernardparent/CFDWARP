@@ -6,6 +6,15 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2026 OCT 04a  
+  * in /src/control.c
+    - in the DISTMPI version of find_wall_distance(), changed MPI_INT to MPI_LONG when sending
+      and receiving the long numbdrywall; fixes an MPI_ERR_BUFFER crash at startup with MPI
+  * in /cycle/share/cycle_share.c
+    - in update_linked_nodes_2(), changed MPI_INT to MPI_SHORT when sending and receiving the
+      short numlinkmusclvars
+
+
 2026 SEP 23a  
   * in /cycle/share/tsemf_share.c
     - in update_dUstar_emfield_SOR_istation(), now only stores per-node list of offsets 
