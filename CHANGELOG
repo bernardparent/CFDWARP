@@ -6,6 +6,18 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2026 OCT 04c  
+  * in /src/data.c
+    - added _numnodes_in_zone(): returns the number of nodes in a zone
+    - added gather_fluxtmp_on_rank0(): with DISTMPI, gathers one field of all nodes on rank 0
+      with one message per rank instead of one per node
+    - in find_NODEVALID_on_domain_all(), with DISTMPI, each rank now broadcasts the node
+      validity of its whole domain in one MPI_Bcast instead of one MPI_Bcast per node
+    - in write_data_file_binary_ascii(), with DISTMPI, U, Uemfield, trapezoidalm1 and
+      averagedrates are now gathered on rank 0 with one message per rank instead of one per
+      node; speeds up data file writes with MPI
+
+
 2026 OCT 04b  
   * in /tools/tarCFDWARP.sh
     - the tarball is now created under umask 077 and then set to mode 600 (-rw-------)

@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/_model.h>
 #include <cycle/_cycle.h>
 #include <unistd.h>
+#include <limits.h>
 
 #define dt_steady 1.0e99
 
@@ -60,28 +61,85 @@ long _ai_mpidatafile(gl_t *gl, long i, long j, long k) {
 }
 
 
+#ifdef DISTMPI
+static long _numnodes_in_zone(gl_t *gl, zone_t zone){
+  long i,j,k,cnt;
+  cnt=0;
+  for_ijk(zone,is,js,ks,ie,je,ke){
+    cnt++;
+  }
+  return(cnt);
+}
+
+
+/* each rank has stored the first numvars entries of fluxtmp (stride ntmpflux) on its own domain;
+   gather them on rank 0 with one message per rank rather than one per node */
+static void gather_fluxtmp_on_rank0(gl_t *gl, double *fluxtmp, long ntmpflux, long numvars){
+  long i,j,k,cnt,flux;
+  int rank,proc,numproc;
+  zone_t domain;
+  double *buf;
+  MPI_Status MPI_Status1;
+
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &numproc);
+  for (proc=1; proc<numproc; proc++){
+    if (rank!=0 && rank!=proc) continue;
+    domain=_domain_from_rank(proc,gl);
+    if (_numnodes_in_zone(gl,domain)*numvars>INT_MAX) fatal_error("Subdomain too large to be sent in one MPI message in gather_fluxtmp_on_rank0().");
+    buf=(double *)malloc(max(1,_numnodes_in_zone(gl,domain)*numvars)*sizeof(double));
+    cnt=0;
+    if (rank==proc) {
+      for_ijk(domain,is,js,ks,ie,je,ke){
+        for (flux=0; flux<numvars; flux++) buf[cnt++]=fluxtmp[_ai_all(gl,i,j,k)*ntmpflux+flux];
+      }
+      MPI_Send(buf,cnt,MPI_DOUBLE,0,9452,MPI_COMM_WORLD);
+    } else {
+      MPI_Recv(buf,_numnodes_in_zone(gl,domain)*numvars,MPI_DOUBLE,proc,9452,MPI_COMM_WORLD,&MPI_Status1);
+      for_ijk(domain,is,js,ks,ie,je,ke){
+        for (flux=0; flux<numvars; flux++) fluxtmp[_ai_all(gl,i,j,k)*ntmpflux+flux]=buf[cnt++];
+      }
+    }
+    free(buf);
+  }
+  MPI_Barrier(MPI_COMM_WORLD);
+}
+#endif
+
+
 void find_NODEVALID_on_domain_all(np_t *np, gl_t *gl, int TYPELEVEL, bool *NODEVALID){
   long i,j,k;
 #ifdef DISTMPI
-  int rank,thisrank;
-  int THISNODEVALID;
+  int rank,proc,numproc;
+  long cnt;
+  int *THISNODEVALID;
+  zone_t domain;
 #endif
-  
+
   for_ijk(gl->domain_lim_all,is,js,ks,ie,je,ke){
         NODEVALID[_ai_all(gl,i,j,k)]=FALSE;
   }
 
 #ifdef DISTMPI
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
-        if (j==gl->domain_all.js && k==gl->domain_all.ks) MPI_Barrier(MPI_COMM_WORLD);
-        thisrank=_node_rank(gl, i, j, k);
-        if (thisrank==rank) THISNODEVALID=(int)(is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL));
-        MPI_Bcast(&THISNODEVALID,1,MPI_INT,thisrank,MPI_COMM_WORLD);           
-        assert(THISNODEVALID==TRUE || THISNODEVALID==FALSE);          
-        NODEVALID[_ai_all(gl,i,j,k)]=(bool)THISNODEVALID;
+  MPI_Comm_size(MPI_COMM_WORLD, &numproc);
+  for (proc=0; proc<numproc; proc++){
+    domain=_domain_from_rank(proc,gl);
+    THISNODEVALID=(int *)malloc(max(1,_numnodes_in_zone(gl,domain))*sizeof(int));
+    cnt=0;
+    for_ijk(domain,is,js,ks,ie,je,ke){
+      if (proc==rank) THISNODEVALID[cnt]=(int)(is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL));
+      cnt++;
+    }
+    MPI_Bcast(THISNODEVALID,cnt,MPI_INT,proc,MPI_COMM_WORLD);
+    cnt=0;
+    for_ijk(domain,is,js,ks,ie,je,ke){
+      assert(THISNODEVALID[cnt]==TRUE || THISNODEVALID[cnt]==FALSE);
+      NODEVALID[_ai_all(gl,i,j,k)]=(bool)THISNODEVALID[cnt];
+      cnt++;
+    }
+    free(THISNODEVALID);
   }
-  MPI_Barrier(MPI_COMM_WORLD);
 #else
   for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
         NODEVALID[_ai_all(gl,i,j,k)]=is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL);
@@ -689,9 +747,7 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
   double effiter_U,effiter_R;
 #ifdef DISTMPI
   zone_t domain;
-  flux_t U;
-  int rank,proc,numproc;
-  MPI_Status MPI_Status1;
+  int rank;
 #endif
   long ntmpflux=nf;
 #ifdef EMFIELD
@@ -699,7 +755,6 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
 #endif
 #if defined(UNSTEADY) && defined(_AVERAGEDRATES)
   ntmpflux=max(ntmpflux,numaveragedrates);
-  double averagedrates[numaveragedrates];
 #endif  
   sizeoftmpflux=ntmpflux*sizeof(double);
   typedef double tmpflux_t[ntmpflux];
@@ -734,7 +789,6 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
 #ifdef DISTMPI
   MPI_Barrier(MPI_COMM_WORLD);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &numproc);
   MPI_Allreduce(&gl->effiter_U, &effiter_U, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
   MPI_Allreduce(&gl->effiter_R, &effiter_R, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 #ifdef EMFIELD
@@ -804,24 +858,11 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
 
   find_NODEVALID_on_domain_all(np, gl, TYPELEVEL_FLUID, NODEVALID);
 #ifdef DISTMPI
-  for (proc=0; proc<numproc; proc++){
-    domain=_domain_from_rank(proc,gl);
-    for_ijk(domain,is,js,ks,ie,je,ke){
-          if (proc==rank){
-            for (flux=0; flux<nf; flux++) U[flux]=np[_ai(gl,i,j,k)].bs->U[flux];
-            if (proc!=0) {
-              MPI_Send(U,nf,MPI_DOUBLE,0,9452,MPI_COMM_WORLD);
-            }
-          } 
-          
-          if (rank==0 && proc!=0) {
-            MPI_Recv(U,nf,MPI_DOUBLE,proc,9452,MPI_COMM_WORLD,&MPI_Status1);
-          }
-          
-          for (flux=0; flux<nf; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=U[flux];
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
+  domain=_domain_from_rank(rank,gl);
+  for_ijk(domain,is,js,ks,ie,je,ke){
+        for (flux=0; flux<nf; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->U[flux];
   }
+  gather_fluxtmp_on_rank0(gl, (double *)fluxtmp, ntmpflux, nf);
 #else
   for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
         for (flux=0; flux<nf; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->U[flux];
@@ -848,24 +889,11 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
 #ifdef EMFIELD
   find_NODEVALID_on_domain_all(np, gl, TYPELEVEL_EMFIELD, NODEVALID);
 #ifdef DISTMPI
-  for (proc=0; proc<numproc; proc++){
-    domain=_domain_from_rank(proc,gl);
-    for_ijk(domain,is,js,ks,ie,je,ke){
-          if (proc==rank){
-            for (flux=0; flux<nfe; flux++) U[flux]=np[_ai(gl,i,j,k)].bs->Uemfield[flux];
-            if (proc!=0) {
-              MPI_Send(U,nfe,MPI_DOUBLE,0,9452,MPI_COMM_WORLD);
-            }
-          } 
-          
-          if (rank==0 && proc!=0) {
-            MPI_Recv(U,nfe,MPI_DOUBLE,proc,9452,MPI_COMM_WORLD,&MPI_Status1);
-          }
-          
-          for (flux=0; flux<nfe; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=U[flux];
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
+  domain=_domain_from_rank(rank,gl);
+  for_ijk(domain,is,js,ks,ie,je,ke){
+        for (flux=0; flux<nfe; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->Uemfield[flux];
   }
+  gather_fluxtmp_on_rank0(gl, (double *)fluxtmp, ntmpflux, nfe);
 #else
   for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
         for (flux=0; flux<nfe; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->Uemfield[flux];
@@ -894,24 +922,11 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
 #ifdef _RESTIME_STORAGE_TRAPEZOIDAL
   find_NODEVALID_on_domain_all(np, gl, TYPELEVEL_FLUID, NODEVALID);
 #ifdef DISTMPI
-  for (proc=0; proc<numproc; proc++){
-    domain=_domain_from_rank(proc,gl);
-    for_ijk(domain,is,js,ks,ie,je,ke){
-          if (proc==rank){
-            for (flux=0; flux<nf; flux++) U[flux]=np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux];
-            if (proc!=0) {
-              MPI_Send(U,nf,MPI_DOUBLE,0,9452,MPI_COMM_WORLD);
-            }
-          } 
-          
-          if (rank==0 && proc!=0) {
-            MPI_Recv(U,nf,MPI_DOUBLE,proc,9452,MPI_COMM_WORLD,&MPI_Status1);
-          }
-          
-          for (flux=0; flux<nf; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=U[flux];
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
+  domain=_domain_from_rank(rank,gl);
+  for_ijk(domain,is,js,ks,ie,je,ke){
+        for (flux=0; flux<nf; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux];
   }
+  gather_fluxtmp_on_rank0(gl, (double *)fluxtmp, ntmpflux, nf);
 #else
   for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
         for (flux=0; flux<nf; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->trapezoidalm1[flux];
@@ -944,24 +959,11 @@ void write_data_file_binary_ascii(char *filename, np_t *np, gl_t *gl, int DATATY
 #if defined(UNSTEADY) && defined(_AVERAGEDRATES)
   find_NODEVALID_on_domain_all(np, gl, TYPELEVEL_FLUID, NODEVALID);
 #ifdef DISTMPI
-  for (proc=0; proc<numproc; proc++){
-    domain=_domain_from_rank(proc,gl);
-    for_ijk(domain,is,js,ks,ie,je,ke){
-          if (proc==rank){
-            for (flux=0; flux<numaveragedrates; flux++) averagedrates[flux]=np[_ai(gl,i,j,k)].bs->averagedrates[flux];
-            if (proc!=0) {
-              MPI_Send(averagedrates,numaveragedrates,MPI_DOUBLE,0,9452,MPI_COMM_WORLD);
-            }
-          } 
-          
-          if (rank==0 && proc!=0) {
-            MPI_Recv(averagedrates,numaveragedrates,MPI_DOUBLE,proc,9452,MPI_COMM_WORLD,&MPI_Status1);
-          }
-          
-          for (flux=0; flux<numaveragedrates; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=averagedrates[flux];
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
+  domain=_domain_from_rank(rank,gl);
+  for_ijk(domain,is,js,ks,ie,je,ke){
+        for (flux=0; flux<numaveragedrates; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->averagedrates[flux];
   }
+  gather_fluxtmp_on_rank0(gl, (double *)fluxtmp, ntmpflux, numaveragedrates);
 #else
   for_ijk(gl->domain_all,is,js,ks,ie,je,ke){
         for (flux=0; flux<numaveragedrates; flux++) fluxtmp[_ai_all(gl,i,j,k)][flux]=np[_ai(gl,i,j,k)].bs->averagedrates[flux];
