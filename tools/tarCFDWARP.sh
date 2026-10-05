@@ -57,7 +57,8 @@ make cleanall
 make cleanbin
 cd ..
 echo 'creating tarball..'
-tar -cpPvzf CFDWARP.$1.tgz CFDWARP.$1
+(umask 077 && tar -cpPvzf CFDWARP.$1.tgz CFDWARP.$1)
+chmod 600 CFDWARP.$1.tgz
 echo 'cleaning up'
 rm -rf CFDWARP.$1
 echo 'done'

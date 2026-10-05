@@ -6,6 +6,11 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2026 OCT 04b  
+  * in /tools/tarCFDWARP.sh
+    - the tarball is now created under umask 077 and then set to mode 600 (-rw-------)
+
+
 2026 OCT 04a  
   * in /src/control.c
     - in the DISTMPI version of find_wall_distance(), changed MPI_INT to MPI_LONG when sending
