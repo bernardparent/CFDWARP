@@ -6,6 +6,16 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+2026 OCT 05a  
+  * in /model/emfield/_test/emfield.c
+    - in write_bdry_emfield_template(), added BDRYEMF_EXTRAPOLATED1 to the list of bdry types
+    - in add_bdry_types_emfield_to_codex(), added BDRYEMF_EXTRAPOLATED1
+    - in find_linearization_coefficients_bdry_node_emfield(), added the BDRYEMF_EXTRAPOLATED1
+      linearization (dphi at bdry node equal to dphi at the near-bdry inner node)
+    - in update_bdry_emfield(), phi at a BDRYEMF_EXTRAPOLATED1 node is now extrapolated
+      from the inner nodes with a first-order stencil
+
+
 2026 OCT 04c  
   * in /src/data.c
     - added _numnodes_in_zone(): returns the number of nodes in a zone

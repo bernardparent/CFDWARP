@@ -31,11 +31,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/chem/_chem.h>
 #include <model/metrics/_metrics.h>
 #include <model/fluid/_fluid.h>
+#include <model/share/model_share.h>
 #include <cycle/_cycle.h>
 #include <src/control.h>
 #include <src/bdry.h>
 
 #define BDRYEMF_ELECTRODE 0
+#define BDRYEMF_EXTRAPOLATED1 1
 
 #define INITEMF_TYPE1 1
 
@@ -52,14 +54,16 @@ void write_bdry_emfield_template(FILE **controlfile){
   "    _________________________________________________________________________________________\n"
   "\n"
   "    BDRYEMF_ELECTRODE             %c    Electrode, phi fixed\n"
+  "    BDRYEMF_EXTRAPOLATED1         %c    Extrapolated, similar to outflow, 1o\n"
   "    _________________________________________________________________________________________\n"
   "\n"
   "    }\n"
   "    All(BDRYEMF_ELECTRODE);\n"
   "    {\n"
   "    Region(is" if2DL(",js") if3DL(",ks") ",  ie" if2DL(",je") if3DL(",ke") ",  BDRYEMF_ELECTRODE);\n"
+  "    Plane(\"i\",ie,BDRYEMF_EXTRAPOLATED1);\n"
   "    }\n"
-  "  );\n",_bdry_ID(BDRYEMF_ELECTRODE));
+  "  );\n",_bdry_ID(BDRYEMF_ELECTRODE),_bdry_ID(BDRYEMF_EXTRAPOLATED1));
 }
 
 
@@ -141,6 +145,7 @@ void add_init_types_emfield_to_codex(SOAP_codex_t *codex){
 
 void add_bdry_types_emfield_to_codex(SOAP_codex_t *codex){
   add_int_to_codex(codex,"BDRYEMF_ELECTRODE",   BDRYEMF_ELECTRODE);
+  add_int_to_codex(codex,"BDRYEMF_EXTRAPOLATED1",   BDRYEMF_EXTRAPOLATED1);
 }
 
 
@@ -442,10 +447,31 @@ void find_Vk(np_t *np, gl_t *gl, long l, long spec, EXM_vec3D_t Vk){
 
 void find_linearization_coefficients_bdry_node_emfield(np_t *np, gl_t *gl, long lA, long theta, long thetasgn,
                         long flux, long bdrytype, double *valA, double *valB, double *valRHS){
-  
-  *valA=1.0e0;
-  *valB=0.0e0;
-  *valRHS=0.0e0;
+  long lB;
+
+  switch (bdrytype) {
+    case BDRYEMF_ELECTRODE:
+      /* phi is fixed, so the increment at the bdry node is zero */
+      *valA=1.0e0;
+      *valB=0.0e0;
+      *valRHS=0.0e0;
+    break;
+    case BDRYEMF_EXTRAPOLATED1:
+      lB=_al(gl,lA,theta,thetasgn);
+      *valA=1.0e0;
+      if (lB==lA || is_node_link(np[lA],TYPELEVEL_EMFIELD)) {
+        /* a link node (phi set by the link), or a corner node passed with thetasgn=0 (no bdry
+           direction): hold the increment at zero; update_bdry_emfield() sets phi at corners */
+        *valB=0.0e0;
+      } else {
+        assert_np(np[lB],is_node_valid(np[lB],TYPELEVEL_EMFIELD));
+        *valB=-_Omega(np[lA],gl)/_Omega(np[lB],gl);
+      }
+      *valRHS=0.0e0;
+    break;
+    default:
+      fatal_error("EMF boundary condition type %ld invalid in find_linearization_coefficients_bdry_node_emfield().",bdrytype);
+  }
 }
 
 
@@ -742,8 +768,15 @@ void find_Vk_from_Vk_at_interfaces(np_t *np, gl_t *gl, long l, long spec, EXM_ve
 void update_bdry_emfield(np_t *np, gl_t *gl, long lA, long lB, long lC, long theta, long thetasgn, bool BDRYDIRECFOUND, int TYPELEVEL){
 
  /* NOTE: No relaxation of the properties is allowed at the emfield boundary nodes */
-  if (_node_type(np[lA],TYPELEVEL)==BDRYEMF_ELECTRODE) {
-    /* phi is specified, so don't do anything */
+  switch (_node_type(np[lA],TYPELEVEL)) {
+    case BDRYEMF_ELECTRODE:
+      /* phi is specified, so don't do anything */
+    break;
+    case BDRYEMF_EXTRAPOLATED1:
+      np[lA].bs->Uemfield[0]=_f_extrapol(ACCURACY_FIRSTORDER,_phi(np[lB],gl),_phi(np[lC],gl));
+    break;
+    default:
+      fatal_error("EMF boundary condition type %ld invalid in update_bdry_emfield().",_node_type(np[lA],TYPELEVEL));
   }
 }
 
