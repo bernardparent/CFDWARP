@@ -6,6 +6,14 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
+
+2026 OCT 06a
+  * in model/chem/
+    - deleted _Air_Plasma_kinetic_11s
+  * in model/fluid/
+    - deleted _Navier-Stokes_plasma_kinetic
+
+
 2026 OCT 05a  
   * in /model/emfield/_test/emfield.c
     - in write_bdry_emfield_template(), added BDRYEMF_EXTRAPOLATED1 to the list of bdry types
