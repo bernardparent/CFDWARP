@@ -12,16 +12,16 @@ tools: makelib maketools
 tar: makelib makesrc maketar
 
 makelib:
-	( cd lib ; make all )
+	( cd lib && make all )
 
 makelibext:
-	( cd lib ; make ext )
+	( cd lib && make ext )
 
 makeconfig:
-	( cd config ; make clean ; make config )
-	( cd config ; exec ./config )
-	( cd config ; chmod u+x applyconfig.sh )
-	( cd config ; exec ./applyconfig.sh )
+	( cd config && make clean && make config )
+	( cd config && exec ./config )
+	( cd config && chmod u+x applyconfig.sh )
+	( cd config && exec ./applyconfig.sh )
 	@echo
 	@echo CFDWARP configuration completed.
 	@echo
@@ -30,10 +30,10 @@ makeconfig:
 
 
 makeconfigx:
-	( cd config ; make clean ; make configx )
-	( cd config ;  exec ./config )
-	( cd config ; chmod u+x applyconfig.sh )
-	( cd config ; exec ./applyconfig.sh )
+	( cd config && make clean && make configx )
+	( cd config && exec ./config )
+	( cd config && chmod u+x applyconfig.sh )
+	( cd config && exec ./applyconfig.sh )
 	@echo
 	@echo CFDWARP configuration completed.
 	@echo
@@ -41,10 +41,10 @@ makeconfigx:
 	@echo
 
 makeconfigp:
-	( cd config ; make clean ; make configp )
-	( cd config ;  exec ./config )
-	( cd config ; chmod u+x applyconfig.sh )
-	( cd config ; exec ./applyconfig.sh )
+	( cd config && make clean && make configp )
+	( cd config && exec ./config )
+	( cd config && chmod u+x applyconfig.sh )
+	( cd config && exec ./applyconfig.sh )
 	@echo
 	@echo CFDWARP configuration completed.
 	@echo
@@ -52,10 +52,10 @@ makeconfigp:
 	@echo
 
 makeconfigpx:
-	( cd config ; make clean ; make configpx )
-	( cd config ;  exec ./config )
-	( cd config ; chmod u+x applyconfig.sh )
-	( cd config ; exec ./applyconfig.sh )
+	( cd config && make clean && make configpx )
+	( cd config && exec ./config )
+	( cd config && chmod u+x applyconfig.sh )
+	( cd config && exec ./applyconfig.sh )
 	@echo
 	@echo CFDWARP configuration completed.
 	@echo
@@ -63,7 +63,7 @@ makeconfigpx:
 	@echo
 
 makesrc:	
-	( cd src ; make )
+	( cd src && make )
 	@echo
 	@echo Finished compiling CFDWARP.  
 	@echo
@@ -73,7 +73,7 @@ makesrc:
 	@echo 
 
 maketar:	
-	( cd tar ; make )
+	( cd tar && make )
 	@echo
 	@echo Finished creating CFDWARP package.  
 	@echo
@@ -81,23 +81,23 @@ maketar:
 	@echo
 
 maketools:	
-	( cd tools ; make ) 
+	( cd tools && make ) 
 	@echo
 	@echo Finished compiling all tools. See tools directory for executables.  
 	@echo
 
 
 cleanbin:	
-	( cd bin ; make cleanout ) 
+	( cd bin && make cleanout ) 
 
 clean:
-	( cd config ; make clean ) 
-	( cd src ; make clean ) 
-	( cd model ; make clean ) 
-	( cd cycle ; make clean )
-	( cd tools ; make clean ) 
-	( cd lib ; make clean ) 
-	( cd tar ; make clean ) 
+	( cd config && make clean ) 
+	( cd src && make clean ) 
+	( cd model && make clean ) 
+	( cd cycle && make clean )
+	( cd tools && make clean ) 
+	( cd lib && make clean ) 
+	( cd tar && make clean ) 
 	( rm -f core `find . -type f -name 'core' -print` ) 
 	@echo
 	@echo Finished cleaning the directories.
@@ -107,13 +107,13 @@ clean:
 
 
 cleanall:
-	( cd config ; make cleanall ) 
-	( cd src ; make cleanall ) 
-	( cd tar ; make cleanall ) 
-	( cd model ; make cleanall ) 
-	( cd cycle ; make cleanall ) 
-	( cd tools ; make cleanall ) 
-	( cd lib ; make cleanall )
+	( cd config && make cleanall ) 
+	( cd src && make cleanall ) 
+	( cd tar && make cleanall ) 
+	( cd model && make cleanall ) 
+	( cd cycle && make cleanall ) 
+	( cd tools && make cleanall ) 
+	( cd lib && make cleanall )
 	( rm -f core `find . -type f -name 'core' -print` )
 	( rm -f gmon.out `find . -type f -name 'gmon.out' -print` )
 	( rm -f  `find . -type f -name '*~' -print` )

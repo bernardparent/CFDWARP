@@ -7,6 +7,25 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 OCT 12b
+  * in all Makefiles, the recipe lines ( cd DIR ; ... ) are now ( cd DIR && ... ): when DIR
+    was missing (e.g. a missing or dangling .active link), the cd failed and make ran again in
+    the same directory, recursing without bound and launching thousands of make processes;
+    make now stops with "can't cd to DIR"; the lines with several commands after the cd stop
+    at the first one that fails; make clean also stops at a missing directory
+  * in /Makefile, /bin/Makefile, /config/Makefile, /lib/Makefile, /lib/gridg/Makefile,
+    /lib/soap/Makefile, /src/Makefile, /tar/Makefile
+    - replaced ; by && after cd
+  * in /cycle/Makefile and the Makefiles of /cycle/res, /cycle/resconv, /cycle/resconv/_MUSCL,
+    /cycle/resconv/_MUSCLX, /cycle/ressource, /cycle/restime, /cycle/ts, /cycle/tsemf,
+    /cycle/tsemf/_GS
+    - replaced ; by && after cd
+  * in /model/Makefile and the Makefiles of /model/beam, /model/chem, /model/emfield,
+    /model/emfield/doc, /model/fluid, /model/fluid/doc, /model/metrics, /model/thermo,
+    /model/transport, and of 30 chemical solvers in /model/chem and /model/chem/old
+    - replaced ; by && after cd
+
+
 2026 OCT 12a
   * the vibrational energy equation of _Navier-Stokes_plasma, _Favre-Reynolds_plasma and
     _Favre-Reynolds_Tv is no longer limited to N2: the species with vibrationally excited

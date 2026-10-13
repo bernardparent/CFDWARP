@@ -36,8 +36,8 @@ libgridg.so: $(OBJECTS)
 	$(L) -shared $(LFLAGS) -lm -o libgridg.so $(OBJECTS) 
 
 makecleanall: clean
-	( cd doc ; make clean )
-	( cd eg ; make clean )
+	( cd doc && make clean )
+	( cd eg && make clean )
 
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.

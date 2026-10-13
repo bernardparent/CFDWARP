@@ -41,7 +41,7 @@ clean:
 
 cleanall: clean
 	rm -f removeproprietary.sh_tmp
-	( cd _proprietary ; make clean ) 
+	( cd _proprietary && make clean ) 
 
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.    

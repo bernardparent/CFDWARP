@@ -9,11 +9,11 @@ warp:
 	( cp ../src/warp warp_package/warp ; cp ../LICENSE warp_package/LICENSE.txt ; cp ../USAGE warp_package/USAGE.txt)
 
 gridg:
-	( cd ../lib/gridg/doc/ ; make ; make ; make )
+	( cd ../lib/gridg/doc/ && make && make && make )
 	( mkdir warp_package ; cp ../lib/gridg/doc/report.pdf warp_package/GRIDG_manual.pdf )
 
 soap:
-	( cd ../lib/soap/doc/ ; make ; make ; make )
+	( cd ../lib/soap/doc/ && make && make && make )
 	( mkdir warp_package ; cp ../lib/soap/doc/report.pdf warp_package/SOAP_manual.pdf )
 
 tgz:

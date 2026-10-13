@@ -35,17 +35,17 @@ ifdef GIT
 endif
 
 model:
-	( cd ../model ; make src )
+	( cd ../model && make src )
 
 cycle:
-	( cd ../cycle ; make src )
+	( cd ../cycle && make src )
 
 warp: $(OBJECTS) main.o
-	( cd arc ; rm -f *.o ; ar -x ../../model/_model.a ; ar -x ../../cycle/_cycle.a )
+	( cd arc && rm -f *.o && ar -x ../../model/_model.a && ar -x ../../cycle/_cycle.a )
 	$(L) $(OBJECTS) main.o arc/*.o $(LFLAGS) $(LFLAGSLOCAL) -o warp
 
 test: $(OBJECTS) test.o
-	( cd arc ; rm -f *.o ; ar -x ../../model/_model.a ; ar -x ../../cycle/_cycle.a )
+	( cd arc && rm -f *.o && ar -x ../../model/_model.a && ar -x ../../cycle/_cycle.a )
 	$(L) $(OBJECTS) test.o arc/*.o $(LFLAGS) $(LFLAGSLOCAL) -o test
 
 cleanall:

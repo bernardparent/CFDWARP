@@ -21,7 +21,7 @@ arc:
 	( rm -f $(TARGETS) ; ar cqs $(TARGETS) *.o )                        
 
 cleanall: clean
-	(cd doc ; make clean )
+	(cd doc && make clean )
 
 	
 

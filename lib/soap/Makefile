@@ -26,7 +26,7 @@ libsoap.so: $(OBJECTS)
 	$(L) -shared $(LFLAGS) -o libsoap.so $(OBJECTS)
 
 makecleanall: clean
-	( cd eg ; make clean )
-	( cd doc ; make clean )
+	( cd eg && make clean )
+	( cd doc && make clean )
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
