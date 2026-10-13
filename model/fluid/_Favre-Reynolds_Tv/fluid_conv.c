@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/emfield/_emfield.h>
 #include <model/_model.h>
 #include <model/share/fluid_share.h>
+#include <model/share/fluid_vib.h>
 
 
 
@@ -140,7 +141,7 @@ void find_dFstar_dUstar(np_t np, gl_t *gl, long theta, sqmat_t A){
     A[fluxet][spec]=Vstar*dPdrhok[spec]-htstar*Vstar;
     A[fluxtke][spec]=-Vstar*k;
     A[fluxpsi][spec]=-Vstar*psi;
-    A[fluxev][spec]=-Vstar*ev*_w(np,specN2);
+    A[fluxev][spec]=-Vstar*ev*_wv(np);
   }
   for (row=0; row<nd; row++){
     for (col=0; col<nd; col++){
@@ -154,7 +155,7 @@ void find_dFstar_dUstar(np_t np, gl_t *gl, long theta, sqmat_t A){
     A[fluxet][ns+dim]=Vstar*dPdrhoV[dim]+_X(np,theta,dim)*htstar;
     A[fluxtke][ns+dim]=_X(np,theta,dim)*k;
     A[fluxpsi][ns+dim]=_X(np,theta,dim)*psi;
-    A[fluxev][ns+dim]=_X(np,theta,dim)*ev*_w(np,specN2);
+    A[fluxev][ns+dim]=_X(np,theta,dim)*ev*_wv(np);
   }
   A[fluxet][fluxet]=Vstar+Vstar*dPdrhoetstar;
   A[fluxtke][fluxtke]=Vstar;
@@ -195,7 +196,7 @@ void find_Fstar_from_jacvars(jacvars_t jacvars, metrics_t metrics, flux_t Fstar)
   Fstar[fluxet]=metrics.Omega*jacvars.rho*Vstar*jacvars.htstar;
   Fstar[fluxtke]=metrics.Omega*jacvars.rho*Vstar*jacvars.k;
   Fstar[fluxpsi]=metrics.Omega*jacvars.rho*Vstar*jacvars.psi;
-  Fstar[fluxev]=metrics.Omega*jacvars.rho*jacvars.w[specN2]*Vstar*jacvars.ev;
+  Fstar[fluxev]=metrics.Omega*jacvars.rho*_wv_from_w(jacvars.w)*Vstar*jacvars.ev;
 }
 
 
@@ -241,7 +242,7 @@ void find_A_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t A){
     A[fluxet][spec]=Vstar*dPdrhok[spec]-htstar*Vstar;
     A[fluxtke][spec]=-Vstar*jacvars.k;
     A[fluxpsi][spec]=-Vstar*jacvars.psi;
-    A[fluxev][spec]=-Vstar*jacvars.ev*jacvars.w[specN2];
+    A[fluxev][spec]=-Vstar*jacvars.ev*_wv_from_w(jacvars.w);
   }
   for (row=0; row<nd; row++){
     for (col=0; col<nd; col++){
@@ -255,7 +256,7 @@ void find_A_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqmat_t A){
     A[fluxet][ns+dim]=Vstar*jacvars.dPdrhou[dim]+metrics.X[dim]*htstar;
     A[fluxtke][ns+dim]=metrics.X[dim]*jacvars.k;
     A[fluxpsi][ns+dim]=metrics.X[dim]*jacvars.psi;
-    A[fluxev][ns+dim]=metrics.X[dim]*jacvars.ev*jacvars.w[specN2];
+    A[fluxev][ns+dim]=metrics.X[dim]*jacvars.ev*_wv_from_w(jacvars.w);
   }
   A[fluxet][fluxet]=Vstar+Vstar*dPdrhoetstar;
   A[fluxtke][fluxtke]=Vstar;
@@ -293,12 +294,12 @@ double _a_from_jacvars(jacvars_t jacvars){
   for (dim=0; dim<nd; dim++){
     q2=q2+sqr(jacvars.V[dim]);
   }
-  if (dPdrho+2.0e0/3.0e0*jacvars.k+jacvars.dPdrhoetstar*(jacvars.htstar-jacvars.k-jacvars.w[specN2]*jacvars.ev-q2)<=0.0e0){
+  if (dPdrho+2.0e0/3.0e0*jacvars.k+jacvars.dPdrhoetstar*(jacvars.htstar-jacvars.k-_wv_from_w(jacvars.w)*jacvars.ev-q2)<=0.0e0){
     printf("dPdrho=%E\n",dPdrho);
     printf("k=%E\n",jacvars.k);
     printf("dPdrhoetstar=%E\n",jacvars.dPdrhoetstar);
     printf("htstar=%E\n",jacvars.htstar);
-    printf("w[specN2]=%E\n",jacvars.w[specN2]);
+    printf("wv=%E\n",_wv_from_w(jacvars.w));
     printf("ev=%E\n",jacvars.ev);
     printf("q2=%E\n",q2);
     for (spec=0; spec<ns; spec++){
@@ -306,8 +307,8 @@ double _a_from_jacvars(jacvars_t jacvars){
     }
     fatal_error("Problem with dPrhok in _a_from_jacvars.");
   }
-  assert(dPdrho+2.0e0/3.0e0*jacvars.k+jacvars.dPdrhoetstar*(jacvars.htstar-jacvars.k-jacvars.w[specN2]*jacvars.ev-q2)>0.0e0);
-  ret=sqrt(dPdrho+2.0e0/3.0e0*jacvars.k+jacvars.dPdrhoetstar*(jacvars.htstar-jacvars.k-jacvars.w[specN2]*jacvars.ev-q2));
+  assert(dPdrho+2.0e0/3.0e0*jacvars.k+jacvars.dPdrhoetstar*(jacvars.htstar-jacvars.k-_wv_from_w(jacvars.w)*jacvars.ev-q2)>0.0e0);
+  ret=sqrt(dPdrho+2.0e0/3.0e0*jacvars.k+jacvars.dPdrhoetstar*(jacvars.htstar-jacvars.k-_wv_from_w(jacvars.w)*jacvars.ev-q2));
 
 
   return(ret);
@@ -367,12 +368,15 @@ void find_Linv_from_jacvars_eigenset1(jacvars_t jacvars, metrics_t metrics, sqma
   spec_t dPdrhok,w;
   long row,col,spec,dim;
   dim_t Xhat;
-  double k,ev,cN2;
+  double k,ev,wv;
   double l[3][2];
   if3D( double denom; )
 
   k=jacvars.k;
-  cN2=jacvars.w[specN2];
+  wv=_wv_from_w(jacvars.w);
+  /* the fluxev column of the right eigenvectors is divided by wv and the fluxev row of the left 
+     eigenvectors is multiplied by wv compared with the expressions in the comments, so that the 
+     eigenvectors remain defined when the vibrating species are absent (wv=0) */
   ev=jacvars.ev;
   sum=0.0e0;
   Vstar=0.0e0;
@@ -411,12 +415,12 @@ void find_Linv_from_jacvars_eigenset1(jacvars_t jacvars, metrics_t metrics, sqma
     }
     R[fluxet][spec]=sum-dPdrhok[spec]/(dPdrhoetstar)
                            +jacvars.k*(1.0e0-2.0e0/3.0e0/dPdrhoetstar)
-                           +ev*cN2;
+                           +ev*wv;
     R[spec][fluxet-1]=w[spec];
     R[spec][fluxet]=w[spec];
     R[fluxtke][spec]=jacvars.k;
     R[fluxpsi][spec]=jacvars.psi;
-    R[fluxev][spec]=cN2*jacvars.ev;
+    R[fluxev][spec]=wv*jacvars.ev;
   }
   for (dim=0; dim<nd; dim++){
     R[ns+dim][fluxet-1]=jacvars.V[dim]+Xhat[dim]*a;
@@ -425,7 +429,7 @@ void find_Linv_from_jacvars_eigenset1(jacvars_t jacvars, metrics_t metrics, sqma
   R[fluxet][fluxet-1]=htstar+Vhat*a;
   R[fluxet][fluxet]=htstar-Vhat*a;
   R[fluxet][fluxtke]=a*a*(1.0e0-2.0e0/(3.0e0*dPdrhoetstar));
-  R[fluxet][fluxev]=cN2*a*a;
+  R[fluxet][fluxev]=a*a;
 
 
   R[fluxtke][fluxet-1]=k;
@@ -434,9 +438,9 @@ void find_Linv_from_jacvars_eigenset1(jacvars_t jacvars, metrics_t metrics, sqma
   R[fluxpsi][fluxet-1]=jacvars.psi;
   R[fluxpsi][fluxet]=jacvars.psi;
   R[fluxpsi][fluxpsi]=a*a;
-  R[fluxev][fluxet-1]=cN2*ev;
-  R[fluxev][fluxet]=cN2*ev;
-  R[fluxev][fluxev]=cN2*a*a;
+  R[fluxev][fluxet-1]=wv*ev;
+  R[fluxev][fluxet]=wv*ev;
+  R[fluxev][fluxev]=a*a;
 
 
 #ifdef _2D
@@ -471,7 +475,7 @@ void find_Linv_from_jacvars_eigenset1(jacvars_t jacvars, metrics_t metrics, sqma
 
 void find_Linv_from_jacvars_eigenset2(jacvars_t jacvars, metrics_t metrics, sqmat_t R){
   double H,Vstar,a;
-  double cN2,dPdrhoetstar,Xmag,q2,a2,Vx,Vy,Xhat1,Xhat2;
+  double wv,dPdrhoetstar,Xmag,q2,a2,Vx,Vy,Xhat1,Xhat2;
   spec_t dPdrhok,w;
   long row,col,spec,dim;
   dim_t Xhat;
@@ -504,7 +508,10 @@ void find_Linv_from_jacvars_eigenset2(jacvars_t jacvars, metrics_t metrics, sqma
     dPdrhok[spec]=jacvars.dPdrhok[spec];
     w[spec]=jacvars.w[spec];
   }
-  cN2=w[specN2];
+  wv=_wv_from_w(w);
+  /* the fluxev column of the right eigenvectors is divided by wv and the fluxev row of the left 
+     eigenvectors is multiplied by wv compared with the expressions in the comments, so that the 
+     eigenvectors remain defined when the vibrating species are absent (wv=0) */
 
   dPdrhoetstar=jacvars.dPdrhoetstar;
   for (row=0; row<nf; row++){
@@ -548,7 +555,7 @@ void find_Linv_from_jacvars_eigenset2(jacvars_t jacvars, metrics_t metrics, sqma
   R[fluxet][ns+1]=H + a*(Vx*Xhat1 + Vy*Xhat2);
   R[fluxet][fluxet]=H - a*(Vx*Xhat1 + Vy*Xhat2);
   R[fluxet][fluxtke]=a*a - 2.0e0*a*a/(3.0e0*dPdrhoetstar);
-  R[fluxet][fluxev]=cN2*a*a;
+  R[fluxet][fluxev]=a*a;
 
   R[fluxtke][ns]=k;
   R[fluxtke][ns+1]=k;
@@ -560,10 +567,10 @@ void find_Linv_from_jacvars_eigenset2(jacvars_t jacvars, metrics_t metrics, sqma
   R[fluxpsi][fluxet]=psi;
   R[fluxpsi][fluxpsi]=a2;
 
-  R[fluxev][ns]=cN2*ev;
-  R[fluxev][ns+1]=cN2*ev;
-  R[fluxev][fluxet]=cN2*ev;
-  R[fluxev][fluxev]=cN2*a2;
+  R[fluxev][ns]=wv*ev;
+  R[fluxev][ns+1]=wv*ev;
+  R[fluxev][fluxet]=wv*ev;
+  R[fluxev][fluxev]=a2;
 
 
 /*
@@ -579,9 +586,9 @@ Linv = {{1, 0, 0, c1, c1, c1, 0, 0, 0},
    H - a*a/Prhoetstar + a*(Vy*Xhat1 - Vx*Xhat2),
    H + a*(Vx*Xhat1 + Vy*Xhat2),
    H - a*(Vx*Xhat1 + Vy*Xhat2),
-   a*a - 2*a*a/(3*Prhoetstar), 0, cN2*a*a}, {0, 0, 0, k, k, k, a*a, 0, 0},
-  {0, 0, 0, psi, psi, psi, 0, a*a, 0}, {0, 0, 0, cN2*ev, cN2*ev, 
-   cN2*ev, 0, 0, cN2*a*a}}
+   a*a - 2*a*a/(3*Prhoetstar), 0, wv*a*a}, {0, 0, 0, k, k, k, a*a, 0, 0},
+  {0, 0, 0, psi, psi, psi, 0, a*a, 0}, {0, 0, 0, wv*ev, wv*ev, 
+   wv*ev, 0, 0, wv*a*a}}
 
 */
 
@@ -630,7 +637,7 @@ Linv = {{1, 0, 0, c1, c1, c1, 0, 0, 0},
   R[fluxet][ns+2]=H + a*(Vx*Xhat1 + Vy*Xhat2 + Vz*Xhat3);
   R[fluxet][fluxet]=H - a*(Vx*Xhat1 + Vy*Xhat2 + Vz*Xhat3);
   R[fluxet][fluxtke]=a2 - 2.0*a2/(3.0*dPdrhoetstar);
-  R[fluxet][fluxev]=cN2*a2;
+  R[fluxet][fluxev]=a2;
 
   R[fluxtke][ns]=k;
   R[fluxtke][ns+1]=k;
@@ -644,11 +651,11 @@ Linv = {{1, 0, 0, c1, c1, c1, 0, 0, 0},
   R[fluxpsi][fluxet]=psi;
   R[fluxpsi][fluxpsi]=a2;
 
-  R[fluxev][ns]=ev*cN2;
-  R[fluxev][ns+1]=ev*cN2;
-  R[fluxev][ns+2]=ev*cN2;
-  R[fluxev][fluxet]=ev*cN2;
-  R[fluxev][fluxev]=a2*cN2;
+  R[fluxev][ns]=ev*wv;
+  R[fluxev][ns+1]=ev*wv;
+  R[fluxev][ns+2]=ev*wv;
+  R[fluxev][fluxet]=ev*wv;
+  R[fluxev][fluxev]=a2;
 
 /*
 Linv = {
@@ -670,10 +677,10 @@ Linv = {
    H - a2/Prhoetstar + a*Vz*(Xhat1 + Xhat2) - a*(Vx + Vy)*Xhat3, 
    H + a*(Vx*Xhat1 + Vy*Xhat2 + Vz*Xhat3), 
    H - a*(Vx*Xhat1 + Vy*Xhat2 + Vz*Xhat3), a2 - 2*a2/(3*Prhoetstar), 0, 
-   cN2*a2},
+   wv*a2},
 {0, 0, 0, k, k, k, k, a2, 0, 0}, 
 {0, 0, 0, psi, psi, psi, psi, 0, a2, 0}, 
-{0, 0, 0, cN2*ev, cN2*ev, cN2*ev, cN2*ev, 0, 0, cN2*a2}}
+{0, 0, 0, wv*ev, wv*ev, wv*ev, wv*ev, 0, 0, wv*a2}}
 */
 
 
@@ -701,7 +708,7 @@ void find_Ustar_from_jacvars(jacvars_t jacvars,  metrics_t metrics, flux_t Ustar
   Ustar[fluxet]=jacvars.rho*(jacvars.htstar-jacvars.P/jacvars.rho-2.0/3.0*jacvars.k );
   Ustar[fluxtke]=jacvars.rho*jacvars.k;
   Ustar[fluxpsi]=jacvars.rho*jacvars.psi;
-  Ustar[fluxev]=jacvars.rho*jacvars.ev*jacvars.w[specN2];
+  Ustar[fluxev]=jacvars.rho*jacvars.ev*_wv_from_w(jacvars.w);
 
   for (flux=0; flux<nf; flux++) Ustar[flux]=Ustar[flux]*metrics.Omega;
 }
@@ -732,7 +739,7 @@ void find_LUstar_from_jacvars(jacvars_t jacvars,  metrics_t metrics, flux_t LUst
     LUstar[fluxet]=(jacvars.rho*a2 - Pstar*dPdrhoetstar)/(2.0*a2);
     LUstar[fluxtke]=jacvars.k*Pstar*dPdrhoetstar/(2.0*a2*a2);
     LUstar[fluxpsi]=jacvars.psi*Pstar*dPdrhoetstar/(2.0*a2*a2);
-    LUstar[fluxev]=jacvars.ev*Pstar*dPdrhoetstar/(2.0*a2*a2);
+    LUstar[fluxev]=_wv_from_w(jacvars.w)*jacvars.ev*Pstar*dPdrhoetstar/(2.0*a2*a2);
 
 /*
 alpha = {c1*Pstar*Prhoetstar, c2*Pstar*Prhoetstar, c3*Pstar*Prhoetstar, Pstar*Prhoetstar, 
@@ -757,7 +764,7 @@ alpha = {c1*Pstar*Prhoetstar, c2*Pstar*Prhoetstar, c3*Pstar*Prhoetstar, Pstar*Pr
     LUstar[fluxet]=(jacvars.rho - (Pstar*dPdrhoetstar)/a2)/2.0;
     LUstar[fluxtke]=jacvars.k*Pstar*dPdrhoetstar/(3.0*a2*a2);
     LUstar[fluxpsi]=Pstar*dPdrhoetstar*jacvars.psi/(3.0*a2*a2);
-    LUstar[fluxev]=jacvars.ev*Pstar*dPdrhoetstar/(3.0*a2*a2);
+    LUstar[fluxev]=_wv_from_w(jacvars.w)*jacvars.ev*Pstar*dPdrhoetstar/(3.0*a2*a2);
 
 /*
 alpha = {c1*Pstar*Prhoetstar/(3*a2), c2*Pstar*Prhoetstar/(3*a2), c3*Pstar*Prhoetstar/(3*a2), 
@@ -790,7 +797,7 @@ void find_L_from_jacvars_eigenset1(jacvars_t jacvars, metrics_t metrics, sqmat_t
 
 void find_L_from_jacvars_eigenset2(jacvars_t jacvars, metrics_t metrics, sqmat_t L){
   double Vstar,a;
-  double cN2,dPdrhoetstar,Xmag,q2,a2,Vx,Vy,Xhat1,Xhat2;
+  double wv,dPdrhoetstar,Xmag,q2,a2,Vx,Vy,Xhat1,Xhat2;
   spec_t dPdrhok,w;
   long row,col,spec,dim;
   dim_t Xhat;
@@ -822,7 +829,10 @@ void find_L_from_jacvars_eigenset2(jacvars_t jacvars, metrics_t metrics, sqmat_t
     dPdrhok[spec]=jacvars.dPdrhok[spec];
     w[spec]=jacvars.w[spec];
   }
-  cN2=w[specN2];
+  wv=_wv_from_w(w);
+  /* the fluxev column of the right eigenvectors is divided by wv and the fluxev row of the left 
+     eigenvectors is multiplied by wv compared with the expressions in the comments, so that the 
+     eigenvectors remain defined when the vibrating species are absent (wv=0) */
 
   dPdrhoetstar=jacvars.dPdrhoetstar;
   for (row=0; row<nf; row++){
@@ -914,13 +924,13 @@ void find_L_from_jacvars_eigenset2(jacvars_t jacvars, metrics_t metrics, sqmat_t
 
 
   for (spec=0; spec<ns; spec++){
-    L[fluxev][spec]=-ev*(a2 + dPdrhok[spec] + a*qtmp1)/a2;
+    L[fluxev][spec]=-wv*ev*(a2 + dPdrhok[spec] + a*qtmp1)/a2;
   }
-  L[fluxev][ns]=ev*(dPdrhoetstar*Vx + a*Xhat2)/a2;
-  L[fluxev][ns+1]=ev*(dPdrhoetstar*Vy - a*Xhat1)/a2;
-  L[fluxev][fluxet]=-ev*dPdrhoetstar/a2;
-  L[fluxev][fluxtke]=ev*(dPdrhoetstar - 2.0/3.0)/a2;
-  L[fluxev][fluxev]=(2.0*a2 + cN2*ev*dPdrhoetstar)/(cN2*a2);
+  L[fluxev][ns]=wv*ev*(dPdrhoetstar*Vx + a*Xhat2)/a2;
+  L[fluxev][ns+1]=wv*ev*(dPdrhoetstar*Vy - a*Xhat1)/a2;
+  L[fluxev][fluxet]=-wv*ev*dPdrhoetstar/a2;
+  L[fluxev][fluxtke]=wv*ev*(dPdrhoetstar - 2.0/3.0)/a2;
+  L[fluxev][fluxev]=(2.0*a2 + wv*ev*dPdrhoetstar)/a2;
 
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
@@ -963,7 +973,7 @@ L = {{-c1*(a2 + Prho1 + a*qtmp1) +
    {-ev*(a2 + Prho1 + a*qtmp1), -ev*(a2 + Prho2 + 
         a*qtmp1), -ev*(a2 + Prho3 + a*qtmp1), ev*(Prhoetstar*Vx + a*Xhat2), 
      ev*(Prhoetstar*Vy - a*Xhat1), -ev*Prhoetstar, ev*(Prhoetstar - 2/3), 
-     0, (2*a2 + cN2*ev*Prhoetstar)/cN2}/(a2)}/(2*a2)
+     0, (2*a2 + wv*ev*Prhoetstar)/wv}/(a2)}/(2*a2)
 
 */
 
@@ -1075,14 +1085,14 @@ L = {{-c1*(a2 + Prho1 + a*qtmp1) +
   L[fluxpsi][fluxev]=dPdrhoetstar*psi/(3.0*a2*a2);
 
   for (spec=0; spec<ns; spec++){
-    L[fluxev][spec]=-ev*(2.0*a2 + dPdrhok[spec] + a*qtmp1)/(3.0*a2*a2);
+    L[fluxev][spec]=-wv*ev*(2.0*a2 + dPdrhok[spec] + a*qtmp1)/(3.0*a2*a2);
   }
-  L[fluxev][ns]=ev*(dPdrhoetstar*Vx + a*Xtmp3)/(3.0*a2*a2);
-  L[fluxev][ns+1]=ev*(dPdrhoetstar*Vy - a*Xtmp2)/(3.0*a2*a2);
-  L[fluxev][ns+2]=ev*(dPdrhoetstar*Vz - a*Xtmp1)/(3.0*a2*a2);
-  L[fluxev][fluxet]=-dPdrhoetstar*ev/(3.0*a2*a2);
-  L[fluxev][fluxtke]=(-2.0/3.0 + dPdrhoetstar)*ev/(3.0*a2*a2);
-  L[fluxev][fluxev]=(3.0*a2 + cN2*dPdrhoetstar*ev)/(cN2*3.0*a2*a2);
+  L[fluxev][ns]=wv*ev*(dPdrhoetstar*Vx + a*Xtmp3)/(3.0*a2*a2);
+  L[fluxev][ns+1]=wv*ev*(dPdrhoetstar*Vy - a*Xtmp2)/(3.0*a2*a2);
+  L[fluxev][ns+2]=wv*ev*(dPdrhoetstar*Vz - a*Xtmp1)/(3.0*a2*a2);
+  L[fluxev][fluxet]=-wv*dPdrhoetstar*ev/(3.0*a2*a2);
+  L[fluxev][fluxtke]=wv*(-2.0/3.0 + dPdrhoetstar)*ev/(3.0*a2*a2);
+  L[fluxev][fluxev]=(3.0*a2 + wv*dPdrhoetstar*ev)/(3.0*a2*a2);
 
 
 /*
@@ -1160,7 +1170,7 @@ L = {{-c1*(a*qtmp1 + 2*a2 + Prho1) +
        a*qtmp1), -ev*(2*a2 + Prho3 + a*qtmp1), ev*(Prhoetstar*Vx + a*Xtmp3),
      ev*(Prhoetstar*Vy - a*Xtmp2), 
     ev*(Prhoetstar*Vz - a*Xtmp1), -Prhoetstar*ev, (-2/3 + Prhoetstar)*ev, 
-    0, (3*a2 + cN2*Prhoetstar*ev)/cN2}/(3*a2*a2)}
+    0, (3*a2 + wv*Prhoetstar*ev)/wv}/(3*a2*a2)}
 
 */
 
@@ -1212,16 +1222,16 @@ void find_jacvars_at_interface_Roe_average(jacvars_t jacvarsL, jacvars_t jacvars
   }
   k=jacvars->k;
   ev=jacvars->ev;
-  T=_T_from_w_h(jacvars->w, jacvars->htstar-5.0e0/3.0e0*jacvars->k-0.5e0*sum-jacvars->ev*jacvars->w[specN2]);
+  T=_T_from_w_h(jacvars->w, jacvars->htstar-5.0e0/3.0e0*jacvars->k-0.5e0*sum-jacvars->ev*_wv_from_w(jacvars->w));
   // Find Pressure
   jacvars->P=_P_from_w_rho_T(jacvars->w,rho,T);
 
   // Find dPdx
-  etstar = 0.5e0*sum + k + _e_from_w_T(jacvars->w,T) + jacvars->w[specN2]*ev;
+  etstar = 0.5e0*sum + k + _e_from_w_T(jacvars->w,T) + _wv_from_w(jacvars->w)*ev;
   jacvars->dPdrhoetstar=1.0e0/(rho*_de_dP_at_constant_rho(rhok,T));
   find_de_drhok_at_constant_P(rhok,T,dedrhok);
   for (spec=0; spec<ns; spec++){
-      jacvars->dPdrhok[spec]=-(jacvars->dPdrhoetstar)*(etstar-sum-k-jacvars->w[specN2]*ev
+      jacvars->dPdrhok[spec]=-(jacvars->dPdrhoetstar)*(etstar-sum-k-_wv_from_w(jacvars->w)*ev
                                  +dedrhok[spec]*rho);
   }
 
@@ -1230,7 +1240,7 @@ void find_jacvars_at_interface_Roe_average(jacvars_t jacvarsL, jacvars_t jacvars
   }
 
   jacvars->T=T;
-  jacvars->Te=_Te_from_T_Tv(gl,T,_Tv_from_ev(ev));
+  jacvars->Te=_Te_from_T_Tv(gl,T,_Tv_from_w_T_ev(gl,jacvars->w,T,ev));
   
   set_jacvars_eigenconditioning_constants(gl, jacvars);
   
@@ -1265,16 +1275,16 @@ void find_jacvars_at_interface_arith_average(jacvars_t jacvarsL, jacvars_t jacva
   }
   k=jacvars->k;
   ev=jacvars->ev;
-  T=_T_from_w_h(jacvars->w, jacvars->htstar-5.0e0/3.0e0*jacvars->k-0.5e0*sum-jacvars->ev*jacvars->w[specN2]);
+  T=_T_from_w_h(jacvars->w, jacvars->htstar-5.0e0/3.0e0*jacvars->k-0.5e0*sum-jacvars->ev*_wv_from_w(jacvars->w));
   // Find Pressure
   jacvars->P=_P_from_w_rho_T(jacvars->w,rho,T);
 
   // Find dPdx
-  etstar = 0.5e0*sum + k + _e_from_w_T(jacvars->w,T) + jacvars->w[specN2]*ev;
+  etstar = 0.5e0*sum + k + _e_from_w_T(jacvars->w,T) + _wv_from_w(jacvars->w)*ev;
   jacvars->dPdrhoetstar=1.0e0/(rho*_de_dP_at_constant_rho(rhok,T));
   find_de_drhok_at_constant_P(rhok,T,dedrhok);
   for (spec=0; spec<ns; spec++){
-      jacvars->dPdrhok[spec]=-(jacvars->dPdrhoetstar)*(etstar-sum-k-jacvars->w[specN2]*ev
+      jacvars->dPdrhok[spec]=-(jacvars->dPdrhoetstar)*(etstar-sum-k-_wv_from_w(jacvars->w)*ev
                                  +dedrhok[spec]*rho);
   }
 
@@ -1283,7 +1293,7 @@ void find_jacvars_at_interface_arith_average(jacvars_t jacvarsL, jacvars_t jacva
   }
 
   jacvars->T=T;
-  jacvars->Te=_Te_from_T_Tv(gl,T,_Tv_from_ev(ev));
+  jacvars->Te=_Te_from_T_Tv(gl,T,_Tv_from_w_T_ev(gl,jacvars->w,T,ev));
   
   set_jacvars_eigenconditioning_constants(gl, jacvars);
 }
@@ -1315,7 +1325,7 @@ void find_jacvars(np_t np, gl_t *gl, metrics_t metrics, long theta, jacvars_t *j
   jacvars->P=_P(np,gl);
 
   jacvars->T=_T(np,gl);
-  jacvars->Te=_Te_from_T_Tv(gl,jacvars->T,_Tv_from_ev(jacvars->ev));
+  jacvars->Te=_Te_from_T_Tv(gl,jacvars->T,_Tv(np,gl));
 
   set_jacvars_eigenconditioning_constants(gl, jacvars);
 }
@@ -1336,7 +1346,7 @@ void find_musclvars(np_t np, gl_t *gl, flux_t musclvars){
   }
   musclvars[fluxtke]=_k(np);
   musclvars[fluxpsi]=_psi(np);
-  musclvars[fluxev]=_Tv(np);
+  musclvars[fluxev]=_ev(np);
 }
 
 
@@ -1357,7 +1367,7 @@ bool is_musclvar_a_mass_fraction(long flux){
 
 
 void find_Ustar_from_musclvars(flux_t musclvars, metrics_t metrics, gl_t *gl, flux_t Ustar){
-  double Pstar,P,rho,emix,sum,k,T,Tv,psi;
+  double Pstar,P,rho,emix,sum,k,T,psi,ev;
   spec_t rhok,w;
   long spec,dim;
   dim_t V;
@@ -1416,14 +1426,14 @@ T=_T_from_w_rho_P(w,rho,Pstar-(2.0e0/3.0e0*rho*k));
   }
 
   emix=_e_from_w_T(w,T);
-  Tv=musclvars[fluxev];
-  reformat_Tv(gl,T,&Tv,"_muscl",&REFORMAT);
+  ev=musclvars[fluxev];
+  reformat_ev(gl,w,&ev,"_muscl",&REFORMAT);
 
   Ustar[fluxet]=metrics.Omega*rho*(0.5e0*(sum)+k+emix
-                       +w[specN2]*_ev_from_T(Tv));
+                       +_wv_from_w(w)*ev);
   Ustar[fluxtke]=metrics.Omega*rho*k;
   Ustar[fluxpsi]=metrics.Omega*rho*psi;
-  Ustar[fluxev]=metrics.Omega*rho*w[specN2]*_ev_from_T(Tv);
+  Ustar[fluxev]=metrics.Omega*rho*_wv_from_w(w)*ev;
 }
 
 
@@ -1431,7 +1441,7 @@ T=_T_from_w_rho_P(w,rho,Pstar-(2.0e0/3.0e0*rho*k));
 void find_jacvars_from_musclvars(flux_t musclvars, metrics_t metrics, gl_t *gl, long theta, jacvars_t *jacvars){
   spec_t rhok,w,dedrhok;
   long dim,spec;
-  double Pstar,T,P,k,psi,ev,Tv,sum,rho,etstar;
+  double Pstar,T,P,k,psi,ev,sum,rho,etstar;
   dim_t V;
   bool REFORMAT;
 
@@ -1481,18 +1491,17 @@ void find_jacvars_from_musclvars(flux_t musclvars, metrics_t metrics, gl_t *gl, 
     break;
   }
 
-  Tv=musclvars[fluxev];
-  reformat_Tv(gl,T,&Tv,"_muscl",&REFORMAT);
-  ev=_ev_from_T(Tv);
+  ev=musclvars[fluxev];
+  reformat_ev(gl,w,&ev,"_muscl",&REFORMAT);
   jacvars->ev=ev;
   jacvars->P=P;
 
-  etstar = 0.5e0*sum + k + _e_from_w_T(w,T) + w[specN2]*ev;
+  etstar = 0.5e0*sum + k + _e_from_w_T(w,T) + _wv_from_w(w)*ev;
   jacvars->htstar=etstar+P/rho+2.0e0/3.0e0*k;
   jacvars->dPdrhoetstar=1.0e0/(rho*_de_dP_at_constant_rho(rhok,T));
   find_de_drhok_at_constant_P(rhok,T,dedrhok);
   for (spec=0; spec<ns; spec++){
-      jacvars->dPdrhok[spec]=-(jacvars->dPdrhoetstar)*(etstar-sum-k-w[specN2]*ev
+      jacvars->dPdrhok[spec]=-(jacvars->dPdrhoetstar)*(etstar-sum-k-_wv_from_w(w)*ev
                                  +dedrhok[spec]*rho);
   }
 
@@ -1501,14 +1510,14 @@ void find_jacvars_from_musclvars(flux_t musclvars, metrics_t metrics, gl_t *gl, 
   }
 
   jacvars->T=T;
-  jacvars->Te=_Te_from_T_Tv(gl,T,Tv);
+  jacvars->Te=_Te_from_T_Tv(gl,T,_Tv_from_w_T_ev(gl,w,T,ev));
 
   set_jacvars_eigenconditioning_constants(gl, jacvars);
 }
 
 
 void find_jacvars_from_U(flux_t U, metrics_t metrics, gl_t *gl, long theta, jacvars_t *jacvars){
-  double rho,P,T,q2;
+  double rho,P,T,q2,wv;
   spec_t rhok,dedrhok;
   long spec,dim;
 
@@ -1522,7 +1531,9 @@ void find_jacvars_from_U(flux_t U, metrics_t metrics, gl_t *gl, long theta, jacv
   }
   jacvars->k=U[fluxtke]/rho;
   jacvars->psi=U[fluxpsi]/rho;
-  jacvars->ev=U[fluxev]/rho/jacvars->w[specN2];
+  wv=_wv_from_w(jacvars->w);
+  jacvars->ev=0.0;
+  if (wv!=0.0) jacvars->ev=U[fluxev]/rho/wv;
 
   q2=0.0;
   for (dim=0; dim<nd; dim++){
@@ -1530,12 +1541,12 @@ void find_jacvars_from_U(flux_t U, metrics_t metrics, gl_t *gl, long theta, jacv
     q2+=sqr(jacvars->V[dim]);
   }
 
-  T=_T_from_w_e(jacvars->w,U[fluxet]/rho-0.5e0*q2-jacvars->k-jacvars->w[specN2]*jacvars->ev);
+  T=_T_from_w_e(jacvars->w,U[fluxet]/rho-0.5e0*q2-jacvars->k-_wv_from_w(jacvars->w)*jacvars->ev);
   P=_P_from_w_rho_T(jacvars->w,rho,T);
 
   jacvars->P=P;
   jacvars->T=T;
-  jacvars->Te=_Te_from_T_Tv(gl,T,_Tv_from_ev(jacvars->ev));
+  jacvars->Te=_Te_from_T_Tv(gl,T,_Tv_from_w_T_ev(gl,jacvars->w,T,jacvars->ev));
 
   jacvars->htstar=U[fluxet]/rho+P/rho+2.0e0/3.0e0*jacvars->k;
   jacvars->dPdrhoetstar=1.0e0/(rho*_de_dP_at_constant_rho(rhok,T));
@@ -1543,7 +1554,7 @@ void find_jacvars_from_U(flux_t U, metrics_t metrics, gl_t *gl, long theta, jacv
   find_de_drhok_at_constant_P(rhok,T,dedrhok);
   for (spec=0; spec<ns; spec++){
       jacvars->dPdrhok[spec]=-(jacvars->dPdrhoetstar)*( U[fluxet]/rho-q2-jacvars->k
-                         -jacvars->w[specN2]*jacvars->ev + dedrhok[spec]*rho );
+                         -_wv_from_w(jacvars->w)*jacvars->ev + dedrhok[spec]*rho );
   }
 
   for (dim=0; dim<nd; dim++){
@@ -1588,15 +1599,16 @@ double _Pe_from_jacvars(gl_t *gl , jacvars_t jacvars, metrics_t metrics){
 // the Uprime vector is composed of rhok[1..ns], V[1..nd], e, k, psi, ev
 void find_Uprime(np_t np, gl_t *gl, flux_t Uprime){
   long dim,spec;
-  double rho,q2,k,ev,wN2;
+  double rho,q2,k,ev,wv;
 
-  // find rho, k, ev, q2, wN2
+  // find rho, k, ev, q2, wv
   rho=0.0;
   for (spec=0; spec<ns; spec++) rho+=np.bs->U[spec];
   k=np.bs->U[fluxtke]/rho;
-  wN2=np.bs->U[specN2]/rho;
-  assert(wN2*rho>0.0);
-  ev=np.bs->U[fluxev]/(rho*wN2);
+  wv=0.0;
+  for (spec=0; spec<ns; spec++) if (_isvib(spec)) wv+=np.bs->U[spec]/rho;
+  ev=0.0;
+  if (wv!=0.0) ev=np.bs->U[fluxev]/(rho*wv);
   q2=0.0e0;
   for (dim=0; dim<nd; dim++){
     q2+=sqr(np.bs->U[ns+dim]/rho);
@@ -1609,7 +1621,7 @@ void find_Uprime(np_t np, gl_t *gl, flux_t Uprime){
   for (dim=0; dim<nd; dim++) Uprime[ns+dim]=np.bs->U[ns+dim]/rho;
 
   /* set energy flux component */
-  Uprime[fluxet]=(np.bs->U[fluxet]-0.5e0*rho*q2-rho*k-rho*wN2*ev)/rho;
+  Uprime[fluxet]=(np.bs->U[fluxet]-0.5e0*rho*q2-rho*k-rho*wv*ev)/rho;
 
   /* set turbulence kinetic energy and (specific) dissipation rate flux components */
   Uprime[fluxtke]=k;
@@ -1620,7 +1632,7 @@ void find_Uprime(np_t np, gl_t *gl, flux_t Uprime){
 }
 
 
-void find_primvars_from_jacvars(jacvars_t jacvars, spec_t rhok, dim_t V, double *T, double *e,  double *k, double *psi, double *Tv, double *ev){
+void find_primvars_from_jacvars(jacvars_t jacvars, spec_t rhok, dim_t V, double *T, double *e,  double *k, double *psi, double *ev){
   double q2,rho;
   long dim,spec;
   spec_t wk;
@@ -1632,7 +1644,7 @@ void find_primvars_from_jacvars(jacvars_t jacvars, spec_t rhok, dim_t V, double 
   *k=jacvars.k;
   *ev=jacvars.ev;
   *psi=jacvars.psi;
-  *e=jacvars.htstar-jacvars.P/jacvars.rho-2.0/3.0*jacvars.k-0.5*q2-jacvars.k-jacvars.w[specN2]*jacvars.ev;
+  *e=jacvars.htstar-jacvars.P/jacvars.rho-2.0/3.0*jacvars.k-0.5*q2-jacvars.k-_wv_from_w(jacvars.w)*jacvars.ev;
   rho=0.0;
   for (spec=0; spec<ns; spec++){
     rhok[spec]=jacvars.w[spec]*jacvars.rho;
@@ -1642,7 +1654,6 @@ void find_primvars_from_jacvars(jacvars_t jacvars, spec_t rhok, dim_t V, double 
     wk[spec]=rhok[spec]/rho;
   }
   *T=_T_from_w_e(wk, *e);
-  *Tv=_Tv_from_ev(*ev);
 }
 
 
@@ -1651,11 +1662,11 @@ void find_dUstar_dUprime_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqma
   long dim,row,col,spec;
   dim_t V;
   spec_t rhok;
-  double rho,e,k,psi,T,Tv,ev,wN2;
+  double rho,e,k,psi,T,ev,wv;
 
-  find_primvars_from_jacvars(jacvars, rhok, V, &T, &e, &k, &psi, &Tv, &ev);
+  find_primvars_from_jacvars(jacvars, rhok, V, &T, &e, &k, &psi, &ev);
   rho=jacvars.rho;
-  wN2=jacvars.w[specN2];
+  wv=_wv_from_w(jacvars.w);
 
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
@@ -1678,14 +1689,14 @@ void find_dUstar_dUprime_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqma
 
 
   // the total energy row
-  // recall that rho*et=rho*e + 0.5*rho*q^2 + rho*k + rho*wN2*ev
-  //                   =rho*e + 0.5*rho*u*u + 0.5*rho*v*v + rho*k + rho*wN2*ev
+  // recall that rho*et=rho*e + 0.5*rho*q^2 + rho*k + rho*wv*ev
+  //                   =rho*e + 0.5*rho*u*u + 0.5*rho*v*v + rho*k + rho*wv*ev
   //                   =rho*e + 0.5*rho*u^2 + 0.5*rho*v^2 + rho*k + rhoN2*ev  
   dUstardUprime[fluxet][fluxet]=rho*metrics.Omega;
   for (spec=0; spec<ns; spec++) {
     dUstardUprime[fluxet][spec]=(e+k)*metrics.Omega;
   }
-  dUstardUprime[fluxet][specN2]+=ev*metrics.Omega;
+  for (spec=0; spec<ns; spec++) if (_isvib(spec)) dUstardUprime[fluxet][spec]+=ev*metrics.Omega;
 
   for (dim=0; dim<nd; dim++) {
     dUstardUprime[fluxet][ns+dim]=rho*V[dim]*metrics.Omega;
@@ -1694,7 +1705,7 @@ void find_dUstar_dUprime_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqma
     }
   }
   dUstardUprime[fluxet][fluxtke]=rho*metrics.Omega;
-  dUstardUprime[fluxet][fluxev]=rho*wN2*metrics.Omega;
+  dUstardUprime[fluxet][fluxev]=rho*wv*metrics.Omega;
 
   // the turbulence kinetic energy and its (specific) dissipation rate rows
   dUstardUprime[fluxtke][fluxtke]=rho*metrics.Omega;
@@ -1706,9 +1717,9 @@ void find_dUstar_dUprime_from_jacvars(jacvars_t jacvars, metrics_t metrics, sqma
     dUstardUprime[fluxpsi][spec]=psi*metrics.Omega;
   }
 
-  // the non-equilibrium nitrogen vibrational energy row
-  dUstardUprime[fluxev][fluxev]=rho*wN2*metrics.Omega;
-  dUstardUprime[fluxev][specN2]=ev*metrics.Omega;
+  // the non-equilibrium vibrational energy row
+  dUstardUprime[fluxev][fluxev]=rho*wv*metrics.Omega;
+  for (spec=0; spec<ns; spec++) if (_isvib(spec)) dUstardUprime[fluxev][spec]=ev*metrics.Omega;
    
 
 }

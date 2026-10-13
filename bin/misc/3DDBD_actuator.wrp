@@ -275,8 +275,10 @@ Bdry(
 Model(
   NavierStokesPlasma(
     TEMODEL=TEMODEL_LOCAL;    {set TEMODEL to TEMODEL_LOCAL, TEMODEL_TRANSPORT, or TEMODEL_CONSTANT}
-    N2VIBMODEL=N2VIBMODEL_PARENT2024;
-    N2VIBJOULEHEATING=YES; {solve the nitrogen vibration energy joule heating source terms?}
+    VibSpecies("N2");  {species with vibrationally excited states}
+    TAUVTMODEL=TAUVTMODEL_PARENT2024;
+    QEVMODEL=QEVMODEL_PARENT2024;
+    VIBDISTTYPE=VIBDISTTYPE_BOLTZMANN;
     if (UNSTEADY,
       REACTING=YES;   {solve chemical reactions?}
     ,{else}

@@ -115,10 +115,6 @@
   
 #endif
 
-#if _FLUID_N2VIBMODEL
-  double _Tv(np_t np);
-#endif
-
 #ifdef _FLUID_PLASMA
   void find_alpha(np_t *np, gl_t *gl, long l, spec2_t alpha);
 

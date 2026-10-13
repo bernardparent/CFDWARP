@@ -37,11 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/_model.h>
 #include <cycle/_cycle.h>
 #include <model/share/fluid_share.h>
+#include <model/share/fluid_vib.h>
 
-
-#ifndef specN2
-  #error The module Favre-Reynolds Tv is not compatible with chemical models that do not include the N2 species. 
-#endif
 
 
 bool _FLUIDPRIMMEM(np_t np){
@@ -56,8 +53,20 @@ void write_model_fluid_template(FILE **controlfile){
     "    DILATDISSIP=DILATDISSIP_WILCOX;\n"
     "    RAPCOMP=NO;\n"
     "    TURBSOURCE=YES;\n"
-    "    N2VIBMODEL=N2VIBMODEL_PARENT2024;\n"
+#ifdef specN2
+    "    VibSpecies(\"N2\");  {species with vibrationally excited states; VibSpecies(); if none}\n"
+    "    TAUVTMODEL=TAUVTMODEL_PARENT2024;  {TAUVTMODEL_PARENT2024 (N2 only), TAUVTMODEL_MILLIKANWHITE, TAUVTMODEL_TEQUILIBRIUM}\n"
+#else
+    "    VibSpecies();  {species with vibrationally excited states, e.g. VibSpecies(\"N2\",\"CO\");}\n"
+    "    TAUVTMODEL=TAUVTMODEL_MILLIKANWHITE;  {TAUVTMODEL_PARENT2024 (N2 only), TAUVTMODEL_MILLIKANWHITE, TAUVTMODEL_TEQUILIBRIUM}\n"
+#endif
+    "    QEVMODEL=QEVMODEL_NONE;  {no e-V excitation in this module}\n"
+    "    VIBDISTTYPE=VIBDISTTYPE_BOLTZMANN;  {distribution of the vibrational states}\n"
+#ifdef specN2
     "    TEMODEL=TEMODEL_TVEQUILIBRIUM;\n" 
+#else
+    "    TEMODEL=TEMODEL_TEQUILIBRIUM;\n" 
+#endif
     "    SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL=TRUE;\n"
     "    REACTING=YES;\n"
     "    Prt=0.9e0;\n"
@@ -115,6 +124,7 @@ void write_cycle_fluid_template(FILE **controlfile){
 
 void read_model_fluid_actions_2(char *actionname, char **argum, SOAP_codex_t *codex){
   read_model_fluid_actions_Fbody_Qadd(actionname, argum, codex);
+  read_model_fluid_actions_vib_species(actionname, argum, codex);
 }
 
 
@@ -132,8 +142,7 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
     SOAP_add_int_to_vars(codex,"TURBMODEL_KOMEGA1988",TURBMODEL_KOMEGA1988); 
     SOAP_add_int_to_vars(codex,"TURBMODEL_KOMEGA2008",TURBMODEL_KOMEGA2008); 
     SOAP_add_int_to_vars(codex,"TURBMODEL_SST1994",TURBMODEL_SST1994); 
-    SOAP_add_int_to_vars(codex,"N2VIBMODEL_PARENT2024",N2VIBMODEL_PARENT2024);
-    SOAP_add_int_to_vars(codex,"N2VIBMODEL_MILLIKAN",N2VIBMODEL_MILLIKAN);
+    add_vib_constants_to_codex(codex);
     SOAP_add_int_to_vars(codex,"TEMODEL_TEQUILIBRIUM",TEMODEL_TEQUILIBRIUM);
     SOAP_add_int_to_vars(codex,"TEMODEL_TVEQUILIBRIUM",TEMODEL_TVEQUILIBRIUM);
 
@@ -165,12 +174,14 @@ void read_model_fluid_actions(char *actionname, char **argum, SOAP_codex_t *code
     find_bool_var_from_codex(codex,"ADD_ETA_TO_ETAT_WITHIN_QK",&gl->model.fluid.ADD_ETA_TO_ETAT_WITHIN_QK);
     find_bool_var_from_codex(codex,"TURBSOURCE",&gl->model.fluid.TURBSOURCE);
     find_bool_var_from_codex(codex,"SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL",&gl->model.fluid.SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL);
-    find_int_var_from_codex(codex,"N2VIBMODEL",&gl->model.fluid.N2VIBMODEL);
-    if (gl->model.fluid.N2VIBMODEL!=N2VIBMODEL_PARENT2024 && gl->model.fluid.N2VIBMODEL!=N2VIBMODEL_MILLIKAN)
-      SOAP_fatal_error(codex,"N2VIBMODEL must be set to either N2VIBMODEL_PARENT2024 or N2VIBMODEL_MILLIKAN.");
+    read_model_fluid_vib(codex);
+    if (gl->model.fluid.QEVMODEL!=QEVMODEL_NONE)
+      SOAP_fatal_error(codex,"QEVMODEL must be set to QEVMODEL_NONE within %s() because this module does not solve for the electron energy.",_FLUID_ACTIONNAME);
     find_int_var_from_codex(codex,"TEMODEL",&gl->model.fluid.TEMODEL);
     if (gl->model.fluid.TEMODEL!=TEMODEL_TEQUILIBRIUM && gl->model.fluid.TEMODEL!=TEMODEL_TVEQUILIBRIUM)
       SOAP_fatal_error(codex,"TEMODEL must be set to either TEMODEL_TEQUILIBRIUM or TEMODEL_TVEQUILIBRIUM.");
+    if (gl->model.fluid.TEMODEL==TEMODEL_TVEQUILIBRIUM && _numvibspecies()==0)
+      SOAP_fatal_error(codex,"TEMODEL_TVEQUILIBRIUM can not be used when no species has vibrationally excited states (VibSpecies();).");
     find_int_var_from_codex(codex,"TURBMODEL",&gl->model.fluid.TURBMODEL);
     if (gl->model.fluid.TURBMODEL!=TURBMODEL_KEPSILON && gl->model.fluid.TURBMODEL!=TURBMODEL_KOMEGA1988 && gl->model.fluid.TURBMODEL!=TURBMODEL_KOMEGA2008 && gl->model.fluid.TURBMODEL!=TURBMODEL_SST1994)
       SOAP_fatal_error(codex,"TURBMODEL must be set to either TURBMODEL_KEPSILON or TURBMODEL_KOMEGA1988 or TURBMODEL_KOMEGA2008 or TURBMODEL_SST1994.");
@@ -338,8 +349,7 @@ double _a(np_t np, gl_t *gl) {
     }
     find_dP_dx(np, gl, &dPdrhoetstar, dPdrhok, dPdrhoV);
     htstar=np.bs->U[fluxet]/rho+2.0e0/3.0e0*k+P/rho;
-//  np.wk->amem=2.0e0/3.0e0*k+dPdrhoetstar*(htstar-k-w[specN2]*_ev(np)-sum);
-    ret=2.0e0/3.0e0*k+dPdrhoetstar*(htstar-sum-k-w[specN2]*_ev(np));
+    ret=2.0e0/3.0e0*k+dPdrhoetstar*(htstar-sum-k-_wv_from_w(w)*_ev(np));
     for (spec=0; spec<ns; spec++){
       ret+=dPdrhok[spec]*w[spec];
     }
@@ -403,7 +413,7 @@ double _T (np_t np, gl_t *gl) {
     eint=np.bs->U[fluxet]/rho /* total energy */
       -ekin  /* kinetic energy */
       -np.bs->U[fluxtke]/rho /* k */
-      -np.bs->U[fluxev]/rho; /* cN2*evib */
+      -np.bs->U[fluxev]/rho; /* wv*ev */
     ret=_T_from_w_e(w,eint);
   }
   return(ret);
@@ -417,35 +427,11 @@ double _k (np_t np){
 }
 
 
-double _ev (np_t np){
-  double ret;
-  assert_np(np,_rho(np)!=0.0e0);
-  ret=np.bs->U[fluxev]/(_rho(np)*_w(np,specN2));
-  return(ret);
-}
-
-double _evzero (np_t np, gl_t *gl){
-  double ret,T;
-  T=_T(np, gl);
-  ret=_ev_from_T(T);
-  return(ret);
-}
-
-
-
 double _psi (np_t np){
   double ret;
   assert_np(np,_rho(np)!=0.0e0);
   ret=np.bs->U[fluxpsi]/_rho(np);
   return(ret);
-}
-
-
-double _Tv(np_t np){
-  double Tv;
-  assert_np(np,_rho(np)!=0.0e0);
-  Tv=_Tv_from_ev(np.bs->U[fluxev]/(_rho(np)*_w(np,specN2)));
-  return(Tv);
 }
 
 
@@ -467,7 +453,7 @@ double _Te_from_T_Tv(gl_t *gl, double T, double Tv){
 
 double _Te(np_t np, gl_t *gl){
   double Te;
-  Te=_Te_from_T_Tv(gl, _T(np, gl), _Tv(np));
+  Te=_Te_from_T_Tv(gl, _T(np, gl), _Tv(np,gl));
   return(Te);
 }
 
@@ -527,8 +513,9 @@ double _nu(np_t np, gl_t *gl, long spec) {
 
 
 double _kappa(np_t *np, long l, gl_t *gl) {
-  double T,cp,ret,eta,kappa;
+  double T,cp,ret,eta,kappa,cvsum;
   spec_t w,nu,rhok;
+  long spec;
 
   if (_FLUIDPRIMMEM(np[l])){
     ret=np[l].wk->kappamem;
@@ -538,7 +525,9 @@ double _kappa(np_t *np, long l, gl_t *gl) {
     cp=_cp_from_w_T_equilibrium(w,T);
     find_rhok(np[l],rhok);
     find_nuk_eta_kappa(gl, rhok, T, _Te(np[l],gl), nu, &eta, &kappa);
-    ret=cp*_eta(np,l,gl)/( /* Prandtl number */(_eta(np,l,gl))/(kappa)*(cp+w[specN2]*_dev_dTv_from_Tv(T)) );
+    cvsum=0.0;
+    for (spec=0; spec<ns; spec++) if (_isvib(spec)) cvsum+=w[spec]*_cvk_from_T(spec,T);
+    ret=cp*_eta(np,l,gl)/( /* Prandtl number */(_eta(np,l,gl))/(kappa)*(cp+cvsum) );
 
   }
 
@@ -576,7 +565,7 @@ void find_dP_dx(np_t np, gl_t *gl, double *dPdrhoetstar, spec_t dPdrhok, dim_t d
   assert_np(np,rho!=0.0e0);
   assert_np(np,dedP!=0.0e0);
   for (spec=0; spec<ns; spec++){
-      dPdrhok[spec]=-(*dPdrhoetstar)*(etstar-sum-k-_w(np,specN2)*_ev(np)
+      dPdrhok[spec]=-(*dPdrhoetstar)*(etstar-sum-k-_wv(np)*_ev(np)
                                  +dedrhok[spec]*rho);
   }
 
@@ -620,7 +609,7 @@ void find_dT_dx(np_t np, gl_t *gl, double *dTdrhoetstar, spec_t dTdrhok, dim_t d
     dTdrhok[spec]=(-(etstar-k)/rho+sum/rho-dedrhok[spec])/dedT;
   }*/
   for (spec=0; spec<ns; spec++){
-      dTdrhok[spec]=-(etstar-sum-k-_w(np,specN2)*_ev(np)
+      dTdrhok[spec]=-(etstar-sum-k-_wv(np)*_ev(np)
                                  +dedrhok[spec]*rho)/dedT/rho;
   }
 
@@ -662,30 +651,6 @@ void find_dT_dU(np_t np, gl_t *gl, flux_t dTdU){
 }
 
 
-void find_dTv_dU(np_t np, gl_t *gl, flux_t dTvdU){
-  long flux;
-/*  double T1,T2; */
-  for (flux=0; flux<nf; flux++) dTvdU[flux]=0.0;
-  dTvdU[fluxev]=1.0/_dev_dTv_from_Tv(_Tv(np))/(_rho(np)*_w(np,specN2));
-  dTvdU[specN2]=-_ev(np)/_dev_dTv_from_Tv(_Tv(np))/(_rho(np)*_w(np,specN2));
-  
-  /*
- //testing!
-  for (flux=0; flux<nf; flux++){
-    wfprintf(stdout,"dTvdU=%15.10E  ",dTvdU[flux]);
-    T1=_Tv(np);
-    np.bs->U[flux]+=1.0e-6;
-    find_prim_fluid(np,gl);
-    T2=_Tv(np);
-    np.bs->U[flux]-=1.0e-6;
-    find_prim_fluid(np,gl);
-    wfprintf(stdout,"dTvdU=%15.10E\n",(T2-T1)/1.0e-6);
-  }
- wfprintf(stdout,"\n\n");
-  */
-}
-
-
 void find_Ustar(np_t np, gl_t *gl, flux_t Ustar){
   double Omega;
   long flux;
@@ -705,14 +670,15 @@ void find_G(np_t np, gl_t *gl, flux_t G){
   G[fluxet]=_T(np,gl);
   G[fluxtke]=_k(np);
   G[fluxpsi]=_psi(np);
-  G[fluxev]=_Tv(np);
+  G[fluxev]=_ev(np);
 }
 
 
 void find_Kstar_interface(np_t *np, gl_t *gl, long lL, long lR, metrics_t metrics, long theta, long vartheta, sqmat_t K, int CYCLELEVEL){
-  long dim,dim2,row,col,r,k;
+  long dim,dim2,row,col,r,k,spec;
   double Omega,fact1,sum;
   double fact2[nd][nd];
+  vibdist_t vibdistL,vibdistR;
   
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++) K[row][col]=0.0e0;
@@ -760,12 +726,18 @@ void find_Kstar_interface(np_t *np, gl_t *gl, long lL, long lR, metrics_t metric
     K[fluxtke][fluxtke]=avg(_etakstar(np,lL,gl),_etakstar(np,lR,gl))*fact1;
     K[fluxpsi][fluxpsi]=avg(_etapsistar(np,lL,gl),_etapsistar(np,lR,gl))*fact1;
     
-/* nitrogen vibration supplement */
-    K[fluxet][fluxev]=avg(_kappavstar(np,lL,gl),_kappavstar(np,lR,gl))*fact1;
-    K[fluxev][fluxev]=avg(_kappavstar(np,lL,gl),_kappavstar(np,lR,gl))*fact1;
-    K[fluxet][specN2]+=avg(_nustar(np,lL,gl,specN2),_nustar(np,lR,gl,specN2))*avg(_ev(np[lL]),_ev(np[lR]))*fact1; 
-    K[fluxev][specN2]+=avg(_nustar(np,lL,gl,specN2),_nustar(np,lR,gl,specN2))*avg(_ev(np[lL]),_ev(np[lR]))*fact1; 
-/* nitrogen vibration supplement ends */
+/* vibrational energy supplement */
+    K[fluxet][fluxev]=avg(_nuvstar(np,lL,gl),_nuvstar(np,lR,gl))*fact1;
+    K[fluxev][fluxev]=avg(_nuvstar(np,lL,gl),_nuvstar(np,lR,gl))*fact1;
+    find_vibdist_from_np(np[lL],gl,&vibdistL);
+    find_vibdist_from_np(np[lR],gl,&vibdistR);
+    for (spec=0; spec<ns; spec++){
+      if (_isvib(spec)){
+        K[fluxet][spec]+=avg(_nustar(np,lL,gl,spec),_nustar(np,lR,gl,spec))*avg(vibdistL.evk[spec],vibdistR.evk[spec])*fact1; 
+        K[fluxev][spec]+=avg(_nustar(np,lL,gl,spec),_nustar(np,lR,gl,spec))*avg(vibdistL.evk[spec],vibdistR.evk[spec])*fact1; 
+      }
+    }
+/* vibrational energy supplement ends */
 }
 
 
@@ -773,12 +745,13 @@ void find_dG_dUstar(np_t np, gl_t *gl, sqmat_t B){
   long dim,spec,row,col;
   spec_t w,dTdrhok;
   dim_t dTdrhoV;
-  double k,psi,Omega,rho,dTdrhoetstar,ev;
+  double k,psi,Omega,rho,dTdrhoetstar;
+  flux_t devdU;
   Omega=_Omega(np,gl);
   rho=_rho(np);
   k=_k(np);
   psi=_psi(np);
-  ev=_ev(np);
+  find_dev_dU(np,gl,devdU);
 
   find_w(np,w);
   find_dT_dx(np, gl, &dTdrhoetstar, dTdrhok, dTdrhoV);
@@ -805,7 +778,7 @@ void find_dG_dUstar(np_t np, gl_t *gl, sqmat_t B){
     B[fluxtke][spec]=-k/(Omega*rho);
     B[fluxpsi][spec]=-psi/(Omega*rho);
   }
-  B[fluxev][specN2]=-ev/(Omega*rho*_w(np,specN2))/_dev_dTv_from_Tv(_Tv(np));
+  for (spec=0; spec<ns; spec++) B[fluxev][spec]=devdU[spec]/Omega;
   for (dim=0; dim<nd; dim++){
     B[ns+dim][ns+dim]=1.0e0/(Omega*rho);
     B[fluxet][ns+dim]=dTdrhoV[dim]/(Omega);
@@ -815,7 +788,7 @@ void find_dG_dUstar(np_t np, gl_t *gl, sqmat_t B){
   B[fluxet][fluxev]=-dTdrhoetstar/(Omega);
   B[fluxtke][fluxtke]=1.0e0/Omega/rho;
   B[fluxpsi][fluxpsi]=1.0e0/Omega/rho;
-  B[fluxev][fluxev]=1.0/_dev_dTv_from_Tv(_Tv(np))/(Omega)/(rho*_w(np,specN2));
+  B[fluxev][fluxev]=devdU[fluxev]/Omega;
 }
 
 
@@ -876,11 +849,13 @@ void reformat_w(gl_t *gl, spec_t w, char *suffix,  bool *flag){
       free(speciesname);
       *flag=TRUE;
     }
-    if (spec==specN2 && w[spec]<gl->model.fluid.wminN2) {
+#ifdef specN2
+    if (spec==specN2 && _isvib(specN2) && w[spec]<gl->model.fluid.wminN2) {
       add_to_clipped_variables2(gl,"wminN2",suffix);
       w[spec]=gl->model.fluid.wminN2;
       *flag=TRUE;
     }
+#endif
     sum=sum+w[spec];
   }
   assert(sum!=0.0e0);
@@ -941,7 +916,7 @@ void reformat_k_psi(gl_t *gl, double *k, double *psi, char *suffix,  bool *flag)
 
 void find_prim_fluid_mem(np_t *np, long l, gl_t *gl, double P, double T){
   spec_t w;
-  double Te,Tv,sum1,sum,rho,k,eta,psitilde;
+  double Te,Tv,sum1,sum,rho,k,eta,psitilde,wv,ev,cvsum;
   spec_t dPdrhok,rhok;
   dim_t dPdrhoV;
   double dPdrhoetstar,htstar;
@@ -971,11 +946,16 @@ void find_prim_fluid_mem(np_t *np, long l, gl_t *gl, double P, double T){
   for (dim=0; dim<nd; dim++){
     np[l].wk->Vmem[dim]=np[l].bs->U[ns+dim]/rho;
   }
-  Tv=_Tv_from_ev(np[l].bs->U[fluxev]/(rho*w[specN2]));
+  wv=_wv_from_w(w);
+  ev=0.0;
+  if (wv!=0.0) ev=np[l].bs->U[fluxev]/(rho*wv);
+  Tv=_Tv_from_w_T_ev(gl,w,T,ev);
   Te=_Te_from_T_Tv(gl,T,Tv);
   for (spec=0; spec<ns; spec++) rhok[spec]=rho*w[spec];
   find_nuk_eta_kappa(gl, rhok, T, Te, np[l].wk->numem, &(np[l].wk->etamem), &(np[l].wk->kappamem));
-  np[l].wk->kappamem=_cp_from_w_T_equilibrium(w,T)*np[l].wk->etamem/( /* Prandtl number */(np[l].wk->etamem)/(np[l].wk->kappamem)*(_cp_from_w_T_equilibrium(w,T)+w[specN2]*_dev_dTv_from_Tv(T)) );
+  cvsum=0.0;
+  for (spec=0; spec<ns; spec++) if (_isvib(spec)) cvsum+=w[spec]*_cvk_from_T(spec,T);
+  np[l].wk->kappamem=_cp_from_w_T_equilibrium(w,T)*np[l].wk->etamem/( /* Prandtl number */(np[l].wk->etamem)/(np[l].wk->kappamem)*(_cp_from_w_T_equilibrium(w,T)+cvsum) );
 
   k=_k(np[l]);
   psitilde=_psitilde(np[l],gl);
@@ -989,7 +969,7 @@ void find_prim_fluid_mem(np_t *np, long l, gl_t *gl, double P, double T){
   }
   find_dP_dx(np[l], gl, &dPdrhoetstar, dPdrhok, dPdrhoV);
   htstar=np[l].bs->U[fluxet]/rho+2.0e0/3.0e0*k+P/rho;
-  np[l].wk->amem=2.0e0/3.0e0*k+dPdrhoetstar*(htstar-k-w[specN2]*_ev(np[l])-sum);
+  np[l].wk->amem=2.0e0/3.0e0*k+dPdrhoetstar*(htstar-k-_wv_from_w(w)*_ev(np[l])-sum);
   for (spec=0; spec<ns; spec++){
     np[l].wk->amem+=dPdrhok[spec]*w[spec];
   }
@@ -1001,7 +981,7 @@ void find_prim_fluid_mem(np_t *np, long l, gl_t *gl, double P, double T){
 
 
 void find_U(np_t *np, long l, gl_t *gl, spec_t rhok, dim_t V, double T, double k, double psi, double Tv){
-  double rho,emix,sum;
+  double rho,emix,sum,ev,rhov;
   long dim,spec;
   spec_t w;
   bool ref_flag;
@@ -1025,16 +1005,19 @@ void find_U(np_t *np, long l, gl_t *gl, spec_t rhok, dim_t V, double T, double k
     w[spec]=rhok[spec]/rho;
   }
   emix=_e_from_w_T(w,T);
+  ev=_ev_from_w_Tv(gl->model.fluid.VIBDISTTYPE,w,Tv);
+  rhov=0.0;
+  for (spec=0; spec<ns; spec++) if (_isvib(spec)) rhov+=rhok[spec];
   sum=0.0e0;
   for (dim=0; dim<nd; dim++){
     np[l].bs->U[ns+dim]=rho*V[dim];
     sum=sum+sqr(V[dim]);
   }
   np[l].bs->U[fluxet]=rho*(0.5e0*(sum)+k+emix
-                       +rhok[specN2]/rho*_ev_from_T(Tv));
+                       +_wv_from_w(w)*ev);
   np[l].bs->U[fluxtke]=rho*k;
   np[l].bs->U[fluxpsi]=rho*psi;
-  np[l].bs->U[fluxev]=rhok[specN2]*_ev_from_T(Tv);
+  np[l].bs->U[fluxev]=rhov*ev;
   if (is_node_resumed(np[l])) {
     np[l].wk->Tmem=T;
     find_prim_fluid(np,l,gl);
@@ -1043,7 +1026,7 @@ void find_U(np_t *np, long l, gl_t *gl, spec_t rhok, dim_t V, double T, double k
 
 
 void find_U_2(np_t *np, long l, gl_t *gl, spec_t w, dim_t V, double P, double T, double k, double psi, double Tv){
-  double sum,rho,emix;
+  double sum,rho,emix,ev;
   long spec,dim;
   bool ref_flag;
 
@@ -1056,6 +1039,7 @@ void find_U_2(np_t *np, long l, gl_t *gl, spec_t w, dim_t V, double P, double T,
   reformat_k_psi(gl,&k,&psi,"",&ref_flag);
 
   emix=_e_from_w_T(w,T);
+  ev=_ev_from_w_Tv(gl->model.fluid.VIBDISTTYPE,w,Tv);
   rho=_rho_from_w_P_T(w,P,T);
   for (spec=0; spec<ns; spec++){
     np[l].bs->U[spec]=rho*w[spec];
@@ -1066,10 +1050,10 @@ void find_U_2(np_t *np, long l, gl_t *gl, spec_t w, dim_t V, double P, double T,
     sum=sum+sqr(V[dim]);
   }
   np[l].bs->U[fluxet]=rho*(0.5e0*(sum)+emix+k
-                            +w[specN2]*_ev_from_T(Tv));
+                            +_wv_from_w(w)*ev);
   np[l].bs->U[fluxtke]=rho*k;
   np[l].bs->U[fluxpsi]=rho*psi;
-  np[l].bs->U[fluxev]=rho*w[specN2]*_ev_from_T(Tv);
+  np[l].bs->U[fluxev]=rho*_wv_from_w(w)*ev;
   if (is_node_resumed(np[l])){
     np[l].wk->Tmem=T;
     find_prim_fluid_mem(np, l, gl, P, T);
@@ -1101,7 +1085,7 @@ void find_U_3(np_t *np, long l, gl_t *gl, spec_t rhok, dim_t V, double Pstar, do
 
 void find_prim_fluid(np_t *np, long l, gl_t *gl){
   long dim,spec;
-  double ev,Tv,rho,P,T,sum,k,psi,e;
+  double ev,Tv,rho,P,T,sum,k,psi,e,wv;
   spec_t w;
   dim_t V;
   bool ref_flag;
@@ -1132,37 +1116,44 @@ void find_prim_fluid(np_t *np, long l, gl_t *gl){
   assert_np(np[l],rho!=0.0e0);
   k=np[l].bs->U[fluxtke]/rho;
   psi=np[l].bs->U[fluxpsi]/rho;
-  ev=np[l].bs->U[fluxev]/(rho*w[specN2]);
+  wv=_wv_from_w(w);
+  if (wv!=0.0) {
+    ev=np[l].bs->U[fluxev]/(rho*wv);
+  } else {
+    /* no species vibrates: the vibrational energy equation is passive */
+    ev=0.0;
+    np[l].bs->U[fluxev]=0.0;
+  }
   /* clip ev and adjust U*/
-  if (ev<_ev_from_T(gl->model.fluid.Tvmin)){
-    ev=_ev_from_T(gl->model.fluid.Tvmin); 
-    np[l].bs->U[fluxev]=ev*(rho*w[specN2]);
+  if (ev<_ev_from_w_Tv(gl->model.fluid.VIBDISTTYPE,w,gl->model.fluid.Tvmin)){
+    ev=_ev_from_w_Tv(gl->model.fluid.VIBDISTTYPE,w,gl->model.fluid.Tvmin); 
+    np[l].bs->U[fluxev]=ev*(rho*wv);
     add_to_clipped_variables(gl,"Tvmin");
   }
-  if (ev>_ev_from_T(gl->model.fluid.Tvmax)){
-    ev=_ev_from_T(gl->model.fluid.Tvmax); 
-    np[l].bs->U[fluxev]=ev*(rho*w[specN2]);
+  if (ev>_ev_from_w_Tv(gl->model.fluid.VIBDISTTYPE,w,gl->model.fluid.Tvmax)){
+    ev=_ev_from_w_Tv(gl->model.fluid.VIBDISTTYPE,w,gl->model.fluid.Tvmax); 
+    np[l].bs->U[fluxev]=ev*(rho*wv);
     add_to_clipped_variables(gl,"Tvmax");
   }
-  Tv=_Tv_from_ev(ev);
-  e=np[l].bs->U[fluxet]/rho-0.5e0*sum-k-w[specN2]*ev;
+  e=np[l].bs->U[fluxet]/rho-0.5e0*sum-k-wv*ev;
   /* clip e and adjust U*/
   if (e<_e_from_w_T(w, gl->model.fluid.Tmin)){
     e=_e_from_w_T(w, gl->model.fluid.Tmin); 
-    np[l].bs->U[fluxet]=rho*(e+0.5e0*sum+k+w[specN2]*ev);
+    np[l].bs->U[fluxet]=rho*(e+0.5e0*sum+k+wv*ev);
     add_to_clipped_variables(gl,"Tmin");
   }
   if (e>_e_from_w_T(w, gl->model.fluid.Tmax)){
     e=_e_from_w_T(w, gl->model.fluid.Tmax); 
-    np[l].bs->U[fluxet]=rho*(e+0.5e0*sum+k+w[specN2]*ev);
+    np[l].bs->U[fluxet]=rho*(e+0.5e0*sum+k+wv*ev);
     add_to_clipped_variables(gl,"Tmax");
   }
   T=_T_from_w_e(w,e);
   np[l].wk->Tmem=T;
   P=_P_from_w_rho_T(w,rho,T);
+  Tv=_Tv_from_w_T_ev(gl,w,T,ev);
 
   /*
-  ret=2.0e0/3.0e0*k+dPdrhoetstar*(htstar-sum-k-w[specN2]*_ev(np[l]));
+  ret=2.0e0/3.0e0*k+dPdrhoetstar*(htstar-sum-k-_wv_from_w(w)*_ev(np[l]));
     for (spec=0; spec<ns; spec++){
       ret+=dPdrhok[spec]*w[spec];
     }

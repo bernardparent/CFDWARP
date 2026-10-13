@@ -613,47 +613,6 @@ double _he_from_Te(double Te){
 
 
 
-/* Nitrogen vibration energy */
-
-double _Tv_from_ev(double ev){
-  double Tv;
-  if (ev>THERMO_EVLIM) {
-    Tv=THERMO_THETAV/log(THERMO_RN2*THERMO_THETAV/ev+1.0);
-  } else {
-    Tv=ev/THERMO_EVLIM*THERMO_TVLIM;
-  } 
-  return(Tv);
-}
-
-double _ev_from_T(double T){
-  double ev;
-
-  ev=T/THERMO_TVLIM*THERMO_EVLIM;
-  if (ev>THERMO_EVLIM) {
-    ev=THERMO_RN2*THERMO_THETAV/(exp(THERMO_THETAV/T)-1.0);
-  }
-  return(ev);
-}
-
-
-
-
-double _dev_dTv_from_Tv(double T){
-  double _dev_dTv_from_Tv;
-  if (T<THERMO_TVLIM) {
-    _dev_dTv_from_Tv=1.0/THERMO_TVLIM*THERMO_EVLIM;
-  } else {
-    _dev_dTv_from_Tv=THERMO_RN2*sqr(THERMO_THETAV)*exp(THERMO_THETAV/T)/sqr(T)/sqr(exp(THERMO_THETAV/T)-1.0);
-  }
-  return(_dev_dTv_from_Tv);
-}
-
-
-
-
-
-
-
 double _s_from_w_T(spec_t w, double T){
   double smix;
   long spec;

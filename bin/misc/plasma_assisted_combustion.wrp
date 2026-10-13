@@ -225,9 +225,11 @@ Bdry(
 Model(
   NavierStokesPlasma(
     TEMODEL=TEMODEL_LOCAL;    {set TEMODEL to TEMODEL_LOCAL, TEMODEL_TRANSPORT, or TEMODEL_CONSTANT}
-    N2VIBMODEL=N2VIBMODEL_PARENT2024;
+    VibSpecies("N2");  {species with vibrationally excited states}
+    TAUVTMODEL=TAUVTMODEL_PARENT2024;
+    QEVMODEL=QEVMODEL_PARENT2024;
+    VIBDISTTYPE=VIBDISTTYPE_BOLTZMANN;
     emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
-    N2VIBJOULEHEATING=YES; {solve the nitrogen vibration energy joule heating source terms?}
     REACTING=YES;   {solve chemical reactions?}
     sigmadiv=1e-10; {minimum magnitude of sigma in S/m allowed when sigma appears on the denominator }
     etdiv=1e-1;     {minimum magnitude of et in J/kg allowed when et appears on the denominator}

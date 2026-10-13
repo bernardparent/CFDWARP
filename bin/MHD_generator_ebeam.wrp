@@ -214,8 +214,10 @@ Model(
   NavierStokesPlasma(
     TEMODEL=TEMODEL_LOCAL;
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
-    N2VIBMODEL=N2VIBMODEL_PARENT2024;
-    N2VIBJOULEHEATING=YES;
+    VibSpecies("N2");  {species with vibrationally excited states}
+    TAUVTMODEL=TAUVTMODEL_PARENT2024;
+    QEVMODEL=QEVMODEL_ALEKSANDROV;
+    VIBDISTTYPE=VIBDISTTYPE_BOLTZMANN;
     REACTING=YES;
     INCLUDE_E_EFFECTS_ON_ION_MOBILITY=YES; 
     INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY=NO; 
@@ -223,7 +225,6 @@ Model(
     emissivity=0.0;            {emissivity coefficient of the gas mixture needed for radiation heat transfer}
     emfieldworkfact=1.0;   {factor multiplying the emfield work and heat source terms}
     emfieldheatfact=1.0;
-    N2VIBJOULEHEATINGMODEL=N2VIBJOULEHEATINGMODEL_ALEKSANDROV;
     sigmadiv=1e-10; {S/m}
     etdiv=1e-1;     {J/kg}
     Pmin=5000;    Pmax=9.9e99;   {Pa}

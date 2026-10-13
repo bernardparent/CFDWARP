@@ -235,8 +235,10 @@ Model(
   NavierStokesPlasma(
     TEMODEL=TEMODEL_TRANSPORT;
     TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
-    N2VIBMODEL=N2VIBMODEL_EQUILIBRIUM;
-    N2VIBJOULEHEATING=NO;
+    VibSpecies("N2");  {species with vibrationally excited states}
+    TAUVTMODEL=TAUVTMODEL_TEQUILIBRIUM;
+    QEVMODEL=QEVMODEL_NONE;
+    VIBDISTTYPE=VIBDISTTYPE_BOLTZMANN;
     REACTING=YES;
     emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
     sigmadiv=1e-10; {S/m}

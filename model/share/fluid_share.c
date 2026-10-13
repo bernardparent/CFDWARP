@@ -656,22 +656,6 @@ void find_w_V_P_T_bdry_symmetrical(np_t *np, gl_t *gl,  long lA, long lB, long l
 #endif
 
 
-#if _FLUID_N2VIBMODEL
-double _kappav (np_t *np, long l, gl_t *gl) {
-  double kappav;
-  double Tv,Pr,T,cp;
-  spec_t w;
-  Tv=_Tv(np[l]);
-  T=_T(np[l],gl);
-  find_w(np[l],w);
-  cp=_cp_from_w_T_equilibrium(w,T);
-  Pr=_eta(np,l,gl)*cp/_kappa(np,l,gl);
-  kappav=w[specN2]*(_eta(np,l,gl)/Pr)*_dev_dTv_from_Tv(Tv);  
-  return(kappav);
-}
-#endif
-
-
 #ifdef _FLUID_FAVREREYNOLDS
 
 
@@ -952,22 +936,6 @@ double _etapsistar (np_t *np, long l, gl_t *gl) {
   }
   return(etapsistar);
 }
-
-
-#if _FLUID_N2VIBMODEL
-double _kappavstar (np_t *np, long l, gl_t *gl) {
-  double kappavstar;
-  double Tv,Pr,T,cp;
-  spec_t w;
-  Tv=_Tv(np[l]);
-  T=_T(np[l],gl);
-  find_w(np[l],w);
-  cp=_cp_from_w_T_equilibrium(w,T);
-  Pr=_eta(np,l,gl)*cp/_kappa(np,l,gl);
-  kappavstar=w[specN2]*(_eta(np,l,gl)/Pr+_etat(np,l,gl)/gl->model.fluid.Prt)*_dev_dTv_from_Tv(Tv);  
-  return(kappavstar);
-}
-#endif
 
 
 void find_k_psi_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC, double *k, double *psi){
@@ -2283,10 +2251,21 @@ void find_LambdaZ(np_t *np, gl_t *gl, long l, sqmat_t LambdaZ) {
 
 
 
+/* the last neutral species: used by the templates when the chemical solver has neither N2, O2 nor CO2 */
+static long _template_neutral_species(void){
+  long spec,specneutral;
+  specneutral=ns-1;
+  for (spec=0; spec<ns; spec++) if (speciestype[spec]==SPECIES_NEUTRAL) specneutral=spec;
+  return(specneutral);
+}
+
+
 void find_init_mass_fraction_templates(char **specstr1, char **specstr2){
   char *specname;
   *specstr1=(char *)realloc(*specstr1,1000*sizeof(char));
   *specstr2=(char *)realloc(*specstr2,1000*sizeof(char));
+  strcpy(*specstr1,"");
+  strcpy(*specstr2,"");
   #if (defined(specN2) && defined(specO2))
     strcpy(*specstr1,
     "    Species(\"O2\", \"N2\"");
@@ -2322,6 +2301,15 @@ void find_init_mass_fraction_templates(char **specstr1, char **specstr2){
     );  
     strcpy(*specstr2, ",w_CO2,w_default");
   #endif
+  if (ns>1 && strlen(*specstr1)==0){
+    specname=(char *)malloc(sizeof(char));
+    find_species_name(_template_neutral_species(), &specname);
+    sprintf(*specstr1,"    Species(\"%s\", \"default\");\n",specname);
+    find_species_variable_name(_template_neutral_species(), &specname);
+    sprintf(*specstr1+strlen(*specstr1),"    w_%s=1.0;\n    w_default=1e-30;\n",specname);
+    sprintf(*specstr2,",w_%s,w_default",specname);
+    free(specname);   
+  }
   if (ns==1){
     specname=(char *)malloc(sizeof(char));
     find_species_variable_name(0, &specname);
@@ -2340,6 +2328,8 @@ void find_init_molar_fraction_templates(char **specstr1, char **specstr2){
   char *specname;
   *specstr1=(char *)realloc(*specstr1,1000*sizeof(char));
   *specstr2=(char *)realloc(*specstr2,1000*sizeof(char));
+  strcpy(*specstr1,"");
+  strcpy(*specstr2,"");
   chargedstr1=(char *)malloc(1000*sizeof(char));
   chargedstr2=(char *)malloc(1000*sizeof(char));
   chargedstr3=(char *)malloc(1000*sizeof(char));
@@ -2420,6 +2410,15 @@ void find_init_molar_fraction_templates(char **specstr1, char **specstr2){
     );  
     strcpy(*specstr2, ",chi_CO2,chi_default");
   #endif
+  if (ns>1 && strlen(*specstr1)==0){
+    specname=(char *)malloc(sizeof(char));
+    find_species_name(_template_neutral_species(), &specname);
+    sprintf(*specstr1,"    Species(\"%s\"%s,\"default\");\n",specname,chargedstr3);
+    find_species_variable_name(_template_neutral_species(), &specname);
+    sprintf(*specstr1+strlen(*specstr1),"    chi_%s=1.0;\n%s    chi_default=1e-30;\n",specname,chargedstr1);
+    sprintf(*specstr2,",chi_%s%s,chi_default",specname,chargedstr2);
+    free(specname);   
+  }
   if (ns==1){
     specname=(char *)malloc(sizeof(char));
     find_species_variable_name(0, &specname);

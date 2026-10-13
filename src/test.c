@@ -329,6 +329,22 @@ void test_dS_dU ( np_t * np, gl_t * gl, long l ) {
   display_matrix ( Cnum );
 }
 
+#if _FLUID_VIBMODEL
+void test_dSvib_dU_local ( np_t * np, gl_t * gl, long l ) {
+
+  printf ( "\n" );
+  printf ( "Testing the Jacobian of the vibrational energy source terms.\n" );
+  printf ( "The numerical jacobian is function of the Uref vector in the control file.\n" );
+  printf ( "The terms are determined at node " );
+  printf_ijk_position_of_node_l ( gl, l );
+  printf ( ".\n" );
+
+  test_dSvib_dU ( np, gl, l );
+
+}
+#endif
+
+
 void test_dSchem_dU_local ( np_t * np, gl_t * gl, long l ) {
 
   printf ( "\n" );
@@ -697,6 +713,50 @@ void test_h ( double Tmin, double Tmax, double dT ) {
   } while ( T < Tmax );
 
 }
+
+
+#if _FLUID_VIBMODEL
+/* vibrational energy and specific heat of each species with vibrational data, and the round 
+   trip T -> ev -> Tv through find_vibdist() */
+void test_ev ( gl_t *gl, double Tmin, double Tmax, double dT ) {
+  double T, ev, cv, cvnum, dTnum, errcv, errTv;
+  spec_t Nk;
+  long spec, spec2;
+  char *specname;
+  vibdist_t vibdist;
+  specname=(char *)malloc(sizeof(char));
+  printf ( "\n" );
+  printf ( "Vibrational energy ev [J/kg] and specific heat cv=dev/dT [J/kgK] of each species with vibrational data\n" );
+  printf ( "at equilibrium, as a function of temperature [K]. cvnum is cv found from ev by finite differences.\n" );
+  printf ( "Tv is the vibrational temperature found by find_vibdist() from ev; it should be equal to T.\n" );
+  printf ( "Tmin=%EK Tmax=%EK dT=%EK.\n", Tmin, Tmax, dT );
+  for ( spec = 0; spec < ns; spec++ ) {
+    if (is_vib_data_available(spec)) {
+      find_species_name(spec, &specname);
+      printf ( "\nSpecies %s, characteristic vibrational temperature of the lowest mode %EK\n", specname, _thetavk(spec) );
+      printf ( "           T           ev           cv        cvnum   rel.err.cv           Tv   rel.err.Tv\n");
+      errcv=0.0;
+      errTv=0.0;
+      T = Tmin;
+      do {
+        ev=_evk_from_T(spec,T);
+        cv=_cvk_from_T(spec,T);
+        dTnum=T*1.0e-6;
+        cvnum=(_evk_from_T(spec,T+dTnum)-_evk_from_T(spec,T-dTnum))/(2.0*dTnum);
+        for ( spec2 = 0; spec2 < ns; spec2++ ) Nk[spec2]=0.0;
+        Nk[spec]=1.0e24;
+        find_vibdist(gl, VIBDISTTYPE_BOLTZMANN, Nk, 300.0, ev, 0.0, &vibdist);
+        printf ( "%12.5E %12.5E %12.5E %12.5E %+12.5E %12.5E %+12.5E\n", T, ev, cv, cvnum, (cvnum-cv)/cv, vibdist.Tv, (vibdist.Tv-T)/T );
+        errcv=max(errcv,fabs((cvnum-cv)/cv));
+        errTv=max(errTv,fabs((vibdist.Tv-T)/T));
+        T += dT;
+      } while ( T < Tmax );
+      printf ( "maximum relative error on cv: %E;  maximum relative error on Tv: %E\n", errcv, errTv );
+    }
+  }
+  free(specname);
+}
+#endif
 
 
 void test_hmolar ( double Tmin, double Tmax, double dT ) {
@@ -1171,6 +1231,11 @@ void output_options_help(int linewidth){
       write_options_row ( stderr, "dSchemdU", "none", 
                           "dSchem/dU Jacobian  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop dSchemdU", linewidth,
                           lengthcol1, lengthcol2 );
+#if _FLUID_VIBMODEL
+      write_options_row ( stderr, "dSvibdU", "none", 
+                          "dSvib/dU Jacobian of the vibrational energy source terms  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop dSvibdU", linewidth,
+                          lengthcol1, lengthcol2 );
+#endif
       write_options_row ( stderr, "Linv", "none", 
                           "Right eigenvectors  ./test -r test.wrp -node 10 10"if3D(" 10")" -prop Linv", linewidth, lengthcol1,
                           lengthcol2 );
@@ -1203,6 +1268,10 @@ void output_options_help(int linewidth){
                           linewidth, lengthcol1, lengthcol2 );
       write_options_row ( stderr, "hmolar", "none", "species molar specific enthalpy  ./test -prop hmolar -Tmin 500 -Tmax 2000 -dT 2",
                           linewidth, lengthcol1, lengthcol2 );
+#if _FLUID_VIBMODEL
+      write_options_row ( stderr, "ev", "none", "species vibrational energy  ./test -prop ev -Tmin 300 -Tmax 20000 -dT 100",
+                          linewidth, lengthcol1, lengthcol2 );
+#endif
       write_options_row ( stderr, "cp", "none", "species specific heat  ./test -prop cp -Tmin 500 -Tmax 2000 -dT 2",
                           linewidth, lengthcol1, lengthcol2 );
       write_options_row ( stderr, "s", "none", "species specific entropy  ./test -prop s -Tmin 500 -Tmax 2000 -dT 2",
@@ -1259,6 +1328,9 @@ int main ( int argc, char **argv ) {
   double *argdouble, argonedouble;
   double sum;
   spec_t chik;
+#if _FLUID_VIBMODEL
+  bool isvibspec[ns];
+#endif
   double P, Tmin, Tmax, dT;
 #endif
   int term_width, term_height, linewidth;
@@ -1400,6 +1472,12 @@ int main ( int argc, char **argv ) {
         test_dSchem_dU_local ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
         VALIDOPTIONS=TRUE;
       }
+#if _FLUID_VIBMODEL
+      if ( strcmp ( "dSvibdU", propstring ) == 0 ) {
+        test_dSvib_dU_local ( npArray, &gl, _ai ( &gl, node_i, node_j, node_k ) );
+        VALIDOPTIONS=TRUE;
+      }
+#endif
       if ( strcmp ( "Roe", propstring ) == 0 ) {
         test_Roe_average ( npArray, &gl, lL, lR, theta );
         VALIDOPTIONS=TRUE;
@@ -1515,6 +1593,26 @@ int main ( int argc, char **argv ) {
   }
 #endif
   
+#if _FLUID_VIBMODEL
+  /* without a control file, the species with vibrationally excited states are N2 (as with
+     VibSpecies("N2");), or all species with vibrational data for -prop ev */
+  if (!CONTROL) {
+    for ( spec = 0; spec < ns; spec++ ) isvibspec[spec]=FALSE;
+    if ( strcmp ( "ev", propstring ) == 0 ) {
+      for ( spec = 0; spec < ns; spec++ ) isvibspec[spec]=is_vib_data_available(spec);
+    } else {
+#ifdef specN2
+      isvibspec[specN2]=TRUE;
+#endif
+    }
+    set_vibspecies(isvibspec);
+    if ( strcmp ( "ev", propstring ) == 0 ){
+      test_ev ( &gl, Tmin, Tmax, dT );
+      VALIDOPTIONS=TRUE;
+    }
+  }
+#endif
+
 #ifdef _FLUID_MULTISPECIES
   if (!CONTROL) {
     if ( strcmp ( "h", propstring ) == 0 ){

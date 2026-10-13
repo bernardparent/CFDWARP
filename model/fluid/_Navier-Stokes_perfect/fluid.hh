@@ -5,7 +5,7 @@
 #define _FLUID_DIFFUSION TRUE
 #define _FLUID_SOURCE TRUE
 #define _FLUID_ACTIONNAME "NavierStokesPerfect"
-#define _FLUID_N2VIBMODEL FALSE
+#define _FLUID_VIBMODEL FALSE
 #define _FLUID_EENERGY FALSE
 #define _FLUID_FBODY_QADD
 #define fluxmom 1

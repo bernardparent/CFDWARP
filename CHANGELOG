@@ -7,6 +7,474 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 OCT 12a
+  * the vibrational energy equation of _Navier-Stokes_plasma, _Favre-Reynolds_plasma and
+    _Favre-Reynolds_Tv is no longer limited to N2: the species with vibrationally excited
+    states are listed with VibSpecies() within Model(<fluid>()), e.g. VibSpecies("N2","CO"); or
+    VibSpecies(); if no species vibrates (the vibrational energy equation is then passive and
+    rho*ev remains zero); VibSpecies() has no default and must be called
+  * N2VIBMODEL is replaced by TAUVTMODEL (V-T relaxation time: TAUVTMODEL_PARENT2024,
+    TAUVTMODEL_MILLIKANWHITE, TAUVTMODEL_TEQUILIBRIUM) and QEVMODEL (e-V excitation:
+    QEVMODEL_NONE, QEVMODEL_ALEKSANDROV, QEVMODEL_PARENT2024, QEVMODEL_RODRIGUEZ2025,
+    QEVMODEL_RODRIGUEZ2026); N2VIBJOULEHEATING is replaced by QEVMODEL; the distribution of
+    the vibrational states is set by VIBDISTTYPE=VIBDISTTYPE_BOLTZMANN; N2VIBMODEL and
+    N2VIBJOULEHEATING now give a deprecation error that lists the replacement lines; existing
+    control files must be updated (those in /bin have been)
+  * results change: (i) MUSCL reconstruction, vibrational energy conduction and the
+    extrapolated boundary conditions now act on ev instead of Tv; (ii) the gain part of the
+    V-T source term and the chemical source term of species formed are no longer included in
+    the source term Jacobian (they are included when TEST is defined), which changes the
+    convergence path; (iii) in _Favre-Reynolds_plasma, QEVMODEL_ALEKSANDROV includes the N2
+    molar fraction factor of _Navier-Stokes_plasma; (iv) TAUVTMODEL_MILLIKANWHITE differs
+    from the former N2VIBMODEL_RODRIGUEZ2026 relaxation time: electrons and negative ions are
+    now excluded from the Millikan-White average as intended, the average is taken on the
+    inverse of tau (harmonic mean) and the pressure is found from rhok and T
+  * the template of _Navier-Stokes_plasma now writes TEMODEL_TRANSPORT_RODRIGUEZ2025 with
+    QEVMODEL_RODRIGUEZ2025; QEVMODEL_RODRIGUEZ2025/2026 and TEMODEL_TRANSPORT_RODRIGUEZ2025/2026
+    must be used together
+  * the three modules no longer require N2 in the chemical solver
+  * _FLUID_N2VIBMODEL is renamed _FLUID_VIBMODEL
+  * /model/thermo/_generic/enthalpy_sai.c is not used and should be deleted
+  * in /model/thermo/_generic/vibration.c (new file)
+    - added _vibdata_index(): index of a species in the table of vibrational data vibdata[]
+    - added is_vib_data_available(): TRUE if a species has vibrational data
+    - added find_vib_data_species_list(): list of the species with vibrational data
+    - added is_vib_state_in_chem(): TRUE if the chemical solver has vibrational states of a
+      species as separate species
+    - added _evk_mode(): vibrational energy of one mode of a harmonic oscillator
+    - added _evk_Boltzmann(): vibrational energy of a species at equilibrium
+    - added init_vibdata(): characteristic temperatures, gas constants and linear extension
+      temperatures of the species from vibdata[]
+    - added set_vibspecies(): sets the species with vibrationally excited states, once
+    - added _isvib(): TRUE if a species has vibrationally excited states
+    - added _numvibspecies(): number of species with vibrationally excited states
+    - added check_spec(): fatal error if a species has no vibrational data
+    - added _thetavk(): characteristic vibrational temperature of the lowest mode
+    - added _evk_from_T(): vibrational energy of a species at equilibrium at T
+    - added _cvk_from_T(): vibrational specific heat of a species at equilibrium at T
+    - added _svk_from_T(): vibrational entropy of a species at equilibrium at T
+    - added _dsvk_dT_from_T(): derivative of the vibrational entropy with respect to T
+    - added _wv_from_w(): sum of the mass fractions of the vibrating species
+    - added _ev_from_w_Tv(): vibrational energy per unit mass of vibrating species of a
+      distribution with characteristic temperature Tv; fatal error if VIBDISTTYPE is not
+      VIBDISTTYPE_BOLTZMANN
+    - added find_vibdist_Boltzmann(): Boltzmann distribution at a common Tv found from ev
+    - added find_vibdist(): distribution of the vibrational states from the number densities,
+      T, ev and dev/dt; fatal error if VIBDISTTYPE is not VIBDISTTYPE_BOLTZMANN
+  * in /model/thermo/_generic/Makefile
+    - added vibration.c
+  * in /model/thermo/_generic/thermo.c
+    - removed _Tv_from_ev(): replaced by find_vibdist()
+    - removed _ev_from_T(): replaced by _evk_from_T() and _ev_from_w_Tv()
+    - removed _dev_dTv_from_Tv(): replaced by _cvk_from_T()
+  * in /model/thermo/_generic/thermo.h
+    - removed THERMO_RN2, THERMO_THETAV, THERMO_EVLIM, THERMO_TVLIM
+  * in /model/thermo/_thermo.h
+    - added VIBDISTTYPE_BOLTZMANN, vibdist_t and the prototypes of vibration.c; removed the
+      prototypes of _Tv_from_ev(), _ev_from_T(), _dev_dTv_from_Tv()
+  * in /model/thermo/_generic/enthalpy.c
+    - in _cpk_from_T_eval(), the vibrational specific heat is removed for every species with
+      vibrationally excited states instead of N2 only
+    - in _hk_from_T_eval(), the vibrational energy is removed for every species with
+      vibrationally excited states instead of N2 only
+    - in _sk_from_T(), the vibrational entropy is removed for every species with
+      vibrationally excited states instead of N2 only
+    - in _dsk_dT_from_T(), the derivative of the vibrational entropy is removed for every
+      species with vibrationally excited states instead of N2 only
+  * in /model/share/fluid_vib.c (new file, holds the vibrational functions of fluid_share.c)
+    - added _nuv(): diffusion coefficient of ev, rho*Dv=kappav/cv
+    - added _nuvstar(): rho*Dv including turbulent diffusion
+    - added _wv(): sum of the mass fractions of the vibrating species at a node
+    - added _ev(): vibrational energy per unit mass of vibrating species at a node
+    - added _evzero(): vibrational energy at equilibrium at T at a node
+    - added find_vibdist_from_np(): find_vibdist() at a node
+    - added _Tv(): vibrational temperature at a node
+    - added _Tvk(): vibrational temperature of a species at a node, from the population of its
+      first vibrational level (T if it does not vibrate); fatal error if the species is not
+      part of the chemical solver
+    - added _Tv_from_w_T_ev(): vibrational temperature from the composition, T and ev
+    - added reformat_ev(): clips ev between its values at Tvmin and Tvmax
+    - added find_dev_dU(): derivatives of ev with respect to U
+    - added _Tv_from_np_ev(): vibrational temperature from ev with the composition of a node
+    - added find_dTv_dU(): derivatives of Tv with respect to U for every vibrating species
+    - added read_model_fluid_actions_vib_species(): the VibSpecies() action
+    - added add_vib_constants_to_codex(): TAUVTMODEL, QEVMODEL, VIBDISTTYPE constants and the
+      deprecated N2VIBMODEL constants
+    - added fatal_error_N2VIBMODEL_deprecated(): deprecation message with the replacement lines
+    - added read_model_fluid_vib(): reads and checks TAUVTMODEL, QEVMODEL, VIBDISTTYPE
+    - added _tauvt_Macheret(): moved from _Navier-Stokes_plasma
+    - added _tauvtk_MillikanWhite(): Millikan-White and Park V-T relaxation time of a species
+      in a mixture
+    - added find_tauvtk(): V-T relaxation time of each vibrating species
+    - added find_tauvtk_d1overtauvtk(): V-T relaxation times and the derivatives of their
+      inverse
+    - added find_Svib_VT(): V-T relaxation source term summed over the vibrating species
+    - added find_dSvib_VT_dU(): Jacobian of the V-T source term; gain part only with TEST
+    - added test_dSvib_dU_display(): displays the analytical and numerical Jacobians
+    - added _Qev(): e-V excitation, moved from find_Semfield() of _Navier-Stokes_plasma
+    - added find_dQev_dU(): Jacobian of the e-V de-excitation terms, moved from
+      find_dSemfield_dU() of _Navier-Stokes_plasma
+    - added _kappav(): vibrational conductivity summed over the vibrating species (was
+      N2 only in fluid_share.c)
+    - added _kappavstar(): vibrational conductivity including the turbulent conductivity
+  * in /model/share/fluid_vib.h (new file)
+    - added the TAUVTMODEL, QEVMODEL and deprecated N2VIBMODEL constants
+    - added the prototypes of the functions of fluid_vib.c
+  * in /model/share/Makefile
+    - added fluid_vib.c
+  * in /model/share/fluid_share.c
+    - added _template_neutral_species(): neutral species used by the templates when the
+      chemical solver has neither N2, O2 nor CO2
+    - removed _kappav(): moved to fluid_vib.c
+    - removed _kappavstar(): moved to fluid_vib.c
+    - in find_init_mass_fraction_templates(), the template no longer contains uninitialized
+      strings when the chemical solver has neither N2, O2 nor CO2
+    - in find_init_molar_fraction_templates(), same as above
+  * in /model/share/fluid_share.h
+    - removed the prototypes of _kappav() and _kappavstar(), now in fluid_vib.h
+  * in /model/fluid/_fluid.h
+    - removed the prototype of _Tv(), now in fluid_vib.h
+  * in /model/_model.h
+    - added the prototype of test_dSvib_dU()
+  * in /model/fluid/_Navier-Stokes_plasma/fluid.h
+    - removed the N2VIBMODEL constants and the prototypes of _Tv(), _ev(), _evzero() and
+      find_dTv_dU(), now in fluid_vib.h
+  * in /model/fluid/_Navier-Stokes_plasma/fluid.hh
+    - _FLUID_N2VIBMODEL renamed _FLUID_VIBMODEL
+    - in gl_model_fluid_t, N2VIBMODEL is replaced by TAUVTMODEL, QEVMODEL, VIBDISTTYPE and
+      VIBSPECIESREAD
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid.h
+    - removed the N2VIBMODEL constants and the prototypes of _Tv(), _ev(), _evzero() and
+      find_dTv_dU(), now in fluid_vib.h
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid.hh
+    - _FLUID_N2VIBMODEL renamed _FLUID_VIBMODEL
+    - in gl_model_fluid_t, N2VIBMODEL and N2VIBJOULEHEATING is replaced by TAUVTMODEL, QEVMODEL, VIBDISTTYPE and
+      VIBSPECIESREAD
+  * in /model/fluid/_Favre-Reynolds_Tv/fluid.h
+    - removed the N2VIBMODEL constants and the prototypes of _Tv(), _ev(), _evzero() and
+      find_dTv_dU(), now in fluid_vib.h
+  * in /model/fluid/_Favre-Reynolds_Tv/fluid.hh
+    - _FLUID_N2VIBMODEL renamed _FLUID_VIBMODEL
+    - in gl_model_fluid_t, N2VIBMODEL is replaced by TAUVTMODEL, QEVMODEL, VIBDISTTYPE and
+      VIBSPECIESREAD
+  * in /model/fluid/_Navier-Stokes/fluid.hh
+    - _FLUID_N2VIBMODEL renamed _FLUID_VIBMODEL
+  * in /model/fluid/_Navier-Stokes_perfect/fluid.hh
+    - _FLUID_N2VIBMODEL renamed _FLUID_VIBMODEL
+  * in /model/fluid/_Favre-Reynolds/fluid.hh
+    - _FLUID_N2VIBMODEL renamed _FLUID_VIBMODEL
+  * in /model/fluid/_drift-diffusion/fluid.hh
+    - _FLUID_N2VIBMODEL renamed _FLUID_VIBMODEL
+  * in /model/fluid/_Navier-Stokes_plasma/fluid.c
+    - removed _Tv(): moved to fluid_vib.c
+    - removed _ev(): moved to fluid_vib.c
+    - removed _evzero(): moved to fluid_vib.c
+    - removed find_dTv_dU(): moved to fluid_vib.c
+    - in _a(), w[specN2] is replaced by the sum of the mass fractions of the vibrating species
+    - in _kappan(), the vibrational conductivity of every vibrating species is removed
+    - in add_dUstar_to_U(), TAUVTMODEL_TEQUILIBRIUM replaces N2VIBMODEL_TEQUILIBRIUM; ev at
+      equilibrium of the mixture
+    - in find_G(), G[fluxev] is ev instead of Tv
+    - in find_Kstar_interface(), vibrational conduction acts on ev through rho*Dv; species
+      diffusion of the vibrational energy summed over the vibrating species
+    - in find_U(), rho*ev of the mixture from Tv
+    - in find_U_2(), rho*ev of the mixture from Tv
+    - in find_dG_dUstar(), fluxev row from the derivatives of ev
+    - in find_dP_dx(), w[specN2] is replaced by the sum of the mass fractions of the vibrating
+      species
+    - in find_dT_dx(), w[specN2] is replaced by the sum of the mass fractions of the vibrating
+      species
+    - in find_prim_fluid(), ev per unit mass of vibrating species clipped between its values at
+      Tvmin and Tvmax; Tv found by find_vibdist() once T is known; rho*ev set to zero if no species
+      vibrates
+    - in find_prim_fluid_mem(), vibrational conductivity removed for every vibrating species; mass
+      fraction of the vibrating species in the sound speed
+    - in read_model_fluid_actions(), reads VibSpecies(), TAUVTMODEL, QEVMODEL and VIBDISTTYPE
+      through the functions of fluid_vib.c; QEVMODEL and TEMODEL checks
+    - in read_model_fluid_actions_2(), calls read_model_fluid_actions_vib_species()
+    - in reformat_w(), wminN2 is applied only if N2 has vibrationally excited states
+    - in write_model_fluid_template(), writes VibSpecies(), TAUVTMODEL, QEVMODEL and VIBDISTTYPE
+      instead of N2VIBMODEL
+  * in /model/fluid/_Navier-Stokes_plasma/fluid_conv.c
+    - in _a_from_jacvars(), w[specN2] is replaced by the sum of the mass fractions of the vibrating
+      species
+    - in find_A_from_jacvars(), w[specN2] is replaced by the sum of the mass fractions of the
+      vibrating species
+    - in find_Fstar_from_jacvars(), w[specN2] is replaced by the sum of the mass fractions of the
+      vibrating species
+    - in find_LUstar_from_jacvars(), LUstar[fluxev] multiplied by the sum of the mass fractions of
+      the vibrating species, as the left eigenvectors
+    - in find_L_from_jacvars_eigenset2(), fluxev row multiplied by the sum of the mass fractions of
+      the vibrating species so that L remains defined when no species vibrates
+    - in find_Linv_from_jacvars_eigenset2(), fluxev column divided by the sum of the mass fractions
+      of the vibrating species
+    - in find_Uprime(), ev per unit mass of vibrating species; zero if no species vibrates
+    - in find_Ustar_from_jacvars(), w[specN2] is replaced by the sum of the mass fractions of the
+      vibrating species
+    - in find_Ustar_from_musclvars(), reconstructs ev instead of Tv
+    - in find_dFstar_dUstar(), w[specN2] is replaced by the sum of the mass fractions of the
+      vibrating species
+    - in find_dUstar_dUprime_from_jacvars(), derivatives with respect to the density of every
+      vibrating species
+    - in find_jacvars_at_interface_Roe_average(), w[specN2] is replaced by the sum of the mass
+      fractions of the vibrating species
+    - in find_jacvars_at_interface_arith_average(), w[specN2] is replaced by the sum of the mass
+      fractions of the vibrating species
+    - in find_jacvars_from_U(), ev per unit mass of vibrating species; zero if no species vibrates
+    - in find_jacvars_from_musclvars(), reconstructs ev instead of Tv
+    - in find_musclvars(), musclvars[fluxev] is ev instead of Tv
+    - in find_primvars_from_jacvars(), removed the unused Tv argument
+  * in /model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - added find_Svibstar(): V-T source term times Omega, used by -prop dSvibdU
+    - added test_dSvib_dU(): compares the analytical and numerical Jacobians of the V-T source term
+    - removed _tauvt_Gnoffo(): replaced by _tauvtk_MillikanWhite() in fluid_vib.c
+    - removed _tauvt_Macheret(): moved to fluid_vib.c
+    - removed find_Svib(): replaced by find_Svib_VT() in fluid_vib.c
+    - removed find_tauvt_d1overtauvt(): replaced by find_tauvtk_d1overtauvtk() in fluid_vib.c
+    - in _taueN2(), the N2 characteristic vibrational temperature is found from _thetavk()
+    - in find_Qe_Peters2019(), uses _Tvk() and _thetavk(); compiled only if the chemical solver
+      has N2
+    - in find_Qe_Rodriguez2024(), calls _Tv() with gl
+    - in find_Qe_Rodriguez2025(), uses _Tvk() and _thetavk(); compiled only if the chemical
+      solver has N2
+    - in find_Qe_Rodriguez2025_ADHOC(), uses _Tvk(); compiled only if the chemical solver has N2
+    - in find_Qe_Rodriguez2026(), uses _Tvk() and _thetavk(); compiled only if the chemical
+      solver has N2
+    - in find_Qen_Kim2012(), uses _evk_from_T(); compiled only if the chemical solver has N2
+    - in find_Schem(), chemical source term of the vibrational energy summed over the vibrating
+      species
+    - in find_Semfield(), e-V excitation moved to _Qev() of fluid_vib.c
+    - in find_Sstar(), calls find_Svib_VT()
+    - in find_dSchem_dU(), summed over the vibrating species; W[k]*cvk*dTv/dU is included only if
+      W[k]<0, or with TEST
+    - in find_dSe_dU(), calls _Tv() with gl
+    - in find_dSe_dU_transport_Kim2012(), uses _evk_from_T(); compiled only if the chemical solver
+      has N2
+    - in find_dSe_dU_transport_Peters2019(), uses _Tvk() and _thetavk(); compiled only if the
+      chemical solver has N2
+    - in find_dSe_dU_transport_Rodriguez2024(), calls _Tv() with gl
+    - in find_dSe_dU_transport_Rodriguez2025(), uses _Tvk() and _thetavk(); compiled only if the
+      chemical solver has N2
+    - in find_dSe_dU_transport_Rodriguez2025_ADHOC(), uses _Tvk(); compiled only if the chemical
+      solver has N2
+    - in find_dSe_dU_transport_Rodriguez2026(), uses _Tvk() and _thetavk(); compiled only if the
+      chemical solver has N2
+    - in find_dSemfield_dU(), e-V rows moved to find_dQev_dU() of fluid_vib.c
+    - in find_dSvib_dU(), calls find_dSvib_VT_dU() with the complete dT/dU; the derivative with
+      respect to rho*ev is no longer counted twice
+    - in test_dSchem_dU(), calls _Tv() with gl
+  * in /model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - in update_bdry_back_pressure(), ev is extrapolated instead of Tv
+    - in update_bdry_freestream(), calls _Tv() with gl
+    - in update_bdry_inflow(), calls _Tv() with gl
+    - in update_bdry_inflow_reservoir(), calls _Tv() with gl
+    - in update_bdry_inflow_reservoir_2(), calls _Tv() with gl
+    - in update_bdry_outflow(), ev is extrapolated instead of Tv
+    - in update_bdry_outflow_Mach(), ev is extrapolated instead of Tv
+    - in update_bdry_symmetrical(), ev is mirrored instead of Tv
+    - in update_bdry_wall(), at an adiabatic wall ev is mirrored instead of Tv
+  * in /model/fluid/_Navier-Stokes_plasma/fluid_init.c
+    - in find_default_initvar(), calls _Tv() with gl
+  * in /model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - in _Tstag(), sum of the mass fractions of the vibrating species
+    - in find_post_variable_value_fluid(), calls _Tv() with gl
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid.c
+    - removed _Tv(): moved to fluid_vib.c
+    - removed _ev(): moved to fluid_vib.c
+    - removed _evzero(): moved to fluid_vib.c
+    - removed find_dTv_dU(): moved to fluid_vib.c
+    - in _a(), w[specN2] is replaced by the sum of the mass fractions of the vibrating species
+    - in _kappan(), the vibrational conductivity of every vibrating species is removed
+    - in add_dUstar_to_U(), TAUVTMODEL_TEQUILIBRIUM replaces N2VIBMODEL_TEQUILIBRIUM; ev at
+      equilibrium of the mixture
+    - in find_G(), G[fluxev] is ev instead of Tv
+    - in find_Kstar_interface(), vibrational conduction acts on ev through rho*Dv; species
+      diffusion of the vibrational energy summed over the vibrating species
+    - in find_U(), rho*ev of the mixture from Tv
+    - in find_U_2(), rho*ev of the mixture from Tv
+    - in find_dG_dUstar(), fluxev row from the derivatives of ev
+    - in find_dP_dx(), w[specN2] is replaced by the sum of the mass fractions of the vibrating
+      species
+    - in find_dT_dx(), w[specN2] is replaced by the sum of the mass fractions of the vibrating
+      species
+    - in find_prim_fluid(), ev per unit mass of vibrating species clipped between its values at
+      Tvmin and Tvmax; Tv found by find_vibdist() once T is known; rho*ev set to zero if no species
+      vibrates
+    - in find_prim_fluid_mem(), vibrational conductivity removed for every vibrating species; mass
+      fraction of the vibrating species in the sound speed
+    - in read_model_fluid_actions(), reads VibSpecies(), TAUVTMODEL, QEVMODEL and VIBDISTTYPE
+      through the functions of fluid_vib.c; QEVMODEL and TEMODEL checks
+    - in read_model_fluid_actions_2(), calls read_model_fluid_actions_vib_species()
+    - in reformat_w(), wminN2 is applied only if N2 has vibrationally excited states
+    - in write_model_fluid_template(), writes VibSpecies(), TAUVTMODEL, QEVMODEL and VIBDISTTYPE
+      instead of N2VIBMODEL
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid_conv.c
+    - in _a_from_jacvars(), w[specN2] is replaced by the sum of the mass fractions of the vibrating
+      species
+    - in find_A_from_jacvars(), w[specN2] is replaced by the sum of the mass fractions of the
+      vibrating species
+    - in find_Fstar_from_jacvars(), w[specN2] is replaced by the sum of the mass fractions of the
+      vibrating species
+    - in find_LUstar_from_jacvars(), LUstar[fluxev] multiplied by the sum of the mass fractions of
+      the vibrating species, as the left eigenvectors
+    - in find_L_from_jacvars_eigenset2(), fluxev row multiplied by the sum of the mass fractions of
+      the vibrating species so that L remains defined when no species vibrates
+    - in find_Linv_from_jacvars_eigenset1(), fluxev column divided by the sum of the mass fractions
+      of the vibrating species
+    - in find_Linv_from_jacvars_eigenset2(), fluxev column divided by the sum of the mass fractions
+      of the vibrating species
+    - in find_Uprime(), ev per unit mass of vibrating species; zero if no species vibrates
+    - in find_Ustar_from_jacvars(), w[specN2] is replaced by the sum of the mass fractions of the
+      vibrating species
+    - in find_Ustar_from_musclvars(), reconstructs ev instead of Tv
+    - in find_dFstar_dUstar(), w[specN2] is replaced by the sum of the mass fractions of the
+      vibrating species
+    - in find_dUstar_dUprime_from_jacvars(), derivatives with respect to the density of every
+      vibrating species
+    - in find_jacvars_at_interface_Roe_average(), w[specN2] is replaced by the sum of the mass
+      fractions of the vibrating species
+    - in find_jacvars_at_interface_arith_average(), w[specN2] is replaced by the sum of the mass
+      fractions of the vibrating species
+    - in find_jacvars_from_U(), ev per unit mass of vibrating species; zero if no species vibrates
+    - in find_jacvars_from_musclvars(), reconstructs ev instead of Tv
+    - in find_musclvars(), musclvars[fluxev] is ev instead of Tv
+    - in find_primvars_from_jacvars(), removed the unused Tv argument
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid_source.c
+    - added find_Svibstar(): V-T source term times Omega, used by -prop dSvibdU
+    - added test_dSvib_dU(): compares the analytical and numerical Jacobians of the V-T source term
+    - removed _tauvt(): replaced by find_tauvtk() in fluid_vib.c
+    - removed find_Svib(): replaced by find_Svib_VT() in fluid_vib.c
+    - in find_Schem(), chemical source term of the vibrational energy summed over the vibrating
+      species
+    - in find_Se(), removed the unused smoothed Tv
+    - in find_Semfield(), e-V excitation through _Qev(), which adds the N2 molar fraction factor to
+      QEVMODEL_ALEKSANDROV and makes QEVMODEL_PARENT2024 available
+    - in find_Sstar(), calls find_Svib_VT()
+    - in find_dSchem_dU(), summed over the vibrating species; W[k]*cvk*dTv/dU is included only if
+      W[k]<0, or with TEST
+    - in find_dSvib_dU(), calls find_dSvib_VT_dU() with the complete dT/dU; the derivative with
+      respect to rho*ev is no longer counted twice
+    - in test_dSchem_dU(), calls _Tv() with gl
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid_bdry.c
+    - in update_bdry_back_pressure(), ev is extrapolated instead of Tv
+    - in update_bdry_freestream(), calls _Tv() with gl
+    - in update_bdry_inflow(), calls _Tv() with gl
+    - in update_bdry_inflow_injection(), the injected mass fraction is limited by wminN2 only if N2
+      has vibrationally excited states
+    - in update_bdry_inflow_reservoir(), calls _Tv() with gl
+    - in update_bdry_inflow_reservoir_2(), calls _Tv() with gl
+    - in update_bdry_outflow(), ev is extrapolated instead of Tv
+    - in update_bdry_outflow_Mach(), ev is extrapolated instead of Tv
+    - in update_bdry_symmetrical(), ev is mirrored instead of Tv
+    - in update_bdry_wall(), at an adiabatic wall ev is mirrored instead of Tv
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid_init.c
+    - in find_default_initvar(), calls _Tv() with gl
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid_post.c
+    - in _Tstag(), sum of the mass fractions of the vibrating species
+    - in find_post_variable_value_fluid(), calls _Tv() with gl
+  * in /model/fluid/_Favre-Reynolds_Tv/fluid.c
+    - removed _Tv(): moved to fluid_vib.c
+    - removed _ev(): moved to fluid_vib.c
+    - removed _evzero(): moved to fluid_vib.c
+    - removed find_dTv_dU(): moved to fluid_vib.c
+    - in _Te(), passes gl to the vibrational temperature function, now in fluid_vib.c
+    - in _a(), w[specN2] is replaced by the sum of the mass fractions of the vibrating species
+    - in _kappa(), the vibrational conductivity of every vibrating species is removed
+    - in find_G(), G[fluxev] is ev instead of Tv
+    - in find_Kstar_interface(), vibrational conduction acts on ev through rho*Dv; species
+      diffusion of the vibrational energy summed over the vibrating species
+    - in find_U(), rho*ev of the mixture from Tv
+    - in find_U_2(), rho*ev of the mixture from Tv
+    - in find_dG_dUstar(), fluxev row from the derivatives of ev
+    - in find_dP_dx(), w[specN2] is replaced by the sum of the mass fractions of the vibrating
+      species
+    - in find_dT_dx(), w[specN2] is replaced by the sum of the mass fractions of the vibrating
+      species
+    - in find_prim_fluid(), ev per unit mass of vibrating species clipped between its values at
+      Tvmin and Tvmax; Tv found by find_vibdist() once T is known; rho*ev set to zero if no species
+      vibrates
+    - in find_prim_fluid_mem(), vibrational conductivity removed for every vibrating species; mass
+      fraction of the vibrating species in the sound speed
+    - in read_model_fluid_actions(), reads VibSpecies(), TAUVTMODEL, QEVMODEL and VIBDISTTYPE
+      through the functions of fluid_vib.c; QEVMODEL and TEMODEL checks
+    - in read_model_fluid_actions_2(), calls read_model_fluid_actions_vib_species()
+    - in reformat_w(), wminN2 is applied only if N2 has vibrationally excited states
+    - in write_model_fluid_template(), writes VibSpecies(), TAUVTMODEL, QEVMODEL and VIBDISTTYPE
+      instead of N2VIBMODEL
+  * in /model/fluid/_Favre-Reynolds_Tv/fluid_conv.c
+    - in _a_from_jacvars(), w[specN2] is replaced by the sum of the mass fractions of the vibrating
+      species
+    - in find_A_from_jacvars(), w[specN2] is replaced by the sum of the mass fractions of the
+      vibrating species
+    - in find_Fstar_from_jacvars(), w[specN2] is replaced by the sum of the mass fractions of the
+      vibrating species
+    - in find_LUstar_from_jacvars(), LUstar[fluxev] multiplied by the sum of the mass fractions of
+      the vibrating species, as the left eigenvectors
+    - in find_L_from_jacvars_eigenset2(), fluxev row multiplied by the sum of the mass fractions of
+      the vibrating species so that L remains defined when no species vibrates
+    - in find_Linv_from_jacvars_eigenset1(), fluxev column divided by the sum of the mass fractions
+      of the vibrating species
+    - in find_Linv_from_jacvars_eigenset2(), fluxev column divided by the sum of the mass fractions
+      of the vibrating species
+    - in find_Uprime(), ev per unit mass of vibrating species; zero if no species vibrates
+    - in find_Ustar_from_jacvars(), w[specN2] is replaced by the sum of the mass fractions of the
+      vibrating species
+    - in find_Ustar_from_musclvars(), reconstructs ev instead of Tv
+    - in find_dFstar_dUstar(), w[specN2] is replaced by the sum of the mass fractions of the
+      vibrating species
+    - in find_dUstar_dUprime_from_jacvars(), derivatives with respect to the density of every
+      vibrating species
+    - in find_jacvars(), Tv found with find_vibdist()
+    - in find_jacvars_at_interface_Roe_average(), w[specN2] is replaced by the sum of the mass
+      fractions of the vibrating species
+    - in find_jacvars_at_interface_arith_average(), w[specN2] is replaced by the sum of the mass
+      fractions of the vibrating species
+    - in find_jacvars_from_U(), ev per unit mass of vibrating species; zero if no species vibrates
+    - in find_jacvars_from_musclvars(), reconstructs ev instead of Tv
+    - in find_musclvars(), musclvars[fluxev] is ev instead of Tv
+    - in find_primvars_from_jacvars(), removed the unused Tv argument
+  * in /model/fluid/_Favre-Reynolds_Tv/fluid_source.c
+    - added find_Svibstar(): V-T source term times Omega, used by -prop dSvibdU
+    - added test_dSvib_dU(): compares the analytical and numerical Jacobians of the V-T source term
+    - removed _tauvt(): replaced by find_tauvtk() in fluid_vib.c
+    - removed find_Svib(): replaced by find_Svib_VT() in fluid_vib.c
+    - in find_Schem(), chemical source term of the vibrational energy summed over the vibrating
+      species
+    - in find_Sstar(), calls find_Svib_VT()
+    - in find_dSchem_dU(), summed over the vibrating species; W[k]*cvk*dTv/dU is included only if
+      W[k]<0, or with TEST
+    - in find_dSvib_dU(), calls find_dSvib_VT_dU() with the complete dT/dU
+    - in test_dSchem_dU(), calls _Tv() with gl
+  * in /model/fluid/_Favre-Reynolds_Tv/fluid_bdry.c
+    - in update_bdry_back_pressure(), ev is extrapolated instead of Tv
+    - in update_bdry_freestream(), calls _Tv() with gl
+    - in update_bdry_inflow(), calls _Tv() with gl
+    - in update_bdry_inflow_reservoir(), calls _Tv() with gl
+    - in update_bdry_inflow_reservoir_2(), calls _Tv() with gl
+    - in update_bdry_outflow(), ev is extrapolated instead of Tv
+    - in update_bdry_outflow_Mach(), ev is extrapolated instead of Tv
+    - in update_bdry_symmetrical(), ev is mirrored instead of Tv
+    - in update_bdry_wall(), at an adiabatic wall ev is mirrored instead of Tv
+  * in /model/fluid/_Favre-Reynolds_Tv/fluid_init.c
+    - in find_default_initvar(), calls _Tv() with gl
+  * in /model/fluid/_Favre-Reynolds_Tv/fluid_post.c
+    - in _Tstag(), sum of the mass fractions of the vibrating species
+    - in find_post_variable_value_fluid(), calls _Tv() with gl
+  * in /src/common.c
+    - in _smooth(), the function smoothed is given gl, as _Tv() now needs it
+  * in /src/common.h
+    - in the prototype of _smooth(), the function smoothed is given gl
+  * in /src/test.c
+    - added test_dSvib_dU_local(): -prop dSvibdU, Jacobian of the V-T source term
+    - added test_ev(): -prop ev, ev, cv and the ev->Tv inversion of each species
+    - in output_options_help(), added dSvibdU and ev
+    - in main(), added -prop dSvibdU and -prop ev; without a control file the vibrating
+      species are N2, or all species with data for -prop ev
+  * in /bin
+    - the control files that used N2VIBMODEL or N2VIBJOULEHEATING now use VibSpecies("N2"),
+      TAUVTMODEL, QEVMODEL and VIBDISTTYPE
+
+
 2026 OCT 06a
   * in model/chem/
     - deleted _Air_Plasma_kinetic_11s

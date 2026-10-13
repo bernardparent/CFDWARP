@@ -6,7 +6,7 @@
 #define _FLUID_DIFFUSION TRUE
 #define _FLUID_CONVECTION TRUE
 #define _FLUID_SOURCE TRUE
-#define _FLUID_N2VIBMODEL TRUE
+#define _FLUID_VIBMODEL TRUE
 #define _FLUID_EENERGY FALSE
 #define _FLUID_ACTIONNAME "FavreReynoldsTv"
 #define _FLUID_FBODY_QADD
@@ -46,12 +46,12 @@ typedef struct {
 
 
 typedef struct {
-  bool RAPCOMP,TURBSOURCE,
+  bool VIBSPECIESREAD,RAPCOMP,TURBSOURCE,
        REACTING,ADD_ETA_TO_ETAT_WITHIN_QK,SET_CHARGED_DENSITIES_TO_ZERO_AT_WALL;
   double kdiv,psidiv,zetaA1,zetaA3,zetaA2,Prt,Sct;
   double Pmin,Pmax,Tmin,Tmax,wmin,wminN2,kmin,kmax,
          psimin,psimax,aref,Eref,evref,kref,psiref,
          Tvmin,Tvmax,Twmin,Twmax;
-  int DILATDISSIP,TURBMODEL,N2VIBMODEL,TEMODEL;
+  int DILATDISSIP,TURBMODEL,TAUVTMODEL,QEVMODEL,VIBDISTTYPE,TEMODEL;
 } gl_model_fluid_t;
 

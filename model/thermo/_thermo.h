@@ -497,13 +497,50 @@ double _dee_dTe_from_Te(double Te);
 double _he_from_Te(double Te);
 
 
+/* vibrational energy (vibration.c) */
+
+#define VIBDISTTYPE_BOLTZMANN 0
+
+typedef struct {
+  int VIBDISTTYPE;
+  bool EMPTY;   /* TRUE if no species vibrates or if the vibrating species are absent */
+  double Tv;    /* state of the distribution: the common vibrational temperature for VIBDISTTYPE_BOLTZMANN */
+  double ev;    /* vibrational energy per unit mass of the vibrating species, J/kg */
+  double cv;    /* d ev/d Tv at constant composition, J/kgK */
+  spec_t evk;   /* vibrational energy per unit mass of each vibrating species, J/kg */
+  spec_t cvk;   /* d evk/d Tv, J/kgK */
+  spec_t T1k;   /* temperature of the first vibrational level of each species (T for the species that do not vibrate) */
+} vibdist_t;
+
+bool is_vib_data_available(long spec);
+
+void find_vib_data_species_list(char **list);
+
+bool is_vib_state_in_chem(long spec, char **statename);
+
+void set_vibspecies(bool *isvibspec);
+
+bool _isvib(long spec);
+
+long _numvibspecies(void);
+
+double _thetavk(long spec);
+
+double _evk_from_T(long spec, double T);
+
+double _cvk_from_T(long spec, double T);
+
+double _svk_from_T(long spec, double T);
+
+double _dsvk_dT_from_T(long spec, double T);
+
+double _wv_from_w(spec_t w);
+
+double _ev_from_w_Tv(int VIBDISTTYPE, spec_t w, double Tv);
+
+void find_vibdist(gl_t *gl, int VIBDISTTYPE, spec_t Nk, double T, double ev, double devdt, vibdist_t *vibdist);
+
 /* nitrogen vibration energy */
-double _Tv_from_ev(double ev);
-
-double _ev_from_T(double T);
-
-double _dev_dTv_from_Tv(double T);
-
 double _zetav_from_Te_Rodriguez2025(double Te);
 
 double _zetav_from_Te_Parent2024(double Te);

@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/metrics/_metrics.h>
 #include <model/emfield/_emfield.h>
 #include <model/share/fluid_share.h>
+#include <model/share/fluid_vib.h>
 #include <model/share/model_share.h>
 #include <model/_model.h>
 
@@ -150,7 +151,7 @@ static void update_bdry_back_pressure(np_t *np, gl_t *gl, long lA, long lB, long
   }
   k=_f_extrapol(ACCURACY,_k(np[lB]),_k(np[lC]));
   psi=_f_extrapol(ACCURACY,_psi(np[lB]),_psi(np[lC]));
-  Tv=_f_extrapol(ACCURACY,_Tv(np[lB]),_Tv(np[lC]));
+  Tv=_Tv_from_np_ev(np[lB],gl,_f_extrapol(ACCURACY,_ev(np[lB]),_ev(np[lC])));
   find_U_3(np, lA, gl, rhok, V, Pstar, k, psi, Tv);
 
 }
@@ -184,7 +185,7 @@ static void update_bdry_outflow_Mach(np_t *np, gl_t *gl, long lA, long lB, long 
 
   k=_f_extrapol(ACCURACY,_k(np[lB]),_k(np[lC]));
   psi=_f_extrapol(ACCURACY,_psi(np[lB]),_psi(np[lC]));
-  Tv=_f_extrapol(ACCURACY,_Tv(np[lB]),_Tv(np[lC]));
+  Tv=_Tv_from_np_ev(np[lB],gl,_f_extrapol(ACCURACY,_ev(np[lB]),_ev(np[lC])));
   find_U_3(np, lA, gl, rhok, V, P, k,psi,Tv);
 
   V_temp=0.0;
@@ -217,7 +218,7 @@ static void update_bdry_inflow(np_t *np, gl_t *gl, long lA, long lB, long lC, lo
   for (dim=0; dim<nd; dim++) V[dim]=_V(np[lA],dim);
   k=_k(np[lA]);
   psi=_psi(np[lA]);
-  Tv=_Tv(np[lA]);
+  Tv=_Tv(np[lA],gl);
   find_U_2(np, lA, gl, w, V, P, T, k, psi,Tv);
 }
 
@@ -230,7 +231,7 @@ static void update_bdry_inflow_reservoir(np_t *np, gl_t *gl, long lA, long lB, l
   find_w_V_P_T_bdry_inflow_reservoir(np, gl, lA, lB, lC, ACCURACY, w, V, &P, &T);
   k=_k(np[lA]);
   psi=_psi(np[lA]);
-  Tv=_Tv(np[lA]);
+  Tv=_Tv(np[lA],gl);
   find_U_2(np, lA, gl, w, V, P, T, k, psi,Tv);
 }
 
@@ -243,7 +244,7 @@ static void update_bdry_inflow_reservoir_2(np_t *np, gl_t *gl, long lA, long lB,
   find_w_V_P_T_bdry_inflow_reservoir_2(np, gl, lA, lB, lC, ACCURACY, w, V, &P, &T);
   k=_k(np[lA]);
   psi=_psi(np[lA]);
-  Tv=_Tv(np[lA]);
+  Tv=_Tv(np[lA],gl);
   find_U_2(np, lA, gl, w, V, P, T, k, psi,Tv);
 }
 
@@ -268,7 +269,7 @@ static void update_bdry_outflow(np_t *np, gl_t *gl, long lA, long lB, long lC, l
   }
   k=_f_extrapol(ACCURACY,_k(np[lB]),_k(np[lC]));
   psi=_f_extrapol(ACCURACY,_psi(np[lB]),_psi(np[lC]));
-  Tv=_f_extrapol(ACCURACY,_Tv(np[lB]),_Tv(np[lC]));
+  Tv=_Tv_from_w_T_ev(gl,w,_T(np[lB],gl),_f_extrapol(ACCURACY,_ev(np[lB]),_ev(np[lC])));
   find_U_2(np, lA, gl, w, V, P, T, k, psi,Tv);
 }
 
@@ -284,7 +285,7 @@ static void update_bdry_symmetrical(np_t *np, gl_t *gl, long lA, long lB, long l
 
   k=_f_symmetry(ACCURACY,_k(np[lB]),_k(np[lC]));
   psi=_f_symmetry(ACCURACY,_psi(np[lB]),_psi(np[lC]));
-  Tv=_f_symmetry(ACCURACY,_Tv(np[lB]),_Tv(np[lC]));
+  Tv=_Tv_from_w_T_ev(gl,w,_T(np[lB],gl),_f_symmetry(ACCURACY,_ev(np[lB]),_ev(np[lC])));
 
   find_U_2(np, lA, gl, w, V, P, T, k, psi, Tv);
 }
@@ -303,12 +304,12 @@ static void update_bdry_freestream(np_t *np, gl_t *gl, long lA, long lB, long lC
     for (spec=0; spec<ns; spec++) w[spec]=_w(np[lB],spec);
     k=_k(np[lB]);
     psi=_psi(np[lB]);
-    Tv=_Tv(np[lB]);
+    Tv=_Tv(np[lB],gl);
   } else {
     for (spec=0; spec<ns; spec++) w[spec]=_w(np[lA],spec);
     k=_k(np[lA]);
     psi=_psi(np[lA]);
-    Tv=_Tv(np[lA]);
+    Tv=_Tv(np[lA],gl);
   }
   find_U_2(np, lA, gl, w, V, P, T, k, psi, Tv);
 
@@ -327,12 +328,12 @@ static void update_bdry_wall(np_t *np, gl_t *gl, long lA, long lB, long lC,
 
   if (ADIABATIC) {
     Twall=_f_symmetry(ACCURACY,_T(np[lB],gl),_T(np[lC],gl));
-    Tvwall=_f_symmetry(ACCURACY,_Tv(np[lB]),_Tv(np[lC]));
+    Tvwall=_Tv_from_np_ev(np[lB],gl,_f_symmetry(ACCURACY,_ev(np[lB]),_ev(np[lC])));
   } else {
     Twall=_bdry_param(np,gl,lA,0,TYPELEVEL_FLUID_WORK);
     Tvwall=Twall;
     // make the vibrational temperature at the wall adiabatic
-    //Tvwall=_f_symmetry(ACCURACY,_Tv(np[lB]),_Tv(np[lC]));
+    //Tvwall=_f_symmetry(ACCURACY,_Tv(np[lB],gl),_Tv(np[lC],gl));
   }
   /* clip Twall and Tvwall so that they remain within the user-specified bounds */
   Twall=max(gl->model.fluid.Twmin,min(gl->model.fluid.Twmax,Twall));

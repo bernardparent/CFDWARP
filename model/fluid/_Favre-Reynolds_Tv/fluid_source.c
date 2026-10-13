@@ -32,47 +32,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/beam/_beam.h>
 #include <model/_model.h>
 #include <model/share/fluid_share.h>
+#include <model/share/fluid_vib.h>
 #include <model/share/chem_share.h>
-
-
-double _tauvt(np_t np, gl_t *gl){
-  double N_tot,N_O,T,tauvt;
-  long spec;
-  
-  T=_T(np,gl);
-  tauvt=1.0e99;
-  switch (gl->model.fluid.N2VIBMODEL){ 
-    case N2VIBMODEL_PARENT2024:
-      N_O=0.0;
-#ifdef specO
-      N_O=_rhok(np,specO)*calA/_calM(specO);
-#endif
-      N_tot=0.0;
-      for (spec=0; spec<ns; spec++) N_tot+=_rhok(np,spec)*calA/_calM(spec);
-      tauvt=1.0/(N_tot*7E-16*exp(-141.0/pow(T,1.0/3.0))
-            +N_O*5E-18*exp(-128.0/sqrt(T)));
-    break;
-    case N2VIBMODEL_MILLIKAN:
-      fatal_error("Millikan N2 vibrational energy model not implemented in this version.");
-    break;
-    default:
-      fatal_error("N2 vibrational model must be set to Macheret.");
-  }
-  return(tauvt);
-}
-
-
-static void find_Svib(np_t *np, gl_t *gl, long l, flux_t S){
-  long flux;
-  
-  for (flux=0; flux<nf; flux++) S[flux]=0.0e0;
-  assert_np(np[l],_tauvt(np[l],gl)!=0.0);
-  S[fluxev]=(_rhok(np[l],specN2)/_tauvt(np[l],gl)*(_evzero(np[l],gl)-_ev(np[l])));
-}
 
 
 void find_Schem(np_t *np, gl_t *gl, long l, flux_t S){
   spec_t W,rhok;
+  vibdist_t vibdist;
   long flux,spec;
   double EoverN,Te;
 
@@ -86,18 +52,21 @@ void find_Schem(np_t *np, gl_t *gl, long l, flux_t S){
       Te=_T(np[l],gl);
     break;
     case TEMODEL_TVEQUILIBRIUM:
-      Te=_Tv(np[l]);
+      Te=_Tv(np[l],gl);
     break;
     default:
       Te=0.0;  // needed to avoid warning about unitialized Te
       fatal_error("Problem with TEMODEL in find_Schem().");
   }  
   
-  find_W(np[l],gl, rhok, _T(np[l],gl), Te, _Tv(np[l]), EoverN, _Qbeam(np[l],gl), W);
+  find_W(np[l],gl, rhok, _T(np[l],gl), Te, _Tv(np[l],gl), EoverN, _Qbeam(np[l],gl), W);
   for (spec=0; spec<ns; spec++){
     S[spec]=W[spec];
   }
-  S[fluxev]=W[specN2]*_ev(np[l]);
+  find_vibdist_from_np(np[l],gl,&vibdist);
+  for (spec=0; spec<ns; spec++){
+    if (_isvib(spec)) S[fluxev]+=W[spec]*vibdist.evk[spec];
+  }
 }
 
 
@@ -111,7 +80,7 @@ void find_Sstar(np_t *np, gl_t *gl, long l, flux_t S){
     else set_vector_to_zero(St_norm);
   if (gl->model.fluid.TURBSOURCE) find_Stcomp(np, gl, l, St_comp);
     else set_vector_to_zero(St_comp);
-  find_Svib(np, gl, l, Svib);
+  find_Svib_VT(np, gl, l, Svib);
   find_Saxi(np, gl, l, Saxisymmetric);
   find_Sheatforces(np, gl, l, Sheatforces);
 
@@ -125,69 +94,10 @@ void find_Sstar(np_t *np, gl_t *gl, long l, flux_t S){
 
 
 static void find_dSvib_dU(np_t *np, gl_t *gl, long l, sqmat_t dSvibdU){
-  long row,col,spec,dim,flux;
-  spec_t dTdrhok;
-  double dTdrhoetstar;
-  dim_t dTdrhoV;
   flux_t dTdU;
-  double fact_evzero;
 
-  /* for good linearization, fix fact_evzero to 1.0 ; if not stable, try fact_evzero=0.0; */
-  fact_evzero=1.0;
-
-  for (row=0; row<nf; row++) {
-    for (col=0; col<nf; col++) {
-      dSvibdU[row][col]=0.0e0;
-    }
-  }
-  find_dT_dx(np[l], gl, &dTdrhoetstar, dTdrhok, dTdrhoV);
-  for (flux=0; flux<nf; flux++) dTdU[flux]=0.0;
-  for (spec=0; spec<ns; spec++) dTdU[spec]=dTdrhok[spec];
-  for (dim=0; dim<nd; dim++) dTdU[ns+dim]=dTdrhoV[dim];
-  dTdU[fluxet]=dTdrhoetstar;
-  
-  /* wrt rhoN2*ev */
-  dSvibdU[fluxev][fluxev]=-1.0/_tauvt(np[l],gl);
-
-  /* wrt rhoN2*evzero */
-  dSvibdU[fluxev][specN2]=fact_evzero*1.0/_tauvt(np[l],gl)*_evzero(np[l],gl);
-  for (flux=0; flux<nf; flux++)
-    dSvibdU[fluxev][flux]+=fact_evzero*1.0/_tauvt(np[l],gl)*_rhok(np[l],specN2)*_dev_dTv_from_Tv(_T(np[l],gl))*dTdU[flux];
-
-  /* wrt to (1/tauvt) */
-  if (gl->model.fluid.N2VIBMODEL==N2VIBMODEL_PARENT2024) {
- 
-    for (spec=0; spec<ns; spec++)
-      dSvibdU[fluxev][spec]+=
-        -_rhok(np[l],specN2)*(_ev(np[l])-fact_evzero*_evzero(np[l],gl))
-          *7E-16*exp(-141.0/pow(_T(np[l],gl),1.0/3.0))*calA/_calM(spec);
-#ifdef specO
-    dSvibdU[fluxev][specO]+=
-        -_rhok(np[l],specN2)*(_ev(np[l])-fact_evzero*_evzero(np[l],gl))*5E-18
-        *exp(-128.0/pow(_T(np[l],gl),1.0/2.0))*calA/_calM(specO);
-#endif
-
-    for (flux=0; flux<nf; flux++){
-      for (spec=0; spec<ns; spec++)
-        dSvibdU[fluxev][flux]+=
-        -_rhok(np[l],specN2)*(_ev(np[l])-fact_evzero*_evzero(np[l],gl))*7E-16*exp(-141.0/pow(_T(np[l],gl),1.0/3.0))
-        *_rhok(np[l],spec)*calA/_calM(spec)
-        *(141.0/3.0*pow(_T(np[l],gl),-4.0/3.0))*dTdU[flux];
-#ifdef specO
-      dSvibdU[fluxev][flux]+=
-        -_rhok(np[l],specN2)*(_ev(np[l])-fact_evzero*_evzero(np[l],gl))*5E-18*exp(-128.0/pow(_T(np[l],gl),1.0/2.0))
-        *_rhok(np[l],specO)*calA/_calM(specO)
-        *(128.0/2.0*pow(_T(np[l],gl),-3.0/2.0))*dTdU[flux];
-#endif
-    }
-    dSvibdU[fluxev][fluxtke]=-dSvibdU[fluxev][fluxet];
-    dSvibdU[fluxev][fluxev]+=-dSvibdU[fluxev][fluxet];
-  }
-
-  /* wrt to (1/tauvt) */
-  if (gl->model.fluid.N2VIBMODEL==N2VIBMODEL_MILLIKAN) {
-    fatal_error("The Millikan model for N2 Vibration is not implemented in this version.");
-  }
+  find_dT_dU(np[l], gl, dTdU);
+  find_dSvib_VT_dU(np, gl, l, dTdU, dSvibdU);
 }
 
 
@@ -196,13 +106,14 @@ static void find_dSchem_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
   spec_t rhok,dWdT,dWdTe,dWdTv,dWdQbeam;
   spec2_t dWdrhok;
   flux_t dTdU,dTvdU,dTedU;
-  double ev,devdTv,EoverN;
+  double EoverN;
   flux_t W;
+  vibdist_t vibdist;
     
   EoverN=0.0;
   for (s=0; s<ns; s++) rhok[s]=_rhok(np[l],s);
 
-  find_dW_dx(np[l],gl, rhok, _T(np[l],gl), _T(np[l],gl), _Tv(np[l]), EoverN, _Qbeam(np[l],gl),
+  find_dW_dx(np[l],gl, rhok, _T(np[l],gl), _T(np[l],gl), _Tv(np[l],gl), EoverN, _Qbeam(np[l],gl),
            dWdrhok, dWdT, dWdTe, dWdTv, dWdQbeam);
   find_dT_dU(np[l], gl, dTdU);
   find_dTv_dU(np[l], gl, dTvdU);
@@ -229,20 +140,27 @@ static void find_dSchem_dU(np_t *np, gl_t *gl, long l, sqmat_t dS_dU){
     for (s=0; s<nf; s++)  dS_dU[k][s]+=dWdTe[k]*dTedU[s];
   }
 
-  find_W(np[l],gl,rhok, _T(np[l],gl), _T(np[l],gl), _Tv(np[l]), EoverN, _Qbeam(np[l],gl), W);
+  find_W(np[l],gl,rhok, _T(np[l],gl), _T(np[l],gl), _Tv(np[l],gl), EoverN, _Qbeam(np[l],gl), W);
 
-//  S[fluxev]=W[specN2]*_ev(np[l]);
-// here add the contribution to the jacobian coming from the chemical source term in the nitrogen vib energy
+//  S[fluxev]=sum_k W[k]*evk;
+// here add the contribution to the jacobian coming from the chemical source term in the vib energy
 // equation
 
-  ev=_ev(np[l]);
-  devdTv=_dev_dTv_from_Tv(_Tv(np[l]));
-
-  for (s=0; s<ns; s++)  dS_dU[fluxev][s]+=dWdrhok[specN2][s]*ev;
-  for (s=0; s<nf; s++)  dS_dU[fluxev][s]+=dWdT[specN2]*dTdU[s]*ev;
-  for (s=0; s<nf; s++)  dS_dU[fluxev][s]+=dWdTv[specN2]*dTvdU[s]*ev;
-  for (s=0; s<nf; s++)  dS_dU[fluxev][s]+=dWdTe[specN2]*dTedU[s]*ev;
-  for (s=0; s<nf; s++)  dS_dU[fluxev][s]+=devdTv*dTvdU[s]*W[specN2];
+  find_vibdist_from_np(np[l],gl,&vibdist);
+  for (k=0; k<ns; k++){
+    if (_isvib(k)){
+      for (s=0; s<ns; s++)  dS_dU[fluxev][s]+=dWdrhok[k][s]*vibdist.evk[k];
+      for (s=0; s<nf; s++)  dS_dU[fluxev][s]+=dWdT[k]*dTdU[s]*vibdist.evk[k];
+      for (s=0; s<nf; s++)  dS_dU[fluxev][s]+=dWdTv[k]*dTvdU[s]*vibdist.evk[k];
+      for (s=0; s<nf; s++)  dS_dU[fluxev][s]+=dWdTe[k]*dTedU[s]*vibdist.evk[k];
+#ifdef TEST
+      for (s=0; s<nf; s++)  dS_dU[fluxev][s]+=vibdist.cvk[k]*dTvdU[s]*W[k];
+#else
+      /* when species k is formed (W[k]>0) this is a gain term, left out of the Jacobian */
+      if (W[k]<0.0) for (s=0; s<nf; s++)  dS_dU[fluxev][s]+=vibdist.cvk[k]*dTvdU[s]*W[k];
+#endif
+    }
+  }
 
 #ifndef TEST
   for (k=0; k<nf; k++) dS_dU[k][k]=min(0.0e0,dS_dU[k][k]);
@@ -257,7 +175,23 @@ void test_dSchem_dU(np_t *np, gl_t *gl, long l){
   Estar=0.0;
   for (spec=0; spec<ns; spec++) rhok[spec]=_rhok(np[l],spec);
 
-  test_dW_dx(np[l],gl, gl->cycle.fluid.Uref, rhok,_T(np[l],gl), _T(np[l],gl), _Tv(np[l]), Estar, _Qbeam(np[l],gl));
+  test_dW_dx(np[l],gl, gl->cycle.fluid.Uref, rhok,_T(np[l],gl), _T(np[l],gl), _Tv(np[l],gl), Estar, _Qbeam(np[l],gl));
+}
+
+
+/* the vibrational energy source term tested by test_dSvib_dU(): V-T relaxation */
+static void find_Svibstar(np_t *np, gl_t *gl, long l, flux_t S){
+  long flux;
+  find_Svib_VT(np, gl, l, S);
+  for (flux=0; flux<nf; flux++) S[flux]*=_Omega(np[l],gl);
+}
+
+
+void test_dSvib_dU(np_t *np, gl_t *gl, long l){
+  sqmat_t dSvibdU,dSvibdUnum;
+  find_dSvib_dU(np,gl,l,dSvibdU);
+  find_numerical_jacobian_3(np, l, gl, &find_Svibstar, dSvibdUnum);
+  test_dSvib_dU_display(gl, dSvibdU, dSvibdUnum);
 }
 
 

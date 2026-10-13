@@ -50,9 +50,6 @@ void find_w_V_P_T_bdry_symmetrical(np_t *np, gl_t *gl,  long lA, long lB, long l
 
 
 
-#if _FLUID_N2VIBMODEL
-double _kappav (np_t *np, long l, gl_t *gl);
-#endif
 
 
 #ifdef _FLUID_FAVREREYNOLDS
@@ -80,10 +77,6 @@ double _etat_from_rho_eta_k_psitilde(np_t *np, long l, gl_t *gl, double rho, dou
 double _etat_mem(np_t *np, long l, gl_t *gl);
 
 double _kappastar (np_t *np, long l, gl_t *gl);
-
-#if _FLUID_N2VIBMODEL
-double _kappavstar (np_t *np, long l, gl_t *gl);
-#endif
 
 double _nustar (np_t *np, long l, gl_t *gl, long spec);
 

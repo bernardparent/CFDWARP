@@ -211,8 +211,10 @@ Model(
     MHDTURB=NO;
     TURBSOURCE=YES;
     TEMODEL=TEMODEL_TRANSPORT;
-    N2VIBMODEL=N2VIBMODEL_PARENT2024;
-    N2VIBJOULEHEATING=NO;
+    VibSpecies("N2");  {species with vibrationally excited states}
+    TAUVTMODEL=TAUVTMODEL_PARENT2024;
+    QEVMODEL=QEVMODEL_NONE;
+    VIBDISTTYPE=VIBDISTTYPE_BOLTZMANN;
     REACTING=YES;
     emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}
     Prt=0.9e0;

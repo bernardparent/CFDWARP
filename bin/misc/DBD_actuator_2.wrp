@@ -163,8 +163,10 @@ Bdry(
 Model(
   NavierStokesPlasma(
     TEMODEL=TEMODEL_LOCAL;
-    N2VIBMODEL=N2VIBMODEL_PARENT2024;
-    N2VIBJOULEHEATING=YES;
+    VibSpecies("N2");  {species with vibrationally excited states}
+    TAUVTMODEL=TAUVTMODEL_PARENT2024;
+    QEVMODEL=QEVMODEL_PARENT2024;
+    VIBDISTTYPE=VIBDISTTYPE_BOLTZMANN;
     REACTING=YES;
     emfieldworkheatfact=1.0;
     sigmadiv=1e-18; {S/m}

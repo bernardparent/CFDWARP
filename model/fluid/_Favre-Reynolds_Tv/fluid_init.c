@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/_model.h>
 #include <src/init.h>
 #include <model/share/fluid_share.h>
+#include <model/share/fluid_vib.h>
 
 #define INIT_TYPE1 1
 #define INIT_TYPE2 2
@@ -345,7 +346,7 @@ void find_default_initvar(np_t *np, gl_t *gl, long l, initvar_t initvar){
   for (spec=0; spec<ns; spec++) initvar[nd+2+spec]=_w(np[l],spec);
   initvar[nd+2+ns]=_k(np[l]);
   initvar[nd+3+ns]=_psi(np[l]);
-  initvar[nd+4+ns]=_Tv(np[l]);
+  initvar[nd+4+ns]=_Tv(np[l],gl);
 }
 
 

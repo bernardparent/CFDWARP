@@ -4,8 +4,6 @@
   #include <src/common.h>
   #include <model/fluid/_fluid.h>
 
-  #define N2VIBMODEL_PARENT2024 1
-  #define N2VIBMODEL_MILLIKAN 2
   #define TEMODEL_TEQUILIBRIUM 1
   #define TEMODEL_TVEQUILIBRIUM 2
   
@@ -23,7 +21,6 @@
 
   double _psi (np_t np);
 
-  double _Tv(np_t np);
   
   double _omega (np_t *np, long l, gl_t *gl);
 
@@ -35,7 +32,6 @@
 
   void find_dT_dU(np_t np, gl_t *gl, flux_t dTdU);
   
-  void find_dTv_dU(np_t np, gl_t *gl, flux_t dTvdU);
   
   double _rhok (np_t np, long spec);
 
@@ -77,11 +73,8 @@
 
   double _ktilde (np_t *np, long l, gl_t *gl);
 
-  double _ev (np_t np);
 
-  double _evzero (np_t np, gl_t *gl);
 
-  double _Tv_from_ev(double ev);
 
   double _eps (np_t np, gl_t *gl);
 

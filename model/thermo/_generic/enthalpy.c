@@ -5450,11 +5450,9 @@ static double _cpk_from_T_eval(long spec, double T){
 			       Pa[smap[spec]][index2][8]*T4)
         +(1.0-weight2)*cpk;
   }
-#ifdef specN2
-  if (_FLUID_N2VIBMODEL && spec==specN2) {
-    cpk-=_dev_dTv_from_Tv(T+dTplus);
+  if (_FLUID_VIBMODEL && _isvib(spec)) {
+    cpk-=_cvk_from_T(spec,T+dTplus);
   }
-#endif
 #ifdef speceminus
   if (_FLUID_EENERGY && spec==speceminus) {
     cpk=0.0;
@@ -5562,11 +5560,9 @@ static double _hk_from_T_eval(long spec, double T){
 	     );
   }	     
 	         
-#ifdef specN2
-  if (_FLUID_N2VIBMODEL && spec==specN2) {
-    tmp-=_ev_from_T(T+dTplus);
+  if (_FLUID_VIBMODEL && _isvib(spec)) {
+    tmp-=_evk_from_T(spec,T+dTplus);
   }
-#endif
 #ifdef speceminus
   if (_FLUID_EENERGY && spec==speceminus) {
     tmp-=_he_from_Te(T);
@@ -5673,27 +5669,20 @@ double _sk_from_T(long spec, double T){
   assert(T!=0.0e0);
 
 /*
-  nitrogen vibrational energy:
+  vibrational energy of the species with vibrationally excited states:
   ------------------------------------------------------------------------
   first notice that by definition 
   sk=\int cpk(T)/T dT;
-  also, for the nitrogen vibrational energy correction: 
-  cpk(T)-=_dev_dTv_from_Tv(T);
-  with
-  _dev_dTv_from_Tv=RN2*sqr(Thetav)*exp(Thetav/T)/sqr(T)/sqr(exp(Thetav/T)-1.0);  
+  also, for the vibrational energy correction: 
+  cpk(T)-=_cvk_from_T(spec,T);
   therefore, we need to take away from tmp
-  tmp-=\int RN2*sqr(Thetav)*exp(Thetav/T)/sqr(exp(Thetav/T)-1.0)/T^3 dT  
+  tmp-=\int _cvk_from_T(spec,T)/T dT  
+  which is given by _svk_from_T(spec,T)
   ========================================================================
 */  
-#ifdef specN2
-  if (_FLUID_N2VIBMODEL && spec==specN2) {
-    if (T+dTplus>THERMO_TVLIM){
-      tmp-=THERMO_RN2*(
-         (1.0+1.0/(exp(THERMO_THETAV/(T+dTplus))-1.0))*THERMO_THETAV/(T+dTplus)-log(exp(THERMO_THETAV/(T+dTplus))-1.0)   
-      );
-    } 
+  if (_FLUID_VIBMODEL && _isvib(spec)) {
+    tmp-=_svk_from_T(spec,T+dTplus);
   }
-#endif
 
 #if (defined(speceminus))
   if (_FLUID_EENERGY && spec==speceminus){
@@ -5767,13 +5756,9 @@ double _dsk_dT_from_T(long spec, double T){
 
 
   if (dTplus!=0.0) tmp+=_cpk_from_T(spec, T)/(T+dTplus)*(-dTplus/T);
-#ifdef specN2
-  if (_FLUID_N2VIBMODEL && spec==specN2) {
-    if (T+dTplus>THERMO_TVLIM) { /* if T+dTplus<THERMO_TVLIM, the following won't affect tmp */
-    tmp-=THERMO_RN2*sqr(THERMO_THETAV)*exp(THERMO_THETAV/(T+dTplus))/sqr(exp(THERMO_THETAV/(T+dTplus))-1.0)/(T+dTplus)/(T+dTplus)/(T+dTplus);
-    } 
+  if (_FLUID_VIBMODEL && _isvib(spec)) {
+    tmp-=_dsvk_dT_from_T(spec,T+dTplus);
   }
-#endif
 #if (defined(speceminus))
   if (_FLUID_EENERGY && spec==speceminus){
     fatal_error("In _dsk_dT_from_T part of thermo.c, spec can't be set to speceminus when the electron temperature is not equal to the gas temperature.");

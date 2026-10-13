@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/emfield/_emfield.h>
 #include <model/_model.h>
 #include <model/share/fluid_share.h>
+#include <model/share/fluid_vib.h>
 
 
 typedef struct {
@@ -127,7 +128,7 @@ double _Tstag(np_t np, gl_t *gl){
   double hstag,Tstag;
   spec_t w;
   find_w(np,w);
-  hstag=np.bs->U[fluxet]/_rho(np)-_k(np)-_w(np,specN2)*_ev(np)+_P(np,gl)/_rho(np);
+  hstag=np.bs->U[fluxet]/_rho(np)-_k(np)-_wv(np)*_ev(np)+_P(np,gl)/_rho(np);
   Tstag=_T_from_w_h(w, hstag);
   return(Tstag);
 }
@@ -185,7 +186,7 @@ void find_post_variable_value_fluid(np_t *np, long l, gl_t *gl,
       case nd+ns+1:   *varvalue=_P(np[l],gl);         break;
       case nd+ns+2:   *varvalue=_Pstar(np[l],gl);     break;
       case nd+ns+3:   *varvalue=_T(np[l],gl);         break;
-      case nd+ns+4:   *varvalue=_Tv(np[l]);         break;
+      case nd+ns+4:   *varvalue=_Tv(np[l],gl);         break;
       case nd+ns+5:   *varvalue=_a(np[l],gl);         break;
       case nd+ns+6:   *varvalue=_eta(np,l,gl);        break;
       case nd+ns+7:   *varvalue=_etastar(np,l,gl);    break;
