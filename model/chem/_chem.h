@@ -21,6 +21,10 @@ void find_We ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Est
                           double *We_create, double *We_destroy );
 
 
+#ifdef _CHEM_BALLISTIC
+void find_Q_ballistic(np_t np, gl_t *gl, spec_t rhok, double T, double Te, bool JACOBIAN, double *Q, spec_t *dQdrhok, double *dQdT, double *dQdTe);
+#endif
+
 #ifdef _AVERAGEDRATES_CHEM
 void find_Qchemave (np_t np, gl_t *gl, spec_t rhok, double Estar, double T, double Te, double *Q );
 #endif

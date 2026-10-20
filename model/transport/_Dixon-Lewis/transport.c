@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
 Copyright 2022 Felipe Martin Rodriguez Fuentes
-Copyright 1998-2018,2020,2022 Bernard Parent
+Copyright 1998-2018,2020,2022,2026 Bernard Parent
 Copyright 2020 Aaron Trinh
 Copyright 2001 Jason Etele
 Copyright 2000 Giovanni Fusina
@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <model/thermo/_thermo.h>
 #include <model/transport/_transport.h>
+#include <model/share/fluid_plasma_share.h>
 
 // maximum reduced temperature (T/Peps) used to determine the viscosity, thermal conductivity, and mass diffusion coefficients with Leonard Jones potentials
 #define TSTAR_MAX 100.0
@@ -743,6 +744,11 @@ void find_nuk_eta_kappak_muk(gl_t *gl, spec_t rhok, double T, double Te,
     if (METHOD==METHOD1){
       muk[spec]=_muk_from_rhok_T_Te_ParentMacheret(rhok, T, Te, spec);
     }
+#if defined(_CHEM_BALLISTIC) && defined(_FLUID_PLASMA)
+    /* the ballistic groups move with the speed given by their birth potential (Eq. (8) of parent2026): they have 
+       no mobility, and hence no thermal conductivity and no viscosity */
+    if (_is_ballistic_group(spec)) muk[spec]=0.0;
+#endif
     kappac[spec]=_kappac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
     (*eta)+=_etac_from_rhok_Tk_muk(rhok, T, Te, muk[spec], spec);
   }
@@ -779,7 +785,17 @@ double _eta_from_rhok_T_Te(gl_t *gl, spec_t rhok, double T, double Te){
 
 
 void find_dmuk_from_rhok_Tk_Ek(gl_t *gl, spec_t rhok, double Tk, double Ek, long k, double *dmukdTk, spec_t dmukdrhok){
+#if defined(_CHEM_BALLISTIC) && defined(_FLUID_PLASMA)
+  long spec;
+#endif
   find_dmuk_from_rhok_Tk_Ek_ParentMacheret(rhok, Tk, Ek, k, dmukdTk, dmukdrhok);
+#if defined(_CHEM_BALLISTIC) && defined(_FLUID_PLASMA)
+  /* the ballistic groups have no mobility (see find_nuk_eta_kappak_muk()) */
+  if (_is_ballistic_group(k)){
+    *dmukdTk=0.0;
+    for (spec=0; spec<ns; spec++) dmukdrhok[spec]=0.0;
+  }
+#endif
 }
 
 

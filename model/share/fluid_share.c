@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-Copyright 2015-2018,2020,2021 Bernard Parent
+Copyright 2015-2018,2020,2021,2026 Bernard Parent
 Copyright 2001 Jason Etele
 Copyright 2002 Thomas E. Schwartzentruber
 
@@ -1974,262 +1974,6 @@ void set_jacvars_eigenconditioning_constants(gl_t *gl, jacvars_t *jacvars){
 #endif
 
 
-#ifdef _FLUID_PLASMA
-
-double _betan(long k){
-  double betan;
-  if (speciestype[k]==SPECIES_NEUTRAL) betan=1.0; else betan=0.0;
-  return(betan);
-}
-
-double _betai(long k){
-  double betai;
-  if (speciestype[k]==SPECIES_IONMINUS || speciestype[k]==SPECIES_IONPLUS) betai=1.0; else betai=0.0;
-  return(betai);
-}
-
-
-
-/* determines whether the gauss's law terms are added to the continuity equations */
-double _betag(gl_t *gl, long k){  
-  return(gl->model.fluid.betag[k]);
-}
-
-
-double _betaplus(long k){
-  double betaplus;
-  if (speciestype[k]==SPECIES_IONPLUS) betaplus=1.0; else betaplus=0.0;
-  return(betaplus);
-}
-
-
-double _betaa(gl_t *gl, long k){
-  return(gl->model.fluid.betaa[k]);
-}
-
-
-double _rhoc(np_t np, gl_t *gl){
-  double rhoc;
-  long spec;
-  rhoc=0.0;
-  for (spec=0; spec<ns; spec++){
-    rhoc+=_C(spec)*_Nk(np, gl, spec);
-  }
-
-  return(rhoc);
-}
-
-
-#define Ethresholdbdry 1e-2
-
-bool is_bdry_cathode(np_t *np, gl_t *gl, long lA, long lB, long lC,
-                     long theta, long thetasgn){
-  bool CATHODE;
-  double dphi,dwall,fact_cathode,Nminus,Nplus;
-  long dim,spec;
-
-  CATHODE=FALSE;
-
-  dwall=0.0;
-  for (dim=0; dim<nd; dim++){
-    dwall=dwall+sqr(np[lB].bs->x[dim]-np[lA].bs->x[dim]);
-  }
-  assert_np(np[lA],dwall>0.0e0);
-  dwall=sqrt(dwall);
-
-
-  Nminus=0.0;
-  Nplus=0.0;
-  for (spec=0; spec<ns; spec++){
-    if (_Charge_number(spec)<0) Nminus+=_Nk(np[lA],gl,spec);
-    if (_Charge_number(spec)>0) Nplus+=_Nk(np[lA],gl,spec);
-  }
-  if (Nplus>Nminus) fact_cathode=1.0; else fact_cathode=0.0;
-
-// Approach 1
-/*
-  dphi=minmod(_phi(np[lA],gl)-_phi(np[lB],gl),_phi(np[lB],gl)-_phi(np[lC],gl));
-*/
-
-
-// Approach 2
-  dphi=2.0*(_phi(np[lA],gl)-_phi(np[lB],gl));
-  dphi+=_phi(np[lB],gl)-_phi(np[lC],gl);
-  for (dim=0; dim<nd; dim++){
-    if (dim!=theta) dphi+=1.0*(_phi(np[_al(gl,lA,dim,+1)],gl)-_phi(np[_al(gl,lB,dim,+1)],gl));
-    if (dim!=theta) dphi+=1.0*(_phi(np[_al(gl,lA,dim,-1)],gl)-_phi(np[_al(gl,lB,dim,-1)],gl));
-  }
-  dphi/=(3.0+((double)nd-1.0)*2.0);
-
-
-// Approach 3
-
-/*  double dphi1,dphi2;
-  dphi1=2.0*(_phi(np[lA],gl)-_phi(np[lB],gl));
-  for (dim=0; dim<nd; dim++){
-    if (dim!=theta) dphi1+=1.0*(_phi(np[_al(gl,lA,dim,+1)],gl)-_phi(np[_al(gl,lB,dim,+1)],gl));
-    if (dim!=theta) dphi1+=1.0*(_phi(np[_al(gl,lA,dim,-1)],gl)-_phi(np[_al(gl,lB,dim,-1)],gl));
-  }
-  dphi1/=(2.0+((double)nd-1.0)*2.0);
-
-  dphi2=2.0*(_phi(np[lB],gl)-_phi(np[lC],gl));
-  for (dim=0; dim<nd; dim++){
-    if (dim!=theta) dphi2+=1.0*(_phi(np[_al(gl,lB,dim,+1)],gl)-_phi(np[_al(gl,lC,dim,+1)],gl));
-    if (dim!=theta) dphi2+=1.0*(_phi(np[_al(gl,lB,dim,-1)],gl)-_phi(np[_al(gl,lC,dim,-1)],gl));
-  }
-  dphi2/=(2.0+((double)nd-1.0)*2.0);
-  dphi1=minmod(dphi1,dphi2);
-  dphi2=minmod(_phi(np[lA],gl)-_phi(np[lB],gl),_phi(np[lB],gl)-_phi(np[lC],gl));
-  dphi=minmod(dphi1,dphi2);
-*/
-
-
-  if (dphi<Ethresholdbdry*dwall*fact_cathode) CATHODE=TRUE;
-
-
-  return(CATHODE);
-}
-
-
-
-/* conditioned conductivity (must not be zero because some terms are divided by sigma_positive) */ 
-double _sigma_positive(np_t *np, gl_t *gl, long l){
-  double sigma_positive,sigma;
-  sigma=_sigma(np,gl,l);
-  sigma_positive=max(sigma,gl->model.fluid.sigmadiv);
-  return(sigma_positive);
-}
-
-
-
-double _alpha(np_t *np, gl_t *gl, long l, long k, long r){
-  double alpha,sigma_positive;
-  sigma_positive=_sigma_positive(np,gl,l);
-  alpha=_m(k)/_m(r)*(_delta(r,k)+_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)*_Nk(np[l],gl,k)/sigma_positive);
-  return(alpha);
-}
-
-
-void find_alpha(np_t *np, gl_t *gl, long l, spec2_t alpha){
-  long k,r;
-  double sigma;
-  sigma=_sigma_positive(np,gl,l);
-  for (k=0; k<ns; k++){
-    for (r=0; r<ns; r++){
-      alpha[k][r]=_calM(k)/_calM(r)*(_delta(r,k)+_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)*_Nk(np[l],gl,k)/sigma);
-      
-    }
-#ifndef NDEBUG
-    if (alpha[k][k]<=0.0){
-      wfprintf(stderr,"alpha[%ld][%ld]=%E   \n",k,k,alpha[k][k]);
-      wfprintf(stderr,"mu_k=%E N_k=%E betaa_k=%E C_k=%E \n",_mu(np,gl,l,k),_Nk(np[l],gl,k),_betaa(gl,k),_C(k));
-      wfprintf(stderr," sigma=%E betaa_k*C_k*mu_k*N_k=%E\n",sigma,_betaa(gl,k)*_C(k)*_mu(np,gl,l,k)*_Nk(np[l],gl,k));
-      fatal_error("alpha[k][k] is negative at node i=%ld j=%ld k=%ld.",_i(l,gl,0),_i(l,gl,1),_i(l,gl,2));
-    }
-#endif
-  }
-  
-}
-
-
-void find_Z(np_t *np, gl_t *gl, long l, sqmat_t Z) {
-  long row,col;
-  spec2_t alpha;
-  find_alpha(np, gl, l, alpha);
-  set_matrix_to_identity(Z);
-  for (row=0; row<ns; row++){
-    for (col=0; col<ns; col++){
-      Z[row][col]=alpha[row][col];
-    }
-  }
-
-}
-
-
-void find_dZU_dU(np_t *np, gl_t *gl, long l, sqmat_t dZU_dU){
-  double sigma,dsigma_drhom;
-  long k,r,m;
-  sigma=_sigma_positive(np,gl,l);
-
-  set_matrix_to_identity(dZU_dU);
-
-
-  for (k=0; k<ns; k++){
-    for (r=0; r<ns; r++){
-      /* wrt rhok[k] */
-      dZU_dU[k][k]+=1.0/_m(r)*_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)/sigma*_rhok(np[l],r);
-      /* wrt rhok[r] */
-      dZU_dU[k][r]+=1.0/_m(r)*_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)*_rhok(np[l],k)/sigma;
-      /* wrt sigma */
-      for (m=0; m<ns; m++){
-        dsigma_drhom=_C(m)*_mu(np,gl,l,m)/_m(m);
-        dZU_dU[k][m]+=-1.0/_m(r)*_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)*_rhok(np[l],k)/sqr(sigma)*_rhok(np[l],r)*dsigma_drhom; 
-      }
-    }
-  }
-
-}
-
-
-void find_LambdaZ(np_t *np, gl_t *gl, long l, sqmat_t LambdaZ) {
-  long r,k;
-  double sigma;
-  sigma=_sigma_positive(np,gl,l);
-  set_matrix_to_identity(LambdaZ);
-  for (k=0; k<ns; k++){
-    for (r=0; r<ns; r++){
-      LambdaZ[k][k]+=1.0/_m(r)*_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)/sigma*_rhok(np[l],r);
-    }
-  }
-
-}
-
-
-
-void find_Y1star_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, flux_t Ystar){
-  double Estar;
-  long spec, flux;
-  metrics_t metrics;
-  find_metrics_at_interface(np,gl,lL,lR,theta,&metrics);
-  find_Estar_at_interface(np, gl, lL, lR, theta, &Estar);
-
-  for (flux=0; flux<nf; flux++){
-    Ystar[flux]=0.0;
-  }
-
-  for (spec=0; spec<ns; spec++){
-    Ystar[spec]=metrics.Omega*Estar*_betag(gl,spec);  
-  }
-
-}
-
-
-
-void find_Y2star_at_interface(np_t *np, gl_t *gl, long lL, long lR, long theta, flux_t Ystar){
-  double Jstar;
-  long spec, flux;
-  metrics_t metrics;
-  find_metrics_at_interface(np,gl,lL,lR,theta,&metrics);
-  find_Jstar_at_interface(np, gl, lL, lR, theta, &Jstar);
-
-  for (flux=0; flux<nf; flux++){
-    Ystar[flux]=0.0;
-  }
-
-  for (spec=0; spec<ns; spec++){
-    Ystar[spec]=-metrics.Omega*Jstar*_betaa(gl,spec);  
-  }
-
-}
-
-
-
-
-
-
-#endif
-
-
 #ifndef _FLUID_PLASMA
 
 void find_Z(np_t *np, gl_t *gl, long l, sqmat_t Z) {
@@ -2442,6 +2186,8 @@ void find_init_number_density_templates(char **specstr1, char **specstr2){
   char *chargedstr1,*chargedstr2,*chargedstr3;
   *specstr1=(char *)realloc(*specstr1,1000*sizeof(char));
   *specstr2=(char *)realloc(*specstr2,1000*sizeof(char));
+  strcpy(*specstr1,"");
+  strcpy(*specstr2,"");
   chargedstr1=(char *)malloc(1000*sizeof(char));
   chargedstr2=(char *)malloc(1000*sizeof(char));
   chargedstr3=(char *)malloc(1000*sizeof(char));
@@ -2507,6 +2253,16 @@ void find_init_number_density_templates(char **specstr1, char **specstr2){
     );  
     strcpy(*specstr2, ",N_H2,N_He,N_CH4,N_default");
   #endif
+  /* any other gas: the neutral species of the template, the electrons and the default species */
+  if (ns>1 && strlen(*specstr1)==0){
+    specname=(char *)malloc(sizeof(char));
+    find_species_name(_template_neutral_species(), &specname);
+    sprintf(*specstr1,"    Species(\"%s\"%s,\"default\");\n",specname,chargedstr3);
+    find_species_variable_name(_template_neutral_species(), &specname);
+    sprintf(*specstr1+strlen(*specstr1),"    N_%s=1e24; {1/m3}\n%s    N_default=1e9;\n",specname,chargedstr1);
+    sprintf(*specstr2,",N_%s%s,N_default",specname,chargedstr2);
+    free(specname);
+  }
   if (ns==1){
     specname=(char *)malloc(sizeof(char));
     find_species_variable_name(0, &specname);

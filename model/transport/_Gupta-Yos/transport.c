@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
 
-Copyright 2022 Bernard Parent
+Copyright 2022,2026 Bernard Parent
 Copyright 2022 Prasanna Thoguluva Rajendran
 Copyright 2022 Felipe Martin Rodriguez Fuentes
 
@@ -42,6 +42,7 @@ https://ntrs.nasa.gov/api/citations/19900017748/downloads/19900017748.pdf
 #include <model/transport/_transport.h>
 #include <assert.h>
 #include <src/control.h>
+#include <model/share/fluid_plasma_share.h>
 
 #define Runiv 1.987 //cal/(g-mol K)
 #define kBol 1.38066E-16 // erg/K
@@ -1189,6 +1190,10 @@ double _eta_from_chik_N_T_Te_Delta1_Delta2(spec_t chik, double N, double T, doub
   aav=num/den;
   num=0.0;
   for (i=0; i<ns; i++){
+#if defined(_CHEM_BALLISTIC) && defined(_FLUID_PLASMA)
+    /* the ballistic groups have no viscosity (see find_nuk_eta_kappak_muk()) */
+    if (_is_ballistic_group(i)) continue;
+#endif
     num+=chik[i]/(Ai[i]+aav);
   }
   eta=num/(1.0-aav*num);
@@ -1439,6 +1444,17 @@ void find_nuk_eta_kappak_muk(gl_t *gl, spec_t rhok, double T, double Te,
     default:
       fatal_error("gl->model.transport.TRANSPORTMODEL can not be set to %ld.",gl->model.transport.TRANSPORTMODEL);
   }
+#if defined(_CHEM_BALLISTIC) && defined(_FLUID_PLASMA)
+  /* the ballistic groups move with the speed given by their birth potential (Eq. (8) of parent2026): they have 
+     no mobility, and hence no thermal conductivity and no viscosity; with EQ27 and EQ40A their conductivity
+     has already been taken out of kappan above */
+  for (spec=0; spec<ncs; spec++){
+    if (_is_ballistic_group(spec)){
+      muk[spec]=0.0;
+      kappac[spec]=0.0;
+    }
+  }
+#endif
 
 }
 

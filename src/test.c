@@ -192,9 +192,8 @@ void test_dH2_dUstar ( np_t * np, gl_t * gl, long l ) {
 
 
 void test_Dstarmat ( np_t * np, gl_t * gl, long l ) {
-  sqmat_t Dstar, Dstarplus, Dstarminus, Dstarsum, Dstartest;
-  flux_t Ustar, DstartesttimesUstar, DstartimesUstar;
-  long theta, flux;
+  sqmat_t Dstar, Dstarplus, Dstarminus, Dstarsum;
+  long theta;
 
   printf ( "\n" );
   printf ( "Testing  Dstar plus and minus matrices.\n" );
@@ -206,9 +205,7 @@ void test_Dstarmat ( np_t * np, gl_t * gl, long l ) {
   theta = 0;
   find_Dstarmatplus ( np, gl, l, theta, Dstarplus );
   find_Dstarmatminus ( np, gl, l, theta, Dstarminus );
-  find_Dstarmat_test ( np, gl, l, theta, Dstartest );
   find_Dstarmat ( np, gl, l, theta, Dstar );
-  find_Ustar ( np[l], gl, Ustar );
 
   add_two_matrices ( Dstarminus, Dstarplus, Dstarsum );
 
@@ -222,15 +219,6 @@ void test_Dstarmat ( np_t * np, gl_t * gl, long l ) {
   display_matrix ( Dstar );
   printf ( "Dstarplus+Dstarminus:\n" );
   display_matrix ( Dstarsum );
-
-  multiply_matrix_and_vector ( Dstartest, Ustar, DstartesttimesUstar );
-  multiply_matrix_and_vector ( Dstar, Ustar, DstartimesUstar );
-
-  printf ( "\n\nBoth columns should be equal:\n" );
-  for ( flux = 0; flux < nf; flux++ ) {
-    printf ( "DstartesttimesUstar[%3.3ld]=%12.12E  DstartimesUstar[%3.3ld]=%12.12E \n", flux,
-             DstartesttimesUstar[flux], flux, DstartimesUstar[flux] );
-  }
 }
 
 

@@ -7,6 +7,478 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 OCT 20d
+  * added the ballistic electron model (the birth-potential multigroup model) of Parent and
+    Perry, arXiv:2610.02139, 2026 [parent2026], through the chemical solver
+    _Ar_Plasma_Ballistic_20s (BSD-2-Clause, offered by make config) used with the proprietary
+    fluid modules _Navier-Stokes_plasma and _Favre-Reynolds_plasma, and stopping at compilation
+    with a fluid module without plasma support; species 0 is the bulk electron
+    group, species 1 to nb the ballistic groups (nb=17 by default, set in chem.hh), then Ar+ and
+    Ar; the groups travel along beamdir at the speed set by the local potential and have no
+    energy equation
+  * the parts of the model that do not depend on the gas are in /model/share/fluid_plasma_share.c
+    (BSD-2-Clause), compiled when the chemical solver defines _CHEM_BALLISTIC and the fluid
+    module _FLUID_PLASMA; the two plasma fluid modules call them within #ifdef _CHEM_BALLISTIC,
+    so that they are unchanged with any other chemical solver; fluid_plasma_share.h lists what a
+    ballistic electron chemical solver, a plasma fluid module and the transport module must
+    provide; the ballistic groups have no mobility, thermal conductivity or viscosity, set in
+    find_nuk_eta_kappak_muk() and find_dmuk_from_rhok_Tk_Ek() of the transport modules
+    _Dixon-Lewis and _Gupta-Yos (_Gupta-Yos has no collision data for argon yet; it is meant for
+    a future N2 ballistic electron chemical solver); _drift-diffusion has no electron energy
+    equation, does not support the model, and stops at compilation with a ballistic electron
+    chemical solver
+  * added /model/share/fluid_plasma_share.c (BSD-2-Clause) and fluid_plasma_share.h, which
+    gather the functions shared by the plasma fluid modules: the plasma functions of
+    fluid_share.c (compiled with _FLUID_PLASMA), _Vk_drift_perp_to_bdry() of the fluid_bdry.c of
+    _Navier-Stokes_plasma (compiled with _FLUID_PLASMA), all the functions of the fluid_plasma.c
+    of _Navier-Stokes_plasma and _Favre-Reynolds_plasma (compiled with _FLUID_PLASMA and
+    _FLUID_NEUTRALSTRANSPORT, since _drift-diffusion has its own), and the ballistic electron
+    model (compiled with _CHEM_BALLISTIC and _FLUID_PLASMA); the moved functions are unchanged,
+    except find_dH2_dUstar() with TEST, and find_Dstar(), find_Dstarmat() and
+    find_Dstar_interface(), which now use is_TEMODEL_transport() for the list of TEMODEL that
+    transport the electron energy (the lists differed between the two modules); the
+    _Favre-Reynolds_plasma versions of find_Dstarmat(), find_Dstar_interface(),
+    find_Dstarmatplus() and find_Dstarmatminus() were fatal_error() stubs and are now the
+    _Navier-Stokes_plasma ones; find_dTe_dNk(), never called, is removed; the functions
+    used only within fluid_plasma_share.c are static; the fluid_plasma.c and fluid_plasma.h of
+    both modules, left with no code, are removed; fluid_plasma_share.h is
+    included by the plasma fluid modules, by emfield_share.c, by the transport modules
+    _Dixon-Lewis and _Gupta-Yos and by _Ar_Plasma_Ballistic_20s
+  * the chemical solver includes the 7 reactions of [parent2026] and the ionization by an
+    external electron beam of power Qbeamext (W/m3), set in the control file; its source terms
+    and Jacobian are hard-coded in chem.c, and the Hayashi cross-sections are in hayashi.c;
+    documented in _Ar_Plasma_Ballistic_20s/doc; the runaway fraction of Reaction 7 (thermal
+    runaway of the bulk electrons) uses the critical field Ecrit7=EcritfactReaction7*Ecrit,
+    with EcritfactReaction7 set in the control file (at least 1, 5 in the template), since
+    with Ecrit the coupled solution diverges; EcritfactReaction7=1e99 turns Reaction 7 off;
+    with EcritfactReaction7=5, twoelectrodes.wrp does not diverge with the anode at 100 or
+    400 V
+  * added the test case bin/twoelectrodes.wrp: 2D square box of argon, 1 cm by 1 cm, at 133 Pa
+    and 300 K, with a cathode at 0 V and an anode at 400 V on the middle half of the left and
+    right walls; all other walls are dielectric, at 300 K, and emit secondary electrons into the
+    bulk (gamma=0.1); sustained by an external electron beam (Qbeamext=15 kW/m3), 101x71 nodes
+    clustered at the cathode, the walls and the edges of the electrodes, gas free, started from
+    an analytical cathode-fall profile, with 500 SOR then 7 IMAF subiterations of the potential
+    per iteration; run in two steps: 500 iterations without the ballistic electrons
+    (STARTUP=TRUE), then a restart with them up to iteration 6500 (STARTUP=FALSE);
+    EcritfactReaction7=5.0; it has the actions of _Navier-Stokes_plasma and _Favre-Reynolds_plasma
+    (with a negligible turbulence)
+  * with the ballistic electron model, the electron energy equation of every TEMODEL_TRANSPORT
+    model of _Navier-Stokes_plasma, and of TEMODEL_TRANSPORT_PARENT2024 of
+    _Favre-Reynolds_plasma, receives the energy source terms Qborn+Qbeam-Qrun of the reactions
+    of the ballistic electron model, in place of the energy carried by the bulk electrons
+    created and destroyed; INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY must be NO; chibmin is added
+    to the control file; with _Navier-Stokes_plasma, thermionic emission and
+    TETRANSPORT_WEEE_TWOTEMPERATURE are not supported
+  * _Favre-Reynolds_plasma takes the secondary emission coefficient of the cathode and of the
+    dielectric walls from gamma in its Model() action
+  * the current of the ballistic groups is part of the total current Jt of the potential
+    equation but not of J, and their kinetic energy is not part of the total energy; the total
+    energy instead receives Qbeam+Qthreshold-Qrun, what the groups lose in collisions minus
+    what they gain through runaway, so that the flux Jacobian and its eigenvalues and
+    eigenvectors are unchanged
+  * BALLISTIC=FALSE in the chemical solver removes the ballistic electrons: no electron runs
+    away and the cathode emits into the bulk, so that the model reduces to the fluid model of
+    the local energy approximation
+  * the ballistic groups have their own minimum molar fraction chibmin (1e-25 in the template),
+    since a group held at chiemin creates electrons that the potential equation does not see;
+    the bulk electron equation receives the part of the ambipolar drift that the current of the
+    groups removes from div(J)
+  * the mobility of Ar+ in the transport model is now that of Eq. (49) of [parent2026]
+  * added the boundary condition BDRY_WALLTFIXEDABSORBING1 to _Navier-Stokes_plasma: a wall with
+    a fixed temperature that, where it acts as an anode, absorbs the electrons reaching it with
+    their thermal speed (Eq. (58) of [parent2026]); it works with any chemical solver
+  * Temax is now 10.0e6 K in the template of _Navier-Stokes_plasma
+  * the Gauss-based potential equation can now use the stencil of the Ohm-based one, with the
+    conductivity replaced by the relative permittivity
+  * in /bin
+    - added twoelectrodes.wrp
+  * in /model/_model.h
+    - removed the prototype of find_Dstarmat_test()
+  * in /model/chem/.config
+    - added _Ar_Plasma_Ballistic_20s (option, not proprietary)
+  * in /model/chem/Makefile
+    - added _Ar_Plasma_Ballistic_20s to cleanall
+  * in /model/chem/_chem.h
+    - added the prototype of find_Q_ballistic() within _CHEM_BALLISTIC, the only function of
+      the ballistic electron chemical solver called from outside /model/chem
+  * in /model/chem/_Ar_Plasma_Ballistic_20s/chem.c (new file)
+    - added an #error with a fluid module without plasma support
+    - added write_model_chem_template(): writes the ArPlasmaBallistic20s() action of the control
+      file template, BALLISTIC and EcritfactReaction7 included
+    - added find_group_geometry(): potential windows, mean potentials and width ratios of the
+      groups, the potential of the emission group, epsborn and the maximum loss of the
+      cross-sections, from the parameters read
+    - added read_model_chem_actions_2(): empty sub-action processor of the
+      ArPlasmaBallistic20s() action
+    - added read_model_chem_actions(): reads and checks BALLISTIC, phigauge, phicathode,
+      epsemit, Tborn, zeta, EcritfactReaction7, chi0, kturnmax, Qbeamext, beamdir_x/y/z,
+      UNIFORMLEVELS and the levels
+    - added find_g(): destination weights of an electron born at a given potential, and their
+      derivatives, Eqs. (14)-(16)
+    - added find_frun_Ecritfact(): runaway fraction of Eqs. (10)-(12) with the critical field
+      Ecritfact*Ecrit, and its derivative with respect to N_Ar; zero with BALLISTIC=FALSE
+    - added find_frun(): runaway fraction of an electron liberated at rest and its derivative
+      with respect to N_Ar, Eqs. (10)-(12), with Ecritfact=1; zero with BALLISTIC=FALSE
+    - added _f_from_lnspline(): monotone spline in ln Te of a log-tabulated quantity, and its
+      derivative
+    - added _k1(): electron-impact ionization rate coefficient of the bulk electrons and its
+      derivative
+    - added _mueN(): reduced mobility of the bulk electrons from the transport model and its
+      derivative
+    - added _muArplus(): field-corrected mobility of Ar+ from the transport model and its
+      derivatives
+    - added find_k2(): ion-impact ionization rate coefficient of Phelps and Petrovic and its
+      derivatives
+    - added add_to_dW_term(): adds a contribution to the Jacobian, only if negative unless TEST
+      is defined
+    - added add_W(): adds a rate of progress to the source term of a species
+    - added add_dW(): adds a derivative with respect to a number density to dW/drhok
+    - added add_dWdTe(): adds a derivative with respect to Te to dW/dTe
+    - added add_dWdT(): adds a derivative with respect to T to dW/dT
+    - added find_W_dW_parent2026(): source terms of Reactions 1 to 8 and their Jacobian, which
+      keeps the gain of the bulk in Reaction 6 although it is positive, so that the transfer at
+      the turning point is implicit on both sides; Reaction 7 uses the runaway fraction with
+      Ecrit7; checks the conservation of mass and charge when TEST is defined
+    - added find_W(): source terms of the reactions
+    - added find_dW_dx(): Jacobian of the source terms of the reactions
+    - added find_Q_ballistic(): energy source terms Qborn, Qbeam, Qrun and Qthreshold of the
+      reactions of the ballistic electron model, Eqs. (41)-(43), and their derivatives, for the
+      fluid module; Qrun of Reaction 7 uses the runaway fraction with Ecrit7
+    - added find_Qei(): zero: the energy of the bulk electrons is exchanged through the energy
+      source terms of the ballistic electron model and the relaxation term of the fluid module
+    - added find_dQei_dx(): zero, since Qei is not used by this model
+  * in /model/chem/_Ar_Plasma_Ballistic_20s/hayashi.c (new file)
+    - added _sigma_from_table(): linear interpolation in a cross-section table
+    - added _sigma_el_Hayashi(): elastic momentum-transfer cross-section of argon
+    - added _sigma_inel_Hayashi(): cross-section of an inelastic channel of argon (25
+      excitations and the ionization)
+    - added _Deltaeps_inel_Hayashi(): threshold of an inelastic channel
+    - added _maxloss_Hayashi(): maximum over the energy of the sum of the cross-sections times
+      the thresholds, for Ecrit
+  * in /model/chem/_Ar_Plasma_Ballistic_20s/chem.h (new file)
+    - include guard only
+  * in /model/chem/_Ar_Plasma_Ballistic_20s/chem.hh (new file)
+    - species, nb, ns, the names of the groups, the switches of Reactions 1 to 6 and 8, and
+      gl_model_chem_t, EcritfactReaction7 included
+  * in /model/chem/_Ar_Plasma_Ballistic_20s/hayashi.h (new file)
+    - prototypes of hayashi.c
+  * in /model/chem/_Ar_Plasma_Ballistic_20s/Makefile (new file)
+    - builds chem.c and hayashi.c
+  * in /model/chem/_Ar_Plasma_Ballistic_20s/.config (new file)
+    - module description for make config
+  * in /model/chem/_Ar_Plasma_Ballistic_20s/doc/report.tex (new file)
+    - description of the species, the reactions, the energy source terms and the parameters;
+      states that Reaction 7 uses Ecrit7 (footnote c of the reaction table) and that
+      EcritfactReaction7=1e99 turns it off
+  * in /model/chem/_Ar_Plasma_Ballistic_20s/doc/all.bib (new file)
+    - references of the report
+  * in /model/chem/_Ar_Plasma_Ballistic_20s/doc/Makefile (new file)
+    - builds the report
+  * in /model/emfield/_Epotential/emfield.c
+    - in find_dtau_emfield(), with POTENTIAL_GAUSSBASED the pseudo-time step uses the relative
+      permittivity in place of the conductivity
+    - in find_linearization_coefficients_inner_node_emfield(), POTENTIAL_GAUSSBASED is now
+      accepted and uses the Ohm-based stencil with the relative permittivity in place of the
+      conductivity
+  * in /model/fluid/_drift-diffusion/fluid.c
+    - added an #error with a ballistic electron chemical solver
+    - removed find_Dstarmat_test(): not used
+    - in _mu(), the mobility of a neutral is now zero when it is not taken from memory (muk[k]
+      was read past the charged species)
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid.c
+    - in write_model_fluid_template(), chibmin with _CHEM_BALLISTIC
+    - in read_model_fluid_actions(), with _CHEM_BALLISTIC the parameters of the ballistic
+      electron model are read
+    - in reformat_w(), with _CHEM_BALLISTIC the ballistic groups are clipped at chibmin in place
+      of chiemin
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid_bdry.c
+    - in update_bdry_wall(), with _CHEM_BALLISTIC the electron densities at the cathode are those
+      of the ballistic electron model, and at the anode the bulk electron density has a zero
+      gradient and the ballistic groups flow out
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid_conv.c
+    - no longer includes fluid_plasma.h
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid_plasma.c (file removed)
+    - removed _Te_local(): moved to fluid_plasma_share.c
+    - removed _Tk(): moved to fluid_plasma_share.c
+    - removed _Pkmem(): moved to fluid_plasma_share.c
+    - removed _Pk(): moved to fluid_plasma_share.c
+    - removed _Nnmem(): moved to fluid_plasma_share.c
+    - removed _Nn(): moved to fluid_plasma_share.c
+    - removed _Nmem(): moved to fluid_plasma_share.c
+    - removed _N(): moved to fluid_plasma_share.c
+    - removed find_dQbeam_dU(): moved to fluid_plasma_share.c
+    - removed find_dTe_dNk(): not used
+    - removed _et_denom(): moved to fluid_plasma_share.c
+    - removed find_Dstarplus(): moved to fluid_plasma_share.c
+    - removed find_Dstarminus(): moved to fluid_plasma_share.c
+    - removed find_H1(): moved to fluid_plasma_share.c
+    - removed find_H2(): moved to fluid_plasma_share.c
+    - removed find_dH1_dUstar(): moved to fluid_plasma_share.c
+    - removed find_dH2_dUstar(): moved to fluid_plasma_share.c
+    - removed find_Dstar(): moved to fluid_plasma_share.c
+    - removed find_Dstarmat(): moved to fluid_plasma_share.c
+    - removed find_Dstar_interface(): moved to fluid_plasma_share.c
+    - removed find_Dstarmatplus(): moved to fluid_plasma_share.c
+    - removed find_Dstarmatminus(): moved to fluid_plasma_share.c
+    - removed find_Dstarmat_test(): not used
+    - removed _Emag(): was commented out
+    - removed _Te_local_old(): was commented out
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid_plasma.h (file removed)
+    - the files of the module no longer include it; _delta() is declared in /src/common.h,
+      _alpha() in fluid_plasma_share.h and find_alpha() in /model/fluid/_fluid.h; _Nesmoothed(),
+      kept in fluid_source.c but not called, needs no prototype
+  * in /model/fluid/_Favre-Reynolds_plasma/Makefile
+    - removed fluid_plasma
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid_post.c
+    - in find_post_variable_name_fluid(), with _CHEM_BALLISTIC the names of the post variables
+      of the ballistic groups are added at the end
+    - in find_post_variable_value_fluid(), with _CHEM_BALLISTIC the post variables of the
+      ballistic groups are added at the end
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid_source.c
+    - in find_Semfield(), with _CHEM_BALLISTIC the species equations receive the part of the
+      ambipolar drift term that the current of the ballistic groups removes from div(J)
+    - in find_Schem(), with _CHEM_BALLISTIC the energy source terms of the reactions of the
+      ballistic electron model are added, in place of the energy carried by the bulk electrons
+      created and destroyed
+    - in find_dSchem_dU(), with _CHEM_BALLISTIC the Jacobian of the energy source terms of the
+      reactions of the ballistic electron model is added, in place of the one of the energy
+      carried by the bulk electrons created and destroyed
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid.hh
+    - with _CHEM_BALLISTIC, added chibmin to gl_model_fluid_t and the numpostvarballistic post
+      variables of the ballistic groups to totalpostvarfluid
+  * in /model/fluid/_Navier-Stokes_plasma/fluid.c
+    - in write_model_fluid_template(), Temax=10.0e6, and chibmin with _CHEM_BALLISTIC
+    - in read_model_fluid_actions(), with _CHEM_BALLISTIC, the parameters of the ballistic
+      electron model are read once the others are, and TETRANSPORT_WEEE_TWOTEMPERATURE is
+      refused
+    - in _mu(), the mobility of a neutral is now zero when it is not taken from memory, as when
+      it is (muk[k] was read past the charged species)
+    - in reformat_w(), with _CHEM_BALLISTIC the ballistic groups are clipped at chibmin in place
+      of chiemin
+  * in /model/fluid/_Navier-Stokes_plasma/fluid_bdry.c
+    - removed _Vk_drift_perp_to_bdry(): moved to fluid_plasma_share.c
+    - in write_bdry_fluid_template(), added BDRY_WALLTFIXEDABSORBING1
+    - in add_bdry_types_fluid_to_codex(), added BDRY_WALLTFIXEDABSORBING1
+    - in update_bdry_wall(), new flag ABSORBINGWALL: at an anode, the bulk electron density is
+      that of a wall absorbing the electrons, Eq. (56) of [parent2026] with the wall density at
+      the node lA, a distance dwall from lB, in place of Deltax/2 (hence 4 De in place of the
+      8 De of Eq. (58)); with _CHEM_BALLISTIC the electron densities at the cathode and, without
+      ABSORBINGWALL, at the anode are those of the ballistic electron model, and thermionic
+      emission is refused
+    - in update_bdry_fluid(), BDRY_WALLTFIXEDABSORBING1 is a wall with the flag ABSORBINGWALL;
+      the other walls have it set to FALSE
+  * in /model/fluid/_Navier-Stokes_plasma/fluid_conv.c
+    - no longer includes fluid_plasma.h
+  * in /model/fluid/_Navier-Stokes_plasma/fluid_plasma.c (file removed)
+    - removed _Te_local(): moved to fluid_plasma_share.c
+    - removed _Tk(): moved to fluid_plasma_share.c
+    - removed _Pkmem(): moved to fluid_plasma_share.c
+    - removed _Pk(): moved to fluid_plasma_share.c
+    - removed _Nnmem(): moved to fluid_plasma_share.c
+    - removed _Nn(): moved to fluid_plasma_share.c
+    - removed _Nmem(): moved to fluid_plasma_share.c
+    - removed _N(): moved to fluid_plasma_share.c
+    - removed find_dQbeam_dU(): moved to fluid_plasma_share.c
+    - removed find_dTe_dNk(): not used
+    - removed _et_denom(): moved to fluid_plasma_share.c
+    - removed find_Dstarplus(): moved to fluid_plasma_share.c
+    - removed find_Dstarminus(): moved to fluid_plasma_share.c
+    - removed find_H1(): moved to fluid_plasma_share.c
+    - removed find_H2(): moved to fluid_plasma_share.c
+    - removed find_dH1_dUstar(): moved to fluid_plasma_share.c
+    - removed find_dH2_dUstar(): moved to fluid_plasma_share.c
+    - removed find_Dstar(): moved to fluid_plasma_share.c
+    - removed _DeltaVkstar(): moved to fluid_plasma_share.c
+    - removed _DeltaVkstar_interface(): moved to fluid_plasma_share.c
+    - removed find_Dstarmat(): moved to fluid_plasma_share.c
+    - removed find_Dstar_interface(): moved to fluid_plasma_share.c
+    - removed find_Dstarmatplus(): moved to fluid_plasma_share.c
+    - removed find_Dstarmatminus(): moved to fluid_plasma_share.c
+    - removed find_Dstarmat_test(): not used
+    - removed _dTkdXj_interface_2(): not used
+    - removed _Emag(): was commented out
+    - removed _Te_local_old(): was commented out
+  * in /model/fluid/_Navier-Stokes_plasma/fluid_plasma.h (file removed)
+    - the files of the module no longer include it; _delta() is declared in /src/common.h,
+      _mu_test() was never defined, and _Nesmoothed(), kept in fluid_source.c but not called,
+      needs no prototype
+  * in /model/fluid/_Navier-Stokes_plasma/Makefile
+    - removed fluid_plasma
+  * in /model/fluid/_Navier-Stokes_plasma/fluid_post.c
+    - in find_post_variable_name_fluid(), with _CHEM_BALLISTIC the names of the post variables
+      of the ballistic groups are added at the end
+    - in find_post_variable_value_fluid(), with _CHEM_BALLISTIC the post variables of the
+      ballistic groups are added at the end
+  * in /model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - in find_Semfield(), with _CHEM_BALLISTIC the species equations receive the part of the
+      ambipolar drift term that the current of the ballistic groups removes from div(J)
+    - in find_Schem(), with _CHEM_BALLISTIC the energy source terms of the reactions of the
+      ballistic electron model are added, in place of the energy carried by the bulk electrons
+      created and destroyed
+    - in find_dSchem_dU(), with _CHEM_BALLISTIC the Jacobian of the energy source terms of the
+      reactions of the ballistic electron model is added, in place of the one of the energy
+      carried by the bulk electrons created and destroyed
+  * in /model/fluid/_Navier-Stokes_plasma/fluid.hh
+    - with _CHEM_BALLISTIC, added chibmin to gl_model_fluid_t and the numpostvarballistic post
+      variables of the ballistic groups to totalpostvarfluid
+  * in /model/share/fluid_plasma_share.c (new file)
+    - added _betan(): moved from fluid_share.c
+    - added _betai(): moved from fluid_share.c
+    - added _betag(): moved from fluid_share.c
+    - added _betaplus(): moved from fluid_share.c
+    - added _betaa(): moved from fluid_share.c
+    - added _rhoc(): moved from fluid_share.c
+    - added is_bdry_cathode(): moved from fluid_share.c
+    - added _sigma_positive(): moved from fluid_share.c
+    - added _alpha(): moved from fluid_share.c
+    - added find_alpha(): moved from fluid_share.c
+    - added find_Z(): moved from fluid_share.c
+    - added find_dZU_dU(): moved from fluid_share.c
+    - added find_LambdaZ(): moved from fluid_share.c
+    - added find_Y1star_at_interface(): moved from fluid_share.c
+    - added find_Y2star_at_interface(): moved from fluid_share.c
+    - added _Vk_drift_perp_to_bdry(): moved from the fluid_bdry.c of _Navier-Stokes_plasma
+    - added _Te_local(): moved from the fluid_plasma.c of the plasma fluid modules
+    - added _Tk(): moved from the fluid_plasma.c of the plasma fluid modules
+    - added _Pkmem(): moved from the fluid_plasma.c of the plasma fluid modules
+    - added _Pk(): moved from the fluid_plasma.c of the plasma fluid modules
+    - added _Nnmem(): moved from the fluid_plasma.c of the plasma fluid modules
+    - added _Nn(): moved from the fluid_plasma.c of the plasma fluid modules
+    - added _Nmem(): moved from the fluid_plasma.c of the plasma fluid modules
+    - added _N(): moved from the fluid_plasma.c of the plasma fluid modules
+    - added find_dQbeam_dU(): moved from the fluid_plasma.c of the plasma fluid modules
+    - added _et_denom(): moved from the fluid_plasma.c of the plasma fluid modules
+    - added is_TEMODEL_transport(): TRUE if TEMODEL solves a transport equation for the
+      electron energy
+    - added find_Dstar(): moved from the fluid_plasma.c of the plasma fluid modules, with the
+      same list of TEMODEL for the electron energy term in both; with _CHEM_BALLISTIC the beam
+      convection of the ballistic groups is added and kept at the boundary nodes, and the groups
+      are left out of the enthalpy flux
+    - added find_Dstarplus(): moved from the fluid_plasma.c of the plasma fluid modules
+    - added find_Dstarminus(): moved from the fluid_plasma.c of the plasma fluid modules
+    - added _DeltaVkstar(): moved from the fluid_plasma.c of _Navier-Stokes_plasma
+    - added _DeltaVkstar_interface(): moved from the fluid_plasma.c of _Navier-Stokes_plasma
+    - added find_Dstarmat(): moved from the fluid_plasma.c of _Navier-Stokes_plasma, with the
+      shared list of TEMODEL for the electron energy term; with _CHEM_BALLISTIC the beam
+      convection of the ballistic groups is added and kept at the boundary nodes, and the
+      groups are left out of the enthalpy flux
+    - added find_Dstar_interface(): moved from the fluid_plasma.c of _Navier-Stokes_plasma, with
+      the shared list of TEMODEL for the electron energy term; with _CHEM_BALLISTIC the upwinded
+      beam convection of the ballistic groups is added and the groups are left out of the
+      enthalpy flux
+    - added find_Dstarmatplus(): moved from the fluid_plasma.c of _Navier-Stokes_plasma
+    - added find_Dstarmatminus(): moved from the fluid_plasma.c of _Navier-Stokes_plasma
+    - added find_H1(): moved from the fluid_plasma.c of the plasma fluid modules
+    - added find_H2(): moved from the fluid_plasma.c of the plasma fluid modules
+    - added find_dH1_dUstar(): moved from the fluid_plasma.c of the plasma fluid modules
+    - added find_dH2_dUstar(): moved from the fluid_plasma.c of the plasma fluid modules; with
+      TEST, the derivative of the conductivity is rewritten (Nk was not set)
+    - added find_beamdir(): unit vector along which the ballistic groups travel
+    - added _xi(): dimensionless offset of the mean potential of a group, Eqs. (A.4)-(A.5)
+    - added _phibar(): mean potential of a group, Eq. (18)
+    - added _eps_group(): kinetic energy of a group at the local potential, Eq. (7)
+    - added _Ve_group(): speed of a group at the local potential, Eq. (8)
+    - added _is_ballistic_group(): TRUE for species 1 to nb
+    - added _Vstar_ballistic_group(): contravariant speed of a ballistic group along beamdir at
+      the local potential
+    - added _Jstar_ballistic_groups_interface(): contravariant current of the ballistic groups
+      at an interface, upwinded, for the potential equation
+    - added _divJb(): divergence of the current of the ballistic groups, discretized as in the
+      Ohm-based potential equation
+    - added read_model_fluid_actions_ballistic(): reads chibmin and refuses
+      INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY
+    - added add_Dstarmat_ballistic_groups(): beam convection of the ballistic groups in the
+      convection matrix at a node
+    - added set_Dstarmat_to_zero_except_ballistic_groups(): at a boundary node, keeps only the
+      beam convection of the ballistic groups
+    - added add_Dstar_interface_ballistic_groups(): upwinded beam convection of the ballistic
+      groups at an interface
+    - added add_Dstar_ballistic_groups(): beam convection of the ballistic groups at a node
+    - added add_Semfield_ballistic_groups(): the part of the ambipolar drift term that the
+      current of the ballistic groups removes from div(J)
+    - added add_to_dS_term(): adds a contribution to the source Jacobian, only if negative
+      unless TEST is defined
+    - added add_Schem_ballistic(): energy source terms of the reactions of the ballistic
+      electron model, Qborn+Qbeam-Qrun to the bulk electrons when TEMODEL transports the
+      electron energy, and Qbeam+Qthreshold-Qrun to the total energy
+    - added add_dSchem_dU_ballistic(): Jacobian of the energy source terms of the reactions of
+      the ballistic electron model
+    - added update_Nk_electrons_at_cathode_ballistic(): an electrode that beamdir enters emits
+      into the emission group nb only, gamma times the ion flux (Eqs. (50)-(51)), with gamma
+      given by the fluid module; a dielectric wall, a wall that beamdir does not enter, or any
+      wall with BALLISTIC=FALSE emits into the bulk
+    - added update_Nk_electrons_at_anode_ballistic(): zero gradient of the bulk electron density
+      at an anode that does not absorb the electrons, Eq. (52)
+    - added find_post_variable_name_ballistic(): names of the post variables of the ballistic
+      groups
+    - added find_post_variable_value_ballistic(): energy and speed of each group, total electron
+      density, mean electron energy and current of the groups
+  * in /model/share/fluid_plasma_share.h (new file)
+    - added _betac(): moved from fluid_share.h
+    - added is_bdry_cathode(): prototype moved from fluid_share.h
+    - prototypes of the functions of fluid_plasma_share.c called from other files, moved from
+      fluid_share.h and the fluid_plasma.h of the plasma fluid modules, and what the chemical
+      solver, the fluid module and the transport module must provide for the ballistic electron
+      model
+  * in /model/share/Makefile
+    - added fluid_plasma_share
+  * in /model/share/fluid_share.c
+    - removed _betan(): moved to fluid_plasma_share.c
+    - removed _betai(): moved to fluid_plasma_share.c
+    - removed _betag(): moved to fluid_plasma_share.c
+    - removed _betaplus(): moved to fluid_plasma_share.c
+    - removed _betaa(): moved to fluid_plasma_share.c
+    - removed _rhoc(): moved to fluid_plasma_share.c
+    - removed is_bdry_cathode(): moved to fluid_plasma_share.c
+    - removed _sigma_positive(): moved to fluid_plasma_share.c
+    - removed _alpha(): moved to fluid_plasma_share.c
+    - removed find_alpha(): moved to fluid_plasma_share.c
+    - removed find_Y1star_at_interface(): moved to fluid_plasma_share.c
+    - removed find_Y2star_at_interface(): moved to fluid_plasma_share.c
+    - in find_Z(), the version of _FLUID_PLASMA is moved to fluid_plasma_share.c; the
+      one of the other fluid modules stays
+    - in find_dZU_dU(), the version of _FLUID_PLASMA is moved to fluid_plasma_share.c; the
+      one of the other fluid modules stays
+    - in find_LambdaZ(), the version of _FLUID_PLASMA is moved to fluid_plasma_share.c; the
+      one of the other fluid modules stays
+    - in find_init_number_density_templates(), the strings now start empty, and a gas other
+      than those listed (argon, for instance) gets its neutral species, the electrons and the
+      default species, as in find_init_molar_fraction_templates(); the init template of
+      _drift-diffusion was garbage with argon
+  * in /model/share/fluid_share.h
+    - removed _betac(): moved to fluid_plasma_share.h
+    - removed is_bdry_cathode(): prototype moved to fluid_plasma_share.h
+    - the prototypes of the other plasma functions are moved to fluid_plasma_share.h
+  * in /model/share/emfield_share.c
+    - in _Jtstar_interface(), with _CHEM_BALLISTIC and _FLUID_PLASMA the current of the
+      ballistic groups is added to the total current
+  * in /model/share/transport_share.c
+    - in _muk_from_rhok_T_Te_ParentMacheret(), added Ar+ with the low-field mobility of Eq. (49)
+      of [parent2026]
+    - in adjust_muk_for_Ek_effect(), added the high-field mobility of Ar+ of Eq. (49) of
+      [parent2026]
+    - in find_dmuk_from_rhok_Tk_Ek_ParentMacheret(), added the derivatives of the mobility of
+      Ar+
+  * in /model/thermo/_generic/thermo.c
+    - in find_species_name(), with _CHEM_BALLISTIC the names are those of the chemical solver,
+      since the electron groups all map to SMAP_eminus
+    - in find_species_variable_name(), the name is now the one of the chemical solver as well
+      with _CHEM_BALLISTIC
+  * in /model/transport/_Dixon-Lewis/transport.c
+    - in find_nuk_eta_kappak_muk(), with _CHEM_BALLISTIC the ballistic groups have no mobility,
+      and hence no thermal conductivity and no viscosity
+    - in find_dmuk_from_rhok_Tk_Ek(), with _CHEM_BALLISTIC the derivatives of the mobility of
+      the ballistic groups are zero
+  * in /model/transport/_Gupta-Yos/transport.c
+    - in _eta_from_chik_N_T_Te_Delta1_Delta2(), with _CHEM_BALLISTIC the ballistic groups do not
+      contribute to the viscosity
+    - in find_nuk_eta_kappak_muk(), with _CHEM_BALLISTIC the ballistic groups have no mobility
+      and no thermal conductivity, whatever the TRANSPORTMODEL
+  * in /src/test.c
+    - in test_Dstarmat(), Dstar is now only compared with Dstarplus+Dstarminus
+
+
 2026 OCT 12b
   * in all Makefiles, the recipe lines ( cd DIR ; ... ) are now ( cd DIR && ... ): when DIR
     was missing (e.g. a missing or dangling .active link), the cd failed and make ran again in

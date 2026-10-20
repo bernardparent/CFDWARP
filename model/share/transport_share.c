@@ -192,6 +192,10 @@ void adjust_muk_for_Ek_effect(long k, double Ek, double N, double *muk){
         B=3.56e19;
         p=-0.1;
       break;
+      case SMAP_Arplus:
+        B=0.40/sqrt(_m(k));
+        p=-0.5;
+      break;
       default:
         B=0.55/sqrt(_m(k));
         p=-0.5;
@@ -309,6 +313,8 @@ static double _mui_from_Nn_Ni_Ti(double Nn, double Ni, double A, double Ti, doub
 
   O2- is found from GOSHO, Y. AND HARADA, A., “A New Technique for Measuring Negative Ion Mobilities at Atmospheric Pressure,” Journal of Physics D, Vol. 16, 1983, pp. 1159–1166.
    
+  Ar+ is found from Eq. (49) in PARENT, B. AND PERRY, B., “Birth-Potential Multigroup Fluid Model for Ballistic Electrons: Breakdown and Cathode Sheath Regimes,” arXiv:2610.02139, 2026: mu=min(4.08e21, 0.40/sqrt(m)*(E/N)^-0.5)/N
+
   H2+, Cs+, N+, O+, O- are approximated using Fig. 8 in THE MOBILITIES OF SMALL IONS THE ATMOSPHERE AND THEIR RELATIONSHIP by E. UNGETHUM, Aerosol Science, 1974, Vol. 5, pp. 25 37. 
 */ 
 double _muk_from_rhok_T_Te_ParentMacheret(spec_t rhok, double T, double Te, long k){
@@ -343,6 +349,9 @@ double _muk_from_rhok_T_Te_ParentMacheret(spec_t rhok, double T, double Te, long
       break;
       case SMAP_NOplus:
         mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 1.62e23, T, -0.5,   _m(k));
+      break;
+      case SMAP_Arplus:
+        mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 4.08e21, T, 0.0,   _m(k));
       break;
       default:
         mu=_mui_from_Nn_Ni_Ti(Nn,Ni, 2.2e10/sqrt(_m(k)), T, -0.5,  _m(k));
@@ -469,6 +478,9 @@ void find_dmuk_from_rhok_Tk_Ek_ParentMacheret(spec_t rhok, double Tk, double Ek,
       break;
       case SMAP_NOplus:
         find_dmui_from_Nn_Ni_Ti(Nn, Ni, 1.62e23, Tk, -0.5, 4.47e12, Ekstar, -0.5, _m(k),  dmukdTk, dmukdrhok);
+      break;
+      case SMAP_Arplus:
+        find_dmui_from_Nn_Ni_Ti(Nn, Ni, 4.08e21, Tk, 0.0, 0.40/sqrt(_m(k)), Ekstar, -0.5, _m(k),  dmukdTk, dmukdrhok);
       break;
       default:
         find_dmui_from_Nn_Ni_Ti(Nn, Ni, 2.2e10/sqrt(_m(k)), Tk, -0.5, 0.55/sqrt(_m(k)), Ekstar, -0.5, _m(k),  dmukdTk, dmukdrhok);

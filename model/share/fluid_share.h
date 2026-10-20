@@ -114,45 +114,6 @@ void rearrange_metrics_eigenset2(metrics_t *metrics);
 void set_jacvars_eigenconditioning_constants(gl_t *gl, jacvars_t *jacvars);
 #endif
 
-#ifdef _FLUID_PLASMA
-double _betan(long k);
-
-static inline double _betac(long k){
-  double betac;
-  if (speciestype[k]!=SPECIES_NEUTRAL) betac=1.0; else betac=0.0;
-  return(betac);
-}
-
-double _betag(gl_t *gl, long k);
-
-double _betaa(gl_t *gl, long k);
-
-double _betai(long k);
-
-double _betaplus(long k);
-
-double _betaminus(long k);
-
-double _rhoc(np_t np, gl_t *gl);
-
-bool is_bdry_cathode(np_t *np, gl_t *gl, long lA, long lB, long lC,
-                     long theta, long thetasgn);
-
-double _sigma_positive(np_t *np, gl_t *gl, long l);
-
-double _alpha(np_t *np, gl_t *gl, long l, long k, long r);
-
-void find_alpha(np_t *np, gl_t *gl, long l, spec2_t alpha);
-
-void find_Z(np_t *np, gl_t *gl, long l, sqmat_t Z);
-
-void find_dZU_dU(np_t *np, gl_t *gl, long l, sqmat_t dZU_dU);
-
-void find_LambdaZ(np_t *np, gl_t *gl, long l, sqmat_t LambdaZ);
-
-
-#endif
-
 void find_init_mass_fraction_templates(char **specstr1, char **specstr2);
 
 void find_init_molar_fraction_templates(char **specstr1, char **specstr2);

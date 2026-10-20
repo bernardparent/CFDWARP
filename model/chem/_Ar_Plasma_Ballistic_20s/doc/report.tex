@@ -1,0 +1,327 @@
+\documentclass{warpdoc}
+\usepackage{bm}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{float}
+\pdfminorversion=7
+
+%%%%%%%%%%%%%=--NEW COMMANDS BEGINS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alb}{\vspace{0.2cm}\\} % array line break
+\newcommand{\ordi}{{\rm d}}
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\mfa}{\scriptscriptstyle}
+\newcommand{\mfb}{\scriptstyle}
+\newcommand{\mfc}{\textstyle}
+\newcommand{\mfd}{\displaystyle}
+\renewcommand{\fontsizetable}{\footnotesize}
+\newcommand{\eb}{{\rm e}_b}
+\setcounter{tocdepth}{3}
+\let\citen\cite
+%%%%%%%%%%%%%=--NEW COMMANDS ENDS--=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\author{
+ Bernard Parent
+}
+
+\email{
+  bparent@arizona.edu
+}
+
+\department{
+  Aerospace and Mechanical Engineering
+}
+
+\institution{
+  University of Arizona
+}
+
+\title{Ballistic Electron Argon Plasma Kinetics
+}
+
+\date{
+October 2026
+}
+
+\nomenclature{
+  \begin{nomenclaturelist}{Roman symbols}
+   \item[$a$] speed of sound
+  \end{nomenclaturelist}
+}
+
+
+\abstract{
+abstract
+}
+
+\begin{document}
+  \pagestyle{headings}
+  \pagenumbering{arabic}
+  \setcounter{page}{1}
+  \makewarpdoctitle
+ \tableofcontents
+
+
+\section{Overview}
+
+This chemical solver implements the electron kinetics of the ballistic electron model (the birth-potential multigroup model) of Parent and Perry \cite{arxiv:2026:parent} in argon. The electrons are split into a bulk group $\rm e^-_0$, described by a drift-diffusion equation and an electron energy equation, and $n_{\rm b}$ ballistic groups $\rm e^-_1$ to $\rm e^-_{n_b}$, each of which travels along a fixed direction at a speed set by the local electric potential. The ballistic groups $1$ to $n_{\rm b}-1$ receive the electrons liberated in the volume (the volumetric groups, ordered from the least to the most energetic), while group $n_{\rm b}$ receives only the electrons emitted from the cathode (the emission group). The species are listed in Table~\ref{tab:species}. The number of groups is set by the constant {\tt nb} in {\tt chem.hh}; the default $n_{\rm b}=17$ gives 20 species.
+
+\begin{table*}[!ht]
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Species included in the reaction mechanism.}
+    \label{tab:species}
+    \fontsizetable
+    \begin{tabular*}{0.75\textwidth}{@{}l@{\extracolsep{\fill}}ll@{}}
+    \toprule
+    Species no. & Species & Description\\
+    \midrule
+    0 & $\rm e^-_0$ & bulk electrons\\
+    1 to $n_{\rm b}-1$ & $\rm e^-_1$ to $\rm e^-_{n_b-1}$ & volumetric ballistic groups\\
+    $n_{\rm b}$ & $\rm e^-_{n_b}$ & emission group (electrons emitted from the cathode)\\
+    $n_{\rm b}+1$ & $\rm Ar^+$ & argon ion\\
+    $n_{\rm b}+2$ & $\rm Ar$ & argon atom\\
+    \bottomrule
+    \end{tabular*}
+   \end{threeparttable}
+\end{table*}
+
+The reactions are not in standard form: the share of each product electron sent to a given group depends on the local potential, on the electric field and on the argon number density. The source terms and their Jacobian are therefore written explicitly in {\tt chem.c} rather than built on {\tt chem\_share.c}. As in {\tt chem\_share.c}, only the negative contributions to the Jacobian are retained unless {\tt TEST} is defined. The equation numbers given below in brackets refer to Ref.~\cite{arxiv:2026:parent}.
+
+
+\section{Ballistic groups}
+
+\subsection{Energy levels and group windows}
+
+The groups are defined by $n_{\rm b}$ energy levels $\varepsilon_1 < \varepsilon_2 < \dots < \varepsilon_{n_b}$, in eV, measured from the gauge potential $\phi_{\rm gauge}$. Group $j\in\{1,\dots,n_{\rm b}-1\}$ collects the electrons whose birth potential lies within its window:
+$$
+\phi^{\rm lo}_j=\phi_{\rm gauge}-\varepsilon_{j+1},\qquad
+\phi^{\rm hi}_j=\phi_{\rm gauge}-\varepsilon_{j},\qquad
+\phi^{\rm mid}_j=\tfrac{1}{2}\left(\phi^{\rm lo}_j+\phi^{\rm hi}_j\right),\qquad
+\Delta\phi_j=\phi^{\rm hi}_j-\phi^{\rm lo}_j
+$$
+When {\tt UNIFORMLEVELS} is set, the levels are spaced uniformly between 0 and $\phi_{\rm gauge}-\phi_{\rm cathode}$; otherwise they are given one by one in the control file. The window of the emission group reduces to a point,
+$$
+\phi^{\rm lo}_{n_b}=\phi^{\rm hi}_{n_b}=\phi^{\rm mid}_{n_b}=\phi_{\rm emit}=\phi_{\rm cathode}-\varepsilon_{\rm emit}
+$$
+
+\subsection{Group energy and speed}
+
+The kinetic energy of group $j$, in eV, and its speed follow from the local potential $\phi$ [Eqs.~(7)--(8)]:
+$$
+\varepsilon_{{\rm e}_j}=\max\left(0,\ \phi-\overline{\phi}_j(\phi)\right),\qquad
+V_{{\rm e}_j}=\sqrt{\frac{2\,|C_{\rm e}|\,\varepsilon_{{\rm e}_j}}{m_{\rm e}}}
+$$
+where the mean group potential $\overline{\phi}_j=\phi^{\rm mid}_j+\Delta\phi_j\,\xi_j(\phi)$ is the centroid of the birth potentials deposited into the group up to the potential $\phi$ [Eqs.~(18)--(19)], with $\xi_j$ the closed-form expressions of Appendix~A of Ref.~\cite{arxiv:2026:parent}. For the emission group, $\overline{\phi}_{n_b}=\phi_{\rm emit}$. The groups travel along the unit vector set by {\tt beamdir} in the control file, and $E_n$ denotes the component of the electric field along that direction. The emission group receives the secondary electrons of an electrode that the direction {\tt beamdir} enters; those of a dielectric wall, or of a wall that {\tt beamdir} does not enter, go to the bulk electrons (fluid module).
+
+
+\section{Partition of the liberated electrons}
+
+An electron liberated at rest runs away into the ballistic groups only if the field exceeds the critical field [Eq.~(10)]:
+$$
+E_{\rm crit}=\frac{N_{\rm Ar}}{|C_{\rm e}|}\,\max_{\varepsilon}\sum_k \sigma_k(\varepsilon)\,\Delta\varepsilon_k
+$$
+where the sum runs over the 25 excitation channels and the ionization channel of Table~\ref{tab:hayashi}. With the cross-sections used here, the maximum is reached at $\varepsilon=75$~eV and gives $E_{\rm crit}/N_{\rm Ar}=572$~Td. The runaway fraction and the bulk fraction are [Eqs.~(11)--(13)]:
+$$
+f_{\rm run}=\left\{\begin{array}{ll}\mfd 1-\exp\left(-\frac{-E_n-E_{\rm crit}}{\zeta E_{\rm crit}}\right) & \textrm{if } -E_n>E_{\rm crit}\alb 0 & \textrm{otherwise}\end{array}\right.
+\qquad\qquad f_0=1-f_{\rm run}
+$$
+with $\zeta$ the straggling parameter. The runaway share is split between the group $j_{\rm A}$ whose window contains the birth potential, $\phi^{\rm lo}_{j_{\rm A}}\le\phi_{\rm birth}<\phi^{\rm hi}_{j_{\rm A}}$, and the adjacent more energetic group $j_{\rm A}+1$, through the destination weights [Eqs.~(14)--(16)]:
+$$
+g_j(\phi_{\rm birth})=\left\{\begin{array}{ll}1-s & j=j_{\rm A}\\ s & j=j_{\rm A}+1\\ 0 & \textrm{otherwise}\end{array}\right.
+\qquad\textrm{with}\qquad
+s=\frac{\phi^{\rm hi}_{j_{\rm A}}-\phi_{\rm birth}}{\Delta\phi_{j_{\rm A}}}
+$$
+Only the volumetric groups $1$ to $n_{\rm b}-1$ receive electrons: a birth above the window of group 1 goes to group 1, and a birth within or below the window of group $n_{\rm b}-1$ goes to group $n_{\rm b}-1$. An electron liberated at rest at the local potential $\phi$ is thus sent to group $j\ge1$ with the share $f_j=f_{\rm run}\,g_j(\phi)$ [Eq.~(17)] and to the bulk with the share $f_0$.
+
+
+\section{Argon chemical reactions}\label{sec:reactions}
+
+The reactions are listed in Table~\ref{tab:reactions}. Each row stands for one reaction per destination group $j\in\{0,1,\dots,n_{\rm b}-1\}$, and Reactions 3 to 6 also run over every parent group $b\in\{1,\dots,n_{\rm b}\}$. The quantities in the rate coefficients are the following:
+
+\begin{itemize}
+\item $k_1$ is the electron-impact ionization rate coefficient of ground state argon by the bulk electrons. It was obtained with BOLSIG- \cite{psst:2005:hagelaar} from the cross-sections of the Hayashi database \cite{nifs:2003:hayashi,lxcat:hayashi} and is given as a monotone spline in Table~\ref{tab:k1}. Outside the control points, $k_1$ is held at its value at the nearest end point.
+
+\item The ion-impact ionization rate coefficient of Reaction 2 follows Phelps and Petrovi\'c \cite{psst:1999:phelps}, with $|\vec{E}|/N$ in Td and $N=N_{\rm Ar}+N_{\rm Ar^+}$. The ion mobility $\mu_{\rm Ar^+}$ is the one of the transport model, corrected for the electric field as in the fluid module, so that [Eq.~(49)]
+$$
+\mu_{\rm Ar^+}=N^{-1}\min\left(4.08\times10^{21},\ 0.40\,m_{\rm Ar}^{-0.5}\,(|\vec{E}|/N)^{-0.5}\right)
+$$
+in m$^2$/(V$\cdot$s), with $|\vec{E}|/N$ in V$\cdot$m$^2$ and $m_{\rm Ar}$ in kg in this expression.
+
+\item $\sigma_{\rm el}$ is the elastic momentum-transfer cross-section, and $\sigma_k$ and $\Delta\varepsilon_k$ are the cross-section and the threshold of the inelastic channel $k$, all from the Hayashi database \cite{nifs:2003:hayashi,lxcat:hayashi} (Table~\ref{tab:hayashi}). The tabulated values are interpolated linearly in energy and held at the last tabulated value beyond the last point. They are evaluated at the energy $\varepsilon_{\eb}$ of the parent group.
+
+\item In Reactions 4 and 5, the primary electron keeps the share $\chi_{b,k}=\sqrt{1-\Delta\varepsilon_k/\varepsilon_{\eb}}$ of its forward momentum [Eq.~(22)]. That share goes to the group of the birth potential $\phi^{\rm birth}_{b,k}=\overline{\phi}_b(\phi)+\Delta\varepsilon_k$ [Eq.~(20)]. The share $1-\chi_{b,k}$ is scattered and is partitioned as an electron liberated at rest. The secondary electron of Reaction 5 is born at rest and goes to group $j'$ with the share $f_{j'}$.
+
+\item In Reaction 6, a group that is decelerated by the field and whose energy has fallen below $\varepsilon_{\rm born}=\tfrac{3}{2}k_{\rm B}T_{\rm born}$ is returned to the bulk [Eq.~(32)]. The rate coefficient is capped by {\tt kturnmax}, since it diverges at the turning point. A group at rest ($\varepsilon_{\eb}\le 0$, its level lying above the local potential) is also returned to the bulk at the rate {\tt kturnmax}, whatever the direction of the field: no flux leaves such a group and no birth can feed it, so without this sink it would accumulate the electrons brought in by numerical transport and never converge. The gain of the bulk in Reaction 6 is kept in the Jacobian of the source terms, although it is positive, so that the transfer from the group to the bulk is implicit on both sides; otherwise, the bulk would receive within one iteration $k^{\rm turn}\Delta t$ times what the group loses. Even so, {\tt kturnmax} must remain finite: the bulk then receives $k^{\rm turn}\Delta t\,N_b$ through the residual and loses it back through the implicit update, and the round-off error of this difference, about $10^{-16}k^{\rm turn}\Delta t\,N_b$, exceeds the bulk electron density in the cathode fall of a 1D version of the test case {\tt twoelectrodes.wrp} when {\tt kturnmax} is $10^{28}$~s$^{-1}$ or more. Between $10^{11}$ and $10^{24}$~s$^{-1}$, the solution does not depend on {\tt kturnmax}.
+
+\item In Reaction 7, the bulk electrons run away into the ballistic groups. The attempt frequency is $|C_{\rm e}|N_{\rm Ar}/(m_{\rm e}\mu_{\rm e}^\star)$, with $\mu^\star_{\rm e}=\mu_{\rm e}N$ the reduced mobility of the bulk electrons given by the transport model as a function of $T_{\rm e}$. Of these attempts, only the share $\chi_0$ can be re-collimated. The runaway electrons go to the group of the birth potential $\phi^{\rm birth}_0=\phi-\tfrac{3}{2}k_{\rm B}T_{\rm e}/|C_{\rm e}|$ [Eqs.~(34)--(35)]. The runaway fraction $f^{\rm run}_7$ of Reaction 7 is the one of Eqs.~(10)--(12) with $E_{\rm crit}$ replaced by a higher critical field $E_{\rm crit7}$, set through {\tt EcritfactReaction7} in the control file (Table~\ref{tab:reactions}, footnote c). To turn Reaction~7 off, set {\tt EcritfactReaction7} to a large value such as $10^{99}$: $|E_n|$ then never exceeds $E_{\rm crit7}$, and $f^{\rm run}_7=0$.
+
+\item Reaction 8 is the ionization of argon by an external electron beam \cite{jcp:2013:parent}. $Q_{\rm b}$ is the power the beam deposits per unit volume, set by {\tt Qbeamext} in the control file, and $N=N_{\rm Ar}+N_{\rm Ar^+}$. The factor $2.36\times10^{17}$~J$^{-1}$ is the inverse of the energy spent per ion pair formed in argon, about 26.4~eV. The electron is liberated at rest and is partitioned with the shares $f_j$, as the electrons of Reactions 1 and 2.
+\end{itemize}
+
+The bulk electrons are not subject to the elastic, excitation and superelastic processes in this solver. The energy they exchange in these collisions is accounted for by the relaxation term of the electron energy equation in the fluid module, through the reduced electric field $E^\star$ and the reduced mobility $\mu^\star_{\rm e}$ [Eq.~(44)] \cite{pf:2024:parent}.
+
+\begin{table*}[!ht]
+  \center\fontsizetable
+  \begin{threeparttable}
+  \renewcommand{\arraystretch}{1.3}
+    \tablecaption{Ballistic electron argon chemical kinetics\tnote{a}.}
+    \label{tab:reactions}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}lll@{}}
+    \toprule
+    No. & Reaction & Rate coefficient, m$^3$/s or 1/s & Ref.\\
+    \midrule
+    1 & $\rm e^-_0 + Ar \rightarrow Ar^+ + e^-_0 + e^-_j$
+      & $f_j\,k_1(T_{\rm e})$
+      & \cite{nifs:2003:hayashi,lxcat:hayashi}, Table~\ref{tab:k1}\\
+    2 & $\rm Ar^+ + Ar \rightarrow Ar^+ + Ar^+ + e^-_j$
+      & $f_j\,\mu_{\rm Ar^+}|\vec{E}|\left(8.2\cdot10^{-22}\,e^{-19900/(|\vec{E}|/N)}+7.1\cdot10^{-21}\,e^{-46000/(|\vec{E}|/N)}\right)$
+      & \cite{psst:1999:phelps}\\
+    3 & $\rm e^-_b + Ar \rightarrow e^-_0 + Ar$
+      & $f_0\,\sigma_{\rm el}(\varepsilon_{\eb})\,V_{\eb}$
+      & \cite{nifs:2003:hayashi,lxcat:hayashi}\\
+    4 & $\rm e^-_b + Ar \rightarrow e^-_j + Ar^*_k$
+      & $\left[\chi_{b,k}\,g_j(\phi^{\rm birth}_{b,k})+(1-\chi_{b,k})\,f_j\right]\sigma_k(\varepsilon_{\eb})\,V_{\eb}$
+      & \cite{nifs:2003:hayashi,lxcat:hayashi}\\
+    5 & $\rm e^-_b + Ar \rightarrow Ar^+ + e^-_j + e^-_{j'}$
+      & $\left[\chi_{b,{\rm iz}}\,g_j(\phi^{\rm birth}_{b,{\rm iz}})+(1-\chi_{b,{\rm iz}})\,f_j\right]f_{j'}\,\sigma_{\rm iz}(\varepsilon_{\eb})\,V_{\eb}$\tnote{b}
+      & \cite{nifs:2003:hayashi,lxcat:hayashi}\\
+    6 & $\rm e^-_b \rightarrow e^-_0$
+      & $\min\left(k^{\rm turn}_{\rm max},\ H(\varepsilon_{\rm born}-\varepsilon_{\eb})\,\max(0,\,-C_{\rm e}E_nV_{\eb})/(m_{\rm e}V_{\eb}^2)\right)$; $k^{\rm turn}_{\rm max}$ if $\varepsilon_{\eb}\le 0$
+      & \cite{arxiv:2026:parent}\\
+    7\tnote{c} & $\rm e^-_0 + Ar \rightarrow e^-_j + Ar$
+      & $\chi_0\,g_j(\phi^{\rm birth}_0)\,f^{\rm run}_7\,|C_{\rm e}|/(m_{\rm e}\mu^\star_{\rm e})$
+      & \cite{arxiv:2026:parent}\\
+    8 & $\rm Ar \rightarrow Ar^+ + e^-_j$
+      & $f_j\cdot 2.36\cdot10^{17}\,Q_{\rm b}/N$
+      & \cite{jcp:2013:parent}\\
+    \bottomrule
+    \end{tabular*}
+\begin{tablenotes}
+\item[{a}] $|\vec{E}|/N$ is in Td in Reaction 2 and $\mu_{\rm Ar^+}$ in m$^2$/(V$\cdot$s). In Reactions 3 to 8, all quantities are in SI units ($Q_{\rm b}$ in W/m$^3$, $N$ in m$^{-3}$, $\sigma$ in m$^2$, $V_{\eb}$ in m/s, $E_n$ in V/m, $C_{\rm e}$ in C, $m_{\rm e}$ in kg and $\mu^\star_{\rm e}$ in 1/(m$\cdot$V$\cdot$s)); $\varepsilon_{\eb}$ and $\Delta\varepsilon_k$ are in eV in $\chi_{b,k}$ and in the cross-sections. $H$ is the Heaviside step function. Reactions 4 and 5 run over the inelastic channels $k$ of Table~\ref{tab:hayashi}.
+\item[{b}] Reaction 5 runs over both $j$ and $j'$: the bracket is the share of the primary sent to group $j$ and $f_{j'}$ the share of the secondary sent to group $j'$. Each ionizing collision gives one $\rm Ar^+$.
+\item[{c}] $f^{\rm run}_7$ is the runaway fraction $f_{\rm run}$ of Eqs.~(10)--(12) with $E_{\rm crit}$ replaced by $E_{\rm crit7}=c_{\rm crit7}E_{\rm crit}$, in both the threshold and the denominator, where $c_{\rm crit7}\ge1$ is set by {\tt EcritfactReaction7} in the control file; Reactions 1, 2, 5 and 8 keep $E_{\rm crit}$. A bulk electron is sent ballistic only where the field exceeds $E_{\rm crit7}$, and hence well inside the sheath. Near the sheath edge, $|E_n|$ is only 1 to 3 times $E_{\rm crit}$ over the band where the bulk density rises, and is not sustained downstream; with $c_{\rm crit7}=1$, Reaction 7 sends the bulk electrons of this band into the groups, and a 1D version of {\tt twoelectrodes.wrp} at 400~V diverges within 10 iterations. The same case does not diverge with $c_{\rm crit7}\ge4$ with 17 groups, and with $c_{\rm crit7}\ge3$ with 41 groups. With $c_{\rm crit7}=5$, {\tt twoelectrodes.wrp} does not diverge with the anode at 100 or 400~V.
+\end{tablenotes}
+   \end{threeparttable}
+\end{table*}
+
+
+\begin{table*}[!ht]
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Coordinates of the spline control points of the electron-impact ionization rate coefficient $k_1$ of Reaction 1.\tnote{a}}
+    \label{tab:k1}
+    \fontsizetable
+    \begin{tabular*}{0.5\textwidth}{@{}l@{\extracolsep{\fill}}l@{}}
+    \toprule
+    ${\rm ln}~T_{\rm e}$ & ${\rm ln}~k_1$ \\
+    \midrule
+    10.42099 & $-$76.65280\\
+    10.56124 & $-$62.60476\\
+    10.59131 & $-$58.59835\\
+    10.65607 & $-$48.07229\\
+    10.70699 & $-$43.27593\\
+    10.79470 & $-$39.10465\\
+    10.92818 & $-$36.06700\\
+    11.12563 & $-$34.02993\\
+    11.45201 & $-$32.46860\\
+    13.11916 & $-$29.95960\\
+    16.11810 & $-$29.25725\\
+    \bottomrule
+    \end{tabular*}
+\begin{tablenotes}
+\item[{a}] $k_1$ is in m$^3$/s and $T_{\rm e}$ in K. The control points were obtained by fitting a monotone cubic spline to the rate coefficient given by BOLSIG- with the Hayashi cross-sections, within 3\% \cite{arxiv:2026:parent}.
+\end{tablenotes}
+   \end{threeparttable}
+\end{table*}
+
+
+\begin{table*}[!ht]
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Inelastic channels of the Hayashi database used in Reactions 4 and 5 and in $E_{\rm crit}$.\tnote{a}}
+    \label{tab:hayashi}
+    \fontsizetable
+    \begin{tabular*}{0.95\textwidth}{@{}l@{\extracolsep{\fill}}ll@{}}
+    \toprule
+    Channel $k$ & Process & Threshold $\Delta\varepsilon_k$, eV\\
+    \midrule
+    0 to 24 & $\rm e^- + Ar \rightarrow e^- + Ar^*_k$ & 11.55, 11.62, 11.72, 11.83, 12.91, 13.08, 13.09, 13.15, 13.17,\\
+            & & 13.27, 13.30, 13.33, 13.48, 13.84, 13.90, 13.98, 14.01, 14.06,\\
+            & & 14.09, 14.15, 14.21, 14.23, 14.30, 14.71, 15.20\\
+    25 (iz) & $\rm e^- + Ar \rightarrow Ar^+ + e^- + e^-$ & 15.76\\
+    \bottomrule
+    \end{tabular*}
+\begin{tablenotes}
+\item[{a}] Cross-sections from M.~Hayashi, NIFS-DATA-72 \cite{nifs:2003:hayashi}, as exported from LXCat on 16 May 2026 \cite{lxcat:hayashi}, along with the elastic momentum-transfer cross-section $\sigma_{\rm el}$. They are stored unchanged in {\tt hayashi.c}.
+\end{tablenotes}
+   \end{threeparttable}
+\end{table*}
+
+
+\section{Energy source terms}
+
+The ballistic groups have no energy equation: their energy follows from the potential. When electrons leave or join them, the energy exchanged with the bulk electrons and with the gas is given by the following terms, computed in {\tt find\_Q\_ballistic()} [Eqs.~(41)--(43)].
+
+\begin{itemize}
+\item The electrons that are liberated at rest and stay in the bulk add their birth energy $\varepsilon_{\rm born}=\tfrac{3}{2}k_{\rm B}T_{\rm born}$ to the bulk:
+$$
+Q^{\rm born}_{{\rm e}_0}=f_0\,\varepsilon_{\rm born}\left[k_1N_{{\rm e}_0}N_{\rm Ar}+k_2N_{\rm Ar^+}N_{\rm Ar}+N_{\rm Ar}\sum_{b=1}^{n_b}N_{\eb}V_{\eb}\,\sigma_{\rm iz}(\varepsilon_{\eb})+2.36\cdot10^{17}\,Q_{\rm b}\frac{N_{\rm Ar}}{N}\right]
+$$
+\item The electrons scattered out of the groups by Reactions 3 to 5 and the groups returned to the bulk by Reaction 6 give their remaining kinetic energy to the bulk:
+$$
+Q^{\rm beam}_{{\rm e}_0}=\sum_{b=1}^{n_b}N_{\eb}N_{\rm Ar}V_{\eb}\left[f_0\,\sigma_{\rm el}\,\varepsilon_{\eb}+\sum_k(1-\chi_{b,k})\,\sigma_k\,(\varepsilon_{\eb}-\Delta\varepsilon_k)\right]
++\sum_{b=1}^{n_b}N_{\eb}\,k^{\rm turn}_b\,\varepsilon_{\eb}
+$$
+\item The bulk electrons that run away through Reaction 7 take away their mean thermal energy (zero when Reaction 7 is turned off):
+$$
+Q^{\rm run}_{{\rm e}_0}=\chi_0\,N_{{\rm e}_0}N_{\rm Ar}\,f_{\rm run}\,\frac{|C_{\rm e}|}{m_{\rm e}\mu_{\rm e}^\star}\,\tfrac{3}{2}k_{\rm B}T_{\rm e}
+$$
+\item The ballistic groups lose the thresholds of the excitations and ionizations of Reactions 4 and 5 to the gas:
+$$
+Q^{\rm threshold}=\sum_{b=1}^{n_b}N_{\eb}N_{\rm Ar}V_{\eb}\sum_k\sigma_k\,\Delta\varepsilon_k
+$$
+\end{itemize}
+In the expressions above, the energies are in J. The bulk electron energy equation receives $Q^{\rm born}_{{\rm e}_0}+Q^{\rm beam}_{{\rm e}_0}-Q^{\rm run}_{{\rm e}_0}$. Since the kinetic energy of the ballistic groups is not part of the total energy of the fluid module, the total energy receives $Q^{\rm beam}_{{\rm e}_0}+Q^{\rm threshold}-Q^{\rm run}_{{\rm e}_0}$. The energy the bulk electrons lose in their own collisions is not part of this solver (see Section~\ref{sec:reactions}).
+
+
+\section{Control file parameters}
+
+The parameters of the model are set in the {\tt ArPlasmaBallistic20s()} module of the control file and are listed in Table~\ref{tab:parameters}.
+
+\begin{table*}[!ht]
+  \center\fontsizetable
+  \begin{threeparttable}
+    \tablecaption{Parameters of the chemical solver.}
+    \label{tab:parameters}
+    \fontsizetable
+    \begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}lp{0.55\textwidth}@{}}
+    \toprule
+    Parameter & Symbol & Description\\
+    \midrule
+    {\tt BALLISTIC} & & {\tt TRUE} for the ballistic groups of Ref.~\cite{arxiv:2026:parent}; {\tt FALSE} for none: the runaway fraction is then zero, so that every electron liberated in the volume goes to the bulk, and the secondary electrons emitted from the cathode go to the bulk as well (fluid module), so that the model reduces to the fluid model of the local energy approximation\\
+    {\tt phigauge} & $\phi_{\rm gauge}$ & potential mapped to the zero of the energy axis, in V\\
+    {\tt phicathode} & $\phi_{\rm cathode}$ & potential of the cathode, in V\\
+    {\tt epsemit} & $\varepsilon_{\rm emit}$ & energy of the electrons emitted from the cathode, in eV\\
+    {\tt Tborn} & $T_{\rm born}$ & temperature at which the electrons are liberated in the volume, in K\\
+    {\tt zeta} & $\zeta$ & straggling parameter of the runaway fraction; 0.8 in Ref.~\cite{arxiv:2026:parent}\\
+    {\tt EcritfactReaction7} & $c_{\rm crit7}$ & ratio $E_{\rm crit7}/E_{\rm crit}$ of the critical field of Reaction 7 to the one of Eq.~(10), at least 1; $10^{99}$ turns Reaction 7 off (Table~\ref{tab:reactions}, footnote c)\\
+    {\tt chi0} & $\chi_0$ & share of the bulk electrons that can be re-collimated in Reaction 7; 0.5 in Ref.~\cite{arxiv:2026:parent}\\
+    {\tt kturnmax} & $k^{\rm turn}_{\rm max}$ & cap on the rate coefficient of Reaction 6, in 1/s\\
+    {\tt Qbeamext} & $Q_{\rm b}$ & power deposited by the external electron beam in Reaction 8, in W/m$^3$; 0 for no beam\\
+    {\tt beamdir\_x}, {\tt \_y}, {\tt \_z} & & direction along which the ballistic groups travel (normalized when read)\\
+    {\tt UNIFORMLEVELS} & & {\tt TRUE} for levels uniform between 0 and $\phi_{\rm gauge}-\phi_{\rm cathode}$; if {\tt FALSE}, the levels are given as {\tt epslevel1} to {\tt epslevel}$n_{\rm b}$, in eV, in increasing order\\
+    \bottomrule
+    \end{tabular*}
+   \end{threeparttable}
+\end{table*}
+
+
+ \clearpage
+\bibliographystyle{warpdoc}
+\bibliography{all}
+
+
+\end{document}

@@ -104,8 +104,6 @@ void find_Dstarplus(np_t *np, gl_t *gl, long l, long theta, metrics_t metricsint
 
 void find_D2star_interface(np_t *np, gl_t *gl, long l, long theta, flux_t Dstar);
 
-void find_Dstarmat_test(np_t *np, gl_t *gl, long l, long theta, sqmat_t Dstar);
-
 void find_Z(np_t *np, gl_t *gl, long l, sqmat_t Z);
 
 void find_dZU_dU(np_t *np, gl_t *gl, long l, sqmat_t dZU_dU);

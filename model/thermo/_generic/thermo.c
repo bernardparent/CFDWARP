@@ -190,8 +190,14 @@ Units: kg/mol
   
 
 void find_species_name(long spec, char **name){
-  *name=(char *)realloc(*name,((long)strlen(speciesname[smap[spec]])+2)*sizeof(char));
-  strcpy(*name,speciesname[smap[spec]]);
+  const char *thisname;
+  thisname=speciesname[smap[spec]];
+#ifdef _CHEM_BALLISTIC
+  /* the electron groups all map to SMAP_eminus and take their names from the chem module */
+  thisname=speciesname_chem[spec];
+#endif
+  *name=(char *)realloc(*name,((long)strlen(thisname)+2)*sizeof(char));
+  strcpy(*name,thisname);
 }
 
 
@@ -221,8 +227,8 @@ int find_neutral_spec_from_ion_spec(long specion, long *specneutral){
 /* same as find_species_name but replaces '-' by 'minus' and '+' by 'plus' */
 void find_species_variable_name(long spec, char **name){
   long cnt;
-  *name=(char *)realloc(*name,((long)strlen(speciesname[smap[spec]])+10)*sizeof(char));
-  strcpy(*name,speciesname[smap[spec]]);
+  find_species_name(spec, name);
+  *name=(char *)realloc(*name,((long)strlen(*name)+10)*sizeof(char));
   cnt=0;
   do {
     if ((*name)[cnt]=='-') {
