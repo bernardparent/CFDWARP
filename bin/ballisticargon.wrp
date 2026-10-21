@@ -6,7 +6,7 @@
                       Computational Fluid Dynamics, Waves, Reactions, Plasmas
   _______________________________________________________________________________________________
 
-  Version                          26oct20d
+  Version                          26oct20e
   Compiler                         gcc 12.2.0 with OPENMP threads with assertions
   Compiled on                      Oct 14 2026 at 10:31:57
   Cycle Strategy                   Standard

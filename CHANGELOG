@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 OCT 20e
+  * the test case bin/twoelectrodes.wrp is renamed bin/ballisticargon.wrp; its content is
+    unchanged
+  * in /bin
+    - renamed twoelectrodes.wrp to ballisticargon.wrp
+  * in /model/chem/_Ar_Plasma_Ballistic_20s/doc/report.tex
+    - twoelectrodes.wrp is now ballisticargon.wrp in the three places that cite it
+
+
 2026 OCT 20d
   * added the ballistic electron model (the birth-potential multigroup model) of Parent and
     Perry, arXiv:2610.02139, 2026 [parent2026], through the chemical solver
