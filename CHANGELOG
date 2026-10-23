@@ -7,6 +7,20 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 OCT 20f
+  * without DISTMPI, the SOR of the potential keeps dUstar in a contiguous array during the
+    sweeps instead of reading it from np[].bs; the result is unchanged; with _Epotential and
+    _NH3_Plasma_32s on 30x30x30 nodes and 16 threads, the SOR is 2.4 to 2.6 times faster
+  * in /cycle/share/tsemf_share.c
+    - in update_dUstar_emfield_SOR_istation(), without DISTMPI, dUstar is read from and
+      written to the contiguous array dUs passed as a new argument instead of np[].bs
+    - in update_dUstar_emfield_SOR(), without DISTMPI, allocates dUs and sets it to zero,
+      passes it to each station update and copies it back into
+      np[].bs->dUstaremfield at the valid nodes after the sweeps
+  * in /cycle/share/tsemf_share.h
+    - added the dUs argument to the prototype of update_dUstar_emfield_SOR_istation()
+
+
 2026 OCT 20e
   * the test case bin/twoelectrodes.wrp is renamed bin/ballisticargon.wrp; its content is
     unchanged
