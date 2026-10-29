@@ -727,10 +727,11 @@ void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
 #else //not DISTMPI
 
 
-void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, zone_t zone, int SOR_SWEEP, long iter, double *dUs){
-  long j,k,l,theta,thetasgn;
-  double sum,RHS,Cp0,Cp1,dtau,tsemfcf;
-  long ioffset,joffset,koffset;
+void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, zone_t zone, int SOR_SWEEP, long iter, double *dUs,
+                                        double *sum0, double *fac, double *Cp1s, long *lBs,
+                                        double *tsemfcfs, long *dl, long nc){
+  long j,k,l,m;
+  double sum,RHS;
   assert(flux<nfe);
   for_2DL(j,zone.js,zone.je){
     for_3DL(k,zone.ks,zone.ke){
@@ -748,34 +749,22 @@ void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, z
       if (is_node_valid(np[l],TYPELEVEL_EMFIELD)) { 
         if (is_node_inner(np[l],TYPELEVEL_EMFIELD)) {
           /* for inner node */
-          sum=-np[l].bs->Resemfield[flux];
+          sum=sum0[l];
 //          for (dim=0; dim<nd; dim++){
 //            sum-=np[l].bs->coeffp1[dim][flux]*np[_al(gl,l,dim,+1)].bs->dUstaremfield[flux]
 //                +np[l].bs->coeffm1[dim][flux]*np[_al(gl,l,dim,-1)].bs->dUstaremfield[flux];
 //          }
-          for_1DL (ioffset,gl->tsemfcoeffzone.is,gl->tsemfcoeffzone.ie){
-            for_2DL (joffset,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
-              for_3DL (koffset,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
-                tsemfcf=np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,ioffset,joffset,koffset)][flux];
-                if (tsemfcf!=0.0)
-                  if (is_node_valid(np[_alll(gl,l,0,ioffset,1,joffset,2,koffset)],TYPELEVEL_EMFIELD) && !(ioffset==0 && joffset==0 && koffset==0))
-                  sum-=tsemfcf*dUs[_alll(gl,l,0,ioffset,1,joffset,2,koffset)];
-              }
-            }
-          }
+          for (m=0; m<nc; m++) sum-=tsemfcfs[l*nc+m]*dUs[l+dl[m]];
 
-          dtau=np[l].bs->dtauemfield[flux];
 //          RHS=(1.0-gl->relaxEMF)*np[l].bs->dUstaremfield[flux]+gl->relaxEMF/(np[l].bs->coeffp0sum[flux]+1.0/dtau)*sum;
-          RHS=(1.0-gl->relaxEMF)*dUs[l]+gl->relaxEMF/(np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,0,0,0)][flux]+1.0/dtau)*sum;
+          RHS=(1.0-gl->relaxEMF)*dUs[l]+fac[l]*sum;
           dUs[l]=RHS;
         } else {
-          /* for bdry node */ 
-          if (find_bdry_direc(np, gl, l, TYPELEVEL_EMFIELD, &theta, &thetasgn)){
-            find_linearization_coefficients_bdry_node_emfield(np, gl, l, theta, thetasgn, flux, 
-                                     _node_type(np[l], TYPELEVEL_EMFIELD), &Cp0, &Cp1,&sum);
-            sum-=Cp1*dUs[_al(gl,l,theta,thetasgn)];
-            RHS=(1.0-gl->relaxEMF)*dUs[l]+gl->relaxEMF/Cp0*sum;
-            dUs[l]=RHS;    
+          /* for bdry node; lBs[l]<0 if no bdry direction was found */
+          if (lBs[l]>=0){
+            sum=sum0[l]-Cp1s[l]*dUs[lBs[l]];
+            RHS=(1.0-gl->relaxEMF)*dUs[l]+fac[l]*sum;
+            dUs[l]=RHS;
           }
         }
       }
@@ -787,8 +776,9 @@ void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, z
 
 
 void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
-  long i,j,k,l,n,cnt,ilocal,numsubiter,numcycle,cycle;
-  double *dUs;
+  long i,j,k,l,n,m,nc,cnt,ilocal,numsubiter,numcycle,cycle,theta,thetasgn,ioffset,joffset,koffset;
+  double *dUs,*sum0,*fac,*Cp1s,Cp0,*tsemfcfs,tsemfcf;
+  long *lBs,*dl;
 
   assert(flux<nfe);
   n=(gl->domain_lim.ie-gl->domain_lim.is+1);
@@ -801,6 +791,86 @@ void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
   dUs=(double *)malloc(n*sizeof(double));
   if (dUs==NULL) fatal_error("Problem allocating dUs in update_dUstar_emfield_SOR().");
   for (l=0; l<n; l++) dUs[l]=0.0;
+  sum0=(double *)malloc(n*sizeof(double));
+  fac=(double *)malloc(n*sizeof(double));
+  Cp1s=(double *)malloc(n*sizeof(double));
+  lBs=(long *)malloc(n*sizeof(long));
+  if (sum0==NULL || fac==NULL || Cp1s==NULL || lBs==NULL)
+    fatal_error("Problem allocating sum0, fac, Cp1s or lBs in update_dUstar_emfield_SOR().");
+
+  /* the coefficients do not depend on dUstar: find them once, before the sweeps */
+#ifdef OPENMPTHREADS
+  #pragma omp parallel for private(j,k,l,theta,thetasgn,Cp0) schedule(dynamic)
+#endif
+  for_1DL(i,zone.is,zone.ie){
+    for_2DL(j,zone.js,zone.je){
+      for_3DL(k,zone.ks,zone.ke){
+        l=_ai(gl,i,j,k);
+        lBs[l]=-1;
+        if (is_node_valid(np[l],TYPELEVEL_EMFIELD)) {
+          if (is_node_inner(np[l],TYPELEVEL_EMFIELD)) {
+            sum0[l]=-np[l].bs->Resemfield[flux];
+            fac[l]=gl->relaxEMF/(np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,0,0,0)][flux]+1.0/np[l].bs->dtauemfield[flux]);
+          } else {
+            if (find_bdry_direc(np, gl, l, TYPELEVEL_EMFIELD, &theta, &thetasgn)){
+              find_linearization_coefficients_bdry_node_emfield(np, gl, l, theta, thetasgn, flux,
+                                       _node_type(np[l], TYPELEVEL_EMFIELD), &Cp0, &(Cp1s[l]), &(sum0[l]));
+              fac[l]=gl->relaxEMF/Cp0;
+              lBs[l]=_al(gl,l,theta,thetasgn);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /* the neighbour coefficients do not depend on dUstar: copy them once, before the sweeps, into a
+     contiguous array, with zeros at the centre and where the neighbour node is not valid;
+     dl[m] is the offset in l of neighbour m */
+  nc=0;
+  for_1DL (ioffset,gl->tsemfcoeffzone.is,gl->tsemfcoeffzone.ie){
+    for_2DL (joffset,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
+      for_3DL (koffset,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
+        nc++;
+      }
+    }
+  }
+  dl=(long *)malloc(nc*sizeof(long));
+  tsemfcfs=(double *)malloc(n*nc*sizeof(double));
+  if (dl==NULL || tsemfcfs==NULL) fatal_error("Problem allocating dl or tsemfcfs in update_dUstar_emfield_SOR().");
+  m=0;
+  for_1DL (ioffset,gl->tsemfcoeffzone.is,gl->tsemfcoeffzone.ie){
+    for_2DL (joffset,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
+      for_3DL (koffset,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
+        dl[m]=_alll(gl,0,0,ioffset,1,joffset,2,koffset);
+        m++;
+      }
+    }
+  }
+#ifdef OPENMPTHREADS
+  #pragma omp parallel for private(j,k,l,m,ioffset,joffset,koffset,tsemfcf) schedule(dynamic)
+#endif
+  for_1DL(i,zone.is,zone.ie){
+    for_2DL(j,zone.js,zone.je){
+      for_3DL(k,zone.ks,zone.ke){
+        l=_ai(gl,i,j,k);
+        if (is_node_valid(np[l],TYPELEVEL_EMFIELD) && is_node_inner(np[l],TYPELEVEL_EMFIELD)) {
+          m=0;
+          for_1DL (ioffset,gl->tsemfcoeffzone.is,gl->tsemfcoeffzone.ie){
+            for_2DL (joffset,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
+              for_3DL (koffset,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
+                tsemfcf=np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,ioffset,joffset,koffset)][flux];
+                if ((ioffset==0 && joffset==0 && koffset==0) || (tsemfcf!=0.0 && !is_node_valid(np[l+dl[m]],TYPELEVEL_EMFIELD)))
+                  tsemfcf=0.0;
+                tsemfcfs[l*nc+m]=tsemfcf;
+                m++;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
   find_tsemf_SOR_numsubiter_numcycle(gl->numsubiter_tsemf, TSEMF_SOR_NUMSUBITEROPT, &numsubiter, &numcycle);
   for (cycle=0; cycle<numcycle; cycle++){
 
@@ -811,7 +881,7 @@ void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
       for (cnt=0; cnt<numsubiter; cnt++)  {
         ilocal=i-cnt*2;
         if (ilocal>=zone.is && ilocal<=zone.ie) {
-          update_dUstar_emfield_SOR_istation(np, gl, flux, ilocal, zone, SOR_SWEEP_FORWARD,cnt,dUs);
+          update_dUstar_emfield_SOR_istation(np, gl, flux, ilocal, zone, SOR_SWEEP_FORWARD,cnt,dUs,sum0,fac,Cp1s,lBs,tsemfcfs,dl,nc);
         }
       }
     }
@@ -823,7 +893,7 @@ void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
       for (cnt=0; cnt<numsubiter; cnt++)  {
         ilocal=i+cnt*2;
         if (ilocal>=zone.is && ilocal<=zone.ie) {
-          update_dUstar_emfield_SOR_istation(np, gl, flux, ilocal, zone, SOR_SWEEP_BACKWARD,cnt,dUs);
+          update_dUstar_emfield_SOR_istation(np, gl, flux, ilocal, zone, SOR_SWEEP_BACKWARD,cnt,dUs,sum0,fac,Cp1s,lBs,tsemfcfs,dl,nc);
         }
       }
     }
@@ -839,6 +909,12 @@ void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
     }
   }
   free(dUs);
+  free(sum0);
+  free(fac);
+  free(Cp1s);
+  free(lBs);
+  free(tsemfcfs);
+  free(dl);
 }
 
 

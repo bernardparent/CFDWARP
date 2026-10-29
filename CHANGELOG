@@ -7,6 +7,27 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 OCT 28a
+  * without DISTMPI, the SOR of the potential finds the coefficients of each node once per call,
+    before the sweeps, and keeps them in contiguous arrays instead of reading them from np[].bs
+    and recomputing the boundary coefficients on every subiteration; the result is unchanged;
+    with _Epotential and _NH3_Plasma_32s on 30x30x30 nodes and 16 threads, the SOR is 3.8 times
+    faster
+  * in /cycle/share/tsemf_share.c
+    - in update_dUstar_emfield_SOR_istation(), without DISTMPI, the inner and boundary node
+      updates use the stored right-hand sides, relaxation factors, boundary coefficients and
+      neighbour coefficients passed as new arguments instead of reading them from np[].bs
+    - in update_dUstar_emfield_SOR(), without DISTMPI, finds before the sweeps, for each valid
+      node, the right-hand side and relaxEMF divided by the diagonal term, and for each
+      boundary node the coefficient and index of its neighbour; copies the neighbour
+      coefficients of the inner nodes into a contiguous array, with zeros at the centre and
+      where the neighbour is not valid; passes these arrays to each station update and frees
+      them after the sweeps
+  * in /cycle/share/tsemf_share.h
+    - added the arguments of the stored coefficients to the prototype of
+      update_dUstar_emfield_SOR_istation()
+
+
 2026 OCT 20f
   * without DISTMPI, the SOR of the potential keeps dUstar in a contiguous array during the
     sweeps instead of reading it from np[].bs; the result is unchanged; with _Epotential and
