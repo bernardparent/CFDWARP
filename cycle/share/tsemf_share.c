@@ -727,9 +727,9 @@ void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
 #else //not DISTMPI
 
 
-void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, zone_t zone, int SOR_SWEEP, long iter, double *dUs,
-                                        double *sum0, double *fac, double *Cp1s, long *lBs,
-                                        double *tsemfcfs, long *dl, long nc){
+static void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, zone_t zone, int SOR_SWEEP, long iter, double *dUs,
+                                               double *sum0, double *fac, double *Cp1s, long *lBs,
+                                               double *tsemfcfs, long *dl, long nc){
   long j,k,l,m;
   double sum,RHS;
   assert(flux<nfe);

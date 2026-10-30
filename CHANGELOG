@@ -7,6 +7,15 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 OCT 30a
+  * update_dUstar_emfield_SOR_istation(), used only within tsemf_share.c, is now static and
+    no longer declared in tsemf_share.h; the result is unchanged
+  * in /cycle/share/tsemf_share.c
+    - in update_dUstar_emfield_SOR_istation(), made static
+  * in /cycle/share/tsemf_share.h
+    - removed the prototype of update_dUstar_emfield_SOR_istation()
+
+
 2026 OCT 28a
   * without DISTMPI, the SOR of the potential finds the coefficients of each node once per call,
     before the sweeps, and keeps them in contiguous arrays instead of reading them from np[].bs

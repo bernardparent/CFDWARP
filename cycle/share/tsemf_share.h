@@ -29,7 +29,5 @@ void update_U_emfield_ADIk(np_t *np, gl_t *gl, zone_t zone);
 
 void update_U_emfield_Newton(np_t *np, gl_t *gl, zone_t zone);
 
-void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, long i, zone_t zone, int SOR_SWEEP, long iter, double *dUs, double *sum0, double *fac, double *Cp1s, long *lBs, double *tsemfcfs, long *dl, long nc);
-
 
 #endif /* _TSEMF_SHARE_H */
