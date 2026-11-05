@@ -154,34 +154,108 @@ static void init_dUstar_emfield_SOR(np_t *np, gl_t *gl, long theta, long ls, lon
 #define SOR_SWEEP_BACKWARD 2
 
 
+/* the coefficients do not depend on dUstar: find them once, before the sweeps;
+   the neighbour coefficients are copied into a contiguous array, with zeros at the centre and
+   where the neighbour node is not valid; dl[m] is the offset in l of neighbour m */
+static void find_dUstar_emfield_SOR_coefficients(np_t *np, gl_t *gl, long flux, zone_t zone, long n,
+                                       double *sum0, double *fac, double *Cp1s, long *lBs,
+                                       double **tsemfcfs_out, long **dl_out, long *nc_out){
+  long i,j,k,l,m,nc,theta,thetasgn,ioffset,joffset,koffset;
+  double Cp0,tsemfcf,*tsemfcfs;
+  long *dl;
+
+#ifdef OPENMPTHREADS
+  #pragma omp parallel for private(j,k,l,theta,thetasgn,Cp0) schedule(dynamic)
+#endif
+  for_1DL(i,zone.is,zone.ie){
+    for_2DL(j,zone.js,zone.je){
+      for_3DL(k,zone.ks,zone.ke){
+        l=_ai(gl,i,j,k);
+        lBs[l]=-1;
+        if (is_node_valid(np[l],TYPELEVEL_EMFIELD)) {
+          if (is_node_inner(np[l],TYPELEVEL_EMFIELD)) {
+            sum0[l]=-np[l].bs->Resemfield[flux];
+            fac[l]=gl->relaxEMF/(np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,0,0,0)][flux]+1.0/np[l].bs->dtauemfield[flux]);
+          } else {
+            if (find_bdry_direc(np, gl, l, TYPELEVEL_EMFIELD, &theta, &thetasgn)){
+              find_linearization_coefficients_bdry_node_emfield(np, gl, l, theta, thetasgn, flux,
+                                       _node_type(np[l], TYPELEVEL_EMFIELD), &Cp0, &(Cp1s[l]), &(sum0[l]));
+              fac[l]=gl->relaxEMF/Cp0;
+              lBs[l]=_al(gl,l,theta,thetasgn);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  nc=0;
+  for_1DL (ioffset,gl->tsemfcoeffzone.is,gl->tsemfcoeffzone.ie){
+    for_2DL (joffset,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
+      for_3DL (koffset,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
+        nc++;
+      }
+    }
+  }
+  dl=(long *)malloc(nc*sizeof(long));
+  tsemfcfs=(double *)malloc(n*nc*sizeof(double));
+  if (dl==NULL || tsemfcfs==NULL) fatal_error("Problem allocating dl or tsemfcfs in find_dUstar_emfield_SOR_coefficients().");
+  m=0;
+  for_1DL (ioffset,gl->tsemfcoeffzone.is,gl->tsemfcoeffzone.ie){
+    for_2DL (joffset,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
+      for_3DL (koffset,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
+        dl[m]=_alll(gl,0,0,ioffset,1,joffset,2,koffset);
+        m++;
+      }
+    }
+  }
+#ifdef OPENMPTHREADS
+  #pragma omp parallel for private(j,k,l,m,ioffset,joffset,koffset,tsemfcf) schedule(dynamic)
+#endif
+  for_1DL(i,zone.is,zone.ie){
+    for_2DL(j,zone.js,zone.je){
+      for_3DL(k,zone.ks,zone.ke){
+        l=_ai(gl,i,j,k);
+        if (is_node_valid(np[l],TYPELEVEL_EMFIELD) && is_node_inner(np[l],TYPELEVEL_EMFIELD)) {
+          m=0;
+          for_1DL (ioffset,gl->tsemfcoeffzone.is,gl->tsemfcoeffzone.ie){
+            for_2DL (joffset,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
+              for_3DL (koffset,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
+                tsemfcf=np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,ioffset,joffset,koffset)][flux];
+                if ((ioffset==0 && joffset==0 && koffset==0) || (tsemfcf!=0.0 && !is_node_valid(np[l+dl[m]],TYPELEVEL_EMFIELD)))
+                  tsemfcf=0.0;
+                tsemfcfs[l*nc+m]=tsemfcf;
+                m++;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  *tsemfcfs_out=tsemfcfs;
+  *dl_out=dl;
+  *nc_out=nc;
+}
+
+
 #ifdef DISTMPI
 
 
-void update_dUstar_emfield_SOR_node(np_t *np, gl_t *gl, long l, long flux, int SOR_SWEEP){
-  long theta,thetasgn;
-  double sum,RHS,Cp0,Cp1,dtau;
+void update_dUstar_emfield_SOR_node(np_t *np, gl_t *gl, long l, long flux, int SOR_SWEEP, double *dUs,
+                                    double *sum0, double *fac, double *Cp1s, long *lBs,
+                                    double *tsemfcfs, long *dl, long nc){
+  long m;
+  double sum,RHS;
 #ifndef NDEBUG
-  long i,j,k;
+  long i,j,k,theta,thetasgn;
 #endif
-  long ioffset,joffset,koffset;
 
   if (is_node_valid(np[l],TYPELEVEL_EMFIELD)) { 
 	if (is_node_inner(np[l],TYPELEVEL_EMFIELD)) {
       // for inner node 
-      sum=-np[l].bs->Resemfield[flux];
-//      for (dim=0; dim<nd; dim++){
-//        sum-=np[l].bs->coeffp1[dim][flux]*np[_al(gl,l,dim,+1)].bs->dUstaremfield[flux]
-//            +np[l].bs->coeffm1[dim][flux]*np[_al(gl,l,dim,-1)].bs->dUstaremfield[flux];
-//      }
-      
-      for_1DL (ioffset,gl->tsemfcoeffzone.is,gl->tsemfcoeffzone.ie){
-        for_2DL (joffset,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
-          for_3DL (koffset,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
-            if (is_node_valid(np[_alll(gl,l,0,ioffset,1,joffset,2,koffset)],TYPELEVEL_EMFIELD) && !(ioffset==0 && joffset==0 && koffset==0))
-              sum-=np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,ioffset,joffset,koffset)][flux]*np[_alll(gl,l,0,ioffset,1,joffset,2,koffset)].bs->dUstaremfield[flux];
-          }
-        }
-      }
+      sum=sum0[l];
+      for (m=0; m<nc; m++) sum-=tsemfcfs[l*nc+m]*dUs[l+dl[m]];
       
 #ifndef NDEBUG
       find_ijk_from_l(gl,l,&i,&j,&k);
@@ -215,20 +289,17 @@ void update_dUstar_emfield_SOR_node(np_t *np, gl_t *gl, long l, long flux, int S
 
       }
 #endif
-      dtau=np[l].bs->dtauemfield[flux];
-//      RHS=(1.0-gl->relaxEMF)*np[l].bs->dUstaremfield[flux]+gl->relaxEMF/(np[l].bs->coeffp0sum[flux]+1.0/dtau)*sum;
-      RHS=(1.0-gl->relaxEMF)*np[l].bs->dUstaremfield[flux]+gl->relaxEMF/(np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,0,0,0)][flux]+1.0/dtau)*sum;
-      np[l].bs->dUstaremfield[flux]=RHS; 
+      RHS=(1.0-gl->relaxEMF)*dUs[l]+fac[l]*sum;
+      dUs[l]=RHS; 
     } else {
-      // for bdry node  
-      if (find_bdry_direc(np, gl, l, TYPELEVEL_EMFIELD, &theta, &thetasgn)){
-        find_linearization_coefficients_bdry_node_emfield(np, gl, l, theta, thetasgn, flux, 
-                                     _node_type(np[l], TYPELEVEL_EMFIELD), &Cp0, &Cp1,&sum);
-        sum-=Cp1*np[_al(gl,l,theta,thetasgn)].bs->dUstaremfield[flux];
-        RHS=(1.0-gl->relaxEMF)*np[l].bs->dUstaremfield[flux]+gl->relaxEMF/Cp0*sum;
-        np[l].bs->dUstaremfield[flux]=RHS;   
+      // for bdry node; lBs[l]<0 if no bdry direction was found
+      if (lBs[l]>=0){
+        sum=sum0[l]-Cp1s[l]*dUs[lBs[l]];
+        RHS=(1.0-gl->relaxEMF)*dUs[l]+fac[l]*sum;
+        dUs[l]=RHS;   
 
 #ifndef NDEBUG
+        find_bdry_direc(np, gl, l, TYPELEVEL_EMFIELD, &theta, &thetasgn);
         switch (SOR_SWEEP){
           case SOR_SWEEP_FORWARD:
             if (thetasgn>0){
@@ -261,15 +332,14 @@ void update_dUstar_emfield_SOR_node(np_t *np, gl_t *gl, long l, long flux, int S
 
 
 
-static void find_mpivars_in_zone(np_t *np, gl_t *gl, long is, long js, long ks, long ie, long je, long ke, long flux, int *cntvars, double **mpivars){
+static void find_mpivars_in_zone(np_t *np, gl_t *gl, long is, long js, long ks, long ie, long je, long ke, double *dUs, int *cntvars, double *mpivars){
   long i,j,k;
   *cntvars=0;
   for_1DL(i,is,ie){
     for_2DL(j,js,je){
       for_3DL(k,ks,ke){
         if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
-          (*mpivars)=(double *)realloc(*mpivars,sizeof(double)*(*cntvars+1));
-          (*mpivars)[*cntvars]=np[_ai(gl,i,j,k)].bs->dUstaremfield[flux];
+          mpivars[*cntvars]=dUs[_ai(gl,i,j,k)];
           (*cntvars)++;
         }    
       }
@@ -278,7 +348,7 @@ static void find_mpivars_in_zone(np_t *np, gl_t *gl, long is, long js, long ks, 
 }
 
 
-static void copy_mpivars_in_zone(np_t *np, gl_t *gl, long is, long js, long ks, long ie, long je, long ke, long flux, int numvars, double *mpivars){
+static void copy_mpivars_in_zone(np_t *np, gl_t *gl, long is, long js, long ks, long ie, long je, long ke, double *dUs, int numvars, double *mpivars){
   long i,j,k;
   int cntvars;
   cntvars=0;
@@ -286,7 +356,7 @@ static void copy_mpivars_in_zone(np_t *np, gl_t *gl, long is, long js, long ks, 
     for_2DL(j,js,je){
       for_3DL(k,ks,ke){
         if (is_node_valid(np[_ai(gl,i,j,k)],TYPELEVEL_EMFIELD)){
-          np[_ai(gl,i,j,k)].bs->dUstaremfield[flux]=mpivars[cntvars];
+          dUs[_ai(gl,i,j,k)]=mpivars[cntvars];
           cntvars++;
 #ifndef NDEBUG
           np[_ai(gl,i,j,k)].bs->TSEMF_UPDATED=TRUE;
@@ -303,7 +373,9 @@ static void copy_mpivars_in_zone(np_t *np, gl_t *gl, long is, long js, long ks, 
 
 
 
-static void update_dUstar_emfield_SOR_forward(np_t *np, gl_t *gl, long flux, zone_t zone, long numiter){
+static void update_dUstar_emfield_SOR_forward(np_t *np, gl_t *gl, long flux, zone_t zone, long numiter, double *dUs,
+                                     double *sum0, double *fac, double *Cp1s, long *lBs,
+                                     double *tsemfcfs, long *dl, long nc, double *mpivars){
   long i,iter,cnt;
   long j,k,plane,planestart,planeend,jplusk;
 #ifdef _3D
@@ -313,7 +385,6 @@ static void update_dUstar_emfield_SOR_forward(np_t *np, gl_t *gl, long flux, zon
   long *lplane[((zone.ie-zone.is+1)+(zone.je-zone.js+1))+1];
 #endif
   int numvars,rank,thisrank;
-  double *mpivars;
 
   int packsize,buffersize,bbuffersize;
   double *buffer,*bbuffer;
@@ -328,7 +399,6 @@ static void update_dUstar_emfield_SOR_forward(np_t *np, gl_t *gl, long flux, zon
   
   buffersize = (zone.ie-zone.is+1)*(zone.je-zone.js+1)if3DL(*(zone.ke-zone.ks+1)) * (MPI_BSEND_OVERHEAD + packsize);
   buffer = (double *)malloc( buffersize );
-  mpivars=(double *)malloc(sizeof(double));
 
 
   /* find lplane */
@@ -377,85 +447,87 @@ static void update_dUstar_emfield_SOR_forward(np_t *np, gl_t *gl, long flux, zon
     rank=_node_rank(gl,zone.is-1,zone.js,zone.ks);
     if (rank!=thisrank){
       if (MPI_Recv(&numvars,1,MPI_INT,rank,39302,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
       if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,39301,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      copy_mpivars_in_zone(np,gl,zone.is-1-exlap,zone.js,zone.ks,zone.is-1,zone.je,zone.ke, flux, numvars,mpivars);
+      copy_mpivars_in_zone(np,gl,zone.is-1-exlap,zone.js,zone.ks,zone.is-1,zone.je,zone.ke, dUs, numvars,mpivars);
     }
 
 
     rank=_node_rank(gl,zone.is,zone.js-1,zone.ks);
     if (rank!=thisrank){
       if (MPI_Recv(&numvars,1,MPI_INT,rank,39312,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
       if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,39311,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      copy_mpivars_in_zone(np,gl,zone.is,zone.js-1-exlap,zone.ks,zone.ie,zone.js-1,zone.ke, flux, numvars,mpivars);
+      copy_mpivars_in_zone(np,gl,zone.is,zone.js-1-exlap,zone.ks,zone.ie,zone.js-1,zone.ke, dUs, numvars,mpivars);
     }
 
 #ifdef _3DL
     rank=_node_rank(gl,zone.is,zone.js,zone.ks-1);
     if (rank!=thisrank){
       if (MPI_Recv(&numvars,1,MPI_INT,rank,39322,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
       if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,39321,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      copy_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks-1-exlap,zone.ie,zone.je,zone.ks-1, flux, numvars,mpivars);
+      copy_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks-1-exlap,zone.ie,zone.je,zone.ks-1, dUs, numvars,mpivars);
     }
 #endif
 
 
-    /* the threaded loop */
-    for (plane=planestart; plane<=planeend; plane++){
+    /* the threaded loop: one parallel region, with a barrier after each plane */
 #ifdef OPENMPTHREADS
-      #pragma omp parallel for private(cnt) schedule(static)  
+    #pragma omp parallel private(plane)
 #endif
-      for (cnt=1; cnt<=lplane[plane][0]; cnt++){
-        update_dUstar_emfield_SOR_node(np, gl, lplane[plane][cnt], flux, SOR_SWEEP_FORWARD);
+    {
+      for (plane=planestart; plane<=planeend; plane++){
+#ifdef OPENMPTHREADS
+        #pragma omp for private(cnt) schedule(static)
+#endif
+        for (cnt=1; cnt<=lplane[plane][0]; cnt++){
+          update_dUstar_emfield_SOR_node(np, gl, lplane[plane][cnt], flux, SOR_SWEEP_FORWARD, dUs, sum0, fac, Cp1s, lBs, tsemfcfs, dl, nc);
+        }
       }
     }
 
 
     /* exchange data with other processes after the threading */
 
-    find_mpivars_in_zone(np,gl,zone.ie-exlap,zone.js,zone.ks,zone.ie,zone.je,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.ie+1,zone.js,zone.ks);
     if (rank!=thisrank){
+      find_mpivars_in_zone(np,gl,zone.ie-exlap,zone.js,zone.ks,zone.ie,zone.je,zone.ke, dUs, &numvars,mpivars);
       if (MPI_Bsend(&numvars,1,MPI_INT,rank,39302,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
       if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,39301,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 
 
-    find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.is+exlap,zone.je,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is-1,zone.js,zone.ks);
     if (rank!=thisrank){
+      find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.is+exlap,zone.je,zone.ke, dUs, &numvars,mpivars);
       if (MPI_Bsend(&numvars,1,MPI_INT,rank,39302,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
       if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,39301,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 
 
-    find_mpivars_in_zone(np,gl,zone.is,zone.je-exlap,zone.ks,zone.ie,zone.je,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is,zone.je+1,zone.ks);
     if (rank!=thisrank){
+      find_mpivars_in_zone(np,gl,zone.is,zone.je-exlap,zone.ks,zone.ie,zone.je,zone.ke, dUs, &numvars,mpivars);
       if (MPI_Bsend(&numvars,1,MPI_INT,rank,39312,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
       if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,39311,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 
 
-    find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.ie,zone.js+exlap,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is,zone.js-1,zone.ks);
     if (rank!=thisrank){
+      find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.ie,zone.js+exlap,zone.ke, dUs, &numvars,mpivars);
       if (MPI_Bsend(&numvars,1,MPI_INT,rank,39312,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
       if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,39311,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 #ifdef _3DL
-    find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ke-exlap,zone.ie,zone.je,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is,zone.js,zone.ke+1);
     if (rank!=thisrank){
+      find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ke-exlap,zone.ie,zone.je,zone.ke, dUs, &numvars,mpivars);
       if (MPI_Bsend(&numvars,1,MPI_INT,rank,39322,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
       if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,39321,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 
-    find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.ie,zone.je,zone.ks+exlap, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is,zone.js,zone.ks-1);
     if (rank!=thisrank){
+      find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.ie,zone.je,zone.ks+exlap, dUs, &numvars,mpivars);
       if (MPI_Bsend(&numvars,1,MPI_INT,rank,39322,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
       if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,39321,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
@@ -465,27 +537,24 @@ static void update_dUstar_emfield_SOR_forward(np_t *np, gl_t *gl, long flux, zon
     rank=_node_rank(gl,zone.ie+1,zone.js,zone.ks);
     if (rank!=thisrank){
       if (MPI_Recv(&numvars,1,MPI_INT,rank,39302,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
       if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,39301,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      copy_mpivars_in_zone(np,gl,zone.ie+1,zone.js,zone.ks,zone.ie+1+exlap,zone.je,zone.ke, flux, numvars,mpivars);
+      copy_mpivars_in_zone(np,gl,zone.ie+1,zone.js,zone.ks,zone.ie+1+exlap,zone.je,zone.ke, dUs, numvars,mpivars);
     }
 
 
     rank=_node_rank(gl,zone.is,zone.je+1,zone.ks);
     if (rank!=thisrank){
       if (MPI_Recv(&numvars,1,MPI_INT,rank,39312,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
       if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,39311,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      copy_mpivars_in_zone(np,gl,zone.is,zone.je+1,zone.ks,zone.ie,zone.je+1+exlap,zone.ke, flux, numvars,mpivars);
+      copy_mpivars_in_zone(np,gl,zone.is,zone.je+1,zone.ks,zone.ie,zone.je+1+exlap,zone.ke, dUs, numvars,mpivars);
     }
 
 #ifdef _3DL
     rank=_node_rank(gl,zone.is,zone.js,zone.ke+1);
     if (rank!=thisrank){
       if (MPI_Recv(&numvars,1,MPI_INT,rank,39322,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
       if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,39321,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      copy_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ke+1,zone.ie,zone.je,zone.ke+1+exlap, flux, numvars,mpivars);
+      copy_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ke+1,zone.ie,zone.je,zone.ke+1+exlap, dUs, numvars,mpivars);
     }
 #endif
 
@@ -507,14 +576,15 @@ static void update_dUstar_emfield_SOR_forward(np_t *np, gl_t *gl, long flux, zon
   MPI_Barrier(MPI_COMM_WORLD);
 
   free(buffer);
-  free(mpivars);
 
 }
 
 
 
 
-static void update_dUstar_emfield_SOR_backward(np_t *np, gl_t *gl, long flux, zone_t zone, long numiter){
+static void update_dUstar_emfield_SOR_backward(np_t *np, gl_t *gl, long flux, zone_t zone, long numiter, double *dUs,
+                                     double *sum0, double *fac, double *Cp1s, long *lBs,
+                                     double *tsemfcfs, long *dl, long nc, double *mpivars){
   long i,iter,cnt;
   long j,k,plane,planestart,planeend,jplusk;
 #ifdef _3D
@@ -524,7 +594,6 @@ static void update_dUstar_emfield_SOR_backward(np_t *np, gl_t *gl, long flux, zo
   long *lplane[((zone.ie-zone.is+1)+(zone.je-zone.js+1))+1];
 #endif
   int numvars,rank,thisrank;
-  double *mpivars;
 
   int packsize,buffersize,bbuffersize;
   double *buffer,*bbuffer;
@@ -536,7 +605,6 @@ static void update_dUstar_emfield_SOR_backward(np_t *np, gl_t *gl, long flux, zo
   
   buffersize = min(INT_MAX,(zone.ie-zone.is+1)*(zone.je-zone.js+1)if3DL(*(zone.ke-zone.ks+1)) * (MPI_BSEND_OVERHEAD + packsize));
   buffer = (double *)malloc( buffersize );
-  mpivars=(double *)malloc(sizeof(double));
 
   exlap=(gl->tsemfcoeffzone.ie-gl->tsemfcoeffzone.is)/2-1;  //overlap
   assert(exlap>=0);
@@ -586,81 +654,83 @@ static void update_dUstar_emfield_SOR_backward(np_t *np, gl_t *gl, long flux, zo
     rank=_node_rank(gl,zone.ie+1,zone.js,zone.ks);
     if (rank!=thisrank){
       if (MPI_Recv(&numvars,1,MPI_INT,rank,54701,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
       if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,54702,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      copy_mpivars_in_zone(np,gl,zone.ie+1,zone.js,zone.ks,zone.ie+1+exlap,zone.je,zone.ke, flux, numvars,mpivars);
+      copy_mpivars_in_zone(np,gl,zone.ie+1,zone.js,zone.ks,zone.ie+1+exlap,zone.je,zone.ke, dUs, numvars,mpivars);
     }
 
     rank=_node_rank(gl,zone.is,zone.je+1,zone.ks);
     if (rank!=thisrank){
       if (MPI_Recv(&numvars,1,MPI_INT,rank,54711,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
       if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,54712,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      copy_mpivars_in_zone(np,gl,zone.is,zone.je+1,zone.ks,zone.ie,zone.je+1+exlap,zone.ke, flux, numvars,mpivars);
+      copy_mpivars_in_zone(np,gl,zone.is,zone.je+1,zone.ks,zone.ie,zone.je+1+exlap,zone.ke, dUs, numvars,mpivars);
     }
 
 #ifdef _3DL
     rank=_node_rank(gl,zone.is,zone.js,zone.ke+1);
     if (rank!=thisrank){
       if (MPI_Recv(&numvars,1,MPI_INT,rank,54721,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
       if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,54722,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      copy_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ke+1,zone.ie,zone.je,zone.ke+1+exlap, flux, numvars,mpivars);
+      copy_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ke+1,zone.ie,zone.je,zone.ke+1+exlap, dUs, numvars,mpivars);
     }
 #endif
 
 
-    /* the threaded loop */
-    for (plane=planeend; plane>=planestart; plane--){
+    /* the threaded loop: one parallel region, with a barrier after each plane */
 #ifdef OPENMPTHREADS
-      #pragma omp parallel for private(cnt) schedule(static)  
+    #pragma omp parallel private(plane)
 #endif
-      for (cnt=1; cnt<=lplane[plane][0]; cnt++){
-        update_dUstar_emfield_SOR_node(np, gl, lplane[plane][cnt], flux, SOR_SWEEP_BACKWARD);
+    {
+      for (plane=planeend; plane>=planestart; plane--){
+#ifdef OPENMPTHREADS
+        #pragma omp for private(cnt) schedule(static)
+#endif
+        for (cnt=1; cnt<=lplane[plane][0]; cnt++){
+          update_dUstar_emfield_SOR_node(np, gl, lplane[plane][cnt], flux, SOR_SWEEP_BACKWARD, dUs, sum0, fac, Cp1s, lBs, tsemfcfs, dl, nc);
+        }
       }
     }
 
 
     /* exchange data with other processes after the threading */
 
-    find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.is+exlap,zone.je,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is-1,zone.js,zone.ks);
     if (rank!=thisrank){
+      find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.is+exlap,zone.je,zone.ke, dUs, &numvars,mpivars);
       if (MPI_Bsend(&numvars,1,MPI_INT,rank,54701,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
       if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,54702,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 
-    find_mpivars_in_zone(np,gl,zone.ie-exlap,zone.js,zone.ks,zone.ie,zone.je,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.ie+1,zone.js,zone.ks);
     if (rank!=thisrank){
+      find_mpivars_in_zone(np,gl,zone.ie-exlap,zone.js,zone.ks,zone.ie,zone.je,zone.ke, dUs, &numvars,mpivars);
       if (MPI_Bsend(&numvars,1,MPI_INT,rank,54701,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
       if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,54702,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 
-    find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.ie,zone.js+exlap,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is,zone.js-1,zone.ks);
     if (rank!=thisrank){
+      find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.ie,zone.js+exlap,zone.ke, dUs, &numvars,mpivars);
       if (MPI_Bsend(&numvars,1,MPI_INT,rank,54711,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
       if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,54712,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 
-    find_mpivars_in_zone(np,gl,zone.is,zone.je-exlap,zone.ks,zone.ie,zone.je,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is,zone.je+1,zone.ks);
     if (rank!=thisrank){
+      find_mpivars_in_zone(np,gl,zone.is,zone.je-exlap,zone.ks,zone.ie,zone.je,zone.ke, dUs, &numvars,mpivars);
       if (MPI_Bsend(&numvars,1,MPI_INT,rank,54711,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
       if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,54712,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 #ifdef _3DL
-    find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.ie,zone.je,zone.ks+exlap, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is,zone.js,zone.ks-1);
     if (rank!=thisrank){
+      find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks,zone.ie,zone.je,zone.ks+exlap, dUs, &numvars,mpivars);
       if (MPI_Bsend(&numvars,1,MPI_INT,rank,54721,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
       if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,54722,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
 
-    find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ke-exlap,zone.ie,zone.je,zone.ke, flux, &numvars,&mpivars);
     rank=_node_rank(gl,zone.is,zone.js,zone.ke+1);
     if (rank!=thisrank){
+      find_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ke-exlap,zone.ie,zone.je,zone.ke, dUs, &numvars,mpivars);
       if (MPI_Bsend(&numvars,1,MPI_INT,rank,54721,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
       if (MPI_Bsend(mpivars,numvars,MPI_DOUBLE,rank,54722,MPI_COMM_WORLD)!=MPI_SUCCESS) fatal_error("MPI_Send problem in update_dUstar_emfield_SOR");
     }
@@ -670,26 +740,23 @@ static void update_dUstar_emfield_SOR_backward(np_t *np, gl_t *gl, long flux, zo
     rank=_node_rank(gl,zone.is-1,zone.js,zone.ks);
     if (rank!=thisrank){
       if (MPI_Recv(&numvars,1,MPI_INT,rank,54701,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
       if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,54702,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      copy_mpivars_in_zone(np,gl,zone.is-1-exlap,zone.js,zone.ks,zone.is-1,zone.je,zone.ke, flux, numvars,mpivars);
+      copy_mpivars_in_zone(np,gl,zone.is-1-exlap,zone.js,zone.ks,zone.is-1,zone.je,zone.ke, dUs, numvars,mpivars);
     }
 
     rank=_node_rank(gl,zone.is,zone.js-1,zone.ks);
     if (rank!=thisrank){
       if (MPI_Recv(&numvars,1,MPI_INT,rank,54711,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
       if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,54712,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      copy_mpivars_in_zone(np,gl,zone.is,zone.js-1-exlap,zone.ks,zone.ie,zone.js-1,zone.ke, flux, numvars,mpivars);
+      copy_mpivars_in_zone(np,gl,zone.is,zone.js-1-exlap,zone.ks,zone.ie,zone.js-1,zone.ke, dUs, numvars,mpivars);
     }
 
 #ifdef _3DL
     rank=_node_rank(gl,zone.is,zone.js,zone.ks-1);
     if (rank!=thisrank){
       if (MPI_Recv(&numvars,1,MPI_INT,rank,54721,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      mpivars=(double *)realloc(mpivars,sizeof(double)*numvars);
       if (MPI_Recv(mpivars,numvars,MPI_DOUBLE,rank,54722,MPI_COMM_WORLD,&MPI_Status1)!=MPI_SUCCESS) fatal_error("MPI_Recv problem in update_dUstar_emfield_SOR");
-      copy_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks-1-exlap,zone.ie,zone.je,zone.ks-1, flux, numvars,mpivars);
+      copy_mpivars_in_zone(np,gl,zone.is,zone.js,zone.ks-1-exlap,zone.ie,zone.je,zone.ks-1, dUs, numvars,mpivars);
     }
 #endif
 
@@ -710,17 +777,57 @@ static void update_dUstar_emfield_SOR_backward(np_t *np, gl_t *gl, long flux, zo
 
   MPI_Barrier(MPI_COMM_WORLD);
   free(buffer);
-  free(mpivars);
 }
 
 
 void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
-  long cycle,numcycle,numsubiter;
+  long i,j,k,l,n,nc,cycle,numcycle,numsubiter;
+  double *dUs,*sum0,*fac,*Cp1s,*tsemfcfs,*mpivars;
+  long *lBs,*dl;
+
+  assert(flux<nfe);
+  n=(gl->domain_lim.ie-gl->domain_lim.is+1);
+#ifdef _2DL
+  n*=(gl->domain_lim.je-gl->domain_lim.js+1);
+#endif
+#ifdef _3DL
+  n*=(gl->domain_lim.ke-gl->domain_lim.ks+1);
+#endif
+  dUs=(double *)malloc(n*sizeof(double));
+  sum0=(double *)malloc(n*sizeof(double));
+  fac=(double *)malloc(n*sizeof(double));
+  Cp1s=(double *)malloc(n*sizeof(double));
+  lBs=(long *)malloc(n*sizeof(long));
+  mpivars=(double *)malloc(n*sizeof(double));
+  if (dUs==NULL || sum0==NULL || fac==NULL || Cp1s==NULL || lBs==NULL || mpivars==NULL)
+    fatal_error("Problem allocating dUs, sum0, fac, Cp1s, lBs or mpivars in update_dUstar_emfield_SOR().");
+
+  /* gather dUstar of all valid nodes of the domain, including those received from other processes */
+  for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
+    l=_ai(gl,i,j,k);
+    if (is_node_valid(np[l],TYPELEVEL_EMFIELD)) dUs[l]=np[l].bs->dUstaremfield[flux]; else dUs[l]=0.0;
+  }
+
+  find_dUstar_emfield_SOR_coefficients(np, gl, flux, zone, n, sum0, fac, Cp1s, lBs, &tsemfcfs, &dl, &nc);
   find_tsemf_SOR_numsubiter_numcycle(gl->numsubiter_tsemf, TSEMF_SOR_NUMSUBITEROPT, &numsubiter, &numcycle);
   for (cycle=0; cycle<numcycle; cycle++){
-    update_dUstar_emfield_SOR_forward(np, gl, flux, zone, numsubiter);
-    update_dUstar_emfield_SOR_backward(np, gl, flux, zone, numsubiter);
+    update_dUstar_emfield_SOR_forward(np, gl, flux, zone, numsubiter, dUs, sum0, fac, Cp1s, lBs, tsemfcfs, dl, nc, mpivars);
+    update_dUstar_emfield_SOR_backward(np, gl, flux, zone, numsubiter, dUs, sum0, fac, Cp1s, lBs, tsemfcfs, dl, nc, mpivars);
   }
+
+  /* scatter dUs back into the node structures */
+  for_ijk(gl->domain_lim,is,js,ks,ie,je,ke){
+    l=_ai(gl,i,j,k);
+    if (is_node_valid(np[l],TYPELEVEL_EMFIELD)) np[l].bs->dUstaremfield[flux]=dUs[l];
+  }
+  free(dUs);
+  free(sum0);
+  free(fac);
+  free(Cp1s);
+  free(lBs);
+  free(mpivars);
+  free(tsemfcfs);
+  free(dl);
 }
 
 
@@ -776,8 +883,8 @@ static void update_dUstar_emfield_SOR_istation(np_t *np, gl_t *gl, long flux, lo
 
 
 void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
-  long i,j,k,l,n,m,nc,cnt,ilocal,numsubiter,numcycle,cycle,theta,thetasgn,ioffset,joffset,koffset;
-  double *dUs,*sum0,*fac,*Cp1s,Cp0,*tsemfcfs,tsemfcf;
+  long i,j,k,l,n,nc,cnt,ilocal,numsubiter,numcycle,cycle;
+  double *dUs,*sum0,*fac,*Cp1s,*tsemfcfs;
   long *lBs,*dl;
 
   assert(flux<nfe);
@@ -798,79 +905,7 @@ void update_dUstar_emfield_SOR(np_t *np, gl_t *gl, long flux, zone_t zone){
   if (sum0==NULL || fac==NULL || Cp1s==NULL || lBs==NULL)
     fatal_error("Problem allocating sum0, fac, Cp1s or lBs in update_dUstar_emfield_SOR().");
 
-  /* the coefficients do not depend on dUstar: find them once, before the sweeps */
-#ifdef OPENMPTHREADS
-  #pragma omp parallel for private(j,k,l,theta,thetasgn,Cp0) schedule(dynamic)
-#endif
-  for_1DL(i,zone.is,zone.ie){
-    for_2DL(j,zone.js,zone.je){
-      for_3DL(k,zone.ks,zone.ke){
-        l=_ai(gl,i,j,k);
-        lBs[l]=-1;
-        if (is_node_valid(np[l],TYPELEVEL_EMFIELD)) {
-          if (is_node_inner(np[l],TYPELEVEL_EMFIELD)) {
-            sum0[l]=-np[l].bs->Resemfield[flux];
-            fac[l]=gl->relaxEMF/(np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,0,0,0)][flux]+1.0/np[l].bs->dtauemfield[flux]);
-          } else {
-            if (find_bdry_direc(np, gl, l, TYPELEVEL_EMFIELD, &theta, &thetasgn)){
-              find_linearization_coefficients_bdry_node_emfield(np, gl, l, theta, thetasgn, flux,
-                                       _node_type(np[l], TYPELEVEL_EMFIELD), &Cp0, &(Cp1s[l]), &(sum0[l]));
-              fac[l]=gl->relaxEMF/Cp0;
-              lBs[l]=_al(gl,l,theta,thetasgn);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  /* the neighbour coefficients do not depend on dUstar: copy them once, before the sweeps, into a
-     contiguous array, with zeros at the centre and where the neighbour node is not valid;
-     dl[m] is the offset in l of neighbour m */
-  nc=0;
-  for_1DL (ioffset,gl->tsemfcoeffzone.is,gl->tsemfcoeffzone.ie){
-    for_2DL (joffset,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
-      for_3DL (koffset,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
-        nc++;
-      }
-    }
-  }
-  dl=(long *)malloc(nc*sizeof(long));
-  tsemfcfs=(double *)malloc(n*nc*sizeof(double));
-  if (dl==NULL || tsemfcfs==NULL) fatal_error("Problem allocating dl or tsemfcfs in update_dUstar_emfield_SOR().");
-  m=0;
-  for_1DL (ioffset,gl->tsemfcoeffzone.is,gl->tsemfcoeffzone.ie){
-    for_2DL (joffset,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
-      for_3DL (koffset,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
-        dl[m]=_alll(gl,0,0,ioffset,1,joffset,2,koffset);
-        m++;
-      }
-    }
-  }
-#ifdef OPENMPTHREADS
-  #pragma omp parallel for private(j,k,l,m,ioffset,joffset,koffset,tsemfcf) schedule(dynamic)
-#endif
-  for_1DL(i,zone.is,zone.ie){
-    for_2DL(j,zone.js,zone.je){
-      for_3DL(k,zone.ks,zone.ke){
-        l=_ai(gl,i,j,k);
-        if (is_node_valid(np[l],TYPELEVEL_EMFIELD) && is_node_inner(np[l],TYPELEVEL_EMFIELD)) {
-          m=0;
-          for_1DL (ioffset,gl->tsemfcoeffzone.is,gl->tsemfcoeffzone.ie){
-            for_2DL (joffset,gl->tsemfcoeffzone.js,gl->tsemfcoeffzone.je){
-              for_3DL (koffset,gl->tsemfcoeffzone.ks,gl->tsemfcoeffzone.ke){
-                tsemfcf=np[l].bs->tsemfcoeff[EXM_ai3(gl->tsemfcoeffzone,ioffset,joffset,koffset)][flux];
-                if ((ioffset==0 && joffset==0 && koffset==0) || (tsemfcf!=0.0 && !is_node_valid(np[l+dl[m]],TYPELEVEL_EMFIELD)))
-                  tsemfcf=0.0;
-                tsemfcfs[l*nc+m]=tsemfcf;
-                m++;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+  find_dUstar_emfield_SOR_coefficients(np, gl, flux, zone, n, sum0, fac, Cp1s, lBs, &tsemfcfs, &dl, &nc);
   find_tsemf_SOR_numsubiter_numcycle(gl->numsubiter_tsemf, TSEMF_SOR_NUMSUBITEROPT, &numsubiter, &numcycle);
   for (cycle=0; cycle<numcycle; cycle++){
 

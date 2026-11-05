@@ -7,6 +7,31 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 NOV 03a
+  * with DISTMPI, the SOR of the potential finds the coefficients of each node once per call,
+    before the sweeps, and sweeps on a contiguous copy of dUstar, as without DISTMPI; the
+    result is unchanged; with _Epotential and _NH3_Plasma_32s on 30x30x30 nodes, 3 processes
+    and 5 threads per process, the SOR is 3.6 times faster
+  * in /cycle/share/tsemf_share.c
+    - added find_dUstar_emfield_SOR_coefficients(): finds, before the sweeps, the right-hand
+      sides, relaxation factors and boundary coefficients of the SOR, and copies the neighbour
+      coefficients of the inner nodes into a contiguous array; used with and without DISTMPI
+    - in update_dUstar_emfield_SOR_node(), the inner and boundary node updates use the stored
+      coefficients and the contiguous dUstar passed as new arguments instead of reading them
+      from np[].bs and recomputing the boundary coefficients on every subiteration
+    - in find_mpivars_in_zone(), reads the contiguous dUstar and fills a buffer allocated once
+      by the caller instead of calling realloc once per node
+    - in copy_mpivars_in_zone(), writes the received values into the contiguous dUstar
+    - in update_dUstar_emfield_SOR_forward(), opens one parallel region per subiteration instead
+      of one per plane, passes the stored coefficients to each node update, and packs the halo
+      only when the neighbouring zone belongs to another process
+    - in update_dUstar_emfield_SOR_backward(), the same changes as for the forward sweep
+    - in update_dUstar_emfield_SOR(), with DISTMPI, copies dUstar of the valid nodes into a
+      contiguous array, finds the coefficients once before the sweeps, passes them to the
+      sweeps and copies the result back after; without DISTMPI, the coefficient setup is moved
+      out into the new function above, and the result is unchanged
+
+
 2026 OCT 30a
   * update_dUstar_emfield_SOR_istation(), used only within tsemf_share.c, is now static and
     no longer declared in tsemf_share.h; the result is unchanged
