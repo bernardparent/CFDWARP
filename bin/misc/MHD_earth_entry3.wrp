@@ -213,7 +213,6 @@ Bdry(
 Model(
   NavierStokesPlasma(
     TEMODEL=TEMODEL_TRANSPORT;
-    TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     VibSpecies("N2");  {species with vibrationally excited states}
     TAUVTMODEL=TAUVTMODEL_TEQUILIBRIUM;
     QEVMODEL=QEVMODEL_NONE;

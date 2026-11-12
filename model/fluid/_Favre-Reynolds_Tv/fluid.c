@@ -55,10 +55,10 @@ void write_model_fluid_template(FILE **controlfile){
     "    TURBSOURCE=YES;\n"
 #ifdef specN2
     "    VibSpecies(\"N2\");  {species with vibrationally excited states; VibSpecies(); if none}\n"
-    "    TAUVTMODEL=TAUVTMODEL_PARENT2024;  {TAUVTMODEL_PARENT2024 (N2 only), TAUVTMODEL_MILLIKANWHITE, TAUVTMODEL_TEQUILIBRIUM}\n"
+    "    TAUVTMODEL=TAUVTMODEL_MILLIKANWHITE;  {TAUVTMODEL_MILLIKANWHITE, TAUVTMODEL_TEQUILIBRIUM}\n"
 #else
     "    VibSpecies();  {species with vibrationally excited states, e.g. VibSpecies(\"N2\",\"CO\");}\n"
-    "    TAUVTMODEL=TAUVTMODEL_MILLIKANWHITE;  {TAUVTMODEL_PARENT2024 (N2 only), TAUVTMODEL_MILLIKANWHITE, TAUVTMODEL_TEQUILIBRIUM}\n"
+    "    TAUVTMODEL=TAUVTMODEL_MILLIKANWHITE;  {TAUVTMODEL_MILLIKANWHITE, TAUVTMODEL_TEQUILIBRIUM}\n"
 #endif
     "    QEVMODEL=QEVMODEL_NONE;  {no e-V excitation in this module}\n"
     "    VIBDISTTYPE=VIBDISTTYPE_BOLTZMANN;  {distribution of the vibrational states}\n"

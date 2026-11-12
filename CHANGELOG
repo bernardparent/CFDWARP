@@ -7,6 +7,184 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 NOV 09a
+  * within _Navier-Stokes_plasma and _Favre-Reynolds_plasma, TEMODEL is TEMODEL_CONSTANT,
+    TEMODEL_TEQUILIBRIUM, TEMODEL_TVEQUILIBRIUM, TEMODEL_LOCAL or TEMODEL_TRANSPORT_PARENT2024;
+    TEMODEL_TRANSPORT_PARENT2021, TEMODEL_TRANSPORTEMF, TEMODEL_TRANSPORT_KIM2012,
+    TEMODEL_TRANSPORT_RODRIGUEZ2024, TEMODEL_TRANSPORT_RODRIGUEZ2025,
+    TEMODEL_TRANSPORT_RODRIGUEZ2025_ADHOC, TEMODEL_TRANSPORT_PETERS2019 and
+    TEMODEL_TRANSPORT_RODRIGUEZ2026 give a fatal error saying they are deprecated since 26nov09a
+  * the TEMODELs are shared by _Navier-Stokes_plasma and _Favre-Reynolds_plasma: their reading and
+    checks, the electron energy source terms and their Jacobian, and the setting and clipping of
+    the electron energy are moved to /model/share/fluid_plasma_share.c
+  * TETRANSPORT_WEEE_TWOTEMPERATURE and QENSOURCETERMS (used only by the removed TEMODELs) are
+    removed from _Navier-Stokes_plasma and give a fatal error saying they are deprecated since
+    26nov09a
+  * TAUVTMODEL is reduced to TAUVTMODEL_MILLIKANWHITE and TAUVTMODEL_TEQUILIBRIUM and QEVMODEL to
+    QEVMODEL_NONE and QEVMODEL_PARENT2024 in all fluid modules; TAUVTMODEL_PARENT2024,
+    QEVMODEL_ALEKSANDROV, QEVMODEL_RODRIGUEZ2025 and QEVMODEL_RODRIGUEZ2026 give a fatal error
+    saying they are deprecated since 26nov09a
+  * TEMODEL_TVEQUILIBRIUM is added to _Favre-Reynolds_plasma, with the same smoothed Tv in the
+    electron energy source as in _Navier-Stokes_plasma, and TEMODEL_CONSTANT, which was
+    accepted but stopped with a fatal error in find_Se(), now works there
+  * the example control files in bin/ are updated: TETRANSPORT_WEEE_TWOTEMPERATURE and
+    QENSOURCETERMS are removed, TAUVTMODEL_PARENT2024 is replaced by TAUVTMODEL_MILLIKANWHITE, the
+    removed TEMODELs by TEMODEL_TRANSPORT_PARENT2024, and QEVMODEL_ALEKSANDROV and
+    QEVMODEL_RODRIGUEZ2025 by QEVMODEL_PARENT2024
+  * with TEMODEL_TEQUILIBRIUM, the sign of the derivative of the electron energy source with respect
+    to the electron density is corrected in the source Jacobian of _Favre-Reynolds_plasma
+  * with TEMODEL_LOCAL, the derivative of the electron energy source with respect to the electron
+    density is no longer overwritten by the derivative with respect to Te in the source Jacobian of
+    _Navier-Stokes_plasma and _Favre-Reynolds_plasma
+  * otherwise, with the TEMODELs, TAUVTMODELs and QEVMODELs kept, the result is unchanged
+  * in /model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - removed _kev(): used only by TEMODEL_TRANSPORT_KIM2012
+    - removed _K_l(): used only by TEMODEL_TRANSPORT_PETERS2019
+    - removed _sigmaes(): used only by TEMODEL_TRANSPORT_KIM2012
+    - removed _grot(): used only by TEMODEL_TRANSPORT_KIM2012
+    - removed _taueN2(): used only by TEMODEL_TRANSPORT_KIM2012
+    - removed find_Qen_Kim2012(): TEMODEL_TRANSPORT_KIM2012 is removed
+    - removed find_Qe_Parent2024(): moved to /model/share/fluid_plasma_share.c
+    - removed find_Qe(): moved to /model/share/fluid_plasma_share.c
+    - removed find_Se(): moved to /model/share/fluid_plasma_share.c
+    - removed find_dSe_dU_transport_Parent2024(): moved to /model/share/fluid_plasma_share.c
+    - removed find_dSe_dU(): moved to /model/share/fluid_plasma_share.c
+    - removed find_Qe_Rodriguez2024(): TEMODEL_TRANSPORT_RODRIGUEZ2024 is removed
+    - removed find_Qe_Rodriguez2025(): TEMODEL_TRANSPORT_RODRIGUEZ2025 is removed
+    - removed find_Qe_Rodriguez2026(): TEMODEL_TRANSPORT_RODRIGUEZ2026 is removed
+    - removed find_Qe_Rodriguez2025_ADHOC(): TEMODEL_TRANSPORT_RODRIGUEZ2025_ADHOC is removed
+    - removed find_Qe_Peters2019(): TEMODEL_TRANSPORT_PETERS2019 is removed
+    - removed find_dSe_dU_transport_Rodriguez2024(): TEMODEL_TRANSPORT_RODRIGUEZ2024 is removed
+    - removed find_dSe_dU_transport_Rodriguez2025(): TEMODEL_TRANSPORT_RODRIGUEZ2025 is removed
+    - removed find_dSe_dU_transport_Rodriguez2025_ADHOC(): TEMODEL_TRANSPORT_RODRIGUEZ2025_ADHOC is
+      removed
+    - removed find_dSe_dU_transport_Rodriguez2026(): TEMODEL_TRANSPORT_RODRIGUEZ2026 is removed
+    - removed find_dSe_dU_transport_Peters2019(): TEMODEL_TRANSPORT_PETERS2019 is removed
+    - removed find_dSe_dU_transport_Kim2012(): TEMODEL_TRANSPORT_KIM2012 is removed
+    - removed find_dSe_dU_transport_Parent2021(): TEMODEL_TRANSPORT_PARENT2021 is removed
+    - in find_Schem(), the electron energy source is W[speceminus]*ee when the TEMODEL transports
+      the electron energy; the TETRANSPORT_WEEE_TWOTEMPERATURE branch calling find_We() is removed
+    - in find_dSchem_dU(), the electron energy Jacobian is added only when the TEMODEL transports
+      the electron energy
+    - in find_dSemfield_dU(), removed the Jacobian of the e-V de-excitation of
+      QEVMODEL_RODRIGUEZ2025
+  * in /model/fluid/_Navier-Stokes_plasma/fluid.c
+    - in write_model_fluid_template(), TETRANSPORT_WEEE_TWOTEMPERATURE and QENSOURCETERMS are
+      removed, TAUVTMODEL_PARENT2024 is replaced by TAUVTMODEL_MILLIKANWHITE, the default TEMODEL
+      and QEVMODEL with N2 are TEMODEL_TRANSPORT_PARENT2024 and QEVMODEL_PARENT2024, and the valid
+      choices are listed
+    - in read_model_fluid_actions(), TEMODEL is read in /model/share/fluid_plasma_share.c;
+      TETRANSPORT_WEEE_TWOTEMPERATURE and QENSOURCETERMS give a fatal error saying they are
+      deprecated since 26nov09a
+    - in find_Kstar_interface(), the electron energy conduction is added when the TEMODEL transports
+      the electron energy
+    - in find_prim_fluid(), the clipping of the electron energy is done in
+      /model/share/fluid_plasma_share.c; removed the TEMODEL_TRANSPORTEMF clipping
+    - in add_dUstar_to_U(), the electron energy is set in /model/share/fluid_plasma_share.c
+  * in /model/fluid/_Navier-Stokes_plasma/fluid.h
+    - the TEMODEL defines are moved to /model/share/fluid_plasma_share.h, which is included
+  * in /model/fluid/_Navier-Stokes_plasma/fluid_source.h
+    - removed the prototype of find_Qe(), now in /model/share/fluid_plasma_share.h
+  * in /model/fluid/_Navier-Stokes_plasma/fluid.hh
+    - removed TETRANSPORT_WEEE_TWOTEMPERATURE and QENSOURCETERMS from gl_model_fluid_t
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid_source.c
+    - removed find_Qe(): moved to /model/share/fluid_plasma_share.c
+    - removed find_Se(): moved to /model/share/fluid_plasma_share.c
+    - removed find_dSe_dU_transport_Parent2024(): moved to /model/share/fluid_plasma_share.c
+    - removed find_dSe_dU_local(): its Jacobian is computed in /model/share/fluid_plasma_share.c
+    - removed find_dSe_dU_Tequilibrium(): its Jacobian is computed in
+      /model/share/fluid_plasma_share.c
+    - removed find_dSe_dU(): moved to /model/share/fluid_plasma_share.c
+    - in find_Schem(), the electron energy source is W[speceminus]*ee when the TEMODEL transports
+      the electron energy
+    - in find_dSchem_dU(), the electron energy Jacobian is added when the TEMODEL transports the
+      electron energy
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid.c
+    - in write_model_fluid_template(), TAUVTMODEL_PARENT2024 is replaced by TAUVTMODEL_MILLIKANWHITE
+      and QEVMODEL_ALEKSANDROV by QEVMODEL_PARENT2024, and the valid choices of TEMODEL, TAUVTMODEL
+      and QEVMODEL are listed
+    - in read_model_fluid_actions(), TEMODEL is read in /model/share/fluid_plasma_share.c; the
+      QEVMODEL check is removed, QEVMODEL being checked in /model/share/fluid_vib.c
+    - in find_Kstar_interface(), the electron energy conduction is added when the TEMODEL transports
+      the electron energy
+    - in find_prim_fluid(), the clipping of the electron energy is done in
+      /model/share/fluid_plasma_share.c
+    - in add_dUstar_to_U(), the electron energy is set in /model/share/fluid_plasma_share.c
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid.h
+    - the TEMODEL defines are moved to /model/share/fluid_plasma_share.h, which is included
+  * in /model/fluid/_Favre-Reynolds_Tv/fluid.c
+    - in write_model_fluid_template(), TAUVTMODEL_PARENT2024 is replaced by TAUVTMODEL_MILLIKANWHITE
+  * in /model/share/fluid_vib.c
+    - removed _tauvt_Macheret(): used only by TAUVTMODEL_PARENT2024
+    - removed find_dQev_dU(): used only by QEVMODEL_RODRIGUEZ2025 and QEVMODEL_RODRIGUEZ2026
+    - in add_vib_constants_to_codex(), TAUVTMODEL_PARENT2024, QEVMODEL_ALEKSANDROV,
+      QEVMODEL_RODRIGUEZ2025 and QEVMODEL_RODRIGUEZ2026 are kept only to give the deprecation
+      message
+    - in fatal_error_N2VIBMODEL_deprecated(), the replacements suggested are
+      TAUVTMODEL_MILLIKANWHITE and QEVMODEL_PARENT2024 in place of the removed models
+    - in read_model_fluid_vib(), TAUVTMODEL_PARENT2024, QEVMODEL_ALEKSANDROV,
+      QEVMODEL_RODRIGUEZ2025 and QEVMODEL_RODRIGUEZ2026 give a fatal error saying they are
+      deprecated since 26nov09a; the N2VIBJOULEHEATING message suggests QEVMODEL_PARENT2024
+    - in find_tauvtk(), removed the case TAUVTMODEL_PARENT2024
+    - in find_tauvtk_d1overtauvtk(), removed the case TAUVTMODEL_PARENT2024
+    - in _Qev(), removed the cases QEVMODEL_ALEKSANDROV, QEVMODEL_RODRIGUEZ2025 and
+      QEVMODEL_RODRIGUEZ2026
+  * in /model/share/fluid_vib.h
+    - TAUVTMODEL_PARENT2024, QEVMODEL_ALEKSANDROV, QEVMODEL_RODRIGUEZ2025 and QEVMODEL_RODRIGUEZ2026
+      moved to the deprecated defines; removed the prototype of find_dQev_dU()
+  * in /model/share/fluid_plasma_share.c
+    - added add_TEMODEL_constants_to_codex(): adds the TEMODELs, including the deprecated ones, to
+      the codex
+    - added read_model_fluid_TEMODEL(): reads TEMODEL and checks it
+    - added find_Qe_Parent2024(): from _Navier-Stokes_plasma
+    - added find_Qe(): from _Navier-Stokes_plasma
+    - added find_Se(): from _Navier-Stokes_plasma; with _AVERAGEDRATES_FLUID, the work done by the
+      electric field on the electrons is averaged as before
+    - added find_dSe_dU_transport_Parent2024(): from _Navier-Stokes_plasma
+    - added find_dSe_dU(): from _Navier-Stokes_plasma
+    - added update_U_ee_from_TEMODEL(): sets the electron energy following TEMODEL once U is updated
+    - added clip_ee_from_TEMODEL(): clips the electron energy following TEMODEL
+    - in is_TEMODEL_transport(), removed TEMODEL_TRANSPORTEMF; the function is no longer static
+  * in /model/share/fluid_plasma_share.h
+    - added the TEMODEL defines and the prototypes of the shared TEMODEL functions; removed
+      TEMODEL_TRANSPORTEMF from the comment on the TEMODELs
+  * in /model/emfield/_Epotential/emfield.c
+    - removed _Te_EMF(): used only by TEMODEL_TRANSPORTEMF
+  * in /model/emfield/_Epotential-B/emfield.c
+    - removed _Te_EMF(): used only by TEMODEL_TRANSPORTEMF
+  * in /model/emfield/_Epotential-Bfixed/emfield.c
+    - removed _Te_EMF(): used only by TEMODEL_TRANSPORTEMF
+  * in /model/emfield/_Epotential-Bpotential/emfield.c
+    - removed _Te_EMF(): used only by TEMODEL_TRANSPORTEMF
+  * in /model/emfield/_emfield.h
+    - removed the prototype of _Te_EMF()
+  * in /model/chem/_Air_Plasma_11s/chem.c
+    - removed find_We(): used only by TETRANSPORT_WEEE_TWOTEMPERATURE
+  * in /model/chem/_NH3_Plasma_21s/chem.c
+    - removed find_We(): used only by TETRANSPORT_WEEE_TWOTEMPERATURE
+  * in /model/chem/_NH3_Plasma_32s/chem.c
+    - removed find_We(): used only by TETRANSPORT_WEEE_TWOTEMPERATURE
+  * in /model/chem/_NH3_Plasma_34s/chem.c
+    - removed find_We(): used only by TETRANSPORT_WEEE_TWOTEMPERATURE
+  * in /model/chem/_Air_Plasma_11s/chem.hh
+    - removed _CHEM_WEEE_TWOTEMPERATURE
+  * in /model/chem/_NH3_Plasma_21s/chem.hh
+    - removed _CHEM_WEEE_TWOTEMPERATURE
+  * in /model/chem/_NH3_Plasma_32s/chem.hh
+    - removed _CHEM_WEEE_TWOTEMPERATURE
+  * in /model/chem/_NH3_Plasma_34s/chem.hh
+    - removed _CHEM_WEEE_TWOTEMPERATURE
+  * in /model/chem/_chem.h
+    - removed the prototype of find_We()
+  * in /model/thermo/_generic/thermo.c
+    - removed _zetav_from_Te_Aleksandrov(): used only by QEVMODEL_ALEKSANDROV
+    - removed _zetav_from_Te_Rodriguez2025(): used only by TEMODEL_TRANSPORT_RODRIGUEZ2025 and
+      QEVMODEL_RODRIGUEZ2025
+  * in /model/thermo/_thermo.h
+    - removed the prototype of _zetav_from_Te_Aleksandrov()
+    - removed the prototype of _zetav_from_Te_Rodriguez2025()
+
+
 2026 NOV 03a
   * with DISTMPI, the SOR of the potential finds the coefficients of each node once per call,
     before the sweeps, and sweeps on a contiguous copy of dUstar, as without DISTMPI; the

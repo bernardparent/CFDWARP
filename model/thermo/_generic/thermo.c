@@ -629,44 +629,6 @@ double _s_from_w_T(spec_t w, double T){
   return(smix);
 }
 
-double _zetav_from_Te_Rodriguez2025(double Te){
-  double zetav;
-  double Te_control[] = 
-  { 
-    300.000000000000,
-    10405.7712366020,
-    12758.1826500507,
-    21673.3788660228,
-    38350.1739856647,
-    55346.9270284963,
-    83199.8600309798,
-    115277.848348167,
-    188009.918441261,
-    407883.388080480,
-    638657.488862754,
-    1000000.00000000,
-  };
-  double zetav_control[] = 
-  {
-    1.000000000000000,
-    0.999706109630770,
-    0.998096040585763,
-    0.808391768288578,
-    0.483534318118858,
-    0.246928559228925,
-    0.0700695413621944,
-    0.0223991633144689,
-    0.00502283344748368,
-    0.000793648704787836,
-    0.000337593322464755,
-    0.000158976912844893
-  };  
-  int N = sizeof(Te_control)/sizeof(Te_control[0]);
-  Te=min(Te_control[N-1],max(Te,Te_control[0]));
-  zetav = EXM_f_from_monotonespline(N, Te_control, zetav_control, Te);
-  return(zetav);
-}
-
 double _zetav_from_Te_Parent2024(double Te){
   double zetav;
   double Te_control[] = 
@@ -718,36 +680,6 @@ double _zetav_from_Te_Parent2024(double Te){
   zetav = EXM_f_from_monotonespline(N, Te_control, zetav_control, Te);
   return(zetav);
 }
-
-/* fraction of electron joule heating that is consumed in nitrogen vibrational energy 
- * Aleksandrov, N. L., Vysikailo, F. I., Islamov, R. S., Kochetov, I. V., Napartovich, A. P., and Pevgov, V. G., “Electron
-Distribution Function in 4:1 N2-O2 Mixture,” High Temperature, Vol. 19, No. 1, 1981, pp. 17–21.
- * */ 
-double _zetav_from_Te_Aleksandrov(double Te){
-  double etav;
-  double k[11],Tepower[11];
-  long cnt;
-  k[0]=+1.8115947E-3;
-  k[1]=+2.1238526E-5;
-  k[2]=-2.2082300E-8;
-  k[3]=+7.3911515E-12;
-  k[4]=-8.0418868E-16;
-  k[5]=+4.3999729E-20;
-  k[6]=-1.4009604E-24;
-  k[7]=+2.7238062E-29;
-  k[8]=-3.1981279E-34;
-  k[9]=+2.0887979E-39;
-  k[10]=-5.8381036E-45;
-  Te=max(300.0,Te);
-  Te=min(60000.0,Te);
-  Tepower[0]=1.0;
-  Tepower[1]=Te;
-  for (cnt=2; cnt<11; cnt++) Tepower[cnt]=Tepower[cnt-1]*Te;
-  etav=0.0;
-  for (cnt=0; cnt<11; cnt++) etav+=k[cnt]*Tepower[cnt];  
-  return(etav);
-}
-
 
 /* electron energy loss function as a function of electron temperature */
 double _zetae_from_Te(double Te){

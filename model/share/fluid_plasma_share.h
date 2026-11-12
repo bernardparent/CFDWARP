@@ -33,6 +33,32 @@ double _Vk_drift_perp_to_bdry(np_t *np, gl_t *gl, long lA, long lB, long lC, lon
 #endif
 
 #if defined(_FLUID_PLASMA) && defined(_FLUID_NEUTRALSTRANSPORT)
+/* electron energy models of _Navier-Stokes_plasma and _Favre-Reynolds_plasma */
+#define TEMODEL_CONSTANT 1
+#define TEMODEL_TEQUILIBRIUM 2
+#define TEMODEL_TVEQUILIBRIUM 3
+#define TEMODEL_LOCAL 4
+#define TEMODEL_TRANSPORT_PARENT2024 5
+/* the deprecated TEMODELs are given the values TEMODEL_DEPRECATED, TEMODEL_DEPRECATED+1, etc.
+   so that the deprecation message can be given */
+#define TEMODEL_DEPRECATED 101
+
+bool is_TEMODEL_transport(gl_t *gl);
+
+void add_TEMODEL_constants_to_codex(SOAP_codex_t *codex);
+
+void read_model_fluid_TEMODEL(SOAP_codex_t *codex);
+
+void find_Qe(np_t *np, gl_t *gl, long l, double *Qe);
+
+void find_Se(np_t *np, gl_t *gl, long l, flux_t S);
+
+void find_dSe_dU(np_t *np, gl_t *gl, long l, sqmat_t dSedU);
+
+void update_U_ee_from_TEMODEL(np_t *np, gl_t *gl, long l, double rhoe, double eemem);
+
+bool clip_ee_from_TEMODEL(np_t np, gl_t *gl, double rhoe, double T, double Tv, double *ee, double *Te);
+
 double _Te_local(np_t *np, gl_t *gl, long l, double Temin);
 
 double _Pkmem(np_t *np, gl_t *gl, long l, long spec);
@@ -56,8 +82,8 @@ void find_dQbeam_dU(np_t np, gl_t *gl, flux_t dQbeamdU);
 
    The fluid module must provide:
      - an electron energy equation (fluxee), and in gl->model.fluid: chibmin, INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY and
-       the TEMODELs TEMODEL_CONSTANT, TEMODEL_TEQUILIBRIUM and TEMODEL_LOCAL (and TEMODEL_TVEQUILIBRIUM and
-       TEMODEL_TRANSPORTEMF if defined); any other TEMODEL transports the electron energy
+       the TEMODELs defined above; TEMODEL_TRANSPORT_PARENT2024 transports the
+       electron energy
      - the numpostvarballistic post variables of the groups, placed at the end of those of the fluid module
 
    The transport module must give the ballistic groups no mobility, no thermal conductivity and no viscosity

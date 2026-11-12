@@ -17,9 +17,6 @@ void find_Qei(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, double *Q
 
 void find_dQei_dx(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, spec_t dQeidrhok, double *dQeidTe);
 
-void find_We ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, 
-                          double *We_create, double *We_destroy );
-
 
 #ifdef _CHEM_BALLISTIC
 void find_Q_ballistic(np_t np, gl_t *gl, spec_t rhok, double T, double Te, bool JACOBIAN, double *Q, spec_t *dQdrhok, double *dQdT, double *dQdTe);

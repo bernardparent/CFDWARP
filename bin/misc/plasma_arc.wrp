@@ -205,8 +205,8 @@ Model(
     TURBSOURCE=YES;
     TEMODEL=TEMODEL_LOCAL;
     VibSpecies("N2");  {species with vibrationally excited states}
-    TAUVTMODEL=TAUVTMODEL_PARENT2024;
-    QEVMODEL=QEVMODEL_ALEKSANDROV;
+    TAUVTMODEL=TAUVTMODEL_MILLIKANWHITE;
+    QEVMODEL=QEVMODEL_PARENT2024;
     VIBDISTTYPE=VIBDISTTYPE_BOLTZMANN;
     REACTING=YES;
     emfieldworkheatfact=1.0;   {factor multiplying the emfield work and heat source terms}

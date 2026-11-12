@@ -8,18 +8,18 @@
 
 #if _FLUID_VIBMODEL
 /* model of the V-T relaxation time */
-#define TAUVTMODEL_PARENT2024 1
 #define TAUVTMODEL_MILLIKANWHITE 2
 #define TAUVTMODEL_TEQUILIBRIUM 3
 
 /* model of the e-V excitation */
 #define QEVMODEL_NONE 0
-#define QEVMODEL_ALEKSANDROV 1
 #define QEVMODEL_PARENT2024 2
-#define QEVMODEL_RODRIGUEZ2025 3
-#define QEVMODEL_RODRIGUEZ2026 4
 
 /* deprecated; defined only so that a deprecation message can be given */
+#define TAUVTMODEL_PARENT2024 111
+#define QEVMODEL_ALEKSANDROV 120
+#define QEVMODEL_RODRIGUEZ2025 121
+#define QEVMODEL_RODRIGUEZ2026 122
 #define N2VIBMODEL_ALEKSANDROV 101
 #define N2VIBMODEL_TEQUILIBRIUM 102
 #define N2VIBMODEL_PARENT2024 103
@@ -67,8 +67,6 @@ void test_dSvib_dU_display(gl_t *gl, sqmat_t dSvibdU, sqmat_t dSvibdUnum);
 
 #ifdef _FLUID_PLASMA
 double _Qev(np_t *np, gl_t *gl, long l, double emfieldfact);
-
-void find_dQev_dU(np_t *np, gl_t *gl, long l, sqmat_t dQevdU);
 #endif
 
 #ifdef _FLUID_FAVREREYNOLDS

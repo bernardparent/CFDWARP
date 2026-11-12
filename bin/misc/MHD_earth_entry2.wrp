@@ -234,7 +234,6 @@ Bdry(
 Model(
   NavierStokesPlasma(
     TEMODEL=TEMODEL_TRANSPORT;
-    TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     VibSpecies("N2");  {species with vibrationally excited states}
     TAUVTMODEL=TAUVTMODEL_TEQUILIBRIUM;
     QEVMODEL=QEVMODEL_NONE;
@@ -263,7 +262,6 @@ Model(
     AddHeatPoint(0.0{x,m},0.0{y,m}, 0.1{radius,m}, 0.0{W/m});
     }
     HEAT_DEPOSITED_TO_ELECTRONS=FALSE;
-    QENSOURCETERMS=TRUE;
   );
   AirPlasma11s(
     CHEMMODEL=CHEMMODEL_PARENT2023;

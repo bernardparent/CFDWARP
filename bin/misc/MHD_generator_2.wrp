@@ -151,8 +151,8 @@ Model(
                      flow as laminar}
     TEMODEL=TEMODEL_LOCAL;    {set TE to TEMODEL_LOCAL, TEMODEL_TRANSPORT, or TEMODEL_CONSTANT}
     VibSpecies("N2");  {species with vibrationally excited states}
-    TAUVTMODEL=TAUVTMODEL_PARENT2024;
-    QEVMODEL=QEVMODEL_ALEKSANDROV;
+    TAUVTMODEL=TAUVTMODEL_MILLIKANWHITE;
+    QEVMODEL=QEVMODEL_PARENT2024;
     VIBDISTTYPE=VIBDISTTYPE_BOLTZMANN;
     REACTING=YES;   {solve chemical reactions?}
     Prt=0.9e0;      {the turbulent Prandtl number;

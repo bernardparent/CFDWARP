@@ -71,7 +71,7 @@ Model(
                      kinetic energy k is set to zero in the freestream, then will solve the 
                      flow as laminar}
     VibSpecies("N2");  {species with vibrationally excited states}
-    TAUVTMODEL=TAUVTMODEL_PARENT2024;
+    TAUVTMODEL=TAUVTMODEL_MILLIKANWHITE;
     QEVMODEL=QEVMODEL_NONE;
     VIBDISTTYPE=VIBDISTTYPE_BOLTZMANN;
     

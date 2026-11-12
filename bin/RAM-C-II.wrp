@@ -376,7 +376,7 @@ Model(
     RAPCOMP=NO;
     TURBSOURCE=NO;
     VibSpecies("N2");  {species with vibrationally excited states}
-    TAUVTMODEL=TAUVTMODEL_PARENT2024;
+    TAUVTMODEL=TAUVTMODEL_MILLIKANWHITE;
     QEVMODEL=QEVMODEL_NONE;
     VIBDISTTYPE=VIBDISTTYPE_BOLTZMANN;
     TEMODEL=TEMODEL_TVEQUILIBRIUM;
@@ -415,11 +415,10 @@ Model(
     }
   );
   NavierStokesPlasma(
-    TEMODEL=TEMODEL_TRANSPORT_RODRIGUEZ2025;
-    TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
+    TEMODEL=TEMODEL_TRANSPORT_PARENT2024;
     VibSpecies("N2");  {species with vibrationally excited states}
-    TAUVTMODEL=TAUVTMODEL_PARENT2024;
-    QEVMODEL=QEVMODEL_RODRIGUEZ2025;
+    TAUVTMODEL=TAUVTMODEL_MILLIKANWHITE;
+    QEVMODEL=QEVMODEL_PARENT2024;
     VIBDISTTYPE=VIBDISTTYPE_BOLTZMANN;
     INCLUDE_E_EFFECTS_ON_ION_MOBILITY=FALSE;
     INCLUDE_E_EFFECTS_ON_ELECTRON_MOBILITY=FALSE;
@@ -442,7 +441,6 @@ Model(
     chiemin=1e-12;  chiemax=1.0;    {min and max electron molar fraction}
     Nminbdry=1e8;   {the minimum number density in 1/m3 for the charged species at the bdry nodes}
     gamma=0.1e0;    {secondary emission coefficient}
-    QENSOURCETERMS=TRUE;
     SetBodyForce(is,js, ie,je, 0.0{N/m3},0.0{N/m3});
     SetHeatDeposited(is,js, ie,je, 0.0 {W/m3});
     {

@@ -228,16 +228,16 @@ void read_model_fluid_actions_vib_species(char *actionname, char **argum, SOAP_c
 /* to be called before processing the Fluid() module of the control file */
 void add_vib_constants_to_codex(SOAP_codex_t *codex){
   gl_t *gl=((readcontrolarg_t *)codex->action_args)->gl;
-  SOAP_add_int_to_vars(codex,"TAUVTMODEL_PARENT2024",TAUVTMODEL_PARENT2024);
   SOAP_add_int_to_vars(codex,"TAUVTMODEL_MILLIKANWHITE",TAUVTMODEL_MILLIKANWHITE);
   SOAP_add_int_to_vars(codex,"TAUVTMODEL_TEQUILIBRIUM",TAUVTMODEL_TEQUILIBRIUM);
   SOAP_add_int_to_vars(codex,"QEVMODEL_NONE",QEVMODEL_NONE);
-  SOAP_add_int_to_vars(codex,"QEVMODEL_ALEKSANDROV",QEVMODEL_ALEKSANDROV);
   SOAP_add_int_to_vars(codex,"QEVMODEL_PARENT2024",QEVMODEL_PARENT2024);
-  SOAP_add_int_to_vars(codex,"QEVMODEL_RODRIGUEZ2025",QEVMODEL_RODRIGUEZ2025);
-  SOAP_add_int_to_vars(codex,"QEVMODEL_RODRIGUEZ2026",QEVMODEL_RODRIGUEZ2026);
   SOAP_add_int_to_vars(codex,"VIBDISTTYPE_BOLTZMANN",VIBDISTTYPE_BOLTZMANN);
   /* deprecated constants: they remain defined so that the deprecation message is given */
+  SOAP_add_int_to_vars(codex,"TAUVTMODEL_PARENT2024",TAUVTMODEL_PARENT2024);
+  SOAP_add_int_to_vars(codex,"QEVMODEL_ALEKSANDROV",QEVMODEL_ALEKSANDROV);
+  SOAP_add_int_to_vars(codex,"QEVMODEL_RODRIGUEZ2025",QEVMODEL_RODRIGUEZ2025);
+  SOAP_add_int_to_vars(codex,"QEVMODEL_RODRIGUEZ2026",QEVMODEL_RODRIGUEZ2026);
   SOAP_add_int_to_vars(codex,"N2VIBMODEL_ALEKSANDROV",N2VIBMODEL_ALEKSANDROV);
   SOAP_add_int_to_vars(codex,"N2VIBMODEL_TEQUILIBRIUM",N2VIBMODEL_TEQUILIBRIUM);
   SOAP_add_int_to_vars(codex,"N2VIBMODEL_PARENT2024",N2VIBMODEL_PARENT2024);
@@ -257,20 +257,20 @@ static void fatal_error_N2VIBMODEL_deprecated(SOAP_codex_t *codex){
   find_int_var_from_codex(codex,"N2VIBMODEL",&N2VIBMODEL);
   switch (N2VIBMODEL){
     case N2VIBMODEL_PARENT2024:
-      strcpy(tauvt,"TAUVTMODEL_PARENT2024");
+      strcpy(tauvt,"TAUVTMODEL_MILLIKANWHITE");
       strcpy(qev,"QEVMODEL_PARENT2024");
     break;
     case N2VIBMODEL_ALEKSANDROV:
-      strcpy(tauvt,"TAUVTMODEL_PARENT2024");
-      strcpy(qev,"QEVMODEL_ALEKSANDROV");
+      strcpy(tauvt,"TAUVTMODEL_MILLIKANWHITE");
+      strcpy(qev,"QEVMODEL_PARENT2024");
     break;
     case N2VIBMODEL_RODRIGUEZ2025:
-      strcpy(tauvt,"TAUVTMODEL_PARENT2024");
-      strcpy(qev,"QEVMODEL_RODRIGUEZ2025");
+      strcpy(tauvt,"TAUVTMODEL_MILLIKANWHITE");
+      strcpy(qev,"QEVMODEL_PARENT2024");
     break;
     case N2VIBMODEL_RODRIGUEZ2026:
       strcpy(tauvt,"TAUVTMODEL_MILLIKANWHITE");
-      strcpy(qev,"QEVMODEL_RODRIGUEZ2026");
+      strcpy(qev,"QEVMODEL_PARENT2024");
     break;
     case N2VIBMODEL_MILLIKAN:
       strcpy(tauvt,"TAUVTMODEL_MILLIKANWHITE");
@@ -281,7 +281,7 @@ static void fatal_error_N2VIBMODEL_deprecated(SOAP_codex_t *codex){
       strcpy(qev,"QEVMODEL_NONE");
     break;
     default:
-      strcpy(tauvt,"TAUVTMODEL_PARENT2024");
+      strcpy(tauvt,"TAUVTMODEL_MILLIKANWHITE");
       strcpy(qev,"QEVMODEL_NONE");
   }
 #if !_FLUID_EENERGY
@@ -292,7 +292,7 @@ static void fatal_error_N2VIBMODEL_deprecated(SOAP_codex_t *codex){
   strcpy(qev,"QEVMODEL_NONE");
   if (N2VIBMODEL!=N2VIBMODEL_TEQUILIBRIUM && SOAP_is_var_in_codex(codex,"N2VIBJOULEHEATING")) {
     find_bool_var_from_codex(codex,"N2VIBJOULEHEATING",&N2VIBJOULEHEATING);
-    if (N2VIBJOULEHEATING) strcpy(qev,"QEVMODEL_ALEKSANDROV");
+    if (N2VIBJOULEHEATING) strcpy(qev,"QEVMODEL_PARENT2024");
   }
 #endif
   fatal_error("N2VIBMODEL is deprecated within Model(%s()). Replace it by the following:\n\n"
@@ -309,20 +309,25 @@ void read_model_fluid_vib(SOAP_codex_t *codex){
   gl_t *gl=((readcontrolarg_t *)codex->action_args)->gl;
 
   if (SOAP_is_var_in_codex(codex, "N2VIBMODEL")) fatal_error_N2VIBMODEL_deprecated(codex);
-  if (SOAP_is_var_in_codex(codex, "N2VIBJOULEHEATING")) fatal_error("The parameter N2VIBJOULEHEATING is deprecated. Replace N2VIBJOULEHEATING=YES; by QEVMODEL=QEVMODEL_ALEKSANDROV; and N2VIBJOULEHEATING=NO; by QEVMODEL=QEVMODEL_NONE;.");
+  if (SOAP_is_var_in_codex(codex, "N2VIBJOULEHEATING")) fatal_error("The parameter N2VIBJOULEHEATING is deprecated. Replace N2VIBJOULEHEATING=YES; by QEVMODEL=QEVMODEL_PARENT2024; and N2VIBJOULEHEATING=NO; by QEVMODEL=QEVMODEL_NONE;.");
   if (SOAP_is_var_in_codex(codex, "N2VIBJOULEHEATINGMODEL")) fatal_error("The parameter N2VIBJOULEHEATINGMODEL is deprecated. Use QEVMODEL instead.");
   if (!gl->model.fluid.VIBSPECIESREAD) 
     fatal_error("VibSpecies() must be called within Model(%s()). List the species with vibrationally excited states, for example VibSpecies(\"N2\");. Use VibSpecies(); if no species has vibrationally excited states.",_FLUID_ACTIONNAME);
 
   find_int_var_from_codex(codex,"TAUVTMODEL",&gl->model.fluid.TAUVTMODEL);
-  if (gl->model.fluid.TAUVTMODEL!=TAUVTMODEL_PARENT2024 && gl->model.fluid.TAUVTMODEL!=TAUVTMODEL_MILLIKANWHITE 
-   && gl->model.fluid.TAUVTMODEL!=TAUVTMODEL_TEQUILIBRIUM)
-    SOAP_fatal_error(codex,"TAUVTMODEL must be set to TAUVTMODEL_PARENT2024, TAUVTMODEL_MILLIKANWHITE or TAUVTMODEL_TEQUILIBRIUM.");
+  if (gl->model.fluid.TAUVTMODEL==TAUVTMODEL_PARENT2024)
+    fatal_error("TAUVTMODEL_PARENT2024 is deprecated since 26nov09a. TAUVTMODEL must be set to TAUVTMODEL_MILLIKANWHITE or TAUVTMODEL_TEQUILIBRIUM.");
+  if (gl->model.fluid.TAUVTMODEL!=TAUVTMODEL_MILLIKANWHITE && gl->model.fluid.TAUVTMODEL!=TAUVTMODEL_TEQUILIBRIUM)
+    SOAP_fatal_error(codex,"TAUVTMODEL must be set to TAUVTMODEL_MILLIKANWHITE or TAUVTMODEL_TEQUILIBRIUM.");
   find_int_var_from_codex(codex,"QEVMODEL",&gl->model.fluid.QEVMODEL);
-  if (gl->model.fluid.QEVMODEL!=QEVMODEL_NONE && gl->model.fluid.QEVMODEL!=QEVMODEL_ALEKSANDROV 
-   && gl->model.fluid.QEVMODEL!=QEVMODEL_PARENT2024 && gl->model.fluid.QEVMODEL!=QEVMODEL_RODRIGUEZ2025 
-   && gl->model.fluid.QEVMODEL!=QEVMODEL_RODRIGUEZ2026)
-    SOAP_fatal_error(codex,"QEVMODEL must be set to QEVMODEL_NONE, QEVMODEL_ALEKSANDROV, QEVMODEL_PARENT2024, QEVMODEL_RODRIGUEZ2025 or QEVMODEL_RODRIGUEZ2026.");
+  if (gl->model.fluid.QEVMODEL==QEVMODEL_ALEKSANDROV)
+    fatal_error("QEVMODEL_ALEKSANDROV is deprecated since 26nov09a. QEVMODEL must be set to QEVMODEL_NONE or QEVMODEL_PARENT2024.");
+  if (gl->model.fluid.QEVMODEL==QEVMODEL_RODRIGUEZ2025)
+    fatal_error("QEVMODEL_RODRIGUEZ2025 is deprecated since 26nov09a. QEVMODEL must be set to QEVMODEL_NONE or QEVMODEL_PARENT2024.");
+  if (gl->model.fluid.QEVMODEL==QEVMODEL_RODRIGUEZ2026)
+    fatal_error("QEVMODEL_RODRIGUEZ2026 is deprecated since 26nov09a. QEVMODEL must be set to QEVMODEL_NONE or QEVMODEL_PARENT2024.");
+  if (gl->model.fluid.QEVMODEL!=QEVMODEL_NONE && gl->model.fluid.QEVMODEL!=QEVMODEL_PARENT2024)
+    SOAP_fatal_error(codex,"QEVMODEL must be set to QEVMODEL_NONE or QEVMODEL_PARENT2024.");
   find_int_var_from_codex(codex,"VIBDISTTYPE",&gl->model.fluid.VIBDISTTYPE);
   if (gl->model.fluid.VIBDISTTYPE!=VIBDISTTYPE_BOLTZMANN)
     SOAP_fatal_error(codex,"VIBDISTTYPE must be set to VIBDISTTYPE_BOLTZMANN. Other distributions of the vibrational states are not available yet.");
@@ -331,36 +336,10 @@ void read_model_fluid_vib(SOAP_codex_t *codex){
 #ifdef specN2
   N2ONLY=(_numvibspecies()==1 && _isvib(specN2));
 #endif
-  if (gl->model.fluid.TAUVTMODEL==TAUVTMODEL_PARENT2024 && !N2ONLY)
-    SOAP_fatal_error(codex,"TAUVTMODEL_PARENT2024 is a fit for N2 and can only be used with VibSpecies(\"N2\");. With other vibrating species or with no vibrating species, use TAUVTMODEL_MILLIKANWHITE or TAUVTMODEL_TEQUILIBRIUM.");
   if (gl->model.fluid.QEVMODEL!=QEVMODEL_NONE && !N2ONLY)
     SOAP_fatal_error(codex,"The e-V excitation models are fits for N2 and require VibSpecies(\"N2\");. With other vibrating species or with no vibrating species, set QEVMODEL=QEVMODEL_NONE;.");
   if (gl->model.fluid.TAUVTMODEL==TAUVTMODEL_TEQUILIBRIUM && gl->model.fluid.QEVMODEL!=QEVMODEL_NONE)
     SOAP_fatal_error(codex,"TAUVTMODEL_TEQUILIBRIUM requires QEVMODEL=QEVMODEL_NONE;.");
-}
-
-
-/*
-Macheret, Sergey O., et al. "Electron-beam-generated plasmas in hypersonic magnetohydrodynamic channels." 
-AIAA journal 39.6 (2001): 1127-1138. 
-Macheret, S. O., Martinelli, L., and Miles, R. B., "Shock Wave Propagation and Structure in Non-Uniform Gases and
-Plasmas," 1999, AIAA Paper 99-0598. 
-- VT relaxation time of N2 in air */
-static double _tauvt_Macheret(spec_t rhok, double T){
-  double N,N_O,tauvt;
-  long spec;  
-  tauvt=1.0e99;
-  N=0.0;
-  N_O=0.0;
-  for (spec=0; spec<ns; spec++) N+=rhok[spec]/_m(spec);
-#ifdef specO
-  N_O=rhok[specO]/_m(specO);
-#else
-  N_O=0.0;
-#endif
-  tauvt=1.0/(N*7E-16*exp(-141.0/pow(T,1.0/3.0))
-       +N_O*5E-18*exp(-128.0/sqrt(T)));
-  return(tauvt);
 }
 
 
@@ -412,9 +391,6 @@ static void find_tauvtk(gl_t *gl, spec_t rhok, double T, spec_t tauvtk){
         case TAUVTMODEL_TEQUILIBRIUM:
           tauvtk[k]=TAUVT_EQUILIBRIUM_CONSTANT/rho;
         break;
-        case TAUVTMODEL_PARENT2024:
-          tauvtk[k]=_tauvt_Macheret(rhok,T);
-        break;
         case TAUVTMODEL_MILLIKANWHITE:
           tauvtk[k]=_tauvtk_MillikanWhite(k,rhok,T);
         break;
@@ -447,17 +423,6 @@ static void find_tauvtk_d1overtauvtk(gl_t *gl, spec_t rhok, double T, spec_t tau
           tauvtk[k] = TAUVT_EQUILIBRIUM_CONSTANT/rho;
           for (spec=0; spec<ns; spec++) 
             d1overtauvtkdrhok[k][spec]=1.0/TAUVT_EQUILIBRIUM_CONSTANT;
-        break;
-        case TAUVTMODEL_PARENT2024: 
-          tauvtk[k]=_tauvt_Macheret(rhok,T);
-          for (spec=0; spec<ns; spec++) {
-            d1overtauvtkdT[k]+=7E-16*exp(-141.0/pow(T,1.0/3.0))*rhok[spec]*calA/_calM(spec)*(141.0/3.0*pow(T,-4.0/3.0));
-            d1overtauvtkdrhok[k][spec]=7E-16*exp(-141.0/pow(T,1.0/3.0))*calA/_calM(spec);
-          }
-#ifdef specO
-          d1overtauvtkdrhok[k][specO]+=5E-18*exp(-128.0/pow(T,1.0/2.0))*calA/_calM(specO);
-          d1overtauvtkdT[k]+=5E-18*exp(-128.0/pow(T,1.0/2.0))*rhok[specO]*calA/_calM(specO)*(128.0/2.0*pow(T,-3.0/2.0));
-#endif
         break;
         case TAUVTMODEL_MILLIKANWHITE:
           tauvtk[k]=_tauvtk_MillikanWhite(k,rhok,T);
@@ -594,9 +559,7 @@ void test_dSvib_dU_display(gl_t *gl, sqmat_t dSvibdU, sqmat_t dSvibdUnum){
 double _Qev(np_t *np, gl_t *gl, long l, double emfieldfact){
   double Qev;
 #ifdef specN2
-  long spec;
-  spec_t N;
-  double chiN2,Te,Tv,Tref,Ntotal,thetavib,f0,f1,f2,f3;
+  double chiN2;
 #endif
 
   Qev=0.0;
@@ -609,43 +572,6 @@ double _Qev(np_t *np, gl_t *gl, long l, double emfieldfact){
       chiN2=_Nk(np[l],gl,specN2)/_N(np[l],gl);
       Qev=_zetav_from_Te_Parent2024(_Te(np[l]))*chiN2*_Qjoulek(np, gl, l, speceminus)*emfieldfact;
     break;
-    case QEVMODEL_ALEKSANDROV:
-      chiN2=_Nk(np[l],gl,specN2)/_N(np[l],gl);
-      Qev=_zetav_from_Te_Aleksandrov(_Te(np[l]))*chiN2*_Qjoulek(np, gl, l, speceminus)*emfieldfact;
-    break;
-    case QEVMODEL_RODRIGUEZ2025:
-      Ntotal=0.0;
-      for (spec=0; spec<ns; spec++){
-        N[spec]=_rhok(np[l],spec)/_m(spec); 
-        Ntotal+=N[spec];
-      }
-      Tv=_Tv(np[l],gl);
-      Te=_Te(np[l]);
-      Tref=300.0e0; //gas temperature at which the experiments or BOLSIG+ results of mueN and E/N were obtained
-      thetavib=_thetavk(specN2); //characteristic N2 vibration temperature in K
-      // electron cooling-heating due to e-V interactions
-      Qev=_zetav_from_Te_Rodriguez2025(_Te(np[l]))*N[speceminus]*N[specN2]*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverNk_from_Te_chieminus(specN2, Te, N[speceminus]/Ntotal))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*(1.0-exp( thetavib/Te - thetavib/Tv ));
-    break;
-    case QEVMODEL_RODRIGUEZ2026:
-      Ntotal=0.0;
-      for (spec=0; spec<ns; spec++){
-        N[spec]=_rhok(np[l],spec)/_m(spec); 
-        Ntotal+=N[spec];
-      }
-      Tv=_Tv(np[l],gl);
-      Te=_Te(np[l]);
-      Tref=300.0e0; //gas temperature at which the experiments or BOLSIG+ results of mueN and E/N were obtained
-      thetavib=_thetavk(specN2); //characteristic N2 vibration temperature in K
-      f0 = 1.0-exp(-thetavib/Tv);
-      f1 = exp(-1.0*thetavib/Tv)*(1.0-exp(-thetavib/Tv));
-      f2 = exp(-2.0*thetavib/Tv)*(1.0-exp(-thetavib/Tv));
-      f3 = 1.0-f0-f1-f2;
-      // electron cooling-heating due to e-V interactions
-      Qev=_zetav_from_Te_Rodriguez2025(_Te(np[l]))*N[speceminus]*f0*N[specN2]*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverNk_from_Te_chieminus(specN2, Te, N[speceminus]/Ntotal))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*(1.0-exp( thetavib/Te - thetavib/Tv ))
-               +_zetav_from_Te_Rodriguez2025(_Te(np[l]))*N[speceminus]*f1*N[specN2]*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverN_from_Te_chieminus_N2v1(Te, N[speceminus]/Ntotal))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*(1.0-exp( thetavib/Te - thetavib/Tv ))
-               +_zetav_from_Te_Rodriguez2025(_Te(np[l]))*N[speceminus]*f2*N[specN2]*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverN_from_Te_chieminus_N2v2(Te, N[speceminus]/Ntotal))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*(1.0-exp( thetavib/Te - thetavib/Tv ))
-               +_zetav_from_Te_Rodriguez2025(_Te(np[l]))*N[speceminus]*f3*N[specN2]*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverN_from_Te_chieminus_N2v3(Te, N[speceminus]/Ntotal))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*(1.0-exp( thetavib/Te - thetavib/Tv ));
-    break;
 #endif
     default:
       fatal_error("Problem with QEVMODEL in _Qev().");
@@ -653,78 +579,6 @@ double _Qev(np_t *np, gl_t *gl, long l, double emfieldfact){
   return(Qev);
 }
 
-
-/* derivatives of _Qev() with respect to U: only the de-excitation parts of the 
-   RODRIGUEZ2025 and RODRIGUEZ2026 models, through Tv and Te, are included */
-void find_dQev_dU(np_t *np, gl_t *gl, long l, sqmat_t dQevdU){
-  long row,col;
-#ifdef specN2
-  spec_t N;
-  long flux,spec;
-  double Ntotal,Tv,Te,Tref,thetavib,f0,f1,f2,f3;
-  flux_t dTvdU,dTedU;
-#endif
-
-  for (row=0; row<nf; row++){
-    for (col=0; col<nf; col++){
-      dQevdU[row][col]=0.0;
-    }
-  }	
-  switch (gl->model.fluid.QEVMODEL){
-#ifdef specN2
-    case QEVMODEL_RODRIGUEZ2025:
-      Ntotal=0.0;
-      for (spec=0; spec<ns; spec++){
-        N[spec]=_rhok(np[l],spec)/_m(spec); 
-        Ntotal+=N[spec];
-      }
-      Tv=_Tv(np[l],gl);
-      Te=_Te(np[l]);
-      Tref=300.0e0; //gas temperature at which the experiments or BOLSIG+ results of mueN and E/N were obtained
-      thetavib=_thetavk(specN2); //characteristic N2 vibration temperature in K
-      // electron cooling-heating due to e-V interactions
-      find_dTv_dU(np[l], gl, dTvdU);  
-      find_dTe_dU(np[l], gl, dTedU);  
-      for (flux=0; flux<nf; flux++){
-        // wrt Tv
-        dQevdU[fluxev][flux]+=_zetav_from_Te_Rodriguez2025(_Te(np[l]))*N[speceminus]*N[specN2]*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverNk_from_Te_chieminus(specN2, Te, N[speceminus]/Ntotal))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*(-exp( thetavib/Te)*exp(- thetavib/Tv)*(thetavib/sqr(Tv)) )*dTvdU[flux];
-        // wrt Te
-        dQevdU[fluxev][flux]+=_zetav_from_Te_Rodriguez2025(_Te(np[l]))*N[speceminus]*N[specN2]*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverNk_from_Te_chieminus(specN2, Te, N[speceminus]/Ntotal))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*(-exp( thetavib/Te)*(-thetavib/sqr(Te))*exp(- thetavib/Tv) )*dTedU[flux];
-      }
-    break;
-    case QEVMODEL_RODRIGUEZ2026:
-      Ntotal=0.0;
-      for (spec=0; spec<ns; spec++){
-        N[spec]=_rhok(np[l],spec)/_m(spec); 
-        Ntotal+=N[spec];
-      }
-      Tv=_Tv(np[l],gl);
-      Te=_Te(np[l]);
-      Tref=300.0e0; //gas temperature at which the experiments or BOLSIG+ results of mueN and E/N were obtained
-      thetavib=_thetavk(specN2); //characteristic N2 vibration temperature in K
-      // electron cooling-heating due to e-V interactions
-      find_dTv_dU(np[l], gl, dTvdU);  
-      find_dTe_dU(np[l], gl, dTedU);  
-      f0 = 1.0-exp(-thetavib/Tv); 
-      f1 = exp(-1.0*thetavib/Tv)*(1.0-exp(-thetavib/Tv)); 
-      f2 = exp(-2.0*thetavib/Tv)*(1.0-exp(-thetavib/Tv)); 
-      f3 = 1.0-f0-f1-f2;
-      for (flux=0; flux<nf; flux++){
-        // wrt Tv
-        dQevdU[fluxev][flux]+=_zetav_from_Te_Rodriguez2025(_Te(np[l]))*N[speceminus]*f0*N[specN2]*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverNk_from_Te_chieminus(specN2, Te, N[speceminus]/Ntotal))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*(-exp( thetavib/Te)*exp(- thetavib/Tv)*(thetavib/sqr(Tv)) )*dTvdU[flux]
-                            +_zetav_from_Te_Rodriguez2025(_Te(np[l]))*N[speceminus]*f1*N[specN2]*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverN_from_Te_chieminus_N2v1(Te, N[speceminus]/Ntotal))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*(-exp( thetavib/Te)*exp(- thetavib/Tv)*(thetavib/sqr(Tv)) )*dTvdU[flux]
-                            +_zetav_from_Te_Rodriguez2025(_Te(np[l]))*N[speceminus]*f2*N[specN2]*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverN_from_Te_chieminus_N2v2(Te, N[speceminus]/Ntotal))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*(-exp( thetavib/Te)*exp(- thetavib/Tv)*(thetavib/sqr(Tv)) )*dTvdU[flux]
-                            +_zetav_from_Te_Rodriguez2025(_Te(np[l]))*N[speceminus]*f3*N[specN2]*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverN_from_Te_chieminus_N2v3(Te, N[speceminus]/Ntotal))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*(-exp( thetavib/Te)*exp(- thetavib/Tv)*(thetavib/sqr(Tv)) )*dTvdU[flux];
-        // wrt Te
-        dQevdU[fluxev][flux]+=_zetav_from_Te_Rodriguez2025(_Te(np[l]))*N[speceminus]*f0*N[specN2]*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverNk_from_Te_chieminus(specN2, Te, N[speceminus]/Ntotal))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*(-exp( thetavib/Te)*(-thetavib/sqr(Te))*exp(- thetavib/Tv) )*dTedU[flux]
-                            +_zetav_from_Te_Rodriguez2025(_Te(np[l]))*N[speceminus]*f1*N[specN2]*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverN_from_Te_chieminus_N2v1(Te, N[speceminus]/Ntotal))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*(-exp( thetavib/Te)*(-thetavib/sqr(Te))*exp(- thetavib/Tv) )*dTedU[flux]
-                            +_zetav_from_Te_Rodriguez2025(_Te(np[l]))*N[speceminus]*f2*N[specN2]*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverN_from_Te_chieminus_N2v2(Te, N[speceminus]/Ntotal))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*(-exp( thetavib/Te)*(-thetavib/sqr(Te))*exp(- thetavib/Tv) )*dTedU[flux]
-                            +_zetav_from_Te_Rodriguez2025(_Te(np[l]))*N[speceminus]*f3*N[specN2]*fabs(_C(speceminus))*_mueNk_from_Te(gl,specN2,Te)*max(sqr(_EoverN_from_Te_chieminus_N2v3(Te, N[speceminus]/Ntotal))-3.0*kB*max(0.0,Te-Tref)/(_m(specN2)*sqr(_mueNk_from_Te(gl,specN2,Te))),0.0)*(-exp( thetavib/Te)*(-thetavib/sqr(Te))*exp(- thetavib/Tv) )*dTedU[flux];
-      }
-    break;  
-#endif
-  }
-}
 
 #endif //_FLUID_PLASMA
 

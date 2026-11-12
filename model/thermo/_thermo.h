@@ -541,11 +541,7 @@ double _ev_from_w_Tv(int VIBDISTTYPE, spec_t w, double Tv);
 void find_vibdist(gl_t *gl, int VIBDISTTYPE, spec_t Nk, double T, double ev, double devdt, vibdist_t *vibdist);
 
 /* nitrogen vibration energy */
-double _zetav_from_Te_Rodriguez2025(double Te);
-
 double _zetav_from_Te_Parent2024(double Te);
-
-double _zetav_from_Te_Aleksandrov(double Te);
 
 double _zetae_from_Te(double Te);
 

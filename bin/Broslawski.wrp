@@ -272,9 +272,8 @@ Bdry(
 Model(
   NavierStokesPlasma(
     TEMODEL=TEMODEL_TRANSPORT_PARENT2024;
-    TETRANSPORT_WEEE_TWOTEMPERATURE=FALSE;
     VibSpecies("N2");  {species with vibrationally excited states}
-    TAUVTMODEL=TAUVTMODEL_PARENT2024;
+    TAUVTMODEL=TAUVTMODEL_MILLIKANWHITE;
     QEVMODEL=QEVMODEL_PARENT2024;
     VIBDISTTYPE=VIBDISTTYPE_BOLTZMANN;
     REACTING=YES;
@@ -302,7 +301,6 @@ Model(
     AddHeatPoint(0.0{x,m},0.0{y,m}, 0.1{radius,m}, 0.0{W/m});
     }
     HEAT_DEPOSITED_TO_ELECTRONS=FALSE;
-    QENSOURCETERMS=TRUE;
     TrefElectronEnergyTransport=10.0; {reference temperature used in electron energy transport Qe term}
   );
   AirPlasma11s(

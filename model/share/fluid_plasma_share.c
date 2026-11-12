@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <model/beam/_beam.h>
 #include <model/fluid/.active/fluid.h>
 #include <model/share/model_share.h>
+#include <model/share/fluid_vib.h>
+#include <model/thermo/_generic/electronimpact.h>
 #include <src/control.h>
 #include <src/bdry.h>
 
@@ -607,18 +609,306 @@ static double _et_denom(double et, gl_t *gl){
 
 
 /* TRUE if TEMODEL solves a transport equation for the energy of the bulk electrons */
-static bool is_TEMODEL_transport(gl_t *gl){
+bool is_TEMODEL_transport(gl_t *gl){
   long TEMODEL;
   bool TRANSPORT;
   TEMODEL=gl->model.fluid.TEMODEL;
-  TRANSPORT=(TEMODEL!=TEMODEL_CONSTANT && TEMODEL!=TEMODEL_TEQUILIBRIUM && TEMODEL!=TEMODEL_LOCAL);
-#ifdef TEMODEL_TVEQUILIBRIUM
-  if (TEMODEL==TEMODEL_TVEQUILIBRIUM) TRANSPORT=FALSE;
-#endif
-#ifdef TEMODEL_TRANSPORTEMF
-  if (TEMODEL==TEMODEL_TRANSPORTEMF) TRANSPORT=FALSE;
-#endif
+  TRANSPORT=(TEMODEL!=TEMODEL_CONSTANT && TEMODEL!=TEMODEL_TEQUILIBRIUM && TEMODEL!=TEMODEL_LOCAL && TEMODEL!=TEMODEL_TVEQUILIBRIUM);
   return(TRANSPORT);
+}
+
+
+/* electron energy models (TEMODEL) of _Navier-Stokes_plasma and _Favre-Reynolds_plasma */
+
+#define factTesource 1.0e0
+
+/* TEMODELs deprecated since 26nov09a: TEMODELdeprecated[i] is given the value TEMODEL_DEPRECATED+i */
+#define NUMTEMODELDEPRECATED 8
+static char *TEMODELdeprecated[NUMTEMODELDEPRECATED]={"TEMODEL_TRANSPORT_PARENT2021","TEMODEL_TRANSPORTEMF",
+  "TEMODEL_TRANSPORT_KIM2012","TEMODEL_TRANSPORT_RODRIGUEZ2024","TEMODEL_TRANSPORT_RODRIGUEZ2025",
+  "TEMODEL_TRANSPORT_RODRIGUEZ2025_ADHOC","TEMODEL_TRANSPORT_PETERS2019","TEMODEL_TRANSPORT_RODRIGUEZ2026"};
+
+
+void add_TEMODEL_constants_to_codex(SOAP_codex_t *codex){
+  long cnt;
+  SOAP_add_int_to_vars(codex,"TEMODEL_CONSTANT",TEMODEL_CONSTANT);
+  SOAP_add_int_to_vars(codex,"TEMODEL_TEQUILIBRIUM",TEMODEL_TEQUILIBRIUM);
+  SOAP_add_int_to_vars(codex,"TEMODEL_TVEQUILIBRIUM",TEMODEL_TVEQUILIBRIUM);
+  SOAP_add_int_to_vars(codex,"TEMODEL_LOCAL",TEMODEL_LOCAL);
+  SOAP_add_int_to_vars(codex,"TEMODEL_TRANSPORT_PARENT2024",TEMODEL_TRANSPORT_PARENT2024);
+  /* deprecated constants: they remain defined so that the deprecation message is given */
+  for (cnt=0; cnt<NUMTEMODELDEPRECATED; cnt++)
+    SOAP_add_int_to_vars(codex,TEMODELdeprecated[cnt],TEMODEL_DEPRECATED+cnt);
+}
+
+
+/* reads TEMODEL and checks it; QEVMODEL must have been read before (read_model_fluid_vib()) */
+void read_model_fluid_TEMODEL(SOAP_codex_t *codex){
+  gl_t *gl=((readcontrolarg_t *)codex->action_args)->gl;
+  find_int_var_from_codex(codex,"TEMODEL",&gl->model.fluid.TEMODEL);
+  if (gl->model.fluid.TEMODEL>=TEMODEL_DEPRECATED && gl->model.fluid.TEMODEL<TEMODEL_DEPRECATED+NUMTEMODELDEPRECATED)
+    fatal_error("%s is deprecated since 26nov09a. TEMODEL must be set to TEMODEL_CONSTANT, TEMODEL_TEQUILIBRIUM, TEMODEL_TVEQUILIBRIUM, TEMODEL_LOCAL or TEMODEL_TRANSPORT_PARENT2024.",TEMODELdeprecated[gl->model.fluid.TEMODEL-TEMODEL_DEPRECATED]);
+  if (gl->model.fluid.TEMODEL!=TEMODEL_CONSTANT && gl->model.fluid.TEMODEL!=TEMODEL_TEQUILIBRIUM && gl->model.fluid.TEMODEL!=TEMODEL_TVEQUILIBRIUM 
+   && gl->model.fluid.TEMODEL!=TEMODEL_LOCAL && gl->model.fluid.TEMODEL!=TEMODEL_TRANSPORT_PARENT2024)
+    SOAP_fatal_error(codex,"TEMODEL must be set to TEMODEL_CONSTANT, TEMODEL_TEQUILIBRIUM, TEMODEL_TVEQUILIBRIUM, TEMODEL_LOCAL or TEMODEL_TRANSPORT_PARENT2024.");
+  if (gl->model.fluid.TEMODEL==TEMODEL_TVEQUILIBRIUM && _numvibspecies()==0)
+    SOAP_fatal_error(codex,"TEMODEL_TVEQUILIBRIUM can not be used when no species has vibrationally excited states (VibSpecies();).");
+}
+
+/* Parent, Bernard, and Felipe Martin Rodriguez Fuentes. "Progress in electron energy modeling for plasma flows and discharges." Physics of Fluids 36.8 (2024). */
+static void find_Qe_Parent2024(np_t *np, gl_t *gl, long l, double *Qe){
+  spec_t N,rhok;
+  double T,Te,Tref,Ntotal,lnLambda;
+  long spec;
+  Ntotal=0.0;
+  for (spec=0; spec<ns; spec++){
+    rhok[spec]=_rhok(np[l],spec);
+    N[spec]=_rhok(np[l],spec)/_m(spec); 
+    Ntotal+=N[spec];
+  }
+  T=_T(np[l],gl);
+  Te=_Te(np[l]);
+  Tref=300.0e0; //gas temperature at which the experiments or BOLSIG+ results of mueN and E/N were obtained
+  lnLambda=_lnLambda(rhok, Te);
+  *Qe=0.0;
+  for (spec=0; spec<ns; spec++){
+    if (speciestype[spec]==SPECIES_NEUTRAL){
+      *Qe+=N[speceminus]*N[spec]*fabs(_C(speceminus))*_mueNk_from_Te(gl,spec,Te)*max(sqr(_EoverNk_from_Te(spec, Te))-3.0*kB*max(0.0,Te-Tref)/(_m(spec)*sqr(_mueNk_from_Te(gl,spec,Te))),0.0);
+      *Qe+=3.0*kB*fabs(_C(speceminus))*(Te-T)*rhok[speceminus]*rhok[spec]/(_m(speceminus)*sqr(_m(spec))*_mueNk_from_Te(gl,spec,Te));
+    }
+    if (speciestype[spec]==SPECIES_IONPLUS || speciestype[spec]==SPECIES_IONMINUS){
+//      *Qe+=rhok[speceminus]*rhok[spec]*(Te-T)*6.0*kB*sqr(_C(spec))*sqr(_C(speceminus))*lnLambda/(powint(pi*qe,3)*sqr(epsilon0*_m(speceminus)*_m(spec)));
+      *Qe+=rhok[speceminus]*rhok[spec]*(pow(Te,-0.5)-T*pow(Te,-1.5))*pow(pi*_m(speceminus)/8.0/kB,1.5)*6.0*kB*sqr(_C(spec))*sqr(_C(speceminus))*lnLambda/(powint(pi,3)*sqr(epsilon0*_m(speceminus)*_m(spec)));
+    }
+  }
+}
+
+
+void find_Qe(np_t *np, gl_t *gl, long l, double *Qe){
+  switch (gl->model.fluid.TEMODEL){
+    case TEMODEL_TRANSPORT_PARENT2024:
+      find_Qe_Parent2024(np, gl, l, Qe);
+    break;
+    default:
+      *Qe=0.0;
+  }  
+}
+
+
+/* source terms to electron energy transport equation */
+void find_Se(np_t *np, gl_t *gl, long l, flux_t S){
+  long flux;
+  double Qe,mue,Ne,Te,Tv,EdotJe;
+
+  for (flux=0; flux<nf; flux++) S[flux]=0.0e0;
+
+  Ne=_Nk(np[l],gl,speceminus);
+  Te=_Te(np[l]);
+  mue=_mu(np,gl,l,speceminus);
+
+  switch (gl->model.fluid.TEMODEL){
+    case TEMODEL_TRANSPORT_PARENT2024:
+      find_Qe(np, gl, l, &Qe);
+      EdotJe=mue*Ne*_E_dot_Je_over_mueNe(np,gl,l);
+#ifdef _AVERAGEDRATES_FLUID
+      EdotJe=_averaged_rate(np[l],gl,"EDOTJE",EdotJe);
+#endif
+      //As derived in the document model/fluid/doc/Transport_Equations
+      S[fluxee]=factTesource*(EdotJe-Qe);
+    break;
+    case TEMODEL_LOCAL:
+      S[fluxee]=factTesource*_rhok(np[l],speceminus)*(_Te_local(np,gl,l,_T(np[l],gl))-Te);
+    break;
+    case TEMODEL_TEQUILIBRIUM:
+      S[fluxee]=factTesource*_rhok(np[l],speceminus)*(_T(np[l],gl)-Te);
+    break;
+    case TEMODEL_TVEQUILIBRIUM:
+      Tv=_smooth(np, gl, l, TYPELEVEL_FLUID, &(_Tv));
+      S[fluxee]=factTesource*_rhok(np[l],speceminus)*(Tv-Te);
+    break;
+    case TEMODEL_CONSTANT:
+      S[fluxee]=0.0;
+    break;
+    default:
+      fatal_error("TEMODEL problem in find_Se().");
+  }
+}
+
+
+static void find_dSe_dU_transport_Parent2024(np_t *np, gl_t *gl, long l, sqmat_t dSedU){
+  long row,col,flux,spec;
+  double k1,T,Te,Tref,dTe,Ntotal,lnLambda;
+  spec_t N,rhok;
+  flux_t dTdU,dTedU;
+  for (row=0; row<nf; row++) {
+    for (col=0; col<nf; col++) {
+      dSedU[row][col]=0.0e0;
+    }
+  }
+  Ntotal=0.0;
+  for (spec=0; spec<ns; spec++){
+    rhok[spec]=_rhok(np[l],spec);
+    N[spec]=_rhok(np[l],spec)/_m(spec); 
+    Ntotal+=N[spec];
+  }
+  Te=_Te(np[l]);
+  dTe=10.0;
+  T=_T(np[l],gl);
+  Tref=300.0e0;
+  find_dT_dU(np[l], gl, dTdU);
+  find_dTe_dU(np[l], gl, dTedU);
+  lnLambda=_lnLambda(rhok, Te);
+  for (spec=0; spec<ns; spec++){
+    if (speciestype[spec]==SPECIES_NEUTRAL){
+      //      *Qe+=N[speceminus]*N[spec]*fabs(_C(speceminus))*_mueNk_from_Te(gl,spec,Te)*max(sqr(_EoverNk_from_Te(spec, Te))-3.0*kB*max(0.0,Te-Tref)/(_m(spec)*sqr(_mueNk_from_Te(gl,spec,Te))),0.0);
+
+      // wrt Te
+      for (flux=0; flux<nf; flux++) dSedU[fluxee][flux]-=
+        +(N[speceminus]*N[spec]*fabs(_C(speceminus))*_mueNk_from_Te(gl,spec,Te)*max(sqr(_EoverNk_from_Te(spec, Te+dTe))-3.0*kB*max(0.0,Te-Tref)/(_m(spec)*sqr(_mueNk_from_Te(gl,spec,Te))),0.0)
+         -N[speceminus]*N[spec]*fabs(_C(speceminus))*_mueNk_from_Te(gl,spec,Te)*max(sqr(_EoverNk_from_Te(spec, Te))    -3.0*kB*max(0.0,Te-Tref)/(_m(spec)*sqr(_mueNk_from_Te(gl,spec,Te))),0.0))/dTe*dTedU[flux];
+      // wrt rhoe
+      dSedU[fluxee][speceminus]-=1.0/_m(speceminus)*fabs(_C(speceminus))*N[spec]*_mueNk_from_Te(gl,spec,Te)*max(sqr(_EoverNk_from_Te(spec, Te))-3.0*kB*max(0.0,Te-Tref)/(_m(spec)*sqr(_mueNk_from_Te(gl,spec,Te))),0.0);
+      // wrt N[spec]
+      dSedU[fluxee][spec]-=N[speceminus]*fabs(_C(speceminus))*_mueNk_from_Te(gl,spec,Te)/_m(spec)*max(sqr(_EoverNk_from_Te(spec, Te))-3.0*kB*max(0.0,Te-Tref)/(_m(spec)*sqr(_mueNk_from_Te(gl,spec,Te))),0.0);
+
+
+//    *Qe+=3.0*kB*fabs(_C(speceminus))*(Te-T)*rhok[speceminus]*rhok[spec]/(_m(speceminus)*sqr(_m(spec))*_mueNk_from_Te(gl,spec,Te));
+      // wrt T
+      for (flux=0; flux<nf; flux++) dSedU[fluxee][flux]-=-3.0*kB*fabs(_C(speceminus))*rhok[speceminus]*rhok[spec]/(_m(speceminus)*sqr(_m(spec))*_mueNk_from_Te(gl,spec,Te))*dTdU[flux];
+      // wrt Te
+      for (flux=0; flux<nf; flux++) dSedU[fluxee][flux]-=3.0*kB*fabs(_C(speceminus))*rhok[speceminus]*rhok[spec]/(_m(speceminus)*sqr(_m(spec))*_mueNk_from_Te(gl,spec,Te))*dTedU[flux];
+      // wrt rhoe
+      dSedU[fluxee][speceminus]-=3.0*kB*fabs(_C(speceminus))*(Te-T)*rhok[spec]/(_m(speceminus)*sqr(_m(spec))*_mueNk_from_Te(gl,spec,Te));
+      // wrt rhok[spec]
+      dSedU[fluxee][spec]-=3.0*kB*fabs(_C(speceminus))*(Te-T)*rhok[speceminus]/(_m(speceminus)*sqr(_m(spec))*_mueNk_from_Te(gl,spec,Te));
+    }
+    if (speciestype[spec]==SPECIES_IONPLUS || speciestype[spec]==SPECIES_IONMINUS){
+      //*Qe+=rhok[speceminus]*rhok[spec]*(pow(Te,-0.5)-T*pow(Te,-1.5))*k1;
+      k1=pow(pi*_m(speceminus)/8.0/kB,1.5)*6.0*kB*sqr(_C(spec))*sqr(_C(speceminus))*lnLambda/(powint(pi,3)*sqr(epsilon0*_m(speceminus)*_m(spec)));
+      // wrt rhoe
+      dSedU[fluxee][speceminus]-=rhok[spec]*(pow(Te,-0.5)-T*pow(Te,-1.5))*k1;
+      // wrt rhok[spec]
+      dSedU[fluxee][spec]-=rhok[speceminus]*(pow(Te,-0.5)-T*pow(Te,-1.5))*k1;
+      // wrt T
+      for (flux=0; flux<nf; flux++) dSedU[fluxee][flux]-=rhok[speceminus]*rhok[spec]*(-pow(Te,-1.5))*k1*dTdU[flux];
+      // wrt Te
+      for (flux=0; flux<nf; flux++) dSedU[fluxee][flux]-=rhok[speceminus]*rhok[spec]*(-0.5*pow(Te,-1.5)+1.5*T*pow(Te,-2.5))*k1*dTedU[flux];
+    }
+  }
+}
+
+
+void find_dSe_dU(np_t *np, gl_t *gl, long l, sqmat_t dSedU){
+  long row,col;
+  long flux;
+  flux_t dTedU,dTdU,dTvdU;
+  for (row=0; row<nf; row++) {
+    for (col=0; col<nf; col++) {
+      dSedU[row][col]=0.0e0;
+    }
+  }
+  switch (gl->model.fluid.TEMODEL){
+    case TEMODEL_TRANSPORT_PARENT2024:
+      find_dSe_dU_transport_Parent2024(np,gl,l,dSedU);
+    break;
+    case TEMODEL_LOCAL:
+      //S[fluxee]=factTesource*_rhok(np[l],speceminus)*(_Te_local(np,gl,l,_T(np[l],gl))-_Te(np[l])); 
+      /* wrt rhoe */
+      dSedU[fluxee][speceminus]=factTesource*(_Te_local(np,gl,l,_T(np[l],gl))-_Te(np[l]));
+      /* wrt to Te */
+      find_dTe_dU(np[l], gl, dTedU);
+      for (flux=0; flux<nf; flux++)
+        dSedU[fluxee][flux]+=-factTesource*_rhok(np[l],speceminus)*dTedU[flux];
+    break;
+    case TEMODEL_TEQUILIBRIUM:
+      //S[fluxee]=factTesource*_rhok(np[l],speceminus)*(_T(np[l],gl)-_Te(np[l])); 
+      /* wrt rhoe */
+      dSedU[fluxee][speceminus]=factTesource*(_T(np[l],gl)-_Te(np[l]));
+      /* wrt to Te */
+      find_dTe_dU(np[l], gl, dTedU);
+      for (flux=0; flux<nf; flux++)
+        dSedU[fluxee][flux]-=factTesource*_rhok(np[l],speceminus)*dTedU[flux];
+      /* wrt to T */
+      find_dT_dU(np[l], gl, dTdU);
+      for (flux=0; flux<nf; flux++)
+        dSedU[fluxee][flux]+=factTesource*_rhok(np[l],speceminus)*dTdU[flux];
+    break;
+    case TEMODEL_TVEQUILIBRIUM:
+      //S[fluxee]=factTesource*_rhok(np[l],speceminus)*(_Tv(np[l],gl)-_Te(np[l])); 
+      /* wrt rhoe */
+      dSedU[fluxee][speceminus]=factTesource*(_Tv(np[l],gl)-_Te(np[l]));
+      /* wrt to Te */
+      find_dTe_dU(np[l], gl, dTedU);
+      for (flux=0; flux<nf; flux++)
+        dSedU[fluxee][flux]-=factTesource*_rhok(np[l],speceminus)*dTedU[flux];
+      /* wrt to Tv */
+      find_dTv_dU(np[l], gl, dTvdU);
+      for (flux=0; flux<nf; flux++)
+        dSedU[fluxee][flux]+=factTesource*_rhok(np[l],speceminus)*dTvdU[flux];
+    break;
+    case TEMODEL_CONSTANT:
+      for (flux=0; flux<nf; flux++)
+        dSedU[fluxee][flux]+=0.0;   
+    break;
+    default:
+      fatal_error("TEMODEL can not be equal to %ld in find_dSe_dU().",gl->model.fluid.TEMODEL);
+  }
+}
+
+
+/* sets U[fluxee] following TEMODEL once U has been updated in add_dUstar_to_U(); rhoe is the clipped
+   electron density and eemem the electron specific energy before the update */
+void update_U_ee_from_TEMODEL(np_t *np, gl_t *gl, long l, double rhoe, double eemem){
+  switch (gl->model.fluid.TEMODEL){
+    case TEMODEL_CONSTANT:
+      np[l].bs->U[fluxee]=eemem*rhoe;
+    break;
+    case TEMODEL_TEQUILIBRIUM:
+      np[l].bs->U[fluxee]=rhoe*_ee_from_Te(_T(np[l], gl));
+    break;
+    case TEMODEL_TVEQUILIBRIUM:
+      np[l].bs->U[fluxee]=rhoe*_ee_from_Te(_Tv(np[l],gl));
+    break;
+    case TEMODEL_LOCAL:
+      np[l].bs->U[fluxee]=rhoe*_ee_from_Te(_Te_local(np, gl, l,gl->model.fluid.Temin));
+    break;
+    case TEMODEL_TRANSPORT_PARENT2024:
+      /* the electron energy is transported: U[fluxee] is the one updated */
+    break;
+    default:
+      fatal_error("Problem with TEMODEL=%ld in update_U_ee_from_TEMODEL().",gl->model.fluid.TEMODEL);
+  }
+}
+
+
+/* in find_prim_fluid(), with TEMODEL_TEQUILIBRIUM and TEMODEL_LOCAL the electron temperature can not be less than T,
+   and with TEMODEL_TVEQUILIBRIUM it can not be less than Tv; if so, ee, Te and U[fluxee] are set accordingly
+   (rhoe is the electron density) and TRUE is returned */
+bool clip_ee_from_TEMODEL(np_t np, gl_t *gl, double rhoe, double T, double Tv, double *ee, double *Te){
+  bool CLIPPED;
+  double Tmin;
+  switch (gl->model.fluid.TEMODEL){
+    case TEMODEL_TEQUILIBRIUM:
+    case TEMODEL_LOCAL:
+      Tmin=T;
+      CLIPPED=TRUE;
+    break;
+    case TEMODEL_TVEQUILIBRIUM:
+      Tmin=Tv;
+      CLIPPED=TRUE;
+    break;
+    default:
+      Tmin=0.0;
+      CLIPPED=FALSE;
+  }
+  if (CLIPPED && *ee<_ee_from_Te(Tmin)) {
+    *ee=_ee_from_Te(Tmin);
+    np.bs->U[fluxee]=(*ee)*rhoe;
+    *Te=_Te_from_ee(*ee);
+  } else {
+    CLIPPED=FALSE;
+  }
+  return(CLIPPED);
 }
 
 

@@ -558,15 +558,3 @@ void find_dQei_dx(np_t np, gl_t *gl, spec_t rhok, double Estar, double Te, spec_
   }
 }
 
-
-void find_We ( gl_t *gl, spec_t rhok, double T, double Te, double Tv, double Estar, double Qbeam, 
-                          double *We_create, double *We_destroy ){
-
-  switch (gl->model.chem.CHEMMODEL){
-    case CHEMMODEL_LENARD1964: 
-      find_We_Lenard1964 ( gl, rhok, T, Te, Tv, Estar, Qbeam, We_create, We_destroy );
-    break;
-    default:
-      fatal_error("CHEMMODEL must be set to CHEMMODEL_LENARD1964 for two-temperature model of We*ee.");
-  }
-}
