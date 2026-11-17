@@ -7,6 +7,56 @@ ________________________________________________________________________________
 _____________________________________________________________________________________________________
 
 
+2026 NOV 13a
+  * in _Navier-Stokes_plasma, _Favre-Reynolds_plasma and _drift-diffusion, the mobility and the
+    other per-node species properties are found once per node or interface before the species
+    loops that use them, and with TEMODEL_TRANSPORT_PARENT2024 the factors of the dSe/dU terms
+    that do not depend on the flux are found once before the loops on flux; the result is
+    unchanged; with wafer3D.wrp, _Epotential and _NH3_Plasma_32s on 89x89x35 nodes and 16
+    threads, UpdateFluid() is 2.9 times faster
+  * in /model/share/fluid_plasma_share.c
+    - in find_alpha(), finds the mobility and number density of species k outside the loop on r
+    - in find_dZU_dU(), finds the mobility, the density and dsigma/drhok of all species before
+      the triple loop
+    - in find_dSe_dU_transport_Parent2024(), finds the electron mobility, E/N and the powers of
+      Te once per species, and the factors multiplying dTdU or dTedU before each loop on flux
+    - in find_Dstar(), finds the mobility of all species before the loop on r
+    - in find_Dstarmat(), finds the mobility of all species before the loop on r
+  * in /model/fluid/_Navier-Stokes_plasma/fluid.c
+    - in find_Kstar_interface(), finds the mobility, collision frequency, temperature and density
+      of all species at both nodes before the double loops
+  * in /model/fluid/_Navier-Stokes_plasma/fluid_source.c
+    - added find_dTedX_mass_flux_at_interface(): finds the mass flux due to the electron
+      temperature gradient at an interface for all species at once, with the conductivity at
+      each node found once
+    - removed _dTedX_mass_flux_at_interface(): its flux is now found for all species at once by
+      the function added above
+    - in find_Semfield(), finds the mass flux due to the electron temperature gradient of all
+      species once per interface instead of once per species and interface
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid.c
+    - in find_Kstar_interface(), finds the mobility, nustar, temperature and density of all
+      species at both nodes before the double loops
+  * in /model/fluid/_Favre-Reynolds_plasma/fluid_source.c
+    - added find_dTedX_mass_flux_at_interface(): finds the mass flux due to the electron
+      temperature gradient at an interface for all species at once, with the conductivity at
+      each node found once
+    - removed _dTedX_mass_flux_at_interface(): its flux is now found for all species at once by
+      the function added above
+    - in find_Semfield(), finds the mass flux due to the electron temperature gradient of all
+      species once per interface instead of once per species and interface
+  * in /model/fluid/_drift-diffusion/fluid.c
+    - added find_dTedX_mass_flux_at_interface(): finds the mass flux due to the electron
+      temperature gradient at an interface for all species at once, with the conductivity at
+      each node found once
+    - removed _dTedX_mass_flux_at_interface(): its flux is now found for all species at once by
+      the function added above
+    - in find_Kstar_interface(), finds the mobility and temperature of all species at both
+      nodes before the double loop
+    - in find_Semfield(), finds the mass flux due to the electron temperature gradient of all
+      species once per interface instead of once per species and interface
+    - in find_Dstarmat(), finds the mobility of the charged species and sigma once
+    - in find_Dstar(), finds the mobility of the charged species and sigma once
+
 2026 NOV 09a
   * within _Navier-Stokes_plasma and _Favre-Reynolds_plasma, TEMODEL is TEMODEL_CONSTANT,
     TEMODEL_TEQUILIBRIUM, TEMODEL_TVEQUILIBRIUM, TEMODEL_LOCAL or TEMODEL_TRANSPORT_PARENT2024;

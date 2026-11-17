@@ -179,11 +179,13 @@ double _alpha(np_t *np, gl_t *gl, long l, long k, long r){
 
 void find_alpha(np_t *np, gl_t *gl, long l, spec2_t alpha){
   long k,r;
-  double sigma;
+  double sigma,muk,Nk;
   sigma=_sigma_positive(np,gl,l);
   for (k=0; k<ns; k++){
+    muk=_mu(np,gl,l,k);
+    Nk=_Nk(np[l],gl,k);
     for (r=0; r<ns; r++){
-      alpha[k][r]=_calM(k)/_calM(r)*(_delta(r,k)+_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)*_Nk(np[l],gl,k)/sigma);
+      alpha[k][r]=_calM(k)/_calM(r)*(_delta(r,k)+_betaa(gl,k)*_C(r)*muk*Nk/sigma);
       
     }
 #ifndef NDEBUG
@@ -214,9 +216,15 @@ void find_Z(np_t *np, gl_t *gl, long l, sqmat_t Z) {
 
 
 void find_dZU_dU(np_t *np, gl_t *gl, long l, sqmat_t dZU_dU){
-  double sigma,dsigma_drhom;
+  double sigma;
   long k,r,m;
+  spec_t mu,rhok,dsigma_drhom;
   sigma=_sigma_positive(np,gl,l);
+  for (k=0; k<ns; k++){
+    mu[k]=_mu(np,gl,l,k);
+    rhok[k]=_rhok(np[l],k);
+    dsigma_drhom[k]=_C(k)*mu[k]/_m(k);
+  }
 
   set_matrix_to_identity(dZU_dU);
 
@@ -224,13 +232,12 @@ void find_dZU_dU(np_t *np, gl_t *gl, long l, sqmat_t dZU_dU){
   for (k=0; k<ns; k++){
     for (r=0; r<ns; r++){
       /* wrt rhok[k] */
-      dZU_dU[k][k]+=1.0/_m(r)*_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)/sigma*_rhok(np[l],r);
+      dZU_dU[k][k]+=1.0/_m(r)*_betaa(gl,k)*_C(r)*mu[k]/sigma*rhok[r];
       /* wrt rhok[r] */
-      dZU_dU[k][r]+=1.0/_m(r)*_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)*_rhok(np[l],k)/sigma;
+      dZU_dU[k][r]+=1.0/_m(r)*_betaa(gl,k)*_C(r)*mu[k]*rhok[k]/sigma;
       /* wrt sigma */
       for (m=0; m<ns; m++){
-        dsigma_drhom=_C(m)*_mu(np,gl,l,m)/_m(m);
-        dZU_dU[k][m]+=-1.0/_m(r)*_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)*_rhok(np[l],k)/sqr(sigma)*_rhok(np[l],r)*dsigma_drhom; 
+        dZU_dU[k][m]+=-1.0/_m(r)*_betaa(gl,k)*_C(r)*mu[k]*rhok[k]/sqr(sigma)*rhok[r]*dsigma_drhom[m]; 
       }
     }
   }
@@ -738,6 +745,7 @@ void find_Se(np_t *np, gl_t *gl, long l, flux_t S){
 static void find_dSe_dU_transport_Parent2024(np_t *np, gl_t *gl, long l, sqmat_t dSedU){
   long row,col,flux,spec;
   double k1,T,Te,Tref,dTe,Ntotal,lnLambda;
+  double mueNk,EoverNk_plus_dTe,EoverNk,Te_pow_m05,Te_pow_m15,Te_pow_m25,fact[1];
   spec_t N,rhok;
   flux_t dTdU,dTedU;
   for (row=0; row<nf; row++) {
@@ -758,41 +766,51 @@ static void find_dSe_dU_transport_Parent2024(np_t *np, gl_t *gl, long l, sqmat_t
   find_dT_dU(np[l], gl, dTdU);
   find_dTe_dU(np[l], gl, dTedU);
   lnLambda=_lnLambda(rhok, Te);
+  Te_pow_m05=pow(Te,-0.5);
+  Te_pow_m15=pow(Te,-1.5);
+  Te_pow_m25=pow(Te,-2.5);
   for (spec=0; spec<ns; spec++){
     if (speciestype[spec]==SPECIES_NEUTRAL){
+      mueNk=_mueNk_from_Te(gl,spec,Te);
+      EoverNk_plus_dTe=_EoverNk_from_Te(spec, Te+dTe);
+      EoverNk=_EoverNk_from_Te(spec, Te);
       //      *Qe+=N[speceminus]*N[spec]*fabs(_C(speceminus))*_mueNk_from_Te(gl,spec,Te)*max(sqr(_EoverNk_from_Te(spec, Te))-3.0*kB*max(0.0,Te-Tref)/(_m(spec)*sqr(_mueNk_from_Te(gl,spec,Te))),0.0);
 
       // wrt Te
-      for (flux=0; flux<nf; flux++) dSedU[fluxee][flux]-=
-        +(N[speceminus]*N[spec]*fabs(_C(speceminus))*_mueNk_from_Te(gl,spec,Te)*max(sqr(_EoverNk_from_Te(spec, Te+dTe))-3.0*kB*max(0.0,Te-Tref)/(_m(spec)*sqr(_mueNk_from_Te(gl,spec,Te))),0.0)
-         -N[speceminus]*N[spec]*fabs(_C(speceminus))*_mueNk_from_Te(gl,spec,Te)*max(sqr(_EoverNk_from_Te(spec, Te))    -3.0*kB*max(0.0,Te-Tref)/(_m(spec)*sqr(_mueNk_from_Te(gl,spec,Te))),0.0))/dTe*dTedU[flux];
+      fact[0]=+(N[speceminus]*N[spec]*fabs(_C(speceminus))*mueNk*max(sqr(EoverNk_plus_dTe)-3.0*kB*max(0.0,Te-Tref)/(_m(spec)*sqr(mueNk)),0.0)
+         -N[speceminus]*N[spec]*fabs(_C(speceminus))*mueNk*max(sqr(EoverNk)    -3.0*kB*max(0.0,Te-Tref)/(_m(spec)*sqr(mueNk)),0.0))/dTe;
+      for (flux=0; flux<nf; flux++) dSedU[fluxee][flux]-=fact[0]*dTedU[flux];
       // wrt rhoe
-      dSedU[fluxee][speceminus]-=1.0/_m(speceminus)*fabs(_C(speceminus))*N[spec]*_mueNk_from_Te(gl,spec,Te)*max(sqr(_EoverNk_from_Te(spec, Te))-3.0*kB*max(0.0,Te-Tref)/(_m(spec)*sqr(_mueNk_from_Te(gl,spec,Te))),0.0);
+      dSedU[fluxee][speceminus]-=1.0/_m(speceminus)*fabs(_C(speceminus))*N[spec]*mueNk*max(sqr(EoverNk)-3.0*kB*max(0.0,Te-Tref)/(_m(spec)*sqr(mueNk)),0.0);
       // wrt N[spec]
-      dSedU[fluxee][spec]-=N[speceminus]*fabs(_C(speceminus))*_mueNk_from_Te(gl,spec,Te)/_m(spec)*max(sqr(_EoverNk_from_Te(spec, Te))-3.0*kB*max(0.0,Te-Tref)/(_m(spec)*sqr(_mueNk_from_Te(gl,spec,Te))),0.0);
+      dSedU[fluxee][spec]-=N[speceminus]*fabs(_C(speceminus))*mueNk/_m(spec)*max(sqr(EoverNk)-3.0*kB*max(0.0,Te-Tref)/(_m(spec)*sqr(mueNk)),0.0);
 
 
 //    *Qe+=3.0*kB*fabs(_C(speceminus))*(Te-T)*rhok[speceminus]*rhok[spec]/(_m(speceminus)*sqr(_m(spec))*_mueNk_from_Te(gl,spec,Te));
       // wrt T
-      for (flux=0; flux<nf; flux++) dSedU[fluxee][flux]-=-3.0*kB*fabs(_C(speceminus))*rhok[speceminus]*rhok[spec]/(_m(speceminus)*sqr(_m(spec))*_mueNk_from_Te(gl,spec,Te))*dTdU[flux];
+      fact[0]=-3.0*kB*fabs(_C(speceminus))*rhok[speceminus]*rhok[spec]/(_m(speceminus)*sqr(_m(spec))*mueNk);
+      for (flux=0; flux<nf; flux++) dSedU[fluxee][flux]-=fact[0]*dTdU[flux];
       // wrt Te
-      for (flux=0; flux<nf; flux++) dSedU[fluxee][flux]-=3.0*kB*fabs(_C(speceminus))*rhok[speceminus]*rhok[spec]/(_m(speceminus)*sqr(_m(spec))*_mueNk_from_Te(gl,spec,Te))*dTedU[flux];
+      fact[0]=3.0*kB*fabs(_C(speceminus))*rhok[speceminus]*rhok[spec]/(_m(speceminus)*sqr(_m(spec))*mueNk);
+      for (flux=0; flux<nf; flux++) dSedU[fluxee][flux]-=fact[0]*dTedU[flux];
       // wrt rhoe
-      dSedU[fluxee][speceminus]-=3.0*kB*fabs(_C(speceminus))*(Te-T)*rhok[spec]/(_m(speceminus)*sqr(_m(spec))*_mueNk_from_Te(gl,spec,Te));
+      dSedU[fluxee][speceminus]-=3.0*kB*fabs(_C(speceminus))*(Te-T)*rhok[spec]/(_m(speceminus)*sqr(_m(spec))*mueNk);
       // wrt rhok[spec]
-      dSedU[fluxee][spec]-=3.0*kB*fabs(_C(speceminus))*(Te-T)*rhok[speceminus]/(_m(speceminus)*sqr(_m(spec))*_mueNk_from_Te(gl,spec,Te));
+      dSedU[fluxee][spec]-=3.0*kB*fabs(_C(speceminus))*(Te-T)*rhok[speceminus]/(_m(speceminus)*sqr(_m(spec))*mueNk);
     }
     if (speciestype[spec]==SPECIES_IONPLUS || speciestype[spec]==SPECIES_IONMINUS){
       //*Qe+=rhok[speceminus]*rhok[spec]*(pow(Te,-0.5)-T*pow(Te,-1.5))*k1;
       k1=pow(pi*_m(speceminus)/8.0/kB,1.5)*6.0*kB*sqr(_C(spec))*sqr(_C(speceminus))*lnLambda/(powint(pi,3)*sqr(epsilon0*_m(speceminus)*_m(spec)));
       // wrt rhoe
-      dSedU[fluxee][speceminus]-=rhok[spec]*(pow(Te,-0.5)-T*pow(Te,-1.5))*k1;
+      dSedU[fluxee][speceminus]-=rhok[spec]*(Te_pow_m05-T*Te_pow_m15)*k1;
       // wrt rhok[spec]
-      dSedU[fluxee][spec]-=rhok[speceminus]*(pow(Te,-0.5)-T*pow(Te,-1.5))*k1;
+      dSedU[fluxee][spec]-=rhok[speceminus]*(Te_pow_m05-T*Te_pow_m15)*k1;
       // wrt T
-      for (flux=0; flux<nf; flux++) dSedU[fluxee][flux]-=rhok[speceminus]*rhok[spec]*(-pow(Te,-1.5))*k1*dTdU[flux];
+      fact[0]=rhok[speceminus]*rhok[spec]*(-Te_pow_m15)*k1;
+      for (flux=0; flux<nf; flux++) dSedU[fluxee][flux]-=fact[0]*dTdU[flux];
       // wrt Te
-      for (flux=0; flux<nf; flux++) dSedU[fluxee][flux]-=rhok[speceminus]*rhok[spec]*(-0.5*pow(Te,-1.5)+1.5*T*pow(Te,-2.5))*k1*dTedU[flux];
+      fact[0]=rhok[speceminus]*rhok[spec]*(-0.5*Te_pow_m15+1.5*T*Te_pow_m25)*k1;
+      for (flux=0; flux<nf; flux++) dSedU[fluxee][flux]-=fact[0]*dTedU[flux];
     }
   }
 }
@@ -920,6 +938,7 @@ void find_Dstar(np_t *np, gl_t *gl, long l, long theta, metrics_t metricsint, fl
   dim_t dTedx,V,dTkdx;
   EXM_vec3D_t Vk,Ve,E,DeltaVr;
   double T,Te,etstar,Vkstar,Vestar,hk,Estar;
+  spec_t mu;
   
   //find_metrics_at_node(np, gl, l, theta, &metricsint);
   for (row=0; row<nf; row++){
@@ -939,6 +958,7 @@ void find_Dstar(np_t *np, gl_t *gl, long l, long theta, metrics_t metricsint, fl
   Te=_Te(np[l]);
   etstar=_etstar(np[l]);
   sigma=_sigma_positive(np,gl,l);
+  for (k=0; k<ns; k++) mu[k]=_mu(np,gl,l,k);
 
   for (r=0; r<ns; r++){
     find_DeltaVk(np, gl, l, r, DeltaVr);
@@ -949,7 +969,7 @@ void find_Dstar(np_t *np, gl_t *gl, long l, long theta, metrics_t metricsint, fl
     Dstar[r]+=_betac(r)*DeltaVrstar;
     
     for (k=0; k<ns; k++){
-      Dstar[k]+=1.0/_m(r)*_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)*_betac(k)*_betac(r)*(DeltaVrstar+Vstar)/sigma*_rhok(np[l],r);
+      Dstar[k]+=1.0/_m(r)*_betaa(gl,k)*_C(r)*mu[k]*_betac(k)*_betac(r)*(DeltaVrstar+Vstar)/sigma*_rhok(np[l],r);
     }
   }
 
@@ -1146,6 +1166,7 @@ void find_Dstarmat(np_t *np, gl_t *gl, long l, long theta, sqmat_t Dstar) {
   dim_t dTedx,dTdx;
   EXM_vec3D_t Vk,Ve,E;
   double T,Te,etstar,Vkstar,Vestar,hk,Estar;
+  spec_t mu;
   
   for (row=0; row<nf; row++){
     for (col=0; col<nf; col++){
@@ -1161,13 +1182,14 @@ void find_Dstarmat(np_t *np, gl_t *gl, long l, long theta, sqmat_t Dstar) {
   Te=_Te(np[l]);
   etstar=_etstar(np[l]);
   sigma=_sigma_positive(np,gl,l);
+  for (k=0; k<ns; k++) mu[k]=_mu(np,gl,l,k);
 
   for (r=0; r<ns; r++){
     DeltaVrstar=_DeltaVkstar(np,gl,l,r,theta);
     Dstar[r][r]+=_betac(r)*DeltaVrstar;
     
     for (k=0; k<ns; k++){
-      Dstar[k][k]+=1.0/_m(r)*_betaa(gl,k)*_C(r)*_mu(np,gl,l,k)*_betac(k)*_betac(r)*(DeltaVrstar+Vstar)/sigma*_rhok(np[l],r);
+      Dstar[k][k]+=1.0/_m(r)*_betaa(gl,k)*_C(r)*mu[k]*_betac(k)*_betac(r)*(DeltaVrstar+Vstar)/sigma*_rhok(np[l],r);
     }
   }
 
